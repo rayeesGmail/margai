@@ -1,0 +1,42 @@
+# OS / IDE
+.DS_Store
+.idea/
+*.iml
+.vscode/
+
+# Secrets and local env (also blocked by scripts/block-paths.sh)
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.p12
+*.jks
+
+# Claude Code local-only settings
+.claude/settings.local.json
+
+# Eval gate stamp (written by eval/run.sh, read by scripts/precommit-gate.sh)
+eval/.last-pass
+
+# Server (Maven)
+server/target/
+server/.mvn/wrapper/*.jar
+
+# App (Flutter)
+app/.dart_tool/
+app/build/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/.packages
+app/android/.gradle/
+app/android/local.properties
+app/android/key.properties
+app/ios/Pods/
+
+# Pipeline
+pipeline/.venv/
+pipeline/__pycache__/
+pipeline/**/__pycache__/
+pipeline/data/

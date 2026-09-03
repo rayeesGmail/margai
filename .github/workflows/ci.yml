@@ -1,0 +1,83 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guardrails:
+    name: guardrails (scripts + secret scan)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shell syntax
+        run: bash -n scripts/*.sh eval/run.sh
+      - name: Secret scan over the whole tree
+        run: scripts/detect-secrets.sh --scan-tree
+
+  server:
+    name: server (mvnw verify)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe for the Maven wrapper
+        id: probe
+        run: |
+          if [ -x server/mvnw ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=server skipped::server/mvnw is not present yet (arrives D2)"
+          fi
+      - uses: actions/setup-java@v4
+        if: steps.probe.outputs.present == 'true'
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: mvnw verify
+        if: steps.probe.outputs.present == 'true'
+        run: cd server && ./mvnw -B verify
+
+  app:
+    name: app (flutter analyze + test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe for the Flutter project
+        id: probe
+        run: |
+          if [ -f app/pubspec.yaml ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=app skipped::app/pubspec.yaml is not present yet (arrives D2)"
+          fi
+          if [ -d app/test ]; then echo "tests=true" >> "$GITHUB_OUTPUT"; else echo "tests=false" >> "$GITHUB_OUTPUT"; fi
+      - uses: subosito/flutter-action@v2
+        if: steps.probe.outputs.present == 'true'
+        with:
+          channel: stable
+          cache: true
+      - name: flutter pub get + analyze
+        if: steps.probe.outputs.present == 'true'
+        run: cd app && flutter pub get && flutter analyze
+      - name: flutter test
+        if: steps.probe.outputs.present == 'true' && steps.probe.outputs.tests == 'true'
+        run: cd app && flutter test
+
+  eval:
+    name: eval gate (placeholder until D23)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run eval/run.sh
+        run: eval/run.sh

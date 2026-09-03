@@ -1,0 +1,27 @@
+# Local development stack. Day-1 scope: the database only.
+#   docker compose up db
+# Extensions (vector, pg_trgm) are created by the first Flyway migration (D4), not here,
+# so local and RDS start from the same state. Credentials below are local-only defaults.
+name: margai
+
+services:
+  db:
+    image: pgvector/pgvector:pg18
+    container_name: margai-db
+    environment:
+      POSTGRES_DB: margai
+      POSTGRES_USER: margai
+      POSTGRES_PASSWORD: margai
+    ports:
+      - "5432:5432"
+    volumes:
+      # PostgreSQL 18 images keep the cluster under /var/lib/postgresql/18/; mount the parent.
+      - margai-db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U margai -d margai"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  margai-db-data:

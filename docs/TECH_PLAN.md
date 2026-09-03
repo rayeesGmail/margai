@@ -1063,11 +1063,219 @@ concept sentence, anchor line, optional trap note, ≤ 350 words, no meta-talk, 
 
 ## 5. Flutter app
 
-_Written in task 6._
+### 5.1 Layers and layout
+
+```
+app/lib/
+  main.dart                 ProviderScope + bootstrap (config, storage, locale)
+  app.dart                  MaterialApp.router, theme, localisation delegates
+  core/
+    api/                    ApiClient (dio), interceptors, ApiFailure, envelope mapping
+    auth/                   TokenStore (secure storage), AuthState notifier, refresh logic
+    config/                 AppConfig from --dart-define (API_BASE_URL, POSTHOG_KEY, RAZORPAY_KEY_ID)
+    l10n/                   generated AppLocalizations, LanguageMapper (server value ↔ Locale)
+    offline/                drift database, outbox, SyncWorker (D34)
+    router/                 go_router config, guards, deep links
+    theme/                  Material 3 theme, spacing, one-hand layout constants
+    widgets/                shared widgets (mentor bubble, reason line, anchor chip, offline banner)
+  features/
+    <feature>/
+      models.dart           immutable data classes for wire shapes
+      repository.dart       calls ApiClient, maps to models, owns caching for the feature
+      providers.dart        Riverpod Notifier/AsyncNotifier classes and derived providers
+      screens/              one file per SPEC §8 screen
+      widgets/              feature-local widgets
+```
+
+Rule from `.claude/rules/app.md`: no logic in widgets. Widgets read providers and dispatch intents;
+repositories talk to the API; notifiers hold state and orchestrate. A screen file that starts
+computing is a smell the reviewer rejects.
+
+### 5.2 State (Riverpod 3)
+
+- `Notifier` for synchronous state, `AsyncNotifier` for anything that loads; `ref.watch` in
+  widgets, `ref.read` in callbacks; `select` to narrow rebuilds on the Today screen.
+- Providers are declared by hand (no `riverpod_generator`) until drift brings `build_runner` at D34;
+  the decision is revisited then in DECISIONS.md, not before.
+- Global providers: `authStateProvider`, `meProvider` (the `/me` payload), `localeProvider`,
+  `connectivityProvider`, `outboxProvider`. Feature providers depend on those, never on each other's
+  internals.
+- Tests inject fake repositories through `ProviderScope(overrides: …)` (§8.5).
+
+### 5.3 Navigation and deep links
+
+go_router with a `StatefulShellRoute` for the bottom bar **Today · Practice · Doubts · Notebook ·
+Profile** (SPEC §8) and full-screen routes above it. Redirect guard: no tokens → `/login`;
+onboarding incomplete → `/onboarding`; `mode = silence` shows the exam-eve/silence variant of Today.
+Deep links from notifications: `margai://today`, `margai://practice/{block_id}`,
+`margai://doubts/{id}`, `margai://notebook/due`, `margai://report/weekly`.
+
+### 5.4 ApiClient
+
+dio with interceptors, in order: request id (`X-Request-Id` UUID, logged), app version and client
+time headers, bearer token, single-flight refresh on 401 `AUTH_EXPIRED` (one refresh in flight,
+queued requests retried once, `AUTH_INVALID` → logout), envelope mapping (`ApiFailure(code,
+messageEn, messageUser, details)`), connectivity fallback (`ApiFailure.offline` when there is no
+network, so screens show the honest offline state rather than a timeout). Timeouts: 10 s connect,
+30 s receive (doubt polling uses its own schedule). Base URL from `--dart-define=API_BASE_URL`
+(local emulator: `http://10.0.2.2:8081`).
+
+### 5.5 Localisation and the Hinglish decision
+
+- ARB files `app_en.arb`, `app_hi.arb`, `app_hi_Latn.arb`. `hi-Latn` is a valid BCP-47 tag (Hindi
+  in Latin script) that Flutter's gen-l10n supports through the script subtag, so Hinglish is a
+  first-class locale with no custom plumbing: `Locale.fromSubtags(languageCode: 'hi', scriptCode:
+  'Latn')`. `supportedLocales` lists all three.
+- `LanguageMapper` is the single place that maps the server value `en | hi | hinglish` to a `Locale`
+  and back. The value travels in `/me`, in the JWT `lang` claim and in generated content.
+- Device locale is only a suggestion for the mentor intro ("language auto-suggested, changeable",
+  SPEC §5); the chosen value is saved with `PATCH /me` and locally, and wins on every later start.
+- Hinglish copy is authored, not transliterated; the D67 mentor-voice pass reviews all three files.
+  Server-side copy (`messages_hinglish.properties`) follows the same authored approach.
+
+### 5.6 Offline and the outbox (D34)
+
+- drift (sqlite) tables: `cached_plan` (today + yesterday), `cached_questions` (today's practice
+  blocks from `GET /practice/offline-pack`), `cached_notebook_summary`, `outbox(id, kind, payload,
+  created_at, attempts, last_error)`.
+- Outbox kinds: `practice_answer`, `session_finish`, `block_status`, `mood`. Each carries its
+  `client_event_id`; the server upserts on it, so replays are harmless. `SyncWorker` drains the
+  outbox in order on app resume, on connectivity change and after each new entry; exponential
+  backoff; entries never dropped, only surfaced after 20 failures.
+- Doubts require network (`.claude/rules/app.md`); the capture screen shows the offline state and
+  offers to keep the photo locally until online (one item, not a queue).
+- **Open decision (§0.4 #4): verdicts while offline.**
+  - *Option A — offline pack carries judging data for today's own blocks (recommended).* The pack
+    includes `correct_key`, solution and anchor for the ≤ 75 questions scheduled for that student
+    that day, stored in drift and wiped after sync. The app judges locally for the verdict and
+    solution sheet; the server still judges every synced event and its verdict is what state,
+    notebook and streak use. Exposure: a student can read the keys to their own day's practice
+    before answering. Requires rewording the hard rule to "`correct_key` is never sent before a
+    question is served, except inside that student's offline pack for their own scheduled blocks;
+    all judging that changes state is server-side", and a D34 test that the pack is the only
+    carrier.
+  - *Option B — no verdicts offline.* Answers queue with no feedback; verdicts and solutions arrive
+    on sync. Keeps the rule word for word; contradicts SPEC §6.2's instant verdict for the train
+    scenario the rules themselves describe.
+  - The plan is written for Option A; switching to B removes the judging fields from
+    `GET /practice/offline-pack` and nothing else.
+
+### 5.7 Device capabilities and third-party SDKs
+
+| Need | Package | Day |
+|---|---|---|
+| OTP auto-read | `smart_auth` (Android SMS Retriever; no SMS permission) | D8 |
+| Camera with frame guide, gallery fallback, compression to ≤ 1.5 MB JPEG | `camera`, `image_picker`, `image` | D28, D38 |
+| Push | `firebase_core`, `firebase_messaging` (FCM) | D30 |
+| Payments | `razorpay_flutter` | D61 |
+| Analytics and crash reporting | `posthog_flutter` (events + PostHog error tracking) | D73 |
+| Tokens at rest | `flutter_secure_storage` | D8 |
+| Offline store | `drift`, `sqlite3_flutter_libs` | D34 |
+| Connectivity | `connectivity_plus` | D34 |
+| Answer rendering | `flutter_markdown`, `flutter_math_fork` (LaTeX) | D32, D40 |
+| Routing, HTTP, state | `go_router`, `dio`, `flutter_riverpod` | D8 |
+| Misc | `intl`, `package_info_plus`, `url_launcher` (support links) | as needed |
+
+External services stay FCM, Razorpay and PostHog (`.claude/rules/app.md`). Crash-free ≥ 99.5%
+(SPEC §11) is measured with PostHog's error tracking; if it proves insufficient on Android,
+adding Crashlytics is a founder decision that amends the rule (§13.4).
+
+### 5.8 Screen → route → owner
+
+| SPEC §8 screen | Route | Feature / notifier | Day |
+|---|---|---|---|
+| 1 Splash/Login | `/login`, `/login/otp` | `auth` · `LoginNotifier` | D8 |
+| 2 Onboarding interview | `/onboarding/{step}` | `onboarding` · `InterviewNotifier`, `SyllabusGridNotifier` | D25–D26 |
+| 3 Document capture + confirm | `/documents/{type}` | `documents` · `DocumentCaptureNotifier` | D28–D29 |
+| 4 Parent consent | `/onboarding/consent` | `account` · `ConsentNotifier` | D27 |
+| 5 First-plan reveal | `/onboarding/plan` | `onboarding` · `FirstPlanNotifier` | D29 |
+| 6 Diagnostic intro + session | `/practice/diagnostic` | `practice` · `SessionNotifier(kind: diagnostic)` | D35 |
+| 7 Today | `/today` | `planner` · `TodayNotifier`, `MoodNotifier`, `PlanChatNotifier` | D29, D33, D58 |
+| 8 Practice session + summary | `/practice/{session_id}`, `/practice/{session_id}/summary` | `practice` · `SessionNotifier`, `SummaryNotifier` | D32–D33 |
+| 9 Doubt capture, answer, history | `/doubts`, `/doubts/new`, `/doubts/{id}` | `doubts` · `DoubtCaptureNotifier`, `DoubtAnswerNotifier`, `DoubtHistoryNotifier` | D38, D40, D46 |
+| 10 Notebook views | `/notebook`, `/notebook/entries`, `/notebook/healed`, `/notebook/danger` | `notebook` · `NotebookNotifier` | D50, D52 |
+| 11 Weekly report | `/report/weekly` | `trajectory` · `WeeklyReportNotifier` | D58 |
+| 12 Paywall · subscription | `/paywall?trigger=`, `/profile/subscription` | `billing` · `PaywallNotifier`, `SubscriptionNotifier` | D61–D63 |
+| 13 Profile & settings | `/profile`, `/profile/*` | `account` · `SettingsNotifier` | D10, D64 |
+| 14 Exam-mode Today | `/today` (variant by `mode`) | `planner` | with D55–D59, D68 |
+| 15 Result flows | — | Phase 2 | — |
+
+### 5.9 Build flavours
+
+`--dart-define` for `API_BASE_URL`, `POSTHOG_KEY`, `RAZORPAY_KEY_ID`, `ENV`. Debug builds point at
+the emulator host; the D74 internal-track build points at the beta ALB. Release signing keys are
+human-held and never in the tree (`key.properties` is gitignored).
 
 ## 6. Content pipeline
 
-_Written in task 6._
+### 6.1 Where it runs and why
+
+AI-touching pipeline steps are Java, inside the server image, under the `pipeline` Spring profile
+with picocli commands (`java -jar server.jar --spring.profiles.active=pipeline,bedrock <command>`).
+Reason: `.claude/rules/pipeline.md` requires every pipeline AI call to go through `AiClient` with the
+cost ledger, and the entities, Flyway schema and `HybridRetriever` already exist there. PDF page
+rendering uses PDFBox; paragraph extraction uses the VISION tier on page images rather than text
+extraction, because NCERT layout (two columns, equations, boxed examples, Hindi legacy fonts in older
+scans) defeats text extractors and the buffer day D18 exists for exactly that mess. The top-level
+`pipeline/` directory holds founder-owned inputs (`pipeline/data/*.csv`, `*.yaml`), per-run reports
+(`pipeline/reports/`) and its README. Alternative recorded and rejected for now: Python extraction to
+JSONL plus Java ingest (two toolchains, and the AI calls would still need the Java seam).
+
+### 6.2 Founder-owned inputs (data files in the repo, never edited by the pipeline)
+
+| File | Content | Used by |
+|---|---|---|
+| `pipeline/data/taxonomy.csv` | `code, subject, class_level, parent_code, kind, name_en, name_hi, sort_order, default_learn_minutes, neet_relevant` | `taxonomy load` (D13) |
+| `pipeline/data/prerequisites.csv` | `from_code, to_code` | `taxonomy prerequisites` (D13) |
+| `pipeline/data/archetypes.yaml` | tracks with ordered steps `(node_code, phase, target_week)` | `backbone load` (D13; educator review F3 by W8) |
+| `pipeline/data/cutoffs.csv` | `year, category, quota_scope, seat_type, qualifying_marks, source` | `cutoffs load` |
+| `pipeline/data/books.yaml` | book codes, titles, edition year, S3 keys of the PDFs | `ncert register` (D14) |
+| `pipeline/data/papers/<exam>-<year>.json` | PYQ papers as structured JSON (stem, options, key, paper code) | `pyq load` (D19) |
+
+Source PDFs, page images, JSONL artefacts and eval snapshots live in the content bucket, not in git.
+
+### 6.3 Commands, order and natural keys
+
+| Command | PLAN day | Upsert key | Report the founder spot-checks |
+|---|---|---|---|
+| `taxonomy load` · `taxonomy prerequisites` | D13 | `syllabus_nodes.code`; `(from, to)` | nodes per subject/kind, orphans, **cycle check** (Kahn's algorithm; non-empty remainder fails the run) |
+| `backbone load` · `cutoffs load` | D13 | `archetype_tracks.code` + sequence; cutoff natural key | steps per track, nodes not in any track |
+| `ncert register` | D14 | `ncert_books.code` | — |
+| `ncert render --book --lang` | D14 | page image key `pages/{book}/{lang}/{page}.png` | pages rendered |
+| `ncert extract --book --lang [--pages]` | D14–D15 | JSONL `extract/{book}/{lang}.jsonl`; one VISION call per page with the previous page's tail for paragraph continuity; output `{chapter_no, section, para_no, text, has_equations, figure_refs, confidence}` | pages processed, paragraphs, low-confidence pages, cost |
+| `ncert load --book --lang` | D14–D15 | `(book_id, chapter_no, section, para_no)` | paragraphs upserted; **coverage % per book** (PLAN D15 ✅) |
+| `ncert align --book` | D16 | same key | EN↔HI pairs by section and order, embedding-similarity outliers listed for the 20-pair check |
+| `ncert embed --book` | D17 | paragraph id | embedded count; the 15 concept queries from `eval/retrieval-queries.json` run and print top-3 |
+| `pyq load --paper` | D19 | `(source, exam, year, paper_code, question_no)` | **counts per year/subject** vs the paper's official count |
+| `pyq solve --year --subject` | D20 | question id; skips `verified = true` | solutions written, cost; 50-question audit sample listed |
+| `pyq verify --year --subject` | D20–D21 | question id | verified vs flagged; flagged → `audit_queue(pipeline_flag)` |
+| `pyq distractors --year --subject` | D21 | question id | distractor maps written; 10% sample listed |
+| `stats compute` | D22 | node id | **top-10 weightage chapters** (PLAN D22 ✅), difficulty distribution |
+| `traps mine` | D22 | `(node_id, note)` with evidence rows | traps per node with their PYQ ids |
+| `anchors link` | D23 | `(question_id, paragraph_id)` | anchor coverage %, questions with none |
+| `eval snapshot` | D23 | — | dumps curriculum tables to `snapshots/<date>/` for the eval database |
+| `questions generate --node --target 30` | unscheduled (SPEC §9.3; §12.2) | generated question ids | verified vs rejected, audit sample |
+| `cache seed --top 500` | D76 | `(question_hash, language)` | hits primed, cost |
+
+Every command is idempotent and re-runnable, fails loudly and never half-writes (one transaction
+per natural-key batch). Each writes `pipeline/reports/<date>-<command>.md`, which is committed as
+the evidence for that day's ✅ check.
+
+### 6.4 Embedding language choice
+
+`ncert embed` embeds `text_en` (canonical) with the multilingual model; Hindi and Hinglish queries
+rely on the model's cross-lingual space plus the `tsv` match on `text_hi` in the hybrid retriever.
+The D17 acceptance (15 hand-written concept queries, at least 5 in Hindi) decides whether a second
+pass embedding `text_hi` into a separate column is needed; that would be a D18 buffer item.
+
+### 6.5 Stats and exam intelligence (D22)
+
+`weightage_marks_avg` per node = mean over the last 15 years of (questions tagged to the node or its
+descendants × 4 marks). `difficulty` for PYQs starts as a REASON-tier estimate on a 0–1 scale
+(recalibrated from `practice_events` once students exist). `default_learn_minutes` comes from the
+taxonomy CSV. `traps mine` clusters a node's PYQs by distractor concept and asks the CHEAP tier for
+a one-line "how NTA twists this" note per cluster with ≥ 2 supporting questions; the evidence rows
+are written first, the note second, so an unbacked note cannot exist.
 
 ## 7. Infrastructure (AWS ap-south-1)
 

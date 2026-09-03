@@ -579,7 +579,243 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
 
 ## 3. API surface
 
-_Written in task 4._
+### 3.1 Ground rules
+
+- Base path `/api/v1`, JSON only (multipart for the two image uploads). Field names snake_case;
+  timestamps ISO-8601 UTC (`2026-09-03T01:30:00Z`); dates `YYYY-MM-DD` and always IST calendar
+  dates; money `{amount_paise, currency}`; ids UUID strings.
+- Additive changes only within v1 (new optional fields, new endpoints). A breaking change is a v2
+  path, which the MVP does not plan to need.
+- Every response carries `X-Request-Id`. Clients send `X-App-Version` and `X-Client-Time`
+  (for clock-skew diagnostics in OTP flows, PLAN D9).
+- Copy returned to the client is codes plus text in both `en` and the user's language, never text
+  alone; generated content (plans, answers) comes in the user's language with a `language` field.
+- `correct_key` appears in exactly one response: the judged answer for that one question (§3.7).
+  Question payloads before judging never contain it; a test enforces this (§8.4).
+
+### 3.2 Authentication and tokens
+
+- `POST /auth/otp/request` sends a 6-digit code through MSG91 (DLT template); the code is stored
+  hashed with a pepper; 5-minute expiry; 5 attempts per challenge; 30-second resend cooldown.
+- `POST /auth/otp/verify` returns `{access_token, refresh_token, expires_in, is_new_user, user}`.
+  Access token: JWT HS256, 15 minutes, claims `sub` (user id), `role`, `lang`, `jti`. Refresh
+  token: opaque 256-bit random, 30 days, stored as SHA-256 in `refresh_tokens`, one family per
+  device; each refresh rotates the token and links `replaced_by_id`.
+- Reuse of a rotated refresh token revokes the whole family and returns `AUTH_INVALID`; the app
+  returns to login (DEV_SPEC §5, PLAN D10 "token rotation").
+- `POST /auth/logout` revokes the family. Account deletion revokes every family.
+- Admin endpoints (§3.7 ops) require `role = admin`; the founder's user row is flagged by hand.
+
+### 3.3 Error envelope and codes
+
+```json
+{ "error": { "code": "DOUBT_LIMIT_REACHED",
+             "message_en": "You've used today's 5 free solves.",
+             "message_user_lang": "Aaj ke 5 free solves ho gaye.",
+             "details": { "resets_at": "2026-09-04T00:00:00+05:30", "paywall_trigger": "doubt_limit" } } }
+```
+
+| HTTP | Codes |
+|---|---|
+| 400 | `VALIDATION_FAILED` (details: field → message), `IMAGE_UNREADABLE`, `IDEMPOTENCY_CONFLICT` (same key, different body) |
+| 401 | `AUTH_REQUIRED`, `AUTH_EXPIRED` (refresh now), `AUTH_INVALID` (re-login), `OTP_INVALID`, `OTP_EXPIRED` |
+| 403 | `FORBIDDEN`, `CONSENT_REQUIRED` (minor without parent consent, DEV_SPEC §8.4), `PRO_REQUIRED` (details: paywall_trigger) |
+| 404 | `NOT_FOUND` |
+| 409 | `STATE_CONFLICT` (e.g. answering a finished session, onboarding step out of order) |
+| 422 | `DOUBT_LIMIT_REACHED` (details: resets_at), `DOUBT_UNVERIFIED` (the honest fallback, with the audit reference), `NOT_A_QUESTION` (photo has no question) |
+| 429 | `RATE_LIMITED` (header `Retry-After`), `OTP_RATE_LIMITED` |
+| 502/503 | `AI_UNAVAILABLE` (Bedrock failure after retries, DEV_SPEC §4.1 "couldn't solve this right now"), `AI_BUDGET_EXCEEDED` (breaker; details: degraded mode) |
+| 500 | `INTERNAL` (request id in details; never a stack trace) |
+
+Messages come from `messages_{en,hi,hinglish}.properties` in `common` (server-side copy); the
+app's ARB files own client copy. Both sides use the same code strings.
+
+### 3.4 Rate limits (per user unless noted; values are config, defaults shown)
+
+| Scope | Limit |
+|---|---|
+| default, authenticated | 60 requests/min |
+| `/auth/otp/request` | 3/hour per phone, 10/hour per IP |
+| `/auth/otp/verify` | 5 attempts per challenge |
+| `POST /doubts` | 10/min, plus the free-tier and fair-use rules in §4.4 |
+| `POST /plan/negotiate` | 10/min |
+| `POST /documents` | 6/hour |
+| `POST /billing/webhook` | none (signature-verified, idempotent) |
+
+Implemented as in-process token buckets (Bucket4j) keyed by user id, phone or IP. This assumes one
+API instance, which is the beta topology; the second-instance path is a shared store (§13.3).
+
+### 3.5 Idempotency
+
+Routes marked **Idem** below require `Idempotency-Key` (client-generated UUID). The filter stores
+`(key, user_id) → response` for 24 hours and replays it on a repeat; a repeat with a different body
+hash returns `IDEMPOTENCY_CONFLICT`. Practice answers and block-status updates carry a
+`client_event_id` in the body instead, because they arrive from the offline outbox in bulk (§5.6).
+`POST /billing/webhook` is idempotent on Razorpay's event id (`billing_events`).
+
+### 3.6 Long-running work
+
+Nothing streams before D69. A doubt solve has a 25-second budget; if the pipeline is still
+verifying or the request was queued by fair use, the response is `202` with `status: pending|queued`
+and the client polls `GET /doubts/{id}` every 2 s with backoff (the same object, eventually
+`answered` or `unverified_fallback`). Exports follow the same pattern. Streaming (SSE on the same
+routes, flag `margai.flags.streaming`) is the D69 change and does not alter these shapes.
+
+### 3.7 Endpoint catalog
+
+Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless noted.
+
+**Auth (`auth`)**
+
+| Method, path | Day | Request → response | Notes |
+|---|---|---|---|
+| `POST /auth/otp/request` | D7 | `{phone}` → `{challenge_id, resend_after_s}` | public; SMS provider sandbox until F1 |
+| `POST /auth/otp/verify` | D7 | `{challenge_id, code}` → tokens + `user` + `is_new_user` | public; creates `users` + empty `student_profiles` on first login (D10) |
+| `POST /auth/refresh` | D7 | `{refresh_token}` → tokens | public; rotation + reuse detection |
+| `POST /auth/logout` | D10 | `{refresh_token}` → 204 | |
+
+**Account (`account`)**
+
+| Method, path | Day | Request → response | Notes |
+|---|---|---|---|
+| `GET /me` | D10 | → `{user, profile, subscription, limits, consent_state}` | one call on app start |
+| `PATCH /me` | D10 | `{language?, display_name?, morning_notification_time?, hours_weekday?, hours_weekend?, goal?, state_code?, category?}` → `me` | language switch regenerates future content only (DEV_SPEC §8.3) |
+| `POST /me/devices` | D30 | `{fcm_token, platform, app_version}` → 204 | upsert |
+| `DELETE /me/devices/{token}` | D30 | → 204 | on logout |
+| `POST /me/consent/request` | D27 | `{parent_phone}` → `{challenge_id}` | minors only |
+| `POST /me/consent/verify` | D27 | `{challenge_id, code}` → `{consent_state}` | unlocks `POST /documents` |
+| `POST /me/export` | D64 | → `202 {job_id}` | notebook PDF + JSON |
+| `GET /me/export/{job_id}` | D64 | → `{status, url?, expires_at?}` | 24-hour signed URL |
+| `DELETE /me` **Idem** | D64 | `{confirmation: "DELETE"}` → 202 | anonymise now, purge in 30 days (§2.10) |
+
+**Onboarding (`onboarding`)**
+
+| Method, path | Day | Request → response | Notes |
+|---|---|---|---|
+| `GET /onboarding/state` | D25 | → `{step, answers, next_prompt, options, syllabus_grid?}` | grid = nodes by subject with current `chapter_status` |
+| `PUT /onboarding/answers/{step}` | D25 | `{answer}` → `state` | upsert per step, back/edit allowed (PLAN D25 ✅) |
+| `PUT /onboarding/syllabus` | D26 | `{nodes: [{code, status, feels_weak}]}` → `state` | bulk, skippable |
+| `POST /onboarding/complete` | D29 | → `{plan, target_line, diagnostic_offer}` | deterministic first plan, < 6 s, no AI call |
+
+**Documents (`documents`)** — the SPEC §6.8 pattern
+
+| Method, path | Day | Request → response | Notes |
+|---|---|---|---|
+| `POST /documents` | D28 | multipart `{type, image}` → `{id, fields: [{name, value, confidence}], promise_copy}` | `CONSENT_REQUIRED` for minors; image ≤ 5 MB; types `neet_scorecard` D28, `board_marksheet` D29, `batch_timetable` unscheduled (§12.2) |
+| `POST /documents/{id}/confirm` | D28 | `{fields}` → `{applied_to}` | deletes the image, writes confirmed fields |
+| `POST /documents/{id}/discard` | D28 | → 204 | deletes the image |
+
+**Plan (`planner`)**
+
+| Method, path | Day | Request → response | Notes |
+|---|---|---|---|
+| `GET /plan/today` | D29 | → `{date, mode, mentor_note, blocks[], yesterday_unfinished[], streak, trajectory_card?, mood_prompt, exam_countdown}` | builds the fallback plan if none exists (DEV_SPEC §8.1) |
+| `GET /plan/week` | D58 | → `{days: [{date, blocks_summary, status}]}` | |
+| `POST /plan/blocks/{block_id}/status` | D33 | `{status, client_event_id, at}` → `{block, streak}` | outbox-safe |
+| `POST /plan/negotiate` | D58 | `{text}` → `{mentor_reply, plan?, trade_off}` | revised plan appears on Today immediately (SPEC §6.1) |
+| `GET /plan/messages` | D58 | `?cursor` → page of `mentor_messages` | |
+| `POST /plan/batch-position` | D26 | `{node_code, status}` → 204 | self-report layer; weekly-confirm card unscheduled (§12.2) |
+
+**Practice (`practice`)**
+
+| Method, path | Day | Request → response | Notes |
+|---|---|---|---|
+| `POST /practice/sessions` | D31 | `{block_id}` or `{kind: "diagnostic"}` → `{session_id, questions: [{id, stem, options, time_limit_s, anchor_hint}], total}` | **no `correct_key`**; band + NEET-relevance filter |
+| `POST /practice/sessions/{id}/answers` | D31 | `{question_id, chosen_key?, time_taken_ms, client_event_id}` → `{is_correct, correct_key, solution_md, anchor: {paragraph_id, display}, notebook_entry_id?}` | server judges; the only place `correct_key` is returned |
+| `POST /practice/sessions/{id}/finish` | D33 | → `{accuracy, avg_time_ms, norm_delta, sent_to_notebook: [...]}` | |
+| `GET /practice/sessions/{id}` | D33 | → session + summary | |
+| `GET /practice/offline-pack` | D34 | → today's practice blocks' questions (+ judging data per the §0.4 #4 decision) | cached by drift |
+| `POST /practice/diagnostic` | D35 | → session (30 questions, adaptive) | ability estimates update `chapter_status` |
+
+**Doubts (`doubts`)**
+
+| Method, path | Day | Request → response | Notes |
+|---|---|---|---|
+| `POST /doubts` **Idem** | D37 (photo D38) | `{text}` or multipart `{image}` → `200 doubt` or `202 {id, status}` | `doubt` = `{id, status, question_text, answer: {steps_md, concept_md, anchor: {paragraph_id, display}, nta_trap_md?, followups[], verified}, language, remaining_today: {fresh_left, weight_used}}` |
+| `GET /doubts/{id}` | D37 | → `doubt` | polling target |
+| `POST /doubts/{id}/followup` | D46 | `{text}` or `{chip_index}` → `doubt` (child) | keeps parent context |
+| `POST /doubts/{id}/report` | D40 | `{note}` → 204 | writes `audit_queue` |
+| `GET /doubts` | D46 | `?cursor` → page | history |
+| `GET /doubts/usage` | D44 | → `{fresh_left, cached_weight, resets_at, plan}` | meter |
+
+**Notebook (`notebook`)**
+
+| Method, path | Day | Request → response | Notes |
+|---|---|---|---|
+| `GET /notebook/summary` | D50 | → `{by_subject, by_cause, patterns_line?, free_cap: {limit: 30, shown, hidden}}` | |
+| `GET /notebook/entries` | D50 | `?cursor&subject&cause&state=open|healed` → page of `{question, your_key, correct_key, cause, confidence, srs_stage, next_review}` | correct key is fine here: the question was answered |
+| `POST /notebook/entries/{id}/cause` | D49 | `{cause}` → entry | student correction always wins |
+| `GET /notebook/danger-zones` | D52 | → open errors ordered by node weightage | |
+| `GET /notebook/healed` | D52 | `?cursor` → page | |
+
+**Wellbeing, trajectory (`wellbeing`, `trajectory`)**
+
+| Method, path | Day | Request → response | Notes |
+|---|---|---|---|
+| `POST /signals/mood` | D30 | `{mood, ist_date}` → 204 | outbox-safe, upsert |
+| `GET /trajectory/weekly` | D58 | → `{band, target, cutoff_line, insight, peer_line?, confidence, deep_report?}` | `deep_report` null for free with a teaser flag |
+
+**Billing (`billing`)**
+
+| Method, path | Day | Request → response | Notes |
+|---|---|---|---|
+| `GET /billing/status` | D61 | → `{plan, status, period_end, founding, can_refund_until?}` | |
+| `POST /billing/subscribe` **Idem** | D61 | `{plan}` → Razorpay checkout params | mandate for monthly, order for annual |
+| `POST /billing/webhook` | D61 | raw body + `X-Razorpay-Signature` → 200 | public; HMAC verified; idempotent on event id |
+| `POST /billing/cancel` **Idem** | D63 | → `{status, refund?}` | one call: cancel + automatic refund within 7 days of a charge |
+| `GET /billing/paywall` | D62 | `?trigger` → `{offer, show: bool, snooze_until?}` | once per context; Not now = 48 h |
+| `POST /billing/paywall/dismiss` | D62 | `{trigger, context_key}` → 204 | |
+
+**Curriculum (`curriculum`)**
+
+| Method, path | Day | Request → response | Notes |
+|---|---|---|---|
+| `GET /curriculum/syllabus` | D13 | → tree `{subjects: [{code, name, chapters: [{code, name, topics}]}]}` | ETag; cached by the app |
+| `GET /curriculum/ncert/{paragraph_id}` | D40 | → `{display, text (user language), book, chapter, section, neighbours: [addresses]}` | one paragraph at a time (§2.10) |
+
+**Ops (`ops`)** — `role = admin`
+
+| Method, path | Day | Request → response | Notes |
+|---|---|---|---|
+| `GET /admin/audit-queue` | D75 | `?status&cursor` → page | |
+| `POST /admin/audit-queue/{id}/resolve` | D75 | `{action, note}` → item | may invalidate cache rows |
+| `GET /admin/users/{id}/peek` | D75 | → read-only state summary | founder peek |
+| `GET /admin/costs` | D65 | `?from&to` → `ai_spend_daily` rows | |
+
+Unauthenticated: `/actuator/health` (liveness for the ALB; no details).
+
+### 3.8 Language
+
+The principal's `lang` claim decides `message_user_lang` and the language of generated content;
+`Accept-Language` is honoured only on the public auth routes. Changing `language` via `PATCH /me`
+re-issues the access token on next refresh and affects new content only (DEV_SPEC §8.3). The three
+values `en | hi | hinglish` are the same strings on the server, in the JWT and in the app's locale
+mapping (§5.5).
+
+### 3.9 Pagination
+
+`?cursor=<opaque>&limit=<1..50>` → `{items, next_cursor}`; the cursor encodes `(created_at, id)` of
+the last item, base64url. No offsets.
+
+### 3.10 Coverage check
+
+| SPEC §8 screen | Reads | Writes |
+|---|---|---|
+| 1 Login | — | otp request/verify, refresh |
+| 2 Interview | onboarding/state, curriculum/syllabus | onboarding/answers, onboarding/syllabus, me (language) |
+| 3 Documents | — | documents, confirm, discard |
+| 4 Parent consent | me (consent_state) | me/consent/* |
+| 5 First-plan reveal | — | onboarding/complete |
+| 6 Diagnostic | practice/sessions/{id} | practice/diagnostic, answers, finish |
+| 7 Today | plan/today, trajectory/weekly | plan/blocks/{id}/status, signals/mood, plan/negotiate |
+| 8 Practice | practice/sessions/{id}, offline-pack | practice/sessions, answers, finish |
+| 9 Doubts | doubts, doubts/{id}, doubts/usage, curriculum/ncert/{id} | doubts, followup, report |
+| 10 Notebook | notebook/summary, entries, danger-zones, healed | entries/{id}/cause |
+| 11 Weekly report | trajectory/weekly | — |
+| 12 Paywall · subscription | billing/status, billing/paywall | billing/subscribe, cancel, paywall/dismiss |
+| 13 Profile & settings | me, billing/status | me, me/export, me (DELETE), me/devices, auth/logout |
+| 14 Exam-mode Today | plan/today (`mode`) | same as 7 |
+| 15 Result flows | Phase 2 | — |
 
 ## 4. AI pipeline
 

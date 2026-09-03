@@ -14,9 +14,11 @@ schema / API document in docs/" mean this file.
 ### 0.1 Precedence once approved
 
 1. docs/SPEC.md — product contract. Wins every conflict.
-2. docs/TECH_PLAN.md (this file) — how the product is built: architecture, data, API, AI, app,
+2. CLAUDE.md and docs/DEV_SPEC.md §13 — working agreements and hard rules (authoritative,
+   unchanged by this plan; where this plan proposes to reword a rule it says so in §0.4 and the
+   founder decides).
+3. docs/TECH_PLAN.md (this file) — how the product is built: architecture, data, API, AI, app,
    pipeline, infra, testing, conventions.
-3. docs/DEV_SPEC.md §13 — working agreements (authoritative, unchanged).
 4. docs/DEV_SPEC.md §2–§12 — reference only; where it differs from this file, this file wins.
 5. docs/PLAN.md — the schedule; docs/TRACKER.md — live state; docs/DECISIONS.md — spec-silent choices.
 
@@ -24,11 +26,25 @@ Where this plan is silent, CLAUDE.md applies: choose the boring, maintainable op
 in DECISIONS.md. Where this plan turns out to conflict with SPEC, say so in the session and fix the
 plan — never the behaviour.
 
-### 0.2 What this plan changes about the repo today
+### 0.2 What this plan changes about the repo today, and later
 
 Nothing in code. It fixes the shape that D4 onwards fills in: package layout (§1), the migration
-schedule (§2.9), the endpoint contract (§3), the AI seam (§4.1) and the app skeleton (§5). It also
-adds one line to CLAUDE.md's precedence list on approval, and its §14 is copied into DECISIONS.md.
+schedule (§2.9), the endpoint contract (§3), the AI seam (§4.1) and the app skeleton (§5).
+
+On approval: CLAUDE.md's precedence list gets this file at position 3 (as in §0.1), and the
+spec-silent rows of §14 go into DECISIONS.md. Conflict resolutions from §0.4 are recorded in the
+TRACKER day log, not in DECISIONS.md (its header excludes conflicts).
+
+Follow-on edits to working-agreement files that this plan implies, each made on its PLAN day and
+surfaced in that session rather than now:
+
+| Day | File | Edit |
+|---|---|---|
+| D4 | `.claude/rules/server.md`, `.claude/agents/db-migrator.md` | append-only tables (`practice_events`, `ai_calls`, `billing_events`) carry no `updated_at` (§2.1) |
+| D5 | `.claude/rules/ai-layer.md` | "REASON only via the difficulty router" becomes "only with a `RouteDecision`: router, verification, generation" (§4.2) |
+| D14 | `.claude/rules/pipeline.md` | `paths` adds `server/**/pipeline/**`; founder inputs live in `pipeline/inputs/` (§6.2); command order per §6.3 |
+| D23 | `scripts/precommit-gate.sh`, `.claude/rules/ai-layer.md`, `eval/README.md`, `.gitignore` | the eval stamp becomes the committed `eval/last-pass.json` (§4.10); `cd eval && ./run.sh` stays the command |
+| D31 | CLAUDE.md, `.claude/rules/server.md`, PLAN D31 ✅ wording | `correct_key` rule reworded per the founder's §0.4 #4 decision |
 
 ### 0.3 Disposition of DEV_SPEC §2–§12
 
@@ -38,16 +54,16 @@ adds one line to CLAUDE.md's precedence list on approval, and its §14 is copied
 | §2.1 Technology decisions | Confirmed | §4.9, §7.3 | Model IDs pinned in config; exact IDs to be confirmed in the console (DEV_SPEC §12 item 4) |
 | §3 Data model | Amended | §2 | Enums as text + CHECK; HNSW index; arrays replaced by join tables where a foreign key matters; blocks get their own table; tables added for OTP, refresh tokens, sessions, consent, documents, notifications, idempotency, billing events, usage counters, audit |
 | §4.1 AiClient | Replaced | §4.1 | One primitive (`complete`/`embed`) with typed feature tasks around it; ledger, breaker, retry and tier policy as decorators; REASON needs a route decision by construction |
-| §4.2 Doubt pipeline | Confirmed, specified | §4.3 | Stages become named components with the enforcement point of each hard rule; polling instead of streaming until D69; cross-language cache hits rendered, not re-solved |
+| §4.2 Doubt pipeline | Amended, specified | §4.3 | Stages become named components with the enforcement point of each hard rule; the verifier is blind to the proposed solution (DEV_SPEC §4.1 passed it in); retrieval takes 8 + 8 candidates instead of 4 + 4; polling instead of streaming until D69; cross-language cache hits rendered, not re-solved |
 | §4.3 Nightly re-planner | Confirmed, specified | §4.5 | Deterministic candidate builder spelled out; batch mode conditional; exam-season modes computed here |
 | §4.4 Error classification | Confirmed | §4.6 | Async listener + sweeper; student correction wins |
 | §4.5 Evaluation | Amended | §4.10 | Live eval is human-launched and writes a committed stamp; CI verifies the stamp and runs the fake-client layer (§0.4 #3) |
-| §5 API | Confirmed, extended | §3 | Endpoints added for consent, documents, devices, usage, danger zones, trajectory, paywall state, curriculum reads, export, admin |
+| §5 API | Amended, extended | §3 | Paths regrouped by module (`/onboarding/scorecard` → `/documents`, `DELETE /account` → `DELETE /me`, `/signals/batch-position` → `/plan/batch-position`, `correct-cause` → `cause`; OTP verify takes a `challenge_id`); endpoints added for consent, documents, devices, usage, danger zones, trajectory, paywall state, curriculum reads, export, admin |
 | §6 Flutter | Confirmed, specified | §5 | Layering, packages, offline outbox, Hinglish locale |
 | §6.1 Offline & sync | Confirmed with one open conflict | §5.6, §0.4 #4 | Offline instant verdict vs server-side judging needs a founder decision |
 | §6.2 Notifications | Confirmed | §2.7, §4.5, §10 | One `notification_log` table drives cap, quiet periods and dispatch |
 | §7 Content pipeline | Amended | §6 | AI-touching steps live in the Java server (profile `pipeline`) so they use `AiClient`; `pipeline/` holds founder-owned inputs and reports |
-| §8 Feature rules | Confirmed verbatim | cited where used | They are product decisions consistent with SPEC |
+| §8 Feature rules | Confirmed with two amendments | cited where used | Product decisions consistent with SPEC. §8.1's on-the-fly plan is tagged `generated_by = fallback` (not `onboarding`) so the two origins stay distinguishable; §8.6's T-3 mode is named `light_recall` (§4.5) |
 | §9 Non-functional | Confirmed | §8–§10 | Streaming NFR deferred to D69 by PLAN precedence |
 | §10 Build plan (6 weeks) | Superseded | docs/PLAN.md | Already stated in CLAUDE.md |
 | §11 Out of scope | Confirmed | — | Identical to SPEC §12 |
@@ -69,18 +85,27 @@ adds one line to CLAUDE.md's precedence list on approval, and its §14 is copied
    gitignored, so CI can neither call Bedrock nor check that a live run happened. Proposal (§4.10):
    the live eval is human-launched and writes a committed stamp; CI verifies the stamp against the
    AI-content hash and runs the fake-client layer of the suite. Decision lands at D23.
-4. **Offline practice verdicts vs server-side judging.** SPEC §6.2 wants instant verdicts and offline
-   play for today's blocks; SPEC §3 and CLAUDE.md say answers are judged server-side and
-   `correct_key` never leaves the server. Both cannot hold for an offline session. Options in §5.6;
-   founder decision needed before D31/D34.
+4. **The `correct_key` wording vs SPEC verdicts, online and offline.** CLAUDE.md says "`correct_key`
+   never leaves the server", `.claude/rules/server.md` "never appears in any client payload", PLAN
+   D31 ✅ "no correct answers in any client payload". SPEC §6.2 requires an instant verdict with the
+   step solution after every answer, and SPEC §6.4 shows notebook entries as "your pick vs right":
+   both display the correct option, so a literal reading of the rule contradicts the contract even
+   online. This plan reads the rule as *the key is never sent before the student's answer for that
+   question is recorded server-side, and judging is server-side*; §3.7 returns the key only in the
+   judged-answer response and in notebook entries (already-answered questions), and §8.3 tests that.
+   The wording of CLAUDE.md, server.md and PLAN D31 ✅ should change to say that (§0.2, D31). The
+   **offline** case is harder: an offline session cannot get a server verdict at all, so either the
+   offline pack carries the keys for today's own blocks or offline play has no verdict — options in
+   §5.6; founder decision needed before D31/D34.
 5. **DEV_SPEC §7 "separate module `pipeline/`" vs `.claude/rules/pipeline.md` "AI calls go through
    `AiClient`".** Only satisfiable if the pipeline is Java or calls the server. Hence §6.1.
 6. **DEV_SPEC §9 streaming vs PLAN D69.** PLAN schedules solver streaming at D69; until then answers
    are synchronous with polling (§3.6, §4.3). Resolved by PLAN precedence, recorded here.
-7. **Three SPEC features have no PLAN day:** batch timetable photo and the weekly batch-confirm card
-   (SPEC §6.7), NCERT-style seed generation to ≥30 usable questions per topic (SPEC §9.3), and
-   in-app full mocks with the autopsy (SPEC §4 Phase 4, §7.1 — not excluded by §12). §12.2 proposes
-   where they could land; scheduling them is the founder's call.
+7. **Four SPEC features have no PLAN day:** batch sync beyond the self-report — the onboarding
+   self-report itself, the timetable photo and the weekly batch-confirm card (SPEC §6.7); NCERT-style
+   seed generation to ≥30 usable questions per topic (SPEC §9.3); "NTA trap" mining from PYQs (SPEC
+   §9.4); and in-app full mocks with the autopsy (SPEC §4 Phase 4, §7.1 — not excluded by §12).
+   §12.2 proposes where they could land; scheduling them is the founder's call.
 8. **CLAUDE.md precedence list has no slot for this plan** while three rules/agents already cite it.
    Fixed on approval (§0.2).
 
@@ -126,8 +151,12 @@ service at beta; the places where a second instance would need one are listed in
 
 Modular monolith under `com.margai`. Each module is one top-level package with `api` (public
 types other modules may use), `internal` (everything else) and, where it owns HTTP, `web`. Spring
-Modulith verifies the boundaries in a test from D4 on (§8.2). A module owns its tables; other
-modules read them only through the owning module's `api` package or through events (§1.7).
+Modulith verifies the boundaries in a test from D4 on (§8.1). A module owns its tables; other
+modules read them only through the owning module's `api` package or through events (§1.7). The one
+component that needs SQL over another module's tables, hybrid retrieval, is split accordingly:
+`curriculum.api.ParagraphRetrievalRepository` owns the vector and full-text queries over
+`ncert_paragraphs` and `questions`; `ai.retrieval.HybridRetriever` composes and fuses their results.
+Both names match the eval gate's `retriev*` path rule.
 
 | Module | Owns (SPEC) | Tables (§2) | Depends on |
 |---|---|---|---|
@@ -135,14 +164,14 @@ modules read them only through the owning module's `api` package or through even
 | `auth` | OTP login, tokens, rate limits, security filter chain (§8 screen 1) | `otp_challenges`, `refresh_tokens` | common, account |
 | `account` | users, student profile, language, settings, minors' consent, export, deletion (§5 DOB/consent, §6.11, §8 screens 4, 13) | `users`, `student_profiles`, `parent_consents`, `user_devices`, `data_export_jobs` | common |
 | `curriculum` | syllabus tree, prerequisites, archetype tracks, cutoffs, NCERT books/paragraphs, question bank, topic traps (§9) | `syllabus_nodes`, `syllabus_prerequisites`, `archetype_tracks`, `archetype_track_steps`, `cutoffs`, `ncert_books`, `ncert_paragraphs`, `questions`, `question_topics`, `question_anchors`, `topic_traps`, `topic_trap_evidence` | common |
-| `onboarding` | interview state machine, syllabus check-in, first plan trigger (§5, §8 screens 2, 5) | (writes through account + planner apis) | common, account, curriculum, documents, planner |
+| `onboarding` | interview state machine, syllabus check-in, first plan trigger (§5, §8 screens 2, 5) | (writes through account, practice and planner apis) | common, account, curriculum, documents, planner, practice.api |
 | `documents` | photograph → read → confirm → delete pattern (§6.8, §8 screen 3) | `document_extractions` | common, account, ai, storage |
 | `planner` | Today, blocks, nightly re-plan, negotiation chat, streaks, exam-season modes, batch position (§6.1, §6.7, §8 screens 7, 14) | `daily_plans`, `plan_blocks`, `mentor_messages`, `batch_positions` | common, account, curriculum, ai, notebook.api, practice.api, wellbeing.api |
 | `practice` | sessions, question serving, server judging, events, diagnostic (§5.4, §6.2, §8 screens 6, 8) | `practice_sessions`, `practice_session_questions`, `practice_events`, `chapter_status` | common, account, curriculum |
-| `doubts` | solve pipeline orchestration, history, follow-ups, reports, free-tier meter (§6.3, §8 screen 9) | `doubts`, `doubt_evidence`, `doubt_cache`, `doubt_daily_usage` | common, account, curriculum, ai, billing.api |
+| `doubts` | solve pipeline orchestration, history, follow-ups, reports, free-tier meter (§6.3, §8 screen 9) | `doubts`, `doubt_evidence`, `doubt_cache`, `doubt_daily_usage` | common, account, curriculum, ai, storage, billing.api |
 | `notebook` | error capture, classification, SRS, healed, danger zones, patterns (§6.4, §8 screen 10) | `error_entries`, `srs_reviews`, `notebook_patterns` | common, account, curriculum, ai, billing.api |
 | `wellbeing` | mood chip, slump inference (§6.6) | `wellbeing_signals` | common, account |
-| `trajectory` | weekly predicted band, peer line, deep report (§6.5, §8 screen 11) | `trajectory_snapshots` | common, account, curriculum, practice.api, billing.api |
+| `trajectory` | weekly predicted band, peer line, deep report (§6.5, §8 screen 11) | `trajectory_snapshots` | common, account, curriculum, practice.api, notebook.api, billing.api |
 | `billing` | subscriptions, Razorpay, webhooks, paywall triggers, cancel/refund, auto-pause (§6.9, §8 screen 12) | `subscriptions`, `payments`, `billing_events`, `paywall_impressions` | common, account |
 | `notifications` | FCM devices, scheduling, 2/day cap, quiet periods, dispatcher (§6.10) | `notification_log` | common, account |
 | `ai` | `AiClient`, Bedrock/Fake, ledger, breaker, router, retrieval, prompts, verification, embeddings (§4) | `ai_calls`, `ai_spend_daily`, `audit_queue` | common, curriculum |
@@ -164,11 +193,11 @@ flowchart TD
     ai --> documents & doubts & notebook & planner & pipeline
     account --> onboarding & documents & planner & practice & doubts & notebook & wellbeing & trajectory & billing & notifications
     curriculum --> onboarding & planner & practice & doubts & notebook & trajectory & pipeline
-    storage --> documents & pipeline
+    storage --> documents & doubts & pipeline
     documents --> onboarding
     planner --> onboarding
-    practice --> planner & trajectory
-    notebook --> planner
+    practice --> onboarding & planner & trajectory
+    notebook --> planner & trajectory
     wellbeing --> planner
     billing --> doubts & notebook & trajectory
 ```
@@ -195,7 +224,7 @@ Rules, enforced by the Modulith test from D4:
 5. `IdempotencyFilter` on routes marked idempotent: replays a stored response for a seen
    `Idempotency-Key` (§3.5).
 6. Controller validates the DTO (Bean Validation) and calls one service method.
-7. Service runs in one transaction; AI calls happen outside the transaction (§4.2) with their own
+7. Service runs in one transaction; AI calls happen outside the transaction (§4.8) with their own
    ledger rows.
 8. `ApiExceptionHandler` maps any exception to the envelope `{error:{code, message_en,
    message_user_lang}}` (§3.3) with the message catalogs in the principal's language.
@@ -245,7 +274,7 @@ answers without an `error_entries` row).
 | 2 Onboarding interview | onboarding | curriculum (grid), practice.api (chapter status), account |
 | 3 Scorecard / marksheet / timetable capture + confirm | documents | onboarding, planner (timetable) |
 | 4 Parent consent | account | auth (consent OTP) |
-| 5 First-plan reveal | onboarding | planner (deterministic first plan), trajectory (target line) |
+| 5 First-plan reveal | onboarding | planner (deterministic first plan), curriculum (cutoffs for the target line; the weekly trajectory arrives D58) |
 | 6 Diagnostic intro + session | practice | planner (day-1 block if deferred) |
 | 7 Today | planner | wellbeing (mood chip), trajectory (mini card), notifications |
 | 8 Practice session + summary | practice | notebook (sent-to-notebook list) |
@@ -287,13 +316,14 @@ Every SPEC §6 feature maps the same way: §6.1 planner · §6.2 practice · §6
 
 **users** — D4
 ```
-id, phone VARCHAR(16) UNIQUE NOT NULL (E.164; NULL after deletion), phone_verified_at TIMESTAMPTZ,
+id, phone VARCHAR(16) (E.164; NOT NULL while status = active, NULL after deletion; unique via the partial index below), phone_verified_at TIMESTAMPTZ,
 display_name VARCHAR(80), language VARCHAR(8) NOT NULL DEFAULT 'en' CHECK (en|hi|hinglish),
 role VARCHAR(16) NOT NULL DEFAULT 'student' CHECK (student|admin),
 status VARCHAR(16) NOT NULL DEFAULT 'active' CHECK (active|deleted),
 deleted_at TIMESTAMPTZ, purge_after DATE, created_at, updated_at
 ```
-Index: `phone` (unique, partial `WHERE phone IS NOT NULL`).
+Index: `phone` (unique, partial `WHERE phone IS NOT NULL`). Constraint:
+`CHECK (status = 'deleted' OR phone IS NOT NULL)`.
 
 **student_profiles** (1:1 users) — D4; columns marked † are filled by later days but declared now so
 the row shape is stable.
@@ -359,7 +389,7 @@ acceptance "graph has no cycles" is a loader check plus a repository test; repla
 (fresher_2yr|fresher_1yr|dropper|repeater), name_en, name_hi, weeks SMALLINT, description_md`.
 **archetype_track_steps** — D4: `track_id → archetype_tracks, node_id → syllabus_nodes, sequence
 INTEGER, phase CHECK (learn|mock|revision), target_week SMALLINT, UNIQUE (track_id, sequence)`.
-Loaded from `pipeline/data/archetypes.yaml` (SPEC §9.5; educator review is TRACKER F3).
+Loaded from `pipeline/inputs/archetypes.yaml` (SPEC §9.5; educator review is TRACKER F3).
 
 **cutoffs** — D4 (config table): `year SMALLINT, category VARCHAR(8), quota_scope VARCHAR(8)
 (AIQ or state code), seat_type VARCHAR(16) CHECK (govt_mbbs|private_mbbs|bds|qualifying),
@@ -394,8 +424,8 @@ verification JSONB, generated_from_error_entry_id UUID (variants, D51)
 Natural key for PYQs: `UNIQUE (source, exam, year, paper_code, question_no)`. Indexes:
 `(node_id, difficulty)`, `(source, year)`, partial on `verified`. **`correct_key` is server-only:**
 the JPA entity field is `@JsonIgnore`, no response record carries it before an answer is judged, and
-a test scans every practice payload for the string (§8.4). The verdict after judging returns it for
-that one question only (§3.7).
+a test scans every pre-judging payload for the string (§8.3). Only the judged-answer response and
+notebook entries for already-answered questions return it (§3.7, §0.4 #4).
 
 **question_topics** — D19: `question_id, node_id, PRIMARY KEY (question_id, node_id)` (secondary
 topics). **question_anchors** — D23: `question_id, paragraph_id, PRIMARY KEY`.
@@ -432,11 +462,14 @@ occurred_at TIMESTAMPTZ, client_event_id UUID UNIQUE, created_at`. Indexes `(use
 
 **doubts** — D37: `user_id, input_type CHECK (photo|text), raw_text, normalized_text, question_hash
 CHAR(64), language, image_s3_key (NULL once deleted), image_deleted_at, subject, node_id (nullable),
-cache_hit BOOLEAN, cache_id → doubt_cache, model_tier CHECK (cheap|reason|none), status CHECK
-(answered|pending|queued|unverified_fallback|failed), answer JSONB, verified BOOLEAN,
-verification JSONB, parent_doubt_id → doubts (follow-ups, D46), reported BOOLEAN, report_note,
-audit_status, latency_ms, created_at, updated_at`. Indexes `(user_id, created_at)`, `question_hash`.
-**doubt_evidence** — D37: `doubt_id, question_id, PRIMARY KEY` (PYQs that back the trap note).
+cache_hit BOOLEAN, cache_id → doubt_cache (column added D41 with the cache table), model_tier CHECK
+(cheap|reason|none), status CHECK (answered|pending|queued|unverified_fallback|failed), answer JSONB,
+verified BOOLEAN, verification JSONB, parent_doubt_id → doubts (follow-ups, D46), reported BOOLEAN,
+report_note, audit_status, latency_ms, created_at, updated_at`. Indexes `(user_id, created_at)`,
+`question_hash`.
+**doubt_evidence** — D37: `doubt_id, question_id, PRIMARY KEY`. The PYQs that back the answer's
+trap note; the ids come from the model's `nta_trap.evidence_question_ids`, validated by the
+assembler against the PYQs and topic-trap evidence it was given (§4.3 stages 6–9).
 **doubt_cache** — D41: `question_hash CHAR(64), language, subject, node_id, canonical_question TEXT,
 embedding vector(1024), answer JSONB, verified BOOLEAN NOT NULL CHECK (verified = true),
 hit_count INTEGER, last_hit_at, source_doubt_id, invalidated_at, UNIQUE (question_hash, language)`.
@@ -463,7 +496,7 @@ row exists only when `sample_size` meets the configured minimum (Evidence rule, 
 
 **daily_plans** — D29: `user_id, plan_date DATE, generated_by CHECK
 (onboarding|nightly|fallback|renegotiation), mode CHECK
-(normal|light|revision_only|final_week|exam_eve|silence), mentor_note_md TEXT NOT NULL,
+(normal|light|revision_only|final_week|light_recall|exam_eve|silence), mentor_note_md TEXT NOT NULL,
 inputs_snapshot JSONB, ai_call_id → ai_calls, version INTEGER, UNIQUE (user_id, plan_date)`.
 **plan_blocks** — D29: `plan_id → daily_plans, position SMALLINT, type CHECK
 (learn|practice|revise|mock|diagnostic), node_id, minutes SMALLINT, reason_md TEXT NOT NULL
@@ -472,11 +505,11 @@ CHECK (length(reason_md) > 0), reason_evidence JSONB, payload JSONB, status CHEC
 DEV_SPEC's JSONB array because `POST /plan/blocks/{id}/status` addresses them and streaks count them.
 **mentor_messages** — D58: `user_id, direction CHECK (user|mentor), text, intent CHECK
 (negotiate_plan|checkin|distress|other), resulting_plan_id`. Index `(user_id, created_at)`.
-**batch_positions** — D26: `user_id, node_id, status CHECK (not_started|ongoing|done), source CHECK
+**batch_positions** — unscheduled, see §12.2 (SPEC §6.7 has no PLAN day): `user_id, node_id, status CHECK (not_started|ongoing|done), source CHECK
 (self_report|timetable|inferred|weekly_confirm), confidence NUMERIC(3,2), observed_at,
 UNIQUE (user_id, node_id)`. The plan mentions the batch only when `confidence ≥ 0.7`
 (DEV_SPEC §8.2).
-**wellbeing_signals** — D59 (mood chip earlier, D30): `user_id, ist_date, mood CHECK (good|ok|low),
+**wellbeing_signals** — D59 (PLAN D59 "slump rules + mood chip wiring"): `user_id, ist_date, mood CHECK (good|ok|low),
 inferred_slump BOOLEAN, slump_evidence JSONB, UNIQUE (user_id, ist_date)`.
 **trajectory_snapshots** — D58: `user_id, week_start, predicted_min SMALLINT, predicted_max
 SMALLINT, target_marks SMALLINT, cutoff_id → cutoffs, peer_percentile SMALLINT, insight_md,
@@ -502,18 +535,21 @@ Partial unique `(user_id) WHERE status IN ('pending','active','past_due')`.
 CHAR(3), status CHECK (captured|refunded|failed), refund_id, refunded_at, refund_deadline
 TIMESTAMPTZ, raw JSONB`.
 **billing_events** — D61 (webhook inbox, append-only): `provider_event_id UNIQUE, event_type,
-payload JSONB, signature_ok BOOLEAN, processed_at, error`. The unique id is webhook idempotency.
+payload JSONB, processed_at, error`. A row exists only for webhooks whose signature verified; a
+failed signature is a `400`, a log line and a metric, never a row. The unique id is webhook
+idempotency.
 **paywall_impressions** — D62: `user_id, trigger CHECK (doubt_limit|notebook_cap|srs_lock|weekly_report),
 context_key VARCHAR(64), outcome CHECK (shown|dismissed|paid), snooze_until, UNIQUE (user_id,
 trigger, context_key)`. "Each trigger fires once per context; Not now = 48 h" (PLAN D62 ✅).
-**idempotency_keys** — D61 (used by every idempotent route from D7 on): `key VARCHAR(64), user_id,
-route, request_hash CHAR(64), response_status SMALLINT, response_body JSONB, expires_at,
-PRIMARY KEY (key, user_id)`.
+**idempotency_keys** — D7 (with the first idempotent routes; used by every **Idem** route after):
+`key VARCHAR(64), user_id, route, request_hash CHAR(64), response_status SMALLINT, response_body
+JSONB, expires_at, PRIMARY KEY (key, user_id)`.
 **ai_calls** — D5 (append-only, the cost ledger)
 ```
 id, user_id (nullable), feature VARCHAR(24) NOT NULL CHECK (doubt|doubt_route|doubt_verify|
-  doubt_translate|doubt_extract|plan|mentor_message|classify|srs_variant|extract_document|embed|
-  pipeline_extract|pipeline_solution|pipeline_verify|pipeline_distractor|pipeline_trap|eval|smoke),
+  doubt_render|doubt_extract|plan|mentor_message|classify|srs_variant|extract_document|embed|
+  pipeline_extract|pipeline_solution|pipeline_verify|pipeline_distractor|pipeline_difficulty|
+  pipeline_trap|eval|smoke),
 model_id VARCHAR(120) NOT NULL, tier VARCHAR(8) NOT NULL CHECK (cheap|reason|vision|embed),
 prompt_name VARCHAR(64), prompt_version SMALLINT,
 input_tokens INTEGER, output_tokens INTEGER, cache_read_tokens INTEGER, cache_write_tokens INTEGER,
@@ -534,8 +570,9 @@ may set `doubt_cache.invalidated_at` or `questions.audit_status`.
 ### 2.9 Migration schedule
 
 Flyway, `V<n>__<snake_name>.sql`, drafted by the db-migrator agent with a `-- ROLLBACK:` block and
-`rollback/U<n>__*.sql` where the undo is non-trivial. Numbers are indicative; the agent takes the
-next free integer.
+`rollback/U<n>__*.sql` where the undo is non-trivial. One migration per PLAN day that touches the
+schema, never spanning days: an applied migration is never edited (`.claude/rules/server.md`).
+Numbers are indicative; the agent takes the next free integer.
 
 | Version | PLAN day | Creates |
 |---|---|---|
@@ -545,17 +582,31 @@ next free integer.
 | V4 `chapter_status` | D4 | chapter_status |
 | V5 `ai_calls` | D5 | ai_calls |
 | V6 `auth` | D7 | otp_challenges, refresh_tokens, idempotency_keys |
-| V7 `ncert` | D14 | ncert_books, ncert_paragraphs (embedding column nullable; HNSW index created D17 once rows exist) |
-| V8 `questions` | D19 | questions, question_topics; `topic_traps`, `topic_trap_evidence` at D22; `question_anchors` at D23 |
-| V9 `onboarding` | D25–D28 | parent_consents, batch_positions, document_extractions |
-| V10 `plans` | D29 | daily_plans, plan_blocks |
-| V11 `notifications` | D30 | user_devices, notification_log, wellbeing_signals (mood only) |
-| V12 `practice` | D31–D33 | practice_sessions, practice_session_questions, practice_events |
-| V13 `doubts` | D37–D44 | doubts, doubt_evidence, audit_queue (D39), doubt_cache (D41), doubt_daily_usage (D44) |
-| V14 `notebook` | D49–D53 | error_entries, srs_reviews, notebook_patterns |
-| V15 `planner_brain` | D55–D59 | mentor_messages, trajectory_snapshots, slump columns |
-| V16 `billing` | D61–D62 | subscriptions, payments, billing_events, paywall_impressions |
-| V17 `privacy` | D64–D65 | data_export_jobs, ai_spend_daily |
+| V7 `ncert` | D14 | ncert_books, ncert_paragraphs (embedding column nullable) |
+| V8 `ncert_hnsw` | D17 | HNSW index on `ncert_paragraphs.embedding` (created once rows exist) |
+| V9 `questions` | D19 | questions, question_topics |
+| V10 `topic_traps` | D22 | topic_traps, topic_trap_evidence |
+| V11 `question_anchors` | D23 | question_anchors; HNSW on `questions.embedding` |
+| V12 `parent_consents` | D27 | parent_consents |
+| V13 `document_extractions` | D28 | document_extractions |
+| V14 `plans` | D29 | daily_plans, plan_blocks |
+| V15 `notifications` | D30 | user_devices, notification_log |
+| V16 `practice_sessions` | D31 | practice_sessions, practice_session_questions |
+| V17 `practice_events` | D33 | practice_events |
+| V18 `doubts` | D37 | doubts, doubt_evidence |
+| V19 `audit_queue` | D39 | audit_queue |
+| V20 `doubt_cache` | D41 | doubt_cache, `doubts.cache_id` |
+| V21 `doubt_usage` | D44 | doubt_daily_usage |
+| V22 `error_entries` | D49 | error_entries |
+| V23 `srs_reviews` | D51 | srs_reviews |
+| V24 `notebook_patterns` | D53 | notebook_patterns |
+| V25 `planner_brain` | D58 | mentor_messages, trajectory_snapshots |
+| V26 `wellbeing` | D59 | wellbeing_signals |
+| V27 `billing` | D61 | subscriptions, payments, billing_events |
+| V28 `paywall` | D62 | paywall_impressions |
+| V29 `privacy` | D64 | data_export_jobs |
+| V30 `ai_spend` | D65 | ai_spend_daily |
+| — | unscheduled (§12.2) | batch_positions, with whichever day the founder gives batch sync |
 
 Seed data for local and test profiles (the D4 "test taxonomy": a two-subject, six-chapter tree with
 prerequisites, one archetype track and three cutoff rows) lives in `db/seed/R__test_taxonomy.sql`, a
@@ -590,8 +641,9 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
   (for clock-skew diagnostics in OTP flows, PLAN D9).
 - Copy returned to the client is codes plus text in both `en` and the user's language, never text
   alone; generated content (plans, answers) comes in the user's language with a `language` field.
-- `correct_key` appears in exactly one response: the judged answer for that one question (§3.7).
-  Question payloads before judging never contain it; a test enforces this (§8.4).
+- `correct_key` is returned only for questions the student has already answered: in the judged-answer
+  response and in notebook entries (§3.7, §0.4 #4). Question payloads before judging never contain
+  it; a test enforces this (§8.3).
 
 ### 3.2 Authentication and tokens
 
@@ -612,7 +664,7 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
 { "error": { "code": "DOUBT_LIMIT_REACHED",
              "message_en": "You've used today's 5 free solves.",
              "message_user_lang": "Aaj ke 5 free solves ho gaye.",
-             "details": { "resets_at": "2026-09-04T00:00:00+05:30", "paywall_trigger": "doubt_limit" } } }
+             "details": { "resets_at": "2026-09-03T18:30:00Z", "paywall_trigger": "doubt_limit" } } }
 ```
 
 | HTTP | Codes |
@@ -672,7 +724,7 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 | `POST /auth/otp/request` | D7 | `{phone}` → `{challenge_id, resend_after_s}` | public; SMS provider sandbox until F1 |
 | `POST /auth/otp/verify` | D7 | `{challenge_id, code}` → tokens + `user` + `is_new_user` | public; creates `users` + empty `student_profiles` on first login (D10) |
 | `POST /auth/refresh` | D7 | `{refresh_token}` → tokens | public; rotation + reuse detection |
-| `POST /auth/logout` | D10 | `{refresh_token}` → 204 | |
+| `POST /auth/logout` | D10 | `{refresh_token}` → 204 | naturally idempotent: revoking a revoked family is a no-op |
 
 **Account (`account`)**
 
@@ -702,8 +754,8 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 | Method, path | Day | Request → response | Notes |
 |---|---|---|---|
 | `POST /documents` | D28 | multipart `{type, image}` → `{id, fields: [{name, value, confidence}], promise_copy}` | `CONSENT_REQUIRED` for minors; image ≤ 5 MB; types `neet_scorecard` D28, `board_marksheet` D29, `batch_timetable` unscheduled (§12.2) |
-| `POST /documents/{id}/confirm` | D28 | `{fields}` → `{applied_to}` | deletes the image, writes confirmed fields |
-| `POST /documents/{id}/discard` | D28 | → 204 | deletes the image |
+| `POST /documents/{id}/confirm` **Idem** | D28 | `{fields}` → `{applied_to}` | deletes the image, writes confirmed fields |
+| `POST /documents/{id}/discard` **Idem** | D28 | → 204 | deletes the image |
 
 **Plan (`planner`)**
 
@@ -712,9 +764,9 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 | `GET /plan/today` | D29 | → `{date, mode, mentor_note, blocks[], yesterday_unfinished[], streak, trajectory_card?, mood_prompt, exam_countdown}` | builds the fallback plan if none exists (DEV_SPEC §8.1) |
 | `GET /plan/week` | D58 | → `{days: [{date, blocks_summary, status}]}` | |
 | `POST /plan/blocks/{block_id}/status` | D33 | `{status, client_event_id, at}` → `{block, streak}` | outbox-safe |
-| `POST /plan/negotiate` | D58 | `{text}` → `{mentor_reply, plan?, trade_off}` | revised plan appears on Today immediately (SPEC §6.1) |
+| `POST /plan/negotiate` **Idem** | D58 | `{text}` → `{mentor_reply, plan?, trade_off}` | spends AI and rewrites a plan, hence idempotent; revised plan appears on Today immediately (SPEC §6.1) |
 | `GET /plan/messages` | D58 | `?cursor` → page of `mentor_messages` | |
-| `POST /plan/batch-position` | D26 | `{node_code, status}` → 204 | self-report layer; weekly-confirm card unscheduled (§12.2) |
+| `POST /plan/batch-position` | unscheduled (§12.2) | `{node_code, status}` → 204 | SPEC §6.7 self-report layer; no PLAN day names batch sync |
 
 **Practice (`practice`)**
 
@@ -731,12 +783,12 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 
 | Method, path | Day | Request → response | Notes |
 |---|---|---|---|
-| `POST /doubts` **Idem** | D37 (photo D38) | `{text}` or multipart `{image}` → `200 doubt` or `202 {id, status}` | `doubt` = `{id, status, question_text, answer: {steps_md, concept_md, anchor: {paragraph_id, display}, nta_trap_md?, followups[], verified}, language, remaining_today: {fresh_left, weight_used}}` |
+| `POST /doubts` **Idem** | D37 (photo D38) | `{text}` or multipart `{image}` → `200 doubt` or `202 {id, status}` | `doubt` = `{id, status, question_text, answer: {steps_md, concept_md, anchor: {paragraph_id, display}, nta_trap: {note_md, evidence: [{question_id, year}]}?, followups[], verified}, language, usage}`; `usage` = `{fresh_left, weight_used_today, resets_at, plan}` (same shape as `GET /doubts/usage`) |
 | `GET /doubts/{id}` | D37 | → `doubt` | polling target |
-| `POST /doubts/{id}/followup` | D46 | `{text}` or `{chip_index}` → `doubt` (child) | keeps parent context |
-| `POST /doubts/{id}/report` | D40 | `{note}` → 204 | writes `audit_queue` |
+| `POST /doubts/{id}/followup` | D46 | `{text}` or `{chip_index}` → `doubt` (child) | keeps parent context; counts toward the limit like a fresh solve |
+| `POST /doubts/{id}/report` | D40 | `{note}` → 204 | writes `audit_queue`; idempotent by nature (one report per doubt per user) |
 | `GET /doubts` | D46 | `?cursor` → page | history |
-| `GET /doubts/usage` | D44 | → `{fresh_left, cached_weight, resets_at, plan}` | meter |
+| `GET /doubts/usage` | D44 | → `usage` | meter; the D44 limit meter reads this |
 
 **Notebook (`notebook`)**
 
@@ -752,7 +804,7 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 
 | Method, path | Day | Request → response | Notes |
 |---|---|---|---|
-| `POST /signals/mood` | D30 | `{mood, ist_date}` → 204 | outbox-safe, upsert |
+| `POST /signals/mood` | D59 | `{mood, ist_date}` → 204 | outbox-safe, upsert; PLAN D59 "mood chip wiring" |
 | `GET /trajectory/weekly` | D58 | → `{band, target, cutoff_line, insight, peer_line?, confidence, deep_report?}` | `deep_report` null for free with a teaser flag |
 
 **Billing (`billing`)**
@@ -770,7 +822,7 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 
 | Method, path | Day | Request → response | Notes |
 |---|---|---|---|
-| `GET /curriculum/syllabus` | D13 | → tree `{subjects: [{code, name, chapters: [{code, name, topics}]}]}` | ETag; cached by the app |
+| `GET /curriculum/syllabus` | D13 | → tree `{subjects: [{code, name, chapters: [{code, name, topics}]}]}` | the read side of PLAN D13 ✅ "taxonomy queryable"; ETag; cached by the app |
 | `GET /curriculum/ncert/{paragraph_id}` | D40 | → `{display, text (user language), book, chapter, section, neighbours: [addresses]}` | one paragraph at a time (§2.10) |
 
 **Ops (`ops`)** — `role = admin`
@@ -802,12 +854,12 @@ the last item, base64url. No offsets.
 | SPEC §8 screen | Reads | Writes |
 |---|---|---|
 | 1 Login | — | otp request/verify, refresh |
-| 2 Interview | onboarding/state, curriculum/syllabus | onboarding/answers, onboarding/syllabus, me (language) |
+| 2 Interview | onboarding/state, curriculum/syllabus | onboarding/answers, onboarding/syllabus, me (language); plan/batch-position once batch sync is scheduled |
 | 3 Documents | — | documents, confirm, discard |
 | 4 Parent consent | me (consent_state) | me/consent/* |
 | 5 First-plan reveal | — | onboarding/complete |
 | 6 Diagnostic | practice/sessions/{id} | practice/diagnostic, answers, finish |
-| 7 Today | plan/today, trajectory/weekly | plan/blocks/{id}/status, signals/mood, plan/negotiate |
+| 7 Today (incl. plan chat and week view) | plan/today, plan/week, plan/messages, trajectory/weekly | plan/blocks/{id}/status, signals/mood, plan/negotiate |
 | 8 Practice | practice/sessions/{id}, offline-pack | practice/sessions, answers, finish |
 | 9 Doubts | doubts, doubts/{id}, doubts/usage, curriculum/ncert/{id} | doubts, followup, report |
 | 10 Notebook | notebook/summary, entries, danger-zones, healed | entries/{id}/cause |
@@ -829,6 +881,11 @@ package com.margai.ai.api;
 
 public interface AiClient {
     <T> AiResponse<T> complete(AiRequest<T> request);        // text + optional images → typed JSON
+    <T> List<AiResponse<T>> completeBatch(List<AiRequest<T>> requests);
+                                                             // same contract for many requests: a Bedrock
+                                                             // batch job when the flag and minimum allow,
+                                                             // otherwise a bounded on-demand loop; one
+                                                             // AiResponse and one ledger row per request
     AiResponse<float[]> embed(EmbedRequest request);         // text → vector(1024)
 }
 
@@ -859,10 +916,25 @@ Implementations and decorators (innermost first):
 | `LedgerAiClient` (outermost) | writes the `ai_calls` row for every outcome, including breaker and failure; computes `cost_paise` from the price table |
 
 The bean wiring is the decorator chain over whichever implementation the profile selects, so
-`FakeAiClient` runs under the same breaker and ledger as Bedrock. Feature tasks (`DoubtAnswerTask`,
-`NumericalVerifyTask`, `DifficultyRouteTask`, `PlanSelectTask`, `ErrorClassifyTask`,
-`DocumentExtractTask`, `MentorMessageTask`, `VariantGenerateTask`) each own one prompt and one output
-record and are the only callers of `AiClient`.
+`FakeAiClient` runs under the same breaker and ledger as Bedrock. The only callers of `AiClient`
+are the task classes in `ai.tasks`, each owning one prompt and one output record, plus
+`EmbeddingService`, the only caller of `embed`:
+
+| Task | Tier | Used by |
+|---|---|---|
+| `DifficultyRouter` | CHEAP | doubts (§4.2) |
+| `DoubtAnswerTask` | CHEAP or REASON per route | doubts |
+| `NumericalVerifyTask` | REASON | doubts, SRS variants, pipeline `pyq verify` |
+| `AnswerRenderTask` | CHEAP | cross-language cache hits (§4.3 stage 3) |
+| `DocumentExtractTask` | VISION | photo doubts, documents |
+| `PlanSelectTask` | CHEAP | nightly planner, negotiation |
+| `MentorMessageTask` | CHEAP | negotiation intent and reply |
+| `ErrorClassifyTask` | CHEAP | notebook |
+| `VariantGenerateTask` | REASON | SRS variants |
+| `PageExtractTask` | VISION | pipeline `ncert extract` |
+| `PyqSolveTask` | REASON | pipeline `pyq solve` |
+| `DistractorMapTask`, `DifficultyEstimateTask`, `TrapNoteTask` | CHEAP | pipeline `pyq distractors`, `stats compute`, `traps mine` |
+| `EmbeddingService` | EMBED | cache lookup, `HybridRetriever`, pipeline `ncert embed`, `anchors link` |
 
 The D5 smoke test is a `smoke` feature call under `BEDROCK_LIVE=1` that asserts one `ai_calls` row
 with non-zero token counts, then the profile is switched off (PLAN D5 ✅).
@@ -891,13 +963,13 @@ Orchestrated by `doubts.internal.DoubtSolveService`; each stage is its own class
 |---|---|---|---|---|
 | 1 | Intake | `DoubtIntake` | text as-is; photo → S3 `uploads/doubts/{user}/{id}.jpg` → `DocumentExtractTask` (VISION, schema `{question_text, options[], diagram_description, language_detected, is_question}`) → S3 delete immediately on success; `NOT_A_QUESTION` when `is_question = false` | image in the uploads bucket only; deleted after reading |
 | 2 | Normalise | `QuestionNormalizer` | Unicode NFKC, lowercase Latin, strip numbering, whitespace, trailing punctuation; canonicalise math tokens (×→*, ÷→/, superscripts); Devanagari kept; `question_hash = sha256(normal_form)` | |
-| 3 | Cache lookup | `DoubtCacheLookup` | exact `(hash, language)` → hit. Else `embed` (EMBED, ledger) → HNSW cosine within same subject and language, similarity > 0.93 (config) → hit. Exact hash in *another* language → `AnswerRenderTask` (CHEAP) renders the verified canonical answer in the user's language, numeric final value copied verbatim and re-compared; counts as a cache hit | |
+| 3 | Cache lookup | `DoubtCacheLookup` | exact `(hash, language)` → hit. Else `embed` (EMBED, ledger) → HNSW cosine within same subject and language, similarity > 0.93 (config) → hit. Exact hash in *another* language → `AnswerRenderTask` (CHEAP) renders the verified canonical answer in the user's language; the rendered `final_answer` must equal the canonical one exactly, else the render is discarded, the canonical-language answer is served with a note and an `audit_queue` row is written. A matching render is stored in `doubt_cache` under the new language with the canonical `verified` flag and counts as a cache hit | cache rows stay verified |
 | 4 | Limit gate | `DoubtLimitGate` | weight 0.5 for a hit, 1.0 fresh; free tier refuses when `fresh + 0.5·cached + weight > 5` → `DOUBT_LIMIT_REACHED` with paywall trigger; Pro: fair-use queue when `reason_fresh_count ≥ 30` (§4.4) | |
 | 5 | Route | `DifficultyRouter` | see §4.2 | REASON only via router |
-| 6 | Retrieve | `ai.retrieval.HybridRetriever` | top-8 vector (same subject) ∪ top-8 `websearch_to_tsquery` over `tsv` (both languages) → reciprocal-rank fusion → dedupe by paragraph → cap 2,500 tokens → plus ≤ 2 verified PYQs from the guessed node with anchor overlap or stem similarity. Zero paragraphs above the floor → retry without the node filter → still zero → **grounding failure**: honest fallback + `audit_queue(grounding_failed)` | no answer without retrieval grounding |
-| 7 | Generate | `DoubtAnswerTask` | prompt `doubt_answer` with the retrieved set (ids visible) and the PYQ set; output `{steps_md, concept_md, anchor_paragraph_id, final_answer: {value, unit}?, nta_trap_md?, followups[2], language}` | |
+| 6 | Retrieve | `ai.retrieval.HybridRetriever` over `curriculum.api.ParagraphRetrievalRepository` | top-8 vector (same subject) ∪ top-8 `websearch_to_tsquery` over `tsv` (both languages) → reciprocal-rank fusion → dedupe by paragraph → cap 2,500 tokens. Evidence set alongside: ≤ 2 verified PYQs from the guessed node (anchor overlap or stem similarity) **and** the node's `topic_traps` rows with their `topic_trap_evidence` question ids (D22). Zero paragraphs above the floor → retry without the node filter → still zero → **grounding failure**: honest fallback + `audit_queue(grounding_failed)` | no answer without retrieval grounding |
+| 7 | Generate | `DoubtAnswerTask` | prompt `doubt_answer` with the retrieved paragraphs (ids visible), the PYQ set and the trap candidates (ids visible); output `{steps_md, concept_md, anchor_paragraph_id, final_answer: {value, unit}?, nta_trap: {note_md, evidence_question_ids[]}?, followups[2], language}`; the prompt states that a trap note may only restate a provided trap candidate or cite provided PYQ ids | |
 | 8 | Verify | `NumericalVerifier` | when `route.is_numerical` or `answer_type = option`: `NumericalVerifyTask` (REASON, sees the question only, not the solution) → compare: numbers equal within 1% relative tolerance after unit normalisation, options by key. Mismatch → one regeneration with both attempts in context → verify again → mismatch → `status = unverified_fallback` + `audit_queue(verification_failed)` | numerical answers independently verified; never rendered unverified |
-| 9 | Assemble | `AnswerAssembler` | rejects an answer whose `anchor_paragraph_id ∉ retrieved set`; drops `nta_trap_md` unless ≥ 1 PYQ id from the retrieved evidence backs it (Evidence rule); renders the fallback copy for unverified numericals | anchor on every answer; trap only when PYQ-backed |
+| 9 | Assemble | `AnswerAssembler` | rejects an answer whose `anchor_paragraph_id ∉ retrieved set`; keeps `nta_trap` only if every `evidence_question_ids` entry is a PYQ id from stage 6's evidence set (retrieved PYQs or topic-trap evidence) and the list is non-empty, otherwise drops the note (Evidence rule); those ids become `doubt_evidence` rows; renders the fallback copy for unverified numericals | anchor on every answer; trap only when PYQ-backed |
 | 10 | Persist | `DoubtPersister` | `doubts` row, `doubt_evidence`, `doubt_daily_usage` increment, `DoubtSolved` event (planner weak signal), `DoubtCacheWriter` **only when `verified = true`** (the DB CHECK is the second lock) | cache writes only when verified |
 | 11 | Respond | controller | contract JSON with `remaining_today`; `202 pending` when the 25 s budget is exceeded (work continues in a background executor) | |
 
@@ -925,8 +997,11 @@ per user, in this order:
    track position. The snapshot is stored in `daily_plans.inputs_snapshot` (the evidence trail).
 2. `SlumpDetector` (deterministic, DEV_SPEC §4.3): trailing 3-day session minutes < 40% of the
    14-day median, or accuracy down > 15 points → `inferred_slump = true`.
-3. `ModeResolver` (deterministic): `normal`, `light` (slump or `mood = low`), `revision_only` (T-21
-   days), `final_week` (T-7), `exam_eve` (T-1), `silence` (T-0 to T+14). DEV_SPEC §8.6.
+3. `ModeResolver` (deterministic): `normal`; `light` (slump or `mood = low`); `revision_only` from
+   T-21 days (no new content, danger zones + high-yield recall, volume decreasing); `final_week` from
+   T-7 (sleep protected, volume down); `light_recall` from T-3 (light recall only); `exam_eve` at T-1
+   (one message); `silence` from T-0 to T+14. SPEC §4 Phases 5–6, DEV_SPEC §8.6. Thresholds are
+   config (`margai.exam.*`).
 4. `CandidateBlockBuilder` (deterministic): SRS reviews due (capped at 40% of the day's minutes),
    practice for weak nodes (`feels_weak`, low ability, doubt signals), the next backbone learn node
    whose prerequisites are covered (mentions the batch only at confidence ≥ 0.7), a mock in mock
@@ -937,10 +1012,13 @@ per user, in this order:
    `reason_md` per block and the `mentor_note_md`, softens the day when the mode says so. Output
    schema: block ids ⊆ candidates, minutes ≤ budget, every `reason_md` non-empty and citing at least
    one evidence key it was given.
-6. `PlanValidator` re-checks those constraints in Java. Any failure, timeout, breaker trip or
-   missing model output → `DeterministicPlanner` produces the plan from the candidates with
-   templated reasons (`generated_by = fallback`). **A plan row always exists before the task moves
-   to the next user** (PLAN D56 ✅ "no planless morning").
+6. `PlanValidator` re-checks those constraints in Java, and two more: `mentor_note_md` must cite at
+   least one evidence key from the snapshot (a note like "we lost the weekend" needs the skipped
+   blocks behind it), and every quoted number in a reason or note must appear in the evidence it
+   cites. Any failure, timeout, breaker trip or missing model output → `DeterministicPlanner`
+   produces the plan from the candidates with templated reasons and a templated note
+   (`generated_by = fallback`). **A plan row always exists before the task moves to the next user**
+   (PLAN D56 ✅ "no planless morning").
 7. `NotificationScheduler` writes `notification_log` rows for the morning plan (profile time),
    streak-save (20:30, only if nothing done by then, decided at dispatch), SRS due, and on Sundays
    the weekly trajectory; skips everything in `silence` mode.
@@ -951,7 +1029,10 @@ per user, in this order:
 The same `DeterministicPlanner` produces the onboarding first plan (D29, no AI call, < 6 s) and the
 on-the-fly fallback in `GET /plan/today`. `POST /plan/negotiate` runs `MentorMessageTask` (CHEAP)
 to classify intent and extract constraints ("Fri–Sun unavailable"), then re-runs steps 4–6 for the
-affected days with the constraints applied and `generated_by = renegotiation`.
+affected days with the constraints applied and `generated_by = renegotiation`. The `mentor_reply`
+and `trade_off` are validated the same way: every block the reply says was moved or dropped must be
+a block id in the before/after diff, and quoted numbers must come from the snapshot. A reply that
+fails validation is replaced by a templated trade-off line built from the diff.
 
 ### 4.6 Error classification (D49)
 
@@ -1030,10 +1111,14 @@ Two layers, one fixture set.
   JSON schema and `tool_choice` forced; the tool input is the answer. No free-text JSON parsing.
 - **Prompt caching**: the system prompt and format instructions form the cached prefix; the question
   and retrieved passages follow. `cache_read_tokens` land in the ledger.
-- **Batch inference**: used only when a run has at least `margai.ai.batch_min_records` records
-  (default 100, the documented minimum; set to 0 to disable). Records are written to the content
-  bucket, the job polled, results merged by record id. Until the beta grows past the minimum, nightly
-  work is on-demand with bounded concurrency. This is conflict §0.4 #2 made concrete.
+- **Batch inference**: `completeBatch` submits a Bedrock batch job only when it holds at least
+  `margai.ai.batch_min_records` requests (default 100, the documented minimum; 0 disables batch).
+  Records are written to the content bucket keyed by request id, the job is polled, and the output is
+  merged back by record id; `LedgerAiClient` then writes **one `ai_calls` row per record** from the
+  per-record usage in the output file, with `batch = true` and the batch price. Below the minimum,
+  `completeBatch` runs the requests on-demand with concurrency 4 through the same decorators, so the
+  ledger is identical either way. Until the beta grows past the minimum, nightly work is therefore
+  on-demand. This is conflict §0.4 #2 made concrete.
 - **Timeouts and retries**: 20 s per real-time call, 2 retries with jitter on throttling and 5xx;
   batch jobs 10 min. A final failure is a typed error the UI renders honestly (`AI_UNAVAILABLE`).
 - **Region**: calls from ap-south-1 to global inference profiles; the privacy copy discloses
@@ -1100,7 +1185,7 @@ computing is a smell the reviewer rejects.
 - Global providers: `authStateProvider`, `meProvider` (the `/me` payload), `localeProvider`,
   `connectivityProvider`, `outboxProvider`. Feature providers depend on those, never on each other's
   internals.
-- Tests inject fake repositories through `ProviderScope(overrides: …)` (§8.5).
+- Tests inject fake repositories through `ProviderScope(overrides: …)` (§8.4).
 
 ### 5.3 Navigation and deep links
 
@@ -1125,7 +1210,9 @@ network, so screens show the honest offline state rather than a timeout). Timeou
 - ARB files `app_en.arb`, `app_hi.arb`, `app_hi_Latn.arb`. `hi-Latn` is a valid BCP-47 tag (Hindi
   in Latin script) that Flutter's gen-l10n supports through the script subtag, so Hinglish is a
   first-class locale with no custom plumbing: `Locale.fromSubtags(languageCode: 'hi', scriptCode:
-  'Latn')`. `supportedLocales` lists all three.
+  'Latn')`. `supportedLocales` lists all three. Verified on 2026-09-03 with `flutter gen-l10n` on
+  Flutter 3.47.2 in a scratch project: `app_hi_Latn.arb` generated the `hi_Latn` locale and a
+  `scriptCode` switch.
 - `LanguageMapper` is the single place that maps the server value `en | hi | hinglish` to a `Locale`
   and back. The value travels in `/me`, in the JWT `lang` claim and in generated content.
 - Device locale is only a suggestion for the mentor intro ("language auto-suggested, changeable",
@@ -1176,9 +1263,11 @@ network, so screens show the honest offline state rather than a timeout). Timeou
 | Routing, HTTP, state | `go_router`, `dio`, `flutter_riverpod` | D8 |
 | Misc | `intl`, `package_info_plus`, `url_launcher` (support links) | as needed |
 
-External services stay FCM, Razorpay and PostHog (`.claude/rules/app.md`). Crash-free ≥ 99.5%
-(SPEC §11) is measured with PostHog's error tracking; if it proves insufficient on Android,
-adding Crashlytics is a founder decision that amends the rule (§13.4).
+External services stay FCM, Razorpay and PostHog (`.claude/rules/app.md`): `firebase_core` is FCM's
+own dependency, and `smart_auth` talks to the Android platform's SMS Retriever, not to a third-party
+service, so neither widens the rule. Crash-free ≥ 99.5% (SPEC §11) is measured with PostHog's
+error tracking; if it proves insufficient on Android, adding Crashlytics is a founder decision that
+amends the rule (§13.4).
 
 ### 5.8 Screen → route → owner
 
@@ -1190,7 +1279,7 @@ adding Crashlytics is a founder decision that amends the rule (§13.4).
 | 4 Parent consent | `/onboarding/consent` | `account` · `ConsentNotifier` | D27 |
 | 5 First-plan reveal | `/onboarding/plan` | `onboarding` · `FirstPlanNotifier` | D29 |
 | 6 Diagnostic intro + session | `/practice/diagnostic` | `practice` · `SessionNotifier(kind: diagnostic)` | D35 |
-| 7 Today | `/today` | `planner` · `TodayNotifier`, `MoodNotifier`, `PlanChatNotifier` | D29, D33, D58 |
+| 7 Today | `/today` | `planner` · `TodayNotifier` (D29, D33), `PlanChatNotifier` (D58); `wellbeing` · `MoodNotifier` (D59) | D29, D33, D58, D59 |
 | 8 Practice session + summary | `/practice/{session_id}`, `/practice/{session_id}/summary` | `practice` · `SessionNotifier`, `SummaryNotifier` | D32–D33 |
 | 9 Doubt capture, answer, history | `/doubts`, `/doubts/new`, `/doubts/{id}` | `doubts` · `DoubtCaptureNotifier`, `DoubtAnswerNotifier`, `DoubtHistoryNotifier` | D38, D40, D46 |
 | 10 Notebook views | `/notebook`, `/notebook/entries`, `/notebook/healed`, `/notebook/danger` | `notebook` · `NotebookNotifier` | D50, D52 |
@@ -1217,20 +1306,22 @@ cost ledger, and the entities, Flyway schema and `HybridRetriever` already exist
 rendering uses PDFBox; paragraph extraction uses the VISION tier on page images rather than text
 extraction, because NCERT layout (two columns, equations, boxed examples, Hindi legacy fonts in older
 scans) defeats text extractors and the buffer day D18 exists for exactly that mess. The top-level
-`pipeline/` directory holds founder-owned inputs (`pipeline/data/*.csv`, `*.yaml`), per-run reports
-(`pipeline/reports/`) and its README. Alternative recorded and rejected for now: Python extraction to
+`pipeline/` directory holds founder-owned inputs (`pipeline/inputs/*.csv`, `*.yaml`, committed),
+per-run reports (`pipeline/reports/`, committed) and its README; `pipeline/data/` stays the
+gitignored scratch directory for downloaded PDFs and intermediate files, as `.gitignore` and
+`.claude/rules/pipeline.md` already say. Alternative recorded and rejected for now: Python extraction to
 JSONL plus Java ingest (two toolchains, and the AI calls would still need the Java seam).
 
-### 6.2 Founder-owned inputs (data files in the repo, never edited by the pipeline)
+### 6.2 Founder-owned inputs (committed data files, never edited by the pipeline)
 
 | File | Content | Used by |
 |---|---|---|
-| `pipeline/data/taxonomy.csv` | `code, subject, class_level, parent_code, kind, name_en, name_hi, sort_order, default_learn_minutes, neet_relevant` | `taxonomy load` (D13) |
-| `pipeline/data/prerequisites.csv` | `from_code, to_code` | `taxonomy prerequisites` (D13) |
-| `pipeline/data/archetypes.yaml` | tracks with ordered steps `(node_code, phase, target_week)` | `backbone load` (D13; educator review F3 by W8) |
-| `pipeline/data/cutoffs.csv` | `year, category, quota_scope, seat_type, qualifying_marks, source` | `cutoffs load` |
-| `pipeline/data/books.yaml` | book codes, titles, edition year, S3 keys of the PDFs | `ncert register` (D14) |
-| `pipeline/data/papers/<exam>-<year>.json` | PYQ papers as structured JSON (stem, options, key, paper code) | `pyq load` (D19) |
+| `pipeline/inputs/taxonomy.csv` | `code, subject, class_level, parent_code, kind, name_en, name_hi, sort_order, default_learn_minutes, neet_relevant` | `taxonomy load` (D13) |
+| `pipeline/inputs/prerequisites.csv` | `from_code, to_code` | `taxonomy prerequisites` (D13) |
+| `pipeline/inputs/archetypes.yaml` | tracks with ordered steps `(node_code, phase, target_week)` | `backbone load` (D13; educator review F3 by W8) |
+| `pipeline/inputs/cutoffs.csv` | `year, category, quota_scope, seat_type, qualifying_marks, source` | `cutoffs load` |
+| `pipeline/inputs/books.yaml` | book codes, titles, edition year, S3 keys of the PDFs | `ncert register` (D14) |
+| `pipeline/inputs/papers/<exam>-<year>.json` | PYQ papers as structured JSON (stem, options, key, paper code) | `pyq load` (D19) |
 
 Source PDFs, page images, JSONL artefacts and eval snapshots live in the content bucket, not in git.
 
@@ -1251,7 +1342,7 @@ Source PDFs, page images, JSONL artefacts and eval snapshots live in the content
 | `pyq verify --year --subject` | D20–D21 | question id | verified vs flagged; flagged → `audit_queue(pipeline_flag)` |
 | `pyq distractors --year --subject` | D21 | question id | distractor maps written; 10% sample listed |
 | `stats compute` | D22 | node id | **top-10 weightage chapters** (PLAN D22 ✅), difficulty distribution |
-| `traps mine` | D22 | `(node_id, note)` with evidence rows | traps per node with their PYQ ids |
+| `traps mine` | unscheduled; proposed for the D24 buffer (§12.2) | `(node_id, note)` with evidence rows | traps per node with their PYQ ids |
 | `anchors link` | D23 | `(question_id, paragraph_id)` | anchor coverage %, questions with none |
 | `eval snapshot` | D23 | — | dumps curriculum tables to `snapshots/<date>/` for the eval database |
 | `questions generate --node --target 30` | unscheduled (SPEC §9.3; §12.2) | generated question ids | verified vs rejected, audit sample |
@@ -1271,8 +1362,9 @@ pass embedding `text_hi` into a separate column is needed; that would be a D18 b
 ### 6.5 Stats and exam intelligence (D22)
 
 `weightage_marks_avg` per node = mean over the last 15 years of (questions tagged to the node or its
-descendants × 4 marks). `difficulty` for PYQs starts as a REASON-tier estimate on a 0–1 scale
-(recalibrated from `practice_events` once students exist). `default_learn_minutes` comes from the
+descendants × 4 marks). `difficulty` for PYQs starts as a CHEAP-tier estimate on a 0–1 scale
+(`DifficultyEstimateTask`, feature `pipeline_difficulty`; an estimate does not warrant REASON), recalibrated from
+`practice_events` once students exist. `default_learn_minutes` comes from the
 taxonomy CSV. `traps mine` clusters a node's PYQs by distractor concept and asks the CHEAP tier for
 a one-line "how NTA twists this" note per cluster with ≥ 2 supporting questions; the evidence rows
 are written first, the note second, so an unbacked note cannot exist.
@@ -1419,14 +1511,18 @@ and reusing the Spring context across module-flow tests.
 
 ### 8.3 Contract tests for the hard rules
 
-- `CorrectKeyNeverLeaksTest`: serialises every response record in `practice.web` and walks the
-  JSON of `POST /practice/sessions` and `GET /practice/offline-pack` (Option B) for the string
-  `correct_key`; fails on any occurrence. Under Option A, the offline-pack test asserts the field
-  appears only under `judging` and only for the caller's own scheduled blocks.
+- `CorrectKeyNeverLeaksTest`: walks the JSON of every payload that can precede an answer —
+  `POST /practice/sessions`, `POST /practice/diagnostic`, `GET /practice/sessions/{id}` for
+  unanswered questions, `GET /curriculum/*`, `GET /plan/*` and (under Option B) `GET
+  /practice/offline-pack` — for the string `correct_key`; fails on any occurrence. It also asserts
+  the two permitted carriers: the judged-answer response and `GET /notebook/entries` return the key
+  only for questions with a recorded `practice_events` row by the caller. Under Option A the
+  offline-pack test asserts the field appears only under `judging` and only for the caller's own
+  scheduled blocks.
 - `IdempotencyReplayTest` for every **Idem** route: same key + same body → identical response,
   no second side effect; same key + different body → `IDEMPOTENCY_CONFLICT`.
-- `WebhookSignatureTest`: tampered body → 400 and no `billing_events` row; replayed event id → 200
-  and one row.
+- `WebhookSignatureTest`: tampered body → 400, no `billing_events` row, one `billing.webhook.rejected`
+  metric; replayed event id → 200 and still one row.
 - `ImageLifecycleTest`: after confirm/discard the S3 port received a delete for the key; the sweeper
   deletes an expired unconfirmed upload.
 - `IstBoundaryTest`: doubt limits, streaks and notification caps with a fixed clock at 23:59 and
@@ -1667,8 +1763,9 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 | Gap | SPEC | Proposal |
 |---|---|---|
 | Infrastructure provisioning | §3 (AWS), every deployed check from D57 | founder workstream F8 per §7.6 |
-| Batch timetable photo (documents type 3) and the weekly batch-confirm card | §6.7, §6.8 | timetable photo fits D29 (shared pattern, one more `doc_type`); the weekly confirm card fits D58 alongside the negotiation chat; or park both until coaching students appear in the beta |
+| Batch sync: onboarding self-report (`POST /plan/batch-position`, `batch_positions`), the timetable photo (documents type 3) and the weekly batch-confirm card | §6.7, §6.8 | self-report fits D25 (Q3 asks about coaching); timetable photo fits D29 (shared pattern, one more `doc_type`); the weekly confirm card fits D58 alongside the negotiation chat; or park all three until coaching students appear in the beta. D55's snapshot reads `batch_positions` when it exists and ignores it otherwise |
 | Seed generation to ≥ 30 usable questions per topic | §9.3 | `questions generate` exists in §6.3; run it in the D24 buffer for the top-weightage nodes, and again at D76 |
+| "NTA trap" mining (`traps mine`, `topic_traps`) | §9.4, §6.3 answer contract | fits the D24 buffer after anchors exist (D23); without it the doubt pipeline still shows traps backed by retrieved PYQs (§4.3), only the precomputed candidates are missing |
 | In-app full mocks and the autopsy | §4 Phase 4, §7.1, §6.1 "later Mock" | mocks reuse the session engine (`kind = mock`, 180 questions) and could land at D35 with the diagnostic; the autopsy (per-mark classification, gamble score, pace map) reuses D49 classification and fits D54's buffer or a new day; not excluded by §12, so parking it is an explicit product call |
 | Exam-season planner modes (T-21 revision-only, T-3 light recall, exam eve, silence) | §4 Phases 5–6, §8 screen 14, DEV_SPEC §8.6 | deterministic `ModeResolver` in §4.5 lands with D55–D56; the Today variants at D59; notification silence at D68 — no new day needed, but the days' scopes should name it |
 | Crash reporting SDK | §11 crash-free ≥ 99.5% | PostHog error tracking (§5.7); amend the SDK rule only if it proves insufficient |
@@ -1718,20 +1815,26 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    Terraform in a separately permitted session.
 6. **Pipeline in Java** (§6.1) — confirm, or choose the Python-extraction alternative before D14.
 7. **Console checks** in §13.2 — before D5.
+8. **Minors and photo doubts** — SPEC §6.8 says minors need parent consent "before any upload";
+   DEV_SPEC §8.4 narrows that to document uploads. This plan gates `POST /documents` only, so a
+   minor can photograph a doubt before consent (the photo is deleted within seconds, §4.3). Confirm
+   that reading, or extend `CONSENT_REQUIRED` to photo doubts (D38).
 
 ## 14. Decisions to record in DECISIONS.md on approval
 
-Format there: `date · day · decision · why · revisit when`. Each line below becomes one entry.
+Format there: `date · day · decision · why · revisit when`. Each row below becomes one entry.
+Conflict resolutions are deliberately absent from this table — DECISIONS.md excludes them — and
+live in §0.4 and the D3 day log instead: the precedence order (§0.1), synchronous answers until D69
+streaming (§0.4 #6), the eval stamp and CI arrangement (§0.4 #3), the batch-inference threshold
+(§0.4 #2), the infrastructure workstream (§0.4 #1) and the `correct_key` reading (§0.4 #4).
 
 | # | Decision | Why | Revisit when |
 |---|---|---|---|
 | D3.1 | One technical plan document, `docs/TECH_PLAN.md`, cited by section | one place for rules and agents to point at | never |
-| D3.2 | Precedence SPEC › TECH_PLAN › DEV_SPEC §2–§12; DEV_SPEC §13 stays authoritative | CLAUDE.md said "until D3 confirms or replaces" | never |
-| D3.3 | Hinglish is the `hi_Latn` locale (`app_hi_Latn.arb`); server value `hinglish` | valid BCP-47 tag, zero custom plumbing | never |
-| D3.4 | Content pipeline in Java inside the server (`pipeline` profile, picocli); VISION-tier page extraction; `pipeline/` holds founder data and reports | pipeline.md requires `AiClient`; one toolchain; layout-proof extraction | D14 if extraction quality disappoints |
+| D3.3 | Hinglish is the `hi_Latn` locale (`app_hi_Latn.arb`); server value `hinglish` | valid BCP-47 tag, zero custom plumbing; verified with gen-l10n | never |
+| D3.4 | Content pipeline in Java inside the server (`pipeline` profile, picocli); VISION-tier page extraction; `pipeline/inputs/` holds founder data, `pipeline/reports/` the run reports | pipeline.md requires `AiClient`; one toolchain; layout-proof extraction | D14 if extraction quality disappoints |
 | D3.5 | Enumerations as `VARCHAR` + `CHECK`, never PG enum types | one-line migrations to extend | never |
 | D3.6 | pgvector HNSW cosine indexes (not ivfflat) | no training step, better recall at this scale | > 5M vectors |
-| D3.7 | Doubt answers synchronous with `202` + polling until D69 streaming | PLAN puts streaming at D69 | D69 |
 | D3.8 | In-process rate limiting, dispatcher, sweepers and async listeners; single API task | beta topology; upgrade path in §13.3 | second API task |
 | D3.9 | Flutter: go_router, dio, flutter_secure_storage, Riverpod without codegen, drift at D34, flutter_markdown + flutter_math_fork | boring, well-supported; codegen only when drift forces build_runner | D34 |
 | D3.10 | One AWS environment `beta`; Fargate in public subnets behind the ALB (no NAT gateway); RDS single-AZ; secrets injected by ECS from SSM | cost and simplicity; no staging until public launch | public launch |
@@ -1743,7 +1846,6 @@ Format there: `date · day · decision · why · revisit when`. Each line below 
 | D3.16 | Join tables instead of `UUID[]` where foreign keys matter; plan blocks are rows | referential integrity; blocks are addressed by id | never |
 | D3.17 | Doubt cache keyed by `(question_hash, language)`; a cross-language exact hit renders the verified canonical answer (CHEAP) and counts as a hit | keeps the 55% hit-rate target reachable in three languages without re-solving | D41 metrics |
 | D3.18 | `AiClient` = `complete` + `embed`; feature tasks around it; ledger, breaker, tier policy, schema validation and retry as decorators | stable seam; every rule enforced once | never |
-| D3.19 | Eval gate: founder-launched live run writes a committed `eval/last-pass.json`; CI verifies the stamp and runs the fake layer | CI has no credentials by policy | D23 |
 | D3.20 | Seed data as a repeatable Flyway migration in a `db/seed` location enabled only in `local`/`test` | production never sees test data | never |
 | D3.21 | Structured model output via Bedrock Converse forced tool use, validated against the record schema | no JSON parsing heuristics | never |
 | D3.22 | Doubt images deleted immediately after extraction; documents after confirm/discard; sweeper and lifecycle as backstops | the 24-hour promise becomes minutes | never |

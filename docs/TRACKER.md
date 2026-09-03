@@ -12,20 +12,20 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 0 — Foundations (Week 1) |
-| Current day | D2 built, verified locally and committed on branch `d2-local-env` · 2026-09-03 · tick once the PR's CI is green · next: D3 |
-| Days completed / total | 1 / 84 (2 once D2's CI is green) |
+| Current day | D2 done · 2026-09-03 (PR #1 CI green, merged) · next: D3 |
+| Days completed / total | 2 / 84 |
 | Schedule delta | on track |
 | Last week's gate | n/a — Week-1 gate is due at D6 |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none. Human step open: push `d2-local-env`, open the PR, confirm CI green, merge, tick D2. Toolchain on this machine now: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
 ## PHASE 0 — Foundations (Week 1) · Module M0
 
 - [x] **D1** Claude Code scaffolding (CLAUDE.md, settings, 3 gate scripts, rules, agents, commands) · ✅ gates block bad commit + secret write — done 2026-09-02, all five acceptance tests passed (see day log)
-- [ ] **D2** Local env: Docker Postgres 18+pgvector, Spring Boot 4 boots, Flutter shell on device, CI green · ✅ fresh clone → running <15 min — built 2026-09-03 on `d2-local-env`, local acceptance PASS (see day log); tick when the PR's CI is green
+- [x] **D2** Local env: Docker Postgres 18+pgvector, Spring Boot 4 boots, Flutter shell on device, CI green · ✅ fresh clone → running <15 min — done 2026-09-03, acceptance PASS (35 s warm, ≈14.5 min cold), PR CI green (founder-verified), merged (see day log)
 - [ ] **D3** Claude Code full technical plan reviewed & approved · ✅ plan committed to docs/
 - [ ] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations
 - [ ] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake
@@ -189,7 +189,8 @@ Acceptance: PASS locally —
   Shell runs on the Android 36 emulator (screenshot: "MARG AI"; com.margai.app resumed).
   spec-auditor on the full diff: PASS, one minor finding (a document conflict logged in
   DECISIONS.md) fixed by moving it here; jq added to the Brewfile on its advice (hooks need it).
-  CI: not yet exercised — needs the human push + PR; D2 stays unticked until it is green.
+  CI: PR #1 from d2-local-env green (founder-verified 2026-09-03) — first real run of the server
+  and app jobs; merged to main by the founder (merge commit 5e97f35).
 Doc conflict surfaced: DEV_SPEC §13.8 (bootstrap prompt) scaffolds server/ with "first migration
   = users + subscriptions"; PLAN D2 is environment only and PLAN D4 owns the first migrations
   (docker-compose.yml already says so). Resolved by PLAN precedence in the approved D2 plan;
@@ -204,8 +205,8 @@ Surprise: Testcontainers 2.x renamed its artifacts (testcontainers-postgresql, p
   flutter create's Kotlin template carries TODO comments that the gate rejects — removed.
   Another project's Keycloak holds 127.0.0.1:8080 on this Mac; SERVER_PORT=8081 works (README).
   psql is not installed although settings allow it — use `docker compose exec -T db psql`.
-Tomorrow's first task: D3 — once the PR is green and merged, tick D2; then the full technical
-  plan from SPEC (architecture, data model, API surface, AI pipeline) for a whole-session review.
+Tomorrow's first task: D3 — the full technical plan from SPEC (architecture, data model, API
+  surface, AI pipeline) for a whole-session review; decide the Hinglish ARB locale strategy in it.
 ```
 
 ```

@@ -11,20 +11,20 @@
 
 | Field | Value |
 |---|---|
-| Current phase | _e.g. PHASE 0_ |
-| Current day | _D— (plan) / actual date_ |
-| Days completed / total | _0 / 84_ |
-| Schedule delta | _on track / +N days behind_ |
-| Last week's gate | _passed / partial / failed_ |
-| Eval suite pass rate | _—% (gate ≥97%)_ |
-| Cache hit rate | _—%_ |
-| Blockers | _—_ |
+| Current phase | PHASE 0 — Foundations (Week 1) |
+| Current day | D1 done · 2026-09-02 (session closed just after midnight, 2026-09-03) · next: D2 |
+| Days completed / total | 1 / 84 |
+| Schedule delta | on track |
+| Last week's gate | n/a — Week-1 gate is due at D6 |
+| Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
+| Cache hit rate | — |
+| Blockers | none. D2 prerequisites on this machine: Flutter stable is not installed; JDK is 21, Spring Boot 4 on latest LTS needs 25 |
 
 ---
 
 ## PHASE 0 — Foundations (Week 1) · Module M0
 
-- [ ] **D1** Claude Code scaffolding (CLAUDE.md, settings, 3 gate scripts, rules, agents, commands) · ✅ gates block bad commit + secret write
+- [x] **D1** Claude Code scaffolding (CLAUDE.md, settings, 3 gate scripts, rules, agents, commands) · ✅ gates block bad commit + secret write — done 2026-09-02, all five acceptance tests passed (see day log)
 - [ ] **D2** Local env: Docker Postgres 18+pgvector, Spring Boot 4 boots, Flutter shell on device, CI green · ✅ fresh clone → running <15 min
 - [ ] **D3** Claude Code full technical plan reviewed & approved · ✅ plan committed to docs/
 - [ ] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations
@@ -173,6 +173,33 @@
 ## 📝 Day log (append newest on top)
 
 ```
+D1 · 2026-09-02 · PHASE 0 — Foundations
+Shipped: git repo on main (6 commits). docs renamed to SPEC / DEV_SPEC / PLAN / TRACKER.
+  CLAUDE.md (DEV_SPEC §13.2 verbatim + precedence + session rules). .claude/settings.json
+  (permissions + hooks). scripts/precommit-gate.sh, block-paths.sh, detect-secrets.sh.
+  eval/run.sh placeholder with content-hash stamp. Rules ×4, agents ×2 (spec-auditor,
+  db-migrator), commands ×3 (/week, /endpoint, /evalgate). docker-compose db
+  (pgvector pg18). GitHub Actions CI (guardrails, server, app, eval). Skeleton READMEs.
+Acceptance: PASS —
+  (a) commit with a todo-marker file + an unstamped prompts/ change → BLOCKED (both
+      reasons listed); after eval/run.sh the same change passes the gate.
+  (b) fake AWS access key via the Write tool → BLOCKED; via a shell heredoc → BLOCKED.
+  (c) Write to infra/prod/main.tf → BLOCKED by hook; Write to the dotenv file → refused
+      by the permission deny rule before the hook ran.
+  (d) `aws s3 ls` → PERMISSION DENIED (aws CLI is installed locally, so a real test).
+  (e) five clean commits passed through the live gate.
+Parked: git-native pre-commit hook; protect scripts/ + settings.json from agent edits;
+  release-checklist skill (DEV_SPEC §13.1).
+Surprise: DEV_SPEC §13.3 is not valid settings JSON (comments, matcher form,
+  PostToolUse cannot block) — translated, rationale in commit ddb25ac. Bash bypasses the
+  Write/Edit hooks, so the hooks now cover Bash too; side effect: any shell command that
+  merely mentions a protected path is blocked (lone `git commit`/`git log` exempted).
+  CLAUDE.md §13.2 "SPEC §3–5" citations pointed at Developer-Spec sections; now read DEV_SPEC.
+Tomorrow's first task: D2 — install Flutter stable and JDK 25 (local is 21), then the
+  Spring Boot 4 skeleton with ./mvnw so the gate's SKIPPED warnings disappear.
+```
+
+```
 D— · <date> · <phase>
 Shipped:
 Acceptance: PASS/FAIL —
@@ -186,6 +213,9 @@ Tomorrow's first task:
 ## 🅿️ PARKED (Sunday review only)
 
 - _idea · date · one line_
+- git-native pre-commit hook (`core.hooksPath` → scripts/precommit-gate.sh) · 2026-09-02 · today only Claude's commits are gated; the human's own commits bypass the gate
+- protect scripts/ and .claude/settings.json from agent edits after D1 · 2026-09-02 · the policed agent can currently edit its own policy; commit review by the human is the only control
+- `.claude/skills/release-checklist/` (DEV_SPEC §13.1: migration check, eval gate, changelog) · 2026-09-02 · not in D1 scope; needed before Week 11 (money) at the latest
 
 ---
 

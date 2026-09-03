@@ -263,7 +263,319 @@ Every SPEC §6 feature maps the same way: §6.1 planner · §6.2 practice · §6
 
 ## 2. Data model
 
-_Written in task 3._
+### 2.1 Conventions (apply to every table)
+
+- PostgreSQL 18, snake_case. `id UUID PRIMARY KEY DEFAULT gen_random_uuid()`,
+  `created_at TIMESTAMPTZ NOT NULL DEFAULT now()`, `updated_at TIMESTAMPTZ NOT NULL DEFAULT now()`
+  (Hibernate `@UpdateTimestamp`). Append-only tables (`practice_events`, `ai_calls`, `billing_events`)
+  have no `updated_at`.
+- Enumerations are `VARCHAR` columns with a `CHECK (col IN (...))` constraint; Java side
+  `@Enumerated(EnumType.STRING)`. Adding a value is a one-line migration; PostgreSQL enum types are
+  not used.
+- Foreign keys are `ON DELETE RESTRICT`. Student data is anonymised (§9.6), never cascaded away.
+- Time: `TIMESTAMPTZ` everywhere (UTC on the wire); `DATE` columns are IST calendar dates and are
+  named `ist_date`, `plan_date`, `week_start` etc. (§11.1). Money is `BIGINT` paise.
+- Vectors are `vector(1024)` with HNSW cosine indexes; full text is a stored generated `tsvector`
+  with a GIN index.
+- JSONB is used for shapes the app reads whole and never queries by key (extracted document fields,
+  evidence trails, snapshots). Anything queried, joined or constrained gets columns or a join table.
+  DEV_SPEC §3's `UUID[]` columns become join tables where a foreign key matters.
+- Every table names the PLAN day it lands (§2.9). Column lists below are complete for D4 tables and
+  key-complete for the rest (db-migrator fills types and indexes from these).
+
+### 2.2 Identity and account (`account`, `auth`)
+
+**users** — D4
+```
+id, phone VARCHAR(16) UNIQUE NOT NULL (E.164; NULL after deletion), phone_verified_at TIMESTAMPTZ,
+display_name VARCHAR(80), language VARCHAR(8) NOT NULL DEFAULT 'en' CHECK (en|hi|hinglish),
+role VARCHAR(16) NOT NULL DEFAULT 'student' CHECK (student|admin),
+status VARCHAR(16) NOT NULL DEFAULT 'active' CHECK (active|deleted),
+deleted_at TIMESTAMPTZ, purge_after DATE, created_at, updated_at
+```
+Index: `phone` (unique, partial `WHERE phone IS NOT NULL`).
+
+**student_profiles** (1:1 users) — D4; columns marked † are filled by later days but declared now so
+the row shape is stable.
+```
+id, user_id UUID UNIQUE NOT NULL → users,
+attempt_type VARCHAR(16) CHECK (fresher_1yr|fresher_2yr|dropper|repeater),
+target_year SMALLINT, coaching_mode VARCHAR(16) CHECK (classroom|online|self_study|mix),
+coaching_provider VARCHAR(16) CHECK (pw|aakash|allen|unacademy|other),
+hours_weekday NUMERIC(3,1), hours_weekend NUMERIC(3,1),
+goal VARCHAR(16) CHECK (govt_mbbs|private_ok|bds_other|qualify),
+state_code CHAR(2), category VARCHAR(8) CHECK (general|obc|sc|st|ews),
+dob DATE, is_minor BOOLEAN NOT NULL DEFAULT false,
+last_neet_year SMALLINT, last_neet_score SMALLINT, last_neet_rank INTEGER,
+scorecard JSONB †, board_marks JSONB †,
+onboarding_step VARCHAR(24) NOT NULL DEFAULT 'intro', onboarding_completed_at TIMESTAMPTZ,
+exam_date DATE †, morning_notification_time TIME NOT NULL DEFAULT '07:00',
+current_streak INTEGER NOT NULL DEFAULT 0, longest_streak INTEGER NOT NULL DEFAULT 0,
+last_active_ist_date DATE, created_at, updated_at
+```
+SPEC §5.1 Q1–Q7 map one-to-one: Q1 `attempt_type`, Q2 `target_year`, Q3 `coaching_mode` +
+`coaching_provider`, Q4 → `chapter_status`, Q5 hours, Q6 `goal`/`state_code`/`category`
+(category optional, DEV_SPEC §8.4), Q7 `last_neet_*` or `scorecard`/`board_marks` via documents.
+`scorecard` and `board_marks` hold confirmed fields only (SPEC §5.2): never an image reference.
+
+**parent_consents** — D27: `user_id → users, parent_phone VARCHAR(16), status CHECK
+(pending|consented|expired), otp_challenge_id → otp_challenges, consented_at`. Partial unique
+`(user_id) WHERE status = 'consented'`.
+
+**otp_challenges** — D7: `phone, purpose CHECK (login|parent_consent), code_hash CHAR(64),
+attempts SMALLINT DEFAULT 0, expires_at, verified_at, request_ip INET`. Index `(phone, created_at)`.
+
+**refresh_tokens** — D7: `user_id → users, token_hash CHAR(64) UNIQUE, family_id UUID, expires_at,
+revoked_at, replaced_by_id → refresh_tokens, device_label VARCHAR(80), last_used_at`. Index `user_id`,
+`family_id`.
+
+**user_devices** — D30: `user_id → users, fcm_token TEXT UNIQUE, platform VARCHAR(8), app_version
+VARCHAR(16), last_seen_at`.
+
+**data_export_jobs** — D64: `user_id → users, status CHECK (queued|ready|failed|expired), s3_key,
+expires_at, error`.
+
+### 2.3 Curriculum content (`curriculum`, read-mostly)
+
+**syllabus_nodes** — D4
+```
+id, code VARCHAR(32) UNIQUE NOT NULL  (PHY.11.ROT · PHY.11.ROT.TORQUE; stable, used everywhere),
+subject VARCHAR(16) NOT NULL CHECK (physics|chemistry|botany|zoology),
+class_level SMALLINT CHECK (11|12), parent_id → syllabus_nodes,
+kind VARCHAR(8) NOT NULL CHECK (subject|unit|chapter|topic),
+name_en VARCHAR(160) NOT NULL, name_hi VARCHAR(160), sort_order INTEGER NOT NULL,
+weightage_marks_avg NUMERIC(6,2) NOT NULL DEFAULT 0  (D22),
+default_learn_minutes INTEGER, neet_relevant BOOLEAN NOT NULL DEFAULT true  (SPEC §6.2 "NTA never asked it"),
+created_at, updated_at
+```
+Indexes: `parent_id`, `(subject, kind)`. Constraint: `kind = 'subject'` ⇒ `parent_id IS NULL`.
+
+**syllabus_prerequisites** — D4 (loaded D13): `from_node_id → syllabus_nodes, to_node_id →
+syllabus_nodes, PRIMARY KEY (from_node_id, to_node_id), CHECK (from_node_id <> to_node_id)`. The D13
+acceptance "graph has no cycles" is a loader check plus a repository test; replaces the
+`prerequisites UUID[]` column of DEV_SPEC §3.2.
+
+**archetype_tracks** — D4 (config table): `code VARCHAR(16) UNIQUE CHECK
+(fresher_2yr|fresher_1yr|dropper|repeater), name_en, name_hi, weeks SMALLINT, description_md`.
+**archetype_track_steps** — D4: `track_id → archetype_tracks, node_id → syllabus_nodes, sequence
+INTEGER, phase CHECK (learn|mock|revision), target_week SMALLINT, UNIQUE (track_id, sequence)`.
+Loaded from `pipeline/data/archetypes.yaml` (SPEC §9.5; educator review is TRACKER F3).
+
+**cutoffs** — D4 (config table): `year SMALLINT, category VARCHAR(8), quota_scope VARCHAR(8)
+(AIQ or state code), seat_type VARCHAR(16) CHECK (govt_mbbs|private_mbbs|bds|qualifying),
+qualifying_marks SMALLINT, source VARCHAR(120), UNIQUE (year, category, quota_scope, seat_type)`.
+
+**ncert_books** — D14: `code VARCHAR(16) UNIQUE (keph1 …), subject, class_level, part SMALLINT,
+title_en, title_hi, edition_year SMALLINT, s3_key_en, s3_key_hi, pages_en, pages_hi`.
+
+**ncert_paragraphs** — D14 (embedding D17)
+```
+book_id → ncert_books, chapter_no SMALLINT, section VARCHAR(16) ('7.9'), para_no SMALLINT,
+node_id → syllabus_nodes (nullable; set by the D23 anchor pass),
+text_en TEXT, text_hi TEXT, figure_refs JSONB, has_equations BOOLEAN,
+embedding vector(1024), tsv tsvector GENERATED ALWAYS AS
+  (to_tsvector('english', coalesce(text_en,'')) || to_tsvector('simple', coalesce(text_hi,''))) STORED,
+extraction JSONB (page numbers, confidence, ai_call_id), UNIQUE (book_id, chapter_no, section, para_no)
+```
+Indexes: HNSW `embedding vector_cosine_ops`, GIN `tsv`, `node_id`. The unique key is the paragraph
+address that anchors display as "Class 11 Physics, Ch 7, §7.9" (SPEC §6.3).
+
+**questions** — D19
+```
+source VARCHAR(16) CHECK (pyq|generated), exam VARCHAR(8), year SMALLINT, paper_code VARCHAR(16),
+question_no SMALLINT, node_id → syllabus_nodes NOT NULL,
+stem_en TEXT NOT NULL, stem_hi TEXT, options JSONB NOT NULL ([{key, text_en, text_hi}]),
+correct_key CHAR(1) NOT NULL,
+solution_md_en TEXT, solution_md_hi TEXT, difficulty NUMERIC(3,2), avg_time_sec INTEGER,
+distractor_map JSONB ({"B": "sign_error", …}), embedding vector(1024),
+verified BOOLEAN NOT NULL DEFAULT false, audit_status VARCHAR(16) CHECK (auto|founder_ok|flagged),
+verification JSONB, generated_from_error_entry_id UUID (variants, D51)
+```
+Natural key for PYQs: `UNIQUE (source, exam, year, paper_code, question_no)`. Indexes:
+`(node_id, difficulty)`, `(source, year)`, partial on `verified`. **`correct_key` is server-only:**
+the JPA entity field is `@JsonIgnore`, no response record carries it before an answer is judged, and
+a test scans every practice payload for the string (§8.4). The verdict after judging returns it for
+that one question only (§3.7).
+
+**question_topics** — D19: `question_id, node_id, PRIMARY KEY (question_id, node_id)` (secondary
+topics). **question_anchors** — D23: `question_id, paragraph_id, PRIMARY KEY`.
+
+**topic_traps** — D22: `node_id → syllabus_nodes, note_en TEXT, note_hi TEXT, note_hinglish TEXT`.
+**topic_trap_evidence** — D22: `trap_id, question_id, PRIMARY KEY`. A trap without at least one
+evidence row is never created (service check + test): the Evidence rule for "How NTA twists this".
+
+### 2.4 Practice (`practice`)
+
+**chapter_status** — D4
+```
+user_id → users, node_id → syllabus_nodes,
+status VARCHAR(16) NOT NULL DEFAULT 'untouched' CHECK (untouched|ongoing|covered),
+feels_weak BOOLEAN NOT NULL DEFAULT false,
+source VARCHAR(16) NOT NULL CHECK (self_report|inferred|timetable|diagnostic),
+ability_estimate NUMERIC(3,2), ability_confidence NUMERIC(3,2), last_signal_at TIMESTAMPTZ,
+UNIQUE (user_id, node_id), created_at, updated_at
+```
+Q4's three states plus long-press weak (SPEC §5.1) write `status` and `feels_weak` with
+`source = self_report`; behaviour refines them later.
+
+**practice_sessions** — D31: `user_id, block_id → plan_blocks (nullable), kind CHECK
+(block|diagnostic|srs_review|mock), status CHECK (active|finished|abandoned), started_at,
+finished_at, summary JSONB`. Index `(user_id, started_at)`.
+**practice_session_questions** — D31: `session_id, question_id, position SMALLINT, answered BOOLEAN,
+PRIMARY KEY (session_id, question_id)`.
+**practice_events** — D33 (append-only): `user_id, session_id, question_id, chosen_key CHAR(1)
+(NULL = skipped), is_correct BOOLEAN, time_taken_ms INTEGER, position_in_session SMALLINT,
+occurred_at TIMESTAMPTZ, client_event_id UUID UNIQUE, created_at`. Indexes `(user_id, occurred_at)`,
+`question_id`, `session_id`. `client_event_id` makes offline outbox replays idempotent (§5.6).
+
+### 2.5 Doubts (`doubts`)
+
+**doubts** — D37: `user_id, input_type CHECK (photo|text), raw_text, normalized_text, question_hash
+CHAR(64), language, image_s3_key (NULL once deleted), image_deleted_at, subject, node_id (nullable),
+cache_hit BOOLEAN, cache_id → doubt_cache, model_tier CHECK (cheap|reason|none), status CHECK
+(answered|pending|queued|unverified_fallback|failed), answer JSONB, verified BOOLEAN,
+verification JSONB, parent_doubt_id → doubts (follow-ups, D46), reported BOOLEAN, report_note,
+audit_status, latency_ms, created_at, updated_at`. Indexes `(user_id, created_at)`, `question_hash`.
+**doubt_evidence** — D37: `doubt_id, question_id, PRIMARY KEY` (PYQs that back the trap note).
+**doubt_cache** — D41: `question_hash CHAR(64), language, subject, node_id, canonical_question TEXT,
+embedding vector(1024), answer JSONB, verified BOOLEAN NOT NULL CHECK (verified = true),
+hit_count INTEGER, last_hit_at, source_doubt_id, invalidated_at, UNIQUE (question_hash, language)`.
+HNSW on `embedding`; index `(subject, language)`. The CHECK constraint is the database half of
+"cache writes only when verified" (§4.4).
+**doubt_daily_usage** — D44: `user_id, ist_date, fresh_count SMALLINT, cached_count SMALLINT,
+reason_fresh_count SMALLINT, PRIMARY KEY (user_id, ist_date)`. Free-tier arithmetic (5/day, cached
+= ½) and the Pro fair-use cap read one row; the IST day boundary is the key.
+
+### 2.6 Notebook (`notebook`)
+
+**error_entries** — D49: `user_id, question_id, practice_event_id UNIQUE, cause CHECK
+(concept_gap|silly_slip|time_pressure|gamble|unclassified), cause_confidence NUMERIC(3,2),
+cause_source CHECK (ai|student), student_corrected BOOLEAN, diagnosis JSONB, srs_stage SMALLINT
+DEFAULT 0, next_review_ist_date DATE, healed_at, upgraded_at`. Indexes `(user_id, next_review_ist_date)
+WHERE healed_at IS NULL`, `(user_id, healed_at)`, `(user_id, question_id)`.
+**srs_reviews** — D51: `error_entry_id, stage SMALLINT, variant_question_id → questions,
+scheduled_ist_date, practice_event_id, outcome CHECK (correct|wrong|skipped)`.
+**notebook_patterns** — D53: `user_id, week_start DATE, kind VARCHAR(32), text_en, text_hi,
+text_hinglish, evidence JSONB, sample_size INTEGER, UNIQUE (user_id, week_start, kind)`. A pattern
+row exists only when `sample_size` meets the configured minimum (Evidence rule, PLAN D53 ✅).
+
+### 2.7 Planner, wellbeing, trajectory, notifications
+
+**daily_plans** — D29: `user_id, plan_date DATE, generated_by CHECK
+(onboarding|nightly|fallback|renegotiation), mode CHECK
+(normal|light|revision_only|final_week|exam_eve|silence), mentor_note_md TEXT NOT NULL,
+inputs_snapshot JSONB, ai_call_id → ai_calls, version INTEGER, UNIQUE (user_id, plan_date)`.
+**plan_blocks** — D29: `plan_id → daily_plans, position SMALLINT, type CHECK
+(learn|practice|revise|mock|diagnostic), node_id, minutes SMALLINT, reason_md TEXT NOT NULL
+CHECK (length(reason_md) > 0), reason_evidence JSONB, payload JSONB, status CHECK
+(pending|done|skipped|deferred) DEFAULT 'pending', status_at, session_id`. Blocks are rows rather than
+DEV_SPEC's JSONB array because `POST /plan/blocks/{id}/status` addresses them and streaks count them.
+**mentor_messages** — D58: `user_id, direction CHECK (user|mentor), text, intent CHECK
+(negotiate_plan|checkin|distress|other), resulting_plan_id`. Index `(user_id, created_at)`.
+**batch_positions** — D26: `user_id, node_id, status CHECK (not_started|ongoing|done), source CHECK
+(self_report|timetable|inferred|weekly_confirm), confidence NUMERIC(3,2), observed_at,
+UNIQUE (user_id, node_id)`. The plan mentions the batch only when `confidence ≥ 0.7`
+(DEV_SPEC §8.2).
+**wellbeing_signals** — D59 (mood chip earlier, D30): `user_id, ist_date, mood CHECK (good|ok|low),
+inferred_slump BOOLEAN, slump_evidence JSONB, UNIQUE (user_id, ist_date)`.
+**trajectory_snapshots** — D58: `user_id, week_start, predicted_min SMALLINT, predicted_max
+SMALLINT, target_marks SMALLINT, cutoff_id → cutoffs, peer_percentile SMALLINT, insight_md,
+inputs JSONB, confidence CHECK (humble|growing|solid), UNIQUE (user_id, week_start)`.
+**notification_log** — D30: `user_id, kind CHECK
+(morning_plan|streak_save|srs_due|weekly_trajectory|exam_eve|good_luck), scheduled_for TIMESTAMPTZ,
+ist_date, status CHECK (scheduled|sent|skipped|failed), skip_reason CHECK (cap|quiet|silence|no_device),
+deep_link, payload JSONB, sent_at, provider_message_id, UNIQUE (user_id, kind, ist_date)`. Index
+`(status, scheduled_for)`. The 2/day cap is `COUNT(*) WHERE status='sent' AND ist_date=?` at dispatch.
+
+### 2.8 Documents, billing, AI, ops
+
+**document_extractions** — D28: `user_id, doc_type CHECK (neet_scorecard|board_marksheet|batch_timetable),
+s3_key, status CHECK (uploaded|extracted|confirmed|discarded|deleted), extracted JSONB,
+confirmed JSONB, ai_call_id, image_deleted_at, expires_at`. Index `(status, expires_at)`; the
+hourly sweeper deletes S3 objects past `expires_at` (= created + 24 h) as the belt to the lifecycle's
+braces.
+**subscriptions** — D61: `user_id, plan CHECK (free|pro_monthly|pro_annual), provider, provider_sub_id
+UNIQUE, provider_customer_id, status CHECK (pending|active|past_due|paused|cancelled), founding_price
+BOOLEAN, current_period_start, current_period_end, cancel_at, paused_at, auto_pause_after DATE`.
+Partial unique `(user_id) WHERE status IN ('pending','active','past_due')`.
+**payments** — D61: `subscription_id, provider_payment_id UNIQUE, amount_paise BIGINT, currency
+CHAR(3), status CHECK (captured|refunded|failed), refund_id, refunded_at, refund_deadline
+TIMESTAMPTZ, raw JSONB`.
+**billing_events** — D61 (webhook inbox, append-only): `provider_event_id UNIQUE, event_type,
+payload JSONB, signature_ok BOOLEAN, processed_at, error`. The unique id is webhook idempotency.
+**paywall_impressions** — D62: `user_id, trigger CHECK (doubt_limit|notebook_cap|srs_lock|weekly_report),
+context_key VARCHAR(64), outcome CHECK (shown|dismissed|paid), snooze_until, UNIQUE (user_id,
+trigger, context_key)`. "Each trigger fires once per context; Not now = 48 h" (PLAN D62 ✅).
+**idempotency_keys** — D61 (used by every idempotent route from D7 on): `key VARCHAR(64), user_id,
+route, request_hash CHAR(64), response_status SMALLINT, response_body JSONB, expires_at,
+PRIMARY KEY (key, user_id)`.
+**ai_calls** — D5 (append-only, the cost ledger)
+```
+id, user_id (nullable), feature VARCHAR(24) NOT NULL CHECK (doubt|doubt_route|doubt_verify|
+  doubt_translate|doubt_extract|plan|mentor_message|classify|srs_variant|extract_document|embed|
+  pipeline_extract|pipeline_solution|pipeline_verify|pipeline_distractor|pipeline_trap|eval|smoke),
+model_id VARCHAR(120) NOT NULL, tier VARCHAR(8) NOT NULL CHECK (cheap|reason|vision|embed),
+prompt_name VARCHAR(64), prompt_version SMALLINT,
+input_tokens INTEGER, output_tokens INTEGER, cache_read_tokens INTEGER, cache_write_tokens INTEGER,
+batch BOOLEAN NOT NULL DEFAULT false, latency_ms INTEGER,
+status VARCHAR(16) NOT NULL CHECK (ok|error|timeout|breaker|invalid_output),
+error_code VARCHAR(64), cost_paise BIGINT NOT NULL, request_id VARCHAR(64), created_at
+```
+Indexes `(feature, created_at)`, `(user_id, created_at)`. Written for every call including failures
+and fake-client calls; `cost_paise` computed at insert from the price table (§4.8). Month
+partitioning is PARKED until volume asks for it.
+**ai_spend_daily** — D65: `ist_date, feature, calls INTEGER, cost_paise BIGINT, cache_hits INTEGER,
+PRIMARY KEY (ist_date, feature)`; rebuilt by the nightly run.
+**audit_queue** — D39: `kind CHECK (doubt_report|verification_failed|grounding_failed|pipeline_flag|
+generated_sample|eval_failure), doubt_id, question_id, user_id, reason, payload JSONB, status CHECK
+(open|resolved|dismissed), resolution JSONB, resolved_at`. Index `(status, created_at)`. Resolution
+may set `doubt_cache.invalidated_at` or `questions.audit_status`.
+
+### 2.9 Migration schedule
+
+Flyway, `V<n>__<snake_name>.sql`, drafted by the db-migrator agent with a `-- ROLLBACK:` block and
+`rollback/U<n>__*.sql` where the undo is non-trivial. Numbers are indicative; the agent takes the
+next free integer.
+
+| Version | PLAN day | Creates |
+|---|---|---|
+| V1 `extensions` | D4 | `CREATE EXTENSION IF NOT EXISTS vector, pg_trgm` |
+| V2 `identity` | D4 | users, student_profiles |
+| V3 `curriculum_core` | D4 | syllabus_nodes, syllabus_prerequisites, archetype_tracks, archetype_track_steps, cutoffs |
+| V4 `chapter_status` | D4 | chapter_status |
+| V5 `ai_calls` | D5 | ai_calls |
+| V6 `auth` | D7 | otp_challenges, refresh_tokens, idempotency_keys |
+| V7 `ncert` | D14 | ncert_books, ncert_paragraphs (embedding column nullable; HNSW index created D17 once rows exist) |
+| V8 `questions` | D19 | questions, question_topics; `topic_traps`, `topic_trap_evidence` at D22; `question_anchors` at D23 |
+| V9 `onboarding` | D25–D28 | parent_consents, batch_positions, document_extractions |
+| V10 `plans` | D29 | daily_plans, plan_blocks |
+| V11 `notifications` | D30 | user_devices, notification_log, wellbeing_signals (mood only) |
+| V12 `practice` | D31–D33 | practice_sessions, practice_session_questions, practice_events |
+| V13 `doubts` | D37–D44 | doubts, doubt_evidence, audit_queue (D39), doubt_cache (D41), doubt_daily_usage (D44) |
+| V14 `notebook` | D49–D53 | error_entries, srs_reviews, notebook_patterns |
+| V15 `planner_brain` | D55–D59 | mentor_messages, trajectory_snapshots, slump columns |
+| V16 `billing` | D61–D62 | subscriptions, payments, billing_events, paywall_impressions |
+| V17 `privacy` | D64–D65 | data_export_jobs, ai_spend_daily |
+
+Seed data for local and test profiles (the D4 "test taxonomy": a two-subject, six-chapter tree with
+prerequisites, one archetype track and three cutoff rows) lives in `db/seed/R__test_taxonomy.sql`, a
+Flyway *repeatable* migration in a second location that only the `local` and `test` profiles add to
+`spring.flyway.locations`. Production never sees it; real taxonomy arrives through the D13 loader.
+
+Reversibility (D4 ✅ "migrations reversible"): a Testcontainers test applies every migration, runs
+the collected rollback scripts in reverse, and asserts only `flyway_schema_history` remains.
+
+### 2.10 Retention and deletion
+
+| Data | Rule | Mechanism |
+|---|---|---|
+| Uploaded images (doubts, documents) | gone ≤ 24 h; doubts deleted right after extraction; documents right after confirm/discard | S3 delete in the service + `expires_at` sweeper + bucket lifecycle (three layers) |
+| Account deletion | immediate logout and anonymisation; purge in 30 days | `users.status = deleted`, phone/name/dob/parent phone nulled, refresh tokens and devices deleted, `purge_after = today + 30`; nightly purge deletes doubts' raw text and images, mentor messages, document extractions, exports; aggregate rows (events, plans, ledger) stay under the tombstone id |
+| Data export | notebook PDF + full JSON | job writes to `exports/` in the uploads bucket, 24-hour signed URL |
+| OTP challenges | 24 h | nightly purge |
+| Idempotency keys | 24 h | nightly purge |
+| ai_calls | kept (cost history); user_id nulled on account purge | — |
+| Question bank, NCERT text | kept; NCERT text is retrieval-only and is displayed at most one anchored paragraph at a time (SPEC §9.2 "explains and anchors, never republishes") | `GET /curriculum/ncert/{id}` returns one paragraph plus neighbours' addresses, not text |
 
 ## 3. API surface
 

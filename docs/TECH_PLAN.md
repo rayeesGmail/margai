@@ -819,7 +819,247 @@ the last item, base64url. No offsets.
 
 ## 4. AI pipeline
 
-_Written in task 5._
+### 4.1 The AiClient seam (D5)
+
+One interface, two primitives. Feature-specific behaviour lives in small task classes around it,
+not in the interface, so the seam stays stable while features grow.
+
+```java
+package com.margai.ai.api;
+
+public interface AiClient {
+    <T> AiResponse<T> complete(AiRequest<T> request);        // text + optional images → typed JSON
+    AiResponse<float[]> embed(EmbedRequest request);         // text → vector(1024)
+}
+
+public record AiRequest<T>(
+        AiFeature feature,            // ledger category (ai_calls.feature)
+        Tier tier,                    // CHEAP | REASON | VISION
+        RouteDecision route,          // REQUIRED when tier == REASON (§4.2); null otherwise
+        PromptRef prompt,             // name + version, resolved from resources/prompts/
+        Map<String, Object> variables,
+        List<ImagePart> images,
+        Class<T> outputType,          // JSON schema derived from the record; validated
+        AiCallContext ctx) {}         // userId (nullable), requestId, batchable flag
+
+public record AiResponse<T>(T output, Usage usage, String modelId, Duration latency, UUID aiCallId) {}
+public record Usage(int inputTokens, int outputTokens, int cacheReadTokens, int cacheWriteTokens) {}
+```
+
+Implementations and decorators (innermost first):
+
+| Class | Role |
+|---|---|
+| `BedrockAiClient` (`@Profile("bedrock")`) | Converse API with forced tool-use for JSON output; prompt-cache checkpoint after the system prefix; model id per tier from config |
+| `FakeAiClient` (default) | returns fixtures from `src/test/resources/ai-fixtures/<prompt>.<case>.json` chosen by a variable (`fixture_case`) or a deterministic hash; realistic token counts so the ledger and breaker are exercised |
+| `RetryingAiClient` | 2 retries with jitter on throttling/5xx; timeouts 20 s real-time, 10 min batch; maps failures to `AiUnavailableException` |
+| `SchemaValidatingAiClient` | validates the JSON against the record's schema; one repair retry with the validation error in context; then `InvalidOutputException` |
+| `TierPolicyAiClient` | rejects a REASON request without a `RouteDecision`; rejects a VISION request without images |
+| `BudgetBreakerAiClient` | per-user and global daily spend from `ai_calls` (IST day); over budget → `AiBudgetExceededException`, ledger row with `status = breaker` |
+| `LedgerAiClient` (outermost) | writes the `ai_calls` row for every outcome, including breaker and failure; computes `cost_paise` from the price table |
+
+The bean wiring is the decorator chain over whichever implementation the profile selects, so
+`FakeAiClient` runs under the same breaker and ledger as Bedrock. Feature tasks (`DoubtAnswerTask`,
+`NumericalVerifyTask`, `DifficultyRouteTask`, `PlanSelectTask`, `ErrorClassifyTask`,
+`DocumentExtractTask`, `MentorMessageTask`, `VariantGenerateTask`) each own one prompt and one output
+record and are the only callers of `AiClient`.
+
+The D5 smoke test is a `smoke` feature call under `BEDROCK_LIVE=1` that asserts one `ai_calls` row
+with non-zero token counts, then the profile is switched off (PLAN D5 ✅).
+
+### 4.2 Tiers and routing
+
+| Tier | Config key | Used for |
+|---|---|---|
+| CHEAP | `margai.ai.tier.cheap` | routing, answers judged routine, plan selection, mentor notes, classification, translation/rendering, document extraction text |
+| VISION | `margai.ai.tier.vision` | photo doubts, document images, pipeline page extraction (same model family as CHEAP with image input) |
+| REASON | `margai.ai.tier.reason` | hard or numerical doubt answers, independent numerical verification, variant generation, pipeline PYQ solutions |
+| EMBED | `margai.ai.embed.model` | paragraphs, questions, doubt normal forms |
+
+`DifficultyRouter` (CHEAP, schema `{tier, is_numerical, subject, node_code_guess, answer_type:
+option|numeric|text}`) is the only producer of a `RouteDecision` for doubts. Rule fixed in the
+router, not the model: `is_numerical ⇒ tier = REASON`. Two other producers exist and are named
+constants, each with a test: `RouteDecision.verification()` (the verifier always runs on REASON) and
+`RouteDecision.generation()` (variant and pipeline solution generation). Nothing else can construct
+one, so "REASON only via the router" is a compile-time property plus the `TierPolicyAiClient` check.
+
+### 4.3 Doubt pipeline (D37–D46)
+
+Orchestrated by `doubts.internal.DoubtSolveService`; each stage is its own class with its own tests.
+
+| # | Stage | Component | What it does | Hard rule enforced here |
+|---|---|---|---|---|
+| 1 | Intake | `DoubtIntake` | text as-is; photo → S3 `uploads/doubts/{user}/{id}.jpg` → `DocumentExtractTask` (VISION, schema `{question_text, options[], diagram_description, language_detected, is_question}`) → S3 delete immediately on success; `NOT_A_QUESTION` when `is_question = false` | image in the uploads bucket only; deleted after reading |
+| 2 | Normalise | `QuestionNormalizer` | Unicode NFKC, lowercase Latin, strip numbering, whitespace, trailing punctuation; canonicalise math tokens (×→*, ÷→/, superscripts); Devanagari kept; `question_hash = sha256(normal_form)` | |
+| 3 | Cache lookup | `DoubtCacheLookup` | exact `(hash, language)` → hit. Else `embed` (EMBED, ledger) → HNSW cosine within same subject and language, similarity > 0.93 (config) → hit. Exact hash in *another* language → `AnswerRenderTask` (CHEAP) renders the verified canonical answer in the user's language, numeric final value copied verbatim and re-compared; counts as a cache hit | |
+| 4 | Limit gate | `DoubtLimitGate` | weight 0.5 for a hit, 1.0 fresh; free tier refuses when `fresh + 0.5·cached + weight > 5` → `DOUBT_LIMIT_REACHED` with paywall trigger; Pro: fair-use queue when `reason_fresh_count ≥ 30` (§4.4) | |
+| 5 | Route | `DifficultyRouter` | see §4.2 | REASON only via router |
+| 6 | Retrieve | `ai.retrieval.HybridRetriever` | top-8 vector (same subject) ∪ top-8 `websearch_to_tsquery` over `tsv` (both languages) → reciprocal-rank fusion → dedupe by paragraph → cap 2,500 tokens → plus ≤ 2 verified PYQs from the guessed node with anchor overlap or stem similarity. Zero paragraphs above the floor → retry without the node filter → still zero → **grounding failure**: honest fallback + `audit_queue(grounding_failed)` | no answer without retrieval grounding |
+| 7 | Generate | `DoubtAnswerTask` | prompt `doubt_answer` with the retrieved set (ids visible) and the PYQ set; output `{steps_md, concept_md, anchor_paragraph_id, final_answer: {value, unit}?, nta_trap_md?, followups[2], language}` | |
+| 8 | Verify | `NumericalVerifier` | when `route.is_numerical` or `answer_type = option`: `NumericalVerifyTask` (REASON, sees the question only, not the solution) → compare: numbers equal within 1% relative tolerance after unit normalisation, options by key. Mismatch → one regeneration with both attempts in context → verify again → mismatch → `status = unverified_fallback` + `audit_queue(verification_failed)` | numerical answers independently verified; never rendered unverified |
+| 9 | Assemble | `AnswerAssembler` | rejects an answer whose `anchor_paragraph_id ∉ retrieved set`; drops `nta_trap_md` unless ≥ 1 PYQ id from the retrieved evidence backs it (Evidence rule); renders the fallback copy for unverified numericals | anchor on every answer; trap only when PYQ-backed |
+| 10 | Persist | `DoubtPersister` | `doubts` row, `doubt_evidence`, `doubt_daily_usage` increment, `DoubtSolved` event (planner weak signal), `DoubtCacheWriter` **only when `verified = true`** (the DB CHECK is the second lock) | cache writes only when verified |
+| 11 | Respond | controller | contract JSON with `remaining_today`; `202 pending` when the 25 s budget is exceeded (work continues in a background executor) | |
+
+Verified means: not numerical and grounded, or numerical and the independent value matched. A
+follow-up (`POST /doubts/{id}/followup`) re-enters at stage 5 with the parent's question, answer and
+retrieved set in context and the same stages after.
+
+### 4.4 Limits and fair use
+
+Config `margai.limits.doubts.free_per_day = 5`, `cached_weight = 0.5`, `pro_reason_fresh_per_day = 30`
+(DEV_SPEC §8.5). Counters live in `doubt_daily_usage` keyed by the IST date, so "limit math across
+the day boundary" (PLAN D44 ✅) is a table lookup, tested with a fixed IST clock. Over the Pro
+fair-use cap, the solve is accepted, marked `queued`, and processed by a low-priority single-thread
+executor with on-demand calls; the client sees "in a few minutes" and polls. Nothing is refused
+for a Pro user (SPEC §6.3).
+
+### 4.5 Nightly re-planner (D55–D59)
+
+Runs under the `nightly` profile for every user with activity in the last 14 days, one transaction
+per user, in this order:
+
+1. `SnapshotAssembler` builds `StudentStateSnapshot`: profile and hours, `chapter_status`, the last
+   7 days of block outcomes, accuracy and speed by node, open `error_entries` due, the week's doubt
+   nodes, `wellbeing_signals`, streak, days to exam, batch positions with confidence, the archetype
+   track position. The snapshot is stored in `daily_plans.inputs_snapshot` (the evidence trail).
+2. `SlumpDetector` (deterministic, DEV_SPEC §4.3): trailing 3-day session minutes < 40% of the
+   14-day median, or accuracy down > 15 points → `inferred_slump = true`.
+3. `ModeResolver` (deterministic): `normal`, `light` (slump or `mood = low`), `revision_only` (T-21
+   days), `final_week` (T-7), `exam_eve` (T-1), `silence` (T-0 to T+14). DEV_SPEC §8.6.
+4. `CandidateBlockBuilder` (deterministic): SRS reviews due (capped at 40% of the day's minutes),
+   practice for weak nodes (`feels_weak`, low ability, doubt signals), the next backbone learn node
+   whose prerequisites are covered (mentions the batch only at confidence ≥ 0.7), a mock in mock
+   season, danger-zone recall in revision modes; the minutes budget is the profile's hours for that
+   weekday. Every candidate carries `reason_evidence` keys.
+5. `PlanSelectTask` (CHEAP; batch when the run has ≥ `margai.ai.batch_min_records` users, else
+   on-demand with concurrency 4): chooses and orders a subset that fits the budget, writes
+   `reason_md` per block and the `mentor_note_md`, softens the day when the mode says so. Output
+   schema: block ids ⊆ candidates, minutes ≤ budget, every `reason_md` non-empty and citing at least
+   one evidence key it was given.
+6. `PlanValidator` re-checks those constraints in Java. Any failure, timeout, breaker trip or
+   missing model output → `DeterministicPlanner` produces the plan from the candidates with
+   templated reasons (`generated_by = fallback`). **A plan row always exists before the task moves
+   to the next user** (PLAN D56 ✅ "no planless morning").
+7. `NotificationScheduler` writes `notification_log` rows for the morning plan (profile time),
+   streak-save (20:30, only if nothing done by then, decided at dispatch), SRS due, and on Sundays
+   the weekly trajectory; skips everything in `silence` mode.
+8. On Sundays: `TrajectoryCalculator` (deterministic band from accuracy × weightage, widened while
+   data is thin; `confidence` humble/growing/solid) and `PatternsEngine` (rules over the notebook,
+   minimum sample sizes from config) write their rows.
+
+The same `DeterministicPlanner` produces the onboarding first plan (D29, no AI call, < 6 s) and the
+on-the-fly fallback in `GET /plan/today`. `POST /plan/negotiate` runs `MentorMessageTask` (CHEAP)
+to classify intent and extract constraints ("Fri–Sun unavailable"), then re-runs steps 4–6 for the
+affected days with the constraints applied and `generated_by = renegotiation`.
+
+### 4.6 Error classification (D49)
+
+`PracticeAnswerRecorded` with `is_correct = false` → `error_entries` row (`cause = unclassified`) in
+the same transaction as the event, then `ErrorClassifyTask` (CHEAP) asynchronously with
+`distractor_map[chosen_key]`, time taken vs the user's node median, position in session, the user's
+history on the node, difficulty vs ability, and the user's last five corrections as examples. Output
+`{cause, confidence, evidence}`; `confidence < 0.6` keeps `unclassified` and the UI asks the one-tap
+question. `POST /notebook/entries/{id}/cause` sets `cause_source = student`, which no later
+classification overwrites (SPEC §10.7). A 5-minute sweeper re-queues entries the async path missed.
+
+### 4.7 SRS variants (D51)
+
+Stages `[3, 10, 25]` days (config). `VariantSelector` prefers a verified question on the same node
+sharing the distractor concept that the student has not seen in 60 days; otherwise
+`VariantGenerateTask` (REASON via `RouteDecision.generation()`) writes a new question, which
+`NumericalVerifier` must solve to the same key before it is saved with `source = generated,
+audit_status = auto`; 10% of generated variants go to `audit_queue(generated_sample)`. Three correct
+reviews → `healed_at`; a wrong review → stage reset and `upgraded_at`, which the planner turns into
+a re-learn block candidate.
+
+### 4.8 Cost ledger, prices and the breaker
+
+- Every call, every outcome, one `ai_calls` row (§2.8), written by `LedgerAiClient` in its own
+  transaction so a rolled-back feature transaction still leaves the cost on record.
+- Price table: config JSON keyed by model id with per-million-token prices for input, output, cache
+  read and cache write, plus `usd_inr`. `cost_paise` is computed at insert; a price change never
+  rewrites history.
+- Breaker: `margai.ai.budget.user_daily_paise` (default 2,500 = ₹25) and `global_daily_paise`
+  checked before each call against today's IST sum. Over budget: doubts return `AI_BUDGET_EXCEEDED`
+  with the honest copy and the solve is queued for after midnight; the planner uses the deterministic
+  path; classification waits for the sweeper. Active in every profile, including `local` with the
+  fake client (DEV_SPEC §13.7). The D65 acceptance simulates a runaway loop and expects the trip.
+- Daily alarm: the nightly run rebuilds `ai_spend_daily`; CloudWatch metric `ai.cost.paise` per
+  feature; AWS Budgets on the Bedrock service cost as the independent backstop (§10.4).
+
+### 4.9 Embeddings and retrieval
+
+- Model: Cohere Embed Multilingual v3 on Bedrock, 1,024 dimensions, `input_type` document vs query.
+  Fallback if unavailable in the account: Titan Text Embeddings v2 at 1,024. Both to be confirmed in
+  the console (§13.2); the dimension is fixed at 1,024 so the schema does not move.
+- Indexes: HNSW cosine on `ncert_paragraphs.embedding`, `questions.embedding`,
+  `doubt_cache.embedding` (`m = 16, ef_construction = 64`); GIN on `ncert_paragraphs.tsv`.
+- `HybridRetriever` is the one retrieval component (§4.3 stage 6) and is also used by the pipeline
+  for anchor linking (D23) and PYQ linking. Its parameters (`k_vector`, `k_text`, `token_cap`,
+  `similarity_floor`) are config and part of the eval-gated surface (`.claude/rules/ai-layer.md`).
+
+### 4.10 Eval harness (D23, D47)
+
+Two layers, one fixture set.
+
+- **Fixtures** `eval/fixtures/<subject>/<id>.json`: `{id, subject, node_code, language, input:
+  {text} | {image: "eval/images/<file>"}, expected: {type: option|numeric|text, value, unit?,
+  tolerance?}, expected_anchor: {book_code, chapter_no}, is_numerical, tags[]}`. Hand-verified by
+  the founder; ~60 at D23, ~150 at D47, ~200 target.
+- **Live layer** (the real gate): `BEDROCK_LIVE=1 ./mvnw -Peval verify` runs `EvalSuiteIT`, which
+  drives `DoubtSolveService` end to end with `BedrockAiClient` against a Testcontainers database
+  loaded with the NCERT and question tables from a snapshot in the content bucket. Per fixture it
+  records correct/incorrect, anchor match, verified flag, tier, latency and cost. PASS = ≥ 97%
+  correct final answers **and** zero fixtures where an unverified numerical would have rendered.
+  On PASS it writes `eval/last-pass.json` `{ai_hash, pass_rate, unverified_served, fixtures, date,
+  cost_paise}`, which is **committed**; `eval/results/<date>.json` holds the detail.
+- **Fake layer** (runs everywhere, including CI): the same suite with `FakeAiClient` fixtures that
+  replay recorded model outputs. It cannot judge prompt quality; it catches regressions in
+  normalisation, routing policy, retrieval plumbing, the assembler's rules and verification logic,
+  and it fails if any path could render an unverified numerical.
+- **Gate wiring**: `scripts/precommit-gate.sh` already refuses commits to AI-touching paths unless the
+  stamp hash matches the current content; at D23 it reads `eval/last-pass.json` instead of the
+  gitignored `.last-pass`, and CI's eval job verifies the same equality and runs the fake layer.
+  Every prompt or parameter change therefore needs a founder-launched live run, whose cost
+  (~200 fixtures, mostly CHEAP) is a few hundred rupees.
+
+### 4.11 Bedrock specifics
+
+- **Structured output**: Converse API with a single tool whose input schema is the output record's
+  JSON schema and `tool_choice` forced; the tool input is the answer. No free-text JSON parsing.
+- **Prompt caching**: the system prompt and format instructions form the cached prefix; the question
+  and retrieved passages follow. `cache_read_tokens` land in the ledger.
+- **Batch inference**: used only when a run has at least `margai.ai.batch_min_records` records
+  (default 100, the documented minimum; set to 0 to disable). Records are written to the content
+  bucket, the job polled, results merged by record id. Until the beta grows past the minimum, nightly
+  work is on-demand with bounded concurrency. This is conflict §0.4 #2 made concrete.
+- **Timeouts and retries**: 20 s per real-time call, 2 retries with jitter on throttling and 5xx;
+  batch jobs 10 min. A final failure is a typed error the UI renders honestly (`AI_UNAVAILABLE`).
+- **Region**: calls from ap-south-1 to global inference profiles; the privacy copy discloses
+  processing outside India.
+
+### 4.12 Prompts
+
+`server/src/main/resources/prompts/<name>.v<N>.st` (StringTemplate 4). `PromptRegistry` loads them
+at startup, refuses duplicates, and stamps `prompt_name`/`prompt_version` on every ledger row. The
+active version per prompt is config (`margai.ai.prompts.<name>.version`), so a rollback is a config
+change. Every edit needs the live eval and a line in `docs/prompt-changelog.md`
+(`.claude/rules/ai-layer.md`). Style contract for `doubt_answer` (DEV_SPEC §4.2): steps first, one
+concept sentence, anchor line, optional trap note, ≤ 350 words, no meta-talk, user's language.
+
+### 4.13 Hard-rule enforcement map
+
+| Rule (CLAUDE.md, SPEC §3) | Code point | Test |
+|---|---|---|
+| No AI answer without retrieval grounding | `HybridRetriever` floor + `AnswerAssembler` anchor ∈ retrieved set | fake-layer eval fixture with empty retrieval expects the grounding fallback |
+| Numerical answers independently verified; never rendered unverified | `NumericalVerifier` + `AnswerAssembler` fallback branch; `doubt_cache.verified` CHECK | seeded-mismatch fixture (PLAN D39 ✅) expects `unverified_fallback` and no cache row |
+| REASON only via the router | `RouteDecision` constructors + `TierPolicyAiClient` | unit test: REASON request without a decision is rejected |
+| Every Bedrock call logs an `ai_calls` row | `LedgerAiClient` outermost decorator | ledger count equals call count for success, failure and breaker cases |
+| Cache writes only when verified | `DoubtCacheWriter` guard + DB CHECK | repository test: inserting `verified = false` fails |
+| Per-user AI cost breaker | `BudgetBreakerAiClient` | fixed-clock test crossing the cap; D65 runaway simulation |
+| Model IDs, prices, limits from config | `@ConfigurationProperties` only; ArchUnit rule: no string literal matching a model-id pattern in `ai` | architecture test |
+| NTA-trap only when PYQ-backed | `AnswerAssembler` drops unbacked notes; `topic_traps` need evidence rows | unit + repository tests |
 
 ## 5. Flutter app
 

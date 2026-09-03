@@ -59,5 +59,5 @@ When these disagree, say so out loud and cite both — never silently pick one.
   WebFetch are denied. FakeAiClient is the default; live Bedrock needs a human-launched
   `BEDROCK_LIVE=1` profile with the cost breaker active (DEV_SPEC §13.7).
 - Phase-2 items (SPEC §12) are out of scope. Where the spec is silent choose the boring,
-  maintainable option and record it in docs/; where it conflicts, surface it.
+  maintainable option and record it in docs/DECISIONS.md; where it conflicts, surface it.
 - Anything the human corrects twice belongs here or in a `.claude/rules/*.md` file.

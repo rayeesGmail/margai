@@ -1,0 +1,25 @@
+name: margai
+description: "MARG AI — AI mentor app for NEET (Android first). Contract: docs/SPEC.md."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.4.2
+  intl: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  # ARB strings in lib/l10n (en, hi); generated into lib/l10n/app_localizations*.dart (l10n.yaml).
+  generate: true

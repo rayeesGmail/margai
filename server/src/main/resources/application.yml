@@ -1,0 +1,28 @@
+# MARG AI server — base configuration.
+# Local dev targets the compose db (docker-compose.yml). Model IDs, tiers, limits, prices and
+# real credentials come from SSM per environment (DEV_SPEC §2.1, §9); nothing secret lives here.
+spring:
+  application:
+    name: margai-server
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/margai}
+    username: ${DB_USER:margai}
+    password: ${DB_PASSWORD:margai}   # local compose default only
+  jpa:
+    hibernate:
+      ddl-auto: validate   # schema changes only via Flyway migrations (CLAUDE.md hard rule)
+    open-in-view: false
+  flyway:
+    locations: classpath:db/migration
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-components: always

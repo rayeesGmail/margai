@@ -12,20 +12,20 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 0 — Foundations (Week 1) |
-| Current day | D1 done · 2026-09-02 (session closed just after midnight, 2026-09-03) · next: D2 |
-| Days completed / total | 1 / 84 |
+| Current day | D2 built, verified locally and committed on branch `d2-local-env` · 2026-09-03 · tick once the PR's CI is green · next: D3 |
+| Days completed / total | 1 / 84 (2 once D2's CI is green) |
 | Schedule delta | on track |
 | Last week's gate | n/a — Week-1 gate is due at D6 |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none. D2 prerequisites on this machine: Flutter stable is not installed; JDK is 21, Spring Boot 4 on latest LTS needs 25 |
+| Blockers | none. Human step open: push `d2-local-env`, open the PR, confirm CI green, merge, tick D2. Toolchain on this machine now: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
 ## PHASE 0 — Foundations (Week 1) · Module M0
 
 - [x] **D1** Claude Code scaffolding (CLAUDE.md, settings, 3 gate scripts, rules, agents, commands) · ✅ gates block bad commit + secret write — done 2026-09-02, all five acceptance tests passed (see day log)
-- [ ] **D2** Local env: Docker Postgres 18+pgvector, Spring Boot 4 boots, Flutter shell on device, CI green · ✅ fresh clone → running <15 min
+- [ ] **D2** Local env: Docker Postgres 18+pgvector, Spring Boot 4 boots, Flutter shell on device, CI green · ✅ fresh clone → running <15 min — built 2026-09-03 on `d2-local-env`, local acceptance PASS (see day log); tick when the PR's CI is green
 - [ ] **D3** Claude Code full technical plan reviewed & approved · ✅ plan committed to docs/
 - [ ] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations
 - [ ] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake
@@ -173,6 +173,42 @@
 ## 📝 Day log (append newest on top)
 
 ```
+D2 · 2026-09-03 · PHASE 0 — Foundations
+Shipped (branch d2-local-env, 3 commits + this tracker update): Brewfile + scripts/dev-setup.sh
+  (JDK 25 via the openjdk@25 formula, Flutter 3.47.2 stable, Android cmdline-tools + SDK 36,
+  optional emulator/AVD; idempotent, no sudo). server/: Spring Boot 4.1.0 on Java 25, Maven
+  wrapper 3.9.14, webmvc + data-jpa (validate) + Flyway (empty location) + actuator health; boot
+  test on Testcontainers pgvector/pgvector:pg18. app/: flutter create (Android, --empty),
+  applicationId com.margai.app, Riverpod ProviderScope, ARB en/hi + generated l10n, widget test.
+  Root README (fresh-clone path), docs/DECISIONS.md (9 spec-silent choices).
+Acceptance: PASS locally —
+  fresh clone → db healthy 5 s → mvnw verify 6 s (1 test) → flutter analyze + test + debug APK
+  21 s → server health {"status":"UP", db UP} 2 s: 35 s total with warm caches. Cold installs
+  measured today: brew bundle 4m37s, SDK packages 3m30s, first Gradle build 4m23s, pgvector
+  pull 29 s, Maven deps ≈1.5 min → ≈14.5 min end to end on this connection, inside the bound.
+  Shell runs on the Android 36 emulator (screenshot: "MARG AI"; com.margai.app resumed).
+  spec-auditor on the full diff: PASS, one minor finding (a document conflict logged in
+  DECISIONS.md) fixed by moving it here; jq added to the Brewfile on its advice (hooks need it).
+  CI: not yet exercised — needs the human push + PR; D2 stays unticked until it is green.
+Doc conflict surfaced: DEV_SPEC §13.8 (bootstrap prompt) scaffolds server/ with "first migration
+  = users + subscriptions"; PLAN D2 is environment only and PLAN D4 owns the first migrations
+  (docker-compose.yml already says so). Resolved by PLAN precedence in the approved D2 plan;
+  DEV_SPEC §13.8 stays as the historical bootstrap text. D3 design item: Hinglish is not a
+  BCP-47 locale, so the ARB strategy for the third language needs a decision.
+Parked: Android CLI migration (sdkmanager deprecated); libpq so `psql -h localhost` works;
+  gh CLI in the Brewfile; Gradle native-access flag on JDK 25.
+Surprise: Testcontainers 2.x renamed its artifacts (testcontainers-postgresql, package
+  org.testcontainers.postgresql). Homebrew `openjdk` 25.0.2 was already installed but invisible
+  to java_home — that is why D1 saw "JDK 21"; a user-level symlink fixes it without sudo.
+  Gradle 9.3.1 / AGP 9.1 build on JDK 25, so one JDK suffices (no flutter --jdk-dir).
+  flutter create's Kotlin template carries TODO comments that the gate rejects — removed.
+  Another project's Keycloak holds 127.0.0.1:8080 on this Mac; SERVER_PORT=8081 works (README).
+  psql is not installed although settings allow it — use `docker compose exec -T db psql`.
+Tomorrow's first task: D3 — once the PR is green and merged, tick D2; then the full technical
+  plan from SPEC (architecture, data model, API surface, AI pipeline) for a whole-session review.
+```
+
+```
 D1 · 2026-09-02 · PHASE 0 — Foundations
 Shipped: git repo on main (6 commits). docs renamed to SPEC / DEV_SPEC / PLAN / TRACKER.
   CLAUDE.md (DEV_SPEC §13.2 verbatim + precedence + session rules). .claude/settings.json
@@ -216,6 +252,10 @@ Tomorrow's first task:
 - git-native pre-commit hook (`core.hooksPath` → scripts/precommit-gate.sh) · 2026-09-02 · today only Claude's commits are gated; the human's own commits bypass the gate
 - protect scripts/ and .claude/settings.json from agent edits after D1 · 2026-09-02 · the policed agent can currently edit its own policy; commit review by the human is the only control
 - `.claude/skills/release-checklist/` (DEV_SPEC §13.1: migration check, eval gate, changelog) · 2026-09-02 · not in D1 scope; needed before Week 11 (money) at the latest
+- migrate scripts/dev-setup.sh from `sdkmanager` to the new Android CLI · 2026-09-03 · sdkmanager prints a deprecation notice; still works
+- `brew "libpq"` so the allowed `psql -h localhost *` command exists locally · 2026-09-03 · today sessions use `docker compose exec -T db psql`
+- `brew "gh"` so sessions can read CI run status after the human pushes · 2026-09-03 · optional; web UI works
+- silence Gradle's JDK 25 native-access warning (`--enable-native-access=ALL-UNNAMED` in gradle.properties) · 2026-09-03 · cosmetic
 
 ---
 

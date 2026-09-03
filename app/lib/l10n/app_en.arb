@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "appTitle": "MARG AI",
+  "@appTitle": {
+    "description": "Application name shown in the launcher, app bar and task switcher. Brand name; not translated."
+  }
+}

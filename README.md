@@ -1,8 +1,8 @@
 # MARG AI
 
 AI mentor app for NEET. The product contract is `docs/SPEC.md`; how it is built is `docs/DEV_SPEC.md`,
-`docs/PLAN.md` (14-week schedule) and `docs/TRACKER.md` (live state). Working agreements for agentic
-sessions are in `CLAUDE.md`.
+`docs/PLAN.md` (14-week schedule) and `docs/TRACKER.md` (live state); choices the specs leave open are
+logged in `docs/DECISIONS.md`. Working agreements for agentic sessions are in `CLAUDE.md`.
 
 | Directory | What | Check |
 |---|---|---|

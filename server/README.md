@@ -13,7 +13,8 @@ cd server && ./mvnw spring-boot:run     # http://localhost:8080/actuator/health 
 
 `./mvnw` uses `JAVA_HOME` if set, otherwise the highest JDK known to `/usr/libexec/java_home`;
 `scripts/dev-setup.sh` links the Homebrew `openjdk@25` there. Connection defaults target the compose
-db and can be overridden with `DB_URL`, `DB_USER`, `DB_PASSWORD`.
+db and can be overridden with `DB_URL`, `DB_USER`, `DB_PASSWORD`. If something else already owns
+port 8080 on your machine, `SERVER_PORT=8081 ./mvnw spring-boot:run`.
 
 ## Build and test
 

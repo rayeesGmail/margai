@@ -9,8 +9,9 @@
 # once done. Nothing here needs sudo. Docker Desktop and Homebrew are prerequisites.
 set -euo pipefail
 
+command -v brew >/dev/null 2>&1 || { echo "missing prerequisite: brew — install Homebrew from https://brew.sh" >&2; exit 1; }
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SDK_ROOT="${ANDROID_HOME:-/opt/homebrew/share/android-commandlinetools}"
+SDK_ROOT="${ANDROID_HOME:-$(brew --prefix)/share/android-commandlinetools}"
 SDK_PACKAGES=("platform-tools" "platforms;android-36" "build-tools;36.0.0")
 EMULATOR_PACKAGES=("emulator" "system-images;android-36;google_apis;arm64-v8a")
 AVD_NAME="margai_android36"
@@ -20,7 +21,6 @@ WANT_EMULATOR=0
 say() { printf '\n▶ %s\n' "$*"; }
 need() { command -v "$1" >/dev/null 2>&1 || { echo "missing prerequisite: $1 — $2" >&2; exit 1; }; }
 
-need brew   "install Homebrew from https://brew.sh"
 need docker "install Docker Desktop from https://docs.docker.com/desktop/setup/install/mac-install/"
 
 say "Homebrew packages (Brewfile)"

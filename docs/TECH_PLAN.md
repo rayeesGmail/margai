@@ -1395,28 +1395,358 @@ list prices at the time of writing and are re-estimated at D65 with real ledger 
 
 ## 8. Testing strategy
 
-_Written in task 7._
+### 8.1 Server
+
+| Layer | Tooling | Covers | Runs in |
+|---|---|---|---|
+| Unit | JUnit 5, AssertJ, Mockito (agent attached, see pom) | pure logic: normaliser, route policy, candidate builder, slump detector, mode resolver, streak, limit arithmetic, cost computation, cursor codec, token rotation rules | every `mvnw verify` |
+| Repository slice | `@DataJpaTest` + Testcontainers `pgvector/pgvector:pg18` | migrations apply, constraints (CHECKs, partial uniques), vector and tsv queries, `HybridRetriever` SQL | every `mvnw verify` |
+| Controller slice | `@WebMvcTest` + `MockMvcTester` | envelope for every error code, auth failures, validation, idempotency replay, **no `correct_key` before judging** | every `mvnw verify` |
+| Module flow | `@SpringBootTest` + Testcontainers + `FakeAiClient` | end-to-end paths per PLAN day (onboarding → first plan; session → notebook entry; doubt → cache), events between modules, breaker and ledger behaviour | every `mvnw verify` |
+| Architecture | Spring Modulith `ApplicationModules.verify()`, ArchUnit | §1.4 dependency rules, SDK import restrictions, no model-id literals, controllers only in `web` | every `mvnw verify` |
+| Live | `-Peval` profile, `BEDROCK_LIVE=1` | §4.10 live eval; D5 smoke | founder-launched |
+
+Every service-layer change ships with tests in the same commit (CLAUDE.md). `./mvnw verify` stays
+under ~3 minutes by keeping one shared Testcontainers instance per JVM (singleton container pattern)
+and reusing the Spring context across module-flow tests.
+
+### 8.2 Migrations
+
+`MigrationReversibilityTest` (D4 ✅): start an empty container, run Flyway to latest, then execute the
+`-- ROLLBACK:` blocks (and `rollback/U*.sql`) newest first, and assert the schema contains only
+`flyway_schema_history`. A second test runs the seed location and checks the test taxonomy loads.
+`ddl-auto: validate` in every profile makes an entity/migration mismatch a boot failure.
+
+### 8.3 Contract tests for the hard rules
+
+- `CorrectKeyNeverLeaksTest`: serialises every response record in `practice.web` and walks the
+  JSON of `POST /practice/sessions` and `GET /practice/offline-pack` (Option B) for the string
+  `correct_key`; fails on any occurrence. Under Option A, the offline-pack test asserts the field
+  appears only under `judging` and only for the caller's own scheduled blocks.
+- `IdempotencyReplayTest` for every **Idem** route: same key + same body → identical response,
+  no second side effect; same key + different body → `IDEMPOTENCY_CONFLICT`.
+- `WebhookSignatureTest`: tampered body → 400 and no `billing_events` row; replayed event id → 200
+  and one row.
+- `ImageLifecycleTest`: after confirm/discard the S3 port received a delete for the key; the sweeper
+  deletes an expired unconfirmed upload.
+- `IstBoundaryTest`: doubt limits, streaks and notification caps with a fixed clock at 23:59 and
+  00:01 Asia/Kolkata (PLAN D44 ✅).
+- `NotificationCapTest`: a day of simulated triggers never sends a third notification (PLAN D68 ✅).
+- The AI-specific rules are mapped in §4.13.
+
+### 8.4 App
+
+- Unit tests for every notifier with fake repositories (`ProviderScope(overrides)`); state
+  transitions for login, onboarding steps, session flow, doubt polling, outbox draining.
+- Widget tests per screen state (loading, data, error envelope, offline) using the generated
+  localisations in all three locales, so a missing ARB key fails a test.
+- `flutter analyze` with `flutter_lints` plus `prefer_const_constructors`, `avoid_print`,
+  `always_declare_return_types`; no `ignore:` without a reason comment.
+- Device checks are the PLAN ✅ items themselves, run on the emulator (or a phone when available)
+  and recorded with a screenshot in the day log. Golden tests are PARKED.
+
+### 8.5 CI
+
+The existing `.github/workflows/ci.yml` gains nothing new until D23 (eval stamp verification and the
+fake-layer eval job) and D74 (`flutter build apk --release` on the deploy job). `mvnw verify`
+already includes the architecture and migration tests once they exist.
+
+### 8.6 Test data
+
+`TestDataBuilder`s per module (`aUser()`, `aProfile().dropper().hours(6, 10)`, `aNode("PHY.11.ROT")`,
+`aQuestion().numerical()`), the seed taxonomy from §2.9, `FakeAiClient` fixtures under
+`src/test/resources/ai-fixtures/`, a `MutableClock` bean for IST-boundary tests, and five synthetic
+student histories (`fixtures/students/*.json`) that the D55 dry-run and the D59 slump test load.
 
 ## 9. Security and privacy
 
-_Written in task 7._
+### 9.1 Transport and authentication
+
+TLS at the ALB (ACM), HTTP redirected. Stateless Spring Security; JWT HS256 with a 256-bit key from
+SSM, 15-minute lifetime, `jti` logged with every request. Refresh tokens: opaque, hashed at rest,
+30 days, rotating, family reuse detection (§3.2). OTP: hashed with a pepper, 5-minute expiry,
+attempt and request limits (§3.4), constant-time compare, codes never logged. Consent OTP for
+minors is a separate `purpose` with the same machinery.
+
+### 9.2 Secrets and rotation
+
+All secrets in SSM SecureStrings, injected as environment variables by ECS (§7.3); locally in a
+human-edited `.env` that Claude can neither read nor write (`.claude/settings.json`,
+`scripts/block-paths.sh`); `scripts/detect-secrets.sh` scans every write and CI scans the tree.
+JWT key rotation: `jwt/secret_previous` is accepted for 15 minutes after a rotation. Razorpay and
+MSG91 keys rotate by SSM update plus task restart.
+
+### 9.3 Authorisation and IDOR
+
+Every repository method that touches student data takes the principal's user id as a parameter and
+includes it in the query; there is no `findById` on a student table without the user id. A
+`@WebMvcTest` per module requests another user's resource ids and expects `NOT_FOUND` (never
+`FORBIDDEN`, which would confirm existence). Admin routes require `role = admin` via
+`@PreAuthorize`; the admin peek is read-only by construction (no write repositories in `ops`).
+
+### 9.4 Input handling
+
+Bean Validation on every DTO; sizes bounded (`text ≤ 2,000 chars`, images ≤ 5 MB, JPEG/PNG only by
+magic bytes, re-encoded server-side before storage); S3 keys are server-generated, never
+client-supplied; markdown from the model is rendered by the app's markdown widget with HTML
+disabled; SQL only through JPA/JPQL or parameterised native queries (`HybridRetriever`).
+
+### 9.5 Payments
+
+Razorpay webhook: HMAC-SHA256 of the raw body against `webhook_secret`, compared in constant time
+before parsing; `provider_event_id` unique in `billing_events`; subscription state is derived from
+webhooks, never from the client. `POST /billing/subscribe` and `/cancel` are idempotent (§3.5);
+amounts and plans come from config, never from the request. Refund within 7 days is automatic and
+server-initiated (SPEC §6.9, DEV_SPEC §8.7).
+
+### 9.6 Privacy and DPDP
+
+- **PII inventory**: phone, display name, DOB, parent phone, state, category (optional), confirmed
+  scorecard/marksheet fields, doubt text and images, mentor chat. Everything else is behavioural
+  data the product needs (SPEC principle 1; DEV_SPEC R6).
+- **Minors**: DOB at onboarding; under 18 → `is_minor`; `POST /documents` returns
+  `CONSENT_REQUIRED` until a `parent_consents` row is `consented` (DEV_SPEC §8.4, PLAN D27 ✅).
+- **Images**: uploads bucket only, deleted after reading (doubts) or confirm/discard (documents),
+  `expires_at` sweeper, 1-day lifecycle: three independent layers (§2.10). The D28 acceptance checks
+  the bucket is empty after confirm.
+- **Deletion**: `DELETE /me` anonymises immediately and schedules the 30-day purge (§2.10); the
+  purge job is part of the nightly run and logs what it removed (PLAN D64 ✅).
+- **Export**: JSON of every table keyed by the user plus the notebook PDF (OpenPDF), delivered by
+  24-hour signed URL.
+- **Logging**: phones masked (`+91XXXXXX1234`), no request bodies logged on auth or document
+  routes, no doubt text in logs; request ids link logs to ledger rows instead.
+- **AI processing abroad**: disclosed in the privacy copy (SPEC §6.11); no third-party SDKs beyond
+  FCM, Razorpay, PostHog (DEV_SPEC §9).
+- **Consent text** at signup and the plain-language privacy page are copy tasks for D64/D67.
+
+### 9.7 Hygiene (D71 checklist seed)
+
+Dependency audit (`mvn versions:display-dependency-updates`, OWASP dependency-check, `flutter pub
+outdated`), OWASP Top 10 walk-through per module, rate-limit probes, IDOR probes from the tests in
+§9.3 run against the beta stack, secret scan of the tree, ECS task role least-privilege review,
+RDS not publicly accessible, S3 block-public-access on both buckets.
 
 ## 10. Observability and cost operations
 
-_Written in task 7._
+### 10.1 Logs
+
+Logback with the logstash JSON encoder → stdout → CloudWatch Logs (30 days). MDC on every line:
+`request_id`, `user_id` (when authenticated), `route`, `module`; the nightly run adds `run_id` and
+`plan_date`. Levels: `WARN` for honest fallbacks (grounding failure, unverified fallback, breaker
+trip), `ERROR` for anything that pages. No PII in messages (§9.6).
+
+### 10.2 Metrics (Micrometer → CloudWatch, 1-minute)
+
+`http.server.requests` by route and status; `ai.calls` and `ai.cost.paise` by feature, tier and
+status; `ai.latency` by tier; `doubt.cache.hit_rate`; `doubt.verify.mismatch`; `otp.sent`,
+`otp.verified`, `otp.failed`; `nightly.users`, `nightly.fallbacks`, `nightly.duration`;
+`notifications.sent/skipped` by kind and reason; `outbox.sync_lag_s` (reported by the app through
+PostHog, not CloudWatch); `practice.judge.latency`.
+
+### 10.3 Dashboards (D73)
+
+- **Product funnel** (PostHog): install → OTP success → first plan (< 5 min) → first doubt (48 h) →
+  D7 active; paywall shown/dismissed/paid by trigger; cache hit rate as seen by the client.
+- **Operations** (CloudWatch): p95 latency per route against DEV_SPEC §9 targets (plan fetch 400 ms,
+  judge 250 ms, cached doubt 1.5 s, fresh CHEAP 8 s, REASON with verify 25 s), 5xx rate, ALB
+  health, RDS CPU/storage/connections, nightly run status.
+- **Cost** (admin `GET /admin/costs`, D65): `ai_spend_daily` by feature, cost per active free and
+  Pro user, cache hit rate trend, breaker trips.
+
+### 10.4 Alarms
+
+| Alarm | Condition | Why |
+|---|---|---|
+| API errors | 5xx > 2% over 5 min | reliability is a feature (R5) |
+| Nightly missing | no `nightly.duration` datapoint by 06:00 IST | no planless morning; the API fallback covers users meanwhile |
+| Bedrock spend | `ai.cost.paise` daily sum > `global_daily_paise`, and AWS Budgets on the Bedrock service | cost surprise bounded (PLAN risk register) |
+| Verification mismatches | `doubt.verify.mismatch` > 5% over 1 h | prompt or model regression |
+| OTP failure | `otp.failed / otp.sent` > 5% over 1 h | OTP ≥ 98% first attempt (SPEC §11) |
+| RDS | free storage < 20%, CPU > 80% for 15 min | |
+| Audit queue | open items > 50 | founder review backlog |
+
+Alarms notify the founder by email and, later, a Telegram bot; there is no on-call rotation.
+
+### 10.5 Cost operations
+
+The ledger is the single source: every rupee spent on AI has an `ai_calls` row with feature, user
+and prompt version. Weekly, the founder reads cost per active user and the cache hit rate (SPEC
+§11 "cost health"); the free-tier limits and the breaker thresholds are config knobs turned from
+that reading, not code changes.
+
+### 10.6 Client analytics (PostHog)
+
+Events: `app_open`, `otp_requested`, `otp_verified`, `onboarding_step` (step), `first_plan_shown`,
+`block_status` (type, status), `session_finished` (accuracy, offline), `doubt_asked` (input, cache_hit,
+tier, latency), `doubt_reported`, `notebook_cause_corrected`, `paywall_shown/dismissed/paid`
+(trigger), `notification_opened` (kind), `sync_drained` (count, lag). No PII in properties; the
+PostHog distinct id is the user id (UUID), and account deletion calls PostHog's delete API.
 
 ## 11. Cross-cutting conventions
 
-_Written in task 7._
+### 11.1 Time
+
+One `IstClock` bean (`ZoneId.of("Asia/Kolkata")`) is the only way code learns "today"; tests inject
+a `MutableClock`. Storage is `TIMESTAMPTZ` (UTC); IST calendar dates are `DATE` columns named
+`*_ist_date`, `plan_date`, `week_start` (Monday). Wire format: instants ISO-8601 `Z`, dates
+`YYYY-MM-DD`. The study day, streaks, limits, notification caps and the nightly run all key on the
+IST date.
+
+### 11.2 Money
+
+`BIGINT` paise in the database, `long` in Java wrapped in a `Money` record with `INR` only, `{amount_paise,
+currency}` on the wire. Prices (₹499 list, ₹299 founding, ₹2,999 annual) are config, shown struck or
+highlighted by the app from the `GET /billing/paywall` payload (SPEC §6.9).
+
+### 11.3 Identifiers and JSON
+
+UUID v4 primary keys; stable string codes for curriculum (`PHY.11.ROT`); Jackson snake_case naming
+strategy globally; Java records for every request/response; unknown fields ignored on input (forward
+compatibility), nulls omitted on output.
+
+### 11.4 Java style
+
+Java 25, records, sealed interfaces for typed outcomes, constructor injection, package-private by
+default, no Lombok, no field injection, no static mutable state. One class per stage or task (§4.3)
+so a file rarely passes 200 lines. Exceptions: a sealed `ApiException` hierarchy that carries the
+error code; everything else is a bug and maps to `INTERNAL`.
+
+### 11.5 Configuration
+
+`@ConfigurationProperties(prefix = "margai")` records, validated at startup (`@Validated`, fail-fast
+on a missing secret in the `bedrock` profile). Tree: `margai.ai.*` (tiers, embed, prices, budget,
+batch, prompts), `margai.limits.*`, `margai.srs.*` (stages), `margai.exam.*` (date, mode thresholds),
+`margai.notifications.*` (caps, quiet hours), `margai.billing.*` (prices, refund window),
+`margai.flags.*`. Environment variables follow Spring's relaxed binding (`MARGAI_AI_TIER_CHEAP`),
+which is what the ECS task definition sets from SSM (§7.3).
+
+### 11.6 Feature flags
+
+Booleans under `margai.flags.*`, read at request time from the config records: `streaming` (D69),
+`batch_inference`, `diagnostic_offer`, `paywall.<trigger>`, `annual_front_and_center` (January,
+SPEC §6.9). A flag flip is a config change and a task restart; no flag service.
+
+### 11.7 Copy
+
+Server: error and notification copy in `messages_{en,hi,hinglish}.properties`, addressed by the
+error code or notification kind; responses carry `code`, `message_en`, `message_user_lang`. App:
+ARB in three locales. Generated content is produced in the user's language by the model and never
+machine-translated. Mentor-voice rules (warm, direct, never guilt-tripping, never fake-human) apply
+to every string on both sides and are the subject of the D67 pass.
+
+### 11.8 Repository and delivery
+
+Per-day branch `dN-<topic>`, one conventional commit per task, PR to `main` with CI green, the
+founder reviews and merges (memory of D2 preferences). `docs/TRACKER.md` updated every session;
+spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-changelog.md`.
 
 ## 12. PLAN mapping and gaps
 
-_Written in task 7._
+### 12.1 What each PLAN day consumes from this plan
+
+| PLAN days | Sections that define the work |
+|---|---|
+| D4 core schema | §2.1–§2.4 (D4 tables column by column), §2.9 V1–V4 and the seed location, §8.2 reversibility test, §1.3 first module packages, Modulith verification |
+| D5 AiClient seam | §4.1, §4.8 ledger and breaker, §2.8 `ai_calls`, §1.2 `bedrock` profile, §4.1 smoke |
+| D6 buffer / Week-1 gate | §0.3 dispositions closed, §14 in DECISIONS.md |
+| D7–D12 auth | §3.2, §3.4, §3.7 auth and account, §2.2 auth tables, §9.1, §5.4 refresh interceptor, §5.8 login |
+| D13 taxonomy | §6.2, §6.3 `taxonomy`, `backbone`, `cutoffs` commands; §2.3 |
+| D14–D18 NCERT | §6.1, §6.3 `ncert *`, §6.4, §2.3 `ncert_*`, §4.9 |
+| D19–D24 PYQ + eval v1 | §6.3 `pyq *`, `stats`, `traps`, `anchors`, `eval snapshot`; §2.3 questions; §4.10; §6.5 |
+| D25–D30 onboarding + first plan | §3.7 onboarding, documents, account consent; §2.2, §2.7 `batch_positions`; §4.5 `DeterministicPlanner`; §5.5 language; §5.8 screens 2–5; §2.7 `notification_log`, `user_devices` |
+| D31–D36 practice | §3.7 practice, §2.4, §5.6 offline and the §0.4 #4 decision, §8.3 correct-key test, §4.6 trigger |
+| D37–D48 doubts | §4.2–§4.4, §4.9, §4.11–§4.13, §3.6, §3.7 doubts, §2.5, §5.8 screen 9, §4.10 expansion at D47 |
+| D49–D54 notebook | §4.6, §4.7, §2.6, §3.7 notebook, §5.8 screen 10 |
+| D55–D60 nightly brain | §4.5, §1.6, §2.7, §7.2 scheduled task, §3.7 plan negotiate/week, trajectory |
+| D61–D66 money & trust | §3.7 billing and account export/delete, §2.8, §9.5, §9.6, §2.10, §4.8 breaker demo, §10.3 cost view |
+| D67–D72 hardening | §11.7 copy, §10 notifications caps, §10.3 p95 targets, §7.5 drills, §9.7 checklist |
+| D73–D78 beta prep | §10.3 dashboards, §5.9 flavours, §3.7 ops, §6.3 `cache seed`, §7.6 D74 |
+
+### 12.2 Gaps between SPEC and PLAN (founder to schedule or park)
+
+| Gap | SPEC | Proposal |
+|---|---|---|
+| Infrastructure provisioning | §3 (AWS), every deployed check from D57 | founder workstream F8 per §7.6 |
+| Batch timetable photo (documents type 3) and the weekly batch-confirm card | §6.7, §6.8 | timetable photo fits D29 (shared pattern, one more `doc_type`); the weekly confirm card fits D58 alongside the negotiation chat; or park both until coaching students appear in the beta |
+| Seed generation to ≥ 30 usable questions per topic | §9.3 | `questions generate` exists in §6.3; run it in the D24 buffer for the top-weightage nodes, and again at D76 |
+| In-app full mocks and the autopsy | §4 Phase 4, §7.1, §6.1 "later Mock" | mocks reuse the session engine (`kind = mock`, 180 questions) and could land at D35 with the diagnostic; the autopsy (per-mark classification, gamble score, pace map) reuses D49 classification and fits D54's buffer or a new day; not excluded by §12, so parking it is an explicit product call |
+| Exam-season planner modes (T-21 revision-only, T-3 light recall, exam eve, silence) | §4 Phases 5–6, §8 screen 14, DEV_SPEC §8.6 | deterministic `ModeResolver` in §4.5 lands with D55–D56; the Today variants at D59; notification silence at D68 — no new day needed, but the days' scopes should name it |
+| Crash reporting SDK | §11 crash-free ≥ 99.5% | PostHog error tracking (§5.7); amend the SDK rule only if it proves insufficient |
+| Offline verdicts | §6.2 vs §3 | decision §5.6 before D31 |
+| Referral, graduation, continuity flows | §4 Phase 6, §7.2 | Phase 2 by §12; only the auto-pause rule ships (D63) |
 
 ## 13. Risks and open questions for the founder
 
-_Written in task 7._
+### 13.1 Risks this plan carries
+
+| Risk | Mitigation in the plan |
+|---|---|
+| Content quality (solutions, extraction) — the biggest, per PLAN §5 | vision extraction with confidence reports, verification pass before `verified = true`, founder audit samples in every pipeline command, the eval gate, buffer days D18/D24 |
+| Model availability and IDs in the account | config-only IDs, fallback embedding model, console check before D5 |
+| Vision extraction cost for ~7,000 pages × 2 languages | CHEAP/VISION tier, page-range flags for reruns, cost printed per command; expected a few thousand rupees total |
+| Single-instance assumptions (§13.3) | written down with the upgrade path; beta topology is one task |
+| Hindi legacy fonts in older NCERT scans | vision extraction reads glyphs as images; alignment report catches the misses |
+| NCERT licensing (TRACKER F2) | the app shows one anchored paragraph at a time and never a chapter (§2.10); text is retrieval-only |
+| Solo-founder operations | alarms to email, admin peek, runbooks from D70, no on-call rotation pretended |
+| Bedrock batch minimum | on-demand path is the default; batch is a flag (§4.11) |
+
+### 13.2 Facts to confirm in the AWS console (extends DEV_SPEC §12 item 4)
+
+1. Exact model IDs and inference profiles available for CHEAP, REASON, VISION and EMBED from
+   ap-south-1, with prompt caching and forced tool use supported.
+2. Bedrock batch inference minimum record count and whether the chosen models support it.
+3. RDS for PostgreSQL 18 availability in ap-south-1 and its pgvector version (HNSW needs ≥ 0.5).
+4. Cohere Embed Multilingual v3 access; otherwise Titan Text Embeddings v2 at 1,024 dimensions.
+
+### 13.3 Single-instance assumptions and their upgrade path
+
+| Assumption | Holds while | Upgrade when it breaks |
+|---|---|---|
+| In-process rate limiting (Bucket4j) | one API task | ElastiCache (Valkey) backend for Bucket4j |
+| In-process notification dispatcher and sweepers | one API task | ShedLock on the Postgres table, or move them into the nightly/ops task family |
+| Async classification via Spring events + `@Async` | one JVM, restarts tolerated by the sweeper | SQS queue with the same listener code |
+| Idempotency keys in Postgres | always fine | — |
+| Batch inference disabled | < 100 users active | flip `margai.ai.batch_min_records` |
+
+### 13.4 Decisions only the founder can take
+
+1. **Offline verdicts** — Option A or B in §5.6 (needed before D31).
+2. **Mocks and autopsy** — schedule (D35 + D54) or park (§12.2).
+3. **Batch timetable photo and weekly confirm card** — D29/D58 or park.
+4. **Crash reporting** — accept PostHog error tracking, or amend the SDK rule now.
+5. **Infrastructure workstream F8** — accept the §7.6 timeline; decide whether Claude drafts
+   Terraform in a separately permitted session.
+6. **Pipeline in Java** (§6.1) — confirm, or choose the Python-extraction alternative before D14.
+7. **Console checks** in §13.2 — before D5.
 
 ## 14. Decisions to record in DECISIONS.md on approval
 
-_Collected as sections land; finalised in task 8._
+Format there: `date · day · decision · why · revisit when`. Each line below becomes one entry.
+
+| # | Decision | Why | Revisit when |
+|---|---|---|---|
+| D3.1 | One technical plan document, `docs/TECH_PLAN.md`, cited by section | one place for rules and agents to point at | never |
+| D3.2 | Precedence SPEC › TECH_PLAN › DEV_SPEC §2–§12; DEV_SPEC §13 stays authoritative | CLAUDE.md said "until D3 confirms or replaces" | never |
+| D3.3 | Hinglish is the `hi_Latn` locale (`app_hi_Latn.arb`); server value `hinglish` | valid BCP-47 tag, zero custom plumbing | never |
+| D3.4 | Content pipeline in Java inside the server (`pipeline` profile, picocli); VISION-tier page extraction; `pipeline/` holds founder data and reports | pipeline.md requires `AiClient`; one toolchain; layout-proof extraction | D14 if extraction quality disappoints |
+| D3.5 | Enumerations as `VARCHAR` + `CHECK`, never PG enum types | one-line migrations to extend | never |
+| D3.6 | pgvector HNSW cosine indexes (not ivfflat) | no training step, better recall at this scale | > 5M vectors |
+| D3.7 | Doubt answers synchronous with `202` + polling until D69 streaming | PLAN puts streaming at D69 | D69 |
+| D3.8 | In-process rate limiting, dispatcher, sweepers and async listeners; single API task | beta topology; upgrade path in §13.3 | second API task |
+| D3.9 | Flutter: go_router, dio, flutter_secure_storage, Riverpod without codegen, drift at D34, flutter_markdown + flutter_math_fork | boring, well-supported; codegen only when drift forces build_runner | D34 |
+| D3.10 | One AWS environment `beta`; Fargate in public subnets behind the ALB (no NAT gateway); RDS single-AZ; secrets injected by ECS from SSM | cost and simplicity; no staging until public launch | public launch |
+| D3.11 | IST for every "today"; `TIMESTAMPTZ` storage; paise integers; UUID v4 keys (uuidv7 parked) | correctness at the day boundary; boring ids | never |
+| D3.12 | JWT HS256 15 min + opaque rotating refresh tokens (30 d) with family reuse detection | DEV_SPEC §5 made concrete | never |
+| D3.13 | Config via `@ConfigurationProperties` records bound from environment; `application.yml` holds non-secret local defaults | fail-fast validation, no runtime SSM client | never |
+| D3.14 | Spring Modulith verifies module boundaries in a test from D4 | boundary rules that a test enforces, not a paragraph | never |
+| D3.15 | Nightly run is the same image as a scheduled ECS task; notifications dispatched by the API's in-process scheduler from `notification_log` | API latency unaffected; one dispatch mechanism for all notification kinds | second API task |
+| D3.16 | Join tables instead of `UUID[]` where foreign keys matter; plan blocks are rows | referential integrity; blocks are addressed by id | never |
+| D3.17 | Doubt cache keyed by `(question_hash, language)`; a cross-language exact hit renders the verified canonical answer (CHEAP) and counts as a hit | keeps the 55% hit-rate target reachable in three languages without re-solving | D41 metrics |
+| D3.18 | `AiClient` = `complete` + `embed`; feature tasks around it; ledger, breaker, tier policy, schema validation and retry as decorators | stable seam; every rule enforced once | never |
+| D3.19 | Eval gate: founder-launched live run writes a committed `eval/last-pass.json`; CI verifies the stamp and runs the fake layer | CI has no credentials by policy | D23 |
+| D3.20 | Seed data as a repeatable Flyway migration in a `db/seed` location enabled only in `local`/`test` | production never sees test data | never |
+| D3.21 | Structured model output via Bedrock Converse forced tool use, validated against the record schema | no JSON parsing heuristics | never |
+| D3.22 | Doubt images deleted immediately after extraction; documents after confirm/discard; sweeper and lifecycle as backstops | the 24-hour promise becomes minutes | never |
+| D3.23 | REASON tier reachable only with a `RouteDecision` (router, verification, generation) | the "router only" rule as a type | never |
+| D3.24 | Java records, sealed types, constructor injection; no Lombok | Java 25 makes Lombok unnecessary | never |
+| D3.25 | Crash reporting through PostHog error tracking, within the three-SDK rule | pending founder confirmation (§13.4) | D73 |

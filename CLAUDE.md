@@ -17,7 +17,8 @@ in your plan. If code and SPEC conflict, say so — do not silently pick one.
 - local db: `docker compose up db` (root compose file)
 
 ## Hard rules
-- correct_key never leaves the server; answers judged server-side (DEV_SPEC §5)
+- correct_key is never sent before that student's answer to the question is recorded server-side;
+  judging is server-side (DEV_SPEC §5, TECH_PLAN §0.4 #4)
 - no AI answer path without retrieval grounding + numerical verification (DEV_SPEC §4.2, R2)
 - every Bedrock call logs an ai_calls row (DEV_SPEC §3.4)
 - money endpoints idempotent; Razorpay webhook signature verified (DEV_SPEC §5)
@@ -36,16 +37,22 @@ open TODOs from the current /week task list, eval gate status. Summarize explora
 
 ---
 The block above is DEV_SPEC §13.2 verbatim, except that its "SPEC §3–5" citations now
-read "DEV_SPEC" (they were written when the Developer Spec was docs/SPEC.md).
+read "DEV_SPEC" (they were written when the Developer Spec was docs/SPEC.md), and hard rule 1
+carries the D3 rewording the founder approved on 2026-09-04 (TECH_PLAN §0.4 #4: SPEC §6.2/§6.4
+verdicts show the correct option after an answer is recorded).
 
 ## Documents and precedence (read before proposing anything)
 1. docs/SPEC.md — Product Spec v2.0, **the contract**: behaviour, every screen and rule,
    the Phase-2 exclusion list (§12). Contains no implementation detail by design (§13).
 2. docs/DEV_SPEC.md — Developer Spec v1.1. §13 (working agreements) is authoritative;
-   §2–12 are a reference implementation until the D3 technical plan confirms or replaces them.
-3. docs/PLAN.md — the 14-week schedule (D1–D84), one ✅ acceptance check per day and a gate
+   §2–12 are reference only, confirmed or replaced section by section in TECH_PLAN §0.3.
+3. docs/TECH_PLAN.md — Technical Plan v1.0, approved at D3 (2026-09-04): architecture, data
+   model, API, AI pipeline, app, content pipeline, infra, testing, conventions. Cite as
+   `TECH_PLAN §n`; where it differs from DEV_SPEC §2–12 it wins. §0.4 lists the surfaced
+   conflicts, §0.5 the founder's decisions, §0.2 the rule edits still due on later days.
+4. docs/PLAN.md — the 14-week schedule (D1–D84), one ✅ acceptance check per day and a gate
    per week. Supersedes the 6-week plan in DEV_SPEC §10.
-4. docs/TRACKER.md — live state. Update at the end of every session; tick a day only when it
+5. docs/TRACKER.md — live state. Update at the end of every session; tick a day only when it
    is committed AND its ✅ check passed. New ideas go to its PARKED list, never into scope.
 
 When these disagree, say so out loud and cite both — never silently pick one.
@@ -60,4 +67,7 @@ When these disagree, say so out loud and cite both — never silently pick one.
   `BEDROCK_LIVE=1` profile with the cost breaker active (DEV_SPEC §13.7).
 - Phase-2 items (SPEC §12) are out of scope. Where the spec is silent choose the boring,
   maintainable option and record it in docs/DECISIONS.md; where it conflicts, surface it.
+- docs/SPEC.md is amended only by the founder, or by Claude on an explicit per-edit instruction in
+  that session, each amendment with a DECISIONS.md row citing the finding that forced it. Contract
+  edits are never bundled into ordinary task work (ruling at D3 close, 2026-09-04).
 - Anything the human corrects twice belongs here or in a `.claude/rules/*.md` file.

@@ -12,21 +12,21 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 0 — Foundations (Week 1) |
-| Current day | D2 built, verified locally and committed on branch `d2-local-env` · 2026-09-03 · tick once the PR's CI is green · next: D3 |
-| Days completed / total | 1 / 84 (2 once D2's CI is green) |
+| Current day | D3 done · 2026-09-04 (TECH_PLAN v1.0 approved with 8 founder decisions, TECH_PLAN §0.5) · next: D4 |
+| Days completed / total | 3 / 84 |
 | Schedule delta | on track |
 | Last week's gate | n/a — Week-1 gate is due at D6 |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none. Human step open: push `d2-local-env`, open the PR, confirm CI green, merge, tick D2. Toolchain on this machine now: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none. Before D5: founder console checks (TECH_PLAN §13.2). Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
 ## PHASE 0 — Foundations (Week 1) · Module M0
 
 - [x] **D1** Claude Code scaffolding (CLAUDE.md, settings, 3 gate scripts, rules, agents, commands) · ✅ gates block bad commit + secret write — done 2026-09-02, all five acceptance tests passed (see day log)
-- [ ] **D2** Local env: Docker Postgres 18+pgvector, Spring Boot 4 boots, Flutter shell on device, CI green · ✅ fresh clone → running <15 min — built 2026-09-03 on `d2-local-env`, local acceptance PASS (see day log); tick when the PR's CI is green
-- [ ] **D3** Claude Code full technical plan reviewed & approved · ✅ plan committed to docs/
+- [x] **D2** Local env: Docker Postgres 18+pgvector, Spring Boot 4 boots, Flutter shell on device, CI green · ✅ fresh clone → running <15 min — done 2026-09-03, acceptance PASS (35 s warm, ≈14.5 min cold), PR CI green (founder-verified), merged (see day log)
+- [x] **D3** Claude Code full technical plan reviewed & approved · ✅ plan committed to docs/ — done 2026-09-04, docs/TECH_PLAN.md v1.0 APPROVED with 8 founder decisions (§0.5), three spec-auditor passes (see day log)
 - [ ] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations
 - [ ] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake
 - [ ] **D6** Buffer / overflow
@@ -59,27 +59,27 @@
 
 ## PHASE 3 — Onboarding & first plan (Week 5) · M2 + M4v0
 
-- [ ] **D25** Interview Q1–Q3 (chat UI + persistence) · ✅ back/edit works
+- [ ] **D25** Interview Q1–Q3 (chat UI + persistence) + batch-position self-report for coaching students (D3 decision 3) · ✅ back/edit works
 - [ ] **D26** Syllabus grid + hours sliders + goal/target (+optional category) · ✅ interview <5 min
-- [ ] **D27** DOB + minors parent-consent OTP · ✅ uploads blocked until consent
+- [ ] **D27** DOB + minors parent-consent OTP sent at the DOB step; onboarding completes regardless; "consent pending" state on Profile + re-prompt at gated moments (D3 decision 8) · ✅ photo doubts and uploads blocked until consent; text features and the first plan work
 - [ ] **D28** Scorecard capture → extract → confirm → delete · ✅ 3 sample cards correct; storage empty after
-- [ ] **D29** 12th-marksheet variant + deterministic first plan + reveal screen · ✅ end-to-end new user
+- [ ] **D29** 12th-marksheet + batch-timetable doc_types (D3 decision 3) + deterministic first plan + reveal screen · ✅ end-to-end new user
 - [ ] **D30** Notification permission moment + morning notif skeleton
 - [ ] **🚩 WEEK-5 GATE:** install → plan < 5 min, cold demo on fresh device
 
 ## PHASE 4 — Practice engine (Week 6) · M5
 
-- [ ] **D31** Session backend (band+relevance selection, server judging) · ✅ no answers in client payload
+- [ ] **D31** Session backend (band+relevance selection, server judging) · ✅ no correct answer in any payload before that question is answered (D3 decision 1a)
 - [ ] **D32** Practice UI (timer, verdict, solution, anchor chip) · ✅ smooth on mid-range phone
 - [ ] **D33** Session summary + event stream · ✅ timing data in DB
-- [ ] **D34** Offline cache + outbox sync · ✅ airplane-mode test
-- [ ] **D35** Diagnostic test (30-Q adaptive) → ability estimates · ✅ shifts a seeded plan
+- [ ] **D34** Offline cache + outbox sync, offline pack per Option A (D3 decision 1b) · ✅ airplane-mode test + the pack is the only pre-answer carrier
+- [ ] **D35** Diagnostic test (30-Q adaptive) → ability estimates, plus `kind=mock` sessions (D3 decision 2; may slip into D36) · ✅ shifts a seeded plan
 - [ ] **D36** Buffer · **🚩 WEEK-6 GATE:** practice loop incl. offline + diagnostic
 
 ## PHASE 5 — Doubt solver (Weeks 7–8) · M6 ⭐
 
 - [ ] **D37** Text path: normalize → cache → cheap-tier grounded answer · ✅ 10 doubts, right anchors
-- [ ] **D38** Photo path (vision extraction) · ✅ 10 printed Qs faithful
+- [ ] **D38** Photo path (vision extraction); minors without consent get CONSENT_REQUIRED on photo doubts (D3 decision 8) · ✅ 10 printed Qs faithful
 - [ ] **D39** Router + reasoning tier + numerical verification + honest fallback · ✅ unverified never renders
 - [ ] **D40** Answer UI per contract (steps/anchor/trap/follow-ups/report) · ✅ matches spec wireframe
 - [ ] **D41** Cache write (verified only) + semantic near-match + metrics · ✅ instant repeat answer
@@ -98,7 +98,7 @@
 - [ ] **D51** SRS 3/10/25 + variant selection (real Q preferred, else generate+verify) · ✅ day-3 variants appear
 - [ ] **D52** Healed flow + ✓ gallery + Danger Zones · ✅ healing demo
 - [ ] **D53** Patterns engine v1 (plain-language insights) · ✅ fires only with enough data
-- [ ] **D54** Buffer · **🚩 WEEK-9 GATE:** capture→diagnose→resurface→heal end-to-end
+- [ ] **D54** Buffer + mock autopsy (per-mark classification, gamble score, pace map — D3 decision 2; may slip) · **🚩 WEEK-9 GATE:** capture→diagnose→resurface→heal end-to-end
 - [ ] **D55** Nightly snapshot + deterministic candidate blocks · ✅ sensible plans for 5 synthetic students
 - [ ] **D56** AI selection + reasons + mentor note + validated output + fallback · ✅ no planless morning possible
 - [ ] **D57** Batch run all users + morning deep-link notification · ✅ 2 devices, 2 different 7 AM plans
@@ -152,6 +152,8 @@
 | F5 | Marketing site copy + deploy | W11 | ☐ | |
 | F6 | Trademark search (Class 41 + 9) for final name | anytime | ☐ | before public launch |
 | F7 | Domain + social handles for final name | anytime | ☐ | MARGAI = working name |
+| F9 | DPDP legal review of the minors' consent flow (TECH_PLAN §0.5 item 8, §9.6): consent OTP at the DOB step, gated photo doubts and uploads until consent | before D27 ideally; before beta at the latest | ☐ | not a build blocker; may tighten the gating |
+| F8 | AWS beta stack (Terraform) per TECH_PLAN §7.6 — accepted at D3 (decision 5). Claude drafts Terraform in a separate infra session profile (plan allowed, apply denied), created when the first milestone is due; founder runs every apply | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ accepted 2026-09-04 | PLAN has no infra day (TECH_PLAN §0.4 #1); console checks §13.2 before D5 |
 
 ---
 
@@ -173,6 +175,77 @@
 ## 📝 Day log (append newest on top)
 
 ```
+D3 · 2026-09-03/04 · PHASE 0 — Foundations
+Shipped (branch d3-tech-plan, 10 commits): docs/TECH_PLAN.md — Technical Plan v1.0, ≈1,950 lines.
+  §0 precedence, DEV_SPEC §2–12 disposition table, nine surfaced conflicts/gaps. §1 modular monolith:
+  17 modules with owned tables and an acyclic dependency graph, run modes as Spring profiles, request
+  lifecycle, nightly execution, cross-module events. §2 data model: ≈45 tables, the D4 slice column-
+  complete, one Flyway migration per PLAN day (V1–V31), retention and deletion. §3 API: token model,
+  envelope + code catalog, rate limits, idempotency, polling until D69, every endpoint with its PLAN
+  day and shape. §4 AI: AiClient v2 (two primitives + decorator chain), RouteDecision for REASON, the
+  11-stage doubt pipeline with the enforcement point of each hard rule, limits and fair use, nightly
+  planner with deterministic candidates and fallback, classification, SRS variants, ledger and
+  breaker, hybrid retrieval, two-layer eval harness, Bedrock specifics, prompts, hard-rule map. §5
+  Flutter: layers, Riverpod without codegen, go_router, dio, Hinglish as hi_Latn, drift outbox with
+  the offline-verdict options. §6 content pipeline: Java module under the pipeline profile, VISION
+  extraction, commands mapped to D13–D23. §7 AWS beta stack, SSM layout, IAM, backups, F8 timeline,
+  cost. §8–§11 testing, security/DPDP, observability, conventions. §12 PLAN mapping and gaps. §13
+  risks, console checks, single-instance assumptions, eight founder decisions. §14 25 decisions for
+  DECISIONS.md.
+Acceptance: PASS — TECH_PLAN v1.0 APPROVED by the founder 2026-09-04 (status line flipped, commit
+  on d3-tech-plan). spec-auditor: pass 1 FAIL (1 blocker: the correct_key rule had been silently
+  narrowed; 5 major; ~15 minor), pass 2 FAIL (2 major; ~20 minor), pass 3 PASS (14 minor wording
+  items, all folded in). Three rounds, ≈60 findings addressed.
+Founder decisions at approval (TECH_PLAN §0.5), one line each:
+  1a correct_key reading ACCEPTED — never sent before that student's answer is recorded server-side;
+     CLAUDE.md rule 1, server.md, endpoint.md, spec-auditor.md and PLAN D31 ✅ reworded today.
+  1b Offline verdicts: OPTION A — pack carries judging data for the student's own day only,
+     obfuscated (best effort), wiped after sync; server re-judging authoritative; D34 adds the
+     clause + the only-pre-answer-carrier test.
+  2  Mocks SCHEDULED at D35 (kind=mock), autopsy in D54's buffer; slips to the slippage log.
+  3  Batch sync: self-report at D25, timetable doc_type at D29; weekly confirm card PARKED.
+  4  PostHog error tracking ACCEPTED within the three-SDK rule; revisit D73.
+  5  F8 infra workstream ACCEPTED (§7.6 timeline); Terraform drafted in a separate infra session
+     profile (plan allowed, apply denied) created when the first milestone is due; founder applies.
+  6  Java pipeline CONFIRMED with the D14 escape hatch.
+  7  Founder runs the four console checks before D5; PG17 fallback is a versions change (touch
+     points listed in TECH_PLAN §13.2, incl. SPEC §3).
+  8  Minors: consent OTP inside the onboarding flow; until consent, CONSENT_REQUIRED covers photo
+     doubts and documents (text stays available) — decision D3.28.
+Post-approval exchange (three readings surfaced before executing, all ruled by the founder):
+  decision 8 reading ACCEPTED with two tightenings — consent OTP fired at the DOB step, "consent
+  pending" state on Profile + re-prompt at gated moments; legal review = workstream F9, not a
+  blocker. DEV_SPEC §13.2 divergence ACCEPTED as handled (live CLAUDE.md wins; note records it).
+  PG17 fallback protocol: SPEC §3 is amended only by the founder, or by Claude on an explicit
+  per-edit instruction, with a DECISIONS.md row citing the console finding; contract edits are never
+  bundled into task work — now a CLAUDE.md session rule. If PG18 is on RDS Mumbai the branch evaporates.
+Conflict resolutions recorded (TECH_PLAN §0.4): #1 infra day → F8; #2 batch inference conditional on
+  the minimum, on-demand below it; #3 eval gate = founder-launched live run + committed stamp, CI
+  verifies the stamp and runs the fake layer (D23); #4 correct_key per decisions 1a/1b; #5 pipeline in
+  Java; #6 streaming at D69; #7 five unscheduled features per decisions 2–3 (seed generation, trap
+  mining, continuity still unscheduled); #8 CLAUDE.md precedence line added; #9 rule rewordings on
+  their days (D4, D5, D13). DEV_SPEC §13.2 keeps the original hard-rule sentence; CLAUDE.md's note
+  records the divergence (D1 precedent).
+Doc conflicts surfaced (TECH_PLAN §0.4): PLAN has no infrastructure day (→ proposed F8); Bedrock
+  batch-inference minimum vs "all nightly calls batch"; the eval gate cannot run live in CI; the
+  correct_key wording vs SPEC §6.2/§6.4 verdicts (online reading proposed for approval; offline
+  Option A/B open); pipeline module placement vs pipeline.md; streaming at D69 by PLAN precedence;
+  five SPEC features with no PLAN day (batch sync, seed generation, trap mining, mocks + autopsy,
+  continuity re-onboarding); CLAUDE.md precedence slot; three rule sentences to reword on their days.
+Verified: Flutter gen-l10n accepts app_hi_Latn.arb (scratch project, Flutter 3.47.2) — Hinglish needs
+  no custom plumbing.
+Parked: see PARKED (uuidv7, ai_calls partitioning, staging env, golden tests, Crashlytics fallback,
+  auto-deploy on main, second-instance upgrades).
+Surprise: the plan came out at ≈1,950 lines against a 900–1,200 estimate; the schema and endpoint
+  catalogs are the bulk. The spec-auditor's first pass caught a hard rule being narrowed without a
+  §0.4 entry — keep the audit-before-handover habit for design documents, not just code.
+Tomorrow's first task: founder pushes d3-tech-plan and opens PR #2 (CI: guardrails + secret scan
+  only matter for docs). Then D4 core schema straight from TECH_PLAN §2.2–§2.4 and §2.9 (V1–V4 +
+  the db/seed test taxonomy), the reversibility test (§8.2) and the first Modulith boundary test
+  (§8.1), plus the D4 rule edit from §0.2 (append-only tables carry no updated_at).
+```
+
+```
 D2 · 2026-09-03 · PHASE 0 — Foundations
 Shipped (branch d2-local-env, 3 commits + this tracker update): Brewfile + scripts/dev-setup.sh
   (JDK 25 via the openjdk@25 formula, Flutter 3.47.2 stable, Android cmdline-tools + SDK 36,
@@ -189,7 +262,8 @@ Acceptance: PASS locally —
   Shell runs on the Android 36 emulator (screenshot: "MARG AI"; com.margai.app resumed).
   spec-auditor on the full diff: PASS, one minor finding (a document conflict logged in
   DECISIONS.md) fixed by moving it here; jq added to the Brewfile on its advice (hooks need it).
-  CI: not yet exercised — needs the human push + PR; D2 stays unticked until it is green.
+  CI: PR #1 from d2-local-env green (founder-verified 2026-09-03) — first real run of the server
+  and app jobs; merged to main by the founder (merge commit 5e97f35).
 Doc conflict surfaced: DEV_SPEC §13.8 (bootstrap prompt) scaffolds server/ with "first migration
   = users + subscriptions"; PLAN D2 is environment only and PLAN D4 owns the first migrations
   (docker-compose.yml already says so). Resolved by PLAN precedence in the approved D2 plan;
@@ -204,8 +278,8 @@ Surprise: Testcontainers 2.x renamed its artifacts (testcontainers-postgresql, p
   flutter create's Kotlin template carries TODO comments that the gate rejects — removed.
   Another project's Keycloak holds 127.0.0.1:8080 on this Mac; SERVER_PORT=8081 works (README).
   psql is not installed although settings allow it — use `docker compose exec -T db psql`.
-Tomorrow's first task: D3 — once the PR is green and merged, tick D2; then the full technical
-  plan from SPEC (architecture, data model, API surface, AI pipeline) for a whole-session review.
+Tomorrow's first task: D3 — the full technical plan from SPEC (architecture, data model, API
+  surface, AI pipeline) for a whole-session review; decide the Hinglish ARB locale strategy in it.
 ```
 
 ```
@@ -256,6 +330,15 @@ Tomorrow's first task:
 - `brew "libpq"` so the allowed `psql -h localhost *` command exists locally · 2026-09-03 · today sessions use `docker compose exec -T db psql`
 - `brew "gh"` so sessions can read CI run status after the human pushes · 2026-09-03 · optional; web UI works
 - silence Gradle's JDK 25 native-access warning (`--enable-native-access=ALL-UNNAMED` in gradle.properties) · 2026-09-03 · cosmetic
+- `uuidv7()` primary keys (native in PostgreSQL 18) for append-only tables · 2026-09-04 · better index locality on `practice_events`/`ai_calls`; irrelevant at beta volume (TECH_PLAN D3.11)
+- month partitioning of `ai_calls` and `practice_events` · 2026-09-04 · when volume asks for it (TECH_PLAN §2.8)
+- a staging environment between local and beta · 2026-09-04 · not before public launch (TECH_PLAN §7.1)
+- Flutter golden tests · 2026-09-04 · widget tests per state suffice for now (TECH_PLAN §8.4)
+- Crashlytics if PostHog error tracking proves insufficient on Android · 2026-09-04 · would amend the three-SDK rule (TECH_PLAN §13.4)
+- automatic deploy on merge to main · 2026-09-04 · manual `workflow_dispatch` until D72 (TECH_PLAN §7.4)
+- second-API-task upgrades: Valkey-backed rate limits, ShedLock for the dispatcher, SQS for async listeners · 2026-09-04 · only when a second task exists (TECH_PLAN §13.3)
+- weekly batch-confirm card ("Did your batch finish Rotational Motion?", SPEC §6.7 layer 4) · 2026-09-04 · founder decision 3 at D3: parked until the beta contains coaching students; self-report (D25) and timetable photo (D29) are scheduled
+- continuity re-onboarding after a result that falls short (SPEC §7.2 Fork B) and NCERT-style seed generation to ≥30 questions/topic (SPEC §9.3), NTA-trap mining (SPEC §9.4) · 2026-09-04 · unscheduled per TECH_PLAN §12.2; seed generation and trap mining proposed for the D24 buffer
 
 ---
 

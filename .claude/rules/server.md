@@ -11,7 +11,8 @@ paths:
 - Every service-layer change ships with tests; controllers are tested via MockMvc.
 - REST base `/api/v1`; error envelope `{error: {code, message_en, message_user_lang}}`;
   per-user rate limits; destructive or paid actions idempotent via `Idempotency-Key` (DEV_SPEC §5).
-- `correct_key` never appears in any client payload; judging is server-side only.
+- `correct_key` is never sent before that student's answer to the question is recorded server-side;
+  judging is server-side only. The permitted carriers are listed in TECH_PLAN §3.1 and tested per §8.3.
 - Schema changes only via a Flyway migration under `src/main/resources/db/migration/`
   (`V<n>__<snake_name>.sql`, never edit an applied one) plus the matching JPA entity change.
   Naming: snake_case, UUID PK `gen_random_uuid()`, `created_at`, `updated_at` (DEV_SPEC §3).

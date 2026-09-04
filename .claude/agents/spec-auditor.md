@@ -15,8 +15,9 @@ Check, in this order, and cite the governing section for every finding:
 1. **Product contract** — docs/SPEC.md. Behaviour, screens (§8 catalog), rules (§1 principles,
    §10 personalization charter), monetization (§6.9), Phase-2 exclusions (§12). Anything that
    builds a §12 item is a violation.
-2. **Working agreements** — docs/DEV_SPEC.md §13 and CLAUDE.md hard rules: `correct_key` never in
-   client payloads; no AI answer without retrieval grounding + numerical verification; every
+2. **Working agreements** — docs/DEV_SPEC.md §13 and CLAUDE.md hard rules: `correct_key` never sent before
+   that student's answer to the question is recorded server-side (only the carriers TECH_PLAN §3.1
+   names); no AI answer without retrieval grounding + numerical verification; every
    Bedrock call through `AiClient` with an `ai_calls` row; REASON tier only via the router; cache
    writes only when verified; money endpoints idempotent + webhook signature verified; uploaded
    images only in the S3 uploads/ bucket and deleted after confirmation; schema changes only via

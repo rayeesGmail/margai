@@ -6,6 +6,7 @@ recorded here — they are surfaced in the session and resolved in the documents
 
 Format: `date · day · decision · why · revisit when`
 
+- 2026-09-04 · D4 · Database locked: PostgreSQL 18.6 on db.t4g.small, single-AZ, 20 GB gp3 + autoscaling, 7-day backups, deletion protection; pgvector 0.8.1 confirmed via AWS release notes; console create-screen initially hid 18.x — engine/class facts come from the API (`describe-db-engine-versions`, `describe-orderable-db-instance-options`), extension facts from release notes and `pg_available_extensions` · console check #3 (TECH_PLAN §13.2 item 3) closed 2026-09-04; the PG17 fallback (§0.5 item 7) was never applied and is void · minor-version bumps at maintenance windows.
 - 2026-09-04 · D3 · Minors: the parent-consent OTP is part of the onboarding flow, and until consent is complete `CONSENT_REQUIRED` covers photo doubts as well as document uploads; text features stay available; after consent everything unlocks (TECH_PLAN D3.28, founder decision 8) · SPEC §6.8 says "before any upload"; a doubt photo is an upload · never.
 - 2026-09-04 · D3 · The anonymous peer percentile is shown only when the cohort (same attempt type, active in 14 days) has ≥ 30 students (TECH_PLAN D3.27) · Evidence rule at beta scale · D58.
 - 2026-09-04 · D3 · A doubt follow-up weighs 0.5 toward the free-tier limit, like a cached hit (TECH_PLAN D3.26) · SPEC §6.3 is silent; follow-ups reuse context and are usually CHEAP · D44 metrics.

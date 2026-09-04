@@ -243,6 +243,10 @@ Tomorrow's first task: founder pushes d3-tech-plan and opens PR #2 (CI: guardrai
   only matter for docs). Then D4 core schema straight from TECH_PLAN §2.2–§2.4 and §2.9 (V1–V4 +
   the db/seed test taxonomy), the reversibility test (§8.2) and the first Modulith boundary test
   (§8.1), plus the D4 rule edit from §0.2 (append-only tables carry no updated_at).
+Console check #3 closed (2026-09-04, after PR #2 merged): PG 18.6 + t4g.small + pgvector 0.8.1
+  confirmed; checks #1, #2, #4 (Bedrock models/IDs, batch minimum, embeddings access) still
+  pending before D5. Recorded in DECISIONS.md (D4 row), TECH_PLAN §13.2 item 3 and the new
+  docs/runbooks/f8-infrastructure.md smoke stub; the PG17 fallback was never applied.
 ```
 
 ```

@@ -139,7 +139,8 @@ tools; your reviews focus on output quality.)*
 ### PHASE 4 — Practice engine (Week 6, Days 31–36) — Module M5
 
 - **D31 —** Session backend: block → question set assembly (difficulty band + NEET
-  relevance filter), server-side judging. ✅ *No correct answers in any client payload.*
+  relevance filter), server-side judging. ✅ *No correct answer in any payload before that
+  question is answered; judging server-side (TECH_PLAN §0.4 #4, decided at D3).*
 - **D32 —** Practice UI: timer, taps, verdict + solution sheet + NCERT anchor chip.
   ✅ *A 10-question timed set feels smooth on a mid-range phone.*
 - **D33 —** Session summary (accuracy, speed vs your norm, sent-to-notebook list);

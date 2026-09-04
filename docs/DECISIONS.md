@@ -6,6 +6,31 @@ recorded here — they are surfaced in the session and resolved in the documents
 
 Format: `date · day · decision · why · revisit when`
 
+- 2026-09-04 · D3 · Minors: the parent-consent OTP is part of the onboarding flow, and until consent is complete `CONSENT_REQUIRED` covers photo doubts as well as document uploads; text features stay available; after consent everything unlocks (TECH_PLAN D3.28, founder decision 8) · SPEC §6.8 says "before any upload"; a doubt photo is an upload · never.
+- 2026-09-04 · D3 · The anonymous peer percentile is shown only when the cohort (same attempt type, active in 14 days) has ≥ 30 students (TECH_PLAN D3.27) · Evidence rule at beta scale · D58.
+- 2026-09-04 · D3 · A doubt follow-up weighs 0.5 toward the free-tier limit, like a cached hit (TECH_PLAN D3.26) · SPEC §6.3 is silent; follow-ups reuse context and are usually CHEAP · D44 metrics.
+- 2026-09-04 · D3 · Crash reporting through PostHog error tracking, within the three-SDK rule; founder-confirmed at approval, Crashlytics only via an explicit rule amendment (TECH_PLAN D3.25, decision 4) · SPEC §11 needs crash-free % without a fourth SDK · D73.
+- 2026-09-04 · D3 · Java records, sealed types, constructor injection; no Lombok (TECH_PLAN D3.24) · Java 25 makes Lombok unnecessary · never.
+- 2026-09-04 · D3 · REASON tier reachable only with a `RouteDecision` from three named producers: router, verification, generation (TECH_PLAN D3.23) · the "router only" rule as a type · never.
+- 2026-09-04 · D3 · Doubt images deleted immediately after extraction, documents after confirm/discard; the `expires_at` sweeper and the 1-day lifecycle are backstops (TECH_PLAN D3.22) · the 24-hour promise becomes minutes · never.
+- 2026-09-04 · D3 · Structured model output via Bedrock Converse forced tool use, validated against the record's JSON schema (TECH_PLAN D3.21) · no JSON parsing heuristics · never.
+- 2026-09-04 · D3 · Seed data as a repeatable Flyway migration in a `db/seed` location enabled only in the `local` and `test` profiles (TECH_PLAN D3.20) · production never sees test data · never.
+- 2026-09-04 · D3 · `AiClient` = `complete`, `completeBatch`, `embed`; feature tasks around it; ledger, breaker, tier policy, schema validation and retry as decorators (TECH_PLAN D3.18) · stable seam; every rule enforced once · never.
+- 2026-09-04 · D3 · Doubt cache keyed by `(question_hash, language)`; a cross-language exact hit renders the verified canonical answer (CHEAP) and counts as a hit (TECH_PLAN D3.17) · keeps the 55% hit-rate target reachable in three languages · D41 metrics.
+- 2026-09-04 · D3 · Join tables instead of `UUID[]` where foreign keys matter; plan blocks are rows (TECH_PLAN D3.16) · referential integrity; blocks are addressed by id · never.
+- 2026-09-04 · D3 · The nightly run is the same image as a scheduled ECS task (`jobs` module); notifications are scheduled from `PlanGenerated` events and dispatched by the API's in-process scheduler from `notification_log` (TECH_PLAN D3.15) · API latency unaffected; one dispatch mechanism · second API task.
+- 2026-09-04 · D3 · Spring Modulith verifies module boundaries in a test from D4 (TECH_PLAN D3.14) · rules a test enforces, not a paragraph · never.
+- 2026-09-04 · D3 · Config via `@ConfigurationProperties` records bound from environment variables; `application.yml` holds non-secret local defaults (TECH_PLAN D3.13) · fail-fast validation, no runtime SSM client · never.
+- 2026-09-04 · D3 · JWT HS256 15 min + opaque rotating refresh tokens (30 d) with family reuse detection (TECH_PLAN D3.12) · DEV_SPEC §5 made concrete · never.
+- 2026-09-04 · D3 · IST for every "today"; `TIMESTAMPTZ` storage; paise integers; UUID v4 keys (TECH_PLAN D3.11) · correctness at the day boundary; boring ids · never (uuidv7 parked).
+- 2026-09-04 · D3 · One AWS environment `beta`: Fargate in public subnets behind the ALB (no NAT gateway), RDS single-AZ, secrets injected by ECS from SSM (TECH_PLAN D3.10) · cost and simplicity · public launch.
+- 2026-09-04 · D3 · Flutter: go_router, dio, flutter_secure_storage, Riverpod without codegen, drift at D34, flutter_markdown_plus + flutter_math_fork (TECH_PLAN D3.9) · boring, well-supported; codegen only when drift forces build_runner · D34; markdown package health at D32.
+- 2026-09-04 · D3 · In-process rate limiting, dispatcher, sweepers and async listeners; single API task (TECH_PLAN D3.8) · beta topology; upgrade path in TECH_PLAN §13.3 · second API task.
+- 2026-09-04 · D3 · pgvector HNSW cosine indexes, not ivfflat (TECH_PLAN D3.6) · no training step, better recall at this scale · > 5M vectors.
+- 2026-09-04 · D3 · Enumerations as `VARCHAR` + `CHECK`, never PostgreSQL enum types (TECH_PLAN D3.5) · one-line migrations to extend · never.
+- 2026-09-04 · D3 · Content pipeline in Java inside the server (`pipeline` profile, picocli), VISION-tier page extraction; `pipeline/inputs/` holds founder data, `pipeline/reports/` the run reports; founder-confirmed at approval (TECH_PLAN D3.4, decision 6) · pipeline.md requires `AiClient`; one toolchain; layout-proof extraction · D14 if extraction quality disappoints.
+- 2026-09-04 · D3 · Hinglish is the `hi_Latn` locale (`app_hi_Latn.arb`); server value `hinglish` (TECH_PLAN D3.3) · valid BCP-47 tag, zero custom plumbing; verified with gen-l10n · never.
+- 2026-09-04 · D3 · One technical plan document, `docs/TECH_PLAN.md`, cited by section (TECH_PLAN D3.1) · one place for rules and agents to point at · never.
 - 2026-09-03 · D2 · One JDK for everything: Flutter's Gradle (9.3.1 / AGP 9.1) builds on the same JDK 25 the server uses, so no `flutter config --jdk-dir` · fewer moving parts in the fresh-clone path · if a Flutter upgrade pins an older Gradle.
 - 2026-09-03 · D2 · Actuator exposes only `/actuator/health` with component names, no details · boot proof needs the db component; details wait for auth (D7+) · D7.
 - 2026-09-03 · D2 · Android SDK via Homebrew `android-commandlinetools` (no Android Studio); emulator optional through `scripts/dev-setup.sh --emulator` · lighter, scriptable, fits the 15-minute fresh clone · when a contributor needs the IDE.

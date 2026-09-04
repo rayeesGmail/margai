@@ -12,7 +12,7 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 0 — Foundations (Week 1) |
-| Current day | D2 done · 2026-09-03 (PR #1 CI green, merged) · next: D3 |
+| Current day | D3 in review · 2026-09-04 · docs/TECH_PLAN.md draft committed on `d3-tech-plan`, spec-auditor PASS · next: founder approval (8 decisions in TECH_PLAN §13.4) → tick D3 → D4 |
 | Days completed / total | 2 / 84 |
 | Schedule delta | on track |
 | Last week's gate | n/a — Week-1 gate is due at D6 |
@@ -152,6 +152,7 @@
 | F5 | Marketing site copy + deploy | W11 | ☐ | |
 | F6 | Trademark search (Class 41 + 9) for final name | anytime | ☐ | before public launch |
 | F7 | Domain + social handles for final name | anytime | ☐ | MARGAI = working name |
+| F8 | AWS beta stack (Terraform, founder-run) per TECH_PLAN §7.6 — proposed at D3, founder to accept | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ proposed | PLAN has no infra day (TECH_PLAN §0.4 #1) |
 
 ---
 
@@ -171,6 +172,46 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+D3 · 2026-09-03/04 · PHASE 0 — Foundations
+Shipped (branch d3-tech-plan, 10 commits): docs/TECH_PLAN.md — Technical Plan v1.0, ≈1,950 lines.
+  §0 precedence, DEV_SPEC §2–12 disposition table, nine surfaced conflicts/gaps. §1 modular monolith:
+  17 modules with owned tables and an acyclic dependency graph, run modes as Spring profiles, request
+  lifecycle, nightly execution, cross-module events. §2 data model: ≈45 tables, the D4 slice column-
+  complete, one Flyway migration per PLAN day (V1–V31), retention and deletion. §3 API: token model,
+  envelope + code catalog, rate limits, idempotency, polling until D69, every endpoint with its PLAN
+  day and shape. §4 AI: AiClient v2 (two primitives + decorator chain), RouteDecision for REASON, the
+  11-stage doubt pipeline with the enforcement point of each hard rule, limits and fair use, nightly
+  planner with deterministic candidates and fallback, classification, SRS variants, ledger and
+  breaker, hybrid retrieval, two-layer eval harness, Bedrock specifics, prompts, hard-rule map. §5
+  Flutter: layers, Riverpod without codegen, go_router, dio, Hinglish as hi_Latn, drift outbox with
+  the offline-verdict options. §6 content pipeline: Java module under the pipeline profile, VISION
+  extraction, commands mapped to D13–D23. §7 AWS beta stack, SSM layout, IAM, backups, F8 timeline,
+  cost. §8–§11 testing, security/DPDP, observability, conventions. §12 PLAN mapping and gaps. §13
+  risks, console checks, single-instance assumptions, eight founder decisions. §14 25 decisions for
+  DECISIONS.md.
+Acceptance: PENDING — the ✅ is "approved plan committed"; the draft is committed with status DRAFT
+  and the founder's review is the approval step. spec-auditor: pass 1 FAIL (1 blocker: the
+  correct_key rule had been silently narrowed; 5 major; ~15 minor), pass 2 FAIL (2 major; ~20 minor),
+  pass 3 PASS (14 minor wording items, all folded in). Three rounds, ≈60 findings addressed.
+Doc conflicts surfaced (TECH_PLAN §0.4): PLAN has no infrastructure day (→ proposed F8); Bedrock
+  batch-inference minimum vs "all nightly calls batch"; the eval gate cannot run live in CI; the
+  correct_key wording vs SPEC §6.2/§6.4 verdicts (online reading proposed for approval; offline
+  Option A/B open); pipeline module placement vs pipeline.md; streaming at D69 by PLAN precedence;
+  five SPEC features with no PLAN day (batch sync, seed generation, trap mining, mocks + autopsy,
+  continuity re-onboarding); CLAUDE.md precedence slot; three rule sentences to reword on their days.
+Verified: Flutter gen-l10n accepts app_hi_Latn.arb (scratch project, Flutter 3.47.2) — Hinglish needs
+  no custom plumbing.
+Parked: see PARKED (uuidv7, ai_calls partitioning, staging env, golden tests, Crashlytics fallback,
+  auto-deploy on main, second-instance upgrades).
+Surprise: the plan came out at ≈1,950 lines against a 900–1,200 estimate; the schema and endpoint
+  catalogs are the bulk. The spec-auditor's first pass caught a hard rule being narrowed without a
+  §0.4 entry — keep the audit-before-handover habit for design documents, not just code.
+Tomorrow's first task: founder review of docs/TECH_PLAN.md — answer the eight §13.4 decisions, then
+  "approved" → status line APPROVED, CLAUDE.md precedence line, DECISIONS.md from §14, rule
+  rewordings per §0.2, tick D3, PR #2. Then D4 core schema straight from §2.2–§2.4 and §2.9.
+```
 
 ```
 D2 · 2026-09-03 · PHASE 0 — Foundations
@@ -257,6 +298,13 @@ Tomorrow's first task:
 - `brew "libpq"` so the allowed `psql -h localhost *` command exists locally · 2026-09-03 · today sessions use `docker compose exec -T db psql`
 - `brew "gh"` so sessions can read CI run status after the human pushes · 2026-09-03 · optional; web UI works
 - silence Gradle's JDK 25 native-access warning (`--enable-native-access=ALL-UNNAMED` in gradle.properties) · 2026-09-03 · cosmetic
+- `uuidv7()` primary keys (native in PostgreSQL 18) for append-only tables · 2026-09-04 · better index locality on `practice_events`/`ai_calls`; irrelevant at beta volume (TECH_PLAN D3.11)
+- month partitioning of `ai_calls` and `practice_events` · 2026-09-04 · when volume asks for it (TECH_PLAN §2.8)
+- a staging environment between local and beta · 2026-09-04 · not before public launch (TECH_PLAN §7.1)
+- Flutter golden tests · 2026-09-04 · widget tests per state suffice for now (TECH_PLAN §8.4)
+- Crashlytics if PostHog error tracking proves insufficient on Android · 2026-09-04 · would amend the three-SDK rule (TECH_PLAN §13.4)
+- automatic deploy on merge to main · 2026-09-04 · manual `workflow_dispatch` until D72 (TECH_PLAN §7.4)
+- second-API-task upgrades: Valkey-backed rate limits, ShedLock for the dispatcher, SQS for async listeners · 2026-09-04 · only when a second task exists (TECH_PLAN §13.3)
 
 ---
 

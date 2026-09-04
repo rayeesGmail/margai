@@ -65,10 +65,10 @@ surfaced in that session rather than now:
 | §6.1 Offline & sync | Confirmed with one open conflict | §5.6, §0.4 #4 | Offline instant verdict vs server-side judging needs a founder decision |
 | §6.2 Notifications | Confirmed | §2.7, §4.5, §10 | One `notification_log` table drives cap, quiet periods and dispatch |
 | §7 Content pipeline | Amended | §6 | AI-touching steps live in the Java server (profile `pipeline`) so they use `AiClient`; `pipeline/` holds founder-owned inputs and reports |
-| §8 Feature rules | Confirmed with two amendments | cited where used | Product decisions consistent with SPEC. §8.1's on-the-fly plan is tagged `generated_by = fallback` (not `onboarding`) so the two origins stay distinguishable; §8.6's T-3 mode is named `light_recall` (§4.5) |
+| §8 Feature rules | Confirmed with four amendments | cited where used | Product decisions consistent with SPEC. §8.1's on-the-fly plan is tagged `generated_by = fallback` (not `onboarding`) so the two origins stay distinguishable; §8.5's "queue as batch" is a deferred on-demand queue (§0.4 #2); §8.6's T-3 mode is named `light_recall` (§4.5); §8.6's "continuity offer is Phase 2" is overruled by SPEC §12, which excludes only referral and graduation automation (§0.4 #7) |
 | §9 Non-functional | Confirmed | §8–§10 | Streaming NFR deferred to D69 by PLAN precedence |
 | §10 Build plan (6 weeks) | Superseded | docs/PLAN.md | Already stated in CLAUDE.md |
-| §11 Out of scope | Confirmed | — | Identical to SPEC §12 |
+| §11 Out of scope | Confirmed, one difference | §0.4 #7 | SPEC §12 plus the "NCERT licence badge"; DEV_SPEC §11 also lists "referral/graduation flows", which this plan reads per SPEC §12 as automation only, leaving continuity re-onboarding unscheduled rather than excluded |
 | §12 Open items | Confirmed, extended | §13 | Adds batch-inference minimum, RDS PG18 availability, infra timeline |
 
 ### 0.4 Conflicts and gaps surfaced (not silently resolved)
@@ -109,9 +109,9 @@ surfaced in that session rather than now:
    photo and the weekly batch-confirm card (SPEC §6.7); NCERT-style seed generation to ≥30 usable
    questions per topic (SPEC §9.3); "NTA trap" mining from PYQs (SPEC §9.4); in-app full mocks with
    the autopsy (SPEC §4 Phase 4, §7.1 — not excluded by §12); and the continuity re-onboarding for
-   a student who falls short (SPEC §4 Fork B, §7.2, §8 screen 15 — §12 excludes only "referral &
-   graduation automation", not continuity). §12.2 proposes where they could land; scheduling them is
-   the founder's call.
+   a student who falls short (SPEC §4 Fork B, §7.2, §8 screen 15 — SPEC §12 excludes only "referral
+   & graduation automation"; DEV_SPEC §8.6 and §11 call the continuity offer Phase 2, and SPEC wins).
+   §12.2 proposes where they could land; scheduling them is the founder's call.
 8. **CLAUDE.md precedence list has no slot for this plan** while three rules/agents already cite it.
    Fixed on approval (§0.2).
 9. **Two rule sentences are contradicted by the design and need rewording**, listed here so the
@@ -120,7 +120,9 @@ surfaced in that session rather than now:
    "REASON only with a `RouteDecision` from one of three named producers" (edit at D5, §0.2); and
    `.claude/rules/pipeline.md` "AI calls go through `AiClient` … and Bedrock batch mode" — batch mode
    is conditional on the minimum job size (#2), so the sentence becomes "through `completeBatch`"
-   (edit at D13, §0.2).
+   (edit at D13, §0.2). A third, smaller one: `.claude/rules/server.md` and `db-migrator.md` list
+   `created_at, updated_at` on every table; the append-only tables in §2.1 carry no `updated_at`
+   (edit at D4, §0.2).
 
 ---
 
@@ -174,13 +176,13 @@ Both names match the eval gate's `retriev*` path rule.
 | Module | Owns (SPEC) | Tables (§2) | Depends on |
 |---|---|---|---|
 | `common` | error envelope, request id, IST clock, idempotency, pagination, config binding, message catalogs | `idempotency_keys` | — |
-| `auth` | OTP login, tokens, rate limits, security filter chain (§8 screen 1) | `otp_challenges`, `refresh_tokens` | common, account |
-| `account` | users, student profile, language, settings, minors' consent, export, deletion (§5 DOB/consent, §6.11, §8 screens 4, 13) | `users`, `student_profiles`, `parent_consents`, `user_devices`, `data_export_jobs` | common |
+| `auth` | OTP login, tokens, rate limits, security filter chain, the parent-consent OTP (every OTP-backed fact), beta invite codes (§8 screens 1, 4) | `otp_challenges`, `refresh_tokens`, `parent_consents`, `invite_codes` | common, account |
+| `account` | users, student profile, language, settings, export job and deletion (§5 DOB, §6.11, §8 screen 13) | `users`, `student_profiles`, `user_devices`, `data_export_jobs` | common, storage (export files) |
 | `curriculum` | syllabus tree, prerequisites, archetype tracks, cutoffs, NCERT books/paragraphs, question bank, topic traps (§9) | `syllabus_nodes`, `syllabus_prerequisites`, `archetype_tracks`, `archetype_track_steps`, `cutoffs`, `ncert_books`, `ncert_paragraphs`, `questions`, `question_topics`, `question_anchors`, `topic_traps`, `topic_trap_evidence` | common |
 | `onboarding` | interview state machine, syllabus check-in, first plan trigger (§5, §8 screens 2, 5) | (writes through account, practice and planner apis) | common, account, curriculum, documents, planner, practice.api |
-| `documents` | photograph → read → confirm → delete pattern (§6.8, §8 screen 3) | `document_extractions` | common, account, ai, storage |
+| `documents` | photograph → read → confirm → delete pattern (§6.8, §8 screen 3) | `document_extractions` | common, account, auth.api (consent state), ai, storage |
 | `planner` | Today, blocks, nightly re-plan, negotiation chat, streaks, exam-season modes, batch position (§6.1, §6.7, §8 screens 7, 14) | `daily_plans`, `plan_blocks`, `mentor_messages`, `batch_positions` | common, account, curriculum, ai, notebook.api, practice.api, wellbeing.api, doubts.api (events), documents.api (events) |
-| `practice` | sessions, question serving, server judging, events, diagnostic (§5.4, §6.2, §8 screens 6, 8) | `practice_sessions`, `practice_session_questions`, `practice_events`, `chapter_status` | common, account, curriculum |
+| `practice` | sessions from a `SessionSpec` (node, band, count, drill, timer), question serving, server judging, events, diagnostic (§5.4, §6.2, §8 screens 6, 8). Block sessions are started by the planner through `practice.api.SessionStarter`; practice never reads plan tables | `practice_sessions`, `practice_session_questions`, `practice_events`, `chapter_status` | common, account, curriculum |
 | `doubts` | solve pipeline orchestration, history, follow-ups, reports, free-tier meter (§6.3, §8 screen 9) | `doubts`, `doubt_evidence`, `doubt_cache`, `doubt_daily_usage` | common, account, curriculum, ai, storage, billing.api |
 | `notebook` | error capture, classification, SRS, healed, danger zones, patterns (§6.4, §8 screen 10) | `error_entries`, `srs_reviews`, `notebook_patterns` | common, account, curriculum, ai, billing.api, practice.api (events) |
 | `wellbeing` | mood chip, slump inference (§6.6) | `wellbeing_signals` | common, account |
@@ -190,7 +192,7 @@ Both names match the eval gate's `retriev*` path rule.
 | `ai` | `AiClient`, Bedrock/Fake, ledger, breaker, router, retrieval, prompts, verification, embeddings (§4) | `ai_calls`, `ai_spend_daily`, `audit_queue` | common, curriculum |
 | `storage` | S3 port (uploads, content), signed URLs, deletion | — | common |
 | `pipeline` | §6 CLI commands | — | ai, curriculum, storage |
-| `jobs` | `NightlyRunner` (§4.5 orchestration), the purge and rollup jobs, the sweepers' schedules, the weekly dump | — | every `api` package |
+| `jobs` | `NightlyRunner` (§4.5 orchestration), the purge and rollup jobs, the export executor (gathers every module's data for `data_export_jobs`, D64), the daily document-deletion verification job (§9.6, D64), the sweepers' schedules, the weekly dump | — | every `api` package |
 | `ops` | founder admin peek, audit-queue review, cost views (`GET /admin/costs` D65, the rest D75) | — | every `api` package (read-only) |
 
 `chapter_status` sits in `practice` because ability estimates are written by practice and the
@@ -203,11 +205,12 @@ producer of audit items is an AI outcome.
 flowchart TD
     common --> auth & account & curriculum & storage & ai
     account --> auth
+    auth --> documents
     curriculum --> ai
     ai --> documents & doubts & notebook & planner & pipeline
     account --> onboarding & documents & planner & practice & doubts & notebook & wellbeing & trajectory & billing & notifications
     curriculum --> onboarding & planner & practice & doubts & notebook & trajectory & pipeline
-    storage --> documents & doubts & pipeline
+    storage --> account & documents & doubts & pipeline
     documents --> onboarding & planner
     planner --> onboarding & notifications
     practice --> onboarding & planner & trajectory & notebook
@@ -282,11 +285,13 @@ the same JVM. They carry ids, not entities.
 | `SubscriptionChanged` | billing | doubts, notebook, trajectory | limits and locks re-evaluated on next request |
 | `DocumentConfirmed` | documents | onboarding, planner | scorecard/marksheet fields into profile; timetable into batch positions |
 | `UserDeleted` | account | every module | anonymise/purge own rows (§9.6) |
+| `PlanGenerated` | planner (nightly, onboarding, fallback, renegotiation) | notifications | schedule the day's notification rows (§4.5 step 7) |
 | `PlanChanged` | planner | notifications | reschedule the morning notification if the time moved |
 
 Events are at-least-once within the process; every listener is idempotent on its natural key.
-If the JVM dies mid-listener the hourly sweeper in the owning module repairs the gap (e.g. wrong
-answers without an `error_entries` row).
+If the JVM dies mid-listener a sweeper in the owning module repairs the gap: every 5 minutes for
+wrong answers without an `error_entries` row (§4.6), hourly for expired images and missing
+notification rows.
 
 ### 1.8 Screen and feature ownership (coverage check)
 
@@ -295,7 +300,7 @@ answers without an `error_entries` row).
 | 1 Splash/Login | auth | account (profile on first login) |
 | 2 Onboarding interview | onboarding | curriculum (grid), practice.api (chapter status), account |
 | 3 Scorecard / marksheet / timetable capture + confirm | documents | onboarding, planner (timetable) |
-| 4 Parent consent | account | auth (consent OTP) |
+| 4 Parent consent | auth (consent OTP and the consent record) | account (`is_minor`), documents (reads the consent state) |
 | 5 First-plan reveal | onboarding | planner (deterministic first plan), curriculum (cutoffs for the target line; the weekly trajectory arrives D58) |
 | 6 Diagnostic intro + session | practice | planner (day-1 block if deferred) |
 | 7 Today | planner | wellbeing (mood chip), trajectory (mini card), notifications |
@@ -370,9 +375,13 @@ SPEC §5.1 Q1–Q7 map one-to-one: Q1 `attempt_type`, Q2 `target_year`, Q3 `coac
 (category optional, DEV_SPEC §8.4), Q7 `last_neet_*` or `scorecard`/`board_marks` via documents.
 `scorecard` and `board_marks` hold confirmed fields only (SPEC §5.2): never an image reference.
 
-**parent_consents** — D27: `user_id → users, parent_phone VARCHAR(16), status CHECK
-(pending|consented|expired), otp_challenge_id → otp_challenges, consented_at`. Partial unique
-`(user_id) WHERE status = 'consented'`.
+**parent_consents** — D27, owned by `auth` (it is an OTP-backed fact; §1.3): `user_id → users,
+parent_phone VARCHAR(16), status CHECK (pending|consented|expired), otp_challenge_id →
+otp_challenges, consented_at`. Partial unique `(user_id) WHERE status = 'consented'`.
+
+**invite_codes** — D75, owned by `auth`: `code VARCHAR(16) UNIQUE, uses_left SMALLINT, expires_at,
+note VARCHAR(80)`; `POST /auth/otp/verify` takes an optional `invite_code` while the beta flag
+`margai.flags.invite_only` is on.
 
 **otp_challenges** — D7: `phone, purpose CHECK (login|parent_consent), code_hash CHAR(64),
 attempts SMALLINT DEFAULT 0, expires_at, verified_at, request_ip INET`. Index `(phone, created_at)`.
@@ -385,7 +394,8 @@ revoked_at, replaced_by_id → refresh_tokens, device_label VARCHAR(80), last_us
 VARCHAR(16), last_seen_at`.
 
 **data_export_jobs** — D64: `user_id → users, status CHECK (queued|ready|failed|expired), s3_key,
-expires_at, error`.
+expires_at, error`. `account` owns the row and the endpoints; the `jobs` module's export executor
+gathers each module's data through its `api` and writes the file through `storage` (§1.3).
 
 ### 2.3 Curriculum content (`curriculum`, read-mostly)
 
@@ -446,14 +456,17 @@ verification JSONB, generated_from_error_entry_id UUID (variants, D51)
 Natural key for PYQs: `UNIQUE (source, exam, year, paper_code, question_no)`. Indexes:
 `(node_id, difficulty)`, `(source, year)`, partial on `verified`. **`correct_key` is server-only:**
 the JPA entity field is `@JsonIgnore`, no response record carries it before an answer is judged, and
-a test scans every pre-judging payload for the string (§8.3). Only the judged-answer response and
-notebook entries for already-answered questions return it (§3.7, §0.4 #4).
+a test scans every pre-judging payload for the string (§8.3). Only the three carriers for
+already-answered questions return it — the judged-answer response, answered questions inside a
+session read, and notebook entries in any notebook view (§3.7, §0.4 #4) — plus the offline pack if
+Option A is chosen (§5.6).
 
 **question_topics** — D19: `question_id, node_id, PRIMARY KEY (question_id, node_id)` (secondary
 topics). **question_anchors** — D23: `question_id, paragraph_id, PRIMARY KEY`.
 
-**topic_traps** — D22: `node_id → syllabus_nodes, note_en TEXT, note_hi TEXT, note_hinglish TEXT`.
-**topic_trap_evidence** — D22: `trap_id, question_id, PRIMARY KEY`. A trap without at least one
+**topic_traps** — unscheduled, proposed D24 buffer (§12.2): `node_id → syllabus_nodes, note_en TEXT,
+note_hi TEXT, note_hinglish TEXT`.
+**topic_trap_evidence** — same day: `trap_id, question_id, PRIMARY KEY`. A trap without at least one
 evidence row is never created (service check + test): the Evidence rule for "How NTA twists this".
 
 ### 2.4 Practice (`practice`)
@@ -470,9 +483,11 @@ UNIQUE (user_id, node_id), created_at, updated_at
 Q4's three states plus long-press weak (SPEC §5.1) write `status` and `feels_weak` with
 `source = self_report`; behaviour refines them later.
 
-**practice_sessions** — D31: `user_id, block_id → plan_blocks (nullable), kind CHECK
-(block|diagnostic|srs_review|mock), status CHECK (active|finished|abandoned), started_at,
-finished_at, summary JSONB`. Index `(user_id, started_at)`.
+**practice_sessions** — D31: `user_id, block_id UUID (nullable, no foreign key: the planner passes
+it in the `SessionSpec` and reads it back from `PracticeSessionFinished`; practice never joins plan
+tables), kind CHECK (block|diagnostic|srs_review|mock), spec JSONB (node, band, count, drill,
+timer), status CHECK (active|finished|abandoned), started_at, finished_at, summary JSONB`. Index
+`(user_id, started_at)`.
 **practice_session_questions** — D31: `session_id, question_id, position SMALLINT, answered BOOLEAN,
 PRIMARY KEY (session_id, question_id)`.
 **practice_events** — D33 (append-only): `user_id, session_id, question_id, chosen_key CHAR(1)
@@ -498,8 +513,9 @@ hit_count INTEGER, last_hit_at, source_doubt_id, invalidated_at, UNIQUE (questio
 HNSW on `embedding`; index `(subject, language)`. The CHECK constraint is the database half of
 "cache writes only when verified" (§4.3 stage 10, §4.13).
 **doubt_daily_usage** — D44: `user_id, ist_date, fresh_count SMALLINT, cached_count SMALLINT,
-reason_fresh_count SMALLINT, PRIMARY KEY (user_id, ist_date)`. Free-tier arithmetic (5/day, cached
-= ½) and the Pro fair-use cap read one row; the IST day boundary is the key.
+followup_count SMALLINT, reason_fresh_count SMALLINT, PRIMARY KEY (user_id, ist_date)`. Free-tier
+arithmetic (`fresh + 0.5·(cached + followup)` against 5, §4.4) and the Pro fair-use cap read one
+row; the IST day boundary is the key.
 
 ### 2.6 Notebook (`notebook`)
 
@@ -526,8 +542,9 @@ CHECK (length(reason_md) > 0), reason_evidence JSONB, payload JSONB, status CHEC
 (pending|done|skipped|deferred) DEFAULT 'pending', status_at, session_id`. Blocks are rows rather than
 DEV_SPEC's JSONB array because `POST /plan/blocks/{id}/status` addresses them and streaks count them.
 `payload` for practice and revise blocks carries `drill ∈ {standard, easy_first, checking, pacing,
-skip_discipline}` — the cause-specific treatments of SPEC §6.4 (§4.5 step 4) — which the practice
-engine reads to set the band, the per-question timer and the session copy.
+skip_discipline, recall}` — the cause-specific treatments of SPEC §6.4 (§4.5 step 4) and the light-day
+recall drill (SPEC §6.6) — which the planner copies into the `SessionSpec` so the practice engine
+can set the band, the per-question timer and the session copy without reading plan tables.
 **mentor_messages** — D58: `user_id, direction CHECK (user|mentor), text, intent CHECK
 (negotiate_plan|checkin|distress|other), resulting_plan_id`. Index `(user_id, created_at)`.
 **batch_positions** — unscheduled, see §12.2 (SPEC §6.7 has no PLAN day): `user_id, node_id, status CHECK (not_started|ongoing|done), source CHECK
@@ -587,8 +604,8 @@ and fake-client calls; `cost_paise` computed at insert from the price table (§4
 partitioning is PARKED until volume asks for it.
 **ai_spend_daily** — D65: `ist_date, feature, calls INTEGER, cost_paise BIGINT, cache_hits INTEGER,
 PRIMARY KEY (ist_date, feature)`; rebuilt by the nightly run.
-**audit_queue** — D39: `kind CHECK (doubt_report|verification_failed|grounding_failed|pipeline_flag|
-generated_sample|eval_failure), doubt_id, question_id, user_id, reason, payload JSONB, status CHECK
+**audit_queue** — D39: `kind CHECK (doubt_report|verification_failed|grounding_failed|render_mismatch|
+pipeline_flag|generated_sample|eval_failure), doubt_id, question_id, user_id, reason, payload JSONB, status CHECK
 (open|resolved|dismissed), resolution JSONB, resolved_at`. Index `(status, created_at)`. Resolution
 may set `doubt_cache.invalidated_at` or `questions.audit_status`.
 
@@ -610,8 +627,7 @@ Numbers are indicative; the agent takes the next free integer.
 | V7 `ncert` | D14 | ncert_books, ncert_paragraphs (embedding column nullable) |
 | V8 `ncert_hnsw` | D17 | HNSW index on `ncert_paragraphs.embedding` (created once rows exist) |
 | V9 `questions` | D19 | questions, question_topics |
-| V10 `topic_traps` | D22 | topic_traps, topic_trap_evidence |
-| V11 `question_anchors` | D23 | question_anchors; HNSW on `questions.embedding` |
+| V10 `question_anchors` | D23 | question_anchors; HNSW on `questions.embedding` |
 | V12 `parent_consents` | D27 | parent_consents |
 | V13 `documents` | D28 | document_extractions, idempotency_keys |
 | V14 `plans` | D29 | daily_plans, plan_blocks |
@@ -631,7 +647,8 @@ Numbers are indicative; the agent takes the next free integer.
 | V28 `paywall` | D62 | paywall_impressions |
 | V29 `privacy` | D64 | data_export_jobs |
 | V30 `ai_spend` | D65 | ai_spend_daily |
-| — | unscheduled (§12.2) | batch_positions, with whichever day the founder gives batch sync |
+| V31 `invite_codes` | D75 | invite_codes |
+| — | unscheduled (§12.2) | batch_positions with whichever day the founder gives batch sync; topic_traps and topic_trap_evidence with trap mining (proposed D24 buffer) |
 
 Seed data for local and test profiles (the D4 "test taxonomy": a two-subject, six-chapter tree with
 prerequisites, one archetype track and three cutoff rows) lives in `db/seed/R__test_taxonomy.sql`, a
@@ -666,9 +683,10 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
   (for clock-skew diagnostics in OTP flows, PLAN D9).
 - Copy returned to the client is codes plus text in both `en` and the user's language, never text
   alone; generated content (plans, answers) comes in the user's language with a `language` field.
-- `correct_key` is returned only for questions the student has already answered: in the judged-answer
-  response and in notebook entries (§3.7, §0.4 #4). Question payloads before judging never contain
-  it; a test enforces this (§8.3).
+- `correct_key` is returned only for questions the student has already answered, through three
+  carriers: the judged-answer response, answered questions inside a session read, and notebook
+  entries in any notebook view (§3.7, §0.4 #4); the offline pack is a fourth under Option A (§5.6).
+  Question payloads before judging never contain it; a test enforces this (§8.3).
 
 ### 3.2 Authentication and tokens
 
@@ -747,7 +765,7 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 | Method, path | Day | Request → response | Notes |
 |---|---|---|---|
 | `POST /auth/otp/request` | D7 | `{phone}` → `{challenge_id, resend_after_s}` | public; SMS provider sandbox until F1 |
-| `POST /auth/otp/verify` | D7 | `{challenge_id, code}` → tokens + `user` + `is_new_user` | public; creates `users` + empty `student_profiles` on first login (D10) |
+| `POST /auth/otp/verify` | D7 | `{challenge_id, code, invite_code?}` → tokens + `user` + `is_new_user` | public; creates `users` + empty `student_profiles` on first login (D10); `invite_code` required for new users while `margai.flags.invite_only` is on (D75) |
 | `POST /auth/refresh` | D7 | `{refresh_token}` → tokens | public; rotation + reuse detection |
 | `POST /auth/logout` | D10 | `{refresh_token}` → 204 | naturally idempotent: revoking a revoked family is a no-op |
 
@@ -759,8 +777,8 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 | `PATCH /me` | D10 | `{language?, display_name?, morning_notification_time?, hours_weekday?, hours_weekend?, goal?, state_code?, category?}` → `me` | language switch regenerates future content only (DEV_SPEC §8.3) |
 | `POST /me/devices` | D30 | `{fcm_token, platform, app_version}` → 204 | upsert |
 | `DELETE /me/devices/{token}` | D30 | → 204 | on logout |
-| `POST /me/consent/request` | D27 | `{parent_phone}` → `{challenge_id}` | minors only |
-| `POST /me/consent/verify` | D27 | `{challenge_id, code}` → `{consent_state}` | unlocks `POST /documents` |
+| `POST /me/consent/request` | D27 | `{parent_phone}` → `{challenge_id}` | minors only; served by `auth.web` (§1.3) |
+| `POST /me/consent/verify` | D27 | `{challenge_id, code}` → `{consent_state}` | unlocks `POST /documents`; served by `auth.web` |
 | `POST /me/export` | D64 | → `202 {job_id}` | notebook PDF + JSON |
 | `GET /me/export/{job_id}` | D64 | → `{status, url?, expires_at?}` | 24-hour signed URL |
 | `DELETE /me` **Idem** | D64 | `{confirmation: "DELETE"}` → 202 | anonymise now, purge in 30 days (§2.10) |
@@ -789,6 +807,7 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 | `GET /plan/today` | D29 | → `{date, mode, mentor_note, blocks[], yesterday_unfinished[], streak, trajectory_card?, mood_prompt, exam_countdown}` | builds the fallback plan if none exists (DEV_SPEC §8.1) |
 | `GET /plan/week` | D58 | → `{days: [{date, blocks_summary, status}]}` | |
 | `POST /plan/blocks/{block_id}/status` | D33 | `{status, client_event_id, at}` → `{block, streak}` | outbox-safe |
+| `POST /plan/blocks/{block_id}/session` | D31 | → the practice session payload (see `POST /practice/sessions`) | the planner builds the `SessionSpec` from the block (node, band, count, `drill`, timer) and starts it through `practice.api.SessionStarter` (§1.3); practice never reads plan tables |
 | `POST /plan/negotiate` **Idem** | D58 | `{text}` → `{mentor_reply, plan?, trade_off}` | spends AI and rewrites a plan, hence idempotent; revised plan appears on Today immediately (SPEC §6.1) |
 | `GET /plan/messages` | D58 | `?cursor` → page of `mentor_messages` | |
 | `POST /plan/batch-position` | unscheduled (§12.2) | `{node_code, status}` → 204 | SPEC §6.7 self-report layer; no PLAN day names batch sync |
@@ -797,9 +816,9 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 
 | Method, path | Day | Request → response | Notes |
 |---|---|---|---|
-| `POST /practice/sessions` | D31 | `{block_id}` or `{kind: "diagnostic"}` → `{session_id, questions: [{id, stem, options, time_limit_s, anchor_hint}], total}` | **no `correct_key`**; band + NEET-relevance filter |
-| `POST /practice/sessions/{id}/answers` | D31 | `{question_id, chosen_key?, time_taken_ms, client_event_id}` → `{is_correct, correct_key, solution_md, anchor: {paragraph_id, display}, notebook_entry_id?}` | server judges; one of the three carriers of `correct_key` for an answered question (§0.4 #4, §8.3) |
-| `POST /practice/sessions/{id}/finish` | D33 | → `{accuracy, avg_time_ms, norm_delta, sent_to_notebook: [...]}` | |
+| `POST /practice/sessions` | D31 | `{kind: "diagnostic" | "srs_review"}` → `{session_id, kind, drill, questions: [{id, stem, options, time_limit_s, anchor_hint}], total}` | **no `correct_key`**; band + NEET-relevance filter; block sessions start via `POST /plan/blocks/{id}/session`, which returns this same payload |
+| `POST /practice/sessions/{id}/answers` | D31 | `{question_id, chosen_key?, time_taken_ms, client_event_id}` → `{is_correct, correct_key, solution_md, anchor: {paragraph_id, display}, sent_to_notebook: bool}` | server judges; one of the three carriers of `correct_key` for an answered question (§0.4 #4, §8.3); `sent_to_notebook` is `!is_correct` by rule — the entry itself is created by the notebook listener (§4.6) |
+| `POST /practice/sessions/{id}/finish` | D33 | → `{accuracy, avg_time_ms, norm_delta, sent_to_notebook: [question_id]}` | the wrong answers of the session; the app deep-links to the notebook for the diagnoses |
 | `GET /practice/sessions/{id}` | D33 | → session + summary + questions; `correct_key` and solution present only on questions with a recorded answer by the caller, absent otherwise | second carrier; lets a resumed session show past verdicts |
 | `GET /practice/offline-pack` | D34 | → today's practice blocks' questions (+ judging data per the §0.4 #4 decision) | cached by drift |
 | `POST /practice/diagnostic` | D35 | → session (30 questions, adaptive) | ability estimates update `chapter_status` |
@@ -885,7 +904,7 @@ the last item, base64url. No offsets.
 | 5 First-plan reveal | — | onboarding/complete |
 | 6 Diagnostic | practice/sessions/{id} | practice/diagnostic, answers, finish |
 | 7 Today (incl. plan chat and week view) | plan/today, plan/week, plan/messages, trajectory/weekly | plan/blocks/{id}/status, signals/mood, plan/negotiate |
-| 8 Practice | practice/sessions/{id}, offline-pack | practice/sessions, answers, finish |
+| 8 Practice | practice/sessions/{id}, offline-pack | plan/blocks/{id}/session (block sessions), practice/sessions (diagnostic, SRS review), answers, finish |
 | 9 Doubts | doubts, doubts/{id}, doubts/usage, curriculum/ncert/{id} | doubts, followup, report |
 | 10 Notebook | notebook/summary, entries, danger-zones, healed | entries/{id}/cause |
 | 11 Weekly report | trajectory/weekly | — |
@@ -989,10 +1008,10 @@ Orchestrated by `doubts.internal.DoubtSolveService`; each stage is its own class
 |---|---|---|---|---|
 | 1 | Intake | `DoubtIntake` | text as-is; photo → S3 `uploads/doubts/{user}/{id}.jpg` → `DocumentExtractTask` (VISION, schema `{question_text, options[], diagram_description, language_detected, is_question}`) → S3 delete immediately on success; `NOT_A_QUESTION` when `is_question = false` | image in the uploads bucket only; deleted after reading |
 | 2 | Normalise | `QuestionNormalizer` | Unicode NFKC, lowercase Latin, strip numbering, whitespace, trailing punctuation; canonicalise math tokens (×→*, ÷→/, superscripts); Devanagari kept; `question_hash = sha256(normal_form)` | |
-| 3 | Cache lookup | `DoubtCacheLookup` | exact `(hash, language)` → hit. Else `embed` (EMBED, ledger) → HNSW cosine within same subject and language, similarity > 0.93 (config) → hit. Exact hash in *another* language → `AnswerRenderTask` (CHEAP) renders the verified canonical answer in the user's language; the rendered `final_answer` must equal the canonical one exactly, else the render is discarded, an `audit_queue` row is written and the request continues as a fresh solve from stage 4 in the user's language (SPEC §6.3: always in their language). A matching render is stored in `doubt_cache` under the new language with the canonical `verified` flag and counts as a cache hit | cache rows stay verified; answers always in the user's language |
-| 4 | Limit gate | `DoubtLimitGate` | weight 0.5 for a hit, 1.0 fresh; free tier refuses when `fresh + 0.5·cached + weight > 5` → `DOUBT_LIMIT_REACHED` with paywall trigger; Pro: fair-use queue when `reason_fresh_count ≥ 30` (§4.4) | |
+| 3 | Cache lookup | `DoubtCacheLookup` | exact `(hash, language)` → hit. Else `embed` (EMBED, ledger) → HNSW cosine within same subject and language, similarity > 0.93 (config) → hit. Exact hash in *another* language → `AnswerRenderTask` (CHEAP) renders the verified canonical answer in the user's language; the rendered `final_answer` must equal the canonical one exactly, else the render is discarded, an `audit_queue(render_mismatch)` row is written and the request continues as a fresh solve from stage 4 in the user's language (SPEC §6.3: always in their language). A matching render is stored in `doubt_cache` under the new language with the canonical `verified` flag and counts as a cache hit | cache rows stay verified; answers always in the user's language |
+| 4 | Limit gate | `DoubtLimitGate` | weight 0.5 for a hit or a follow-up, 1.0 fresh; free tier refuses when `fresh + 0.5·(cached + followup) + weight > 5` → `DOUBT_LIMIT_REACHED` with paywall trigger; Pro: fair-use queue when `reason_fresh_count ≥ 30` (§4.4) | |
 | 5 | Route | `DifficultyRouter` | see §4.2 | REASON only via router |
-| 6 | Retrieve | `ai.retrieval.HybridRetriever` over `curriculum.api.ParagraphRetrievalRepository` | top-8 vector (same subject) ∪ top-8 `websearch_to_tsquery` over `tsv` (both languages) → reciprocal-rank fusion → dedupe by paragraph → cap 2,500 tokens. Evidence set alongside: ≤ 2 verified PYQs from the guessed node (anchor overlap or stem similarity) **and** the node's `topic_traps` rows with their `topic_trap_evidence` question ids (D22). Zero paragraphs above the floor → retry without the node filter → still zero → **grounding failure**: honest fallback + `audit_queue(grounding_failed)` | no answer without retrieval grounding |
+| 6 | Retrieve | `ai.retrieval.HybridRetriever` over `curriculum.api.ParagraphRetrievalRepository` | top-8 vector (same subject) ∪ top-8 `websearch_to_tsquery` over `tsv` (both languages) → reciprocal-rank fusion → dedupe by paragraph → cap 2,500 tokens. Evidence set alongside: ≤ 2 verified PYQs from the guessed node (anchor overlap or stem similarity) **and**, once trap mining has run (§12.2), the node's `topic_traps` rows with their `topic_trap_evidence` question ids. Zero paragraphs above the floor → retry without the node filter → still zero → **grounding failure**: honest fallback + `audit_queue(grounding_failed)` | no answer without retrieval grounding |
 | 7 | Generate | `DoubtAnswerTask` | prompt `doubt_answer` with the retrieved paragraphs (ids visible), the PYQ set and the trap candidates (ids visible); output `{steps_md, concept_md, anchor_paragraph_id, final_answer: {value, unit}?, nta_trap: {note_md, evidence_question_ids[]}?, followups[2], language}`; the prompt states that a trap note may only restate a provided trap candidate or cite provided PYQ ids | |
 | 8 | Verify | `NumericalVerifier` | when `route.is_numerical` or `answer_type = option`: `NumericalVerifyTask` (REASON, sees the question only, not the solution) → compare: numbers equal within 1% relative tolerance after unit normalisation, options by key. Mismatch → one regeneration with both attempts in context → verify again → mismatch → `status = unverified_fallback` + `audit_queue(verification_failed)` | numerical answers independently verified; never rendered unverified |
 | 9 | Assemble | `AnswerAssembler` | rejects an answer whose `anchor_paragraph_id ∉ retrieved set`; keeps `nta_trap` only if every `evidence_question_ids` entry is a PYQ id from stage 6's evidence set (retrieved PYQs or topic-trap evidence) and the list is non-empty, otherwise drops the note (Evidence rule); those ids become `doubt_evidence` rows; renders the fallback copy for unverified numericals | anchor on every answer; trap only when PYQ-backed |
@@ -1030,7 +1049,10 @@ per user, in this order:
    track position. The snapshot is stored in `daily_plans.inputs_snapshot` (the evidence trail).
 2. `SlumpDetector` (deterministic, DEV_SPEC §4.3): trailing 3-day session minutes < 40% of the
    14-day median, or accuracy down > 15 points → `inferred_slump = true`.
-3. `ModeResolver` (deterministic): `normal`; `light` (slump or `mood = low`); `revision_only` from
+3. `ModeResolver` (deterministic): `normal`; `light` (slump or `mood = low`: one or two recall
+   blocks — `drill = recall`, easy band, ≤ 40% of the budget, no new learn block, the first block
+   ≤ 10 minutes so the streak stays protectable; the streak-save notification is suppressed and the
+   mentor note uses the slump copy, SPEC §6.6); `revision_only` from
    T-21 days (no new content, danger zones + high-yield recall, volume decreasing); `final_week` from
    T-7 (sleep protected, volume down); `light_recall` from T-3 (light recall only); `exam_eve` at T-1
    (one message); `silence` from T-0 to T+14. SPEC §4 Phases 5–6, DEV_SPEC §8.6. Thresholds are
@@ -1063,8 +1085,11 @@ per user, in this order:
    (PLAN D56 ✅ "no planless morning").
 7. The planner publishes `PlanGenerated` (user, plan date, mode, morning time). The `notifications`
    module's listener writes `notification_log` rows for the morning plan (profile time), streak-save
-   (20:30, only if nothing done by then, decided at dispatch), SRS due, and on Sundays the weekly
-   trajectory; it writes nothing in `silence` mode. The planner never touches `notification_log`.
+   (20:30, only if nothing done by then, decided at dispatch; suppressed in `light` mode), SRS due,
+   and on Sundays the weekly trajectory. In `exam_eve` mode it writes the single evening `exam_eve`
+   message instead ("You've healed N errors since August…", N from the snapshot); on T-0 the single
+   morning `good_luck` message; in `silence` mode nothing at all (SPEC §6.10, DEV_SPEC §8.6). The
+   planner never touches `notification_log`.
 8. On Sundays, called by the runner after the plans: `TrajectoryCalculator` (deterministic band from
    accuracy × weightage, widened while data is thin; `confidence` humble/growing/solid) writes the
    snapshot; its `insight_md` comes from a fixed rule table over measured deltas (e.g. "subject
@@ -1296,10 +1321,10 @@ network, so screens show the honest offline state rather than a timeout). Timeou
     that day, stored in drift and wiped after sync. The app judges locally for the verdict and
     solution sheet; the server still judges every synced event and its verdict is what state,
     notebook and streak use. Exposure: a student can read the keys to their own day's practice
-    before answering. Requires rewording the hard rule to "`correct_key` is never sent before a
-    question is served, except inside that student's offline pack for their own scheduled blocks;
-    all judging that changes state is server-side", and a D34 test that the pack is the only
-    carrier.
+    before answering. Requires adding to the §0.4 #4 reading the clause "…except inside that
+    student's offline pack for their own scheduled blocks, which the app stores encrypted and wipes
+    after sync; all judging that changes state is server-side", and a D34 test that the pack is the
+    only pre-answer carrier.
   - *Option B — no verdicts offline.* Answers queue with no feedback; verdicts and solutions arrive
     on sync. Keeps the rule word for word; contradicts SPEC §6.2's instant verdict for the train
     scenario the rules themselves describe.
@@ -1671,7 +1696,10 @@ server-initiated (SPEC §6.9, DEV_SPEC §8.7).
   `CONSENT_REQUIRED` until a `parent_consents` row is `consented` (DEV_SPEC §8.4, PLAN D27 ✅).
 - **Images**: uploads bucket only, deleted after reading (doubts) or confirm/discard (documents),
   `expires_at` sweeper, 1-day lifecycle: three independent layers (§2.10). The D28 acceptance checks
-  the bucket is empty after confirm.
+  the bucket is empty after confirm. The **document-deletion verification job** (PLAN D64, in
+  `jobs`) runs daily: it lists the uploads bucket, alarms on any object older than 24 hours, and
+  cross-checks `document_extractions` and `doubts` rows whose image key is still set past
+  `expires_at`; its result is a metric and a line in the admin cost/ops view.
 - **Deletion**: `DELETE /me` anonymises immediately and schedules the 30-day purge (§2.10); the
   purge job is part of the nightly run and logs what it removed (PLAN D64 ✅).
 - **Export**: JSON of every table keyed by the user plus the notebook PDF (OpenPDF), delivered by
@@ -1821,9 +1849,9 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 | D37–D48 doubts | §4.2–§4.4, §4.9, §4.11–§4.13, §3.6, §3.7 doubts, §2.5, §5.8 screen 9, §4.10 expansion at D47 |
 | D49–D54 notebook | §4.6, §4.7, §2.6, §3.7 notebook, §5.8 screen 10; the `payload.drill` variants (§2.7, §4.5 step 4) at D51–D52 |
 | D55–D60 nightly brain | §4.5, §1.6, §2.7, §7.2 scheduled task, §3.7 plan negotiate/week, trajectory |
-| D61–D66 money & trust | §3.7 billing and account export/delete, §2.8, §9.5, §9.6, §2.10, §4.8 breaker demo, §10.3 cost view |
+| D61–D66 money & trust | §3.7 billing and account export/delete, §2.8, §9.5, §9.6 (incl. the D64 document-deletion verification job), §2.10, §1.3 `jobs` export executor, §4.8 breaker demo, §10.3 cost view |
 | D67–D72 hardening | §11.7 copy, §2.7 and §8.3 notification caps, §10.3 p95 targets, §7.5 drills, §9.7 checklist |
-| D73–D78 beta prep | §10.3 dashboards, §5.9 flavours, §3.7 ops, §6.3 `cache seed`, §7.6 D74 |
+| D73–D78 beta prep | §10.3 dashboards, §5.9 flavours, §3.7 ops and the D75 `invite_code` on OTP verify (§2.2 `invite_codes`), §6.3 `cache seed`, §7.6 D74 |
 
 ### 12.2 Gaps between SPEC and PLAN (founder to schedule or park)
 

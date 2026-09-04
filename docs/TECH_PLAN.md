@@ -138,11 +138,16 @@ The eight questions of §13.4, answered. Each row names where the plan reflects 
 | 5 | Workstream **F8 accepted** with the §7.6 timeline. Terraform is drafted by Claude in a separate, explicitly permitted infra session profile (`terraform plan` allowed, `apply` denied) that is created when F8's first milestone comes due; the founder runs every apply | §7 intro; TRACKER F8 |
 | 6 | Java pipeline **confirmed** (D3.4), with the D14 extraction-quality escape hatch | — |
 | 7 | The founder runs the four console checks before D5 and reports in that session; if RDS Mumbai lacks PostgreSQL 18, the stack drops to 17 as a versions change | §13.2 lists every touch point, including SPEC §3 |
-| 8 | Minors, **overruling the narrow gating**: the parent-consent OTP is part of the onboarding flow; until consent is complete, `CONSENT_REQUIRED` covers photo doubts as well as documents (text features stay available); after consent everything unlocks | §3.3, §3.7, §4.3 stage 1, §9.6, decision D3.28 |
+| 8 | Minors, **overruling the narrow gating**: the parent-consent OTP is part of the onboarding flow; until consent is complete, `CONSENT_REQUIRED` covers photo doubts as well as documents (text features stay available); after consent everything unlocks | §3.3, §3.7, §4.3 stage 1, §5.8, §9.6, decision D3.28 |
 
-Reading of decision 8 used here: a minor can still finish onboarding and receive the first plan
-without consent (SPEC §5, value before money); the consent step is offered inside the flow and can
-be completed later from Profile.
+Reading of decision 8, confirmed by the founder on 2026-09-04 with two tightenings: a minor
+completes onboarding and receives the first plan without waiting for consent (SPEC §5, value before
+money; the first plan involves no upload). (1) The consent request **starts at the DOB step**: the
+parent's phone is captured there and the consent OTP is sent immediately, so for most students
+consent is done before they ever reach a gate. (2) A visible **"parent consent pending"** state on
+Profile, plus a re-prompt with a resend at every gated moment (`CONSENT_REQUIRED` carries the deep
+link), so the path to unlock is always one tap away. Legal review under DPDP may tighten this; that
+is founder workstream F9, not a build blocker.
 
 ---
 
@@ -798,8 +803,8 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 | `PATCH /me` | D10 | `{language?, display_name?, morning_notification_time?, hours_weekday?, hours_weekend?, goal?, state_code?, category?}` → `me` | language switch regenerates future content only (DEV_SPEC §8.3) |
 | `POST /me/devices` | D30 | `{fcm_token, platform, app_version}` → 204 | upsert |
 | `DELETE /me/devices/{token}` | D30 | → 204 | on logout |
-| `POST /me/consent/request` | D27 | `{parent_phone}` → `{challenge_id}` | minors only; served by `auth.web` (§1.3) |
-| `POST /me/consent/verify` | D27 | `{challenge_id, code}` → `{consent_state}` | unlocks `POST /documents`; served by `auth.web` |
+| `POST /me/consent/request` | D27 | `{parent_phone}` → `{challenge_id, resend_after_s}` | minors only; called from the DOB step of onboarding and again from Profile's "consent pending" state or a gated re-prompt (§0.5 item 8); served by `auth.web` (§1.3) |
+| `POST /me/consent/verify` | D27 | `{challenge_id, code}` → `{consent_state}` | unlocks `POST /documents` and photo `POST /doubts`; served by `auth.web` |
 | `POST /me/export` | D64 | → `202 {job_id}` | notebook PDF + JSON |
 | `GET /me/export/{job_id}` | D64 | → `{status, url?, expires_at?}` | 24-hour signed URL |
 | `DELETE /me` **Idem** | D64 | `{confirmation: "DELETE"}` → 202 | anonymise now, purge in 30 days (§2.10) |
@@ -1381,7 +1386,7 @@ amends the rule (§13.4).
 | 1 Splash/Login | `/login`, `/login/otp` | `auth` · `LoginNotifier` | D8 |
 | 2 Onboarding interview | `/onboarding/{step}` | `onboarding` · `InterviewNotifier`, `SyllabusGridNotifier` | D25–D26 |
 | 3 Document capture + confirm | `/documents/{type}` | `documents` · `DocumentCaptureNotifier` | D28–D29 |
-| 4 Parent consent | `/onboarding/consent` | `account` · `ConsentNotifier` | D27 |
+| 4 Parent consent | `/onboarding/consent` (entered from the DOB step; also reachable from Profile's "consent pending" state and from any `CONSENT_REQUIRED` re-prompt) | `auth` · `ConsentNotifier`; `account` · `SettingsNotifier` shows the pending state | D27 |
 | 5 First-plan reveal | `/onboarding/plan` | `onboarding` · `FirstPlanNotifier` | D29 |
 | 6 Diagnostic intro + session | `/practice/diagnostic` | `practice` · `SessionNotifier(kind: diagnostic)` | D35 |
 | 7 Today | `/today` | `planner` · `TodayNotifier` (D29, D33), `PlanChatNotifier` (D58); `wellbeing` · `MoodNotifier` (D59) | D29, D33, D58, D59 |
@@ -1715,11 +1720,15 @@ server-initiated (SPEC §6.9, DEV_SPEC §8.7).
 - **PII inventory**: phone, display name, DOB, parent phone, state, category (optional), confirmed
   scorecard/marksheet fields, doubt text and images, mentor chat. Everything else is behavioural
   data the product needs (SPEC §5 "collect only what powers features"; DEV_SPEC R6).
-- **Minors**: DOB at onboarding; under 18 → `is_minor`; the parent-consent OTP is a step of the
-  onboarding flow (skippable, resumable from Profile); until a `parent_consents` row is
-  `consented`, `POST /documents` and photo `POST /doubts` return `CONSENT_REQUIRED` while text
-  features stay available; after consent everything unlocks (SPEC §6.8 "before any upload",
-  founder decision 8 in §0.5, decision D3.28, PLAN D27 ✅ and D38).
+- **Minors**: DOB at onboarding; under 18 → `is_minor`, and the same step captures the parent's
+  phone and sends the consent OTP at once (`POST /me/consent/request`), so consent is usually
+  complete before any gate is reached; onboarding completes and the first plan is shown regardless.
+  Until a `parent_consents` row is `consented`, `POST /documents` and photo `POST /doubts` return
+  `CONSENT_REQUIRED` while text features stay available; Profile shows a "parent consent pending"
+  state with resend, and every gated moment re-prompts with the deep link, so unlocking is one tap
+  away; after consent everything unlocks (SPEC §6.8 "before any upload", founder decision 8 in §0.5
+  with its two tightenings, decision D3.28, PLAN D27 ✅ and D38). DPDP legal review may tighten
+  this — founder workstream F9.
 - **Images**: uploads bucket only, deleted after reading (doubts) or confirm/discard (documents),
   `expires_at` sweeper, 1-day lifecycle: three independent layers (§2.10). The D28 acceptance checks
   the bucket is empty after confirm. The **document-deletion verification job** (PLAN D64, in
@@ -1921,7 +1930,11 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    MargaiApplicationTests.java`, `server/README.md`, the root `README.md`, `scripts/dev-setup.sh`
    comments, DEV_SPEC §2.1 (reference), this plan's §2.1, §7.2 and D3.11, and the PARKED `uuidv7()`
    item (PostgreSQL 18 only). The migrations themselves use nothing 18-specific by design
-   (`gen_random_uuid()`, HNSW from pgvector, generated columns).
+   (`gen_random_uuid()`, HNSW from pgvector, generated columns). Protocol if the fallback is
+   forced (founder ruling at D3 close, now a CLAUDE.md session rule): the SPEC §3 amendment is made
+   by the founder, or by Claude only on an explicit per-edit instruction in that session, with a
+   DECISIONS.md row citing the console finding; the version changes elsewhere follow as ordinary
+   task work in the D5 session.
 4. Cohere Embed Multilingual v3 access; otherwise Titan Text Embeddings v2 at 1,024 dimensions.
 
 ### 13.3 Single-instance assumptions and their upgrade path

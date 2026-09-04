@@ -61,7 +61,7 @@
 
 - [ ] **D25** Interview Q1–Q3 (chat UI + persistence) + batch-position self-report for coaching students (D3 decision 3) · ✅ back/edit works
 - [ ] **D26** Syllabus grid + hours sliders + goal/target (+optional category) · ✅ interview <5 min
-- [ ] **D27** DOB + minors parent-consent OTP inside the onboarding flow (D3 decision 8) · ✅ photo doubts and uploads blocked until consent; text features available
+- [ ] **D27** DOB + minors parent-consent OTP sent at the DOB step; onboarding completes regardless; "consent pending" state on Profile + re-prompt at gated moments (D3 decision 8) · ✅ photo doubts and uploads blocked until consent; text features and the first plan work
 - [ ] **D28** Scorecard capture → extract → confirm → delete · ✅ 3 sample cards correct; storage empty after
 - [ ] **D29** 12th-marksheet + batch-timetable doc_types (D3 decision 3) + deterministic first plan + reveal screen · ✅ end-to-end new user
 - [ ] **D30** Notification permission moment + morning notif skeleton
@@ -152,6 +152,7 @@
 | F5 | Marketing site copy + deploy | W11 | ☐ | |
 | F6 | Trademark search (Class 41 + 9) for final name | anytime | ☐ | before public launch |
 | F7 | Domain + social handles for final name | anytime | ☐ | MARGAI = working name |
+| F9 | DPDP legal review of the minors' consent flow (TECH_PLAN §0.5 item 8, §9.6): consent OTP at the DOB step, gated photo doubts and uploads until consent | before D27 ideally; before beta at the latest | ☐ | not a build blocker; may tighten the gating |
 | F8 | AWS beta stack (Terraform) per TECH_PLAN §7.6 — accepted at D3 (decision 5). Claude drafts Terraform in a separate infra session profile (plan allowed, apply denied), created when the first milestone is due; founder runs every apply | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ accepted 2026-09-04 | PLAN has no infra day (TECH_PLAN §0.4 #1); console checks §13.2 before D5 |
 
 ---
@@ -211,6 +212,13 @@ Founder decisions at approval (TECH_PLAN §0.5), one line each:
      points listed in TECH_PLAN §13.2, incl. SPEC §3).
   8  Minors: consent OTP inside the onboarding flow; until consent, CONSENT_REQUIRED covers photo
      doubts and documents (text stays available) — decision D3.28.
+Post-approval exchange (three readings surfaced before executing, all ruled by the founder):
+  decision 8 reading ACCEPTED with two tightenings — consent OTP fired at the DOB step, "consent
+  pending" state on Profile + re-prompt at gated moments; legal review = workstream F9, not a
+  blocker. DEV_SPEC §13.2 divergence ACCEPTED as handled (live CLAUDE.md wins; note records it).
+  PG17 fallback protocol: SPEC §3 is amended only by the founder, or by Claude on an explicit
+  per-edit instruction, with a DECISIONS.md row citing the console finding; contract edits are never
+  bundled into task work — now a CLAUDE.md session rule. If PG18 is on RDS Mumbai the branch evaporates.
 Conflict resolutions recorded (TECH_PLAN §0.4): #1 infra day → F8; #2 batch inference conditional on
   the minimum, on-demand below it; #3 eval gate = founder-launched live run + committed stamp, CI
   verifies the stamp and runs the fake layer (D23); #4 correct_key per decisions 1a/1b; #5 pipeline in

@@ -67,4 +67,7 @@ When these disagree, say so out loud and cite both — never silently pick one.
   `BEDROCK_LIVE=1` profile with the cost breaker active (DEV_SPEC §13.7).
 - Phase-2 items (SPEC §12) are out of scope. Where the spec is silent choose the boring,
   maintainable option and record it in docs/DECISIONS.md; where it conflicts, surface it.
+- docs/SPEC.md is amended only by the founder, or by Claude on an explicit per-edit instruction in
+  that session, each amendment with a DECISIONS.md row citing the finding that forced it. Contract
+  edits are never bundled into ordinary task work (ruling at D3 close, 2026-09-04).
 - Anything the human corrects twice belongs here or in a `.claude/rules/*.md` file.

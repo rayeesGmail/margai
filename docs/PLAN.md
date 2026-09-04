@@ -124,8 +124,10 @@ tools; your reviews focus on output quality.)*
   ✅ *Answers persist; back/edit works.*
 - **D26 —** Syllabus grid (3-state + weak long-press), hours sliders, goal/target picker
   with optional category + inline why-note. ✅ *Full interview <5 min on device.*
-- **D27 —** DOB + minors parent-consent flow (consent OTP). ✅ *Under-18 path blocks
-  uploads until consent.*
+- **D27 —** DOB + minors parent-consent flow: parent phone captured and consent OTP sent at the
+  DOB step; onboarding completes regardless; "parent consent pending" state on Profile with a
+  re-prompt at gated moments (TECH_PLAN §0.5 item 8, decided at D3). ✅ *Under-18 path blocks
+  photo doubts and document uploads until consent; text features and the first plan work.*
 - **D28 —** Scorecard upload: capture UI with frame guide → AI extraction → confirm/edit
   screen → delete-after-confirm behavior. ✅ *3 real scorecard photos (found samples)
   extract correctly; storage verifiably empty after.*

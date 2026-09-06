@@ -41,3 +41,4 @@ which PLAN day lands which version is §2.9.
 | V2 `identity` | D4 | `users`, `student_profiles` |
 | V3 `curriculum_core` | D4 | `syllabus_nodes`, `syllabus_prerequisites`, `archetype_tracks`, `archetype_track_steps`, `cutoffs` |
 | V4 `chapter_status` | D4 | `chapter_status` |
+| V5 `ai_calls` | D5 | `ai_calls` (append-only cost ledger) |

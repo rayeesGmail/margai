@@ -21,7 +21,22 @@
 
   <properties>
     <java.version>25</java.version>
+    <!-- Spring Modulith is not managed by the Boot BOM; 2.1.x is the line built for Boot 4.1.
+         It verifies the module boundaries of TECH_PLAN §1.3–§1.4 in a test (D4, DECISIONS D3.14). -->
+    <spring-modulith.version>2.1.1</spring-modulith.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.modulith</groupId>
+        <artifactId>spring-modulith-bom</artifactId>
+        <version>${spring-modulith.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -49,8 +64,18 @@
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- @ApplicationModule / @NamedInterface annotations only; no runtime behaviour. -->
+    <dependency>
+      <groupId>org.springframework.modulith</groupId>
+      <artifactId>spring-modulith-api</artifactId>
+    </dependency>
 
     <!-- test -->
+    <dependency>
+      <groupId>org.springframework.modulith</groupId>
+      <artifactId>spring-modulith-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -59,6 +84,17 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- @DataJpaTest repository slices run Flyway against Testcontainers (TECH_PLAN §8.1). -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-flyway-test</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -83,6 +119,13 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <!-- `./mvnw spring-boot:run` is the developer default (TECH_PLAN §1.2): the local
+               profile adds the db/seed test taxonomy. The packaged jar gets no profile here. -->
+          <profiles>
+            <profile>local</profile>
+          </profiles>
+        </configuration>
       </plugin>
       <!-- Mockito's inline mock maker must be attached as a -javaagent on JDK 21+; dynamic
            attach prints a warning today and is disallowed by default in a future JDK. -->

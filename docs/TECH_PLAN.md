@@ -1935,6 +1935,10 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    by the founder, or by Claude only on an explicit per-edit instruction in that session, with a
    DECISIONS.md row citing the console finding; the version changes elsewhere follow as ordinary
    task work in the D5 session.
+   **Resolved 2026-09-04:** RDS ap-south-1 offers PostgreSQL 18.1–18.6 and `db.t4g.small` is
+   orderable for 18.6 (both via the API — the console create screen initially hid 18.x); RDS PG18
+   ships pgvector 0.8.1 (AWS release notes; the in-instance check is the `pg_available_extensions`
+   query in `docs/runbooks/f8-infrastructure.md`). Fallback not needed; DECISIONS.md D4 row.
 4. Cohere Embed Multilingual v3 access; otherwise Titan Text Embeddings v2 at 1,024 dimensions.
 
 ### 13.3 Single-instance assumptions and their upgrade path

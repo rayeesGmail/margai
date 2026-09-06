@@ -15,7 +15,13 @@ paths:
   judging is server-side only. The permitted carriers are listed in TECH_PLAN §3.1 and tested per §8.3.
 - Schema changes only via a Flyway migration under `src/main/resources/db/migration/`
   (`V<n>__<snake_name>.sql`, never edit an applied one) plus the matching JPA entity change.
-  Naming: snake_case, UUID PK `gen_random_uuid()`, `created_at`, `updated_at` (DEV_SPEC §3).
+  Columns come from TECH_PLAN §2. Naming: snake_case, UUID PK `gen_random_uuid()`, `created_at`,
+  `updated_at` (DEV_SPEC §3); enumerations as `VARCHAR` + `CHECK` (DECISIONS D3.5). Append-only
+  tables (`practice_events`, `ai_calls`, `billing_events`) carry no `updated_at` (TECH_PLAN §2.1).
+  Every migration carries its undo in a `-- ROLLBACK:` … `-- END ROLLBACK` header block, which
+  `MigrationReversibilityTest` executes; seed data lives only in `db/seed` (the `local` and `test`
+  profiles). Cross-module references are id columns with database foreign keys, never JPA
+  associations (TECH_PLAN §1.3).
 - Configuration (model IDs, tiers, limits, prices, feature flags) comes from config / SSM,
   never from code constants. No credentials anywhere in the tree; `FakeAiClient` is the default.
 - Structured JSON logs with request IDs end-to-end; every Bedrock call writes an `ai_calls` row.

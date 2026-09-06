@@ -1938,6 +1938,14 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    from ap-south-1 returned `ok` (14 input / 4 output tokens) and its usage block carries
    `cacheReadInputTokens` (0 on this uncached call), so the ledger's cache accounting has a
    source on this model. Open: the same call on the REASON profile, the tier defaults, prices.
+   **Sonnet 5 gated, 2026-09-06:** the same call on `global.anthropic.claude-sonnet-5` failed with
+   `AccessDeniedException: anthropic.claude-sonnet-5 is not available for this account … contact
+   AWS Sales` — an account allowlist, not a region or model-access-page matter. The listing shows
+   a model; it does not promise the account may invoke it. REASON therefore comes from a model
+   this account can call: probe `global.anthropic.claude-opus-5`, then the 4.x line
+   (`global.anthropic.claude-sonnet-4-6`, `global.anthropic.claude-opus-4-8`); whichever of the
+   strongest invocable models fits the ₹ budget becomes the REASON default, the gated ones stay
+   an allowlist request (F8 note) rather than a build dependency.
 2. Bedrock batch inference minimum record count and whether the chosen models support it.
 3. RDS for PostgreSQL 18 availability in ap-south-1 and its pgvector version (HNSW needs ≥ 0.5).
    If PostgreSQL 18 is not offered, the founder decided (§0.5 item 7) to drop to 17 as a versions

@@ -64,6 +64,14 @@ class ChapterStatusConstraintsTest {
     }
 
     @Test
+    void nodeMustExist() {
+        assertThatThrownBy(() -> statuses.saveAndFlush(
+                new ChapterStatus(userId, UUID.randomUUID(), StatusSource.self_report)))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("chapter_status_node_id_fkey");
+    }
+
+    @Test
     void userRowCannotBeDeletedWhileAStatusReferencesIt() {
         statuses.saveAndFlush(new ChapterStatus(userId, nodeId, StatusSource.self_report));
 

@@ -32,8 +32,9 @@ Rules:
   the undo is non-trivial, also write `server/src/main/resources/db/rollback/U<n>__<snake_name>.sql`
   (it takes precedence over the block).
 - Seed data for local development and tests goes to `server/src/main/resources/db/seed/R__*.sql`
-  as idempotent repeatable migrations (upserts on natural keys, fixed UUIDs); never into
-  `db/migration/`.
+  as idempotent repeatable migrations: fixed UUIDs, `INSERT … ON CONFLICT (id) DO UPDATE` so any
+  value can be edited and re-applied, no rollback block (the table drops remove seed rows); never
+  into `db/migration/`.
 - Never drop or rewrite a column that holds student data without an explicit instruction that
   names the data-retention decision.
 - No secrets, no environment-specific values, no `TODO` markers.

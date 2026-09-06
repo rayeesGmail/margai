@@ -83,28 +83,27 @@ class MigrationReversibilityTest {
         return migrations;
     }
 
+    /**
+     * A {@code rollback/U<n>__*.sql} file is handed to the driver whole (it may hold function
+     * bodies with their own semicolons; pgjdbc splits a multi-statement script correctly); a
+     * header block is one statement per {@code -- } line, as the convention says.
+     */
     private List<String> undoStatements(Resource migration) throws IOException {
         int version = version(migration);
         // classpath*: tolerates the rollback directory not existing yet (no non-trivial undo so far).
         Resource[] undoFiles = resources.getResources("classpath*:db/rollback/U" + version + "__*.sql");
-        String undo = undoFiles.length > 0
-                ? undoFiles[0].getContentAsString(StandardCharsets.UTF_8)
-                : rollbackBlock(migration);
-        List<String> statements = new ArrayList<>();
-        for (String statement : undo.split(";")) {
-            if (!statement.isBlank()) {
-                statements.add(statement.trim());
-            }
-        }
-        if (statements.isEmpty()) {
+        List<String> statements = undoFiles.length > 0
+                ? List.of(undoFiles[0].getContentAsString(StandardCharsets.UTF_8))
+                : rollbackBlockLines(migration);
+        if (statements.stream().allMatch(String::isBlank)) {
             fail("%s has no undo: add a -- ROLLBACK: block or a rollback/U%d__*.sql file",
                     migration.getFilename(), version);
         }
         return statements;
     }
 
-    private static String rollbackBlock(Resource migration) throws IOException {
-        StringBuilder block = new StringBuilder();
+    private static List<String> rollbackBlockLines(Resource migration) throws IOException {
+        List<String> lines = new ArrayList<>();
         boolean inside = false;
         for (String line : migration.getContentAsString(StandardCharsets.UTF_8).split("\n")) {
             String trimmed = line.strip();
@@ -113,10 +112,13 @@ class MigrationReversibilityTest {
             } else if (trimmed.equals(ROLLBACK_END)) {
                 break;
             } else if (inside && trimmed.startsWith("--")) {
-                block.append(trimmed.substring(2).strip()).append('\n');
+                String statement = trimmed.substring(2).strip();
+                if (!statement.isBlank()) {
+                    lines.add(statement);
+                }
             }
         }
-        return block.toString();
+        return lines;
     }
 
     private static int version(Resource migration) {

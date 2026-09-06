@@ -78,6 +78,69 @@ class CurriculumConstraintsTest {
     }
 
     @Test
+    void classLevelIsElevenOrTwelve() {
+        SyllabusNode physics = nodes.saveAndFlush(subject("PHY"));
+        SyllabusNode classTen = new SyllabusNode("PHY.10.X", Subject.physics, (short) 10, physics.getId(),
+                NodeKind.chapter, "Not a NEET class", 1);
+
+        assertThatThrownBy(() -> nodes.saveAndFlush(classTen))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("syllabus_nodes_class_level_check");
+    }
+
+    // One violation per test: after a failed flush the transaction is aborted, so a second
+    // violation in the same test would surface as a different exception.
+
+    @Test
+    void prerequisiteTargetMustExist() {
+        SyllabusNode physics = nodes.saveAndFlush(subject("PHY"));
+
+        assertThatThrownBy(() -> prerequisites.saveAndFlush(
+                new SyllabusPrerequisite(physics.getId(), UUID.randomUUID())))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("syllabus_prerequisites_to_node_id_fkey");
+    }
+
+    @Test
+    void prerequisiteSourceMustExist() {
+        SyllabusNode physics = nodes.saveAndFlush(subject("PHY"));
+
+        assertThatThrownBy(() -> prerequisites.saveAndFlush(
+                new SyllabusPrerequisite(UUID.randomUUID(), physics.getId())))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("syllabus_prerequisites_from_node_id_fkey");
+    }
+
+    @Test
+    void oneTrackPerArchetype() {
+        tracks.saveAndFlush(new ArchetypeTrack(AttemptType.repeater, "Repeater", (short) 40));
+
+        assertThatThrownBy(() -> tracks.saveAndFlush(new ArchetypeTrack(AttemptType.repeater, "Again", (short) 40)))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("archetype_tracks_code_key");
+    }
+
+    @Test
+    void stepNeedsAnExistingTrack() {
+        SyllabusNode physics = nodes.saveAndFlush(subject("PHY"));
+
+        assertThatThrownBy(() -> steps.saveAndFlush(
+                new ArchetypeTrackStep(UUID.randomUUID(), physics.getId(), 1, TrackPhase.learn, (short) 1)))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("archetype_track_steps_track_id_fkey");
+    }
+
+    @Test
+    void stepNeedsAnExistingNode() {
+        ArchetypeTrack dropper = tracks.saveAndFlush(new ArchetypeTrack(AttemptType.dropper, "Dropper", (short) 7));
+
+        assertThatThrownBy(() -> steps.saveAndFlush(
+                new ArchetypeTrackStep(dropper.getId(), UUID.randomUUID(), 1, TrackPhase.learn, (short) 1)))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("archetype_track_steps_node_id_fkey");
+    }
+
+    @Test
     void prerequisiteRejectsASelfEdge() {
         SyllabusNode physics = nodes.saveAndFlush(subject("PHY"));
         SyllabusNode kinematics = nodes.saveAndFlush(chapter("PHY.11.KIN", physics.getId(), 1));

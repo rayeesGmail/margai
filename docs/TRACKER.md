@@ -237,7 +237,7 @@ Surprise: (1) Spring Boot stops a @ServiceConnection container bean whenever a c
   a record as @EmbeddedId. (5) Modulith 2.x has getIdentifier(), not getName(), on ApplicationModule.
 PR #3 from d4-core-schema merged to main by the founder 2026-09-06 (merge commit 3f77d6f) — the
   first CI run that downloads Spring Modulith and runs the Testcontainers suite on a GitHub
-  runner; CI result is the founder's to confirm (no gh on this machine).
+  runner; CI green (founder-verified 2026-09-06).
 Tomorrow's first task: D5 from TECH_PLAN §4.1 (AiClient v2 + FakeAiClient +
   decorator chain), §4.8 ledger and breaker, §2.8 ai_calls as V5 (append-only: no updated_at),
   §1.2 bedrock profile, the D5 rule edit (§0.2: ai-layer.md RouteDecision wording), ArchUnit's

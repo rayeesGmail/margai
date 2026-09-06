@@ -1965,6 +1965,7 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    | Sonnet 5 (gated) | 2.00 | 10.00 | — | — | 2.50 | 4.00 | 0.20 |
    | Opus 5 (gated) | 5.00 | 25.00 | 2.50 | 12.50 | 6.25 | 10.00 | 0.50 |
    | Fable 5.1 (gated) | 10.00 | 50.00 | — | — | 12.50 | 20.00 | 0.25 |
+   | Cohere Embed 3 Multilingual (EMBED, on-demand in-region) | 0.10 | — | — | — | — | — | — |
 
    The ledger's single `cache_write` price is the 5-minute rate (the default `cachePoint` TTL and
    the plan's per-request prefix); a 1-hour cache point would be a separate price key.
@@ -2002,8 +2003,8 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    ap-south-1 with one English and one Hindi text (`input_type: search_document`) returned
    `embeddings_floats`, 2 vectors × 1,024 dimensions — the `vector(1024)` columns of §2.3 hold
    as designed. EMBED = `cohere.embed-multilingual-v3` (`margai.ai.embed.model`), Titan v2 the
-   fallback by config. Open: the per-1M-token price for the ledger. **Item 4 closed** but for
-   the price.
+   fallback by config. Price (Mumbai on-demand, 2026-09-06): 0.10 USD per 1M input tokens
+   (Embed 4 would be 0.12); recorded in the item 1 table. **Item 4 closed.**
 
 ### 13.3 Single-instance assumptions and their upgrade path
 

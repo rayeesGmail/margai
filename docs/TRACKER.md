@@ -18,7 +18,7 @@
 | Last week's gate | n/a — Week-1 gate is due at D6 |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none. Before D5: founder console checks #1 closed 2026-09-06 (CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles, prices recorded; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request), #2 partial (both models have batch prices; minimum records per job pending), #4 closed but for its price (`cohere.embed-multilingual-v3` on-demand in ap-south-1, access proven, 1,024 dims EN + HI) — TECH_PLAN §13.2; #3 closed. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none. Before D5: founder console checks #1 closed 2026-09-06 (CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles, prices recorded; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request), #2 partial (both models have batch prices; minimum records per job pending), #4 closed 2026-09-06 (`cohere.embed-multilingual-v3` on-demand in ap-south-1, access proven, 1,024 dims EN + HI, $0.10/1M) — TECH_PLAN §13.2; #3 closed. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
@@ -413,6 +413,7 @@ Tomorrow's first task:
 - automatic deploy on merge to main · 2026-09-04 · manual `workflow_dispatch` until D72 (TECH_PLAN §7.4)
 - second-API-task upgrades: Valkey-backed rate limits, ShedLock for the dispatcher, SQS for async listeners · 2026-09-04 · only when a second task exists (TECH_PLAN §13.3)
 - weekly batch-confirm card ("Did your batch finish Rotational Motion?", SPEC §6.7 layer 4) · 2026-09-04 · founder decision 3 at D3: parked until the beta contains coaching students; self-report (D25) and timetable photo (D29) are scheduled
+- Cohere Rerank 3.5 (Mumbai on-demand, $2 per 1,000 queries of ≤100 chunks) as a rerank stage after hybrid retrieval fusion (TECH_PLAN §4.9) · 2026-09-06 · seen on the pricing page during console check #4; only if the D17 ✅ 15-query check or the D23 eval shows fusion alone missing the right paragraphs
 - continuity re-onboarding after a result that falls short (SPEC §7.2 Fork B) and NCERT-style seed generation to ≥30 questions/topic (SPEC §9.3), NTA-trap mining (SPEC §9.4) · 2026-09-04 · unscheduled per TECH_PLAN §12.2; seed generation and trap mining proposed for the D24 buffer
 
 ---

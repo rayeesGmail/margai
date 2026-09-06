@@ -124,20 +124,33 @@ class BedrockAiClientTest {
         assertThat(titanBody.path("dimensions").asInt()).isEqualTo(1024);
 
         String ones = "1.0,".repeat(1023) + "1.0";
-        float[] cohere = client.parseEmbedding("cohere.embed-multilingual-v3",
-                "{\"embeddings\": [[" + ones + "]], \"response_type\": \"embeddings_floats\"}", Optional.of("3"), null);
-        assertThat(cohere).hasSize(1024).contains(1f);
-        float[] cohereTyped = client.parseEmbedding("cohere.embed-multilingual-v3",
-                "{\"embeddings\": {\"float\": [[" + ones + "]]}}", Optional.empty(), null);
-        assertThat(cohereTyped).hasSize(1024);
-        float[] titan = client.parseEmbedding("amazon.titan-embed-text-v2:0",
-                "{\"embedding\": [" + ones + "], \"inputTextTokenCount\": 2}", Optional.empty(), null);
-        assertThat(titan).hasSize(1024);
+        BedrockAiClient.Embedding cohere = client.parseEmbedding("cohere.embed-multilingual-v3",
+                "{\"embeddings\": [[" + ones + "]], \"response_type\": \"embeddings_floats\"}", null);
+        assertThat(cohere.values()).hasSize(1024).contains(1f);
+        assertThat(cohere.bodyTokens()).isEmpty();
+        BedrockAiClient.Embedding cohereTyped = client.parseEmbedding("cohere.embed-multilingual-v3",
+                "{\"embeddings\": {\"float\": [[" + ones + "]]}}", null);
+        assertThat(cohereTyped.values()).hasSize(1024);
+        BedrockAiClient.Embedding titan = client.parseEmbedding("amazon.titan-embed-text-v2:0",
+                "{\"embedding\": [" + ones + "], \"inputTextTokenCount\": 2}", null);
+        assertThat(titan.values()).hasSize(1024);
+        assertThat(titan.bodyTokens()).hasValue(2);
 
         assertThatThrownBy(() -> client.parseEmbedding("cohere.embed-multilingual-v3",
-                "{\"embeddings\": [[0.1, 0.2]]}", Optional.empty(), null))
+                "{\"embeddings\": [[0.1, 0.2]]}", null))
                 .isInstanceOf(InvalidOutputException.class)
                 .hasMessageContaining("2 dimensions");
+    }
+
+    @Test
+    void embeddingInputTokensComeFromTheHeaderThenTheBodyThenAnEstimate() {
+        BedrockAiClient.Embedding counted = new BedrockAiClient.Embedding(new float[0], java.util.OptionalInt.of(2));
+        BedrockAiClient.Embedding uncounted = new BedrockAiClient.Embedding(new float[0], java.util.OptionalInt.empty());
+
+        assertThat(BedrockAiClient.inputTokens(Optional.of(" 3 "), counted, "hello")).isEqualTo(3);
+        assertThat(BedrockAiClient.inputTokens(Optional.empty(), counted, "hello")).isEqualTo(2);
+        assertThat(BedrockAiClient.inputTokens(Optional.empty(), uncounted, "hello world!")).isEqualTo(3);
+        assertThat(BedrockAiClient.inputTokens(Optional.empty(), uncounted, "hi")).isEqualTo(1);
     }
 
     private static AiProperties properties(String embedModel) {

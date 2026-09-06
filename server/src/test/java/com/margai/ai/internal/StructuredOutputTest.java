@@ -100,4 +100,27 @@ class StructuredOutputTest {
     void schemaIsGeneratedOncePerType() {
         assertThat(codec.schemaFor(Answer.class)).isSameAs(codec.schemaFor(Answer.class));
     }
+
+    record Guess(String code, java.util.Optional<String> subject, java.util.Optional<Integer> confidence) {
+    }
+
+    @Test
+    void optionalComponentsAreOptionalAndNullableEverythingElseRequired() {
+        JsonNode schema = codec.schemaFor(Guess.class);
+
+        assertThat(schema.path("required")).extracting(JsonNode::asString).containsExactly("code");
+        assertThat(schema.path("properties").path("subject").toString()).contains("\"string\"").contains("\"null\"");
+        assertThat(schema.path("properties").path("confidence").toString()).contains("\"integer\"").contains("\"null\"");
+
+        Guess absent = codec.decode(Guess.class, codec.parse("{\"code\": \"PHY\"}", usage, "m"), usage, "m");
+        assertThat(absent.subject()).isEmpty();
+        assertThat(absent.confidence()).isEmpty();
+        Guess explicitNull = codec.decode(Guess.class,
+                codec.parse("{\"code\": \"PHY\", \"subject\": null, \"confidence\": 3}", usage, "m"), usage, "m");
+        assertThat(explicitNull.subject()).isEmpty();
+        assertThat(explicitNull.confidence()).contains(3);
+        assertThatThrownBy(() -> codec.decode(Guess.class, codec.parse("{\"subject\": \"physics\"}", usage, "m"), usage, "m"))
+                .isInstanceOf(InvalidOutputException.class)
+                .satisfies(e -> assertThat(((InvalidOutputException) e).errors()).anySatisfy(m -> assertThat(m).contains("code")));
+    }
 }

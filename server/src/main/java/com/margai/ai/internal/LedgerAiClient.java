@@ -21,8 +21,10 @@ import java.util.function.Supplier;
  * {@code ai_calls} row"): one ledger row per call for every outcome — {@code ok},
  * {@code invalid_output} (with the tokens the failed attempts consumed), {@code timeout},
  * {@code error} and {@code breaker} — with {@code cost_paise} computed at insert and the
- * §10.2 metrics {@code ai.calls}, {@code ai.cost.paise}, {@code ai.latency}. The model id of a
- * failed call is the tier's configured model; the prompt version is what the registry has active.
+ * §10.2 metrics {@code ai.calls}, {@code ai.cost.paise}, {@code ai.latency}, plus
+ * {@code ai.attempts} (model calls per successful request: retries and the repair fold into the
+ * one row, DECISIONS D5). The model id of a failed call is the tier's configured model; the
+ * prompt version is what the registry has active.
  */
 public final class LedgerAiClient implements AiClient {
 
@@ -64,6 +66,7 @@ public final class LedgerAiClient implements AiClient {
         try {
             AiResponse<T> response = call.get();
             UUID id = write(row, response.modelId(), response.usage(), AiCallStatus.ok, null, started);
+            meters.counter("ai.attempts", "tier", row.getTier().name()).increment(response.attempts());
             return response.withAiCallId(id);
         } catch (AiBudgetExceededException e) {
             write(row, null, Usage.none(), AiCallStatus.breaker, e.scope().name(), started);

@@ -15,6 +15,9 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.core.exception.ApiCallAttemptTimeoutException;
@@ -48,6 +51,8 @@ public final class BedrockAiClient implements AiClient {
     static final String INPUT_COUNT_HEADER = "X-Amzn-Bedrock-Input-Token-Count";
     static final int EMBEDDING_DIMENSIONS = 1024;
 
+    private static final Logger log = LoggerFactory.getLogger(BedrockAiClient.class);
+
     private final BedrockRuntimeClient runtime;
     private final AiProperties properties;
     private final PromptRegistry prompts;
@@ -60,7 +65,7 @@ public final class BedrockAiClient implements AiClient {
         this.properties = properties;
         this.prompts = prompts;
         this.codec = codec;
-        this.mapper = new ConverseRequestMapper(codec, properties.maxOutputTokens());
+        this.mapper = new ConverseRequestMapper(codec, prompts, properties.maxOutputTokens());
     }
 
     @Override
@@ -98,9 +103,29 @@ public final class BedrockAiClient implements AiClient {
         }
         String body = response.body().asUtf8String();
         Optional<String> header = response.sdkHttpResponse().firstMatchingHeader(INPUT_COUNT_HEADER);
-        float[] vector = parseEmbedding(modelId, body, header, null);
-        Usage usage = new Usage(header.map(Integer::parseInt).orElse(0), 0, 0, 0);
-        return new AiResponse<>(vector, usage, modelId, Duration.ofNanos(System.nanoTime() - started), null);
+        Embedding embedding = parseEmbedding(modelId, body, null);
+        Usage usage = new Usage(inputTokens(header, embedding, request.text()), 0, 0, 0);
+        return new AiResponse<>(embedding.values(), usage, modelId, Duration.ofNanos(System.nanoTime() - started), null);
+    }
+
+    /** A parsed embedding and the token count the body carried, if the model family reports one. */
+    record Embedding(float[] values, OptionalInt bodyTokens) {
+    }
+
+    /**
+     * Input tokens for the ledger (§4.8 "tokens from the response"): the response header, else the
+     * body count (Titan), else an estimate — never silently zero, which would starve the breaker.
+     */
+    static int inputTokens(Optional<String> header, Embedding embedding, String text) {
+        if (header.isPresent()) {
+            return Integer.parseInt(header.get().trim());
+        }
+        if (embedding.bodyTokens().isPresent()) {
+            return embedding.bodyTokens().getAsInt();
+        }
+        int estimate = Math.max(1, text.length() / 4);
+        log.warn("embedding response carried no token count; estimating {} input tokens", estimate);
+        return estimate;
     }
 
     /** The embedding request body per model family; the family prefix selects the wire shape, the id is config. */
@@ -113,12 +138,17 @@ public final class BedrockAiClient implements AiClient {
                 "truncate", "END"));
     }
 
-    /** Cohere: {@code embeddings[0]} (or {@code embeddings.float[0]}); Titan: {@code embedding}. */
-    float[] parseEmbedding(String modelId, String body, Optional<String> countHeader, Usage usage) {
+    /** Cohere: {@code embeddings[0]} (or {@code embeddings.float[0]}); Titan: {@code embedding} + {@code inputTextTokenCount}. */
+    Embedding parseEmbedding(String modelId, String body, Usage usage) {
         JsonNode root = codec.parse(body, usage, modelId);
         JsonNode vector;
+        OptionalInt bodyTokens = OptionalInt.empty();
         if (modelId.startsWith("amazon.titan")) {
             vector = root.path("embedding");
+            JsonNode count = root.path("inputTextTokenCount");
+            if (count.isIntegralNumber()) {
+                bodyTokens = OptionalInt.of(count.asInt());
+            }
         } else {
             JsonNode embeddings = root.path("embeddings");
             vector = embeddings.isObject() ? embeddings.path("float").path(0) : embeddings.path(0);
@@ -131,7 +161,7 @@ public final class BedrockAiClient implements AiClient {
         for (int i = 0; i < values.length; i++) {
             values[i] = (float) vector.get(i).asDouble();
         }
-        return values;
+        return new Embedding(values, bodyTokens);
     }
 
     static Usage toUsage(TokenUsage usage) {

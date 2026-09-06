@@ -14,6 +14,7 @@ import com.networknt.schema.SpecificationVersion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.DeserializationFeature;
@@ -23,11 +24,13 @@ import tools.jackson.databind.json.JsonMapper;
 
 /**
  * The structured-output contract (TECH_PLAN §4.11, DECISIONS D3.21 and D5): one JSON schema is
- * derived from the output record — snake_case property names, every component required, no
- * additional properties, enums as their constant names — and serves both as the forced Bedrock
- * tool's input schema and as the schema the model's answer is validated against before it is
- * decoded into the record. A mismatch is an {@link InvalidOutputException} that carries the
- * validation messages the repair retry puts in context.
+ * derived from the output record — snake_case property names, every component required except
+ * {@link Optional} ones (optional and nullable), no additional properties, enums as their
+ * constant names — and serves both as the forced Bedrock tool's input schema and as the schema
+ * the model's answer is validated against before it is decoded into the record. Required-ness
+ * and types are the validator's job; Jackson only rejects unknown properties and null
+ * primitives. A mismatch is an {@link InvalidOutputException} that carries the validation
+ * messages the repair retry puts in context.
  */
 public final class StructuredOutput {
 
@@ -35,8 +38,6 @@ public final class StructuredOutput {
             .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
             .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
-            .enable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES)
-            .enable(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES)
             .build();
 
     private final SchemaGenerator generator;
@@ -50,7 +51,8 @@ public final class StructuredOutput {
                 .with(Option.FORBIDDEN_ADDITIONAL_PROPERTIES_BY_DEFAULT)
                 .without(Option.SCHEMA_VERSION_INDICATOR);
         config.forFields()
-                .withRequiredCheck(field -> true)
+                .withRequiredCheck(field -> !field.getType().isInstanceOf(Optional.class))
+                .withNullableCheck(field -> field.getType().isInstanceOf(Optional.class))
                 .withPropertyNameOverrideResolver(field -> snakeCase(field.getName()));
         this.generator = new SchemaGenerator(config.build());
     }

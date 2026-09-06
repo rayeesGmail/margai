@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.margai.ai.api.PromptRef;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -77,6 +78,23 @@ class PromptRegistryTest {
                 .isInstanceOf(IllegalStateException.class).hasMessageContaining("zeta.v3.stg");
         assertThatThrownBy(() -> new PromptRegistry(Map.of("zeta.v1.stg", ZETA_V1), Map.of()).activeVersion("omega"))
                 .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("omega");
+    }
+
+    @Test
+    void fragmentGroupsCarryNamedFragmentsInsteadOfAPrompt() {
+        PromptRegistry registry = PromptRegistry.fromClasspath(new PathMatchingResourcePatternResolver(), Map.of());
+
+        assertThat(registry.renderFragment("_protocol", "tool_description", Map.of("task", "smoke")))
+                .isEqualTo("Return the structured result of the smoke task.");
+        assertThat(registry.renderFragment("_protocol", "repair", Map.of("errors", List.of("a: required", "b: bad"))))
+                .startsWith("The tool input was rejected: a: required; b: bad.");
+        assertThatThrownBy(() -> registry.renderFragment("_protocol", "nope", Map.of()))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("nope");
+        assertThatThrownBy(() -> registry.renderFragment("smoke", "user", Map.of()))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("fragment group");
+
+        PromptRegistry inMemory = new PromptRegistry(Map.of("_bits.v1.stg", "greet(v) ::= <<\nhi <v.name>\n>>\n"), Map.of());
+        assertThat(inMemory.renderFragment("_bits", "greet", Map.of("name", "Asha"))).isEqualTo("hi Asha");
     }
 
     @Test

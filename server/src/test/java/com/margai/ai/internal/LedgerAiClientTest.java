@@ -91,6 +91,18 @@ class LedgerAiClientTest {
         assertThat(meters.counter("ai.calls", "feature", "doubt", "tier", "cheap", "status", "ok").count()).isEqualTo(1);
         assertThat(meters.counter("ai.cost.paise", "feature", "doubt", "tier", "cheap").count()).isEqualTo(18);
         assertThat(meters.timer("ai.latency", "tier", "cheap").count()).isEqualTo(1);
+        assertThat(meters.counter("ai.attempts", "tier", "cheap").count()).isEqualTo(1);
+    }
+
+    @Test
+    void attemptsOfARetriedOrRepairedRequestAreCounted() {
+        when(ledger.record(any())).thenReturn(ROW);
+        inner.then(StubAiClient.ok("third try").withAttempts(3));
+
+        client.complete(request());
+
+        assertThat(meters.counter("ai.attempts", "tier", "cheap").count()).isEqualTo(3);
+        assertThat(meters.counter("ai.calls", "feature", "doubt", "tier", "cheap", "status", "ok").count()).isEqualTo(1);
     }
 
     @Test

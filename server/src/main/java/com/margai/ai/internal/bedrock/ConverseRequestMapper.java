@@ -3,10 +3,12 @@ package com.margai.ai.internal.bedrock;
 import com.margai.ai.api.AiRequest;
 import com.margai.ai.api.ImagePart;
 import com.margai.ai.api.Repair;
+import com.margai.ai.internal.PromptRegistry;
 import com.margai.ai.internal.RenderedPrompt;
 import com.margai.ai.internal.StructuredOutput;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.bedrockruntime.model.CachePointBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.CachePointType;
@@ -35,18 +37,22 @@ import software.amazon.awssdk.services.bedrockruntime.model.ToolUseBlock;
  * cache checkpoint (the cached prefix), the user turn with the question and any images, one
  * tool named after the prompt whose input schema is the output record's schema, forced through
  * {@code toolChoice}, and temperature 0. A repair retry appends the model's rejected tool call
- * and an error tool result so the next answer can fix it.
+ * and an error tool result so the next answer can fix it. The model-facing fragments (tool
+ * description, repair message) come from {@code prompts/_protocol.v<N>.stg}, never from code.
  */
 final class ConverseRequestMapper {
 
     static final String REPAIR_TOOL_USE_ID = "repair-1";
+    static final String PROTOCOL = "_protocol";
     static final float TEMPERATURE = 0f;
 
     private final StructuredOutput codec;
+    private final PromptRegistry prompts;
     private final int maxOutputTokens;
 
-    ConverseRequestMapper(StructuredOutput codec, int maxOutputTokens) {
+    ConverseRequestMapper(StructuredOutput codec, PromptRegistry prompts, int maxOutputTokens) {
         this.codec = codec;
+        this.prompts = prompts;
         this.maxOutputTokens = maxOutputTokens;
     }
 
@@ -60,7 +66,7 @@ final class ConverseRequestMapper {
                 .toolConfig(ToolConfiguration.builder()
                         .tools(Tool.fromToolSpec(ToolSpecification.builder()
                                 .name(tool)
-                                .description("Return the structured result of the " + tool + " task.")
+                                .description(prompts.renderFragment(PROTOCOL, "tool_description", Map.of("task", tool)))
                                 .inputSchema(ToolInputSchema.fromJson(Documents.fromJson(codec.schemaFor(request.outputType()))))
                                 .build()))
                         .toolChoice(ToolChoice.fromTool(SpecificToolChoice.builder().name(tool).build()))
@@ -98,9 +104,8 @@ final class ConverseRequestMapper {
                     .content(ContentBlock.fromToolResult(ToolResultBlock.builder()
                             .toolUseId(REPAIR_TOOL_USE_ID)
                             .status(ToolResultStatus.ERROR)
-                            .content(ToolResultContentBlock.fromText("The tool input was rejected: "
-                                    + String.join("; ", repair.errors())
-                                    + ". Call the tool again with an input that matches its schema exactly."))
+                            .content(ToolResultContentBlock.fromText(prompts.renderFragment(PROTOCOL, "repair",
+                                    Map.of("errors", repair.errors()))))
                             .build()))
                     .build());
         }

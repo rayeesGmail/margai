@@ -9,12 +9,14 @@ import com.margai.ai.api.ImagePart;
 import com.margai.ai.api.PromptRef;
 import com.margai.ai.api.Repair;
 import com.margai.ai.api.Tier;
+import com.margai.ai.internal.PromptRegistry;
 import com.margai.ai.internal.RenderedPrompt;
 import com.margai.ai.internal.StructuredOutput;
 import com.margai.ai.tasks.SmokeAnswer;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import software.amazon.awssdk.services.bedrockruntime.model.CachePointType;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.ConversationRole;
@@ -30,7 +32,8 @@ class ConverseRequestMapperTest {
 
     private static final RenderedPrompt PROMPT = new RenderedPrompt("smoke", 1, "SYSTEM PREFIX", "Number 7 please.");
 
-    private final ConverseRequestMapper mapper = new ConverseRequestMapper(new StructuredOutput(), 1024);
+    private final ConverseRequestMapper mapper = new ConverseRequestMapper(new StructuredOutput(),
+            PromptRegistry.fromClasspath(new PathMatchingResourcePatternResolver(), Map.of()), 1024);
 
     private static AiRequest<SmokeAnswer> request() {
         return AiRequest.of(AiFeature.smoke, Tier.cheap, PromptRef.named("smoke"), Map.of("number", 7),
@@ -61,6 +64,7 @@ class ConverseRequestMapperTest {
         assertThat(converse.toolConfig().tools()).hasSize(1);
         ToolSpecification spec = converse.toolConfig().tools().get(0).toolSpec();
         assertThat(spec.name()).isEqualTo("smoke");
+        assertThat(spec.description()).isEqualTo("Return the structured result of the smoke task.");
         Document schema = spec.inputSchema().json();
         assertThat(schema.asMap().get("type").asString()).isEqualTo("object");
         assertThat(schema.asMap().get("properties").asMap()).containsKeys("greeting", "number");

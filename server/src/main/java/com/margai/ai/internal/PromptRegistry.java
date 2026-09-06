@@ -23,14 +23,17 @@ import org.stringtemplate.v4.misc.STMessage;
 /**
  * Loads every {@code prompts/<name>.v<N>.stg} at startup (TECH_PLAN §4.12; DECISIONS D5: group
  * files with a {@code system} and a {@code user} template), refuses duplicates, and resolves the
- * active version per prompt from configuration, else the highest present. Rendering uses
- * StringTemplate 4 with {@code <…>} delimiters; a template error fails loudly rather than
- * rendering a half prompt.
+ * active version per prompt from configuration, else the highest present. A group whose name
+ * starts with {@code _} is a fragment group — named model-facing fragments such as the tool
+ * description and the repair message, no system/user prompt — rendered through
+ * {@link #renderFragment}. Rendering uses StringTemplate 4 with {@code <…>} delimiters; a
+ * template error fails loudly rather than rendering a half prompt.
  */
 public final class PromptRegistry {
 
     static final String LOCATION = "classpath*:prompts/*.stg";
-    private static final Pattern FILENAME = Pattern.compile("([a-z][a-z0-9_]*)\\.v(\\d+)\\.stg");
+    static final String FRAGMENT_PREFIX = "_";
+    private static final Pattern FILENAME = Pattern.compile("(_?[a-z][a-z0-9_]*)\\.v(\\d+)\\.stg");
     private static final Set<String> TEMPLATES = Set.of("system", "user");
 
     private final Map<String, TreeMap<Integer, STGroup>> groups = new LinkedHashMap<>();
@@ -78,9 +81,11 @@ public final class PromptRegistry {
         STGroup group = new STGroupString(filename, text, '<', '>');
         group.setListener(new FailFast(filename));
         group.load();
-        for (String template : TEMPLATES) {
-            if (!group.isDefined(template)) {
-                throw new IllegalStateException(filename + " must define the " + template + "(v) template");
+        if (!name.startsWith(FRAGMENT_PREFIX)) {
+            for (String template : TEMPLATES) {
+                if (!group.isDefined(template)) {
+                    throw new IllegalStateException(filename + " must define the " + template + "(v) template");
+                }
             }
         }
         TreeMap<Integer, STGroup> versions = groups.computeIfAbsent(name, k -> new TreeMap<>());
@@ -118,6 +123,18 @@ public final class PromptRegistry {
         STGroup group = groups.get(ref.name()).get(version);
         return new RenderedPrompt(ref.name(), version,
                 render(group, "system", variables), render(group, "user", variables));
+    }
+
+    /** One fragment of a {@code _}-prefixed group, e.g. {@code _protocol} / {@code repair}. */
+    public String renderFragment(String groupName, String template, Map<String, Object> variables) {
+        if (!groupName.startsWith(FRAGMENT_PREFIX)) {
+            throw new IllegalArgumentException("not a fragment group (no leading _): " + groupName);
+        }
+        STGroup group = groups.get(groupName).get(activeVersion(groupName));
+        if (!group.isDefined(template)) {
+            throw new IllegalArgumentException("fragment group " + groupName + " defines no " + template + "(v)");
+        }
+        return render(group, template, variables);
     }
 
     private static String render(STGroup group, String template, Map<String, Object> variables) {

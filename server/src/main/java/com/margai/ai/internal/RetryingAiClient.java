@@ -58,10 +58,11 @@ public final class RetryingAiClient implements AiClient {
         return attempt(() -> inner.embed(request), request.feature() + "/embed");
     }
 
-    private <R> R attempt(Supplier<R> call, String what) {
+    private <R> AiResponse<R> attempt(Supplier<AiResponse<R>> call, String what) {
         for (int retry = 0; ; retry++) {
             try {
-                return call.get();
+                AiResponse<R> response = call.get();
+                return retry == 0 ? response : response.withAttempts(response.attempts() + retry);
             } catch (AiUnavailableException e) {
                 if (!e.isRetryable() || retry == maxRetries) {
                     throw e;

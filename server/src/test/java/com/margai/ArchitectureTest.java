@@ -32,8 +32,8 @@ class ArchitectureTest {
     }
 
     @Test
-    void onlyTheAiModuleTouchesAiClient() {
-        noClasses().that().resideOutsideOfPackage("com.margai.ai..")
+    void onlyTheAiModulesInternalsAndTasksTouchAiClient() {
+        noClasses().that().resideOutsideOfPackages("com.margai.ai.api..", "com.margai.ai.internal..", "com.margai.ai.tasks..")
                 .should().dependOnClassesThat().areAssignableTo(AiClient.class)
                 .because("feature modules call task classes in ai.tasks, never the seam (TECH_PLAN §4.1)")
                 .check(CLASSES);

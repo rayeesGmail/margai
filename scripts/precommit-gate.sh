@@ -21,7 +21,7 @@ ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}
 cd "$ROOT"
 
 AI_PATHS='^server/src/main/resources/prompts/|^server/.*/ai/|(^|/)[^/]*(router|routing|retriev)[^/]*(/|$)|^eval/fixtures/.+\.(json|jsonl|ya?ml|csv)$'
-CODE_EXT='\.(java|kt|kts|dart|py|sh|sql|ya?ml|json|xml|properties|gradle|st|toml|arb|ts|js)$'
+CODE_EXT='\.(java|kt|kts|dart|py|sh|sql|ya?ml|json|xml|properties|gradle|st|stg|toml|arb|ts|js)$'
 
 sha256() { if command -v sha256sum >/dev/null 2>&1; then sha256sum; else shasum -a 256; fi; }
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.margai.curriculum.api.Subject;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -25,7 +26,8 @@ class RouteDecisionTest {
 
     @Test
     void routerKeepsACheapVerdictForNonNumericalQuestions() {
-        RouterVerdict verdict = new RouterVerdict(Tier.cheap, false, Subject.physics, "PHY.11.KIN", AnswerType.option);
+        RouterVerdict verdict = new RouterVerdict(Tier.cheap, false, Optional.of(Subject.physics),
+                Optional.of("PHY.11.KIN"), AnswerType.option);
 
         RouteDecision decision = RouteDecision.router(verdict);
 
@@ -37,16 +39,19 @@ class RouteDecisionTest {
     @Test
     void numericalQuestionsForceReasonWhateverTheModelSuggested() {
         RouteDecision decision = RouteDecision.router(
-                new RouterVerdict(Tier.cheap, true, Subject.physics, "PHY.11.KIN", AnswerType.numeric));
+                new RouterVerdict(Tier.cheap, true, Optional.of(Subject.physics), Optional.of("PHY.11.KIN"), AnswerType.numeric));
 
         assertThat(decision.tier()).isEqualTo(Tier.reason);
         assertThat(decision.isNumerical()).isTrue();
     }
 
     @Test
-    void routerMayOnlySuggestCheapOrReason() {
+    void routerMayOnlySuggestCheapOrReasonAndGuessesMayBeAbsent() {
         assertThatThrownBy(() -> new RouterVerdict(Tier.vision, false, null, null, AnswerType.text))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("vision");
+        RouterVerdict bare = new RouterVerdict(Tier.reason, false, null, null, AnswerType.text);
+        assertThat(bare.subject()).isEmpty();
+        assertThat(bare.nodeCodeGuess()).isEmpty();
     }
 }

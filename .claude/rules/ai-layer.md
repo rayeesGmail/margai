@@ -11,11 +11,14 @@ paths:
   directly. Implementations: `BedrockAiClient` (the `bedrock` profile: `BEDROCK_LIVE=1` locally,
   the ECS task definition in AWS; TECH_PLAN §1.2) and `FakeAiClient` (the default everywhere
   else; fixtures under `ai-fixtures/`). Both run behind the same decorator chain — ledger,
-  breaker, tier policy, schema validation, retry (TECH_PLAN §4.1) — and only task classes in
-  `ai.tasks` call `AiClient` (ArchUnit).
+  breaker, tier policy, schema validation, retry (TECH_PLAN §4.1). Only the `ai` module's
+  internal packages and its task classes in `ai.tasks` touch `AiClient`; feature modules call
+  task classes (ArchUnit).
 - Prompt templates live in `server/src/main/resources/prompts/<name>.v<N>.stg` (StringTemplate 4
   group files with a `system` template, the cached prefix, and a `user` template; the active
-  version is `margai.ai.prompts.<name>.version`, TECH_PLAN §4.12); never inline prompt strings.
+  version is `margai.ai.prompts.<name>.version`, TECH_PLAN §4.12). Shared model-facing fragments
+  such as the tool description and the repair message live in `_`-prefixed fragment groups
+  (`_protocol.v<N>.stg`). Never inline a model-facing string in Java.
 - Any change to prompts, tier routing or retrieval requires: `cd eval && ./run.sh` passing
   (≥97% correct, zero unverified numericals) AND a line in `docs/prompt-changelog.md`.
   `scripts/precommit-gate.sh` blocks the commit until the eval stamp matches.

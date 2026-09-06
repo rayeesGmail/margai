@@ -63,8 +63,9 @@ default, `BedrockAiClient` when the `bedrock` profile is active. The chain is lo
   are not retried.
 - **Prompts** — `src/main/resources/prompts/<name>.v<N>.stg`, StringTemplate 4 group files with a
   `system` template (the cached prefix) and a `user` template; active version per prompt from
-  `margai.ai.prompts.<name>.version`, else the highest present. Every edit needs the eval gate and
-  a line in `docs/prompt-changelog.md`.
+  `margai.ai.prompts.<name>.version`, else the highest present. `_`-prefixed groups
+  (`_protocol.v1.stg`) hold shared model-facing fragments: the tool description and the repair
+  message. Every edit needs the eval gate and a line in `docs/prompt-changelog.md`.
 - **Fake fixtures** — `ai-fixtures/<prompt>.<case>.json` (the output object only): main resources
   are the runtime default, test resources add cases; `variables.fixture_case` picks one, otherwise a
   deterministic hash of the rendered user prompt does; `_`-prefixed cases are failure cases reachable

@@ -51,6 +51,7 @@ class SchemaValidatingAiClientTest {
 
         assertThat(response.output()).isEqualTo("repaired");
         assertThat(response.usage()).isEqualTo(new Usage(220, 50, 0, 0));
+        assertThat(response.attempts()).isEqualTo(2);
         assertThat(inner.requests).hasSize(2);
         Repair repair = inner.requests.get(1).repair();
         assertThat(repair.previousOutputJson()).isEqualTo("{\"greeting\":\"ok\"}");

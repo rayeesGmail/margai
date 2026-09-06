@@ -46,7 +46,7 @@ public final class SchemaValidatingAiClient implements AiClient {
         try {
             AiResponse<T> repaired = inner.complete(repair);
             return new AiResponse<>(repaired.output(), first.usage().plus(repaired.usage()), repaired.modelId(),
-                    Duration.ofNanos(System.nanoTime() - started), repaired.aiCallId());
+                    Duration.ofNanos(System.nanoTime() - started), repaired.aiCallId(), repaired.attempts() + 1);
         } catch (InvalidOutputException second) {
             throw second.withUsage(first.usage().plus(second.usage()));
         }

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.margai.ai.api.AiCallContext;
 import com.margai.ai.api.AiFeature;
 import com.margai.ai.api.AiRequest;
+import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.AiUnavailableException;
 import com.margai.ai.api.EmbedRequest;
 import com.margai.ai.api.InvalidOutputException;
@@ -38,8 +39,10 @@ class RetryingAiClientTest {
     void retryableFailuresAreRetriedTwiceWithGrowingJitteredDelays() {
         inner.then(throttled()).then(throttled()).then(StubAiClient.ok("third time"));
 
-        assertThat(retrying.complete(REQUEST).output()).isEqualTo("third time");
+        AiResponse<String> response = retrying.complete(REQUEST);
 
+        assertThat(response.output()).isEqualTo("third time");
+        assertThat(response.attempts()).isEqualTo(3);
         assertThat(inner.requests).hasSize(3);
         assertThat(sleeps).hasSize(2);
         assertThat(sleeps.get(0).toMillis()).isBetween(250L, 750L);

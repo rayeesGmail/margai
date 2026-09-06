@@ -1952,9 +1952,29 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    therefore: CHEAP = VISION = `global.anthropic.claude-haiku-4-5-20251001-v1:0`,
    REASON = `global.anthropic.claude-sonnet-4-6`, EMBED per item 4 — all `margai.ai.*` config at
    D5, nothing in code. The gated Claude 5 family and Opus 4.x line become an AWS Sales allowlist
-   request under F8 (upgrade path by config, evaluated by the D23 eval). Prices for the ledger
-   (§4.8) remain the one open sub-item; the D5 smoke call proves caching and forced tool use.
+   request under F8 (upgrade path by config, evaluated by the D23 eval). The D5 smoke call proves
+   caching and forced tool use.
+   **Prices recorded 2026-09-06** (Bedrock pricing page, Asia Pacific (Mumbai), global cross-region
+   inference, USD per 1M tokens; the geo/in-region table lists the current generation as N/A, which
+   matches the profile listing). These seed the §4.8 price table at D5:
+
+   | Model | input | output | batch in | batch out | cache write 5 m | cache write 1 h | cache read |
+   |---|---|---|---|---|---|---|---|
+   | Haiku 4.5 (CHEAP, VISION) | 1.00 | 5.00 | 0.50 | 2.50 | 1.25 | 2.00 | 0.10 |
+   | Sonnet 4.6 (REASON) | 3.00 | 15.00 | 1.50 | 7.50 | 3.75 | 6.00 | 0.30 |
+   | Sonnet 5 (gated) | 2.00 | 10.00 | — | — | 2.50 | 4.00 | 0.20 |
+   | Opus 5 (gated) | 5.00 | 25.00 | 2.50 | 12.50 | 6.25 | 10.00 | 0.50 |
+   | Fable 5.1 (gated) | 10.00 | 50.00 | — | — | 12.50 | 20.00 | 0.25 |
+
+   The ledger's single `cache_write` price is the 5-minute rate (the default `cachePoint` TTL and
+   the plan's per-request prefix); a 1-hour cache point would be a separate price key.
+   `usd_inr` is config beside the table. Reserved-tier and provisioned pricing are not relevant at
+   beta volume. **Item 1 closed.**
 2. Bedrock batch inference minimum record count and whether the chosen models support it.
+   **Partial 2026-09-06:** the Mumbai pricing page lists batch prices for both chosen models
+   (Haiku 4.5 0.50 / 2.50, Sonnet 4.6 1.50 / 7.50 — half of on-demand), so both support batch
+   through their global profiles; Sonnet 5 and Fable 5.1 show no batch price. Open: the minimum
+   records per job (the plan assumes 100) from the batch-inference documentation.
 3. RDS for PostgreSQL 18 availability in ap-south-1 and its pgvector version (HNSW needs ≥ 0.5).
    If PostgreSQL 18 is not offered, the founder decided (§0.5 item 7) to drop to 17 as a versions
    change. Every place that touches: SPEC §3 (fixes "PostgreSQL 18" — a founder amendment to the

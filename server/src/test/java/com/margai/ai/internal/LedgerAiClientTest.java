@@ -42,7 +42,8 @@ class LedgerAiClientTest {
     private final SimpleMeterRegistry meters = new SimpleMeterRegistry();
     private final AiProperties properties = new AiProperties("ap-south-1",
             new AiProperties.Tiers("cheap-model", "reason-model", "vision-model"),
-            new AiProperties.Embed("embed-model"), "{}", BigDecimal.ONE, new AiProperties.Budget(1, 1), 100, 1024, Map.of());
+            new AiProperties.Embed("embed-model"), "{}", BigDecimal.ONE, new AiProperties.Budget(1, 1), 100, 1024,
+            java.time.Duration.ofSeconds(20), Map.of());
     private final PriceTable prices = PriceTable.parse("""
             {"cheap-model": {"input": 1.00, "output": 5.00, "cache_read": 0.10, "cache_write": 1.25},
              "stub-model": {"input": 1.00, "output": 5.00},

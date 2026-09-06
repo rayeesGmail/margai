@@ -49,6 +49,7 @@ margai:
       global-daily-paise: 50000   # ₹500 across all users per IST day (local placeholder)
     batch-min-records: 100        # Bedrock minimum per batch job; 0 disables batch mode (§4.11)
     max-output-tokens: 1024
+    call-timeout: 20s             # one real-time model call (§4.11); retries are RetryingAiClient's
     prompts:
       smoke:
         version: 1

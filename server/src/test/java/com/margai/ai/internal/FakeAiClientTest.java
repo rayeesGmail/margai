@@ -35,7 +35,7 @@ class FakeAiClientTest {
     private final AiProperties properties = new AiProperties("ap-south-1",
             new AiProperties.Tiers("cheap-model", "reason-model", "vision-model"),
             new AiProperties.Embed("embed-model"), "{}", BigDecimal.ONE,
-            new AiProperties.Budget(1, 1), 100, 1024, Map.of());
+            new AiProperties.Budget(1, 1), 100, 1024, java.time.Duration.ofSeconds(20), Map.of());
 
     private final PromptRegistry prompts = PromptRegistry.fromClasspath(new PathMatchingResourcePatternResolver(), Map.of());
 

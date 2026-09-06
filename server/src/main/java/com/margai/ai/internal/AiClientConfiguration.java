@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -13,8 +14,8 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 /**
  * Wires the one {@link AiClient} bean as the decorator chain of TECH_PLAN §4.1, outermost
  * first: ledger → breaker → tier policy → schema validation → retry → the inner client, which
- * is {@link FakeAiClient} unless the {@code bedrock} profile supplies a Bedrock runtime client.
- * The same breaker and ledger therefore run in every profile (DEV_SPEC §13.7 item 6).
+ * is {@link FakeAiClient} unless the {@code bedrock} profile supplies an {@link InnerAiClient}
+ * (§1.2). The same breaker and ledger therefore run in every profile (DEV_SPEC §13.7 item 6).
  */
 @Configuration(proxyBeanMethods = false)
 class AiClientConfiguration {
@@ -29,20 +30,22 @@ class AiClientConfiguration {
     }
 
     @Bean
-    AiClientInfo aiClientInfo() {
-        return new AiClientInfo("fake", CHAIN);
+    AiClientInfo aiClientInfo(ObjectProvider<InnerAiClient> live) {
+        InnerAiClient inner = live.getIfAvailable();
+        return new AiClientInfo(inner == null ? "fake" : inner.name(), CHAIN);
     }
 
     @Bean
     AiClient aiClient(AiProperties properties, PromptRegistry prompts, StructuredOutput codec,
             ResourcePatternResolver resolver, AiCallLedger ledger, CostCalculator cost, MeterRegistry meters,
-            AiClientInfo info) {
-        AiClient inner = new FakeAiClient(properties, prompts, codec, resolver);
+            ObjectProvider<InnerAiClient> live, AiClientInfo info) {
+        InnerAiClient inner = live.getIfAvailable(
+                () -> new InnerAiClient("fake", new FakeAiClient(properties, prompts, codec, resolver)));
         AiClient chain = new LedgerAiClient(
                 new BudgetBreakerAiClient(
                         new TierPolicyAiClient(
                                 new SchemaValidatingAiClient(
-                                        new RetryingAiClient(inner))),
+                                        new RetryingAiClient(inner.client()))),
                         ledger, properties.budget()),
                 ledger, cost, properties, prompts, meters);
         log.info("AiClient chain: {}", info);

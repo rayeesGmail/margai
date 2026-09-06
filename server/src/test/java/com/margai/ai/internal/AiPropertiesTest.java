@@ -33,6 +33,7 @@ class AiPropertiesTest {
             assertThat(properties.budget().globalDailyPaise()).isEqualTo(50_000L);
             assertThat(properties.batchMinRecords()).isEqualTo(100);
             assertThat(properties.maxOutputTokens()).isEqualTo(1024);
+            assertThat(properties.callTimeout()).isEqualTo(java.time.Duration.ofSeconds(20));
             assertThat(properties.promptVersions()).containsEntry("smoke", 1);
 
             PriceTable prices = context.getBean(PriceTable.class);

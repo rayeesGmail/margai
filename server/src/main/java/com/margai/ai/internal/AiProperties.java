@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -27,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
  * @param budget          daily caps in paise (§4.8)
  * @param batchMinRecords Bedrock batch minimum; 0 disables batch mode (§4.11)
  * @param maxOutputTokens cap on generated tokens per call
+ * @param callTimeout     wall-clock limit of one real-time model call (§4.11: 20 s)
  * @param prompts         active version per prompt name (§4.12)
  */
 @ConfigurationProperties(prefix = "margai.ai")
@@ -40,6 +42,7 @@ public record AiProperties(
         @NotNull @Valid Budget budget,
         @Min(0) int batchMinRecords,
         @Min(1) int maxOutputTokens,
+        @NotNull Duration callTimeout,
         Map<String, @Valid Prompt> prompts) {
 
     public AiProperties {

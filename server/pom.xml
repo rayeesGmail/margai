@@ -69,6 +69,17 @@
       <groupId>org.springframework.modulith</groupId>
       <artifactId>spring-modulith-api</artifactId>
     </dependency>
+    <!-- @ConfigurationProperties validation at startup (TECH_PLAN §11.5). -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <!-- Prompt templates: StringTemplate 4 group files under resources/prompts (TECH_PLAN §4.12). -->
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>ST4</artifactId>
+      <version>4.3.4</version>
+    </dependency>
 
     <!-- test -->
     <dependency>

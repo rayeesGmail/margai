@@ -18,6 +18,41 @@ spring:
 server:
   port: 8080
 
+# margai.* binds to @ConfigurationProperties records (TECH_PLAN §11.5). These are the local
+# defaults; every key is overridden per environment from SSM through environment variables
+# (§7.3, e.g. MARGAI_AI_TIER_CHEAP). Model ids, prices and limits never appear in code.
+margai:
+  ai:
+    region: ap-south-1
+    # Tier defaults from console check #1 (TECH_PLAN §13.2 item 1, DECISIONS 2026-09-06): the
+    # current Anthropic models are reachable only through global. inference profiles.
+    tier:
+      cheap: global.anthropic.claude-haiku-4-5-20251001-v1:0
+      reason: global.anthropic.claude-sonnet-4-6
+      vision: global.anthropic.claude-haiku-4-5-20251001-v1:0
+    embed:
+      model: cohere.embed-multilingual-v3
+    # USD per 1M tokens from the Bedrock pricing page, Asia Pacific (Mumbai), global cross-region
+    # inference, recorded 2026-09-06 (§13.2 item 1). cache_write is the 5-minute rate (§4.8).
+    prices-json: >-
+      {"global.anthropic.claude-haiku-4-5-20251001-v1:0":
+         {"input": 1.00, "output": 5.00, "cache_read": 0.10, "cache_write": 1.25,
+          "batch_input": 0.50, "batch_output": 2.50},
+       "global.anthropic.claude-sonnet-4-6":
+         {"input": 3.00, "output": 15.00, "cache_read": 0.30, "cache_write": 3.75,
+          "batch_input": 1.50, "batch_output": 7.50},
+       "cohere.embed-multilingual-v3":
+         {"input": 0.10}}
+    usd-inr: 90
+    budget:
+      user-daily-paise: 2500      # ₹25 per user per IST day (§4.8)
+      global-daily-paise: 50000   # ₹500 across all users per IST day (local placeholder)
+    batch-min-records: 100        # Bedrock minimum per batch job; 0 disables batch mode (§4.11)
+    max-output-tokens: 1024
+    prompts:
+      smoke:
+        version: 1
+
 management:
   endpoints:
     web:

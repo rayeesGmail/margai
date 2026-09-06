@@ -1,0 +1,9 @@
+// Test-only prompt: a template with no fixture, used to prove the fake fails loudly and the
+// decorators render what they are given. Never shipped: src/test/resources only.
+system(v) ::= <<
+Echo.
+>>
+
+user(v) ::= <<
+<v.text>
+>>

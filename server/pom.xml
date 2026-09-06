@@ -80,6 +80,24 @@
       <artifactId>ST4</artifactId>
       <version>4.3.4</version>
     </dependency>
+    <!-- Structured output (TECH_PLAN §4.11, DECISIONS D3.21): the output record's JSON schema is
+         generated once (victools, Jackson 3 line) and serves both as the forced Bedrock tool's
+         input schema and as the validator's schema (networknt, Jackson 3 line). -->
+    <dependency>
+      <groupId>com.github.victools</groupId>
+      <artifactId>jsonschema-generator</artifactId>
+      <version>5.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.victools</groupId>
+      <artifactId>jsonschema-module-jackson</artifactId>
+      <version>5.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.networknt</groupId>
+      <artifactId>json-schema-validator</artifactId>
+      <version>3.0.7</version>
+    </dependency>
 
     <!-- test -->
     <dependency>

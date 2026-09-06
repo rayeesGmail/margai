@@ -1993,6 +1993,12 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    ships pgvector 0.8.1 (AWS release notes; the in-instance check is the `pg_available_extensions`
    query in `docs/runbooks/f8-infrastructure.md`). Fallback not needed; DECISIONS.md D4 row.
 4. Cohere Embed Multilingual v3 access; otherwise Titan Text Embeddings v2 at 1,024 dimensions.
+   **Listed 2026-09-06** (`list-foundation-models --by-output-modality EMBEDDING`, ap-south-1):
+   `cohere.embed-multilingual-v3` is ON_DEMAND in the region itself — the first choice, 1,024
+   dimensions, and unlike the Claude tiers it needs no `global.` profile, so embedding traffic
+   stays in Mumbai; `amazon.titan-embed-text-v2:0` is ON_DEMAND as the fallback;
+   `cohere.embed-v4:0` exists only through `global.cohere.embed-v4:0`. Open: one `invoke-model`
+   probe proving access and a 1,024-length vector, and the per-1M-token price for the ledger.
 
 ### 13.3 Single-instance assumptions and their upgrade path
 

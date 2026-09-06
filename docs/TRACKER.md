@@ -12,13 +12,13 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 0 — Foundations (Week 1) |
-| Current day | D3 done · 2026-09-04 (TECH_PLAN v1.0 approved with 8 founder decisions, TECH_PLAN §0.5) · next: D4 |
-| Days completed / total | 3 / 84 |
+| Current day | D4 done · 2026-09-06 (core schema V1–V4 + seed taxonomy, Modulith + reversibility tests) · next: D5 |
+| Days completed / total | 4 / 84 |
 | Schedule delta | on track |
 | Last week's gate | n/a — Week-1 gate is due at D6 |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none. Before D5: founder console checks (TECH_PLAN §13.2). Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none. Before D5: founder console checks #1, #2, #4 (Bedrock models/IDs, batch minimum, embeddings access — TECH_PLAN §13.2; #3 closed). Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
@@ -27,7 +27,7 @@
 - [x] **D1** Claude Code scaffolding (CLAUDE.md, settings, 3 gate scripts, rules, agents, commands) · ✅ gates block bad commit + secret write — done 2026-09-02, all five acceptance tests passed (see day log)
 - [x] **D2** Local env: Docker Postgres 18+pgvector, Spring Boot 4 boots, Flutter shell on device, CI green · ✅ fresh clone → running <15 min — done 2026-09-03, acceptance PASS (35 s warm, ≈14.5 min cold), PR CI green (founder-verified), merged (see day log)
 - [x] **D3** Claude Code full technical plan reviewed & approved · ✅ plan committed to docs/ — done 2026-09-04, docs/TECH_PLAN.md v1.0 APPROVED with 8 founder decisions (§0.5), three spec-auditor passes (see day log)
-- [ ] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations
+- [x] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations — done 2026-09-06, acceptance PASS (compose-db schema dump matches TECH_PLAN §2.2–§2.4 column by column; `MigrationReversibilityTest` green), branch d4-core-schema (see day log)
 - [ ] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake
 - [ ] **D6** Buffer / overflow
 - [ ] **🚩 WEEK-1 GATE:** repo, env, plan, schema, AI seam in place
@@ -173,6 +173,75 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+D4 · 2026-09-06 · PHASE 0 — Foundations
+Shipped (branch d4-core-schema, 8 commits): V1 extensions (vector, pg_trgm), V2 identity (users,
+  student_profiles), V3 curriculum_core (syllabus_nodes, syllabus_prerequisites, archetype_tracks,
+  archetype_track_steps, cutoffs), V4 chapter_status — column-complete per TECH_PLAN §2.2–§2.4,
+  VARCHAR + CHECK enumerations, ON DELETE RESTRICT, named constraints/indexes, a -- ROLLBACK: …
+  -- END ROLLBACK block in every header. Drafted by the db-migrator agent in one call and reviewed
+  column by column; no rewrite was needed. db/seed/R__test_taxonomy.sql (2 subjects, 2 units,
+  6 chapters, 2 topics, 4 prerequisite edges, one dropper track with 7 steps, 3 synthetic cutoffs;
+  fixed UUIDs, idempotent upserts) behind the local and test profiles; ./mvnw spring-boot:run
+  activates local via the Maven plugin. Eight JPA entities + Spring Data repositories in the
+  account/curriculum/practice internal packages, shared value enums (AttemptType, Category) in
+  common.api; lowercase enum constants = DB/wire codes. Spring Modulith 2.1.1 with per-module
+  allowedDependencies (§1.4) + ModularityTest; TestcontainersConfiguration (one container per JVM,
+  one database per active-profile set); MigrationReversibilityTest (§8.2; also rejects PostgreSQL
+  enum types, D3.5); SeedTaxonomyTest (graph acyclic); three @DataJpaTest constraint slices; the
+  boot test now proves ddl-auto: validate for every entity and seed absence without a profile.
+  30 tests in 7 classes; a full ./mvnw verify takes ≈7 s warm on this Mac (one shared container).
+  Rule edits per §0.2 (server.md, db-migrator.md incl. the enum-line fix),
+  9 DECISIONS rows, server README + db/migration README rewritten.
+Acceptance: PASS —
+  (a) "schema matches approved plan": validate green for all eight entities in every Spring test;
+      compose db after spring-boot:run (local): flyway_schema_history V1–V4 + R test taxonomy,
+      8 tables, extensions vector + pg_trgm; information_schema/pg_constraint/pg_indexes dump
+      compared line by line with §2.2–§2.4 — every column, type, default, CHECK list, partial
+      unique, foreign key and index present. Additions beyond the plan text, all harmless:
+      syllabus_nodes class_level CHECK (11|12), cutoffs_category_check,
+      syllabus_prerequisites_to_node_id_idx.
+  (b) "migrations reversible": MigrationReversibilityTest — empty database → V1–V4 → rollback
+      blocks newest first → only flyway_schema_history remains, only plpgsql among extensions,
+      no sequences/views. Green.
+  spec-auditor on the branch diff: PASS, 3 minor findings, all fixed before the close —
+  (1) the seed upserted ON CONFLICT (code) while rows carry fixed ids, so editing a code would
+  have broken re-application → upserts now key on the id, seed's unexecuted rollback block
+  removed, DECISIONS row and db-migrator.md reworded — proven on the compose db, which already
+  held the old seed: the changed checksum re-ran the repeatable migration through the id-keyed
+  upserts (second "test taxonomy" history row, still 12 nodes / 7 steps); (2) MigrationReversibilityTest split undo
+  SQL on ';' although the convention says one statement per line → header blocks run line by
+  line, U-files are handed to the driver whole; (3) five constraints had no slice test
+  (class_level CHECK, prerequisite and step foreign keys, unique track code, chapter_status node
+  FK) → seven tests added, one violation each (a second violation in the same test only sees
+  "current transaction is aborted"); 30 tests in 7 classes.
+Founder decisions: the plan was approved as written; its four closing questions were answered
+  with the recommended option each — scope incl. chapter_status, lowercase enum codes,
+  db-migrator drafts the DDL, all four rule-edit lines.
+Doc conflicts surfaced in the plan (none blocked): db-migrator.md still allowed PostgreSQL enum
+  types vs D3.5 (fixed today); DEV_SPEC §3 vs TECH_PLAN §2 column differences (TECH_PLAN wins by
+  §0.3, no action); PLAN D4 one-liner vs TECH_PLAN §2.9 adding chapter_status (in scope).
+Deviation from the approved plan, recorded: the `common` module exists from D4, not D5 —
+  AttemptType and Category are stored by both account and curriculum, which §1.4 forbids from
+  depending on each other; DECISIONS row. ArchUnit still waits for D5 (DECISIONS row).
+Parked: none new.
+Surprise: (1) Spring Boot stops a @ServiceConnection container bean whenever a context closes —
+  including one that failed to start — so the shared-container pattern must keep the container
+  outside Spring's lifecycle (DynamicPropertyRegistrar). (2) Contexts with different Flyway
+  locations cannot share one database: the test profile's applied R__ migration fails validation
+  in a no-profile context → one database per active-profile set inside the container.
+  (3) PathMatchingResourcePatternResolver throws on a `classpath:` root that does not exist yet
+  (db/rollback/); `classpath*:` tolerates it. (4) Hibernate 7.4 validated every mapping first time:
+  Instant ↔ TIMESTAMPTZ, CHAR(2) via @JdbcTypeCode(CHAR), JSONB as String, TIME ↔ LocalTime,
+  a record as @EmbeddedId. (5) Modulith 2.x has getIdentifier(), not getName(), on ApplicationModule.
+Tomorrow's first task: founder pushes d4-core-schema, opens PR #3, merges after CI (first CI run
+  that downloads Spring Modulith). Then D5 from TECH_PLAN §4.1 (AiClient v2 + FakeAiClient +
+  decorator chain), §4.8 ledger and breaker, §2.8 ai_calls as V5 (append-only: no updated_at),
+  §1.2 bedrock profile, the D5 rule edit (§0.2: ai-layer.md RouteDecision wording), ArchUnit's
+  first rule (only ai imports the Bedrock SDK), and the one live smoke call — which needs console
+  checks #1, #2, #4 closed by the founder first.
+```
 
 ```
 D3 · 2026-09-03/04 · PHASE 0 — Foundations

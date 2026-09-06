@@ -27,8 +27,9 @@ public final class AiUnavailableException extends RuntimeException {
         return new AiUnavailableException(code, message, cause, false, false);
     }
 
+    /** A 20 s real-time call that did not return; not retried (§4.11 retries throttling and 5xx only). */
     public static AiUnavailableException timeout(String message, Throwable cause) {
-        return new AiUnavailableException("timeout", message, cause, true, true);
+        return new AiUnavailableException("timeout", message, cause, false, true);
     }
 
     public String code() {

@@ -1,0 +1,5 @@
+# test profile (TECH_PLAN §1.2, §2.9): adds the db/seed test taxonomy for tests that opt in with
+# @ActiveProfiles("test"). Tests without the profile see the production locations only.
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/seed

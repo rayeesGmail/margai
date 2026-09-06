@@ -1,0 +1,6 @@
+# local profile (TECH_PLAN §1.2 "developer default"): the compose db plus the db/seed test
+# taxonomy (§2.9). Switched on by `./mvnw spring-boot:run` through the plugin configuration in
+# pom.xml — never by the packaged jar, so no deployed environment inherits the seed location.
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/seed

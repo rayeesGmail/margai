@@ -6,6 +6,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -98,6 +99,12 @@ public final class PromptRegistry {
             throw new IllegalArgumentException("unknown prompt: " + name + " (known: " + names() + ")");
         }
         return version;
+    }
+
+    /** The active version, or empty for a prompt this registry does not know (the ledger never throws). */
+    public OptionalInt versionIfKnown(String name) {
+        Integer version = active.get(name);
+        return version == null ? OptionalInt.empty() : OptionalInt.of(version);
     }
 
     /** Proves at construction time that a task's prompt exists. */

@@ -1997,8 +1997,13 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    `cohere.embed-multilingual-v3` is ON_DEMAND in the region itself — the first choice, 1,024
    dimensions, and unlike the Claude tiers it needs no `global.` profile, so embedding traffic
    stays in Mumbai; `amazon.titan-embed-text-v2:0` is ON_DEMAND as the fallback;
-   `cohere.embed-v4:0` exists only through `global.cohere.embed-v4:0`. Open: one `invoke-model`
-   probe proving access and a 1,024-length vector, and the per-1M-token price for the ledger.
+   `cohere.embed-v4:0` exists only through `global.cohere.embed-v4:0`.
+   **Access confirmed 2026-09-06:** `invoke-model` on `cohere.embed-multilingual-v3` from
+   ap-south-1 with one English and one Hindi text (`input_type: search_document`) returned
+   `embeddings_floats`, 2 vectors × 1,024 dimensions — the `vector(1024)` columns of §2.3 hold
+   as designed. EMBED = `cohere.embed-multilingual-v3` (`margai.ai.embed.model`), Titan v2 the
+   fallback by config. Open: the per-1M-token price for the ledger. **Item 4 closed** but for
+   the price.
 
 ### 13.3 Single-instance assumptions and their upgrade path
 

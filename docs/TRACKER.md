@@ -27,7 +27,7 @@
 - [x] **D1** Claude Code scaffolding (CLAUDE.md, settings, 3 gate scripts, rules, agents, commands) · ✅ gates block bad commit + secret write — done 2026-09-02, all five acceptance tests passed (see day log)
 - [x] **D2** Local env: Docker Postgres 18+pgvector, Spring Boot 4 boots, Flutter shell on device, CI green · ✅ fresh clone → running <15 min — done 2026-09-03, acceptance PASS (35 s warm, ≈14.5 min cold), PR CI green (founder-verified), merged (see day log)
 - [x] **D3** Claude Code full technical plan reviewed & approved · ✅ plan committed to docs/ — done 2026-09-04, docs/TECH_PLAN.md v1.0 APPROVED with 8 founder decisions (§0.5), three spec-auditor passes (see day log)
-- [x] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations — done 2026-09-06, acceptance PASS (compose-db schema dump matches TECH_PLAN §2.2–§2.4 column by column; `MigrationReversibilityTest` green), branch d4-core-schema (see day log)
+- [x] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations — done 2026-09-06, acceptance PASS (compose-db schema dump matches TECH_PLAN §2.2–§2.4 column by column; `MigrationReversibilityTest` green), PR #3 merged by the founder 2026-09-06 (merge commit 3f77d6f) (see day log)
 - [ ] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake
 - [ ] **D6** Buffer / overflow
 - [ ] **🚩 WEEK-1 GATE:** repo, env, plan, schema, AI seam in place
@@ -235,8 +235,10 @@ Surprise: (1) Spring Boot stops a @ServiceConnection container bean whenever a c
   (db/rollback/); `classpath*:` tolerates it. (4) Hibernate 7.4 validated every mapping first time:
   Instant ↔ TIMESTAMPTZ, CHAR(2) via @JdbcTypeCode(CHAR), JSONB as String, TIME ↔ LocalTime,
   a record as @EmbeddedId. (5) Modulith 2.x has getIdentifier(), not getName(), on ApplicationModule.
-Tomorrow's first task: founder pushes d4-core-schema, opens PR #3, merges after CI (first CI run
-  that downloads Spring Modulith). Then D5 from TECH_PLAN §4.1 (AiClient v2 + FakeAiClient +
+PR #3 from d4-core-schema merged to main by the founder 2026-09-06 (merge commit 3f77d6f) — the
+  first CI run that downloads Spring Modulith and runs the Testcontainers suite on a GitHub
+  runner; CI result is the founder's to confirm (no gh on this machine).
+Tomorrow's first task: D5 from TECH_PLAN §4.1 (AiClient v2 + FakeAiClient +
   decorator chain), §4.8 ledger and breaker, §2.8 ai_calls as V5 (append-only: no updated_at),
   §1.2 bedrock profile, the D5 rule edit (§0.2: ai-layer.md RouteDecision wording), ArchUnit's
   first rule (only ai imports the Bedrock SDK), and the one live smoke call — which needs console

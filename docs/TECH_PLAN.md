@@ -1946,6 +1946,14 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    (`global.anthropic.claude-sonnet-4-6`, `global.anthropic.claude-opus-4-8`); whichever of the
    strongest invocable models fits the ₹ budget becomes the REASON default, the gated ones stay
    an allowlist request (F8 note) rather than a build dependency.
+   **Resolved 2026-09-06:** probes from ap-south-1 — `global.anthropic.claude-opus-5` and
+   `global.anthropic.claude-opus-4-8` are gated for this account (same AccessDenied wording as
+   Sonnet 5); `global.anthropic.claude-sonnet-4-6` answers (14 in / 4 out). Tier defaults
+   therefore: CHEAP = VISION = `global.anthropic.claude-haiku-4-5-20251001-v1:0`,
+   REASON = `global.anthropic.claude-sonnet-4-6`, EMBED per item 4 — all `margai.ai.*` config at
+   D5, nothing in code. The gated Claude 5 family and Opus 4.x line become an AWS Sales allowlist
+   request under F8 (upgrade path by config, evaluated by the D23 eval). Prices for the ledger
+   (§4.8) remain the one open sub-item; the D5 smoke call proves caching and forced tool use.
 2. Bedrock batch inference minimum record count and whether the chosen models support it.
 3. RDS for PostgreSQL 18 availability in ap-south-1 and its pgvector version (HNSW needs ≥ 0.5).
    If PostgreSQL 18 is not offered, the founder decided (§0.5 item 7) to drop to 17 as a versions

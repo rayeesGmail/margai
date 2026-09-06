@@ -18,7 +18,7 @@
 | Last week's gate | n/a — Week-1 gate is due at D6 |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none. Before D5: founder console checks #1 (models listed and Haiku 4.5 access confirmed 2026-09-06; Sonnet 5 gated for this account — REASON probe of Opus 5 / Sonnet 4.6 / Opus 4.8, tier defaults and prices pending), #2 (batch minimum), #4 (embeddings: `global.cohere.embed-v4:0` seen, v3/Titan on-demand listing pending) — TECH_PLAN §13.2; #3 closed. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none. Before D5: founder console checks #1 resolved 2026-09-06 except prices (CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request), #2 (batch minimum), #4 (embeddings: `global.cohere.embed-v4:0` seen, v3/Titan on-demand listing pending) — TECH_PLAN §13.2; #3 closed. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
@@ -153,7 +153,7 @@
 | F6 | Trademark search (Class 41 + 9) for final name | anytime | ☐ | before public launch |
 | F7 | Domain + social handles for final name | anytime | ☐ | MARGAI = working name |
 | F9 | DPDP legal review of the minors' consent flow (TECH_PLAN §0.5 item 8, §9.6): consent OTP at the DOB step, gated photo doubts and uploads until consent | before D27 ideally; before beta at the latest | ☐ | not a build blocker; may tighten the gating |
-| F8 | AWS beta stack (Terraform) per TECH_PLAN §7.6 — accepted at D3 (decision 5). Claude drafts Terraform in a separate infra session profile (plan allowed, apply denied), created when the first milestone is due; founder runs every apply | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ accepted 2026-09-04 | PLAN has no infra day (TECH_PLAN §0.4 #1); console checks §13.2 before D5 |
+| F8 | AWS beta stack (Terraform) per TECH_PLAN §7.6 — accepted at D3 (decision 5). Claude drafts Terraform in a separate infra session profile (plan allowed, apply denied), created when the first milestone is due; founder runs every apply | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ accepted 2026-09-04 | PLAN has no infra day (TECH_PLAN §0.4 #1); console checks §13.2 before D5. Bedrock access confirmed 2026-09-06 for Haiku 4.5 + Sonnet 4.6; optional AWS Sales allowlist request for the Claude 5 family / Opus 4.x (REASON upgrade path, not a blocker) |
 
 ---
 

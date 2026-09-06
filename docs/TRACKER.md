@@ -18,7 +18,7 @@
 | Last week's gate | n/a — Week-1 gate is due at D6 |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none. Before D5: founder console checks #1 (models listed 2026-09-06, tier defaults + access + prices pending), #2 (batch minimum), #4 (embeddings: `global.cohere.embed-v4:0` seen, v3/Titan on-demand listing pending) — TECH_PLAN §13.2; #3 closed. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none. Before D5: founder console checks #1 (models listed and Haiku 4.5 access confirmed 2026-09-06; tier defaults, REASON-profile access, prices pending), #2 (batch minimum), #4 (embeddings: `global.cohere.embed-v4:0` seen, v3/Titan on-demand listing pending) — TECH_PLAN §13.2; #3 closed. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 

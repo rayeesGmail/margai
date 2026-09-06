@@ -1934,6 +1934,10 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    the chosen profiles (the D5 smoke call proves both: a `cachePoint` prefix and a forced tool,
    with `cacheReadInputTokens` in the usage block on the second call), and the per-token prices
    for the ledger (§4.8) from the Bedrock pricing page.
+   **Access confirmed 2026-09-06:** a Converse call on `global.anthropic.claude-haiku-4-5-20251001-v1:0`
+   from ap-south-1 returned `ok` (14 input / 4 output tokens) and its usage block carries
+   `cacheReadInputTokens` (0 on this uncached call), so the ledger's cache accounting has a
+   source on this model. Open: the same call on the REASON profile, the tier defaults, prices.
 2. Bedrock batch inference minimum record count and whether the chosen models support it.
 3. RDS for PostgreSQL 18 availability in ap-south-1 and its pgvector version (HNSW needs ≥ 0.5).
    If PostgreSQL 18 is not offered, the founder decided (§0.5 item 7) to drop to 17 as a versions

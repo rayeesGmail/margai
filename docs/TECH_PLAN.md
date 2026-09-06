@@ -1921,6 +1921,19 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 
 1. Exact model IDs and inference profiles available for CHEAP, REASON, VISION and EMBED from
    ap-south-1, with prompt caching and forced tool use supported.
+   **Listed 2026-09-06** (founder, `list-foundation-models` and `list-inference-profiles` in
+   ap-south-1): every current Anthropic model is `INFERENCE_PROFILE`-only, and the current
+   generation is reachable only through `global.` profiles — the `apac.` profiles stop at Claude
+   Sonnet 4 / 3.7. Active `global.` profiles: `claude-haiku-4-5-20251001-v1:0`, `claude-sonnet-5`,
+   `claude-opus-5`, `claude-fable-5`, `claude-fable-5-1` and the 4.x line (all TEXT + IMAGE);
+   `global.cohere.embed-v4:0` is the only embedding profile (item 4). Proposed config defaults,
+   founder to confirm: CHEAP = VISION = the Haiku 4.5 profile, REASON = the Sonnet 5 profile
+   (Opus 5 or Fable 5.1 by config if the D20 audit or the D23 eval asks for more); `global.`
+   routing is what §4.11 assumed and the privacy copy discloses. Still open inside this item:
+   Anthropic model access granted in this account, prompt caching and forced `toolChoice` on
+   the chosen profiles (the D5 smoke call proves both: a `cachePoint` prefix and a forced tool,
+   with `cacheReadInputTokens` in the usage block on the second call), and the per-token prices
+   for the ledger (§4.8) from the Bedrock pricing page.
 2. Bedrock batch inference minimum record count and whether the chosen models support it.
 3. RDS for PostgreSQL 18 availability in ap-south-1 and its pgvector version (HNSW needs ≥ 0.5).
    If PostgreSQL 18 is not offered, the founder decided (§0.5 item 7) to drop to 17 as a versions

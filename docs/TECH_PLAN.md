@@ -1974,8 +1974,15 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 2. Bedrock batch inference minimum record count and whether the chosen models support it.
    **Partial 2026-09-06:** the Mumbai pricing page lists batch prices for both chosen models
    (Haiku 4.5 0.50 / 2.50, Sonnet 4.6 1.50 / 7.50 — half of on-demand), so both support batch
-   through their global profiles; Sonnet 5 and Fable 5.1 show no batch price. Open: the minimum
-   records per job (the plan assumes 100) from the batch-inference documentation.
+   through their global profiles; Sonnet 5 and Fable 5.1 show no batch price.
+   **Resolved 2026-09-06** (AWS General Reference, Bedrock quotas; Bedrock user guide, "Supported
+   Regions and models for batch inference"): "Minimum number of records per batch inference job"
+   is **100** for Claude Haiku 4.5 and for Claude Sonnet 4.6, each supported Region, not
+   adjustable — the plan's `margai.ai.batch_min_records` default stands; "Records per batch
+   inference job" (maximum) is 100,000 for both, adjustable. Batch support for both models is
+   via cross-region inference profiles and the list includes ap-south-1 (Haiku 4.5 has no
+   single-region batch support anywhere; Sonnet 4.6 only in eu-west-2), so `completeBatch`
+   submits with the same `global.` profile IDs as real-time calls. **Item 2 closed.**
 3. RDS for PostgreSQL 18 availability in ap-south-1 and its pgvector version (HNSW needs ≥ 0.5).
    If PostgreSQL 18 is not offered, the founder decided (§0.5 item 7) to drop to 17 as a versions
    change. Every place that touches: SPEC §3 (fixes "PostgreSQL 18" — a founder amendment to the

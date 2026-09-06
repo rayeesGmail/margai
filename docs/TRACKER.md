@@ -18,7 +18,7 @@
 | Last week's gate | n/a — Week-1 gate is due at D6 |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none. Before D5: founder console checks #1 closed 2026-09-06 (CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles, prices recorded; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request), #2 partial (both models have batch prices; minimum records per job pending), #4 closed 2026-09-06 (`cohere.embed-multilingual-v3` on-demand in ap-south-1, access proven, 1,024 dims EN + HI, $0.10/1M) — TECH_PLAN §13.2; #3 closed. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none. All four TECH_PLAN §13.2 console checks closed (#3 on 2026-09-04; #1, #2, #4 on 2026-09-06): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles with prices recorded; batch minimum 100 records, both models batch-capable from ap-south-1; EMBED `cohere.embed-multilingual-v3` on-demand in-region, 1,024 dims; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. D5 may run its live smoke call. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 

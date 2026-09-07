@@ -114,6 +114,14 @@
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>bedrockruntime</artifactId>
     </dependency>
+    <!-- Lets the default credential chain use an `aws login` session (a login_session in the
+         profile), which is how the founder authenticates locally; loaded reflectively by the
+         profile credentials provider, hence runtime scope. In AWS the task role needs nothing. -->
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>signin</artifactId>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- test -->
     <dependency>

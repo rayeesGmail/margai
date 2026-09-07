@@ -18,7 +18,7 @@
 | Last week's gate | n/a — Week-1 gate is due at D6 |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | D5's ✅ second half needs the founder: `cd server && BEDROCK_LIVE=1 AWS_PROFILE=<sso> ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false`, paste the printed rows. All four TECH_PLAN §13.2 console checks closed (#3 on 2026-09-04; #1, #2, #4 on 2026-09-06): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles with prices recorded; batch minimum 100 records, both models batch-capable from ap-south-1; EMBED `cohere.embed-multilingual-v3` on-demand in-region, 1,024 dims; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. D5 may run its live smoke call. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | **D5's ✅ second half is blocked on the AWS account** (2026-09-07): the live smoke now reaches Bedrock (the `aws login` session works once the SDK `signin` module is present, be867be) but Bedrock refuses with 403 `AccessDeniedException: INVALID_PAYMENT_INSTRUMENT` — the AWS Marketplace subscription for the Anthropic model needs a valid payment method on the account (Billing → Payment preferences). Yesterday's CLI probes on the same model succeeded, so also confirm `aws sts get-caller-identity` is the same account as those probes. Retry ≥ 2 minutes after fixing: `cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false`, paste the printed rows. All four TECH_PLAN §13.2 console checks closed (#3 on 2026-09-04; #1, #2, #4 on 2026-09-06): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles with prices recorded; batch minimum 100 records, both models batch-capable from ap-south-1; EMBED `cohere.embed-multilingual-v3` on-demand in-region, 1,024 dims; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. D5 may run its live smoke call. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
@@ -215,6 +215,15 @@ Acceptance: PARTIAL —
       -Dsurefire.failIfNoSpecifiedTests=false — two cheap-tier calls asserting the forced-tool echo,
       real input/output tokens and cost, a cache write (or read) on the first row and a cache read on
       the second (TECH_PLAN §13.2 item 1's open point). The rows are printed; paste them here.
+      Founder runs on 2026-09-07: run 1 (16:36 IST) failed before AWS — the `aws login` session
+      (login_session in the default profile) needs the SDK signin module; added at runtime scope
+      (be867be). Run 2 (16:38 IST) reached Bedrock and was refused: 403 AccessDeniedException
+      "INVALID_PAYMENT_INSTRUMENT: A valid payment instrument must be provided … AWS Marketplace
+      subscription for this model cannot be completed" — an account matter (payment method), not
+      code; yesterday's CLI probes on the same model succeeded, so the account identity of the
+      `aws login` session is the other thing to confirm. Both runs proved the failure path: the
+      chain classified them permanent, no retries, ledger rows status=error with codes
+      SdkClientException and AccessDeniedException (§4.13 "every outcome").
   spec-auditor on the branch diff: PASS, 10 minor findings. Fixed in 2b5d3d9: model-facing text
   moved to prompts/_protocol.v1.stg; embed tokens header → body → estimate, never zero; Optional
   record components optional/nullable in the schema (the D37 router verdict would otherwise have

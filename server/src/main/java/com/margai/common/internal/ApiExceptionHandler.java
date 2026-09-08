@@ -54,10 +54,10 @@ class ApiExceptionHandler {
     ResponseEntity<ErrorEnvelope> invalidBody(MethodArgumentNotValidException failure, HttpServletRequest request) {
         Map<String, Object> fields = new LinkedHashMap<>();
         for (FieldError error : failure.getBindingResult().getFieldErrors()) {
-            fields.putIfAbsent(wireName(error.getField()), error.getDefaultMessage());
+            fields.putIfAbsent(wireName(error.getField()), reasonCode(error.getCode(), error.getDefaultMessage()));
         }
-        failure.getBindingResult().getGlobalErrors()
-                .forEach(error -> fields.putIfAbsent(wireName(error.getObjectName()), error.getDefaultMessage()));
+        failure.getBindingResult().getGlobalErrors().forEach(error -> fields.putIfAbsent(
+                wireName(error.getObjectName()), reasonCode(error.getCode(), error.getDefaultMessage())));
         return validationFailed(fields, request);
     }
 
@@ -66,8 +66,27 @@ class ApiExceptionHandler {
         Map<String, Object> fields = new LinkedHashMap<>();
         failure.getParameterValidationResults().forEach(result -> result.getResolvableErrors()
                 .forEach(error -> fields.putIfAbsent(wireName(result.getMethodParameter().getParameterName()),
-                        error.getDefaultMessage())));
+                        reasonCode(bareConstraint(error.getCodes()), error.getDefaultMessage()))));
         return validationFailed(fields, request);
+    }
+
+    /** Spring lists codes most-specific first ({@code NotBlank.body.name} … {@code NotBlank}); the bare constraint is last. */
+    private static String bareConstraint(String[] codes) {
+        return codes == null || codes.length == 0 ? null : codes[codes.length - 1];
+    }
+
+    /**
+     * {@code details} values are reason codes, never prose (SPEC §3 "all copy is externalized"): a
+     * constraint's own {@code message} when it was set to a code ({@code code.digits}), else the
+     * constraint name in snake_case ({@code NotBlank → not_blank}); the framework's interpolated
+     * English ("must not be blank") never reaches the wire.
+     */
+    static String reasonCode(String constraint, String interpolatedMessage) {
+        if (interpolatedMessage != null && !interpolatedMessage.isBlank() && interpolatedMessage.indexOf(' ') < 0
+                && !interpolatedMessage.startsWith("{")) {
+            return interpolatedMessage;
+        }
+        return constraint == null ? "invalid" : wireName(constraint);
     }
 
     /** Validation names Java fields; the client knows the snake_case wire names (§11.3): {@code challengeId → challenge_id}. */
@@ -92,13 +111,13 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<ErrorEnvelope> unreadableBody(HttpMessageNotReadableException failure, HttpServletRequest request) {
-        return validationFailed(Map.of("body", "malformed or missing JSON"), request);
+        return validationFailed(Map.of("body", "malformed"), request);
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     ResponseEntity<ErrorEnvelope> unsupportedMediaType(HttpMediaTypeNotSupportedException failure,
             HttpServletRequest request) {
-        return validationFailed(Map.of("content_type", "send application/json"), request);
+        return validationFailed(Map.of("content_type", "unsupported"), request);
     }
 
     @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class,

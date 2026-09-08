@@ -35,6 +35,8 @@ public class OtpService {
     static final String VERIFIED_METRIC = "otp.verified";
     static final String FAILED_METRIC = "otp.failed";
     static final String SEND_FAILED_METRIC = "otp.send_failed";
+    /** Reason code on the identifier field when its channel is not enabled (TECH_PLAN §3.3 details). */
+    static final String CHANNEL_UNAVAILABLE = "channel.unavailable";
 
     private static final Logger log = LoggerFactory.getLogger(OtpService.class);
     private static final Duration CAP_WINDOW = Duration.ofHours(1);
@@ -66,8 +68,7 @@ public class OtpService {
     public OtpRequested request(LoginIdentifier identifier, InetAddress clientAddress, Language language) {
         OtpChannel channel = Identifiers.channelOf(identifier);
         if (!policy.allows(channel)) {
-            throw ValidationException.of(channel == OtpChannel.sms ? "phone" : "email",
-                    (channel == OtpChannel.sms ? "phone" : "email") + " login is not available yet");
+            throw ValidationException.of(channel == OtpChannel.sms ? "phone" : "email", CHANNEL_UNAVAILABLE);
         }
         Instant now = clock.now();
         String destination = identifier.value();
@@ -94,7 +95,8 @@ public class OtpService {
     @Transactional(noRollbackFor = ApiException.class)
     public OtpVerified verify(UUID challengeId, String code, String deviceLabel) {
         Instant now = clock.now();
-        OtpChallenge challenge = challenges.findById(challengeId).orElseThrow(OtpException::expired);
+        // Row lock: parallel guesses at one challenge serialise, so attempts can never pass the cap.
+        OtpChallenge challenge = challenges.lockById(challengeId).orElseThrow(OtpException::expired);
         if (challenge.getPurpose() != OtpPurpose.login || challenge.isVerified() || challenge.isExpired(now)
                 || challenge.isExhausted(policy.maxAttempts())) {
             throw OtpException.expired();

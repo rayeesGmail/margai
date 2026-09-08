@@ -24,6 +24,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 class SecurityConfiguration {
 
+    /**
+     * §1.5 step 3's four public routes plus {@code /error}: Boot forwards there when an exception
+     * escapes a filter, and the authorization filter also runs on that ERROR dispatch, so without
+     * the entry the student would see a bare 401 instead of the envelope (DECISIONS 2026-09-08, D7).
+     */
     static final String[] PUBLIC_ROUTES = {
             "/api/v1/auth/otp/**",
             "/api/v1/auth/refresh",

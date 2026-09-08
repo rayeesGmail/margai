@@ -87,11 +87,15 @@ public final class Identifiers {
         return mask(channelOf(identifier), identifier.value());
     }
 
+    /** Reason codes the app maps to its ARB copy (TECH_PLAN §3.3): no student-facing prose here. */
+    static final String PHONE_INVALID = "phone.invalid";
+    static final String EMAIL_INVALID = "email.invalid";
+
     private static ValidationException invalidPhone() {
-        return ValidationException.of("phone", "enter a 10-digit Indian mobile number");
+        return ValidationException.of("phone", PHONE_INVALID);
     }
 
     private static ValidationException invalidEmail() {
-        return ValidationException.of("email", "enter a valid email address");
+        return ValidationException.of("email", EMAIL_INVALID);
     }
 }

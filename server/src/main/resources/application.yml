@@ -88,6 +88,7 @@ margai:
   limits:
     otp-request-per-destination-hourly: 3
     otp-request-per-ip-hourly: 10
+    public-auth-per-ip-per-minute: 60   # verify + refresh per client address (§1.5 step 4)
     authenticated-per-minute: 60
 
 management:

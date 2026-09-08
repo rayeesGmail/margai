@@ -38,7 +38,7 @@ class RateLimitFilterTest {
 
     private final MutableClock clock = new MutableClock(Instant.parse("2026-09-08T10:00:00Z"));
     private final ErrorResponses responses = mock(ErrorResponses.class);
-    private final RateLimitFilter filter = new RateLimitFilter(new RateLimitProperties(3, 10, 60), new IstClock(clock), responses);
+    private final RateLimitFilter filter = new RateLimitFilter(new RateLimitProperties(3, 10, 60, 60), new IstClock(clock), responses);
     private final AtomicInteger reachedController = new AtomicInteger();
 
     @BeforeEach
@@ -79,13 +79,14 @@ class RateLimitFilterTest {
     }
 
     @Test
-    void firstForwardedHopIsTheAddress() throws Exception {
+    void theLastForwardedHopIsTheAddressBecauseTheAlbAppendsIt() throws Exception {
         for (int i = 0; i < 10; i++) {
-            otpRequest("10.0.0.5", "203.0.113.77, 10.0.0.5");
+            otpRequest("10.0.0.5", "1.2.3.4, 203.0.113.77");
         }
 
-        assertThat(otpRequest("10.0.0.6", "203.0.113.77, 10.0.0.6")).as("same first hop, other socket").isFalse();
-        assertThat(otpRequest("10.0.0.5", "203.0.113.78, 10.0.0.5")).as("other first hop, same socket").isTrue();
+        assertThat(otpRequest("10.0.0.6", "9.9.9.9, 203.0.113.77")).as("a client cannot pick its bucket by prefixing hops").isFalse();
+        assertThat(otpRequest("10.0.0.5", "203.0.113.77, 203.0.113.78")).as("another real client behind the ALB").isTrue();
+        assertThat(otpRequest("203.0.113.79", null)).as("no header: the socket address").isTrue();
     }
 
     @Test
@@ -105,14 +106,31 @@ class RateLimitFilterTest {
     }
 
     @Test
-    void anonymousTrafficOnOtherPublicRoutesIsNotBucketed() throws Exception {
+    void verifyAndRefreshGetAPerAddressMinuteBucket() throws Exception {
+        for (int i = 0; i < 60; i++) {
+            assertThat(publicAuth("/api/v1/auth/otp/verify", "203.0.113.1")).as("verify " + (i + 1)).isTrue();
+        }
+        assertThat(publicAuth("/api/v1/auth/refresh", "203.0.113.1")).as("one bucket for both routes").isFalse();
+        assertThat(lastRefusal().code()).isEqualTo(ErrorCode.RATE_LIMITED);
+        assertThat(publicAuth("/api/v1/auth/otp/verify", "203.0.113.2")).as("another address").isTrue();
+
+        clock.advance(Duration.ofMinutes(1));
+        assertThat(publicAuth("/api/v1/auth/refresh", "203.0.113.1")).isTrue();
+    }
+
+    @Test
+    void anonymousTrafficOutsideAuthIsNotBucketed() throws Exception {
         for (int i = 0; i < 100; i++) {
-            MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/v1/auth/otp/verify");
-            request.setRequestURI("/api/v1/auth/otp/verify");
-            request.setRemoteAddr("203.0.113.1");
-            assertThat(run(request)).isTrue();
+            assertThat(publicAuth("/actuator/health", "203.0.113.1")).isTrue();
         }
         verify(responses, never()).write(any(), any(), any());
+    }
+
+    private boolean publicAuth(String path, String address) throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", path);
+        request.setRequestURI(path);
+        request.setRemoteAddr(address);
+        return run(request);
     }
 
     private boolean otpRequestFrom(String address) throws Exception {

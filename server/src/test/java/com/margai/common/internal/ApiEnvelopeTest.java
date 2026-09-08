@@ -95,9 +95,18 @@ class ApiEnvelopeTest {
 
         assertThat(result).hasStatus(400);
         assertThat(result).bodyJson().extractingPath("$.error.code").isEqualTo("VALIDATION_FAILED");
-        assertThat(result).bodyJson().extractingPath("$.error.details.name").asString().isNotBlank();
-        assertThat(result).bodyJson().extractingPath("$.error.details.count").asString().isNotBlank();
+        assertThat(result).bodyJson().extractingPath("$.error.details.name").isEqualTo("not_blank");
+        assertThat(result).bodyJson().extractingPath("$.error.details.count").isEqualTo("min");
         assertThat(result).bodyJson().extractingPath("$.error.message_en").isEqualTo("Some details don't look right. Have a look and try again.");
+    }
+
+    @Test
+    void validationDetailsAreReasonCodesNeverProse() {
+        assertThat(ApiExceptionHandler.reasonCode("NotBlank", "must not be blank")).isEqualTo("not_blank");
+        assertThat(ApiExceptionHandler.reasonCode("Pattern", "code.digits")).isEqualTo("code.digits");
+        assertThat(ApiExceptionHandler.reasonCode("Size", "{jakarta.validation.constraints.Size.message}")).isEqualTo("size");
+        assertThat(ApiExceptionHandler.reasonCode(null, "some prose here")).isEqualTo("invalid");
+        assertThat(ApiExceptionHandler.reasonCode("Min", null)).isEqualTo("min");
     }
 
     @Test
@@ -116,7 +125,7 @@ class ApiEnvelopeTest {
 
         assertThat(result).hasStatus(400);
         assertThat(result).bodyJson().extractingPath("$.error.code").isEqualTo("VALIDATION_FAILED");
-        assertThat(result).bodyJson().extractingPath("$.error.details.phone").isEqualTo("phone login is not available yet");
+        assertThat(result).bodyJson().extractingPath("$.error.details.phone").isEqualTo("channel.unavailable");
     }
 
     @Test
@@ -126,7 +135,7 @@ class ApiEnvelopeTest {
 
         assertThat(result).hasStatus(400);
         assertThat(result).bodyJson().extractingPath("$.error.code").isEqualTo("VALIDATION_FAILED");
-        assertThat(result).bodyJson().extractingPath("$.error.details.body").isEqualTo("malformed or missing JSON");
+        assertThat(result).bodyJson().extractingPath("$.error.details.body").isEqualTo("malformed");
     }
 
     @Test

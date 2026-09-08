@@ -65,12 +65,16 @@ class AuthController {
         return new TokensResponse(pair.accessToken(), pair.refreshToken(), pair.expiresIn());
     }
 
+    /** Reason codes for the app's ARB copy (TECH_PLAN §3.3): exactly one identifier per request. */
+    static final String IDENTIFIER_REQUIRED = "identifier.required";
+    static final String IDENTIFIER_ONE_ONLY = "identifier.one_only";
+
     private static LoginIdentifier identifierOf(OtpRequestBody body) {
         boolean hasPhone = body.phone() != null && !body.phone().isBlank();
         boolean hasEmail = body.email() != null && !body.email().isBlank();
         if (hasPhone == hasEmail) {
-            String message = hasPhone ? "send either phone or email, not both" : "send phone or email";
-            throw ValidationException.of(Map.of("phone", message, "email", message));
+            String reason = hasPhone ? IDENTIFIER_ONE_ONLY : IDENTIFIER_REQUIRED;
+            throw ValidationException.of(Map.of("phone", reason, "email", reason));
         }
         return hasPhone ? Identifiers.phone(body.phone()) : Identifiers.email(body.email());
     }

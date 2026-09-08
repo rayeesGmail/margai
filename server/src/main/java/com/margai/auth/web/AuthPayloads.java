@@ -10,8 +10,9 @@ import java.util.UUID;
 
 /**
  * Request and response records of the auth endpoints (TECH_PLAN §3.7, §11.3: records, snake_case
- * on the wire, nulls omitted). Field-level rules are Bean Validation; "exactly one of phone or
- * email" and the identifier formats are checked by the controller and {@code Identifiers}.
+ * on the wire, nulls omitted). Field-level rules are Bean Validation with reason codes as messages
+ * (the envelope's {@code details} carry codes, never prose); "exactly one of phone or email" and the
+ * identifier formats are checked by the controller and {@code Identifiers}.
  */
 final class AuthPayloads {
 
@@ -25,7 +26,7 @@ final class AuthPayloads {
     /** {@code POST /auth/otp/verify}; {@code invite_code} is accepted now and honoured at D75. */
     record OtpVerifyBody(
             @NotNull UUID challengeId,
-            @NotBlank @Pattern(regexp = "\\s*\\d{4,8}\\s*", message = "enter the digits of the code") String code,
+            @NotBlank @Pattern(regexp = "\\s*\\d{4,8}\\s*", message = "code.digits") String code,
             @Size(max = 16) String inviteCode) {
     }
 

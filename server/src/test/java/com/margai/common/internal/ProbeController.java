@@ -54,7 +54,7 @@ public class ProbeController {
 
     @GetMapping("/service-validation")
     public void serviceValidation() {
-        throw ValidationException.of("phone", "phone login is not available yet");
+        throw ValidationException.of("phone", "channel.unavailable");
     }
 
     @GetMapping("/boom")

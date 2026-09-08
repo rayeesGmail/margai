@@ -74,7 +74,7 @@ class AuthControllerTest {
         when(otp.request(any(), any(), any())).thenReturn(new OtpRequested(CHALLENGE, 30, OtpChannel.email));
 
         MvcTestResult result = mvc.post().uri("/api/v1/auth/otp/request").contentType(MediaType.APPLICATION_JSON)
-                .header("Accept-Language", "hi").header("X-Forwarded-For", "203.0.113.4, 10.0.0.1")
+                .header("Accept-Language", "hi").header("X-Forwarded-For", "198.51.100.9, 203.0.113.4")
                 .content("{\"email\":\" Founder@Example.COM \"}").exchange();
 
         assertThat(result).hasStatusOk();
@@ -108,9 +108,11 @@ class AuthControllerTest {
         for (MvcTestResult result : new MvcTestResult[] {neither, both}) {
             assertThat(result).hasStatus(400);
             assertThat(result).bodyJson().extractingPath("$.error.code").isEqualTo("VALIDATION_FAILED");
-            assertThat(result).bodyJson().extractingPath("$.error.details.phone").asString().isNotBlank();
-            assertThat(result).bodyJson().extractingPath("$.error.details.email").asString().isNotBlank();
         }
+        assertThat(neither).bodyJson().extractingPath("$.error.details.phone").isEqualTo("identifier.required");
+        assertThat(neither).bodyJson().extractingPath("$.error.details.email").isEqualTo("identifier.required");
+        assertThat(both).bodyJson().extractingPath("$.error.details.phone").isEqualTo("identifier.one_only");
+        assertThat(both).bodyJson().extractingPath("$.error.details.email").isEqualTo("identifier.one_only");
     }
 
     @Test
@@ -121,9 +123,9 @@ class AuthControllerTest {
                 .content("{\"email\":\"not-an-email\"}").exchange();
 
         assertThat(phone).hasStatus(400);
-        assertThat(phone).bodyJson().extractingPath("$.error.details.phone").isEqualTo("enter a 10-digit Indian mobile number");
+        assertThat(phone).bodyJson().extractingPath("$.error.details.phone").isEqualTo("phone.invalid");
         assertThat(email).hasStatus(400);
-        assertThat(email).bodyJson().extractingPath("$.error.details.email").isEqualTo("enter a valid email address");
+        assertThat(email).bodyJson().extractingPath("$.error.details.email").isEqualTo("email.invalid");
     }
 
     @Test
@@ -156,9 +158,9 @@ class AuthControllerTest {
                 .content("{\"code\":\"123456\"}").exchange();
 
         assertThat(shortCode).hasStatus(400);
-        assertThat(shortCode).bodyJson().extractingPath("$.error.details.code").isEqualTo("enter the digits of the code");
+        assertThat(shortCode).bodyJson().extractingPath("$.error.details.code").isEqualTo("code.digits");
         assertThat(noChallenge).hasStatus(400);
-        assertThat(noChallenge).bodyJson().extractingPath("$.error.details.challenge_id").asString().isNotBlank();
+        assertThat(noChallenge).bodyJson().extractingPath("$.error.details.challenge_id").isEqualTo("not_null");
     }
 
     @Test
@@ -206,7 +208,7 @@ class AuthControllerTest {
         assertThat(reused).hasStatus(401);
         assertThat(reused).bodyJson().extractingPath("$.error.code").isEqualTo("AUTH_INVALID");
         assertThat(empty).hasStatus(400);
-        assertThat(empty).bodyJson().extractingPath("$.error.details.refresh_token").asString().isNotBlank();
+        assertThat(empty).bodyJson().extractingPath("$.error.details.refresh_token").isEqualTo("not_blank");
     }
 
     @Test

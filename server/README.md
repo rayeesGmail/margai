@@ -29,9 +29,13 @@ Tests share one `pgvector/pgvector:pg18` container per JVM (`TestcontainersConfi
 must be running; the compose db is not used by tests. What runs (TECH_PLAN §8):
 
 - `ModularityTest` — Spring Modulith verifies the §1.3–§1.4 module boundaries.
-- `ArchitectureTest` (ArchUnit) — only `ai.internal.bedrock` imports the AWS SDK, only the `ai`
-  module touches `AiClient`, only the difficulty router produces a routed `RouteDecision`,
-  controllers live in `web` packages. `ModelIdLiteralTest` — no model id literal in `ai` sources.
+- `ArchitectureTest` (ArchUnit) — the AWS SDK only in `ai.internal.bedrock` (Bedrock) and
+  `auth.internal.email` (SES), each service SDK in its own package, only the `ai` module touches
+  `AiClient`, only the difficulty router produces a routed `RouteDecision`, controllers live in `web`
+  packages. `ModelIdLiteralTest` — no model id literal in `ai` sources.
+- `AuthFlowTest`, `SecurityChainTest`, `AuthControllerTest` and the `auth` unit tests — OTP request
+  and verify end to end, the chain's 401 envelopes, token rotation and reuse detection, rate limits,
+  and a log-appender proof that the module never logs a code (see "Auth" below).
 - `MargaiApplicationTests` — boot proof: migrations apply, every JPA entity validates against them
   (`ddl-auto: validate`), health is UP, and the seed is absent without a profile.
 - `*ConstraintsTest` — `@DataJpaTest` slices per module: checks, partial uniques, foreign keys.
@@ -95,6 +99,44 @@ the prompt cache and the second read it. The rows are printed. `BEDROCK_LIVE` is
 afterwards; without it the test is skipped and `./mvnw verify` never touches AWS. To run the API
 itself against Bedrock: `BEDROCK_LIVE=1 ./mvnw spring-boot:run` (prefix `AWS_PROFILE=<profile>` when
 the credentials are not in the default profile).
+
+## Auth (D7): OTP by email, tokens, rate limits
+
+TECH_PLAN §3.2, §3.4, §3.7, §9.1; the D7 founder ruling in DECISIONS.md (2026-09-08). Routes under
+`/api/v1/auth`: `POST /otp/request` with `{email}` — or `{phone}` once `margai.auth.otp.channels`
+includes `sms`, which waits for the DLT template (TRACKER F1) — answers `{challenge_id,
+resend_after_s, channel}`; `POST /otp/verify` with `{challenge_id, code}` answers `{access_token,
+refresh_token, expires_in, is_new_user, user}`; `POST /refresh` with `{refresh_token}` answers the
+rotated pair. Access tokens are 15-minute HS256 JWTs (`sub`, `role`, `lang`, `jti`); refresh tokens
+rotate inside per-device families and presenting a spent one revokes the family. Limits: 3 codes an
+hour per destination, a 30-second resend cooldown, 5 attempts per code, 10 requests an hour per client
+address, 60 requests a minute per signed-in user. Errors are the `{error: {code, message_en,
+message_user_lang, details}}` envelope in the caller's `Accept-Language` (`hi`, `hi-Latn`, else English).
+
+Locally nothing needs configuring: with `margai.auth.otp.sender = log` (the default) the code is
+printed by the logger `margai.otp.sandbox` — that log line is your inbox:
+
+```bash
+SERVER_PORT=8081 ./mvnw spring-boot:run
+curl -s -X POST localhost:8081/api/v1/auth/otp/request -H 'Content-Type: application/json' \
+     -d '{"email":"you@example.com"}'
+# → {"challenge_id":"…","resend_after_s":30,"channel":"email"}; the server log shows
+#   [sandbox email] to y***@example.com — Your MARG AI sign-in code is 123456. …
+curl -s -X POST localhost:8081/api/v1/auth/otp/verify -H 'Content-Type: application/json' \
+     -d '{"challenge_id":"…","code":"123456"}'
+curl -s -X POST localhost:8081/api/v1/auth/refresh -H 'Content-Type: application/json' \
+     -d '{"refresh_token":"…"}'
+```
+
+Secrets: `MARGAI_AUTH_JWT_SECRET` and `MARGAI_AUTH_OTP_PEPPER` (base64, 256-bit; from SSM in AWS,
+TECH_PLAN §7.3). When unset the server makes a random value per boot and says so with a WARN, so
+tokens and pending codes die on a restart. For stable local tokens export them once in your shell
+(for example `export MARGAI_AUTH_JWT_SECRET=$(openssl rand -base64 32)`); nothing reads a `.env` file.
+
+Real email through SES is founder-run, with credentials in the SDK default chain exactly as for
+Bedrock: verify a sender identity in SES ap-south-1 — and, while the account is in the SES sandbox,
+the recipient addresses you test with (TRACKER F10) — then
+`MARGAI_AUTH_OTP_SENDER=ses MARGAI_AUTH_OTP_EMAIL_FROM=you@yourdomain.in SERVER_PORT=8081 ./mvnw spring-boot:run`.
 
 ## Modules and schema
 

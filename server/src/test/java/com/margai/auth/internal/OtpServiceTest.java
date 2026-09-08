@@ -82,7 +82,7 @@ class OtpServiceTest {
         assertThatThrownBy(() -> service.request(PHONE, null, Language.en))
                 .isInstanceOf(ValidationException.class)
                 .satisfies(failure -> assertThat(((ValidationException) failure).details())
-                        .containsEntry("phone", "phone login is not available yet"));
+                        .containsEntry("phone", "channel.unavailable"));
         verify(challenges, never()).save(any());
         verify(sender, never()).send(any());
 
@@ -159,7 +159,7 @@ class OtpServiceTest {
     @Test
     void aWrongCodeCountsAnAttemptAndReportsWhatIsLeft() {
         OtpChallenge challenge = liveChallenge("111111");
-        when(challenges.findById(challenge.getId())).thenReturn(Optional.of(challenge));
+        when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
 
         assertThatThrownBy(() -> service.verify(challenge.getId(), "222222", "dev"))
                 .isInstanceOf(OtpException.class)
@@ -179,7 +179,7 @@ class OtpServiceTest {
         for (int i = 0; i < 4; i++) {
             challenge.recordFailedAttempt();
         }
-        when(challenges.findById(challenge.getId())).thenReturn(Optional.of(challenge));
+        when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
 
         assertThatThrownBy(() -> service.verify(challenge.getId(), "000000", "dev"))
                 .isInstanceOf(OtpException.class)
@@ -196,13 +196,13 @@ class OtpServiceTest {
     @Test
     void unknownUsedAndExpiredChallengesAreExpired() {
         UUID unknown = UUID.randomUUID();
-        when(challenges.findById(unknown)).thenReturn(Optional.empty());
+        when(challenges.lockById(unknown)).thenReturn(Optional.empty());
         OtpChallenge used = liveChallenge("111111");
         used.markVerified(NOW.minusSeconds(60));
-        when(challenges.findById(used.getId())).thenReturn(Optional.of(used));
+        when(challenges.lockById(used.getId())).thenReturn(Optional.of(used));
         OtpChallenge stale = new OtpChallenge(UUID.randomUUID(), OtpChannel.email, EMAIL.address(), OtpPurpose.login,
                 OtpCodes.hash(PEPPER, UUID.randomUUID(), "111111"), NOW.minusSeconds(1), null);
-        when(challenges.findById(stale.getId())).thenReturn(Optional.of(stale));
+        when(challenges.lockById(stale.getId())).thenReturn(Optional.of(stale));
 
         for (UUID id : List.of(unknown, used.getId(), stale.getId())) {
             assertThatThrownBy(() -> service.verify(id, "111111", "dev"))
@@ -215,7 +215,7 @@ class OtpServiceTest {
     @Test
     void theRightCodeSignsInAndOpensATokenFamily() {
         OtpChallenge challenge = liveChallenge("424242");
-        when(challenges.findById(challenge.getId())).thenReturn(Optional.of(challenge));
+        when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
         UserSummary user = new UserSummary(UUID.randomUUID(), null, EMAIL.address(), Language.en, UserRole.student, null);
         when(accounts.signIn(EMAIL)).thenReturn(new SignIn(user, true));
         TokenPair pair = new TokenPair("access", "refresh", 900);
@@ -235,7 +235,7 @@ class OtpServiceTest {
     void aPhoneChallengeSignsInByPhone() {
         OtpChallenge challenge = new OtpChallenge(UUID.randomUUID(), OtpChannel.sms, PHONE.e164(), OtpPurpose.login, "", NOW.plusSeconds(300), null);
         ReflectionTestUtils.setField(challenge, "codeHash", OtpCodes.hash(PEPPER, challenge.getId(), "777777"));
-        when(challenges.findById(challenge.getId())).thenReturn(Optional.of(challenge));
+        when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
         UserSummary user = new UserSummary(UUID.randomUUID(), PHONE.e164(), null, Language.en, UserRole.student, null);
         when(accounts.signIn(PHONE)).thenReturn(new SignIn(user, false));
         when(tokens.issue(eq(user), anyString())).thenReturn(new TokenPair("a", "r", 900));
@@ -251,7 +251,7 @@ class OtpServiceTest {
         verify(sender).send(delivered.capture());
         String code = delivered.getValue().code();
         OtpChallenge challenge = liveChallenge(code);
-        when(challenges.findById(challenge.getId())).thenReturn(Optional.of(challenge));
+        when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
         UserSummary user = new UserSummary(UUID.randomUUID(), null, EMAIL.address(), Language.en, UserRole.student, null);
         when(accounts.signIn(EMAIL)).thenReturn(new SignIn(user, true));
         when(tokens.issue(any(), any())).thenReturn(new TokenPair("a", "r", 900));
@@ -270,7 +270,7 @@ class OtpServiceTest {
                 new AuthProperties.Otp("", Duration.ofMinutes(5), 5, Duration.ofSeconds(30), 6, channels,
                         AuthProperties.Sender.log, "", "ap-south-1"));
         AuthKeys keys = new AuthKeys(new SecretKeySpec(new byte[32], "HmacSHA256"), null, PEPPER);
-        return new OtpService(challenges, sender, accounts, tokens, properties, new RateLimitProperties(3, 10, 60),
+        return new OtpService(challenges, sender, accounts, tokens, properties, new RateLimitProperties(3, 10, 60, 60),
                 keys, new IstClock(Clock.fixed(NOW, ZoneOffset.UTC)), meters);
     }
 

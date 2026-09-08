@@ -180,7 +180,7 @@ class AuthFlowTest {
 
         assertThat(result).hasStatus(400);
         assertThat(result).bodyJson().extractingPath("$.error.code").isEqualTo("VALIDATION_FAILED");
-        assertThat(result).bodyJson().extractingPath("$.error.details.phone").isEqualTo("phone login is not available yet");
+        assertThat(result).bodyJson().extractingPath("$.error.details.phone").isEqualTo("channel.unavailable");
         assertThat(jdbc.queryForObject("SELECT count(*) FROM otp_challenges WHERE channel = 'sms'", Integer.class)).isZero();
     }
 

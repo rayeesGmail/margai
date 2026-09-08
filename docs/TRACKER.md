@@ -274,6 +274,10 @@ Surprise: (1) Boot 4.1 is on Jackson 3 (tools.jackson); victools 5.0.0 and netwo
   that worked on 2026-09-06 stopped working the next day. (8) An exported Bedrock API key silently
   overrides the login session for the CLI too. (9) Sub-paisa calls exist (Nova Lite) and HALF_UP
   hid them from the breaker. (10) The cached prefix is 5,976 tokens, above the ≈ 5,500 estimate.
+  (11) PR #4's first CI run was red: the GitHub runner ordered the test classes differently and
+  AiCallRepositoryTest's global-spend assertion counted rows AiSeamFlowTest had committed into the
+  shared per-JVM test database (3,833 vs 1,250 paise). Global aggregates in slice tests are now
+  asserted as deltas against a baseline; user sums already used fresh users.
 Tomorrow's first task: the founder pushes d5-ai-seam and opens PR #4 (CI's first AWS SDK download;
   no AWS access needed). Then D6: buffer + the Week-1 gate as a demo script ("repo, env, plan,
   schema, AI seam in place"), TECH_PLAN §0.3 dispositions closed and §14 checked against

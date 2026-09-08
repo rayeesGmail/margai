@@ -40,6 +40,12 @@ class AiCallRepositoryTest {
 
     @Test
     void spendSumsOnlyRowsFromTheCurrentIstDay() {
+        IstClock clock = new IstClock(Clock.fixed(TODAY_0001_IST, IstClock.IST));
+        AiCallLedger ledger = new AiCallLedger(calls, clock);
+        // The test database is shared by every context in the JVM and @SpringBootTest classes commit
+        // ledger rows, so the global sum is asserted as a delta; user sums use fresh users.
+        long globalBefore = ledger.globalSpendToday();
+
         UUID alice = jdbc.queryForObject("INSERT INTO users (phone) VALUES ('+919876543201') RETURNING id", UUID.class);
         UUID bob = jdbc.queryForObject("INSERT INTO users (phone) VALUES ('+919876543202') RETURNING id", UUID.class);
         insert(alice, 1_000, YESTERDAY_2359_IST);
@@ -48,13 +54,10 @@ class AiCallRepositoryTest {
         insert(bob, 700, TODAY_0001_IST);
         insert(null, 50, TODAY_0001_IST);
 
-        IstClock clock = new IstClock(Clock.fixed(TODAY_0001_IST, IstClock.IST));
-        AiCallLedger ledger = new AiCallLedger(calls, clock);
-
         assertThat(ledger.userSpendToday(alice)).isEqualTo(500);
         assertThat(ledger.userSpendToday(bob)).isEqualTo(700);
         assertThat(ledger.userSpendToday(UUID.randomUUID())).isZero();
-        assertThat(ledger.globalSpendToday()).isEqualTo(1_250);
+        assertThat(ledger.globalSpendToday() - globalBefore).isEqualTo(1_250);
 
         // Seen from 23:59 IST on 6 September the day began at 2026-09-05T18:30Z: every row counts
         // (the sum has no upper bound — at runtime no row can be stamped in the future).

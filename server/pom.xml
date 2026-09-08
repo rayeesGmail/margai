@@ -93,6 +93,17 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
     </dependency>
+    <!-- D7 (TECH_PLAN §3.4, §13.3; DECISIONS D3.8): in-process token buckets, one API task;
+         Caffeine evicts idle buckets. The shared-store backend is the second-instance upgrade. -->
+    <dependency>
+      <groupId>com.bucket4j</groupId>
+      <artifactId>bucket4j_jdk17-core</artifactId>
+      <version>8.19.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.ben-manes.caffeine</groupId>
+      <artifactId>caffeine</artifactId>
+    </dependency>
     <!-- Prompt templates: StringTemplate 4 group files under resources/prompts (TECH_PLAN §4.12). -->
     <dependency>
       <groupId>org.antlr</groupId>

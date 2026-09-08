@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.margai.TestcontainersConfiguration;
-import com.margai.account.api.Language;
+import com.margai.common.api.Language;
+import com.margai.common.api.UserRole;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

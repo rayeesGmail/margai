@@ -14,6 +14,12 @@ spring:
     open-in-view: false
   flyway:
     locations: classpath:db/migration
+  jackson:
+    # TECH_PLAN §11.3: snake_case on the wire, nulls omitted, unknown input fields ignored.
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: non_null
+    deserialization:
+      fail-on-unknown-properties: false
 
 server:
   port: 8080

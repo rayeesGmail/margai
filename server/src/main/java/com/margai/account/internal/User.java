@@ -1,6 +1,7 @@
 package com.margai.account.internal;
 
-import com.margai.account.api.Language;
+import com.margai.common.api.Language;
+import com.margai.common.api.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.margai.TestcontainersConfiguration;
-import com.margai.account.api.Language;
 import com.margai.account.internal.User;
+import com.margai.common.api.Language;
 import com.margai.account.internal.UserRepository;
 import java.net.InetAddress;
 import java.time.Instant;

@@ -12,7 +12,7 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 0 — Foundations (Week 1) |
-| Current day | D5 done · 2026-09-08 (AiClient seam, fake + decorator chain, ai_calls ledger, breaker, Bedrock client, ArchUnit; live smoke green on Nova Lite) · next: founder pushes `d5-ai-seam` + PR #4, then D6 + Week-1 gate |
+| Current day | D5 done · 2026-09-08 (AiClient seam, fake + decorator chain, ai_calls ledger, breaker, Bedrock client, ArchUnit; live smoke green on Nova Lite; PR #4 merged) · next: D6 + Week-1 gate |
 | Days completed / total | 5 / 84 |
 | Schedule delta | on track |
 | Last week's gate | n/a — Week-1 gate is due at D6 |
@@ -28,7 +28,7 @@
 - [x] **D2** Local env: Docker Postgres 18+pgvector, Spring Boot 4 boots, Flutter shell on device, CI green · ✅ fresh clone → running <15 min — done 2026-09-03, acceptance PASS (35 s warm, ≈14.5 min cold), PR CI green (founder-verified), merged (see day log)
 - [x] **D3** Claude Code full technical plan reviewed & approved · ✅ plan committed to docs/ — done 2026-09-04, docs/TECH_PLAN.md v1.0 APPROVED with 8 founder decisions (§0.5), three spec-auditor passes (see day log)
 - [x] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations — done 2026-09-06, acceptance PASS (compose-db schema dump matches TECH_PLAN §2.2–§2.4 column by column; `MigrationReversibilityTest` green), PR #3 merged by the founder 2026-09-06 (merge commit 3f77d6f) (see day log)
-- [x] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake — done 2026-09-08 (built 2026-09-06 on `d5-ai-seam`, 15 commits), acceptance PASS: (a) fake chain + boot on the compose db; (b) live smoke on Bedrock `apac.amazon.nova-lite-v1:0` — two `ok` rows, real token counts, 5,976-token cache write then read, forced tool honoured; the Anthropic-profile proof waits for the AWS billing ticket (see day log)
+- [x] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake — done 2026-09-08 (built 2026-09-06 on `d5-ai-seam`, 15 commits), acceptance PASS: (a) fake chain + boot on the compose db; (b) live smoke on Bedrock `apac.amazon.nova-lite-v1:0` — two `ok` rows, real token counts, 5,976-token cache write then read, forced tool honoured; the Anthropic-profile proof waits for the AWS billing ticket (see day log); PR #4 merged by the founder 2026-09-08 (merge commit 0b70047, CI green after the test-order fix)
 - [ ] **D6** Buffer / overflow
 - [ ] **🚩 WEEK-1 GATE:** repo, env, plan, schema, AI seam in place
 
@@ -278,11 +278,13 @@ Surprise: (1) Boot 4.1 is on Jackson 3 (tools.jackson); victools 5.0.0 and netwo
   AiCallRepositoryTest's global-spend assertion counted rows AiSeamFlowTest had committed into the
   shared per-JVM test database (3,833 vs 1,250 paise). Global aggregates in slice tests are now
   asserted as deltas against a baseline; user sums already used fresh users.
-Tomorrow's first task: the founder pushes d5-ai-seam and opens PR #4 (CI's first AWS SDK download;
-  no AWS access needed). Then D6: buffer + the Week-1 gate as a demo script ("repo, env, plan,
-  schema, AI seam in place"), TECH_PLAN §0.3 dispositions closed and §14 checked against
-  DECISIONS.md (§12.1 D6 row). When the AWS ticket clears: rerun the smoke on the Anthropic
-  profile and close §13.2 item 1's live proof; confirm or drop the Nova price row.
+PR #4 from d5-ai-seam merged to main by the founder 2026-09-08 (merge commit 0b70047): CI red on
+  the first run (test order, surprise 11), green after acd679c; the server job's first AWS SDK
+  download passed without AWS access, the live smoke skipped as designed.
+Tomorrow's first task: D6 — buffer + the Week-1 gate as a demo script ("repo, env, plan, schema,
+  AI seam in place"), TECH_PLAN §0.3 dispositions closed and §14 checked against DECISIONS.md
+  (§12.1 D6 row). When the AWS ticket clears: rerun the smoke on the Anthropic profile and close
+  §13.2 item 1's live proof; confirm or drop the Nova price row.
 ```
 
 ```

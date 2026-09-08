@@ -144,6 +144,12 @@
       <artifactId>signin</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- D7 (founder ruling 2026-09-08): the OTP email channel over SES v2 while the DLT SMS
+         template (F1) is blocked. Only auth.internal.email imports it (ArchitectureTest). -->
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>sesv2</artifactId>
+    </dependency>
 
     <!-- test -->
     <dependency>

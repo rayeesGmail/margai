@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Architecture rules beyond Modulith's module boundaries (TECH_PLAN §1.4, §4.2, §4.13, §8.1):
- * the SDK import restriction, the single entry point to the AI seam, the router as the only
- * producer of routed decisions, and controllers in {@code web} packages. Main classes only.
+ * the AWS SDK confined to the two integration packages (Bedrock in {@code ai}, SES in
+ * {@code auth} since the D7 ruling) and each service SDK to its own, the single entry point to
+ * the AI seam, the router as the only producer of routed decisions, and controllers in
+ * {@code web} packages. Main classes only.
  */
 class ArchitectureTest {
 
@@ -24,10 +26,26 @@ class ArchitectureTest {
             .importPackages("com.margai");
 
     @Test
-    void onlyTheBedrockPackageImportsTheAwsSdk() {
-        noClasses().that().resideOutsideOfPackage("com.margai.ai.internal.bedrock..")
+    void onlyTheTwoIntegrationPackagesImportTheAwsSdk() {
+        noClasses().that().resideOutsideOfPackages("com.margai.ai.internal.bedrock..", "com.margai.auth.internal.email..")
                 .should().dependOnClassesThat().resideInAPackage("software.amazon.awssdk..")
-                .because("only ai imports the Bedrock SDK (TECH_PLAN §1.4), and inside ai only its bedrock package")
+                .because("the AWS SDK is confined to the packages that talk to a service (TECH_PLAN §1.4; D7 ruling: SES in auth)")
+                .check(CLASSES);
+    }
+
+    @Test
+    void onlyTheBedrockPackageImportsTheBedrockSdk() {
+        noClasses().that().resideOutsideOfPackage("com.margai.ai.internal.bedrock..")
+                .should().dependOnClassesThat().resideInAPackage("software.amazon.awssdk.services.bedrock..")
+                .because("only ai imports software.amazon.awssdk.services.bedrock* (TECH_PLAN §1.4), and inside ai only its bedrock package")
+                .check(CLASSES);
+    }
+
+    @Test
+    void onlyTheEmailPackageImportsTheSesSdk() {
+        noClasses().that().resideOutsideOfPackage("com.margai.auth.internal.email..")
+                .should().dependOnClassesThat().resideInAPackage("software.amazon.awssdk.services.sesv2..")
+                .because("only auth imports an OTP delivery client (TECH_PLAN §1.4), and inside auth only its email package")
                 .check(CLASSES);
     }
 

@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * {@code 0} prefix and any spacing — stored as E.164; emails trimmed, lowercased and shape-checked,
  * stored as typed otherwise (no provider-specific canonicalisation; PARKED). Masks for logs (§9.6).
  */
-final class Identifiers {
+public final class Identifiers {
 
     static final int MAX_EMAIL_LENGTH = 254;
 
@@ -66,7 +66,7 @@ final class Identifiers {
     }
 
     /** {@code +91XXXXXX1234} for phones, {@code r***@example.com} for emails (TECH_PLAN §9.6). */
-    static String mask(OtpChannel channel, String destination) {
+    public static String mask(OtpChannel channel, String destination) {
         if (destination == null || destination.isEmpty()) {
             return "?";
         }

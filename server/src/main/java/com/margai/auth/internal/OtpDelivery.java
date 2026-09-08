@@ -8,5 +8,5 @@ import java.time.Duration;
  * clear (its only appearance outside the device), the language the copy is rendered in (§3.8)
  * and how long the code lives, for the message text.
  */
-record OtpDelivery(OtpChannel channel, String destination, String code, Language language, Duration ttl) {
+public record OtpDelivery(OtpChannel channel, String destination, String code, Language language, Duration ttl) {
 }

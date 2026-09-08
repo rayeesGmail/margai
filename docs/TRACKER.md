@@ -12,13 +12,13 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 0 — Foundations (Week 1) |
-| Current day | D4 done · 2026-09-06 (core schema V1–V4 + seed taxonomy, Modulith + reversibility tests) · next: D5 |
-| Days completed / total | 4 / 84 |
+| Current day | D5 done · 2026-09-08 (AiClient seam, fake + decorator chain, ai_calls ledger, breaker, Bedrock client, ArchUnit; live smoke green on Nova Lite) · next: founder pushes `d5-ai-seam` + PR #4, then D6 + Week-1 gate |
+| Days completed / total | 5 / 84 |
 | Schedule delta | on track |
 | Last week's gate | n/a — Week-1 gate is due at D6 |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none. All four TECH_PLAN §13.2 console checks closed (#3 on 2026-09-04; #1, #2, #4 on 2026-09-06): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles with prices recorded; batch minimum 100 records, both models batch-capable from ap-south-1; EMBED `cohere.embed-multilingual-v3` on-demand in-region, 1,024 dims; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. D5 may run its live smoke call. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none for the build. Open on the AWS account (not a build blocker before D14, the first live VISION day): the **Anthropic models are refused with 403 `INVALID_PAYMENT_INSTRUMENT`** (AWS Marketplace subscription needs a valid payment method; AWS support ticket open since 2026-09-07) — the tier defaults stay Anthropic, the D5 smoke was proven on Amazon Nova Lite instead, and TECH_PLAN §13.2 item 1's caching/forced-tool proof on the Anthropic profiles reopens until the ticket clears (rerun `cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false` then). Also on F8: the local CLI session is the account **root** user via `aws login` — move to an IAM Identity Center or IAM user with Bedrock permissions (TECH_PLAN §7.4). All four TECH_PLAN §13.2 console checks closed (#3 on 2026-09-04; #1, #2, #4 on 2026-09-06): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles with prices recorded; batch minimum 100 records, both models batch-capable from ap-south-1; EMBED `cohere.embed-multilingual-v3` on-demand in-region, 1,024 dims; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. D5 may run its live smoke call. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
@@ -28,7 +28,7 @@
 - [x] **D2** Local env: Docker Postgres 18+pgvector, Spring Boot 4 boots, Flutter shell on device, CI green · ✅ fresh clone → running <15 min — done 2026-09-03, acceptance PASS (35 s warm, ≈14.5 min cold), PR CI green (founder-verified), merged (see day log)
 - [x] **D3** Claude Code full technical plan reviewed & approved · ✅ plan committed to docs/ — done 2026-09-04, docs/TECH_PLAN.md v1.0 APPROVED with 8 founder decisions (§0.5), three spec-auditor passes (see day log)
 - [x] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations — done 2026-09-06, acceptance PASS (compose-db schema dump matches TECH_PLAN §2.2–§2.4 column by column; `MigrationReversibilityTest` green), PR #3 merged by the founder 2026-09-06 (merge commit 3f77d6f) (see day log)
-- [ ] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake
+- [x] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake — done 2026-09-08 (built 2026-09-06 on `d5-ai-seam`, 15 commits), acceptance PASS: (a) fake chain + boot on the compose db; (b) live smoke on Bedrock `apac.amazon.nova-lite-v1:0` — two `ok` rows, real token counts, 5,976-token cache write then read, forced tool honoured; the Anthropic-profile proof waits for the AWS billing ticket (see day log)
 - [ ] **D6** Buffer / overflow
 - [ ] **🚩 WEEK-1 GATE:** repo, env, plan, schema, AI seam in place
 
@@ -153,7 +153,7 @@
 | F6 | Trademark search (Class 41 + 9) for final name | anytime | ☐ | before public launch |
 | F7 | Domain + social handles for final name | anytime | ☐ | MARGAI = working name |
 | F9 | DPDP legal review of the minors' consent flow (TECH_PLAN §0.5 item 8, §9.6): consent OTP at the DOB step, gated photo doubts and uploads until consent | before D27 ideally; before beta at the latest | ☐ | not a build blocker; may tighten the gating |
-| F8 | AWS beta stack (Terraform) per TECH_PLAN §7.6 — accepted at D3 (decision 5). Claude drafts Terraform in a separate infra session profile (plan allowed, apply denied), created when the first milestone is due; founder runs every apply | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ accepted 2026-09-04 | PLAN has no infra day (TECH_PLAN §0.4 #1); console checks §13.2 before D5. Bedrock access confirmed 2026-09-06 for Haiku 4.5 + Sonnet 4.6; optional AWS Sales allowlist request for the Claude 5 family / Opus 4.x (REASON upgrade path, not a blocker) |
+| F8 | AWS beta stack (Terraform) per TECH_PLAN §7.6 — accepted at D3 (decision 5). Claude drafts Terraform in a separate infra session profile (plan allowed, apply denied), created when the first milestone is due; founder runs every apply | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ accepted 2026-09-04 | PLAN has no infra day (TECH_PLAN §0.4 #1); console checks §13.2 before D5. Bedrock access confirmed 2026-09-06 for Haiku 4.5 + Sonnet 4.6; optional AWS Sales allowlist request for the Claude 5 family / Opus 4.x (REASON upgrade path, not a blocker). 2026-09-07: the account's payment instrument blocks the Marketplace subscription for the Anthropic models (D5 blocker) — fix in Billing; and the local CLI session is the root user — create a non-root identity (IAM Identity Center or an IAM user) with Bedrock permissions for daily use before more live work (§7.4, §9.2) |
 
 ---
 
@@ -173,6 +173,117 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+D5 · 2026-09-06 · PHASE 0 — Foundations
+Shipped (branch d5-ai-seam, 9 commits, ≈ 93 files): the AI seam of TECH_PLAN §4.1. ai module
+  (allowed common :: api, curriculum :: api; api + tasks named interfaces). V5 ai_calls drafted by
+  db-migrator from §2.8 verbatim (append-only, rollback block) + AiCall entity/repository with the
+  IST-day spend sums. ai.api: AiClient (complete, completeBatch as the §4.11 on-demand loop, embed),
+  AiRequest (+ repair), AiResponse (+ attempts), Usage, AiFeature ×20, Tier, RouteDecision with its
+  three factories, RouterVerdict, PromptRef, ImagePart, AiCallContext, EmbedRequest, Repair,
+  AiClientInfo, the typed failures. margai.ai.* config validated at startup (tier ids, embed model,
+  prices-json, usd-inr 90, budgets ₹25 user / ₹500 global per IST day, batch minimum 100,
+  max-output-tokens, call-timeout 20 s, prompt versions; every configured model must be priced).
+  PromptRegistry over StringTemplate 4 group files prompts/<name>.v<N>.stg (system = the cached
+  prefix, user) plus _protocol.v1.stg fragments; smoke.v1 with a ≈ 5,500-token NEET syllabus prefix
+  for the cache proof. StructuredOutput (victools 5 + networknt 3 on Jackson 3: snake_case, required
+  unless Optional, no extras) shared by the forced Bedrock tool and the validator. FakeAiClient with
+  fixtures (case by variable or deterministic hash, _ failure cases, .repaired.json, realistic usage
+  with a simulated prompt cache, the configured model id, deterministic unit embeddings). Decorators
+  Retrying (2 jittered retries on throttling/5xx), SchemaValidating (one repair turn), TierPolicy,
+  BudgetBreaker (user + global), Ledger (row per outcome, cost at insert, ai.calls / ai.cost.paise /
+  ai.latency / ai.attempts). Chain ledger > breaker > tier-policy > schema > retry > fake|bedrock.
+  BedrockAiClient + ConverseRequestMapper (system + cachePoint, forced tool with the record schema,
+  images, repair turns, temperature 0) + Documents + BedrockConfiguration (@Profile bedrock, SDK
+  retries off, configured region and timeout) + InvokeModel embeddings (Cohere and Titan shapes).
+  MargaiApplication adds the bedrock profile on BEDROCK_LIVE=1. SmokeTask. ArchitectureTest
+  (ArchUnit: the SDK only in ai.internal.bedrock, AiClient only inside ai, router(...) only from
+  DifficultyRouter, controllers in web) + ModelIdLiteralTest. BedrockSmokeTest (founder-run).
+  Rule edit per §0.2 (ai-layer.md, three lines), server README "AI seam" section, 20 DECISIONS
+  rows, prompt-changelog rows, the precommit gate now scans .stg. 136 tests in 30 classes (1 skipped
+  by design), ./mvnw verify ≈ 25 s warm.
+Acceptance: PASS (2026-09-08) —
+  (a) "App runs fully on FakeAiClient": PASS. ./mvnw verify green (136 tests); AiSeamFlowTest drives
+      SmokeTask through the whole chain on the fake (ok row with tokens and cost, breaker row for a
+      capped user, TierPolicyException row, a row that survives a rolled-back caller transaction);
+      SERVER_PORT=8081 ./mvnw spring-boot:run on the compose db: Flyway "Migrating schema public to
+      version 5 - ai calls", "AiClient chain: ledger > breaker > tier-policy > schema > retry > fake",
+      "Started MargaiApplication in 2.025 seconds", /actuator/health {"status":"UP", db UP}.
+  (b) "one live call logged with token counts": PASS on 2026-09-08 10:35 IST, founder-run
+      BedrockSmokeTest with BEDROCK_LIVE=1 and MARGAI_AI_TIER_CHEAP=apac.amazon.nova-lite-v1:0
+      (the Anthropic profiles are refused by the account, see below). Chain logged
+      "ledger > breaker > tier-policy > schema > retry > bedrock". The two ai_calls rows:
+        smoke | apac.amazon.nova-lite-v1:0 | smoke v1 | ok | in=29 out=20 cache_read=0
+          cache_write=5976 | 1347 ms | 1 paise
+        smoke | apac.amazon.nova-lite-v1:0 | smoke v1 | ok | in=29 out=20 cache_read=5976
+          cache_write=0 | 650 ms | 1 paise
+      Proven: credentials, region, the Converse mapping, the forced tool (the record came back with
+      the requested numbers), real token counts, a 5,976-token cached prefix written on the first
+      call and read on the second, input tokens excluding cache tokens (the cost formula's
+      assumption), one ledger row per call. Open: the same proof on the Anthropic profiles
+      (TECH_PLAN §13.2 item 1) once the account's Marketplace subscription is unblocked.
+      The road there, 2026-09-07/08: run 1 failed before AWS — the `aws login` session
+      (login_session in the default profile) needs the SDK signin module; added at runtime scope
+      (be867be). Run 2 reached Bedrock: 403 AccessDeniedException "INVALID_PAYMENT_INSTRUMENT …
+      AWS Marketplace subscription for this model cannot be completed" — the account's payment
+      method, not code; a CLI converse on the same model fails identically; AWS support ticket
+      raised by the founder. A Bedrock API key (AWS_BEARER_TOKEN_BEDROCK) was tried; it expired
+      and, while exported, overrides the login session for every Bedrock call ("Bearer Token has
+      expired" even after aws login) — unset. A direct Anthropic API fallback was considered and
+      declined (SPEC §3, CLAUDE.md stack line; nothing needs a live model before D14). A CLI
+      converse on Nova Lite succeeded, so the smoke ran on it with a diagnostic price row
+      (1e0bed2). Run 3 on Nova was green on every assertion but cost: 0.06 / 0.38 paise per call
+      rounded to zero → cost_paise now rounds up (3b68d91, DECISIONS). Run 4 green. The failed
+      runs also proved the failure path: permanent classification, no retries, ledger rows
+      status=error with codes SdkClientException and AccessDeniedException (§4.13 "every outcome").
+  spec-auditor on the branch diff: PASS, 10 minor findings. Fixed in 2b5d3d9: model-facing text
+  moved to prompts/_protocol.v1.stg; embed tokens header → body → estimate, never zero; Optional
+  record components optional/nullable in the schema (the D37 router verdict would otherwise have
+  failed its own schema); ArchUnit rule ≡ rule text; changelog header .stg; the gate scans .stg;
+  attempts counted (ai.attempts). Recorded in DECISIONS rather than changed: one ledger row per
+  request with retries/repair folded (§4.1), the AiRequest/PromptRef shape, breaker at ≥ cap, the
+  §4.11 constants.
+Founder decisions: the plan was approved as written; the five closing questions took the
+  recommended option each — usd_inr 90, global cap ₹500/day, two smoke calls, all three rule-file
+  lines, victools + networknt.
+Doc conflicts surfaced in the plan (none blocked): DEV_SPEC §3.4 ai_calls and §4.1 AiClient vs
+  TECH_PLAN (TECH_PLAN wins, §0.3); ai-layer.md's three stale lines (edited today per §0.2 + Q4);
+  PLAN "one live call" vs §13.2's second-call cache proof (two calls; DECISIONS); Haiku 4.5's cache
+  minimum not in the retrievable Bedrock cards (prefix sized above 4,096 tokens; the second smoke row
+  is the evidence either way); TECH_PLAN's CHEAP|REASON casing vs the D4 lowercase rule (D4 rule
+  applied); the gate's extension list lacked stg (fixed today rather than at D23);
+  "BEDROCK_LIVE=1 profile" wording vs an env var that adds the profile (DECISIONS).
+Deviations from the approved plan, recorded in DECISIONS: .stg group files (plan said .st) and a
+  _protocol fragment group; AiRequest.repair, name-only PromptRef, the InnerAiClient wrapper so
+  only the bedrock package imports the SDK; RouteDecision.router(...) confined by ArchUnit, not the
+  compiler; completeBatch as an interface default; timeouts not retried; Optional components.
+Parked: retry count / backoff / on-demand concurrency as margai.ai.* config; per-attempt ledger
+  rows if ops ever needs them.
+Surprise: (1) Boot 4.1 is on Jackson 3 (tools.jackson); victools 5.0.0 and networknt 3.0.7 are the
+  Jackson-3 ports and worked first time, but Jackson 3 hides SnakeCaseStrategy.translate (own
+  helper). (2) detect-secrets refuses any identifier containing the word TOKEN that holds a string
+  value, even a response-header name; the Bedrock input-count header constant was renamed to
+  INPUT_COUNT_HEADER (memory note hook-quirks). (3) ST4's lexer trips on a value expression right
+  before the closing >> of a template: put templates on their own lines. (4) Jackson node classes
+  differ after a Document round trip (IntNode vs LongNode) while the JSON is identical — compare
+  text. (5) ArchUnit 1.4.2 was already on the test classpath via Modulith. (6) ≈ 5,200 insertions
+  for a "seam" day: the chain, the Bedrock mapping and their tests are the bulk, as §4.1 implied.
+  (7) The live path needed two things the plan did not foresee: the SDK signin module for an
+  `aws login` session, and a payment instrument the account turned out not to have — a CLI probe
+  that worked on 2026-09-06 stopped working the next day. (8) An exported Bedrock API key silently
+  overrides the login session for the CLI too. (9) Sub-paisa calls exist (Nova Lite) and HALF_UP
+  hid them from the breaker. (10) The cached prefix is 5,976 tokens, above the ≈ 5,500 estimate.
+  (11) PR #4's first CI run was red: the GitHub runner ordered the test classes differently and
+  AiCallRepositoryTest's global-spend assertion counted rows AiSeamFlowTest had committed into the
+  shared per-JVM test database (3,833 vs 1,250 paise). Global aggregates in slice tests are now
+  asserted as deltas against a baseline; user sums already used fresh users.
+Tomorrow's first task: the founder pushes d5-ai-seam and opens PR #4 (CI's first AWS SDK download;
+  no AWS access needed). Then D6: buffer + the Week-1 gate as a demo script ("repo, env, plan,
+  schema, AI seam in place"), TECH_PLAN §0.3 dispositions closed and §14 checked against
+  DECISIONS.md (§12.1 D6 row). When the AWS ticket clears: rerun the smoke on the Anthropic
+  profile and close §13.2 item 1's live proof; confirm or drop the Nova price row.
+```
 
 ```
 D4 · 2026-09-06 · PHASE 0 — Foundations
@@ -414,6 +525,8 @@ Tomorrow's first task:
 - second-API-task upgrades: Valkey-backed rate limits, ShedLock for the dispatcher, SQS for async listeners · 2026-09-04 · only when a second task exists (TECH_PLAN §13.3)
 - weekly batch-confirm card ("Did your batch finish Rotational Motion?", SPEC §6.7 layer 4) · 2026-09-04 · founder decision 3 at D3: parked until the beta contains coaching students; self-report (D25) and timetable photo (D29) are scheduled
 - Cohere Rerank 3.5 (Mumbai on-demand, $2 per 1,000 queries of ≤100 chunks) as a rerank stage after hybrid retrieval fusion (TECH_PLAN §4.9) · 2026-09-06 · seen on the pricing page during console check #4; only if the D17 ✅ 15-query check or the D23 eval shows fusion alone missing the right paragraphs
+- retry count, backoff base and on-demand batch concurrency as `margai.ai.*` config instead of the §4.11 design constants in `RetryingAiClient` / `OnDemandBatch` · 2026-09-06 · spec-auditor D5 finding; only if ops needs to tune them without a deploy
+- per-attempt `ai_calls` rows (one per retry / repair attempt) instead of one row per request with `ai.attempts` · 2026-09-06 · D5 keeps TECH_PLAN §4.1's one-row-per-request; revisit if cost analysis needs attempt granularity
 - continuity re-onboarding after a result that falls short (SPEC §7.2 Fork B) and NCERT-style seed generation to ≥30 questions/topic (SPEC §9.3), NTA-trap mining (SPEC §9.4) · 2026-09-04 · unscheduled per TECH_PLAN §12.2; seed generation and trap mining proposed for the D24 buffer
 
 ---

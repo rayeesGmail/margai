@@ -131,6 +131,13 @@ D3.18 row names `completeBatch` as §4.1 does, where the §14 row abbreviates to
    (edit at D13, §0.2). A third, smaller one: `.claude/rules/server.md` and `db-migrator.md` list
    `created_at, updated_at` on every table; the append-only tables in §2.1 carry no `updated_at`
    (edit at D4, §0.2).
+10. **(Added 2026-09-08, D7.) SPEC §3 "OTP SMS: DLT-compliant provider", §5 "phone number → OTP" and
+    §8 screen 1 "auto-read" vs feasibility:** the DLT template (TRACKER F1) requires a registered
+    company, which does not exist yet. Founder ruling at the D7 plan review: login by a *verified email*
+    through SES until F1 lands, with the phone/SMS path designed in behind `margai.auth.otp.channels`;
+    SPEC untouched (a temporary deviation, exit condition F1), dated amendments in §1.1, §1.2, §1.4,
+    §1.5, §2.2, §2.9, §2.10, §3.2–§3.4, §3.7, §7.2–§7.4, §7.7, §9.6, DECISIONS row 1 of 2026-09-08,
+    TRACKER F1/F10 and the D8/D11/gate notes.
 
 ### 0.5 Founder decisions at approval (2026-09-04)
 
@@ -173,7 +180,7 @@ flowchart LR
     API --> BR[Amazon Bedrock<br/>CHEAP · REASON · VISION · EMBED]
     NIGHT --> BR
     API --> S3U[(S3 uploads<br/>1-day lifecycle)]
-    API --> EXT[MSG91 OTP · Razorpay · FCM · PostHog]
+    API --> EXT[SES OTP email · MSG91 OTP SMS after F1 · Razorpay · FCM · PostHog]
     RAZ[Razorpay webhooks] --> ALB
     PIPE[Founder laptop<br/>profile pipeline] --> RDS
     PIPE --> BR
@@ -193,7 +200,7 @@ service at beta; the places where a second instance would need one are listed in
 | `pipeline` | Founder's laptop with AWS SSO, `java -jar server.jar --spring.profiles.active=pipeline <command>` | §6 content commands (picocli) | `bedrock` (human-launched) |
 | `eval` | Founder's laptop, `BEDROCK_LIVE=1 ./mvnw -Peval verify` | §4.10 live eval suite | `bedrock` |
 | `bedrock` | Added by the environment (`BEDROCK_LIVE=1` locally; task definition in AWS) | Swaps `FakeAiClient` for `BedrockAiClient`; cost breaker stays on | — |
-| `local` | Developer default | Compose db, seed migrations (§2.9), fake SMS/FCM/Razorpay adapters that log | `fake` |
+| `local` | Developer default | Compose db, seed migrations (§2.9), fake OTP (`margai.auth.otp.sender = log`, the sandbox inbox for email and, after F1, SMS) / FCM / Razorpay adapters that log | `fake` |
 
 ### 1.3 Modules and package layout
 
@@ -265,20 +272,26 @@ Rules, enforced by the Modulith test from D4:
   orchestrates (the nightly run calls `planner.api`, `trajectory.api`, `notebook.api`, `account.api`
   and `ai.api` in turn); `ops` only reads.
 - Only `ai` imports `software.amazon.awssdk.services.bedrock*`. Only `storage` imports S3. Only
-  `billing` imports the Razorpay SDK; only `notifications` the FCM client; only `auth` the SMS client.
+  `billing` imports the Razorpay SDK; only `notifications` the FCM client; only `auth` the SMS client
+  and, since the D7 ruling (2026-09-08, DECISIONS), the SES client for the email OTP channel — inside
+  `auth` only its `internal.email` package, as Bedrock is confined to `ai.internal.bedrock` (ArchUnit).
 - Feature modules never read another module's tables directly; they call `<module>.api` or listen to
   events. `ops` is the one exception: read-only queries across `api` packages.
 - Controllers live in `<module>.web`, are thin, and map to one service call.
 
 ### 1.5 Request lifecycle
 
-1. ALB terminates TLS, forwards to the single task with `X-Forwarded-For`.
+1. ALB terminates TLS, forwards to the single task with `X-Forwarded-For` in its default `append`
+   mode, so the *last* hop is the address the ALB saw and the only one a client cannot choose; the
+   app keys per-address limits and `request_ip` on that last hop (D7; F8 keeps the mode at `append`).
 2. `RequestIdFilter` takes `X-Request-Id` or mints one; puts `request_id` into the MDC and echoes
    it back.
 3. Spring Security (stateless): bearer JWT → principal `{user_id, role, language}`; unauthenticated
-   routes are `/auth/otp/*`, `/auth/refresh`, `/billing/webhook`, `/actuator/health`.
-4. `RateLimitFilter`: in-process token buckets keyed by user id (or phone/IP for `/auth/*`), limits
-   from config (§3.4).
+   routes are `/auth/otp/*`, `/auth/refresh`, `/billing/webhook`, `/actuator/health` — and Boot's
+   `/error` dispatch, so a failure inside a filter still renders the envelope (D7).
+4. `RateLimitFilter`: in-process token buckets keyed by user id, or by client address for the public
+   `/auth/*` routes (D7: 10/hour on `otp/request`, 60/min on `otp/verify` and `refresh`; the
+   per-destination cap is a durable check in the service), limits from config (§3.4).
 5. `IdempotencyFilter` on routes marked idempotent: replays a stored response for a seen
    `Idempotency-Key` (§3.5).
 6. Controller validates the DTO (Bean Validation) and calls one service method.
@@ -376,14 +389,18 @@ Every SPEC §6 feature maps the same way: §6.1 planner · §6.2 practice · §6
 
 **users** — D4
 ```
-id, phone VARCHAR(16) (E.164; NOT NULL while status = active, NULL after deletion; unique via the partial index below), phone_verified_at TIMESTAMPTZ,
+id, phone VARCHAR(16) (E.164; unique via the partial index below; NULL after deletion), phone_verified_at TIMESTAMPTZ,
+email VARCHAR(254) (lowercased; unique via a partial index; added by V6 under the D7 ruling — see the constraint note),
 display_name VARCHAR(80), language VARCHAR(8) NOT NULL DEFAULT 'en' CHECK (en|hi|hinglish),
 role VARCHAR(16) NOT NULL DEFAULT 'student' CHECK (student|admin),
 status VARCHAR(16) NOT NULL DEFAULT 'active' CHECK (active|deleted),
 deleted_at TIMESTAMPTZ, purge_after DATE, created_at, updated_at
 ```
-Index: `phone` (unique, partial `WHERE phone IS NOT NULL`). Constraint:
-`CHECK (status = 'deleted' OR phone IS NOT NULL)`.
+Index: `phone` (unique, partial `WHERE phone IS NOT NULL`); `email` likewise (V6). Constraint, amended
+2026-09-08 (D7 founder ruling, DECISIONS): `CHECK (status = 'deleted' OR phone IS NOT NULL OR email IS NOT NULL)` —
+an active account has at least one *verified* identifier. The SMS DLT template (TRACKER F1) needs a
+registered company, so login is by email until it exists; a phone can be attached later by phone OTP
+(PARKED). Until D7 the check read `status = 'deleted' OR phone IS NOT NULL`; SPEC §3/§5 stay the target.
 
 **student_profiles** (1:1 users) — D4; columns marked † are filled by later days but declared now so
 the row shape is stable.
@@ -416,8 +433,11 @@ otp_challenges, consented_at`. Partial unique `(user_id) WHERE status = 'consent
 note VARCHAR(80)`; `POST /auth/otp/verify` takes an optional `invite_code` while the beta flag
 `margai.flags.invite_only` is on.
 
-**otp_challenges** — D7: `phone, purpose CHECK (login|parent_consent), code_hash CHAR(64),
-attempts SMALLINT DEFAULT 0, expires_at, verified_at, request_ip INET`. Index `(phone, created_at)`.
+**otp_challenges** — D7 (amended 2026-09-08 at build under the D7 ruling): `channel CHECK (sms|email),
+destination VARCHAR(254)` (the E.164 phone or the lowercased email) replace `phone`; `purpose CHECK
+(login|parent_consent), code_hash CHAR(64)` (SHA-256 of pepper ‖ challenge id ‖ code; the code is never
+stored), `attempts SMALLINT DEFAULT 0, expires_at, verified_at, request_ip INET`. Index
+`(destination, created_at)` — the per-destination cap and the resend cooldown (§3.4) query it.
 
 **refresh_tokens** — D7: `user_id → users, token_hash CHAR(64) UNIQUE, family_id UUID, expires_at,
 revoked_at, replaced_by_id → refresh_tokens, device_label VARCHAR(80), last_used_at`. Index `user_id`,
@@ -656,7 +676,7 @@ Numbers are indicative; the agent takes the next free integer.
 | V3 `curriculum_core` | D4 | syllabus_nodes, syllabus_prerequisites, archetype_tracks, archetype_track_steps, cutoffs |
 | V4 `chapter_status` | D4 | chapter_status |
 | V5 `ai_calls` | D5 | ai_calls |
-| V6 `auth` | D7 | otp_challenges, refresh_tokens |
+| V6 `auth` | D7 | otp_challenges, refresh_tokens; also `users.email` + `users_email_key` and the identifier check replacing `users_phone_status_check` (D7 ruling, §2.2) |
 | V7 `ncert` | D14 | ncert_books, ncert_paragraphs (embedding column nullable) |
 | V8 `ncert_hnsw` | D17 | HNSW index on `ncert_paragraphs.embedding` (created once rows exist) |
 | V9 `questions` | D19 | questions, question_topics |
@@ -697,7 +717,7 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
 | Data | Rule | Mechanism |
 |---|---|---|
 | Uploaded images (doubts, documents) | gone ≤ 24 h; doubts deleted right after extraction; documents right after confirm/discard | S3 delete in the service + `expires_at` sweeper + bucket lifecycle (three layers) |
-| Account deletion | immediate logout and anonymisation; purge in 30 days | `users.status = deleted`, phone/name/dob/parent phone nulled, refresh tokens and devices deleted, `purge_after = today + 30`; nightly purge deletes doubts' raw text and images, mentor messages, document extractions, exports; aggregate rows (events, plans, ledger) stay under the tombstone id |
+| Account deletion | immediate logout and anonymisation; purge in 30 days | `users.status = deleted`, phone/email/name/dob/parent phone nulled, refresh tokens and devices deleted, `purge_after = today + 30`; nightly purge deletes doubts' raw text and images, mentor messages, document extractions, exports; aggregate rows (events, plans, ledger) stay under the tombstone id |
 | Data export | notebook PDF + full JSON | job writes to `exports/` in the uploads bucket, 24-hour signed URL |
 | OTP challenges | 24 h | nightly purge |
 | Idempotency keys | 24 h | nightly purge |
@@ -724,8 +744,10 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
 
 ### 3.2 Authentication and tokens
 
-- `POST /auth/otp/request` sends a 6-digit code through MSG91 (DLT template); the code is stored
-  hashed with a pepper; 5-minute expiry; 5 attempts per challenge; 30-second resend cooldown.
+- `POST /auth/otp/request` sends a 6-digit code to the identifier given — by email through SES while
+  the DLT template (F1) is blocked (D7 ruling, 2026-09-08, DECISIONS), by SMS through MSG91 once
+  `margai.auth.otp.channels` includes `sms`; the code is stored hashed with a pepper; 5-minute expiry;
+  5 attempts per challenge; 30-second resend cooldown.
 - `POST /auth/otp/verify` returns `{access_token, refresh_token, expires_in, is_new_user, user}`.
   Access token: JWT HS256, 15 minutes, claims `sub` (user id), `role`, `lang`, `jti`. Refresh
   token: opaque 256-bit random, 30 days, stored as SHA-256 in `refresh_tokens`, one family per
@@ -746,7 +768,7 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
 
 | HTTP | Codes |
 |---|---|
-| 400 | `VALIDATION_FAILED` (details: field → message), `IMAGE_UNREADABLE`, `IDEMPOTENCY_CONFLICT` (same key, different body) |
+| 400 | `VALIDATION_FAILED` (details: field → *reason code* such as `not_blank`, `phone.invalid`, `channel.unavailable`, `code.digits` — the app renders the reason from its ARB copy; D7, so no prose lives in Java), `IMAGE_UNREADABLE`, `IDEMPOTENCY_CONFLICT` (same key, different body) |
 | 401 | `AUTH_REQUIRED`, `AUTH_EXPIRED` (refresh now), `AUTH_INVALID` (re-login), `OTP_INVALID`, `OTP_EXPIRED` |
 | 403 | `FORBIDDEN`, `CONSENT_REQUIRED` (minor without completed parent consent, on `POST /documents` and photo `POST /doubts` — §0.5 item 8; details carry the consent step deep link), `PRO_REQUIRED` (details: paywall_trigger) |
 | 404 | `NOT_FOUND` |
@@ -764,8 +786,8 @@ app's ARB files own client copy. Both sides use the same code strings.
 | Scope | Limit |
 |---|---|
 | default, authenticated | 60 requests/min |
-| `/auth/otp/request` | 3/hour per phone, 10/hour per IP |
-| `/auth/otp/verify` | 5 attempts per challenge |
+| `/auth/otp/request` | 3/hour per destination (phone or email; D7), 30-second resend cooldown, 10/hour per IP |
+| `/auth/otp/verify` | 5 attempts per challenge; `verify` and `refresh` together 60/min per client address (D7, §1.5 step 4) |
 | `POST /doubts` | 10/min, plus the free-tier and fair-use rules in §4.4 |
 | `POST /plan/negotiate` | 10/min |
 | `POST /documents` | 6/hour |
@@ -798,8 +820,8 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 
 | Method, path | Day | Request → response | Notes |
 |---|---|---|---|
-| `POST /auth/otp/request` | D7 | `{phone}` → `{challenge_id, resend_after_s}` | public; SMS provider sandbox until F1 |
-| `POST /auth/otp/verify` | D7 | `{challenge_id, code, invite_code?}` → tokens + `user` + `is_new_user` | public; creates `users` + empty `student_profiles` on first login (D10); `invite_code` required for new users while `margai.flags.invite_only` is on (D75) |
+| `POST /auth/otp/request` | D7 | `{phone}` or `{email}` (exactly one) → `{challenge_id, resend_after_s, channel}` | public; email via SES while F1 (DLT) is blocked, `sms` behind `margai.auth.otp.channels` (D7 ruling, 2026-09-08); the `log` sender is the sandbox |
+| `POST /auth/otp/verify` | D7 | `{challenge_id, code, invite_code?}` → tokens + `user` + `is_new_user` | public; creates the `users` row on first login at D7 (the JWT `sub` needs it) and the empty `student_profiles` row at D10; `invite_code` accepted from D7, required for new users while `margai.flags.invite_only` is on (D75) |
 | `POST /auth/refresh` | D7 | `{refresh_token}` → tokens | public; rotation + reuse detection |
 | `POST /auth/logout` | D10 | `{refresh_token}` → 204 | naturally idempotent: revoking a revoked family is a no-op |
 
@@ -1525,7 +1547,7 @@ rebuilt from Terraform if it drifts.
 | Config and secrets | SSM Parameter Store under `/margai/beta/…`; SecureString for secrets | injected into the task as environment variables through the task definition's `secrets` (`valueFrom` SSM ARN). No library, no runtime fetch; a config change is a task restart (~2 min) |
 | Scheduling | EventBridge Scheduler: nightly 19:00 UTC; weekly dump Sunday 21:00 UTC | both target ECS RunTask |
 | Logs and metrics | CloudWatch Logs (JSON), 30-day retention; CloudWatch metrics from Micrometer; AWS Budgets for the Bedrock daily spend alarm | §10 |
-| Push, SMS, payments, analytics | FCM (Firebase project), MSG91 (DLT template via TRACKER F1), Razorpay (KYC via F1), PostHog Cloud | credentials in SSM only |
+| Push, OTP, payments, analytics | FCM (Firebase project), SES (verified sender identity + production access via TRACKER F10; the OTP email channel since the D7 ruling), MSG91 (DLT template via TRACKER F1; SMS once it lands), Razorpay (KYC via F1), PostHog Cloud | credentials in SSM only; SES needs none (task role) |
 
 ### 7.3 Configuration and secrets layout
 
@@ -1536,6 +1558,9 @@ rebuilt from Terraform if it drifts.
 /margai/beta/jwt/secret                SecureString 256-bit, base64
 /margai/beta/jwt/secret_previous       SecureString rotation window (§9.2)
 /margai/beta/otp/pepper                SecureString
+/margai/beta/otp/channels              String       email | email,sms — sms once F1 lands (D7 ruling)
+/margai/beta/otp/sender                String       ses (log is the sandbox)
+/margai/beta/otp/email_from            String       verified SES identity (TRACKER F10)
 /margai/beta/msg91/auth_key            SecureString
 /margai/beta/msg91/template_id         String
 /margai/beta/razorpay/key_id           String
@@ -1565,8 +1590,9 @@ IDs, prices, limits, flags and prompt versions never appear as code constants (`
 
 - Task role: `bedrock:InvokeModel`, `bedrock:InvokeModelWithResponseStream`, `bedrock:CreateModelInvocationJob`
   and read on the batch job, scoped to the configured model ARNs; `s3:GetObject/PutObject/DeleteObject`
-  on the two buckets; `logs:*` on its log group; `cloudwatch:PutMetricData`; and `iam:PassRole` on
-  the batch service role below. Nothing else.
+  on the two buckets; `logs:*` on its log group; `cloudwatch:PutMetricData`; `ses:SendEmail` on the
+  verified sender identity (D7 ruling; F10); and `iam:PassRole` on the batch service role below.
+  Nothing else.
 - Bedrock batch service role (used only when batch mode is on, §4.11): trusted by `bedrock.amazonaws.com`,
   read on `content/batch/in/`, write on `content/batch/out/`; its ARN is the `roleArn` of every batch
   job.
@@ -1608,7 +1634,7 @@ IDs, prices, limits, flags and prompt versions never appear as code constants (`
 | RDS `db.t4g.small` + 20 GB | ≈ $28 |
 | Nightly task, dumps, S3, CloudWatch, ECR | ≈ $8 |
 | Bedrock, 50 active students | bounded by the breaker (50 × ₹25/day ≈ ₹37,500 worst case); expected ₹5k–10k with a 55% cache rate |
-| MSG91 OTP, Razorpay fees, PostHog free tier, FCM | usage-based, small |
+| SES OTP email (≈ $0.10 per 1,000; D7), MSG91 OTP SMS after F1, Razorpay fees, PostHog free tier, FCM | usage-based, small |
 
 Roughly ₹7,500 of fixed infrastructure per month plus AI spend that the breaker caps. Figures are
 list prices at the time of writing and are re-estimated at D65 with real ledger data.
@@ -1727,7 +1753,7 @@ server-initiated (SPEC §6.9, DEV_SPEC §8.7).
 
 ### 9.6 Privacy and DPDP
 
-- **PII inventory**: phone, display name, DOB, parent phone, state, category (optional), confirmed
+- **PII inventory**: phone, email (D7), display name, DOB, parent phone, state, category (optional), confirmed
   scorecard/marksheet fields, doubt text and images, mentor chat. Everything else is behavioural
   data the product needs (SPEC §5 "collect only what powers features"; DEV_SPEC R6).
 - **Minors**: DOB at onboarding; under 18 → `is_minor`, and the same step captures the parent's
@@ -1749,7 +1775,7 @@ server-initiated (SPEC §6.9, DEV_SPEC §8.7).
   purge job is part of the nightly run and logs what it removed (PLAN D64 ✅).
 - **Export**: JSON of every table keyed by the user plus the notebook PDF (OpenPDF), delivered by
   24-hour signed URL.
-- **Logging**: phones masked (`+91XXXXXX1234`), no request bodies logged on auth or document
+- **Logging**: phones masked (`+91XXXXXX1234`), emails masked (`r***@example.com`; D7), no request bodies logged on auth or document
   routes, no doubt text in logs; request ids link logs to ledger rows instead.
 - **AI processing abroad**: disclosed in the privacy copy (SPEC §6.11); no third-party SDKs beyond
   FCM, Razorpay, PostHog (DEV_SPEC §9).

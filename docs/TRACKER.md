@@ -11,14 +11,14 @@
 
 | Field | Value |
 |---|---|
-| Current phase | PHASE 0 — Foundations (Week 1) complete 2026-09-08 · PHASE 1 — Auth & identity (Week 2) starts at D7 |
-| Current day | D6 done · 2026-09-08 (buffer: TECH_PLAN §0.3 dispositions closed, §14 checked 25/25 against DECISIONS, README + credential-path drift fixed, 3 spec-auditor findings fixed; **Week-1 gate PASS** as a demo script; branch `d6-week1-gate`, 4 commits, PR #5 merged by the founder 2026-09-08, merge commit 11e50bb) · next: D7 OTP request/verify + rate limits + tokens (PHASE 1, Week 2) |
-| Days completed / total | 6 / 84 |
+| Current phase | PHASE 1 — Auth & identity (Week 2, D7–D12), running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
+| Current day | D7 done · 2026-09-08 (OTP login by verified email or phone — phone behind `margai.auth.otp.channels` until F1 — with SES/log senders, JWT + rotating refresh families, Bucket4j limits, the `common` web foundation (envelope, request id, three-language copy, security chain); ✅ curl happy path PASS on the compose db; spec-auditor FAIL → 2 MAJOR + 4 MINOR fixed in `6a96db6`, re-audit in the day log; branch `d7-otp-auth`, 11 commits, PR to be opened by the founder) · next: D8 Flutter login screens — email entry, code entry, retry, change-email, offline-tolerant errors (SMS auto-read waits for F1); device login needs F10 or the sandbox log |
+| Days completed / total | 7 / 84 |
 | Schedule delta | on track |
 | Last week's gate | **Week-1 🚩 PASS** 2026-09-08 — repo, environment, plan, schema and AI seam each demonstrated in-session (transcript in the D6 day log); the only open item, the live proof on the Anthropic profiles, is an account matter, not a build one |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none for the build. Two open items on the AWS account (founder; not build blockers before D14, the first live VISION day): (1) the **Anthropic models are refused with 403 `INVALID_PAYMENT_INSTRUMENT`** (AWS Marketplace subscription needs a valid payment method; AWS support ticket open since 2026-09-07) — the tier defaults stay Anthropic, the D5 smoke was proven on Amazon Nova Lite instead; when the ticket clears, rerun `cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false`, then close TECH_PLAN §13.2 item 1's live proof and confirm or drop the Nova price row (DECISIONS 2026-09-08 D5 row). (2) The local CLI session is the account **root** user via `aws login` — F8 creates a non-root IAM Identity Center or IAM identity with Bedrock permissions (TECH_PLAN §7.4; DECISIONS 2026-09-08 D6 row names the interim path). All four §13.2 console checks are closed (D4/D5 day logs): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles, EMBED `cohere.embed-multilingual-v3` in-region, batch minimum 100; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none for the build (D8's real-device email login needs F10 — an SES sender identity plus verified test recipients, minutes in the console — or reading the code from the sandbox log). Two open items on the AWS account (founder; not build blockers before D14, the first live VISION day): (1) the **Anthropic models are refused with 403 `INVALID_PAYMENT_INSTRUMENT`** (AWS Marketplace subscription needs a valid payment method; AWS support ticket open since 2026-09-07) — the tier defaults stay Anthropic, the D5 smoke was proven on Amazon Nova Lite instead; when the ticket clears, rerun `cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false`, then close TECH_PLAN §13.2 item 1's live proof and confirm or drop the Nova price row (DECISIONS 2026-09-08 D5 row). (2) The local CLI session is the account **root** user via `aws login` — F8 creates a non-root IAM Identity Center or IAM identity with Bedrock permissions (TECH_PLAN §7.4; DECISIONS 2026-09-08 D6 row names the interim path). All four §13.2 console checks are closed (D4/D5 day logs): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles, EMBED `cohere.embed-multilingual-v3` in-region, batch minimum 100; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
@@ -34,13 +34,13 @@
 
 ## PHASE 1 — Auth & identity (Week 2) · M1
 
-- [ ] **D7** OTP request/verify + rate limits + tokens · ✅ curl happy path
-- [ ] **D8** Login screens (auto-read OTP, retry, change number) · ✅ real device, mobile data
+- [x] **D7** OTP request/verify + rate limits + tokens · ✅ curl happy path — done 2026-09-08, acceptance PASS (literal curl transcript in the day log: email request → sandbox code → verify → tokens with `sub/role/lang/jti` → refresh → reuse revokes the family; 429 + `Retry-After` for the cooldown and the hourly cap; phone refused while email-only; hash in the db, code only on the sandbox logger); **email OTP per the founder's D7 ruling** (DECISIONS row 1 of 2026-09-08, exit = F1); branch `d7-otp-auth`, 11 commits, PR to be opened by the founder
+- [ ] **D8** Login screens (auto-read OTP, retry, change number) · ✅ real device, mobile data — *D7 ruling (2026-09-08): email entry first; SMS auto-read (`smart_auth`) waits for F1; the device login needs F10 (SES identity) or the sandbox log*
 - [ ] **D9** Unhappy paths (10-failure checklist) · ✅ all graceful
-- [ ] **D10** Profile-on-first-login, language, logout, token rotation · ✅ persistence + clean logout
-- [ ] **D11** DLT live check / delivery metrics · ✅ OTP success metric visible
+- [ ] **D10** Profile-on-first-login, language, logout, token rotation · ✅ persistence + clean logout — *rotation + reuse detection already live since D7; D10 adds `POST /auth/logout`, the profile row, `/me`*
+- [ ] **D11** DLT live check / delivery metrics · ✅ OTP success metric visible — *D7 ruling: email delivery metrics (`otp.sent/verified/failed/send_failed` exist since D7) + the DLT check only if F1 has landed*
 - [ ] **D12** Buffer
-- [ ] **🚩 WEEK-2 GATE:** a stranger's phone signs in first try
+- [ ] **🚩 WEEK-2 GATE:** a stranger's phone signs in first try — *read as "a stranger's email" until F1 (DECISIONS D7 row 1)*
 
 ## PHASE 2 — Content pipeline v1 (Weeks 3–4) · M3
 
@@ -145,7 +145,8 @@
 
 | ID | Task | Start | Status | Notes |
 |---|---|---|---|---|
-| F1 | Razorpay KYC + DLT SMS template | W1 D1 | ☐ not started | long lead time |
+| F1 | Razorpay KYC + DLT SMS template | W1 D1 | ☐ not started | long lead time. 2026-09-08 (D7): DLT registration needs a registered company, so login runs on **email OTP** until F1 lands (DECISIONS D7 row 1); when it does: add `sms` to `margai.auth.otp.channels`, the MSG91 adapter (D11), the phone-attach flow (PARKED) |
+| F10 | **SES for the OTP email channel** (D7 ruling): in the SES console, ap-south-1, verify a sender identity (address or domain); while the account is in the SES sandbox also verify the recipient addresses you test with; request production access before the first stranger (D12) or beta at the latest. Then run the founder-only live proof in `server/README.md` "Auth" (`MARGAI_AUTH_OTP_SENDER=ses MARGAI_AUTH_OTP_EMAIL_FROM=…`) | before D8's device login ideally; before D12 | ☐ opened 2026-09-08 | minutes, no company registration; SSM keys `otp/sender`, `otp/email_from`, `otp/channels` (TECH_PLAN §7.3) at F8 |
 | F2 | NCERT licensing letter sent | W1 | ☐ | follow-up cadence: monthly |
 | F3 | Educator review of backbone booked | by W5 | ☐ | needed W8 |
 | F4 | Beta recruitment playbook + group scouting | W10–13 | ☐ | 2–3 Telegram groups |
@@ -153,7 +154,7 @@
 | F6 | Trademark search (Class 41 + 9) for final name | anytime | ☐ | before public launch |
 | F7 | Domain + social handles for final name | anytime | ☐ | MARGAI = working name |
 | F9 | DPDP legal review of the minors' consent flow (TECH_PLAN §0.5 item 8, §9.6): consent OTP at the DOB step, gated photo doubts and uploads until consent | before D27 ideally; before beta at the latest | ☐ | not a build blocker; may tighten the gating |
-| F8 | AWS beta stack (Terraform) per TECH_PLAN §7.6 — accepted at D3 (decision 5). Claude drafts Terraform in a separate infra session profile (plan allowed, apply denied), created when the first milestone is due; founder runs every apply | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ accepted 2026-09-04 | PLAN has no infra day (TECH_PLAN §0.4 #1); console checks §13.2 before D5. Bedrock access confirmed 2026-09-06 for Haiku 4.5 + Sonnet 4.6; optional AWS Sales allowlist request for the Claude 5 family / Opus 4.x (REASON upgrade path, not a blocker). 2026-09-07: the account's payment instrument blocks the Marketplace subscription for the Anthropic models (D5 blocker) — fix in Billing; and the local CLI session is the root user — create a non-root identity (IAM Identity Center or an IAM user) with Bedrock permissions for daily use before more live work (§7.4, §9.2) |
+| F8 | AWS beta stack (Terraform) per TECH_PLAN §7.6 — accepted at D3 (decision 5). Claude drafts Terraform in a separate infra session profile (plan allowed, apply denied), created when the first milestone is due; founder runs every apply | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ accepted 2026-09-04 | PLAN has no infra day (TECH_PLAN §0.4 #1); console checks §13.2 before D5. Bedrock access confirmed 2026-09-06 for Haiku 4.5 + Sonnet 4.6; optional AWS Sales allowlist request for the Claude 5 family / Opus 4.x (REASON upgrade path, not a blocker). 2026-09-07: the account's payment instrument blocks the Marketplace subscription for the Anthropic models (D5 blocker) — fix in Billing; and the local CLI session is the root user — create a non-root identity (IAM Identity Center or an IAM user) with Bedrock permissions for daily use before more live work (§7.4, §9.2). 2026-09-08 (D7): the ALB must keep `xff_header_processing.mode = append` — the app keys rate limits and `request_ip` on the *last* `X-Forwarded-For` hop (§1.5 step 1); the task role needs `ses:SendEmail` on the F10 identity (§7.4); SSM gains `otp/sender`, `otp/email_from`, `otp/channels` (§7.3) |
 
 ---
 
@@ -173,6 +174,102 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+D7 · 2026-09-08 · PHASE 1 — Auth & identity (OTP request/verify + rate limits + tokens)
+Founder ruling at the plan review: SMS OTP is not possible yet — the DLT template (F1) needs a
+  registered company. Three choices, taken from the options offered: (1) email joins phone as a
+  VERIFIED login identifier (an unverified phone + an emailed code would let anyone claim another
+  person's number); (2) delivery through AWS SES v2 over the SDK default chain, no secrets;
+  (3) a temporary deviation — SPEC §3/§5 untouched, DECISIONS row with exit condition F1, dated
+  in-place TECH_PLAN amendments, TRACKER notes, new founder workstream F10. The plan was then
+  approved as written; its four closing questions took the recommended option each (disabled
+  channel → VALIDATION_FAILED on the field; sender failure → row deleted + INTERNAL; missing
+  secrets → random per boot + WARN; exhausted attempts → OTP_EXPIRED, no new §3.3 code).
+Shipped (branch d7-otp-auth, 11 commits: 34ff524 V6 + entities, 108c0c4 common web foundation,
+  c5bffb3 security chain + JWT, 2072cf6 rate limits, f9c613b tokens + account port, f4f4951
+  OtpService, 387ab4e SES sender, fef25ed controller + flow tests, 6a96db6 spec-auditor fixes,
+  5f054ea re-audit residual, + the docs commit): V6 auth (users.email + identifier check, otp_challenges channel/destination,
+  refresh_tokens); common.api ErrorCode / sealed ApiException / ErrorEnvelope / ErrorResponses /
+  Messages / RequestLanguage / Principal (+ Language, UserRole moved in), RequestIdFilter,
+  ApiExceptionHandler, messages_{en,hi,hinglish} for all 21 codes + OTP mail copy; auth: HS256
+  JwtService (15 min, sub/role/lang/jti, previous key while configured), stateless chain with
+  envelope-writing entry point, PrincipalContextFilter (MDC user_id/jti), Bucket4j RateLimitFilter
+  (10/h per address on request, 60/min per address on verify+refresh, 60/min per user), TokenService
+  (256-bit opaque refresh, SHA-256 at rest, per-device families, sliding 30 d, reuse revokes the
+  family), OtpService (channels gate, 30-s cooldown, 3/h per destination, store-then-send with
+  cleanup, 5 attempts under a row lock, sign-in + tokens), Identifiers (Indian mobiles → E.164,
+  emails lowercased, masks), OtpSender port with LoggingOtpSender (sandbox on logger
+  margai.otp.sandbox) and SesOtpSender (auth.internal.email, only importer of the SES SDK),
+  AuthController (POST /auth/otp/request {phone}|{email}, /auth/otp/verify, /auth/refresh);
+  account.api Accounts/LoginIdentifier/UserSummary/SignIn + AccountService. Config margai.auth.*,
+  margai.limits.*; blank secrets → ephemeral + WARN. 262 tests (was 146), 0 failures, 1 skipped
+  (Bedrock smoke); flutter analyze/test unchanged and green; no AI path touched (eval stamp intact).
+Acceptance: ✅ PASS — "Happy path via curl", run literally on the compose db (SERVER_PORT=8081,
+  sandbox sender), transcript: Flyway "Migrating schema public to version 6 - auth" … "now at
+  version v6"; WARN margai.auth.jwt.secret / otp.pepper not set (ephemeral); health UP.
+  POST /api/v1/auth/otp/request {"email":"Founder@Example.com"} → 200 X-Request-Id 118ddb08-…
+  {"challenge_id":"50b686be-…","resend_after_s":30,"channel":"email"}; server log
+  "[sandbox email] to f***@example.com — Your MARG AI sign-in code is 444771. It expires in 5
+  minutes." POST /otp/verify → 200 {"expires_in":900,"is_new_user":true,"user":{"id":"555ef46d-…",
+  "email":"founder@example.com","language":"en","role":"student"},"access_token":"eyJhbGciOiJIUzI1NiJ9…",
+  "refresh_token":"Hq7vmsrMsgPJ…"}; JWT claims {sub 555ef46d-…, role student, lang en, iat/exp 900 s
+  apart, jti b0686133-…}. POST /refresh → 200 new pair. Negative demo: old refresh token again →
+  401 AUTH_INVALID, the fresh one dead with it (family revoked); {"phone":"9876543210"} → 400
+  VALIDATION_FAILED details.phone (channel not enabled); no token on /api/v1/probe/whoami with
+  Accept-Language: hi → 401 AUTH_REQUIRED "जारी रखने के लिए साइन इन करें।"; same email inside 30 s →
+  429 Retry-After: 30 OTP_RATE_LIMITED; after two more codes 31 s apart, the 4th → 429
+  Retry-After: 3507. psql: 3 otp_challenges rows (email, founder@example.com, login, code_hash
+  281648ed256d…, attempts 0, verified t/f/f, request_ip ::1); users row 555ef46d-… email set, phone
+  NULL, en, student, active; 2 refresh_tokens in family c5bcbd3c-… device_label curl/acceptance,
+  both revoked, first replaced; flyway_schema_history 6 auth success. The code 444771 appears once
+  in the whole server log, on margai.otp.sandbox; auth INFO lines show f***@example.com only;
+  0 ERROR lines. Server stopped cleanly.
+spec-auditor (branch diff + docs): FAIL — [MAJOR] English prose in details values (SPEC §3,
+  TECH_PLAN §3.1) → details now carry reason codes (phone.invalid, email.invalid,
+  identifier.required/one_only, channel.unavailable, code.digits, not_blank/not_null/min/size,
+  body: malformed, content_type: unsupported) rendered by the app's ARB; [MAJOR] first
+  X-Forwarded-For hop is client-chosen behind an ALB in append mode → last hop; [MINOR] /error
+  route unrecorded → §1.5 + DECISIONS; [MINOR] no anonymous bucket on verify/refresh → 60/min per
+  address; [MINOR] §1.1/§1.2/§2.9/§7.2/§7.4/§7.7/§0.4 still SMS-only → dated amendments + §0.4
+  item 10; [MINOR] no completeness test for error copy, 10 codes without copy → copy authored,
+  MessageCatalogTest. All fixed in 6a96db6. Re-audit (scoped to the six): PASS, every finding
+  closed; one MINOR residual — the reason-code rule judged "code, not prose" by the absence of a
+  space in the interpolated message, which a non-English validator bundle (Accept-Language: ja)
+  could defeat — closed in 5f054ea by deriving the code from the constraint's raw message template
+  instead (locale-independent), with a `ja` case in ApiEnvelopeTest; a stale test javadoc fixed. Unverifiable by the auditor and left as recorded requirements: the ALB's append mode (F8),
+  D8's ARB entries for every reason code.
+Doc conflicts surfaced (none blocked): SPEC §3/§5/§8 screen 1 (SMS, auto-read) vs the DLT
+  reality → founder ruling above, SPEC untouched; TECH_PLAN §2.2 users.phone NOT NULL while active
+  → V6 "phone or email"; §1.4/ArchUnit banned the whole SDK outside bedrock → scoped per service;
+  §3.7 "creates users + profile at D10" → users at D7 (JWT sub), profile D10; DEV_SPEC §5 verify
+  {phone, code} → TECH_PLAN {challenge_id, code}; §3.3 OTP_INVALID/EXPIRED at 401 → followed;
+  §9.2 ".env" → exported env vars; "secret_previous for 15 min" → while configured; §3.4 names
+  Bucket4j → bucket4j_jdk17-core + Caffeine; PLAN D8 auto-read / D11 DLT / gate "phone" → email
+  readings in the PHASE 1 list; §9.1 "codes never logged" vs the sandbox line → binds the
+  service, the sandbox logger is the inbox.
+Spec-silent choices: 11 DECISIONS rows dated 2026-09-08 · D7 (the deviation + exit, SES, Principal
+  in common.api, ephemeral secrets, identifier normalisation + hash, OTP outcomes, sandbox logger,
+  users row at D7, sliding rotation, rate-limit keys + /error + ArchUnit scope, copy + reason codes).
+Parked: phone-attach by OTP once F1 lands; email canonicalisation (Gmail dots/plus); logout +
+  revoke-on-deletion scheduling note; refuse the log sender outside local/test.
+Known edges (not blocking, noted): two simultaneous first logins for one new email race the
+  partial unique index into a 500 (client retries); an access token stays valid up to 15 min after
+  account deletion (D64 decides whether to check per request); LoggingOtpSender is the default when
+  MARGAI_AUTH_OTP_SENDER is unset — F8's SSM seeding must set ses (PARKED startup refusal).
+Surprise: (1) MessageFormat only doubles apostrophes when arguments are passed — one authoring
+  rule needs alwaysUseMessageFormat. (2) Spring's JwtTimestampValidator judges expiry on its own
+  clock: wire the app clock or fixed-clock tests silently pass/fail with wall time. (3) Bean
+  Validation names Java fields and speaks English — both must be translated at the envelope
+  (wire names + reason codes) or the contract leaks Java into the app. (4) A @WebMvcTest in
+  another package cannot import common's package-private beans; include them by a scan filter.
+  (5) A wait-loop with sleep must run in the background in this harness.
+Tomorrow's first task: D8 — Flutter login screens for email (entry, code entry with retry and
+  change-email, offline-tolerant errors, the reason codes → ARB strings), on the emulator against
+  SERVER_PORT=8081 (base URL http://10.0.2.2:8081, TECH_PLAN §5.4); the real-device check reads the
+  code from the sandbox log unless F10 is done. The founder's F10 (SES identity + test recipients)
+  and the PR for d7-otp-auth.
+```
 
 ```
 D6 · 2026-09-08 · PHASE 0 — Foundations (buffer + Week-1 gate)
@@ -607,6 +704,10 @@ Tomorrow's first task:
 - Cohere Rerank 3.5 (Mumbai on-demand, $2 per 1,000 queries of ≤100 chunks) as a rerank stage after hybrid retrieval fusion (TECH_PLAN §4.9) · 2026-09-06 · seen on the pricing page during console check #4; only if the D17 ✅ 15-query check or the D23 eval shows fusion alone missing the right paragraphs
 - retry count, backoff base and on-demand batch concurrency as `margai.ai.*` config instead of the §4.11 design constants in `RetryingAiClient` / `OnDemandBatch` · 2026-09-06 · spec-auditor D5 finding; only if ops needs to tune them without a deploy
 - per-attempt `ai_calls` rows (one per retry / repair attempt) instead of one row per request with `ai.attempts` · 2026-09-06 · D5 keeps TECH_PLAN §4.1's one-row-per-request; revisit if cost analysis needs attempt granularity
+- attach a phone number to an email-identified account by phone OTP (and the reverse) once F1's DLT template exists · 2026-09-08 · D7 ruling: email joins phone as a verified identifier; the merge/attach flow is not scheduled; needs `POST /me/phone/request|verify` or similar and a rule for an email account meeting an existing phone account
+- email canonicalisation beyond lowercase (Gmail dots and plus tags, IDN) · 2026-09-08 · D7 stores emails trimmed + lowercased only; two spellings of one Gmail inbox would be two accounts
+- `POST /auth/logout` and "revoke every family on deletion" · 2026-09-08 · scheduled D10 / D64 (TECH_PLAN §3.2); the family revocation primitive exists since D7 (`RefreshTokenRepository.revokeFamily`)
+- silence or rate-limit the `margai.otp.sandbox` logger in AWS · 2026-09-08 · today the sandbox sender is selected by `margai.auth.otp.sender = log` and simply must not be the value in a deployed environment; a startup refusal of `log` outside `local`/`test` would be the belt to the braces
 - continuity re-onboarding after a result that falls short (SPEC §7.2 Fork B) and NCERT-style seed generation to ≥30 questions/topic (SPEC §9.3), NTA-trap mining (SPEC §9.4) · 2026-09-04 · unscheduled per TECH_PLAN §12.2; seed generation and trap mining proposed for the D24 buffer
 
 ---

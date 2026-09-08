@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.margai.TestcontainersConfiguration;
-import com.margai.account.api.Language;
+import com.margai.common.api.Language;
+import com.margai.common.api.UserRole;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +15,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 
 /**
- * Repository slice (TECH_PLAN §8.1): migration V2 applies and its constraints hold —
- * the partial unique index on {@code users.phone}, {@code status = 'deleted' OR phone IS NOT
- * NULL}, and the 1:1 between {@code student_profiles} and {@code users}.
+ * Repository slice (TECH_PLAN §8.1): migrations V2 and V6 apply and their constraints hold —
+ * the partial unique indexes on {@code users.phone} and {@code users.email}, "an active user has
+ * a phone or an email" ({@code users_identifier_status_check}, D7), and the 1:1 between
+ * {@code student_profiles} and {@code users}.
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -50,10 +52,28 @@ class AccountConstraintsTest {
     }
 
     @Test
-    void activeUserMustHaveAPhone() {
+    void activeUserNeedsAPhoneOrAnEmail() {
         assertThatThrownBy(() -> users.saveAndFlush(new User(null, Language.en)))
                 .isInstanceOf(DataIntegrityViolationException.class)
-                .hasMessageContaining("users_phone_status_check");
+                .hasMessageContaining("users_identifier_status_check");
+    }
+
+    @Test
+    void emailAloneIdentifiesAnActiveUser() {
+        User user = users.saveAndFlush(User.withEmail("d7@example.com", Language.hi));
+
+        assertThat(user.getPhone()).isNull();
+        assertThat(user.getEmail()).isEqualTo("d7@example.com");
+        assertThat(user.getPhoneVerifiedAt()).isNull();
+    }
+
+    @Test
+    void emailIsUniqueWhilePresent() {
+        users.saveAndFlush(User.withEmail("twice@example.com", Language.en));
+
+        assertThatThrownBy(() -> users.saveAndFlush(User.withEmail("twice@example.com", Language.hinglish)))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("users_email_key");
     }
 
     @Test

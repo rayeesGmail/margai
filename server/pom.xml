@@ -83,6 +83,27 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
+    <!-- D7 (TECH_PLAN §3.2, §9.1): stateless security chain; HS256 JWTs encoded and decoded
+         with the Nimbus support the resource-server starter brings. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
+    </dependency>
+    <!-- D7 (TECH_PLAN §3.4, §13.3; DECISIONS D3.8): in-process token buckets, one API task;
+         Caffeine evicts idle buckets. The shared-store backend is the second-instance upgrade. -->
+    <dependency>
+      <groupId>com.bucket4j</groupId>
+      <artifactId>bucket4j_jdk17-core</artifactId>
+      <version>8.19.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.ben-manes.caffeine</groupId>
+      <artifactId>caffeine</artifactId>
+    </dependency>
     <!-- Prompt templates: StringTemplate 4 group files under resources/prompts (TECH_PLAN §4.12). -->
     <dependency>
       <groupId>org.antlr</groupId>
@@ -123,6 +144,12 @@
       <artifactId>signin</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!-- D7 (founder ruling 2026-09-08): the OTP email channel over SES v2 while the DLT SMS
+         template (F1) is blocked. Only auth.internal.email imports it (ArchitectureTest). -->
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>sesv2</artifactId>
+    </dependency>
 
     <!-- test -->
     <dependency>
@@ -146,6 +173,11 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security-test</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- @DataJpaTest repository slices run Flyway against Testcontainers (TECH_PLAN §8.1). -->

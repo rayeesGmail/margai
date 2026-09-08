@@ -72,9 +72,12 @@ surfaced in that session rather than now:
 | §12 Open items | Confirmed, extended | §13 | Adds batch-inference minimum, RDS PG18 availability, infra timeline |
 
 Dispositions closed at D6 (2026-09-08, PLAN Week-1 gate; §12.1 D6 row): every verdict above is
-final. The two that waited on the founder or the console were settled by §0.5 item 1b (offline
-verdicts) and §13.2 items 1 and 4 (model ids). §14 was checked against DECISIONS.md the same day:
-25 of 25 rows present, D3.18 carrying its D5 amendment (`completeBatch`).
+final as a disposition. The two that waited on the founder or the console were settled by §0.5
+item 1b (offline verdicts) and §13.2 items 1 and 4 (model ids). Two follow-ons stay scheduled and
+are not reopened by this note: the §4.5 row's eval-gate arrangement (§0.4 #3) lands at D23, and
+§13.2 item 1's live proof on the Anthropic profiles waits for the account's AWS ticket (D5 note
+there). §14 was checked against DECISIONS.md the same day: 25 of 25 rows present; the DECISIONS
+D3.18 row names `completeBatch` as §4.1 does, where the §14 row abbreviates to `complete` + `embed`.
 
 ### 0.4 Conflicts and gaps surfaced (not silently resolved)
 

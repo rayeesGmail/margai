@@ -108,7 +108,8 @@
       <version>3.0.7</version>
     </dependency>
     <!-- Bedrock Converse + InvokeModel behind BedrockAiClient, active only in the bedrock profile
-         (TECH_PLAN §1.2, §4.11). Credentials come from the default chain (SSO locally, the task
+         (TECH_PLAN §1.2, §4.11). Credentials come from the default chain (an aws login session or
+         a named profile locally — TECH_PLAN §7.4 intends an Identity Center profile — and the task
          role in AWS), never from configuration. -->
     <dependency>
       <groupId>software.amazon.awssdk</groupId>

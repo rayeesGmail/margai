@@ -42,7 +42,14 @@ margai:
          {"input": 3.00, "output": 15.00, "cache_read": 0.30, "cache_write": 3.75,
           "batch_input": 1.50, "batch_output": 7.50},
        "cohere.embed-multilingual-v3":
-         {"input": 0.10}}
+         {"input": 0.10},
+       "apac.amazon.nova-lite-v1:0":
+         {"input": 0.06, "output": 0.24, "cache_read": 0.006, "cache_write": 0,
+          "batch_input": 0.03, "batch_output": 0.12}}
+    # The Nova Lite row is a diagnostic entry (2026-09-08): an Amazon-owned model reachable while
+    # the account's Marketplace subscription for the Anthropic models is blocked. Public list
+    # prices (Nova cache writes are free, reads are 90% off input); founder to confirm the Mumbai
+    # column on the pricing page. It is not a tier default — select it with MARGAI_AI_TIER_CHEAP.
     usd-inr: 90
     budget:
       user-daily-paise: 2500      # ₹25 per user per IST day (§4.8)

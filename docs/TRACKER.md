@@ -11,14 +11,14 @@
 
 | Field | Value |
 |---|---|
-| Current phase | PHASE 0 — Foundations (Week 1) |
-| Current day | D5 done · 2026-09-08 (AiClient seam, fake + decorator chain, ai_calls ledger, breaker, Bedrock client, ArchUnit; live smoke green on Nova Lite; PR #4 merged) · next: D6 + Week-1 gate |
-| Days completed / total | 5 / 84 |
+| Current phase | PHASE 0 — Foundations (Week 1) complete 2026-09-08 · PHASE 1 — Auth & identity (Week 2) starts at D7 |
+| Current day | D6 done · 2026-09-08 (buffer: TECH_PLAN §0.3 dispositions closed, §14 checked 25/25 against DECISIONS, README + credential-path drift fixed, 3 spec-auditor findings fixed; **Week-1 gate PASS** as a demo script; branch `d6-week1-gate`, 4 commits, PR #5 to be opened by the founder) · next: D7 OTP request/verify + rate limits + tokens (PHASE 1, Week 2) |
+| Days completed / total | 6 / 84 |
 | Schedule delta | on track |
-| Last week's gate | n/a — Week-1 gate is due at D6 |
+| Last week's gate | **Week-1 🚩 PASS** 2026-09-08 — repo, environment, plan, schema and AI seam each demonstrated in-session (transcript in the D6 day log); the only open item, the live proof on the Anthropic profiles, is an account matter, not a build one |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none for the build. Open on the AWS account (not a build blocker before D14, the first live VISION day): the **Anthropic models are refused with 403 `INVALID_PAYMENT_INSTRUMENT`** (AWS Marketplace subscription needs a valid payment method; AWS support ticket open since 2026-09-07) — the tier defaults stay Anthropic, the D5 smoke was proven on Amazon Nova Lite instead, and TECH_PLAN §13.2 item 1's caching/forced-tool proof on the Anthropic profiles reopens until the ticket clears (rerun `cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false` then). Also on F8: the local CLI session is the account **root** user via `aws login` — move to an IAM Identity Center or IAM user with Bedrock permissions (TECH_PLAN §7.4). All four TECH_PLAN §13.2 console checks closed (#3 on 2026-09-04; #1, #2, #4 on 2026-09-06): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles with prices recorded; batch minimum 100 records, both models batch-capable from ap-south-1; EMBED `cohere.embed-multilingual-v3` on-demand in-region, 1,024 dims; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. D5 may run its live smoke call. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none for the build. Two open items on the AWS account (founder; not build blockers before D14, the first live VISION day): (1) the **Anthropic models are refused with 403 `INVALID_PAYMENT_INSTRUMENT`** (AWS Marketplace subscription needs a valid payment method; AWS support ticket open since 2026-09-07) — the tier defaults stay Anthropic, the D5 smoke was proven on Amazon Nova Lite instead; when the ticket clears, rerun `cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false`, then close TECH_PLAN §13.2 item 1's live proof and confirm or drop the Nova price row (DECISIONS 2026-09-08 D5 row). (2) The local CLI session is the account **root** user via `aws login` — F8 creates a non-root IAM Identity Center or IAM identity with Bedrock permissions (TECH_PLAN §7.4; DECISIONS 2026-09-08 D6 row names the interim path). All four §13.2 console checks are closed (D4/D5 day logs): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles, EMBED `cohere.embed-multilingual-v3` in-region, batch minimum 100; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
@@ -29,8 +29,8 @@
 - [x] **D3** Claude Code full technical plan reviewed & approved · ✅ plan committed to docs/ — done 2026-09-04, docs/TECH_PLAN.md v1.0 APPROVED with 8 founder decisions (§0.5), three spec-auditor passes (see day log)
 - [x] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations — done 2026-09-06, acceptance PASS (compose-db schema dump matches TECH_PLAN §2.2–§2.4 column by column; `MigrationReversibilityTest` green), PR #3 merged by the founder 2026-09-06 (merge commit 3f77d6f) (see day log)
 - [x] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake — done 2026-09-08 (built 2026-09-06 on `d5-ai-seam`, 15 commits), acceptance PASS: (a) fake chain + boot on the compose db; (b) live smoke on Bedrock `apac.amazon.nova-lite-v1:0` — two `ok` rows, real token counts, 5,976-token cache write then read, forced tool honoured; the Anthropic-profile proof waits for the AWS billing ticket (see day log); PR #4 merged by the founder 2026-09-08 (merge commit 0b70047, CI green after the test-order fix)
-- [ ] **D6** Buffer / overflow
-- [ ] **🚩 WEEK-1 GATE:** repo, env, plan, schema, AI seam in place
+- [x] **D6** Buffer / overflow — done 2026-09-08: TECH_PLAN §0.3 dispositions closed and §14 checked against DECISIONS.md (25/25; the §12.1 D6 deliverables), root README + live-smoke credential wording brought in line with D3.4 and the D5 path, three spec-auditor findings fixed; 4 commits on `d6-week1-gate` (see day log)
+- [x] **🚩 WEEK-1 GATE:** repo, env, plan, schema, AI seam in place — **PASS** 2026-09-08, run as a literal demo script (evidence in the D6 day log)
 
 ## PHASE 1 — Auth & identity (Week 2) · M1
 
@@ -173,6 +173,81 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+D6 · 2026-09-08 · PHASE 0 — Foundations (buffer + Week-1 gate)
+Shipped (branch d6-week1-gate, 4 commits, docs and comments only — no feature code, migration or
+  prompt change): (1) TECH_PLAN §0.3 dispositions closed (the §12.1 D6 row): the §2.1 row records
+  console checks #1/#4, the §6.1 row records Option A (§0.5 item 1b, clause + test at D34), §4.9's
+  embed bullet records check #4, and a closing note under the §0.3 table states what stays
+  scheduled (eval arrangement at D23, Anthropic live proof after the AWS ticket). §14 checked
+  against DECISIONS.md: 25 of 25 rows present. (2) Root README names docs/TECH_PLAN.md (missing
+  since D3) and describes pipeline/ per D3.4; server README, BedrockSmokeTest and
+  BedrockConfiguration javadocs and the pom comment say "SDK default chain (aws login session or
+  AWS_PROFILE)" instead of "AWS SSO profile", with a pointer to the identity TECH_PLAN §7.4
+  intends (F8) and a DECISIONS D6 row. (3) spec-auditor follow-ups (below).
+Acceptance: 🚩 WEEK-1 GATE PASS — run as a demo script, verdict rule fixed in the approved plan
+  (PASS = every pillar demonstrated in-session; the founder-run Bedrock call is cited from D5):
+  repo — git status clean; bash -n scripts/*.sh eval/run.sh OK; detect-secrets --scan-tree exit 0;
+    scripts/precommit-gate.sh with a scratch server/GateDemo.java holding a marker → "❌ todo-markers
+    … ⛔ COMMIT BLOCKED" while secrets/eval/server/app stayed ✅; file removed → "✅ precommit gate
+    passed" (secrets, todo-markers, eval-gate, mvnw verify, flutter analyze all ✅).
+  environment — compose db healthy (PostgreSQL 18.6, up 5 days); cd server && ./mvnw verify: 136 run,
+    0 failures, 0 errors, 1 skipped (BedrockSmokeTest without BEDROCK_LIVE) in 30 classes; cd app &&
+    flutter analyze "No issues found", flutter test 1/1; SERVER_PORT=8081 ./mvnw spring-boot:run on
+    the compose db → profile local, Flyway "Schema public is up to date" (V5), "AiClient chain:
+    ledger > breaker > tier-policy > schema > retry > fake", "Started MargaiApplication in 2.268
+    seconds", /actuator/health {"status":"UP", db UP}, graceful shutdown on kill; AVD
+    margai_android36 booted, flutter build apk --debug (9.4 s), adb install + am start -W
+    com.margai.app/.MainActivity "Status: ok", screencap shows "MARG AI" (scratch screenshot).
+  plan — TECH_PLAN line 3 "APPROVED 2026-09-04 by the founder"; CLAUDE.md precedence list has it at
+    position 3; §0.3 closed today; §14 25/25 in DECISIONS (70 rows).
+  schema — compose db flyway_schema_history: V1 extensions, V2 identity, V3 curriculum core, V4
+    chapter status, R test taxonomy ×2, V5 ai calls, all success; 9 tables + flyway_schema_history;
+    extensions vector 0.8.6, pg_trgm 1.6; MigrationReversibilityTest 1/1 inside verify.
+  AI seam — 94 tests green across 19 ai classes (AiSeamFlowTest 5, ledger 8, breaker 5, tier policy
+    6, schema 5, retry 6, structured output 6, fake 7, prompt registry 5, cost 7, properties 5,
+    Bedrock client 6, Converse mapper 4, documents 2, ai_calls constraints 8 + repository 2, route
+    decision 4, on-demand batch 3) plus ArchitectureTest 4, ModelIdLiteralTest 2, ModularityTest 2;
+    the chain log line above; D5's live rows on Bedrock (Nova Lite, two ok rows, 5,976-token cache
+    write then read) stand as cited — the same proof on the Anthropic profiles is the open account
+    item in the dashboard.
+  eval + audit — cd eval && ./run.sh: placeholder PASS, 0 fixtures, stamp written (the /evalgate
+    half of DEV_SPEC §13.7 item 7); spec-auditor on git diff main...d6-week1-gate: PASS with 3
+    MINOR findings, all fixed in e5633d1 — (1) the §0.3 closure note misattributed completeBatch to a
+    "D5 amendment" of DECISIONS D3.18 (git history: the row named it at the D3 commit; the §14
+    table row is the abbreviation); (2) "every verdict is final" over-closed the §4.5 row (D23) and
+    the Anthropic live proof — both now named; (3) the "default chain" wording replaced "SSO
+    profile" without a pointer to §7.4/F8 or a record — README pointer, pom comment, DECISIONS row.
+Founder decisions: the plan was approved as written; its four closing questions took the
+  recommended option each — PASS rule with the D5 citation, emulator run in the gate, negative gate
+  demo, "SSO" wording fixed in the README + two javadocs only (TECH_PLAN §1.2/§7.4/§7.6 keep the
+  intended identity).
+Doc conflicts surfaced in the plan (none blocked): DEV_SPEC §13.7 item 7 cites "SPEC §10" for the
+  weekly acceptance criteria (SPEC §10 is the personalization charter; the criteria were DEV_SPEC
+  §10, superseded by PLAN) — reading applied: the gate is PLAN §3's 🚩 line, as /week step 7 says;
+  DEV_SPEC stays historical. PLAN D6 has no ✅ of its own — ticked on the gate verdict plus the
+  §12.1 D6 deliverables. PLAN §1 "Fridays end with the gate" vs a Tuesday D6 — day numbering
+  governs. TECH_PLAN §13.2 item 1 "closed" vs the reopened live proof — consistent, both named.
+Spec-silent choices (process, recorded here): the gate is commands + a pasted transcript, no
+  committed gate script; §0.3 rows keep their D3 verdict words and gain the settlement; developer
+  credentials documented as the SDK default chain (DECISIONS D6 row).
+Parked: a reusable week-gate script if the transcript shape grows tedious; adb on PATH via
+  dev-setup.sh (today only the full platform-tools path works).
+Surprise: (1) A settlement note is easy to get subtly wrong from the §14 table alone — the
+  spec-auditor caught a misattribution that only git history settles; keep checking DECISIONS
+  provenance with git log -S, not by reading. (2) flutter emulators --launch from a background
+  shell survives and boots in ≈ 60 s; adb install + am start -W + screencap is a deterministic
+  device proof with no interactive flutter run. (3) A clean gate run costs ≈ 1 min (mvnw verify
+  ≈ 40 s warm). (4) The compose db's ai_calls is empty: the D5 smoke ran on Testcontainers, so a
+  live row on the compose db needs a BEDROCK_LIVE=1 API run once an endpoint calls SmokeTask.
+Tomorrow's first task: founder pushes d6-week1-gate and opens PR #5 (docs + comments; CI runs the
+  full server job). Then D7 — OTP request/verify + rate limits + tokens (PLAN D7 ✅ curl happy path)
+  from TECH_PLAN §3.2 tokens, §3.4 rate limits, §3.7 auth endpoints, §2.2/§2.9 V6 auth tables,
+  §9.1; DEV_SPEC §5 as reference; the /endpoint skill for controller + service + MockMvc test;
+  the fake SMS adapter in the local profile (§1.2). When the AWS ticket clears: the Anthropic-profile
+  smoke rerun and the Nova price row (dashboard).
+```
 
 ```
 D5 · 2026-09-06 · PHASE 0 — Foundations
@@ -514,7 +589,9 @@ Tomorrow's first task:
 - git-native pre-commit hook (`core.hooksPath` → scripts/precommit-gate.sh) · 2026-09-02 · today only Claude's commits are gated; the human's own commits bypass the gate
 - protect scripts/ and .claude/settings.json from agent edits after D1 · 2026-09-02 · the policed agent can currently edit its own policy; commit review by the human is the only control
 - `.claude/skills/release-checklist/` (DEV_SPEC §13.1: migration check, eval gate, changelog) · 2026-09-02 · not in D1 scope; needed before Week 11 (money) at the latest
-- migrate scripts/dev-setup.sh from `sdkmanager` to the new Android CLI · 2026-09-03 · sdkmanager prints a deprecation notice; still works
+- migrate scripts/dev-setup.sh from `sdkmanager` to the new Android CLI · 2026-09-03 · sdkmanager prints a deprecation notice; still works (2026-09-08: `flutter build apk` also warns "understands SDK XML versions up to 3 but … version 4 was encountered" — cosmetic, same cause)
+- put `platform-tools` (adb) on PATH from scripts/dev-setup.sh · 2026-09-08 · today only the full `/opt/homebrew/share/android-commandlinetools/platform-tools/adb` path works; device proofs script it by hand
+- a reusable week-gate demo script (`scripts/week-gate.sh`) · 2026-09-08 · the Week-1 gate ran as commands + a pasted transcript; revisit if the weekly shape grows tedious
 - `brew "libpq"` so the allowed `psql -h localhost *` command exists locally · 2026-09-03 · today sessions use `docker compose exec -T db psql`
 - `brew "gh"` so sessions can read CI run status after the human pushes · 2026-09-03 · optional; web UI works
 - silence Gradle's JDK 25 native-access warning (`--enable-native-access=ALL-UNNAMED` in gradle.properties) · 2026-09-03 · cosmetic

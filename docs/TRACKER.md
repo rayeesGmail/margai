@@ -12,7 +12,7 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 0 — Foundations (Week 1) complete 2026-09-08 · PHASE 1 — Auth & identity (Week 2) starts at D7 |
-| Current day | D6 done · 2026-09-08 (buffer: TECH_PLAN §0.3 dispositions closed, §14 checked 25/25 against DECISIONS, README + credential-path drift fixed, 3 spec-auditor findings fixed; **Week-1 gate PASS** as a demo script; branch `d6-week1-gate`, 4 commits, PR #5 to be opened by the founder) · next: D7 OTP request/verify + rate limits + tokens (PHASE 1, Week 2) |
+| Current day | D6 done · 2026-09-08 (buffer: TECH_PLAN §0.3 dispositions closed, §14 checked 25/25 against DECISIONS, README + credential-path drift fixed, 3 spec-auditor findings fixed; **Week-1 gate PASS** as a demo script; branch `d6-week1-gate`, 4 commits, PR #5 merged by the founder 2026-09-08, merge commit 11e50bb) · next: D7 OTP request/verify + rate limits + tokens (PHASE 1, Week 2) |
 | Days completed / total | 6 / 84 |
 | Schedule delta | on track |
 | Last week's gate | **Week-1 🚩 PASS** 2026-09-08 — repo, environment, plan, schema and AI seam each demonstrated in-session (transcript in the D6 day log); the only open item, the live proof on the Anthropic profiles, is an account matter, not a build one |
@@ -29,7 +29,7 @@
 - [x] **D3** Claude Code full technical plan reviewed & approved · ✅ plan committed to docs/ — done 2026-09-04, docs/TECH_PLAN.md v1.0 APPROVED with 8 founder decisions (§0.5), three spec-auditor passes (see day log)
 - [x] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations — done 2026-09-06, acceptance PASS (compose-db schema dump matches TECH_PLAN §2.2–§2.4 column by column; `MigrationReversibilityTest` green), PR #3 merged by the founder 2026-09-06 (merge commit 3f77d6f) (see day log)
 - [x] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake — done 2026-09-08 (built 2026-09-06 on `d5-ai-seam`, 15 commits), acceptance PASS: (a) fake chain + boot on the compose db; (b) live smoke on Bedrock `apac.amazon.nova-lite-v1:0` — two `ok` rows, real token counts, 5,976-token cache write then read, forced tool honoured; the Anthropic-profile proof waits for the AWS billing ticket (see day log); PR #4 merged by the founder 2026-09-08 (merge commit 0b70047, CI green after the test-order fix)
-- [x] **D6** Buffer / overflow — done 2026-09-08: TECH_PLAN §0.3 dispositions closed and §14 checked against DECISIONS.md (25/25; the §12.1 D6 deliverables), root README + live-smoke credential wording brought in line with D3.4 and the D5 path, three spec-auditor findings fixed; 4 commits on `d6-week1-gate` (see day log)
+- [x] **D6** Buffer / overflow — done 2026-09-08: TECH_PLAN §0.3 dispositions closed and §14 checked against DECISIONS.md (25/25; the §12.1 D6 deliverables), root README + live-smoke credential wording brought in line with D3.4 and the D5 path, three spec-auditor findings fixed; 4 commits on `d6-week1-gate` (see day log); PR #5 merged by the founder 2026-09-08 (merge commit 11e50bb)
 - [x] **🚩 WEEK-1 GATE:** repo, env, plan, schema, AI seam in place — **PASS** 2026-09-08, run as a literal demo script (evidence in the D6 day log)
 
 ## PHASE 1 — Auth & identity (Week 2) · M1
@@ -241,8 +241,9 @@ Surprise: (1) A settlement note is easy to get subtly wrong from the §14 table 
   device proof with no interactive flutter run. (3) A clean gate run costs ≈ 1 min (mvnw verify
   ≈ 40 s warm). (4) The compose db's ai_calls is empty: the D5 smoke ran on Testcontainers, so a
   live row on the compose db needs a BEDROCK_LIVE=1 API run once an endpoint calls SmokeTask.
-Tomorrow's first task: founder pushes d6-week1-gate and opens PR #5 (docs + comments; CI runs the
-  full server job). Then D7 — OTP request/verify + rate limits + tokens (PLAN D7 ✅ curl happy path)
+PR #5 from d6-week1-gate merged to main by the founder 2026-09-08 (merge commit 11e50bb); Week 1
+  closed on main.
+Tomorrow's first task: D7 — OTP request/verify + rate limits + tokens (PLAN D7 ✅ curl happy path)
   from TECH_PLAN §3.2 tokens, §3.4 rate limits, §3.7 auth endpoints, §2.2/§2.9 V6 auth tables,
   §9.1; DEV_SPEC §5 as reference; the /endpoint skill for controller + service + MockMvc test;
   the fake SMS adapter in the local profile (§1.2). When the AWS ticket clears: the Anthropic-profile

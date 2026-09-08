@@ -10,14 +10,14 @@ import java.util.Optional;
  * hop when present, else the socket address. Used as a rate-limit key (§3.4) and recorded on
  * OTP challenges ({@code request_ip}, §2.2).
  */
-final class ClientAddress {
+public final class ClientAddress {
 
     static final String FORWARDED_FOR = "X-Forwarded-For";
 
     private ClientAddress() {
     }
 
-    static String of(HttpServletRequest request) {
+    public static String of(HttpServletRequest request) {
         String forwarded = request.getHeader(FORWARDED_FOR);
         if (forwarded != null && !forwarded.isBlank()) {
             String first = forwarded.split(",")[0].strip();
@@ -29,7 +29,7 @@ final class ClientAddress {
     }
 
     /** The same address as an {@link InetAddress}, or empty when it is not a literal IP. */
-    static Optional<InetAddress> inet(HttpServletRequest request) {
+    public static Optional<InetAddress> inet(HttpServletRequest request) {
         String literal = of(request);
         if (literal == null || literal.isBlank()) {
             return Optional.empty();

@@ -54,10 +54,10 @@ class ApiExceptionHandler {
     ResponseEntity<ErrorEnvelope> invalidBody(MethodArgumentNotValidException failure, HttpServletRequest request) {
         Map<String, Object> fields = new LinkedHashMap<>();
         for (FieldError error : failure.getBindingResult().getFieldErrors()) {
-            fields.putIfAbsent(error.getField(), error.getDefaultMessage());
+            fields.putIfAbsent(wireName(error.getField()), error.getDefaultMessage());
         }
         failure.getBindingResult().getGlobalErrors()
-                .forEach(error -> fields.putIfAbsent(error.getObjectName(), error.getDefaultMessage()));
+                .forEach(error -> fields.putIfAbsent(wireName(error.getObjectName()), error.getDefaultMessage()));
         return validationFailed(fields, request);
     }
 
@@ -65,9 +65,29 @@ class ApiExceptionHandler {
     ResponseEntity<ErrorEnvelope> invalidParameters(HandlerMethodValidationException failure, HttpServletRequest request) {
         Map<String, Object> fields = new LinkedHashMap<>();
         failure.getParameterValidationResults().forEach(result -> result.getResolvableErrors()
-                .forEach(error -> fields.putIfAbsent(result.getMethodParameter().getParameterName(),
+                .forEach(error -> fields.putIfAbsent(wireName(result.getMethodParameter().getParameterName()),
                         error.getDefaultMessage())));
         return validationFailed(fields, request);
+    }
+
+    /** Validation names Java fields; the client knows the snake_case wire names (§11.3): {@code challengeId → challenge_id}. */
+    static String wireName(String javaName) {
+        if (javaName == null) {
+            return null;
+        }
+        StringBuilder wire = new StringBuilder(javaName.length() + 4);
+        for (int i = 0; i < javaName.length(); i++) {
+            char c = javaName.charAt(i);
+            if (Character.isUpperCase(c)) {
+                if (i > 0 && javaName.charAt(i - 1) != '.' && javaName.charAt(i - 1) != '_') {
+                    wire.append('_');
+                }
+                wire.append(Character.toLowerCase(c));
+            } else {
+                wire.append(c);
+            }
+        }
+        return wire.toString();
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

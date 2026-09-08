@@ -101,19 +101,19 @@ class SecurityChainTest {
 
     @Test
     void publicAuthRoutesNeedNoToken() {
-        // No controller yet (T8): the chain lets the request through to MVC, which says 404, not 401.
+        // The chain lets a token-less request through to MVC; without a body the controller's validation answers, not the chain.
         MvcTestResult result = mvc.post().uri("/api/v1/auth/otp/request")
                 .header("X-Forwarded-For", "203.0.113.50").exchange();
 
-        assertThat(result).hasStatus(404);
-        assertThat(result).bodyJson().extractingPath("$.error.code").isEqualTo("NOT_FOUND");
+        assertThat(result).hasStatus(400);
+        assertThat(result).bodyJson().extractingPath("$.error.code").isEqualTo("VALIDATION_FAILED");
     }
 
     @Test
     void otpRequestsAreLimitedPerClientAddressBeforeAnyController() {
         for (int i = 0; i < 10; i++) {
             assertThat(mvc.post().uri("/api/v1/auth/otp/request").header("X-Forwarded-For", "203.0.113.60").exchange())
-                    .as("request " + (i + 1)).hasStatus(404);
+                    .as("request " + (i + 1)).hasStatus(400);
         }
 
         MvcTestResult refused = mvc.post().uri("/api/v1/auth/otp/request")

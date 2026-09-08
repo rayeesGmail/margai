@@ -101,6 +101,16 @@ class ApiEnvelopeTest {
     }
 
     @Test
+    void validationDetailsUseWireNames() {
+        assertThat(ApiExceptionHandler.wireName("challengeId")).isEqualTo("challenge_id");
+        assertThat(ApiExceptionHandler.wireName("refreshToken")).isEqualTo("refresh_token");
+        assertThat(ApiExceptionHandler.wireName("user.displayName")).isEqualTo("user.display_name");
+        assertThat(ApiExceptionHandler.wireName("phone")).isEqualTo("phone");
+        assertThat(ApiExceptionHandler.wireName("hoursWeekdayX")).isEqualTo("hours_weekday_x");
+        assertThat(ApiExceptionHandler.wireName(null)).isNull();
+    }
+
+    @Test
     void serviceRaisedValidationUsesTheSameShape() {
         MvcTestResult result = mvc.get().uri("/api/v1/probe/service-validation").exchange();
 

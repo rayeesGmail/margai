@@ -22,7 +22,7 @@ public final class Identifiers {
     private Identifiers() {
     }
 
-    static LoginIdentifier.Phone phone(String raw) {
+    public static LoginIdentifier.Phone phone(String raw) {
         if (raw == null) {
             throw invalidPhone();
         }
@@ -40,7 +40,7 @@ public final class Identifiers {
         return new LoginIdentifier.Phone("+91" + digits);
     }
 
-    static LoginIdentifier.Email email(String raw) {
+    public static LoginIdentifier.Email email(String raw) {
         if (raw == null) {
             throw invalidEmail();
         }

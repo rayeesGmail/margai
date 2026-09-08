@@ -30,9 +30,10 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * TECH_PLAN §3.4 on a clock the test moves: 10 OTP requests per hour per address, 60 requests
- * per minute per signed-in user, keys independent, refill with time, {@code Retry-After} when
- * refused, and no bucket at all for anonymous traffic on the other public routes.
+ * TECH_PLAN §3.4 and §1.5 step 4 on a clock the test moves: 10 OTP requests per hour per address,
+ * 60 verify/refresh calls per minute per address, 60 requests per minute per signed-in user, the
+ * last forwarded hop as the address, keys independent, refill with time, {@code Retry-After} when
+ * refused, and no bucket for anonymous traffic outside {@code /auth}.
  */
 class RateLimitFilterTest {
 

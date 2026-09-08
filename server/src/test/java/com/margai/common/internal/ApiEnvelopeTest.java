@@ -102,11 +102,22 @@ class ApiEnvelopeTest {
 
     @Test
     void validationDetailsAreReasonCodesNeverProse() {
-        assertThat(ApiExceptionHandler.reasonCode("NotBlank", "must not be blank")).isEqualTo("not_blank");
+        assertThat(ApiExceptionHandler.reasonCode("NotBlank", "{jakarta.validation.constraints.NotBlank.message}")).isEqualTo("not_blank");
         assertThat(ApiExceptionHandler.reasonCode("Pattern", "code.digits")).isEqualTo("code.digits");
         assertThat(ApiExceptionHandler.reasonCode("Size", "{jakarta.validation.constraints.Size.message}")).isEqualTo("size");
+        assertThat(ApiExceptionHandler.reasonCode("NotBlank", "must not be blank")).isEqualTo("not_blank");
         assertThat(ApiExceptionHandler.reasonCode(null, "some prose here")).isEqualTo("invalid");
         assertThat(ApiExceptionHandler.reasonCode("Min", null)).isEqualTo("min");
+    }
+
+    @Test
+    void reasonCodesDoNotDependOnTheRequestLocale() {
+        MvcTestResult japanese = mvc.post().uri("/api/v1/probe/validate").contentType(MediaType.APPLICATION_JSON)
+                .header("Accept-Language", "ja").content("{\"name\":\"\",\"count\":0}").exchange();
+
+        assertThat(japanese).hasStatus(400);
+        assertThat(japanese).bodyJson().extractingPath("$.error.details.name").isEqualTo("not_blank");
+        assertThat(japanese).bodyJson().extractingPath("$.error.details.count").isEqualTo("min");
     }
 
     @Test

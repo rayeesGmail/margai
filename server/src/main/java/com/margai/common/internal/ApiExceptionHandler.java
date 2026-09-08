@@ -6,14 +6,17 @@ import com.margai.common.api.ErrorEnvelope;
 import com.margai.common.api.ErrorResponses;
 import com.margai.common.api.RateLimitedException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -54,10 +57,10 @@ class ApiExceptionHandler {
     ResponseEntity<ErrorEnvelope> invalidBody(MethodArgumentNotValidException failure, HttpServletRequest request) {
         Map<String, Object> fields = new LinkedHashMap<>();
         for (FieldError error : failure.getBindingResult().getFieldErrors()) {
-            fields.putIfAbsent(wireName(error.getField()), reasonCode(error.getCode(), error.getDefaultMessage()));
+            fields.putIfAbsent(wireName(error.getField()), reasonOf(error));
         }
-        failure.getBindingResult().getGlobalErrors().forEach(error -> fields.putIfAbsent(
-                wireName(error.getObjectName()), reasonCode(error.getCode(), error.getDefaultMessage())));
+        failure.getBindingResult().getGlobalErrors()
+                .forEach(error -> fields.putIfAbsent(wireName(error.getObjectName()), reasonOf(error)));
         return validationFailed(fields, request);
     }
 
@@ -66,25 +69,40 @@ class ApiExceptionHandler {
         Map<String, Object> fields = new LinkedHashMap<>();
         failure.getParameterValidationResults().forEach(result -> result.getResolvableErrors()
                 .forEach(error -> fields.putIfAbsent(wireName(result.getMethodParameter().getParameterName()),
-                        reasonCode(bareConstraint(error.getCodes()), error.getDefaultMessage()))));
+                        reasonOf(error))));
         return validationFailed(fields, request);
     }
 
-    /** Spring lists codes most-specific first ({@code NotBlank.body.name} … {@code NotBlank}); the bare constraint is last. */
-    private static String bareConstraint(String[] codes) {
-        return codes == null || codes.length == 0 ? null : codes[codes.length - 1];
+    /**
+     * The reason code of one validation error, independent of the request's locale: the
+     * constraint's raw message template when the source violation is reachable, else the bare
+     * constraint name. Spring lists codes most-specific first ({@code NotBlank.body.name} …
+     * {@code NotBlank}), so the bare constraint is the last one.
+     */
+    private static String reasonOf(MessageSourceResolvable error) {
+        String[] codes = error.getCodes();
+        String constraint = codes == null || codes.length == 0 ? null : codes[codes.length - 1];
+        String template = null;
+        if (error instanceof ObjectError objectError) {
+            try {
+                template = objectError.unwrap(ConstraintViolation.class).getMessageTemplate();
+            } catch (IllegalArgumentException notAConstraintViolation) {
+                template = null;
+            }
+        }
+        return reasonCode(constraint, template);
     }
 
     /**
      * {@code details} values are reason codes, never prose (SPEC §3 "all copy is externalized"): a
-     * constraint's own {@code message} when it was set to a code ({@code code.digits}), else the
-     * constraint name in snake_case ({@code NotBlank → not_blank}); the framework's interpolated
-     * English ("must not be blank") never reaches the wire.
+     * constraint's own {@code message} template when it was set to a code ({@code code.digits}),
+     * else the constraint name in snake_case ({@code NotBlank → not_blank}). The framework's
+     * interpolated text — in whatever locale the request asked for — never reaches the wire.
      */
-    static String reasonCode(String constraint, String interpolatedMessage) {
-        if (interpolatedMessage != null && !interpolatedMessage.isBlank() && interpolatedMessage.indexOf(' ') < 0
-                && !interpolatedMessage.startsWith("{")) {
-            return interpolatedMessage;
+    static String reasonCode(String constraint, String messageTemplate) {
+        if (messageTemplate != null && !messageTemplate.isBlank() && !messageTemplate.startsWith("{")
+                && messageTemplate.chars().noneMatch(Character::isWhitespace)) {
+            return messageTemplate;
         }
         return constraint == null ? "invalid" : wireName(constraint);
     }

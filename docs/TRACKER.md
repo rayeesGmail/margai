@@ -12,13 +12,13 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 0 — Foundations (Week 1) |
-| Current day | D5 built · 2026-09-06 (AiClient seam, fake + decorator chain, ai_calls ledger, breaker, Bedrock client, ArchUnit) on `d5-ai-seam` · acceptance (a) PASS, (b) the founder's live smoke run pending · next: tick D5 after the run, then D6 + Week-1 gate |
-| Days completed / total | 4 / 84 |
+| Current day | D5 done · 2026-09-08 (AiClient seam, fake + decorator chain, ai_calls ledger, breaker, Bedrock client, ArchUnit; live smoke green on Nova Lite) · next: founder pushes `d5-ai-seam` + PR #4, then D6 + Week-1 gate |
+| Days completed / total | 5 / 84 |
 | Schedule delta | on track |
 | Last week's gate | n/a — Week-1 gate is due at D6 |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | **D5's ✅ second half is blocked on the AWS account** (2026-09-07): the live smoke now reaches Bedrock (the `aws login` session works once the SDK `signin` module is present, be867be) but Bedrock refuses with 403 `AccessDeniedException: INVALID_PAYMENT_INSTRUMENT` — the AWS Marketplace subscription for the Anthropic model needs a valid payment method on the account (Billing → Payment preferences). Confirmed 2026-09-07 21:20 IST: `aws bedrock-runtime converse` on the same model from the same terminal fails identically, so the code is not involved; the session is the account's **root** user via `aws login` — daily use should move to an IAM Identity Center or IAM user with Bedrock permissions (TECH_PLAN §7.4; added to F8). Retry ≥ 2 minutes after fixing: `cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false`, paste the printed rows. All four TECH_PLAN §13.2 console checks closed (#3 on 2026-09-04; #1, #2, #4 on 2026-09-06): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles with prices recorded; batch minimum 100 records, both models batch-capable from ap-south-1; EMBED `cohere.embed-multilingual-v3` on-demand in-region, 1,024 dims; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. D5 may run its live smoke call. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none for the build. Open on the AWS account (not a build blocker before D14, the first live VISION day): the **Anthropic models are refused with 403 `INVALID_PAYMENT_INSTRUMENT`** (AWS Marketplace subscription needs a valid payment method; AWS support ticket open since 2026-09-07) — the tier defaults stay Anthropic, the D5 smoke was proven on Amazon Nova Lite instead, and TECH_PLAN §13.2 item 1's caching/forced-tool proof on the Anthropic profiles reopens until the ticket clears (rerun `cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false` then). Also on F8: the local CLI session is the account **root** user via `aws login` — move to an IAM Identity Center or IAM user with Bedrock permissions (TECH_PLAN §7.4). All four TECH_PLAN §13.2 console checks closed (#3 on 2026-09-04; #1, #2, #4 on 2026-09-06): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles with prices recorded; batch minimum 100 records, both models batch-capable from ap-south-1; EMBED `cohere.embed-multilingual-v3` on-demand in-region, 1,024 dims; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. D5 may run its live smoke call. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
@@ -28,7 +28,7 @@
 - [x] **D2** Local env: Docker Postgres 18+pgvector, Spring Boot 4 boots, Flutter shell on device, CI green · ✅ fresh clone → running <15 min — done 2026-09-03, acceptance PASS (35 s warm, ≈14.5 min cold), PR CI green (founder-verified), merged (see day log)
 - [x] **D3** Claude Code full technical plan reviewed & approved · ✅ plan committed to docs/ — done 2026-09-04, docs/TECH_PLAN.md v1.0 APPROVED with 8 founder decisions (§0.5), three spec-auditor passes (see day log)
 - [x] **D4** Core schema migrations (users, profiles, syllabus, config) + seed script · ✅ reversible migrations — done 2026-09-06, acceptance PASS (compose-db schema dump matches TECH_PLAN §2.2–§2.4 column by column; `MigrationReversibilityTest` green), PR #3 merged by the founder 2026-09-06 (merge commit 3f77d6f) (see day log)
-- [ ] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake — built 2026-09-06 on `d5-ai-seam` (9 commits), acceptance (a) PASS; (b) awaits the founder's `BEDROCK_LIVE=1` run of `BedrockSmokeTest` (see day log); tick after the rows are pasted
+- [x] **D5** AiClient seam + FakeAiClient + cost ledger + one live Bedrock smoke call · ✅ app runs fully on fake — done 2026-09-08 (built 2026-09-06 on `d5-ai-seam`, 15 commits), acceptance PASS: (a) fake chain + boot on the compose db; (b) live smoke on Bedrock `apac.amazon.nova-lite-v1:0` — two `ok` rows, real token counts, 5,976-token cache write then read, forced tool honoured; the Anthropic-profile proof waits for the AWS billing ticket (see day log)
 - [ ] **D6** Buffer / overflow
 - [ ] **🚩 WEEK-1 GATE:** repo, env, plan, schema, AI seam in place
 
@@ -203,27 +203,40 @@ Shipped (branch d5-ai-seam, 9 commits, ≈ 93 files): the AI seam of TECH_PLAN �
   Rule edit per §0.2 (ai-layer.md, three lines), server README "AI seam" section, 20 DECISIONS
   rows, prompt-changelog rows, the precommit gate now scans .stg. 136 tests in 30 classes (1 skipped
   by design), ./mvnw verify ≈ 25 s warm.
-Acceptance: PARTIAL —
+Acceptance: PASS (2026-09-08) —
   (a) "App runs fully on FakeAiClient": PASS. ./mvnw verify green (136 tests); AiSeamFlowTest drives
       SmokeTask through the whole chain on the fake (ok row with tokens and cost, breaker row for a
       capped user, TierPolicyException row, a row that survives a rolled-back caller transaction);
       SERVER_PORT=8081 ./mvnw spring-boot:run on the compose db: Flyway "Migrating schema public to
       version 5 - ai calls", "AiClient chain: ledger > breaker > tier-policy > schema > retry > fake",
       "Started MargaiApplication in 2.025 seconds", /actuator/health {"status":"UP", db UP}.
-  (b) "one live call logged with token counts": PENDING the founder's run —
-      cd server && BEDROCK_LIVE=1 AWS_PROFILE=<sso> ./mvnw test -Dtest=BedrockSmokeTest
-      -Dsurefire.failIfNoSpecifiedTests=false — two cheap-tier calls asserting the forced-tool echo,
-      real input/output tokens and cost, a cache write (or read) on the first row and a cache read on
-      the second (TECH_PLAN §13.2 item 1's open point). The rows are printed; paste them here.
-      Founder runs on 2026-09-07: run 1 (16:36 IST) failed before AWS — the `aws login` session
+  (b) "one live call logged with token counts": PASS on 2026-09-08 10:35 IST, founder-run
+      BedrockSmokeTest with BEDROCK_LIVE=1 and MARGAI_AI_TIER_CHEAP=apac.amazon.nova-lite-v1:0
+      (the Anthropic profiles are refused by the account, see below). Chain logged
+      "ledger > breaker > tier-policy > schema > retry > bedrock". The two ai_calls rows:
+        smoke | apac.amazon.nova-lite-v1:0 | smoke v1 | ok | in=29 out=20 cache_read=0
+          cache_write=5976 | 1347 ms | 1 paise
+        smoke | apac.amazon.nova-lite-v1:0 | smoke v1 | ok | in=29 out=20 cache_read=5976
+          cache_write=0 | 650 ms | 1 paise
+      Proven: credentials, region, the Converse mapping, the forced tool (the record came back with
+      the requested numbers), real token counts, a 5,976-token cached prefix written on the first
+      call and read on the second, input tokens excluding cache tokens (the cost formula's
+      assumption), one ledger row per call. Open: the same proof on the Anthropic profiles
+      (TECH_PLAN §13.2 item 1) once the account's Marketplace subscription is unblocked.
+      The road there, 2026-09-07/08: run 1 failed before AWS — the `aws login` session
       (login_session in the default profile) needs the SDK signin module; added at runtime scope
-      (be867be). Run 2 (16:38 IST) reached Bedrock and was refused: 403 AccessDeniedException
-      "INVALID_PAYMENT_INSTRUMENT: A valid payment instrument must be provided … AWS Marketplace
-      subscription for this model cannot be completed" — an account matter (payment method), not
-      code; yesterday's CLI probes on the same model succeeded, so the account identity of the
-      `aws login` session is the other thing to confirm. Both runs proved the failure path: the
-      chain classified them permanent, no retries, ledger rows status=error with codes
-      SdkClientException and AccessDeniedException (§4.13 "every outcome").
+      (be867be). Run 2 reached Bedrock: 403 AccessDeniedException "INVALID_PAYMENT_INSTRUMENT …
+      AWS Marketplace subscription for this model cannot be completed" — the account's payment
+      method, not code; a CLI converse on the same model fails identically; AWS support ticket
+      raised by the founder. A Bedrock API key (AWS_BEARER_TOKEN_BEDROCK) was tried; it expired
+      and, while exported, overrides the login session for every Bedrock call ("Bearer Token has
+      expired" even after aws login) — unset. A direct Anthropic API fallback was considered and
+      declined (SPEC §3, CLAUDE.md stack line; nothing needs a live model before D14). A CLI
+      converse on Nova Lite succeeded, so the smoke ran on it with a diagnostic price row
+      (1e0bed2). Run 3 on Nova was green on every assertion but cost: 0.06 / 0.38 paise per call
+      rounded to zero → cost_paise now rounds up (3b68d91, DECISIONS). Run 4 green. The failed
+      runs also proved the failure path: permanent classification, no retries, ledger rows
+      status=error with codes SdkClientException and AccessDeniedException (§4.13 "every outcome").
   spec-auditor on the branch diff: PASS, 10 minor findings. Fixed in 2b5d3d9: model-facing text
   moved to prompts/_protocol.v1.stg; embed tokens header → body → estimate, never zero; Optional
   record components optional/nullable in the schema (the D37 router verdict would otherwise have
@@ -256,10 +269,16 @@ Surprise: (1) Boot 4.1 is on Jackson 3 (tools.jackson); victools 5.0.0 and netwo
   differ after a Document round trip (IntNode vs LongNode) while the JSON is identical — compare
   text. (5) ArchUnit 1.4.2 was already on the test classpath via Modulith. (6) ≈ 5,200 insertions
   for a "seam" day: the chain, the Bedrock mapping and their tests are the bulk, as §4.1 implied.
-Tomorrow's first task: the founder runs BedrockSmokeTest and pastes the rows; Claude ticks D5. The
-  founder pushes d5-ai-seam and opens PR #4 (CI's first AWS SDK download; no AWS access needed).
-  Then D6: buffer + the Week-1 gate as a demo script ("repo, env, plan, schema, AI seam in place"),
-  TECH_PLAN §0.3 dispositions closed and §14 checked against DECISIONS.md (§12.1 D6 row).
+  (7) The live path needed two things the plan did not foresee: the SDK signin module for an
+  `aws login` session, and a payment instrument the account turned out not to have — a CLI probe
+  that worked on 2026-09-06 stopped working the next day. (8) An exported Bedrock API key silently
+  overrides the login session for the CLI too. (9) Sub-paisa calls exist (Nova Lite) and HALF_UP
+  hid them from the breaker. (10) The cached prefix is 5,976 tokens, above the ≈ 5,500 estimate.
+Tomorrow's first task: the founder pushes d5-ai-seam and opens PR #4 (CI's first AWS SDK download;
+  no AWS access needed). Then D6: buffer + the Week-1 gate as a demo script ("repo, env, plan,
+  schema, AI seam in place"), TECH_PLAN §0.3 dispositions closed and §14 checked against
+  DECISIONS.md (§12.1 D6 row). When the AWS ticket clears: rerun the smoke on the Anthropic
+  profile and close §13.2 item 1's live proof; confirm or drop the Nova price row.
 ```
 
 ```

@@ -1971,6 +1971,14 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    the plan's per-request prefix); a 1-hour cache point would be a separate price key.
    `usd_inr` is config beside the table. Reserved-tier and provisioned pricing are not relevant at
    beta volume. **Item 1 closed.**
+   **D5 smoke, 2026-09-08:** caching and forced tool use proven on Bedrock through the seam, but
+   on `apac.amazon.nova-lite-v1:0` — the account's AWS Marketplace subscription for the Anthropic
+   models is refused (`INVALID_PAYMENT_INSTRUMENT`, AWS ticket open), although the 2026-09-06
+   probes above had answered. Findings: a 5,976-token system prefix was written to the cache on
+   the first call and read on the second; `inputTokens` excludes the cached tokens (the §4.8
+   formula's assumption holds); the forced tool returned the record. The same proof on the
+   Anthropic profiles, and the tier defaults above, stand as recorded; rerun the smoke when the
+   ticket clears.
 2. Bedrock batch inference minimum record count and whether the chosen models support it.
    **Partial 2026-09-06:** the Mumbai pricing page lists batch prices for both chosen models
    (Haiku 4.5 0.50 / 2.50, Sonnet 4.6 1.50 / 7.50 — half of on-demand), so both support batch

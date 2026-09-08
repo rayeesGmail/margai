@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * TECH_PLAN §4.8: cost in whole paise from per-million-token USD prices and {@code usd_inr},
- * HALF_UP; batch rows at the batch input/output rates; cache tokens priced separately.
+ * rounded up so any usage costs at least one paisa; batch rows at the batch input/output rates;
+ * cache tokens priced separately.
  */
 class CostCalculatorTest {
 
@@ -32,8 +33,8 @@ class CostCalculatorTest {
 
     @Test
     void cacheWritesArePricedAtTheWriteRate() {
-        // (100×1.00 + 10×5.00 + 4000×1.25) / 1e6 = 0.00515 USD → 0.4635 INR → 46.35 → 46
-        assertThat(calculator.paise(CHAT, new Usage(100, 10, 0, 4000), false)).isEqualTo(46);
+        // (100×1.00 + 10×5.00 + 4000×1.25) / 1e6 = 0.00515 USD → 0.4635 INR → 46.35 → 47 (up)
+        assertThat(calculator.paise(CHAT, new Usage(100, 10, 0, 4000), false)).isEqualTo(47);
     }
 
     @Test
@@ -43,9 +44,13 @@ class CostCalculatorTest {
     }
 
     @Test
-    void roundsHalfUpToWholePaise() {
+    void roundsUpToWholePaiseSoAnyUsageCostsAtLeastOne() {
         // 500×1.00 / 1e6 = 0.0005 USD → 0.045 INR → 4.5 paise → 5
         assertThat(calculator.paise(CHAT, new Usage(500, 0, 0, 0), false)).isEqualTo(5);
+        // 1×1.00 / 1e6 USD → 0.009 paise → 1: a sub-paisa call never escapes the breaker
+        assertThat(calculator.paise(CHAT, new Usage(1, 0, 0, 0), false)).isEqualTo(1);
+        // exact amounts are not inflated: 200×5.00 / 1e6 = 0.001 USD → 9 paise exactly
+        assertThat(calculator.paise(CHAT, new Usage(0, 200, 0, 0), false)).isEqualTo(9);
         assertThat(calculator.paise(CHAT, Usage.none(), false)).isZero();
     }
 

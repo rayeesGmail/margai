@@ -6,7 +6,9 @@ import java.math.RoundingMode;
 
 /**
  * {@code cost_paise} at insert time (TECH_PLAN §4.8):
- * {@code HALF_UP((in·p_in + out·p_out + cr·p_cr + cw·p_cw) / 1e6 × usd_inr × 100)}.
+ * {@code CEILING((in·p_in + out·p_out + cr·p_cr + cw·p_cw) / 1e6 × usd_inr × 100)}.
+ * Rounded up, so any call that consumed tokens costs at least one paisa: a breaker must never
+ * let sub-paisa calls accumulate unseen (DECISIONS 2026-09-08, found on the Nova Lite smoke).
  * Batch rows use the batch input and output prices; cache tokens are priced the same either way.
  * A price change never rewrites history because the value is stored, not derived.
  */
@@ -32,6 +34,6 @@ public final class CostCalculator {
                 .add(BigDecimal.valueOf(usage.cacheReadTokens()).multiply(price.cacheRead()))
                 .add(BigDecimal.valueOf(usage.cacheWriteTokens()).multiply(price.cacheWrite()))
                 .divide(MILLION);
-        return usd.multiply(usdInr).multiply(PAISE_PER_RUPEE).setScale(0, RoundingMode.HALF_UP).longValueExact();
+        return usd.multiply(usdInr).multiply(PAISE_PER_RUPEE).setScale(0, RoundingMode.CEILING).longValueExact();
     }
 }

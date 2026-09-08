@@ -12,3 +12,11 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get appTitle => 'MARG AI';
 }
+
+/// The translations for Hindi, using the Latin script (`hi_Latn`).
+class AppLocalizationsHiLatn extends AppLocalizationsHi {
+  AppLocalizationsHiLatn() : super('hi_Latn');
+
+  @override
+  String get appTitle => 'MARG AI';
+}

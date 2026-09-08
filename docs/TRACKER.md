@@ -12,7 +12,7 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 1 — Auth & identity (Week 2, D7–D12), running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
-| Current day | D7 done · 2026-09-08 (OTP login by verified email or phone — phone behind `margai.auth.otp.channels` until F1 — with SES/log senders, JWT + rotating refresh families, Bucket4j limits, the `common` web foundation (envelope, request id, three-language copy, security chain); ✅ curl happy path PASS on the compose db; spec-auditor FAIL → 2 MAJOR + 4 MINOR fixed in `6a96db6`, re-audit in the day log; branch `d7-otp-auth`, 11 commits, PR to be opened by the founder) · next: D8 Flutter login screens — email entry, code entry, retry, change-email, offline-tolerant errors (SMS auto-read waits for F1); device login needs F10 or the sandbox log |
+| Current day | D7 done · 2026-09-08 (OTP login by verified email or phone — phone behind `margai.auth.otp.channels` until F1 — with SES/log senders, JWT + rotating refresh families, Bucket4j limits, the `common` web foundation (envelope, request id, three-language copy, security chain); ✅ curl happy path PASS on the compose db; spec-auditor FAIL → 2 MAJOR + 4 MINOR fixed in `6a96db6`, re-audit in the day log; branch `d7-otp-auth`, 11 commits, PR #6 merged by the founder 2026-09-08, merge commit af3adb3) · next: D8 Flutter login screens — email entry, code entry, retry, change-email, offline-tolerant errors (SMS auto-read waits for F1); device login needs F10 or the sandbox log |
 | Days completed / total | 7 / 84 |
 | Schedule delta | on track |
 | Last week's gate | **Week-1 🚩 PASS** 2026-09-08 — repo, environment, plan, schema and AI seam each demonstrated in-session (transcript in the D6 day log); the only open item, the live proof on the Anthropic profiles, is an account matter, not a build one |
@@ -34,7 +34,7 @@
 
 ## PHASE 1 — Auth & identity (Week 2) · M1
 
-- [x] **D7** OTP request/verify + rate limits + tokens · ✅ curl happy path — done 2026-09-08, acceptance PASS (literal curl transcript in the day log: email request → sandbox code → verify → tokens with `sub/role/lang/jti` → refresh → reuse revokes the family; 429 + `Retry-After` for the cooldown and the hourly cap; phone refused while email-only; hash in the db, code only on the sandbox logger); **email OTP per the founder's D7 ruling** (DECISIONS row 1 of 2026-09-08, exit = F1); branch `d7-otp-auth`, 11 commits, PR to be opened by the founder
+- [x] **D7** OTP request/verify + rate limits + tokens · ✅ curl happy path — done 2026-09-08, acceptance PASS (literal curl transcript in the day log: email request → sandbox code → verify → tokens with `sub/role/lang/jti` → refresh → reuse revokes the family; 429 + `Retry-After` for the cooldown and the hourly cap; phone refused while email-only; hash in the db, code only on the sandbox logger); **email OTP per the founder's D7 ruling** (DECISIONS row 1 of 2026-09-08, exit = F1); branch `d7-otp-auth`, 11 commits, PR #6 merged by the founder 2026-09-08 (merge commit af3adb3)
 - [ ] **D8** Login screens (auto-read OTP, retry, change number) · ✅ real device, mobile data — *D7 ruling (2026-09-08): email entry first; SMS auto-read (`smart_auth`) waits for F1; the device login needs F10 (SES identity) or the sandbox log*
 - [ ] **D9** Unhappy paths (10-failure checklist) · ✅ all graceful
 - [ ] **D10** Profile-on-first-login, language, logout, token rotation · ✅ persistence + clean logout — *rotation + reuse detection already live since D7; D10 adds `POST /auth/logout`, the profile row, `/me`*
@@ -267,8 +267,9 @@ Surprise: (1) MessageFormat only doubles apostrophes when arguments are passed �
 Tomorrow's first task: D8 — Flutter login screens for email (entry, code entry with retry and
   change-email, offline-tolerant errors, the reason codes → ARB strings), on the emulator against
   SERVER_PORT=8081 (base URL http://10.0.2.2:8081, TECH_PLAN §5.4); the real-device check reads the
-  code from the sandbox log unless F10 is done. The founder's F10 (SES identity + test recipients)
-  and the PR for d7-otp-auth.
+  code from the sandbox log unless F10 is done. The founder's F10 (SES identity + test recipients).
+PR #6 from d7-otp-auth merged to main by the founder 2026-09-08 (merge commit af3adb3); D7 closed
+  on main.
 ```
 
 ```

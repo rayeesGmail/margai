@@ -78,18 +78,23 @@ default, `BedrockAiClient` when the `bedrock` profile is active. The chain is lo
 
 ### Live smoke (D5 acceptance, founder-run)
 
-The only way to reach Bedrock from a developer machine is a human-launched run with the AWS SSO
-profile; Claude sessions cannot (CLAUDE.md). With Docker running:
+The only way to reach Bedrock from a developer machine is a human-launched run with AWS credentials
+in the SDK's default chain — an `aws login` session in the default profile (the SDK `signin` module
+is on the runtime classpath for it), or a named profile via `AWS_PROFILE=<profile>`; Claude sessions
+cannot (CLAUDE.md). The intended developer identity is an IAM Identity Center (SSO) profile with
+Bedrock permissions (TECH_PLAN §7.4; created under founder workstream F8) — until it exists the
+login session is the interim path, recorded in DECISIONS.md (D6). With Docker running:
 
 ```bash
-cd server && BEDROCK_LIVE=1 AWS_PROFILE=<your sso profile> ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
+cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
 ```
 
 `BedrockSmokeTest` makes two `smoke` calls on the `cheap` tier and asserts: both `ai_calls` rows
 `ok` with non-zero input and output tokens, the forced tool echoed the number, the first row wrote
 the prompt cache and the second read it. The rows are printed. `BEDROCK_LIVE` is unset again
 afterwards; without it the test is skipped and `./mvnw verify` never touches AWS. To run the API
-itself against Bedrock: `BEDROCK_LIVE=1 AWS_PROFILE=<profile> ./mvnw spring-boot:run`.
+itself against Bedrock: `BEDROCK_LIVE=1 ./mvnw spring-boot:run` (prefix `AWS_PROFILE=<profile>` when
+the credentials are not in the default profile).
 
 ## Modules and schema
 

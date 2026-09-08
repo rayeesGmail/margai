@@ -53,7 +53,7 @@ surfaced in that session rather than now:
 | DEV_SPEC | Verdict | Where in this plan | Why |
 |---|---|---|---|
 | §2 System architecture | Confirmed, amended | §1, §7 | Nightly work runs as a scheduled ECS task from the same image; Bedrock batch inference only above its minimum job size (§0.4 #2) |
-| §2.1 Technology decisions | Confirmed | §4.9, §7.3 | Model IDs pinned in config; exact IDs to be confirmed in the console (DEV_SPEC §12 item 4) |
+| §2.1 Technology decisions | Confirmed | §4.9, §7.3 | Model IDs pinned in config; exact IDs to be confirmed in the console (DEV_SPEC §12 item 4) — settled 2026-09-06 by console checks #1 and #4 (§13.2): tier and embed defaults are `margai.ai.*` config since D5, DECISIONS D4 rows |
 | §3 Data model | Amended | §2 | Enums as text + CHECK; HNSW index; arrays replaced by join tables where a foreign key matters; blocks get their own table; tables added for OTP, refresh tokens, sessions, consent, documents, notifications, idempotency, billing events, usage counters, audit |
 | §4.1 AiClient | Replaced | §4.1 | One primitive (`complete`/`embed`) with typed feature tasks around it; ledger, breaker, retry and tier policy as decorators; REASON needs a route decision by construction |
 | §4.2 Doubt pipeline | Amended, specified | §4.3 | Stages become named components with the enforcement point of each hard rule; the verifier is blind to the proposed solution (DEV_SPEC §4.1 passed it in); retrieval takes 8 + 8 candidates instead of 4 + 4; polling instead of streaming until D69; cross-language cache hits rendered, not re-solved |
@@ -62,7 +62,7 @@ surfaced in that session rather than now:
 | §4.5 Evaluation | Amended | §4.10 | Live eval is human-launched and writes a committed stamp; CI verifies the stamp and runs the fake-client layer (§0.4 #3) |
 | §5 API | Amended, extended | §3 | Paths regrouped by module (`/onboarding/scorecard` → `/documents`, `DELETE /account` → `DELETE /me`, `/signals/batch-position` → `/plan/batch-position`, `correct-cause` → `cause`; OTP verify takes a `challenge_id`); endpoints added for consent, documents, devices, usage, danger zones, trajectory, paywall state, curriculum reads, export, admin |
 | §6 Flutter | Confirmed, specified | §5 | Layering, packages, offline outbox, Hinglish locale |
-| §6.1 Offline & sync | Confirmed with one open conflict | §5.6, §0.4 #4 | Offline instant verdict vs server-side judging needs a founder decision |
+| §6.1 Offline & sync | Confirmed, decided | §5.6, §0.4 #4 | Offline instant verdict vs server-side judging needed a founder decision — Option A at approval (§0.5 item 1b); the rule clause and the pack-only-carrier test land at D34 |
 | §6.2 Notifications | Confirmed | §2.7, §4.5, §10 | One `notification_log` table drives cap, quiet periods and dispatch |
 | §7 Content pipeline | Amended | §6 | AI-touching steps live in the Java server (profile `pipeline`) so they use `AiClient`; `pipeline/` holds founder-owned inputs and reports |
 | §8 Feature rules | Confirmed with four amendments | cited where used | Product decisions consistent with SPEC. §8.1's on-the-fly plan is tagged `generated_by = fallback` (not `onboarding`) so the two origins stay distinguishable; §8.5's "queue as batch" is a deferred on-demand queue (§0.4 #2); §8.6's T-3 mode is named `light_recall` (§4.5); §8.6's "continuity offer is Phase 2" is overruled by SPEC §12, which excludes only referral and graduation automation (§0.4 #7) |
@@ -70,6 +70,14 @@ surfaced in that session rather than now:
 | §10 Build plan (6 weeks) | Superseded | docs/PLAN.md | Already stated in CLAUDE.md |
 | §11 Out of scope | Confirmed, one difference | §0.4 #7 | SPEC §12 plus the "NCERT licence badge"; DEV_SPEC §11 also lists "referral/graduation flows", which this plan reads per SPEC §12 as automation only, leaving continuity re-onboarding unscheduled rather than excluded |
 | §12 Open items | Confirmed, extended | §13 | Adds batch-inference minimum, RDS PG18 availability, infra timeline |
+
+Dispositions closed at D6 (2026-09-08, PLAN Week-1 gate; §12.1 D6 row): every verdict above is
+final as a disposition. The two that waited on the founder or the console were settled by §0.5
+item 1b (offline verdicts) and §13.2 items 1 and 4 (model ids). Two follow-ons stay scheduled and
+are not reopened by this note: the §4.5 row's eval-gate arrangement (§0.4 #3) lands at D23, and
+§13.2 item 1's live proof on the Anthropic profiles waits for the account's AWS ticket (D5 note
+there). §14 was checked against DECISIONS.md the same day: 25 of 25 rows present; the DECISIONS
+D3.18 row names `completeBatch` as §4.1 does, where the §14 row abbreviates to `complete` + `embed`.
 
 ### 0.4 Conflicts and gaps surfaced (not silently resolved)
 
@@ -1180,7 +1188,9 @@ a re-learn block candidate.
 
 - Model: Cohere Embed Multilingual v3 on Bedrock, 1,024 dimensions, `input_type` document vs query.
   Fallback if unavailable in the account: Titan Text Embeddings v2 at 1,024. Both to be confirmed in
-  the console (§13.2); the dimension is fixed at 1,024 so the schema does not move.
+  the console (§13.2) — confirmed 2026-09-06 (§13.2 item 4): Cohere Embed Multilingual v3 is
+  on-demand in ap-south-1 itself, Titan v2 the fallback by config; the dimension is fixed at 1,024
+  so the schema does not move.
 - Indexes: HNSW cosine on `ncert_paragraphs.embedding`, `questions.embedding`,
   `doubt_cache.embedding` (`m = 16, ef_construction = 64`); GIN on `ncert_paragraphs.tsv`.
 - `HybridRetriever` is the one retrieval component (§4.3 stage 6) and is also used by the pipeline

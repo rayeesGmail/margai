@@ -1,14 +1,16 @@
 # MARG AI
 
-AI mentor app for NEET. The product contract is `docs/SPEC.md`; how it is built is `docs/DEV_SPEC.md`,
-`docs/PLAN.md` (14-week schedule) and `docs/TRACKER.md` (live state); choices the specs leave open are
-logged in `docs/DECISIONS.md`. Working agreements for agentic sessions are in `CLAUDE.md`.
+AI mentor app for NEET. The product contract is `docs/SPEC.md`; how it is built is `docs/TECH_PLAN.md`
+(the technical plan approved at D3: architecture, data model, API, AI pipeline, app, pipeline, infra,
+testing), with `docs/DEV_SPEC.md` §13 as the working agreements and its §2–12 as reference;
+`docs/PLAN.md` is the 14-week schedule and `docs/TRACKER.md` the live state; choices the specs leave
+open are logged in `docs/DECISIONS.md`. Working agreements for agentic sessions are in `CLAUDE.md`.
 
 | Directory | What | Check |
 |---|---|---|
 | `server/` | Spring Boot 4 API, Java 25, Maven, Flyway, Postgres 18 + pgvector | `cd server && ./mvnw verify` |
 | `app/` | Flutter client (Android first), Riverpod, ARB en/hi | `cd app && flutter analyze && flutter test` |
-| `pipeline/` | content batch jobs (NCERT, PYQ) — from Week 3 | |
+| `pipeline/` | founder-owned inputs (`inputs/`) and run reports (`reports/`) for the content pipeline; the commands themselves run in `server/` under the `pipeline` profile (TECH_PLAN §6) — from Week 3 | |
 | `eval/` | AI eval gate, required after any prompt/routing/retrieval change | `cd eval && ./run.sh` |
 | `scripts/` | commit gate, path/secret guards, `dev-setup.sh` | |
 

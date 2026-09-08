@@ -83,6 +83,16 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
+    <!-- D7 (TECH_PLAN §3.2, §9.1): stateless security chain; HS256 JWTs encoded and decoded
+         with the Nimbus support the resource-server starter brings. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
+    </dependency>
     <!-- Prompt templates: StringTemplate 4 group files under resources/prompts (TECH_PLAN §4.12). -->
     <dependency>
       <groupId>org.antlr</groupId>
@@ -146,6 +156,11 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security-test</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- @DataJpaTest repository slices run Flyway against Testcontainers (TECH_PLAN §8.1). -->

@@ -30,6 +30,11 @@ public final class IstClock {
         return clock.instant();
     }
 
+    /** The underlying clock, for libraries that validate time themselves (token expiry, rate limits). */
+    public Clock asClock() {
+        return clock;
+    }
+
     public ZonedDateTime nowIst() {
         return ZonedDateTime.now(clock);
     }

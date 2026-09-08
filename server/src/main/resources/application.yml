@@ -66,6 +66,29 @@ margai:
     prompts:
       smoke:
         version: 1
+  # Auth (TECH_PLAN §3.2, §3.4, §9.1; D7). The two secrets come from SSM as MARGAI_AUTH_JWT_SECRET
+  # and MARGAI_AUTH_OTP_PEPPER (base64, 256-bit). Blank → a random value for this process with a
+  # WARN at startup (DECISIONS 2026-09-08): right for a laptop, loud anywhere else.
+  auth:
+    jwt:
+      secret: ""
+      secret-previous: ""        # accepted while set, during a rotation (§9.2)
+      access-ttl: 15m
+      refresh-ttl: 30d
+    otp:
+      pepper: ""
+      ttl: 5m
+      max-attempts: 5
+      resend-cooldown: 30s
+      code-length: 6
+      channels: [email]          # sms joins when the DLT template (TRACKER F1) exists
+      sender: log                # log = sandbox (the code is printed in the server log) | ses
+      email-from: ""             # a verified SES identity; required when sender = ses
+      ses-region: ap-south-1
+  limits:
+    otp-request-per-destination-hourly: 3
+    otp-request-per-ip-hourly: 10
+    authenticated-per-minute: 60
 
 management:
   endpoints:

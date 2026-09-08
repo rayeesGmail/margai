@@ -4,9 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
@@ -22,6 +27,18 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 class ApiEnvelopeTest {
 
     private static final String UUID_SHAPE = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+
+    /** This slice is about the envelope, not the chain ({@code SecurityChainTest} covers that): let everything through. */
+    @TestConfiguration(proxyBeanMethods = false)
+    static class PermitEverything {
+
+        @Bean
+        SecurityFilterChain permitEverything(HttpSecurity http) throws Exception {
+            return http.csrf(AbstractHttpConfigurer::disable)
+                    .authorizeHttpRequests(routes -> routes.anyRequest().permitAll())
+                    .build();
+        }
+    }
 
     @Autowired
     private MockMvcTester mvc;

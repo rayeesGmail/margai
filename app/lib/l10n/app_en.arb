@@ -166,9 +166,9 @@
     }
   },
   "languageLabel": "Language",
-  "languageNote": "Plans and answers from now on use this language. What I've already made for you stays as it was.",
+  "languageNote": "Plans and answers from now on use this language; anything from before keeps the language it was made in.",
   "@languageNote": {
-    "description": "SPEC §6.11: the language switch regenerates future content, not history. Mentor voice."
+    "description": "SPEC §6.11: the language switch regenerates future content, not history. A rule, not a claim about content that may not exist yet (SPEC §1 principle 1). Mentor voice."
   },
   "languageEnglish": "English",
   "@languageEnglish": {

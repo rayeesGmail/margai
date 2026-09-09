@@ -62,6 +62,53 @@ void main() {
     expect(container.read(authStateProvider).value, isA<SignedIn>());
   });
 
+  test('an access token from a previous server key is replaced and the app stays signed in', () async {
+    // A local restart mints a new ephemeral JWT secret (DECISIONS D7); the refresh token row survives.
+    adapter
+      ..reply(FakeReply.envelope(401, 'AUTH_INVALID'))
+      ..reply(
+        FakeReply.json(200, {
+          'access_token': 'access-2',
+          'refresh_token': 'refresh-2',
+          'expires_in': 900,
+        }),
+      )
+      ..reply(FakeReply.json(200, {'user': {'id': 'u-1'}}));
+
+    final body = await container.read(apiClientProvider).get('/me');
+
+    expect(body['user'], {'id': 'u-1'});
+    expect(adapter.requests.map((r) => r.options.uri.path), [
+      '/api/v1/me',
+      '/api/v1/auth/refresh',
+      '/api/v1/me',
+    ]);
+    expect((await store.read())?.accessToken, 'access-2');
+    expect(container.read(authStateProvider).value, isA<SignedIn>());
+  });
+
+  test('an account the server can no longer serve signs the app out after one refresh', () async {
+    adapter
+      ..reply(FakeReply.envelope(401, 'AUTH_INVALID'))
+      ..reply(
+        FakeReply.json(200, {
+          'access_token': 'access-2',
+          'refresh_token': 'refresh-2',
+          'expires_in': 900,
+        }),
+      )
+      ..reply(FakeReply.envelope(401, 'AUTH_INVALID'));
+
+    await expectLater(
+      container.read(apiClientProvider).get('/me'),
+      throwsA(isA<ApiFailure>().having((f) => f.code, 'code', 'AUTH_INVALID')),
+    );
+
+    expect(adapter.requests, hasLength(3));
+    expect(container.read(authStateProvider).value, isA<SignedOut>());
+    expect(await store.read(), isNull);
+  });
+
   test('a revoked family on refresh signs the app out and clears the device', () async {
     adapter
       ..reply(FakeReply.envelope(401, 'AUTH_EXPIRED'))

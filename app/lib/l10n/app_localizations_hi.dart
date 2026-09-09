@@ -223,7 +223,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get languageNote =>
-      'अब से प्लान और जवाब इसी भाषा में होंगे। जो मैंने पहले बनाया है, वह वैसा ही रहेगा।';
+      'अब से प्लान और जवाब इसी भाषा में होंगे; पहले का जो कुछ है, वह अपनी भाषा में ही रहेगा।';
 
   @override
   String get languageEnglish => 'English';
@@ -465,7 +465,7 @@ class AppLocalizationsHiLatn extends AppLocalizationsHi {
 
   @override
   String get languageNote =>
-      'Ab se plans aur answers isi language mein honge. Jo maine pehle banaya hai, wo waisa hi rahega.';
+      'Ab se plans aur answers isi language mein honge; pehle ka jo kuch hai, wo apni language mein hi rahega.';
 
   @override
   String get languageEnglish => 'English';

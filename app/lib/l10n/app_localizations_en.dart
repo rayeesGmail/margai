@@ -224,7 +224,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageNote =>
-      'Plans and answers from now on use this language. What I\'ve already made for you stays as it was.';
+      'Plans and answers from now on use this language; anything from before keeps the language it was made in.';
 
   @override
   String get languageEnglish => 'English';

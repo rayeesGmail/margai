@@ -423,10 +423,10 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get languageLabel;
 
-  /// SPEC §6.11: the language switch regenerates future content, not history. Mentor voice.
+  /// SPEC §6.11: the language switch regenerates future content, not history. A rule, not a claim about content that may not exist yet (SPEC §1 principle 1). Mentor voice.
   ///
   /// In en, this message translates to:
-  /// **'Plans and answers from now on use this language. What I\'ve already made for you stays as it was.'**
+  /// **'Plans and answers from now on use this language; anything from before keeps the language it was made in.'**
   String get languageNote;
 
   /// Each language option is written in its own language in every locale, so a student who picked the wrong one can always find the way back. Not translated.

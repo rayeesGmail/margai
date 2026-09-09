@@ -8,10 +8,14 @@ import 'request_ids.dart';
 /// Supplies the bearer token for authenticated calls; `null` when the student is signed out.
 typedef BearerSupplier = Future<String?> Function();
 
-/// Replaces an expired access token (TECH_PLAN §5.4): answers the new one, or throws the
-/// [ApiFailure] that ended the attempt — `AUTH_INVALID` when the session is gone, offline when
-/// the network was. The client never calls it twice for one request.
+/// Replaces an access token the server would not take (TECH_PLAN §5.4): answers the new one, or
+/// throws the [ApiFailure] that ended the attempt — `AUTH_INVALID` when the session is gone,
+/// offline when the network was. The client never calls it twice for one request.
 typedef AuthExpiredHandler = Future<String> Function();
+
+/// Ends the session on the device (TECH_PLAN §3.3: `AUTH_INVALID` means re-login) when even a
+/// freshly refreshed token is refused — the account itself can no longer be served.
+typedef SessionLostHandler = Future<void> Function();
 
 /// The one HTTP client every repository uses (TECH_PLAN §5.4, `.claude/rules/app.md`). dio with
 /// the request headers of §3.1 (`X-Request-Id`, `X-App-Version`, `X-Client-Time`,
@@ -22,10 +26,14 @@ typedef AuthExpiredHandler = Future<String> Function();
 /// the secure connection could not be made (D9).
 ///
 /// Since D10 (PLAN "token rotation"): an authenticated call that comes back 401 `AUTH_EXPIRED`
-/// asks [onAuthExpired] for a new access token and is retried once with it — the handler is
-/// single-flight, so calls that expire together share one refresh. The public auth routes
-/// (`/auth/otp/*`, `/auth/refresh`) carry no bearer and never refresh: the server does not read
-/// one there, and a stale token in the store must not stand in the way of the refresh itself.
+/// — or `AUTH_INVALID`, which is what a stored access token becomes after the server's signing
+/// key changed while the refresh token in the same store is still good — asks [onAuthExpired]
+/// for a new access token and is retried once with it; the handler is single-flight, so calls
+/// that fail together share one refresh. A retry that is still `AUTH_INVALID` means the account
+/// itself cannot be served (deleted, or unrepaired), and [onSessionLost] signs the device out
+/// (§3.3: re-login). The public auth routes (`/auth/otp/*`, `/auth/refresh`) carry no bearer and
+/// never refresh: the server does not read one there, and a stale token in the store must not
+/// stand in the way of the refresh itself.
 class ApiClient {
   ApiClient({
     required String baseUrl,
@@ -33,6 +41,7 @@ class ApiClient {
     required this._acceptLanguage,
     required this._bearer,
     this._onAuthExpired,
+    this._onSessionLost,
     HttpClientAdapter? adapter,
     DateTime Function()? clock,
     RequestIds? requestIds,
@@ -70,6 +79,7 @@ class ApiClient {
   final String Function() _acceptLanguage;
   final BearerSupplier _bearer;
   final AuthExpiredHandler? _onAuthExpired;
+  final SessionLostHandler? _onSessionLost;
   final DateTime Function() _clock;
   final RequestIds _requestIds;
 
@@ -105,11 +115,20 @@ class ApiClient {
       return await _run(send);
     } on ApiFailure catch (failure) {
       final handler = _onAuthExpired;
-      if (!failure.isAuthExpired || isPublic(path) || handler == null) {
+      final replaceable = failure.isAuthExpired || failure.isAuthInvalid;
+      if (!replaceable || isPublic(path) || handler == null) {
         rethrow;
       }
       final renewed = await handler();
-      return _run(() => send(renewed));
+      try {
+        return await _run(() => send(renewed));
+      } on ApiFailure catch (again) {
+        if (again.isAuthInvalid) {
+          // A token minted a moment ago is refused: the account, not the token, is the problem.
+          await _onSessionLost?.call();
+        }
+        rethrow;
+      }
     }
   }
 

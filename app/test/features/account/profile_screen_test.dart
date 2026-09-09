@@ -135,6 +135,31 @@ void main() {
     final locale = allLocales.first;
     final l10n = copyFor(locale);
 
+    testWidgets('a /me the server answered with an error shows the line without Retry (the D8 rule)', (
+      tester,
+    ) async {
+      final accounts = FakeAccountRepository()
+        ..onGetMe(
+          const ApiFailure(
+            code: 'INTERNAL',
+            status: 500,
+            details: {'request_id': 'req-9'},
+          ),
+        );
+
+      await pumpScreen(
+        tester,
+        const ProfileScreen(),
+        locale: locale,
+        store: await signedInStore(),
+        accounts: accounts,
+      );
+
+      expect(find.text(l10n.errorInternal), findsOneWidget);
+      expect(find.text(l10n.failureRequestId('req-9')), findsOneWidget);
+      expect(find.text(l10n.retryButton), findsNothing);
+    });
+
     testWidgets('tapping हिन्दी dispatches the switch and the screen re-renders in Hindi', (
       tester,
     ) async {

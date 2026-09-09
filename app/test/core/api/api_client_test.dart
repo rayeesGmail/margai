@@ -13,6 +13,7 @@ void main() {
   String? bearer;
   String language = 'en';
   var refreshes = 0;
+  var sessionsLost = 0;
   Future<String> Function()? onAuthExpired;
 
   ApiClient client({String baseUrl = 'http://10.0.2.2:8081'}) => ApiClient(
@@ -21,6 +22,7 @@ void main() {
     acceptLanguage: () => language,
     bearer: () async => bearer,
     onAuthExpired: onAuthExpired,
+    onSessionLost: () async => sessionsLost++,
     adapter: adapter,
     clock: () => DateTime.utc(2026, 9, 8, 12, 30, 45, 123),
   );
@@ -30,6 +32,7 @@ void main() {
     bearer = null;
     language = 'en';
     refreshes = 0;
+    sessionsLost = 0;
     onAuthExpired = () async {
       refreshes++;
       return 'access-2';
@@ -124,16 +127,47 @@ void main() {
       expect(failure.code, 'AUTH_EXPIRED');
       expect(refreshes, 1);
       expect(adapter.requests, hasLength(2));
+      expect(sessionsLost, 0);
     });
 
-    test('other 401s pass through untouched', () async {
+    test('AUTH_INVALID on an authenticated call gets the same one refresh: the key may have changed', () async {
+      // A stored access token signed by a previous server key is AUTH_INVALID, while the refresh
+      // token beside it is still good (the local ephemeral secret, or a rotation past the window).
+      bearer = 'access-old-key';
+      adapter
+        ..reply(FakeReply.envelope(401, 'AUTH_INVALID'))
+        ..reply(FakeReply.json(200, {'ok': true}));
+
+      final body = await client().get('/me');
+
+      expect(body, {'ok': true});
+      expect(refreshes, 1);
+      expect(adapter.requests[1].header('Authorization'), 'Bearer access-2');
+      expect(sessionsLost, 0);
+    });
+
+    test('a retry that is still AUTH_INVALID ends the session: the account, not the token', () async {
       bearer = 'access-1';
-      adapter.reply(FakeReply.envelope(401, 'AUTH_INVALID'));
+      adapter
+        ..reply(FakeReply.envelope(401, 'AUTH_INVALID'))
+        ..reply(FakeReply.envelope(401, 'AUTH_INVALID'));
 
       final failure = await _failureOf(client().get('/me'));
 
       expect(failure.code, 'AUTH_INVALID');
+      expect(refreshes, 1);
+      expect(sessionsLost, 1);
+      expect(adapter.requests, hasLength(2));
+    });
+
+    test('AUTH_REQUIRED passes through untouched: there was no token to replace', () async {
+      adapter.reply(FakeReply.envelope(401, 'AUTH_REQUIRED'));
+
+      final failure = await _failureOf(client().get('/me'));
+
+      expect(failure.code, 'AUTH_REQUIRED');
       expect(refreshes, 0);
+      expect(sessionsLost, 0);
     });
 
     test('the public auth routes carry no bearer and never refresh, even with a stored session', () async {

@@ -42,7 +42,11 @@ class ProfileScreen extends ConsumerWidget {
             padding: const EdgeInsets.only(top: AppSpacing.md),
             child: FailureLine(
               failure: fetchFailure,
-              onRetry: () => ref.read(meProvider.notifier).reload(),
+              // One Retry rule for every screen (D8/D9): only after a failure that never
+              // produced a server answer.
+              onRetry: fetchFailure.isEnvelope
+                  ? null
+                  : () => ref.read(meProvider.notifier).reload(),
             ),
           ),
         const SizedBox(height: AppSpacing.lg),

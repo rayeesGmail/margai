@@ -85,6 +85,40 @@ The server's `X-Forwarded-For` last hop is the address every per-address limit k
   offline (the session stays, `session_refresher_test`), and row 10's per-process secrets now
   end a signed-in session gracefully — the dead family answers `AUTH_INVALID` and the app returns
   to login (`api_wiring_test`).
+- **D11 (2026-09-09)** — `auth` changed (the `otp.failed` / `otp.verified` tags,
+  `countExpiredUnverified`, the metrics report, the delivery reporter) and `common` (a
+  `@PreAuthorize` refusal renders as `FORBIDDEN`, `/actuator/**` gated on the admin role). Every
+  row's pinning tests ran green inside the gate on each of its commits (server 319); no device
+  re-run that day — the D12 run below is on the post-D11 build.
+- **D12 (2026-09-09), the Week-2 gate** — no `auth`, `account` or `core/api` change on the day
+  itself; the ten-row device re-run below, on the post-D11 build the gate's stranger signed in on,
+  through `scripts/ui.sh` (committed that day). PASS, no regression.
+
+## D12 run — 2026-09-09 · PASS (the Week-2 gate)
+
+The same AVD and loop as D9, now through `scripts/ui.sh`, against a server built from `db98a49`
+on port 8082 with the sandbox sender. Three server instances, because rows 9 and 10 need a stop
+and a restart and row 3 a 40-second `MARGAI_AUTH_OTP_TTL`; the rows were ordered so each instance
+stayed under the 10-per-hour per-address `otp/request` cap that the AVD and curl share (both
+arrive from 127.0.0.1): 1, 2, 4, 5 and 6 on the first, 9 (a) (b) across its stop, 9 (c), 7 and 8
+on the second, 10 and 3 on the third — 8, 6 and 2 requests, no limit raised. Run right after the
+gate's leg A (a never-seen address on a fresh install, one code typed once, Today, reopen still
+signed in, `first_attempt_rate=1.000` on the reporter line). Every row's tests green in the two
+suites; 18 screenshots and the three server logs in the session scratchpad; the transcript in the
+TRACKER D12 day log.
+
+| # | Observed |
+|---|---|
+| 1 | Wrong codes 000000, 111111, 222222, 333333: each kept in the field, "4 / 3 / 2 tries left." then "1 try left.", the server line, Verify live (shots row1-wrong-1, row1-wrong-4). |
+| 2 | The fifth wrong code (444444): "No tries left on this code — ask for a new one." alone; field and Verify disabled; "Send a new code" live (row2-exhausted). |
+| 3 | Third instance, 40 s lifetime: code sent 22:35:32, the right one typed 22:36:26 → "That code isn't valid any more. Ask for a new one.", field and Verify disabled, resend live (row3-expired-code). |
+| 4 | Resend → "New code in 26s" disabled (row4a). Killed and reopened inside the cooldown: the entry step comes back empty (the address is not kept across a process death), the same address typed → the 429 rendered as "Too many codes requested. Give it a little time." + "Send code in 6s" disabled, address kept, live a few seconds later (row4b). Change email right after a send → address kept, "Send code in 16s" disabled (row4c). |
+| 5 | The fourth code for one address inside the hour → the 429 line + "Send code in 57 min" disabled, address kept (row5a); a different address freed the button and it sent (row5b). |
+| 6 | curl with `X-Client-Time` 3 h ahead → 200, challenge issued, the header not echoed; log `WARN … ClientTimeFilter : client clock is 10799 s ahead of ours on POST /api/v1/auth/otp/request (request_id=b724bde5-…)`. The TLS copy is pinned by tests (plain HTTP locally). |
+| 7 | `  TWINS-D12@EXAMPLE.COM  ` → 200; `twins-d12@example.com` at once → 429 `OTP_RATE_LIMITED`, `retry_after_s: 30` (one destination); a second code 31 s later; both verifies in parallel → 200 with user `968b9de5-…` twice, `is_new_user` true exactly once; `select count(*) from users where email = …` → 1. |
+| 8 | `{"email":` → 400 `details.body: malformed`; `text/plain` → `details.content_type: unsupported`; `challenge_id: "not-a-uuid"` on verify → `details.body: malformed`; no Java names, no stack. |
+| 9 | Server stopped: the right code → "You're offline. Check your connection and retry — nothing you typed is lost.", digits kept, Retry (row9a); Change email, a new address, Send code → the same line, address kept, Retry (row9b). Server back: Retry re-sent and landed on the code screen (row9c). |
+| 10 | The code the second instance sent, typed after the third started: its boot logged `retired 1 pending OTP code(s): the OTP pepper is per process …` and the screen answered "That code isn't valid any more. Ask for a new one." at once, field and Verify disabled, "Send a new code" live (row10-restart-retired-code). |
 
 ## D9 run — 2026-09-09 · PASS
 

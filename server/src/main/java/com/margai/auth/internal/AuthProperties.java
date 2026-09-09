@@ -17,12 +17,14 @@ import org.springframework.validation.annotation.Validated;
  * ({@code MARGAI_AUTH_JWT_SECRET}, {@code MARGAI_AUTH_OTP_PEPPER}); a blank one yields a random
  * value per boot with a WARN (DECISIONS 2026-09-08, D7) — never a fixed key in the tree.
  *
- * @param jwt access-token signing and lifetimes
- * @param otp code policy, enabled channels and the delivery adapter
+ * @param jwt           access-token signing and lifetimes
+ * @param otp           code policy, enabled channels and the delivery adapter
+ * @param clockSkewWarn drift between {@code X-Client-Time} and the server clock above which the
+ *                      auth routes warn and count it (§3.1 clock-skew diagnostics, PLAN D9)
  */
 @ConfigurationProperties(prefix = "margai.auth")
 @Validated
-public record AuthProperties(@NotNull @Valid Jwt jwt, @NotNull @Valid Otp otp) {
+public record AuthProperties(@NotNull @Valid Jwt jwt, @NotNull @Valid Otp otp, @NotNull Duration clockSkewWarn) {
 
     /**
      * @param secret         base64 256-bit HS256 key; blank → ephemeral

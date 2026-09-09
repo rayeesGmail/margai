@@ -43,16 +43,31 @@ final meProvider = AsyncNotifierProvider<MeNotifier, Me?>(
 );
 
 /// What the Profile screen renders around the stored session: a switch or a logout in flight,
-/// and the last failure worth showing.
+/// the last failure worth showing, and the language last asked for so Retry can ask again.
 class SettingsState {
-  const SettingsState({this.busy = false, this.failure});
+  const SettingsState({this.busy = false, this.failure, this.lastLanguage});
 
   final bool busy;
   final ApiFailure? failure;
 
-  SettingsState copyWith({bool? busy, Object? failure = _keep}) => SettingsState(
+  /// The switch last attempted; what [SettingsNotifier.retry] re-runs.
+  final AppLanguage? lastLanguage;
+
+  /// Retry makes sense only after a failure that never produced a server answer (the D8/D9
+  /// rule): offline, a non-envelope reply, a failed secure connection.
+  bool get canRetry =>
+      failure != null && !failure!.isEnvelope && lastLanguage != null;
+
+  SettingsState copyWith({
+    bool? busy,
+    Object? failure = _keep,
+    Object? lastLanguage = _keep,
+  }) => SettingsState(
     busy: busy ?? this.busy,
     failure: identical(failure, _keep) ? this.failure : failure as ApiFailure?,
+    lastLanguage: identical(lastLanguage, _keep)
+        ? this.lastLanguage
+        : lastLanguage as AppLanguage?,
   );
 
   static const Object _keep = Object();
@@ -62,7 +77,10 @@ class SettingsState {
 /// of SPEC §6.11 and logout. No logic lives in the screen (`.claude/rules/app.md`).
 class SettingsNotifier extends Notifier<SettingsState> {
   @override
-  SettingsState build() => const SettingsState();
+  SettingsState build() => initialState();
+
+  /// The state the screen starts in; tests seed a screen by overriding this.
+  SettingsState initialState() => const SettingsState();
 
   /// Saves the language on the server (`PATCH /me`), then locally — the stored user, so it wins
   /// on the next start (§5.5) — and the locale follows; then the tokens are rotated so the JWT's
@@ -73,7 +91,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     if (state.busy || auth is! SignedIn || auth.user.language == language) {
       return;
     }
-    state = state.copyWith(busy: true, failure: null);
+    state = state.copyWith(busy: true, failure: null, lastLanguage: language);
     try {
       final me = await ref.read(accountRepositoryProvider).update(language: language);
       await ref.read(authStateProvider.notifier).updateUser(me.user);
@@ -113,6 +131,15 @@ class SettingsNotifier extends Notifier<SettingsState> {
     }
     await ref.read(authStateProvider.notifier).signOut();
     state = const SettingsState();
+  }
+
+  /// Runs the last switch again with the same language (after an offline failure).
+  Future<void> retry() async {
+    final language = state.lastLanguage;
+    if (language == null) {
+      return;
+    }
+    await setLanguage(language);
   }
 
   void dismissFailure() {

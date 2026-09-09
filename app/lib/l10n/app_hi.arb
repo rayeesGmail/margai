@@ -55,5 +55,17 @@
 
   "todayPlaceholderTitle": "आप अंदर आ गए।",
   "todayPlaceholderBody": "{identifier} के रूप में साइन इन हैं।",
-  "todayPlaceholderNote": "आपका ऑनबोर्डिंग और पहला प्लान अगले बिल्ड में आएगा। अभी यहाँ और कुछ नहीं करना है।"
+  "todayPlaceholderNote": "आपका ऑनबोर्डिंग और पहला प्लान अगले बिल्ड में आएगा। अभी यहाँ और कुछ नहीं करना है।",
+
+  "profileOpenButton": "प्रोफ़ाइल",
+  "profileTitle": "प्रोफ़ाइल",
+  "signedInAs": "{identifier} के रूप में साइन इन हैं।",
+  "languageLabel": "भाषा",
+  "languageNote": "अब से प्लान और जवाब इसी भाषा में होंगे। जो मैंने पहले बनाया है, वह वैसा ही रहेगा।",
+  "languageEnglish": "English",
+  "languageHindi": "हिन्दी",
+  "languageHinglish": "Hinglish",
+  "logoutButton": "लॉग आउट",
+  "loggingOut": "लॉग आउट हो रहा है…",
+  "profileNote": "आपका लक्ष्य, पढ़ाई के घंटे, सब्सक्रिप्शन, डेटा एक्सपोर्ट और अकाउंट हटाना — ये अगले बिल्ड में आएँगे।"
 }

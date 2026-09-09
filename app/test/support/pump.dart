@@ -5,10 +5,13 @@ import 'package:margai/core/auth/token_store.dart';
 import 'package:margai/core/clock.dart';
 import 'package:margai/core/l10n/language_mapper.dart';
 import 'package:margai/core/ticker.dart';
+import 'package:margai/features/account/providers.dart';
+import 'package:margai/features/account/repository.dart';
 import 'package:margai/features/auth/providers.dart';
 import 'package:margai/features/auth/repository.dart';
 import 'package:margai/l10n/app_localizations.dart';
 
+import 'fake_account_repository.dart';
 import 'fake_auth_repository.dart';
 
 /// The three locales every widget test runs in (TECH_PLAN §8.4). Key parity between the ARB
@@ -32,14 +35,27 @@ class SeededLoginNotifier extends LoginNotifier {
   LoginState initialState() => initial;
 }
 
-/// Pumps [screen] inside a localised MaterialApp with the auth providers faked: the login state
-/// seeded, the repository scripted, an in-memory token store, and a frozen clock and ticker.
+/// A [SettingsNotifier] that starts in a chosen state (the Profile screen per state).
+class SeededSettingsNotifier extends SettingsNotifier {
+  SeededSettingsNotifier(this.initial);
+
+  final SettingsState initial;
+
+  @override
+  SettingsState initialState() => initial;
+}
+
+/// Pumps [screen] inside a localised MaterialApp with the auth and account providers faked: the
+/// login and settings states seeded, the repositories scripted, an in-memory token store, and a
+/// frozen clock and ticker.
 Future<void> pumpScreen(
   WidgetTester tester,
   Widget screen, {
   required Locale locale,
   LoginState state = const LoginState(),
+  SettingsState settings = const SettingsState(),
   FakeAuthRepository? repository,
+  FakeAccountRepository? accounts,
   TokenStore? store,
   DateTime? now,
 }) async {
@@ -48,8 +64,12 @@ Future<void> pumpScreen(
     ProviderScope(
       overrides: [
         loginProvider.overrideWith(() => SeededLoginNotifier(state)),
+        settingsProvider.overrideWith(() => SeededSettingsNotifier(settings)),
         authRepositoryProvider.overrideWithValue(
           repository ?? FakeAuthRepository(),
+        ),
+        accountRepositoryProvider.overrideWithValue(
+          accounts ?? (FakeAccountRepository()..onGetMe(FakeAccountRepository.me)),
         ),
         tokenStoreProvider.overrideWithValue(store ?? InMemoryTokenStore()),
         clockProvider.overrideWithValue(() => fixedNow),
@@ -64,7 +84,7 @@ Future<void> pumpScreen(
     ),
   );
   // A busy screen shows an indeterminate progress bar, which never settles.
-  if (state.busy) {
+  if (state.busy || settings.busy) {
     await tester.pump();
   } else {
     await tester.pumpAndSettle();

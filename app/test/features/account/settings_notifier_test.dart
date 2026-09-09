@@ -121,6 +121,37 @@ void main() {
 
       expect(state().failure, isNull);
     });
+
+    test('Retry after a failure that never reached the server re-runs the same switch', () async {
+      accounts
+        ..onUpdate(const ApiFailure.offline())
+        ..onUpdate(FakeAccountRepository.meInHindi);
+      auth.onRefresh(FakeAuthRepository.rotated);
+      await notifier().setLanguage(AppLanguage.hi);
+      expect(state().canRetry, isTrue);
+      expect(state().lastLanguage, AppLanguage.hi);
+
+      await notifier().retry();
+
+      expect(accounts.updatedLanguages, [AppLanguage.hi, AppLanguage.hi]);
+      expect(state().failure, isNull);
+      expect(container.read(localeProvider), const Locale('hi'));
+    });
+
+    test('a server answer offers no Retry: the student picks again', () async {
+      accounts.onUpdate(
+        const ApiFailure(
+          code: 'VALIDATION_FAILED',
+          status: 400,
+          details: {'language': 'language.invalid'},
+        ),
+      );
+
+      await notifier().setLanguage(AppLanguage.hi);
+
+      expect(state().failure?.isEnvelope, isTrue);
+      expect(state().canRetry, isFalse);
+    });
   });
 
   group('logout', () {

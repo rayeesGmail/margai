@@ -6,12 +6,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:margai/app.dart';
 import 'package:margai/core/auth/token_store.dart';
 import 'package:margai/core/clock.dart';
+import 'package:margai/core/l10n/language_mapper.dart';
 import 'package:margai/core/ticker.dart';
+import 'package:margai/features/account/repository.dart';
+import 'package:margai/features/account/screens/profile_screen.dart';
 import 'package:margai/features/auth/repository.dart';
 import 'package:margai/features/auth/screens/login_screen.dart';
 import 'package:margai/features/auth/screens/otp_screen.dart';
 import 'package:margai/features/planner/screens/today_placeholder_screen.dart';
 
+import 'support/fake_account_repository.dart';
 import 'support/fake_auth_repository.dart';
 import 'support/pump.dart';
 
@@ -24,6 +28,7 @@ void main() {
     WidgetTester tester, {
     required TokenStore store,
     FakeAuthRepository? repository,
+    FakeAccountRepository? accounts,
     DateTime Function()? clock,
     Stream<DateTime>? ticks,
   }) async {
@@ -34,6 +39,9 @@ void main() {
           authRepositoryProvider.overrideWithValue(
             repository ?? FakeAuthRepository(),
           ),
+          accountRepositoryProvider.overrideWithValue(
+            accounts ?? (FakeAccountRepository()..onGetMe(FakeAccountRepository.me)),
+          ),
           clockProvider.overrideWithValue(clock ?? () => now),
           tickerProvider.overrideWith((ref) => ticks ?? Stream.value(now)),
         ],
@@ -42,6 +50,67 @@ void main() {
     );
     await tester.pumpAndSettle();
   }
+
+  testWidgets('a stored session fetches /me once on start (TECH_PLAN §3.7)', (tester) async {
+    final store = InMemoryTokenStore();
+    await store.write(FakeAuthRepository.signedIn.toSession());
+    final accounts = FakeAccountRepository()..onGetMe(FakeAccountRepository.me);
+
+    await pumpApp(tester, store: store, accounts: accounts);
+
+    expect(find.byType(TodayPlaceholderScreen), findsOneWidget);
+    expect(accounts.gets, 1);
+  });
+
+  testWidgets('Today → Profile → Log out → the login screen, fresh; a restart stays signed out', (
+    tester,
+  ) async {
+    final store = InMemoryTokenStore();
+    await store.write(FakeAuthRepository.signedIn.toSession());
+    final auth = FakeAuthRepository()..onLogout(null);
+    final l10n = copyFor(allLocales.first);
+    await pumpApp(tester, store: store, repository: auth);
+
+    await tester.tap(find.byTooltip(l10n.profileOpenButton));
+    await tester.pumpAndSettle();
+    expect(find.byType(ProfileScreen), findsOneWidget);
+    expect(find.text(l10n.signedInAs('founder@example.com')), findsOneWidget);
+
+    await tester.tap(find.text(l10n.logoutButton));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LoginScreen), findsOneWidget);
+    expect(find.byType(ProfileScreen), findsNothing);
+    expect(auth.loggedOut, ['refresh-1']);
+    expect(await store.read(), isNull);
+    expect(tester.widget<TextField>(find.byType(TextField)).controller?.text, isEmpty);
+
+    // A cold start over the cleared store: still the login screen (PLAN D10 ✅ "clean state").
+    await pumpApp(tester, store: store);
+    expect(find.byType(LoginScreen), findsOneWidget);
+  });
+
+  testWidgets('a language switch on Profile re-renders the app in that language', (tester) async {
+    final store = InMemoryTokenStore();
+    await store.write(FakeAuthRepository.signedIn.toSession());
+    final accounts = FakeAccountRepository()
+      ..onGetMe(FakeAccountRepository.me)
+      ..onUpdate(FakeAccountRepository.meInHindi);
+    final auth = FakeAuthRepository()..onRefresh(FakeAuthRepository.rotated);
+    final english = copyFor(AppLanguage.en.locale);
+    final hindi = copyFor(AppLanguage.hi.locale);
+    await pumpApp(tester, store: store, accounts: accounts, repository: auth);
+
+    await tester.tap(find.byTooltip(english.profileOpenButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(english.languageHindi));
+    await tester.pumpAndSettle();
+
+    expect(find.text(hindi.profileTitle), findsOneWidget);
+    expect(find.text(hindi.logoutButton), findsOneWidget);
+    expect((await store.read())?.user.language, AppLanguage.hi);
+    expect((await store.read())?.accessToken, 'access-2');
+  });
 
   testWidgets('a fresh install boots to the login screen', (tester) async {
     await pumpApp(tester, store: InMemoryTokenStore());

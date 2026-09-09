@@ -207,4 +207,41 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get todayPlaceholderNote =>
       'Your onboarding and first plan arrive in a later build. Nothing else to do here yet.';
+
+  @override
+  String get profileOpenButton => 'Profile';
+
+  @override
+  String get profileTitle => 'Profile';
+
+  @override
+  String signedInAs(String identifier) {
+    return 'Signed in as $identifier.';
+  }
+
+  @override
+  String get languageLabel => 'Language';
+
+  @override
+  String get languageNote =>
+      'Plans and answers from now on use this language. What I\'ve already made for you stays as it was.';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageHindi => 'हिन्दी';
+
+  @override
+  String get languageHinglish => 'Hinglish';
+
+  @override
+  String get logoutButton => 'Log out';
+
+  @override
+  String get loggingOut => 'Logging out…';
+
+  @override
+  String get profileNote =>
+      'Your target, study hours, subscription, data export and account deletion arrive in later builds.';
 }

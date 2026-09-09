@@ -10,6 +10,7 @@ import com.margai.auth.internal.OtpSender;
 import com.margai.common.api.IstClock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -44,7 +45,9 @@ class AuthFlowTest {
     static class Inbox {
 
         static final List<OtpDelivery> DELIVERIES = new CopyOnWriteArrayList<>();
-        static final MutableClock CLOCK = new MutableClock(Instant.now());
+        // Starts on a sub-microsecond instant on purpose: Linux JDKs hand those out and Postgres
+        // rounds them up to the next microsecond, which made a 20-second wait read 21 on CI (D9).
+        static final MutableClock CLOCK = new MutableClock(Instant.now().with(ChronoField.NANO_OF_SECOND, 999_999_999));
 
         @Bean
         @Primary

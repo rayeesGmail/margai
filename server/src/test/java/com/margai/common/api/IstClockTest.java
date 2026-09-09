@@ -33,6 +33,16 @@ class IstClockTest {
     }
 
     @Test
+    void nowKeepsOnlyTheMicrosecondsThatTimestamptzStores() {
+        IstClock clock = new IstClock(Clock.fixed(Instant.parse("2026-09-06T18:31:00.123456789Z"), IstClock.IST));
+
+        // A Linux JDK hands out nanosecond instants; Postgres rounds them to the nearest microsecond
+        // on the way in, so an untruncated instant would read back later than it was written.
+        assertThat(clock.now()).isEqualTo(Instant.parse("2026-09-06T18:31:00.123456Z"));
+        assertThat(clock.nowIst().toInstant()).isEqualTo(Instant.parse("2026-09-06T18:31:00.123456Z"));
+    }
+
+    @Test
     void anyZoneOnTheGivenClockIsIgnored() {
         IstClock clock = new IstClock(Clock.fixed(Instant.parse("2026-09-06T18:31:00Z"), java.time.ZoneOffset.UTC));
 

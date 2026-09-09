@@ -88,6 +88,17 @@ class LoginState {
   /// May the screen offer "Send a new code" right now.
   bool get canResend => !busy && now != null && canResendAt(now!);
 
+  /// May the entry step ask for a code right now: not busy, and no cooldown pending — from a
+  /// 429, or from a code sent just before Change email (PLAN D9 rows 4–5). A fresh flow may.
+  bool get canRequest =>
+      !busy && (resendAt == null || (now != null && canResendAt(now!)));
+
+  /// A wait of a minute or more reads in minutes (the hourly cap answers with up to 3,600 s).
+  bool get longWait => resendSeconds >= 60;
+
+  /// Whole minutes until a resend is allowed, rounded up; 0 when it already is.
+  int get resendMinutes => (resendSeconds + 59) ~/ 60;
+
   /// Whole seconds until a resend is allowed; 0 when it already is.
   int get resendSeconds {
     final at = resendAt;
@@ -164,7 +175,7 @@ class LoginNotifier extends Notifier<LoginState> {
     });
     ref.onDispose(_stopTicking);
     final initial = initialState();
-    if (initial.challenge != null) {
+    if (initial.challenge != null || initial.resendAt != null) {
       _startTicking();
     }
     return initial;
@@ -182,8 +193,12 @@ class LoginNotifier extends Notifier<LoginState> {
   }
 
   /// Sends a code to the typed email. From the code step this is a resend: the old challenge
-  /// stays on screen until the new one arrives, so a failed resend loses nothing.
+  /// stays on screen until the new one arrives, so a failed resend loses nothing. Inside a
+  /// cooldown this is a no-op on either step: the server would only answer 429 again.
   Future<void> requestCode() async {
+    if (state.busy || !state.canResendAt(_now)) {
+      return;
+    }
     final email = state.email.trim();
     final reason = Identifiers.emailReason(email);
     if (reason != null) {
@@ -299,13 +314,18 @@ class LoginNotifier extends Notifier<LoginState> {
     }
   }
 
-  /// Back to the entry step with the email still there; any cooldown still applies.
+  /// Back to the entry step with the email still there; any cooldown still applies — and keeps
+  /// counting down on the entry step, so the ticker stays only while one is pending.
   void changeEmail() {
     if (state.busy) {
       return;
     }
-    _stopTicking();
+    final now = _now;
+    if (state.canResendAt(now)) {
+      _stopTicking();
+    }
     state = state.copyWith(
+      now: now,
       challenge: null,
       attemptsLeft: null,
       failure: null,
@@ -331,13 +351,17 @@ class LoginNotifier extends Notifier<LoginState> {
     state = state.copyWith(failure: null);
   }
 
-  /// The once-a-second clock runs only while a cooldown can be on screen: from a sent code until
-  /// the flow leaves the code step (SPEC §1 principle 5: no idle timer on a mid-range phone).
+  /// The once-a-second clock runs only while a cooldown can be on screen: on the code step from
+  /// a sent code, and on the entry step only until a pending cooldown elapses (SPEC §1
+  /// principle 5: no idle timer on a mid-range phone).
   void _startTicking() {
     _tick ??= ref.listen<AsyncValue<DateTime>>(tickerProvider, (_, next) {
       final at = next.value;
       if (at != null) {
         state = state.copyWith(now: at);
+        if (state.step == LoginStep.entry && state.canResendAt(at)) {
+          _stopTicking();
+        }
       }
     });
   }

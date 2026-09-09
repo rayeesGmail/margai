@@ -60,6 +60,18 @@ void main() {
         );
       });
 
+      testWidgets('a long wait on the code step reads in minutes', (tester) async {
+        await pumpScreen(
+          tester,
+          const OtpScreen(),
+          locale: locale,
+          now: now,
+          state: sent.copyWith(resendAt: now.add(const Duration(seconds: 3507))),
+        );
+        expect(find.text(l10n.resendInMinutes(59)), findsOneWidget);
+        expect(find.text(l10n.resendButton), findsNothing);
+      });
+
       testWidgets('wrong code: server copy plus the attempts-left plural', (tester) async {
         await pumpScreen(
           tester,

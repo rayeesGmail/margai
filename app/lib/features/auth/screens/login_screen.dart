@@ -39,8 +39,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return OneHandPage(
       primaryAction: FilledButton(
-        onPressed: state.busy ? null : notifier.requestCode,
-        child: Text(state.busy ? l10n.sendingCode : l10n.sendCodeButton),
+        onPressed: state.canRequest ? notifier.requestCode : null,
+        child: Text(_primaryLabel(l10n, state)),
       ),
       children: [
         Text(
@@ -82,5 +82,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
       ],
     );
+  }
+
+  /// Sending, a pending cooldown (seconds, or whole minutes for a long wait), or the plain call.
+  static String _primaryLabel(AppLocalizations l10n, LoginState state) {
+    if (state.busy) {
+      return l10n.sendingCode;
+    }
+    if (state.canRequest) {
+      return l10n.sendCodeButton;
+    }
+    return state.longWait
+        ? l10n.sendCodeInMinutes(state.resendMinutes)
+        : l10n.sendCodeIn(state.resendSeconds);
   }
 }

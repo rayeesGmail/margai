@@ -20,6 +20,24 @@
   "@sendingCode": {
     "description": "Primary button label while the code request is in flight."
   },
+  "sendCodeIn": "Send code in {seconds}s",
+  "@sendCodeIn": {
+    "description": "Primary button label on the entry step while a cooldown is pending (a 429, or a code just sent before Change email); the button is disabled (PLAN D9 rows 4-5).",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "sendCodeInMinutes": "{minutes, plural, =1{Send code in 1 min} other{Send code in {minutes} min}}",
+  "@sendCodeInMinutes": {
+    "description": "Same, for waits of a minute or more (the hourly cap answers with up to 3600 s); minutes are rounded up.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
 
   "codeSentTitle": "Check your email",
   "codeSentTo": "I've sent a 6-digit code to {email}.",
@@ -39,6 +57,15 @@
     "description": "Countdown until a resend is allowed (server resend_after_s / retry_after_s).",
     "placeholders": {
       "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "resendInMinutes": "{minutes, plural, =1{New code in 1 min} other{New code in {minutes} min}}",
+  "@resendInMinutes": {
+    "description": "Countdown on the code step for waits of a minute or more; minutes are rounded up.",
+    "placeholders": {
+      "minutes": {
         "type": "int"
       }
     }

@@ -32,6 +32,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendingCode => 'Sending…';
 
   @override
+  String sendCodeIn(int seconds) {
+    return 'Send code in ${seconds}s';
+  }
+
+  @override
+  String sendCodeInMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Send code in $minutes min',
+      one: 'Send code in 1 min',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get codeSentTitle => 'Check your email';
 
   @override
@@ -54,6 +70,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String resendIn(int seconds) {
     return 'New code in ${seconds}s';
+  }
+
+  @override
+  String resendInMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'New code in $minutes min',
+      one: 'New code in 1 min',
+    );
+    return '$_temp0';
   }
 
   @override

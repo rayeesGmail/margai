@@ -141,6 +141,18 @@ abstract class AppLocalizations {
   /// **'Sending…'**
   String get sendingCode;
 
+  /// Primary button label on the entry step while a cooldown is pending (a 429, or a code just sent before Change email); the button is disabled (PLAN D9 rows 4-5).
+  ///
+  /// In en, this message translates to:
+  /// **'Send code in {seconds}s'**
+  String sendCodeIn(int seconds);
+
+  /// Same, for waits of a minute or more (the hourly cap answers with up to 3600 s); minutes are rounded up.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes, plural, =1{Send code in 1 min} other{Send code in {minutes} min}}'**
+  String sendCodeInMinutes(int minutes);
+
   /// No description provided for @codeSentTitle.
   ///
   /// In en, this message translates to:
@@ -182,6 +194,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New code in {seconds}s'**
   String resendIn(int seconds);
+
+  /// Countdown on the code step for waits of a minute or more; minutes are rounded up.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes, plural, =1{New code in 1 min} other{New code in {minutes} min}}'**
+  String resendInMinutes(int minutes);
 
   /// No description provided for @changeEmailButton.
   ///

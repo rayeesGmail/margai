@@ -32,6 +32,22 @@ class AppLocalizationsHi extends AppLocalizations {
   String get sendingCode => 'भेज रहा हूँ…';
 
   @override
+  String sendCodeIn(int seconds) {
+    return 'कोड $seconds सेकंड में भेजें';
+  }
+
+  @override
+  String sendCodeInMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'कोड $minutes मिनट में भेजें',
+      one: 'कोड 1 मिनट में भेजें',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get codeSentTitle => 'अपना ईमेल देखें';
 
   @override
@@ -54,6 +70,17 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String resendIn(int seconds) {
     return 'नया कोड $seconds सेकंड में';
+  }
+
+  @override
+  String resendInMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'नया कोड $minutes मिनट में',
+      one: 'नया कोड 1 मिनट में',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -204,6 +231,22 @@ class AppLocalizationsHiLatn extends AppLocalizationsHi {
   String get sendingCode => 'Bhej raha hoon…';
 
   @override
+  String sendCodeIn(int seconds) {
+    return 'Code ${seconds}s mein bhejo';
+  }
+
+  @override
+  String sendCodeInMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Code $minutes min mein bhejo',
+      one: 'Code 1 min mein bhejo',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get codeSentTitle => 'Apna email check karo';
 
   @override
@@ -226,6 +269,17 @@ class AppLocalizationsHiLatn extends AppLocalizationsHi {
   @override
   String resendIn(int seconds) {
     return 'Naya code ${seconds}s mein';
+  }
+
+  @override
+  String resendInMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Naya code $minutes min mein',
+      one: 'Naya code 1 min mein',
+    );
+    return '$_temp0';
   }
 
   @override

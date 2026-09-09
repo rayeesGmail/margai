@@ -1,12 +1,19 @@
 package com.margai.account.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.margai.account.api.Accounts;
+import com.margai.account.api.Goal;
 import com.margai.account.api.Me;
 import com.margai.account.api.ProfileSummary;
+import com.margai.account.api.ProfileUpdate;
 import com.margai.account.api.UserSummary;
+import com.margai.common.api.Category;
 import com.margai.common.api.Language;
 import com.margai.common.api.Principal;
 import com.margai.common.api.UserRole;
@@ -14,7 +21,9 @@ import java.time.LocalTime;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
@@ -75,6 +84,67 @@ class MeControllerTest {
         assertThat(result).bodyJson().doesNotHavePath("$.profile.hours_weekday");
         assertThat(result).bodyJson().doesNotHavePath("$.user.phone");
         assertThat(result).bodyJson().doesNotHavePath("$.subscription");
+    }
+
+    @Test
+    void patchMapsTheBodyOntoATypedUpdateAndAnswersMe() {
+        ArgumentCaptor<ProfileUpdate> update = ArgumentCaptor.forClass(ProfileUpdate.class);
+        when(accounts.update(eq(USER.id()), update.capture())).thenReturn(Optional.of(new Me(USER, EMPTY_PROFILE)));
+
+        MvcTestResult result = mvc.patch().uri("/api/v1/me").contentType(MediaType.APPLICATION_JSON)
+                .requestAttr(Principal.REQUEST_ATTRIBUTE, CALLER)
+                .content("{\"language\":\"hi\",\"display_name\":\"  Asha \",\"morning_notification_time\":\"06:30\","
+                        + "\"hours_weekday\":5.5,\"hours_weekend\":\"8\",\"goal\":\"govt_mbbs\",\"state_code\":\"mh\","
+                        + "\"category\":\"obc\"}")
+                .exchange();
+
+        assertThat(result).hasStatusOk();
+        assertThat(result).bodyJson().extractingPath("$.user.language").isEqualTo("hi");
+        assertThat(result).bodyJson().extractingPath("$.profile.onboarding_step").isEqualTo("intro");
+        ProfileUpdate sent = update.getValue();
+        assertThat(sent.language()).isEqualTo(Language.hi);
+        assertThat(sent.displayName()).isEqualTo("Asha");
+        assertThat(sent.morningNotificationTime()).isEqualTo(LocalTime.of(6, 30));
+        assertThat(sent.hoursWeekday()).isEqualByComparingTo("5.5");
+        assertThat(sent.hoursWeekend()).isEqualByComparingTo("8.0");
+        assertThat(sent.goal()).isEqualTo(Goal.govt_mbbs);
+        assertThat(sent.stateCode()).isEqualTo("MH");
+        assertThat(sent.category()).isEqualTo(Category.obc);
+    }
+
+    @Test
+    void patchOfAnEmptyBodyChangesNothingAndAnswersMe() {
+        ArgumentCaptor<ProfileUpdate> update = ArgumentCaptor.forClass(ProfileUpdate.class);
+        when(accounts.update(eq(USER.id()), update.capture())).thenReturn(Optional.of(new Me(USER, EMPTY_PROFILE)));
+
+        MvcTestResult result = mvc.patch().uri("/api/v1/me").contentType(MediaType.APPLICATION_JSON)
+                .requestAttr(Principal.REQUEST_ATTRIBUTE, CALLER).content("{}").exchange();
+
+        assertThat(result).hasStatusOk();
+        assertThat(update.getValue().isEmpty()).isTrue();
+    }
+
+    @Test
+    void patchNamesEveryBadFieldWithAReasonCodeNeverProse() throws Exception {
+        MvcTestResult result = mvc.patch().uri("/api/v1/me").contentType(MediaType.APPLICATION_JSON)
+                .requestAttr(Principal.REQUEST_ATTRIBUTE, CALLER)
+                .content("{\"language\":\"fr\",\"display_name\":\"   \",\"morning_notification_time\":\"25:00\","
+                        + "\"hours_weekday\":17,\"hours_weekend\":-1,\"goal\":\"rich\",\"state_code\":\"Maharashtra\","
+                        + "\"category\":\"x\"}")
+                .exchange();
+
+        assertThat(result).hasStatus(400);
+        assertThat(result).bodyJson().extractingPath("$.error.code").isEqualTo("VALIDATION_FAILED");
+        assertThat(result).bodyJson().extractingPath("$.error.details.language").isEqualTo("language.invalid");
+        assertThat(result).bodyJson().extractingPath("$.error.details.display_name").isEqualTo("not_blank");
+        assertThat(result).bodyJson().extractingPath("$.error.details.morning_notification_time").isEqualTo("time.invalid");
+        assertThat(result).bodyJson().extractingPath("$.error.details.hours_weekday").isEqualTo("decimal_max");
+        assertThat(result).bodyJson().extractingPath("$.error.details.hours_weekend").isEqualTo("decimal_min");
+        assertThat(result).bodyJson().extractingPath("$.error.details.goal").isEqualTo("goal.invalid");
+        assertThat(result).bodyJson().extractingPath("$.error.details.state_code").isEqualTo("state_code.invalid");
+        assertThat(result).bodyJson().extractingPath("$.error.details.category").isEqualTo("category.invalid");
+        assertThat(result.getResponse().getContentAsString()).doesNotContain("java.", "Exception", "Maharashtra");
+        verify(accounts, never()).update(any(), any());
     }
 
     @Test

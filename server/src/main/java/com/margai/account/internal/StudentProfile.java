@@ -28,7 +28,8 @@ import org.hibernate.type.SqlTypes;
  * Q1–Q7 map one-to-one onto the columns; {@code scorecard} and {@code board_marks} hold
  * confirmed fields only, never an image reference (SPEC §5.2). Columns that later days fill
  * ({@code scorecard}, {@code board_marks}, {@code exam_date}) are declared now so the row shape
- * is stable; the JSON ones are plain strings until D28 gives them a record shape.
+ * is stable; the JSON ones are plain strings until D28 gives them a record shape. The setters are
+ * the {@code PATCH /me} fields of §3.7 (D10); the onboarding interview (D25) fills the rest.
  */
 @Entity
 @Table(name = "student_profiles")
@@ -156,20 +157,40 @@ public class StudentProfile {
         return hoursWeekday;
     }
 
+    public void setHoursWeekday(BigDecimal hoursWeekday) {
+        this.hoursWeekday = hoursWeekday;
+    }
+
     public BigDecimal getHoursWeekend() {
         return hoursWeekend;
+    }
+
+    public void setHoursWeekend(BigDecimal hoursWeekend) {
+        this.hoursWeekend = hoursWeekend;
     }
 
     public Goal getGoal() {
         return goal;
     }
 
+    public void setGoal(Goal goal) {
+        this.goal = goal;
+    }
+
     public String getStateCode() {
         return stateCode;
     }
 
+    public void setStateCode(String stateCode) {
+        this.stateCode = stateCode;
+    }
+
     public Category getCategory() {
         return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public LocalDate getDob() {
@@ -214,6 +235,11 @@ public class StudentProfile {
 
     public LocalTime getMorningNotificationTime() {
         return morningNotificationTime;
+    }
+
+    /** {@code PATCH /me morning_notification_time} (D10); SPEC §6.10's "See you at 7 AM?" default until then. */
+    public void setMorningNotificationTime(LocalTime morningNotificationTime) {
+        this.morningNotificationTime = morningNotificationTime;
     }
 
     public int getCurrentStreak() {

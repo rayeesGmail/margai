@@ -27,4 +27,11 @@ public interface Accounts {
      * missing, which the caller answers as {@code AUTH_INVALID} (D10).
      */
     Optional<Me> me(UUID userId);
+
+    /**
+     * {@code PATCH /me} (§3.7): applies the present fields and answers the new {@code me}; empty
+     * when the account cannot be served (as {@link #me}). A language change reaches the JWT on the
+     * next refresh (§3.8) and affects new content only (SPEC §6.11).
+     */
+    Optional<Me> update(UUID userId, ProfileUpdate update);
 }

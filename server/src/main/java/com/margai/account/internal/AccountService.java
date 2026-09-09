@@ -4,6 +4,7 @@ import com.margai.account.api.Accounts;
 import com.margai.account.api.LoginIdentifier;
 import com.margai.account.api.Me;
 import com.margai.account.api.ProfileSummary;
+import com.margai.account.api.ProfileUpdate;
 import com.margai.account.api.SignIn;
 import com.margai.account.api.UserSummary;
 import com.margai.common.api.IstClock;
@@ -22,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
  * on its next sign-in. A phone login stamps {@code phone_verified_at} each time; an email account's
  * proof is the verified email itself. Simultaneous first logins for one identifier are serialised
  * on a per-identifier advisory lock held for the transaction (PLAN D9), so the second one finds the
- * rows the first one created.
+ * rows the first one created. {@code /me} reads both rows and {@code PATCH /me} writes the §3.7
+ * fields; either is empty for an account that cannot be served — deleted, or (before D10) without a
+ * profile — and the caller answers {@code AUTH_INVALID}, so a fresh login heals it.
  */
 @Service
 @Transactional
@@ -70,6 +73,44 @@ class AccountService implements Accounts {
                 .filter(user -> user.getStatus() == UserStatus.active)
                 .flatMap(user -> profiles.findByUserId(userId)
                         .map(profile -> new Me(summary(user), summary(profile))));
+    }
+
+    @Override
+    public Optional<Me> update(UUID userId, ProfileUpdate update) {
+        Optional<User> active = users.findById(userId).filter(user -> user.getStatus() == UserStatus.active);
+        Optional<StudentProfile> profile = active.flatMap(user -> profiles.findByUserId(userId));
+        if (active.isEmpty() || profile.isEmpty()) {
+            return Optional.empty();
+        }
+        User user = active.get();
+        StudentProfile row = profile.get();
+        if (update.language() != null) {
+            user.setLanguage(update.language());
+        }
+        if (update.displayName() != null) {
+            user.setDisplayName(update.displayName());
+        }
+        if (update.morningNotificationTime() != null) {
+            row.setMorningNotificationTime(update.morningNotificationTime());
+        }
+        if (update.hoursWeekday() != null) {
+            row.setHoursWeekday(update.hoursWeekday());
+        }
+        if (update.hoursWeekend() != null) {
+            row.setHoursWeekend(update.hoursWeekend());
+        }
+        if (update.goal() != null) {
+            row.setGoal(update.goal());
+        }
+        if (update.stateCode() != null) {
+            row.setStateCode(update.stateCode());
+        }
+        if (update.category() != null) {
+            row.setCategory(update.category());
+        }
+        users.save(user);
+        profiles.save(row);
+        return Optional.of(new Me(summary(user), summary(row)));
     }
 
     private static ProfileSummary summary(StudentProfile profile) {

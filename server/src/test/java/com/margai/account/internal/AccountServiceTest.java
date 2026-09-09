@@ -3,12 +3,16 @@ package com.margai.account.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.TestcontainersConfiguration;
+import com.margai.account.api.Goal;
 import com.margai.account.api.LoginIdentifier;
 import com.margai.account.api.Me;
+import com.margai.account.api.ProfileUpdate;
 import com.margai.account.api.SignIn;
+import com.margai.common.api.Category;
 import com.margai.common.api.IstClock;
 import com.margai.common.api.Language;
 import com.margai.common.api.UserRole;
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -131,6 +135,43 @@ class AccountServiceTest {
         assertThat(service.me(deleted.user().id())).isEmpty();
         assertThat(service.me(orphan.user().id())).as("a pre-D10 account without a profile: sign in again heals it").isEmpty();
         assertThat(service.me(java.util.UUID.randomUUID())).isEmpty();
+    }
+
+    @Test
+    void updateAppliesOnlyThePresentFields() {
+        SignIn signIn = service.signIn(new LoginIdentifier.Email("update@example.com"), Language.en);
+        ProfileUpdate first = new ProfileUpdate(Language.hi, "Asha", null, new BigDecimal("5.5"), null, null, null, null);
+        ProfileUpdate second = new ProfileUpdate(null, null, LocalTime.of(6, 30), null, null, Goal.govt_mbbs, "MH",
+                Category.obc);
+
+        Me afterFirst = service.update(signIn.user().id(), first).orElseThrow();
+        Me afterSecond = service.update(signIn.user().id(), second).orElseThrow();
+
+        assertThat(afterFirst.user().language()).isEqualTo(Language.hi);
+        assertThat(afterFirst.user().displayName()).isEqualTo("Asha");
+        assertThat(afterFirst.profile().hoursWeekday()).isEqualByComparingTo("5.5");
+        assertThat(afterFirst.profile().goal()).isNull();
+        assertThat(afterFirst.profile().morningNotificationTime()).isEqualTo(LocalTime.of(7, 0));
+        assertThat(afterSecond.user().language()).as("untouched by the second update").isEqualTo(Language.hi);
+        assertThat(afterSecond.user().displayName()).isEqualTo("Asha");
+        assertThat(afterSecond.profile().hoursWeekday()).isEqualByComparingTo("5.5");
+        assertThat(afterSecond.profile().morningNotificationTime()).isEqualTo(LocalTime.of(6, 30));
+        assertThat(afterSecond.profile().goal()).isEqualTo(Goal.govt_mbbs);
+        assertThat(afterSecond.profile().stateCode()).isEqualTo("MH");
+        assertThat(afterSecond.profile().category()).isEqualTo(Category.obc);
+        assertThat(service.findActive(signIn.user().id()).orElseThrow().language())
+                .as("the refresh path sees the new language (TECH_PLAN §3.8)").isEqualTo(Language.hi);
+        assertThat(users.findById(signIn.user().id()).orElseThrow().getLanguage()).isEqualTo(Language.hi);
+    }
+
+    @Test
+    void updateOfAnUnservableAccountIsEmpty() {
+        SignIn deleted = service.signIn(new LoginIdentifier.Email("update-deleted@example.com"), Language.en);
+        users.saveAndFlush(markDeleted(users.findById(deleted.user().id()).orElseThrow()));
+
+        assertThat(service.update(deleted.user().id(), new ProfileUpdate(Language.hi, null, null, null, null, null, null, null)))
+                .isEmpty();
+        assertThat(users.findById(deleted.user().id()).orElseThrow().getLanguage()).isEqualTo(Language.en);
     }
 
     @Test

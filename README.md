@@ -12,7 +12,7 @@ open are logged in `docs/DECISIONS.md`. Working agreements for agentic sessions 
 | `app/` | Flutter client (Android first), Riverpod, ARB en/hi | `cd app && flutter analyze && flutter test` |
 | `pipeline/` | founder-owned inputs (`inputs/`) and run reports (`reports/`) for the content pipeline; the commands themselves run in `server/` under the `pipeline` profile (TECH_PLAN §6) — from Week 3 | |
 | `eval/` | AI eval gate, required after any prompt/routing/retrieval change | `cd eval && ./run.sh` |
-| `scripts/` | commit gate, path/secret guards, `dev-setup.sh` | |
+| `scripts/` | commit gate, path/secret guards, `dev-setup.sh`, `ui.sh` (drives the app on a device for a proof, see app/README) | |
 
 ## Fresh clone to running stack (macOS, Apple Silicon)
 

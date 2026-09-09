@@ -3,5 +3,118 @@
   "appTitle": "MARG AI",
   "@appTitle": {
     "description": "Application name shown in the launcher, app bar and task switcher. Brand name; not translated."
-  }
+  },
+
+  "loginHeadline": "Hi! I'm your NEET mentor.",
+  "@loginHeadline": {
+    "description": "Login screen headline (SPEC §8 screen 1). Mentor voice: warm, direct, proudly AI."
+  },
+  "loginIntro": "Sign in with your email and I'll send you a 6-digit code.",
+  "@loginIntro": {
+    "description": "Login screen intro under the headline. Email while the SMS channel waits for the DLT template (D7 ruling)."
+  },
+  "emailLabel": "Email",
+  "emailHint": "you@example.com",
+  "sendCodeButton": "Send code",
+  "sendingCode": "Sending…",
+  "@sendingCode": {
+    "description": "Primary button label while the code request is in flight."
+  },
+
+  "codeSentTitle": "Check your email",
+  "codeSentTo": "I've sent a 6-digit code to {email}.",
+  "@codeSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "codeLabel": "6-digit code",
+  "verifyButton": "Verify",
+  "verifying": "Checking…",
+  "resendButton": "Send a new code",
+  "resendIn": "New code in {seconds}s",
+  "@resendIn": {
+    "description": "Countdown until a resend is allowed (server resend_after_s / retry_after_s).",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "changeEmailButton": "Change email",
+  "attemptsLeft": "{count, plural, =0{No tries left on this code — ask for a new one.} =1{1 try left.} other{{count} tries left.}}",
+  "@attemptsLeft": {
+    "description": "After a wrong code: details.attempts_left from OTP_INVALID (5 per code).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "retryButton": "Retry",
+
+  "failureOffline": "You're offline. Check your connection and retry — nothing you typed is lost.",
+  "@failureOffline": {
+    "description": "Client-only failure: no network, refused connection or timeout (TECH_PLAN §5.4)."
+  },
+  "failureMalformed": "The server sent something I couldn't read. Try again in a moment.",
+  "@failureMalformed": {
+    "description": "Client-only failure: an answer that is not the error envelope."
+  },
+  "failureRequestId": "Reference: {requestId}",
+  "@failureRequestId": {
+    "description": "Shown under an INTERNAL failure so support can find the call.",
+    "placeholders": {
+      "requestId": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errorValidationFailed": "Some details don't look right. Have a look and try again.",
+  "@errorValidationFailed": {
+    "description": "Fallback copy by error code when the envelope carries no message (TECH_PLAN §3.3). Same strings as the server's messages_en."
+  },
+  "errorAuthRequired": "Please sign in to continue.",
+  "errorAuthExpired": "Your session needs a quick refresh.",
+  "errorAuthInvalid": "Please sign in again.",
+  "errorOtpInvalid": "That code didn't match. Try once more.",
+  "errorOtpExpired": "That code isn't valid any more. Ask for a new one.",
+  "errorRateLimited": "A little too fast. Try again in a moment.",
+  "errorOtpRateLimited": "Too many codes requested. Give it a little time.",
+  "errorInternal": "Something went wrong on our side. Please try again.",
+  "errorUnknown": "That didn't work. Please try again.",
+
+  "reasonNotBlank": "This can't be empty.",
+  "@reasonNotBlank": {
+    "description": "Reason codes of VALIDATION_FAILED details (D7 DECISIONS): field → code, rendered here, never as server prose."
+  },
+  "reasonNotNull": "This is needed.",
+  "reasonMin": "That's too short.",
+  "reasonSize": "That's too long.",
+  "reasonPhoneInvalid": "That doesn't look like an Indian mobile number.",
+  "reasonEmailInvalid": "That doesn't look like an email address.",
+  "reasonIdentifierRequired": "Enter your email to continue.",
+  "reasonIdentifierOneOnly": "Use either your email or your phone, not both.",
+  "reasonChannelUnavailable": "Signing in by phone isn't available yet — use your email.",
+  "reasonCodeDigits": "The code is 6 digits.",
+  "reasonBodyMalformed": "The app sent something the server couldn't read. Please update the app.",
+  "reasonContentTypeUnsupported": "The app sent something the server couldn't read. Please update the app.",
+  "reasonUnknown": "Have a look at this and try again.",
+
+  "todayPlaceholderTitle": "You're in.",
+  "@todayPlaceholderTitle": {
+    "description": "Placeholder for SPEC §8 screen 7 (Today) until D29 builds it."
+  },
+  "todayPlaceholderBody": "Signed in as {identifier}.",
+  "@todayPlaceholderBody": {
+    "placeholders": {
+      "identifier": {
+        "type": "String"
+      }
+    }
+  },
+  "todayPlaceholderNote": "Your onboarding and first plan arrive in a later build. Nothing else to do here yet."
 }

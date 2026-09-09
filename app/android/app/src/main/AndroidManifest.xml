@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Every build talks to the API (TECH_PLAN §5.4); until D8 only the debug manifest declared
+         this, so a release build could not have signed in. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="MARG AI"
         android:name="${applicationName}"

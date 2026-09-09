@@ -1,4 +1,55 @@
 {
   "@@locale": "hi",
-  "appTitle": "MARG AI"
+  "appTitle": "MARG AI",
+
+  "loginHeadline": "नमस्ते! मैं आपका NEET मेंटर हूँ।",
+  "loginIntro": "अपने ईमेल से साइन इन करें — मैं आपको 6 अंकों का कोड भेजूँगा।",
+  "emailLabel": "ईमेल",
+  "emailHint": "you@example.com",
+  "sendCodeButton": "कोड भेजें",
+  "sendingCode": "भेज रहा हूँ…",
+
+  "codeSentTitle": "अपना ईमेल देखें",
+  "codeSentTo": "मैंने {email} पर 6 अंकों का कोड भेजा है।",
+  "codeLabel": "6 अंकों का कोड",
+  "verifyButton": "जाँचें",
+  "verifying": "जाँच रहा हूँ…",
+  "resendButton": "नया कोड भेजें",
+  "resendIn": "नया कोड {seconds} सेकंड में",
+  "changeEmailButton": "ईमेल बदलें",
+  "attemptsLeft": "{count, plural, =0{इस कोड पर कोई कोशिश बाकी नहीं — नया कोड मंगाएँ।} =1{1 कोशिश बाकी।} other{{count} कोशिशें बाकी।}}",
+  "retryButton": "फिर कोशिश करें",
+
+  "failureOffline": "आप ऑफ़लाइन हैं। कनेक्शन देखकर फिर कोशिश करें — आपने जो लिखा है वह सुरक्षित है।",
+  "failureMalformed": "सर्वर से कुछ ऐसा आया जो मैं पढ़ नहीं पाया। कुछ पल बाद फिर कोशिश करें।",
+  "failureRequestId": "संदर्भ: {requestId}",
+
+  "errorValidationFailed": "कुछ जानकारी सही नहीं लग रही। एक बार देखकर फिर कोशिश करें।",
+  "errorAuthRequired": "जारी रखने के लिए साइन इन करें।",
+  "errorAuthExpired": "आपके सेशन को एक छोटा रिफ्रेश चाहिए।",
+  "errorAuthInvalid": "कृपया दोबारा साइन इन करें।",
+  "errorOtpInvalid": "यह कोड मेल नहीं खाया। एक बार और कोशिश करें।",
+  "errorOtpExpired": "यह कोड अब मान्य नहीं है। नया कोड मंगाएँ।",
+  "errorRateLimited": "थोड़ा तेज़ हो गया। कुछ पल बाद फिर कोशिश करें।",
+  "errorOtpRateLimited": "बहुत सारे कोड मंगाए गए हैं। थोड़ा इंतज़ार करें।",
+  "errorInternal": "हमारी तरफ़ से कुछ गड़बड़ हुई। कृपया फिर कोशिश करें।",
+  "errorUnknown": "यह काम नहीं कर पाया। कृपया फिर कोशिश करें।",
+
+  "reasonNotBlank": "यह खाली नहीं हो सकता।",
+  "reasonNotNull": "यह ज़रूरी है।",
+  "reasonMin": "यह बहुत छोटा है।",
+  "reasonSize": "यह बहुत लंबा है।",
+  "reasonPhoneInvalid": "यह भारतीय मोबाइल नंबर जैसा नहीं लग रहा।",
+  "reasonEmailInvalid": "यह ईमेल पता जैसा नहीं लग रहा।",
+  "reasonIdentifierRequired": "जारी रखने के लिए अपना ईमेल लिखें।",
+  "reasonIdentifierOneOnly": "ईमेल या फ़ोन में से एक चुनें, दोनों नहीं।",
+  "reasonChannelUnavailable": "फ़ोन से साइन इन अभी उपलब्ध नहीं है — अपना ईमेल इस्तेमाल करें।",
+  "reasonCodeDigits": "कोड 6 अंकों का होता है।",
+  "reasonBodyMalformed": "ऐप ने कुछ ऐसा भेजा जो सर्वर पढ़ नहीं पाया। कृपया ऐप अपडेट करें।",
+  "reasonContentTypeUnsupported": "ऐप ने कुछ ऐसा भेजा जो सर्वर पढ़ नहीं पाया। कृपया ऐप अपडेट करें।",
+  "reasonUnknown": "इसे एक बार देखकर फिर कोशिश करें।",
+
+  "todayPlaceholderTitle": "आप अंदर आ गए।",
+  "todayPlaceholderBody": "{identifier} के रूप में साइन इन हैं।",
+  "todayPlaceholderNote": "आपका ऑनबोर्डिंग और पहला प्लान अगले बिल्ड में आएगा। अभी यहाँ और कुछ नहीं करना है।"
 }

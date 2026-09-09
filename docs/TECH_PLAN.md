@@ -1393,17 +1393,17 @@ network, so screens show the honest offline state rather than a timeout). Timeou
 
 | Need | Package | Day |
 |---|---|---|
-| OTP auto-read | `smart_auth` (Android SMS Retriever; no SMS permission) | D8 |
+| OTP auto-read | `smart_auth` (Android SMS Retriever; no SMS permission) | ~~D8~~ the day the `sms` channel is enabled (TRACKER F1; D11 at the earliest) — *amended 2026-09-09, D8: login runs on email (§0.4 #10), and an email code has nothing to auto-read; the code field carries Android's one-time-code autofill hint instead* |
 | Camera with frame guide, gallery fallback, compression to ≤ 1.5 MB JPEG | `camera`, `image_picker`, `image` | D28, D38 |
 | Push | `firebase_core`, `firebase_messaging` (FCM) | D30 |
 | Payments | `razorpay_flutter` | D61 |
 | Analytics and crash reporting | `posthog_flutter` (events + PostHog error tracking) | D73 |
-| Tokens at rest | `flutter_secure_storage` | D8 |
+| Tokens at rest | `flutter_secure_storage` — *pinned to 10.x on 2026-09-09 (D8): 11.x compiles against Android 17, which the SDK ships only as the minor-versioned platform `android-37.0` and AGP 9.1.0 cannot resolve; revisit when the Flutter template's `compileSdk` passes 36 (DECISIONS)* | D8 |
 | Offline store | `drift`, `sqlite3_flutter_libs` | D34 |
 | Connectivity | `connectivity_plus` | D34 |
 | Answer rendering | `flutter_markdown_plus` (community fork; the Flutter team discontinued `flutter_markdown` in 2025 — confirm the fork's health at D32, `markdown_widget` is the alternative), `flutter_math_fork` (LaTeX) | D32, D40 |
 | Routing, HTTP, state | `go_router`, `dio`, `flutter_riverpod` | D8 |
-| Misc | `intl`, `package_info_plus`, `url_launcher` (support links) | as needed |
+| Misc | `intl`, `package_info_plus` (`X-App-Version`, since D8), `url_launcher` (support links) | as needed |
 
 External services stay FCM, Razorpay and PostHog (`.claude/rules/app.md`): `firebase_core` is FCM's
 own dependency, and `smart_auth` talks to the Android platform's SMS Retriever, not to a third-party

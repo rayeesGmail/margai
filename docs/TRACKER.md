@@ -12,13 +12,13 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 1 — Auth & identity (Week 2, D7–D12), running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
-| Current day | D7 done · 2026-09-08 (OTP login by verified email or phone — phone behind `margai.auth.otp.channels` until F1 — with SES/log senders, JWT + rotating refresh families, Bucket4j limits, the `common` web foundation (envelope, request id, three-language copy, security chain); ✅ curl happy path PASS on the compose db; spec-auditor FAIL → 2 MAJOR + 4 MINOR fixed in `6a96db6`, re-audit in the day log; branch `d7-otp-auth`, 11 commits, PR #6 merged by the founder 2026-09-08, merge commit af3adb3) · next: D8 Flutter login screens — email entry, code entry, retry, change-email, offline-tolerant errors (SMS auto-read waits for F1); device login needs F10 or the sandbox log |
-| Days completed / total | 7 / 84 |
+| Current day | D8 done · 2026-09-09 (Flutter login on email per the D7 ruling: entry, code entry, resend after the cooldown, change email, honest offline state with Retry, ARB en / hi / hi_Latn for every error and reason code; `core/` foundation — ApiClient with the §3.3 envelope and the §3.1 headers, Keystore-backed token store, auth state, language mapper, go_router guard, theme; ✅ PASS on the AVD against the local server with the sandbox inbox (founder's reading; the mobile-data half waits for F8 on the gate line); spec-auditor PASS with 8 MINOR, all fixed on the branch; `d8-login-screens`, 9 commits, PR pending) · next: D9 unhappy-path hardening — the 10-failure checklist (wrong code ×5, expiry, cooldown + hourly cap, clock skew via `X-Client-Time`, duplicate accounts, malformed body, offline on each step) |
+| Days completed / total | 8 / 84 |
 | Schedule delta | on track |
 | Last week's gate | **Week-1 🚩 PASS** 2026-09-08 — repo, environment, plan, schema and AI seam each demonstrated in-session (transcript in the D6 day log); the only open item, the live proof on the Anthropic profiles, is an account matter, not a build one |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none for the build (D8's real-device email login needs F10 — an SES sender identity plus verified test recipients, minutes in the console — or reading the code from the sandbox log). Two open items on the AWS account (founder; not build blockers before D14, the first live VISION day): (1) the **Anthropic models are refused with 403 `INVALID_PAYMENT_INSTRUMENT`** (AWS Marketplace subscription needs a valid payment method; AWS support ticket open since 2026-09-07) — the tier defaults stay Anthropic, the D5 smoke was proven on Amazon Nova Lite instead; when the ticket clears, rerun `cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false`, then close TECH_PLAN §13.2 item 1's live proof and confirm or drop the Nova price row (DECISIONS 2026-09-08 D5 row). (2) The local CLI session is the account **root** user via `aws login` — F8 creates a non-root IAM Identity Center or IAM identity with Bedrock permissions (TECH_PLAN §7.4; DECISIONS 2026-09-08 D6 row names the interim path). All four §13.2 console checks are closed (D4/D5 day logs): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles, EMBED `cohere.embed-multilingual-v3` in-region, batch minimum 100; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none for the build (the phone-over-mobile-data half of D8's ✅ waits for a public endpoint, F8 — carried on the Week-2 gate line; F10's SES live proof stays founder-run, the sandbox log is the inbox until then). Two open items on the AWS account (founder; not build blockers before D14, the first live VISION day): (1) the **Anthropic models are refused with 403 `INVALID_PAYMENT_INSTRUMENT`** (AWS Marketplace subscription needs a valid payment method; AWS support ticket open since 2026-09-07) — the tier defaults stay Anthropic, the D5 smoke was proven on Amazon Nova Lite instead; when the ticket clears, rerun `cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false`, then close TECH_PLAN §13.2 item 1's live proof and confirm or drop the Nova price row (DECISIONS 2026-09-08 D5 row). (2) The local CLI session is the account **root** user via `aws login` — F8 creates a non-root IAM Identity Center or IAM identity with Bedrock permissions (TECH_PLAN §7.4; DECISIONS 2026-09-08 D6 row names the interim path). All four §13.2 console checks are closed (D4/D5 day logs): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles, EMBED `cohere.embed-multilingual-v3` in-region, batch minimum 100; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
@@ -35,12 +35,12 @@
 ## PHASE 1 — Auth & identity (Week 2) · M1
 
 - [x] **D7** OTP request/verify + rate limits + tokens · ✅ curl happy path — done 2026-09-08, acceptance PASS (literal curl transcript in the day log: email request → sandbox code → verify → tokens with `sub/role/lang/jti` → refresh → reuse revokes the family; 429 + `Retry-After` for the cooldown and the hourly cap; phone refused while email-only; hash in the db, code only on the sandbox logger); **email OTP per the founder's D7 ruling** (DECISIONS row 1 of 2026-09-08, exit = F1); branch `d7-otp-auth`, 11 commits, PR #6 merged by the founder 2026-09-08 (merge commit af3adb3)
-- [ ] **D8** Login screens (auto-read OTP, retry, change number) · ✅ real device, mobile data — *D7 ruling (2026-09-08): email entry first; SMS auto-read (`smart_auth`) waits for F1; the device login needs F10 (SES identity) or the sandbox log*
+- [x] **D8** Login screens (auto-read OTP, retry, change number) · ✅ real device, mobile data — done 2026-09-09 (built 2026-09-08/09 on `d8-login-screens`, 9 commits): email entry, code entry with the sixth digit submitting, resend after the server's cooldown, change email, honest offline state with Retry, three-locale copy for every error and reason code, the `core/` foundation (ApiClient + envelope, token store, auth state, language mapper, router guard, theme); **acceptance PASS on the AVD against the local server with the sandbox inbox** — the founder's reading (plan question 1): the AVD is the device until a public endpoint exists, the mobile-data half is carried on the Week-2 gate line; 8 screenshots + db rows in the day log; spec-auditor PASS with 8 MINOR, all fixed on the branch; *D7 ruling: email first, SMS auto-read (`smart_auth`) waits for F1*; PR pending (founder opens and merges)
 - [ ] **D9** Unhappy paths (10-failure checklist) · ✅ all graceful
 - [ ] **D10** Profile-on-first-login, language, logout, token rotation · ✅ persistence + clean logout — *rotation + reuse detection already live since D7; D10 adds `POST /auth/logout`, the profile row, `/me`*
 - [ ] **D11** DLT live check / delivery metrics · ✅ OTP success metric visible — *D7 ruling: email delivery metrics (`otp.sent/verified/failed/send_failed` exist since D7) + the DLT check only if F1 has landed*
 - [ ] **D12** Buffer
-- [ ] **🚩 WEEK-2 GATE:** a stranger's phone signs in first try — *read as "a stranger's email" until F1 (DECISIONS D7 row 1)*
+- [ ] **🚩 WEEK-2 GATE:** a stranger's phone signs in first try — *read as "a stranger's email" until F1 (DECISIONS D7 row 1); the "real device over mobile data" half of D8's ✅ is carried here until F8 gives a public endpoint (D8, 2026-09-09) — until then a USB phone via `adb reverse` (app/README) or the AVD*
 
 ## PHASE 2 — Content pipeline v1 (Weeks 3–4) · M3
 
@@ -174,6 +174,95 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+D8 · 2026-09-08 → 2026-09-09 · PHASE 1 — Auth & identity (Flutter login screens)
+Plan approved as written (8 tasks, 9 spec-silent decisions, 7 doc notes, 3 closing questions → the
+  recommended option each: the AVD login against the local server is the ✅ reading until F8 gives a
+  public endpoint; the /today placeholder is the signed-in landing; package_info_plus supplies
+  X-App-Version). Email entry per the D7 ruling; SMS auto-read waits for F1. The day ran across the
+  evening of the 8th and the morning of the 9th; the schedule delta is unchanged.
+Shipped (branch d8-login-screens, 9 commits: 4a93ebd foundation, 702c3da ApiClient, 6c94ba8 token
+  store + auth state, 5df8767 auth repository, e9265e4 LoginNotifier, 1b3ccf8 screens + router + copy,
+  e10d2c9 field clear, 69a155a spec-auditor follow-ups, + the docs commit): core/ — AppConfig
+  (--dart-define API_BASE_URL, default http://10.0.2.2:8081), AppLanguage (en|hi|hinglish ↔ Locale ↔
+  Accept-Language) + localeProvider, AppTheme (M3, bottom-anchored 52 dp action), ApiClient (dio,
+  /api/v1, 10 s connect / 30 s receive, X-Request-Id v4 UUID, X-App-Version, X-Client-Time,
+  Accept-Language, bearer; envelope → ApiFailure with reason codes / attempts_left / retry_after /
+  request_id; connection and timeout errors → OFFLINE, a non-envelope answer → MALFORMED), TokenStore
+  (flutter_secure_storage 10.x, one blob) + AuthNotifier (unknown / SignedOut / SignedIn),
+  FailureCopy (envelope copy → ARB by code; every D7 reason code), FailureLine, OneHandPage, go_router
+  with the §5.3 guard as a pure function; features/auth — models (the D7 wire shapes), AuthRepository,
+  LoginState / LoginNotifier (request, verify, resend after resend_after_s or retry_after_s, the sixth
+  digit submits, change email, Retry after an offline failure, the once-a-second ticker owned by the
+  notifier only while a cooldown runs, a sign-out starts the flow over), Splash, LoginScreen (/login),
+  OtpScreen (/login/otp); features/planner — TodayPlaceholderScreen (/today); ARB en / hi / hi_Latn
+  (46 keys each, parity enforced by a test); Android: INTERNET in the main manifest, debug-only
+  cleartext to 10.0.2.2 / localhost / 127.0.0.1. 145 app tests (was 1): client 21, repository 5,
+  notifier 20, both screens per state × 3 locales, guard, copy coverage, ARB parity, FailureLine and
+  the placeholders per locale, the whole flow through the real router. Server untouched (verify green
+  on every commit); no AI path touched (the eval stamp was re-run once, see Surprise 2).
+Acceptance: ✅ PASS on the AVD margai_android36 (the founder's reading, plan question 1) against
+  SERVER_PORT=8081 with the sandbox sender; APK built with --dart-define=API_BASE_URL=
+  http://10.0.2.2:8081 (194 MB debug), driven by adb input + screencap (8 screenshots in the session
+  scratchpad): (1) login screen — headline, intro, Email, Send code pinned at the bottom; the keyboard
+  pushes the button up (adjustResize); (2) founder@example.com → Send code → server log "[sandbox
+  email] to f***@example.com — Your MARG AI sign-in code is 565608"; (3) code screen — "I've sent a
+  6-digit code to founder@example.com", numeric field, Verify, "New code in 26s", Change email;
+  (4) typing the six digits submitted → "You're in. Signed in as founder@example.com." (server: "otp
+  verified … new user: false" — the D7 curl user); (5) pm clear → new code 638204 → wrong code 000000 →
+  "4 tries left." + the server's "That code didn't match. Try once more." in the error box, Verify
+  still enabled; (6) server killed → "Send a new code" after the cooldown → "You're offline. Check your
+  connection and retry — nothing you typed is lost." + Retry, digits and attempts kept, the old
+  challenge on screen; (7) server restarted → Retry → new code 892847, countdown reset to 27 s, failure
+  cleared (the stale digits stayed → e10d2c9); (8) Change email → entry screen with the email kept.
+  Database (compose): users 555ef46d-… founder@example.com, en, student, active; 3 otp_challenges
+  today (email, login; verified t / attempts 1 / fresh; request_ip 127.0.0.1); refresh_tokens family
+  7b7107d9-… device_label "margai/0.1.0+1 android" — X-App-Version end to end. The raw email never
+  appears in the server log (0 hits); the code appears only on margai.otp.sandbox. Not run: a phone
+  over mobile data (no public endpoint; carried on the Week-2 gate line, the USB path is in
+  app/README).
+spec-auditor (branch diff): PASS with 8 MINOR — (1) stale digits after a resend → fixed in e10d2c9
+  before the report landed; (2) "try once more" beside "no tries left" on the fifth wrong code → the
+  attempts line alone carries the remedy ("— ask for a new one"), the failure is dropped; (3) "a
+  missing ARB key fails a test" was not enforced (gen-l10n falls back to English silently) →
+  arb_parity_test compares key sets, placeholders and plural cases across the three files;
+  (4) TodayPlaceholder, INTERNAL with a request id and Splash untested per locale → three test files;
+  (5) the resend decision and the clock choice lived in OtpScreen → LoginState.canResend /
+  resendSeconds, the notifier owns the ticker subscription; (6) tickerProvider never disposed →
+  autoDispose, subscribed only from a sent code until the flow leaves the code step; (7) signOut left
+  loginProvider on a spent challenge → the notifier listens to authStateProvider and starts over;
+  (8) docs wording (bearer read per call, 127.0.0.1, pubspec "en, hi") → corrected. All in 69a155a.
+  Unverifiable items closed by the device run (login on a device; analyze + test green) or left as
+  recorded: Keystore backing of flutter_secure_storage 10.x defaults (a platform fact, no test),
+  PackageInfo awaited before runApp (device matrix at D74), the Hindi register (D67).
+Doc conflicts surfaced in the plan (none blocked): PLAN D8 "number entry, auto-read, change-number"
+  and SPEC §5/§8 auto-read vs the D7 ruling → email, no auto-read; TECH_PLAN §5.7 smart_auth at D8 →
+  dated note moves it to the F1 day; PLAN D8 ✅ "real device over mobile data" vs no public endpoint →
+  AVD proof + gate-line carry (founder question 1); §5.4 "connectivity fallback" vs §5.7
+  connectivity_plus at D34 → dio error mapping now; §12.1 refresh interceptor in the D7–D12 row vs
+  PLAN D10 "token rotation" → D10; CLAUDE.md "ARB (en/hi)" (DEV_SPEC §13.2 verbatim) vs app.md /
+  §5.5 three locales → three; DEV_SPEC §6 "queue + clear errors" → no lost input, one Retry, no queue.
+Spec-silent choices: 6 DECISIONS rows dated 2026-09-09 · D8 (offline from the failing request,
+  failure copy precedence, no lost input / no queue, client plumbing, routing + the /today
+  placeholder, Android build incl. the flutter_secure_storage 10.x pin).
+Parked: narrow the gate's AI_PATHS to server/; the mobile-data proof (F8); flutter_secure_storage
+  11.x + platforms;android-37.0 in dev-setup; a small adb driver for device proofs.
+Surprise: (1) flutter_secure_storage 11 needs compileSdk 37 and Android 17 ships only as
+  platforms;android-37.0 — AGP 9.1.0 fails with "Failed to find target with hash string
+  'android-37'"; pinned 10.x (compileSdk 36). (2) The precommit gate's (router|routing|retriev) regex
+  matches the Flutter router directory; the placeholder eval stamp clears it. (3) Riverpod 3 pauses a
+  provider's own ref.listen subscriptions while nothing listens to that provider — notifier tests
+  need a container.listen keep-alive, exactly what the screen provides in the app. (4) pumpAndSettle
+  never settles on an indeterminate LinearProgressIndicator — busy states pump one frame. (5) The soft
+  keyboard moves the bottom-anchored button; scripted taps need a screenshot first.
+Tomorrow's first task: D9 — unhappy-path hardening, the 10-failure checklist (wrong code ×5,
+  expiry, resend cooldown and the hourly cap, clock skew via X-Client-Time, duplicate accounts and the
+  simultaneous-first-login race noted at D7, malformed body, offline on each step, a dead code after
+  restart since secrets are per boot) — most render through today's FailureLine; the RATE_LIMITED
+  countdown on the entry step and the INTERNAL reference want a device check.
+PR: d8-login-screens → main, for the founder to open and merge (gh is not installed).
+```
 
 ```
 D7 · 2026-09-08 · PHASE 1 — Auth & identity (OTP request/verify + rate limits + tokens)
@@ -710,6 +799,10 @@ Tomorrow's first task:
 - `POST /auth/logout` and "revoke every family on deletion" · 2026-09-08 · scheduled D10 / D64 (TECH_PLAN §3.2); the family revocation primitive exists since D7 (`RefreshTokenRepository.revokeFamily`)
 - silence or rate-limit the `margai.otp.sandbox` logger in AWS · 2026-09-08 · today the sandbox sender is selected by `margai.auth.otp.sender = log` and simply must not be the value in a deployed environment; a startup refusal of `log` outside `local`/`test` would be the belt to the braces
 - continuity re-onboarding after a result that falls short (SPEC §7.2 Fork B) and NCERT-style seed generation to ≥30 questions/topic (SPEC §9.3), NTA-trap mining (SPEC §9.4) · 2026-09-04 · unscheduled per TECH_PLAN §12.2; seed generation and trap mining proposed for the D24 buffer
+- narrow `scripts/precommit-gate.sh`'s `AI_PATHS` to `server/` and `eval/` · 2026-09-09 · D8: the app's `lib/core/router/` and `test/core/router/` matched `(router|routing|retriev)` and demanded the eval stamp; the placeholder stamp cleared it, but the rule is about the AI difficulty router
+- "real device over mobile data" for the login ✅ (PLAN D8) · 2026-09-09 · needs a public endpoint (F8 beta stack); the AVD proof stands until then, a USB phone can use `adb reverse` (app/README); tracked on the Week-2 gate line
+- `flutter_secure_storage` back to 11.x, and `platforms;android-37.0` in `scripts/dev-setup.sh` · 2026-09-09 · D8 pinned 10.x because AGP 9.1.0 cannot resolve Android 17's minor-versioned platform (DECISIONS D8 Android row); lift when the Flutter template's `compileSdk` passes 36
+- clear the code field's autofocus/keyboard on the AVD before scripted taps, or a tiny `adb` driver script for device proofs · 2026-09-09 · D8's screencap-then-tap loop worked but cost a mis-tap on the keyboard; only if device proofs grow
 
 ---
 

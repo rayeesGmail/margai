@@ -24,7 +24,9 @@ import org.springframework.web.util.pattern.PathPatternParser;
  * TECH_PLAN §1.5 steps 3–4 and §9.1: one stateless chain. Public routes are {@code /auth/otp/*},
  * {@code /auth/refresh}, {@code /billing/webhook} and {@code /actuator/health}, where a bearer is
  * not even read (D10); everything else — {@code /auth/logout} included — needs a bearer JWT, which
- * becomes a {@link PrincipalAuthentication}. After authentication the
+ * becomes a {@link PrincipalAuthentication}; the rest of {@code /actuator/**} (metrics, D11) needs
+ * the admin role on top, decided here because actuator endpoints carry no {@code @PreAuthorize}
+ * of their own (§9.3). After authentication the
  * {@link PrincipalContextFilter} publishes the principal and the {@link RateLimitFilter} applies
  * §3.4. Failures are written as the §3.3 envelope by {@link ApiAuthenticationEntryPoint}. No
  * sessions, CSRF, form or basic login, no request cache: a mobile API.
@@ -45,6 +47,11 @@ class SecurityConfiguration {
             "/actuator/health",
             "/error"
     };
+
+    /** Every actuator endpoint but health (matched first, above): the founder's metrics view (D11). */
+    static final String ACTUATOR_ROUTES = "/actuator/**";
+    /** {@code hasRole} adds the {@code ROLE_} prefix; {@link PrincipalAuthentication} grants {@code ROLE_ADMIN}. */
+    static final String ADMIN_ROLE = "ADMIN";
 
     private static final List<PathPattern> PUBLIC_PATTERNS = Arrays.stream(PUBLIC_ROUTES)
             .map(PathPatternParser.defaultInstance::parse)
@@ -86,6 +93,7 @@ class SecurityConfiguration {
                 .sessionManagement(sessions -> sessions.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(routes -> routes
                         .requestMatchers(PUBLIC_ROUTES).permitAll()
+                        .requestMatchers(ACTUATOR_ROUTES).hasRole(ADMIN_ROLE)
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(resourceServer -> resourceServer
                         .bearerTokenResolver(bearerExceptOnPublicRoutes())

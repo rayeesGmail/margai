@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 class SecurityChainTest {
 
     private static final Principal STUDENT = new Principal(UUID.randomUUID(), UserRole.student, Language.hi);
+    private static final Principal ADMIN = new Principal(UUID.randomUUID(), UserRole.admin, Language.en);
 
     @Autowired
     private MockMvcTester mvc;
@@ -151,5 +152,39 @@ class SecurityChainTest {
         assertThat(refused).bodyJson().extractingPath("$.error.message_user_lang").isEqualTo("Bahut saare codes maange gaye. Thoda wait karo.");
         assertThat(refused).bodyJson().extractingPath("$.error.details.retry_after_s").isEqualTo(360);
         assertThat(refused.getResponse().getHeader("Retry-After")).isEqualTo("360");
+    }
+
+    // D11: /actuator/metrics is exposed for the founder and gated on the admin role in the chain (§9.3);
+    // /actuator/health stays public (healthStaysPublic above). DECISIONS D2/D7 actuator rows, amended.
+
+    @Test
+    void actuatorMetricsNeedATokenAndTheAdminRole() {
+        MvcTestResult anonymous = mvc.get().uri("/actuator/metrics").exchange();
+        MvcTestResult student = mvc.get().uri("/actuator/metrics")
+                .header("Authorization", "Bearer " + jwts.issue(STUDENT)).header("Accept-Language", "hi").exchange();
+        MvcTestResult admin = mvc.get().uri("/actuator/metrics").header("Authorization", "Bearer " + jwts.issue(ADMIN)).exchange();
+
+        assertThat(anonymous).hasStatus(401);
+        assertThat(anonymous).bodyJson().extractingPath("$.error.code").isEqualTo("AUTH_REQUIRED");
+        assertThat(student).hasStatus(403);
+        assertThat(student).bodyJson().extractingPath("$.error.code").isEqualTo("FORBIDDEN");
+        assertThat(student).bodyJson().extractingPath("$.error.message_user_lang").asString().isNotBlank();
+        assertThat(admin).hasStatusOk();
+        assertThat(admin).bodyJson().extractingPath("$.names").asArray().contains("jvm.memory.used");
+    }
+
+    @Test
+    void anAdminRouteIsForbiddenToAStudentOverTheRealChain() {
+        // The @PreAuthorize refusal travels through common's handler, not the chain's entry point (D11).
+        MvcTestResult student = mvc.get().uri("/api/v1/admin/metrics/otp")
+                .header("Authorization", "Bearer " + jwts.issue(STUDENT)).header("Accept-Language", "hi-Latn").exchange();
+        MvcTestResult admin = mvc.get().uri("/api/v1/admin/metrics/otp")
+                .header("Authorization", "Bearer " + jwts.issue(ADMIN)).exchange();
+
+        assertThat(student).hasStatus(403);
+        assertThat(student).bodyJson().extractingPath("$.error.code").isEqualTo("FORBIDDEN");
+        assertThat(student).bodyJson().extractingPath("$.error.message_user_lang").asString().isNotBlank();
+        assertThat(admin).hasStatusOk();
+        assertThat(admin).bodyJson().extractingPath("$.channels[1].channel").isEqualTo("email");
     }
 }

@@ -100,14 +100,15 @@ class LoginState {
   /// Whole minutes until a resend is allowed, rounded up; 0 when it already is.
   int get resendMinutes => (resendSeconds + 59) ~/ 60;
 
-  /// Whole seconds until a resend is allowed; 0 when it already is.
+  /// Whole seconds until a resend is allowed, rounded up so a blocked button never reads "0s";
+  /// 0 when it already is.
   int get resendSeconds {
     final at = resendAt;
     final current = now;
     if (at == null || current == null || !current.isBefore(at)) {
       return 0;
     }
-    return at.difference(current).inSeconds;
+    return (at.difference(current).inMilliseconds + 999) ~/ 1000;
   }
 
   /// Retry makes sense only after a failure that never produced a server answer: offline, a
@@ -191,8 +192,24 @@ class LoginNotifier extends Notifier<LoginState> {
 
   AuthRepository get _repository => ref.read(authRepositoryProvider);
 
+  /// A cooldown belongs to the destination that earned it (TECH_PLAN §3.4 keys the cap and the
+  /// cooldown per phone or email): typing a different address lifts it, so a student capped on
+  /// one inbox is not stuck for an hour on another. The server still answers 429 if the "new"
+  /// address turns out to be the same one.
   void emailChanged(String value) {
-    state = state.copyWith(email: value, emailReason: null, failure: null);
+    final differentDestination =
+        state.resendAt != null &&
+        Identifiers.normaliseEmail(value) !=
+            Identifiers.normaliseEmail(state.email);
+    if (differentDestination) {
+      _stopTicking();
+    }
+    state = state.copyWith(
+      email: value,
+      emailReason: null,
+      failure: null,
+      resendAt: differentDestination ? null : state.resendAt,
+    );
   }
 
   /// Sends a code to the typed email. From the code step this is a resend: the old challenge

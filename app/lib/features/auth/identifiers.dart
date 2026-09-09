@@ -24,6 +24,10 @@ abstract final class Identifiers {
     return null;
   }
 
+  /// The destination the server will key on (trimmed, lowercased — the D7 normalisation), so
+  /// two spellings of one inbox count as one destination for the client-side cooldown.
+  static String normaliseEmail(String raw) => raw.trim().toLowerCase();
+
   /// `null` when the code may be sent, else the reason code to render.
   static String? codeReason(String raw) {
     final code = raw.trim();

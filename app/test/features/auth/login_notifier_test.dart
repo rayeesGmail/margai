@@ -274,6 +274,50 @@ void main() {
       expect(ticks.hasListener, isFalse);
     });
 
+    test('typing a different email lifts the cooldown; the same one keeps it', () async {
+      repository
+        ..onRequest(
+          const ApiFailure(
+            code: 'OTP_RATE_LIMITED',
+            status: 429,
+            retryAfter: Duration(seconds: 3507),
+          ),
+        )
+        ..onRequest(FakeAuthRepository.challenge);
+      notifier().emailChanged('capped@b.in');
+      await notifier().requestCode();
+      expect(state().canRequest, isFalse);
+
+      notifier().emailChanged(' Capped@B.in');
+      expect(state().canRequest, isFalse, reason: 'same destination, only spelled differently');
+
+      notifier().emailChanged('other@b.in');
+      expect(state().canRequest, isTrue);
+      expect(state().resendAt, isNull);
+      await Future<void>.delayed(Duration.zero);
+      expect(ticks.hasListener, isFalse);
+
+      await notifier().requestCode();
+      expect(repository.requestedEmails, ['capped@b.in', 'other@b.in']);
+      expect(state().step, LoginStep.code);
+    });
+
+    test('the countdown rounds up, so a blocked button never reads 0s', () async {
+      repository.onRequest(FakeAuthRepository.challenge);
+      notifier().emailChanged('a@b.in');
+      await notifier().requestCode();
+
+      ticks.add(now.add(const Duration(seconds: 29, milliseconds: 100)));
+      await Future<void>.delayed(Duration.zero);
+      expect(state().canResend, isFalse);
+      expect(state().resendSeconds, 1);
+
+      ticks.add(now.add(const Duration(seconds: 30)));
+      await Future<void>.delayed(Duration.zero);
+      expect(state().canResend, isTrue);
+      expect(state().resendSeconds, 0);
+    });
+
     test('waits of a minute or more read in whole minutes, rounded up', () async {
       repository.onRequest(
         const ApiFailure(

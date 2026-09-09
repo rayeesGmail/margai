@@ -201,7 +201,7 @@ class OtpServiceTest {
         used.markVerified(NOW.minusSeconds(60));
         when(challenges.lockById(used.getId())).thenReturn(Optional.of(used));
         OtpChallenge stale = new OtpChallenge(UUID.randomUUID(), OtpChannel.email, EMAIL.address(), OtpPurpose.login,
-                OtpCodes.hash(PEPPER, UUID.randomUUID(), "111111"), NOW.minusSeconds(1), null);
+                OtpCodes.hash(PEPPER, UUID.randomUUID(), "111111"), NOW.minusSeconds(1), null, NOW.minusSeconds(301));
         when(challenges.lockById(stale.getId())).thenReturn(Optional.of(stale));
 
         for (UUID id : List.of(unknown, used.getId(), stale.getId())) {
@@ -233,7 +233,8 @@ class OtpServiceTest {
 
     @Test
     void aPhoneChallengeSignsInByPhone() {
-        OtpChallenge challenge = new OtpChallenge(UUID.randomUUID(), OtpChannel.sms, PHONE.e164(), OtpPurpose.login, "", NOW.plusSeconds(300), null);
+        OtpChallenge challenge = new OtpChallenge(UUID.randomUUID(), OtpChannel.sms, PHONE.e164(), OtpPurpose.login, "",
+                NOW.plusSeconds(300), null, NOW);
         ReflectionTestUtils.setField(challenge, "codeHash", OtpCodes.hash(PEPPER, challenge.getId(), "777777"));
         when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
         UserSummary user = new UserSummary(UUID.randomUUID(), PHONE.e164(), null, Language.en, UserRole.student, null);
@@ -278,7 +279,7 @@ class OtpServiceTest {
     private static OtpChallenge liveChallenge(String code) {
         UUID id = UUID.randomUUID();
         return new OtpChallenge(id, OtpChannel.email, EMAIL.address(), OtpPurpose.login, OtpCodes.hash(PEPPER, id, code),
-                NOW.plusSeconds(300), null);
+                NOW.plusSeconds(300), null, NOW);
     }
 
     private static OtpChallenge challengeCreatedAt(Instant createdAt) {

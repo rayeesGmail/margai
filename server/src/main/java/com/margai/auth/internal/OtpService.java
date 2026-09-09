@@ -78,7 +78,7 @@ public class OtpService {
         UUID challengeId = UUID.randomUUID();
         String code = OtpCodes.generate(policy.codeLength());
         challenges.save(new OtpChallenge(challengeId, channel, destination, OtpPurpose.login,
-                OtpCodes.hash(pepper, challengeId, code), now.plus(policy.ttl()), clientAddress));
+                OtpCodes.hash(pepper, challengeId, code), now.plus(policy.ttl()), clientAddress, now));
         try {
             sender.send(new OtpDelivery(channel, destination, code, language, policy.ttl()));
         } catch (OtpSendException failed) {

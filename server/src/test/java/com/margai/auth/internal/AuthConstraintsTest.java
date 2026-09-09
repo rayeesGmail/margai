@@ -54,7 +54,7 @@ class AuthConstraintsTest {
         UUID id = UUID.randomUUID();
         Instant expires = Instant.now().plus(5, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.MILLIS);
         OtpChallenge challenge = new OtpChallenge(id, OtpChannel.email, "someone@example.com", OtpPurpose.login,
-                HASH_A, expires, InetAddress.getByName("203.0.113.7"));
+                HASH_A, expires, InetAddress.getByName("203.0.113.7"), Instant.now());
 
         OtpChallenge saved = challenges.saveAndFlush(challenge);
 
@@ -164,7 +164,7 @@ class AuthConstraintsTest {
         verified.markVerified(now);
         challenges.saveAndFlush(verified);
         OtpChallenge alreadyDead = challenges.saveAndFlush(new OtpChallenge(UUID.randomUUID(), OtpChannel.email,
-                "dead@example.com", OtpPurpose.login, "c".repeat(64), now.minusSeconds(1), null));
+                "dead@example.com", OtpPurpose.login, "c".repeat(64), now.minusSeconds(1), null, now.minusSeconds(301)));
 
         int retired = challenges.retireLive(now);
 
@@ -177,6 +177,6 @@ class AuthConstraintsTest {
 
     private static OtpChallenge challenge(String destination, String hash, Instant now) {
         return new OtpChallenge(UUID.randomUUID(), OtpChannel.email, destination, OtpPurpose.login, hash,
-                now.plusSeconds(300), null);
+                now.plusSeconds(300), null, now);
     }
 }

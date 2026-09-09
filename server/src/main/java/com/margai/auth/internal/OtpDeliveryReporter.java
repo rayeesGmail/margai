@@ -3,10 +3,14 @@ package com.margai.auth.internal;
 import com.margai.auth.api.OtpChannelReport;
 import com.margai.auth.api.OtpDeliveryReport;
 import com.margai.auth.api.OtpMetrics;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,24 +19,31 @@ import org.springframework.stereotype.Component;
  * {@link OtpDeliveryReport} as {@code key=value} pairs — the shape CloudWatch Logs Insights parses
  * once the logs flow there (TECH_PLAN §10.1; F8), and a plain grep locally. A rate that does not
  * exist yet reads {@code n/a}. The line carries nothing but the report: no destination, no code
- * (§9.6). Scheduling is switched on in {@code common}'s {@code SchedulingConfiguration}.
+ * (§9.6). The schedule is taken from the bound {@link AuthProperties.Otp#reportEvery()} — one
+ * source of truth, in whatever notation the configuration used (§11.5) — on the application's
+ * {@link TaskScheduler}, which {@code common}'s {@code SchedulingConfiguration} switches on.
  */
 @Component
 class OtpDeliveryReporter {
-
-    static final String REPORT_EVERY = "${margai.auth.otp.report-every}";
 
     private static final Logger log = LoggerFactory.getLogger(OtpDeliveryReporter.class);
 
     private final OtpMetrics metrics;
     private final AuthProperties.Otp policy;
+    private final TaskScheduler scheduler;
 
-    OtpDeliveryReporter(OtpMetrics metrics, AuthProperties properties) {
+    OtpDeliveryReporter(OtpMetrics metrics, AuthProperties properties, TaskScheduler scheduler) {
         this.metrics = metrics;
         this.policy = properties.otp();
+        this.scheduler = scheduler;
     }
 
-    @Scheduled(fixedDelayString = REPORT_EVERY, initialDelayString = REPORT_EVERY)
+    @EventListener(ApplicationReadyEvent.class)
+    public void schedule() {
+        Duration every = policy.reportEvery();
+        scheduler.scheduleWithFixedDelay(this::logDeliveryRates, Instant.now().plus(every), every);
+    }
+
     public void logDeliveryRates() {
         OtpDeliveryReport report = metrics.report();
         for (OtpChannelReport channel : report.channels()) {

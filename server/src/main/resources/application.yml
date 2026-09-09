@@ -85,7 +85,7 @@ margai:
       sender: log                # log = sandbox (the code is printed in the server log) | ses
       email-from: ""             # a verified SES identity; required when sender = ses
       ses-region: ap-south-1
-      report-every: PT1H         # the delivery-rate log line (D11); ISO-8601 — PT1M for a demo
+      report-every: 1h           # the delivery-rate log line (D11); 1m for a demo
     clock-skew-warn: 2m          # X-Client-Time drift on /auth/* past this is warned and counted (§3.1, D9)
   limits:
     otp-request-per-destination-hourly: 3

@@ -1,7 +1,10 @@
 package com.margai.auth.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Level;
@@ -18,7 +21,9 @@ import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.TaskScheduler;
 
 /**
  * PLAN D11 "delivery-rate logging" (TECH_PLAN §10.1, §10.2): on its schedule the reporter writes
@@ -31,6 +36,7 @@ class OtpDeliveryReporterTest {
     private static final Instant SINCE = Instant.parse("2026-09-09T04:30:00Z");
 
     private final OtpMetrics metrics = mock(OtpMetrics.class);
+    private final TaskScheduler scheduler = mock(TaskScheduler.class);
     private final ListAppender<ILoggingEvent> authLog = new ListAppender<>();
 
     @BeforeEach
@@ -74,12 +80,22 @@ class OtpDeliveryReporterTest {
                         + " wrong_codes=1 expired_unverified=0 success_rate=0.667 first_attempt_rate=0.333");
     }
 
+    @Test
+    void theScheduleComesFromTheBoundPropertyWithTheSameWaitBeforeTheFirstLine() {
+        // One source of truth (TECH_PLAN §11.5): the record's Duration, whatever notation the yml used.
+        reporter(Set.of(OtpChannel.email)).schedule();
+
+        ArgumentCaptor<Instant> firstRun = ArgumentCaptor.forClass(Instant.class);
+        verify(scheduler).scheduleWithFixedDelay(any(Runnable.class), firstRun.capture(), eq(Duration.ofHours(1)));
+        assertThat(firstRun.getValue()).isBetween(Instant.now().plus(Duration.ofMinutes(59)), Instant.now().plus(Duration.ofMinutes(61)));
+    }
+
     private OtpDeliveryReporter reporter(Set<OtpChannel> channels) {
         AuthProperties properties = new AuthProperties(
                 new AuthProperties.Jwt("", "", Duration.ofMinutes(15), Duration.ofDays(30)),
                 new AuthProperties.Otp("", Duration.ofMinutes(5), 5, Duration.ofSeconds(30), 6, channels,
                         AuthProperties.Sender.log, "", "ap-south-1", Duration.ofHours(1)),
                 Duration.ofMinutes(2));
-        return new OtpDeliveryReporter(metrics, properties);
+        return new OtpDeliveryReporter(metrics, properties, scheduler);
     }
 }

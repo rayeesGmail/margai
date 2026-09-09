@@ -46,8 +46,7 @@ public record AuthProperties(@NotNull @Valid Jwt jwt, @NotNull @Valid Otp otp, @
      * @param emailFrom      verified SES sender identity; required when {@code sender = ses}
      * @param sesRegion      region of the SES endpoint
      * @param reportEvery    how often the delivery report is written to the log (§10.1; PLAN D11
-     *                       "delivery-rate logging"), ISO-8601 so the same value drives
-     *                       {@code @Scheduled}; also the delay before the first line
+     *                       "delivery-rate logging"); also the wait before the first line
      */
     public record Otp(
             String pepper,

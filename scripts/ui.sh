@@ -12,6 +12,7 @@
 #   scripts/ui.sh tap 'Log out' 2      # … the second match
 #   scripts/ui.sh field                # focus the first EditText, cursor at the end (field 2 = second)
 #   scripts/ui.sh type you@example.com # type into the focused field (adb input text: no spaces)
+#   scripts/ui.sh backspace 6          # delete n characters before the cursor (default 1)
 #   scripts/ui.sh shot d12-01-login    # screenshot → $UI_SHOTS/d12-01-login.png
 #   scripts/ui.sh launch | kill | clear   # start the app / force-stop it / wipe it (signed-out device)
 #
@@ -95,6 +96,13 @@ field() {
 # type <text>: into the focused field; adb's `input text` takes no spaces
 type_text() { "$ADB" shell input text "${1:?type needs text}"; }
 
+# backspace [n]: delete n characters before the cursor (a kept wrong code, for instance)
+backspace() {
+  local n="${1:-1}" keys=()
+  for ((i = 0; i < n; i++)); do keys+=(KEYCODE_DEL); done
+  "$ADB" shell input keyevent "${keys[@]}"
+}
+
 # shot <name>: PNG screenshot to $UI_SHOTS/<name>.png
 shot() {
   local name="${1:?shot needs a name}"
@@ -113,6 +121,7 @@ case "${1:-}" in
   tap)    shift; tap "$@" ;;
   field)  shift; field "$@" ;;
   type)   shift; type_text "$@" ;;
+  backspace) shift; backspace "$@" ;;
   shot)   shift; shot "$@" ;;
   launch) launch ;;
   kill)   kill_app ;;

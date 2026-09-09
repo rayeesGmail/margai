@@ -85,6 +85,7 @@ margai:
       sender: log                # log = sandbox (the code is printed in the server log) | ses
       email-from: ""             # a verified SES identity; required when sender = ses
       ses-region: ap-south-1
+      report-every: 1h           # the delivery-rate log line (D11); 1m for a demo
     clock-skew-warn: 2m          # X-Client-Time drift on /auth/* past this is warned and counted (§3.1, D9)
   limits:
     otp-request-per-destination-hourly: 3
@@ -92,11 +93,14 @@ margai:
     public-auth-per-ip-per-minute: 60   # verify + refresh per client address (§1.5 step 4)
     authenticated-per-minute: 60
 
+# health is public (the ALB check, component names only); metrics is the founder's raw view of every
+# Micrometer counter until CloudWatch (F8/D73) and needs an admin bearer — the security chain gates
+# /actuator/** beyond health on role = admin (D11, DECISIONS; amends the D2 "only health" row).
 management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health,metrics
   endpoint:
     health:
       show-components: always

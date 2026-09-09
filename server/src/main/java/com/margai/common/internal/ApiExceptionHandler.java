@@ -15,6 +15,7 @@ import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.ErrorResponse;
@@ -30,7 +31,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 /**
  * TECH_PLAN §1.5 step 8: every exception becomes the envelope of §3.3. Typed outcomes keep
  * their code and status; validation failures list the fields; unknown routes are
- * {@code NOT_FOUND}; anything else is a bug — logged with the request id, answered as
+ * {@code NOT_FOUND}; a {@code @PreAuthorize} refusal on an admin route (§9.3) is
+ * {@code FORBIDDEN}; anything else is a bug — logged with the request id, answered as
  * {@code INTERNAL} with that id and never a stack trace (§11.4).
  */
 @RestControllerAdvice
@@ -136,6 +138,17 @@ class ApiExceptionHandler {
     ResponseEntity<ErrorEnvelope> unsupportedMediaType(HttpMediaTypeNotSupportedException failure,
             HttpServletRequest request) {
         return validationFailed(Map.of("content_type", "unsupported"), request);
+    }
+
+    /**
+     * Method security throws from inside the controller, past the chain's own denied handler
+     * (which covers route-level rules) and straight into this advice — without this mapping a
+     * student on an admin route would be a logged "bug" and a 500 (D11, DECISIONS).
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    ResponseEntity<ErrorEnvelope> forbidden(AccessDeniedException denied, HttpServletRequest request) {
+        return ResponseEntity.status(ErrorCode.FORBIDDEN.httpStatus())
+                .body(responses.envelope(ErrorCode.FORBIDDEN, null, request));
     }
 
     @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class,

@@ -12,8 +12,8 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 1 — Auth & identity (Week 2, D7–D12), running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
-| Current day | D10 done · 2026-09-09 (account basics: the `student_profiles` row on first login and a new account's language from the verify call's `Accept-Language`; `POST /auth/logout` — authenticated, the caller's family, 204 either way, the reuse alarm narrowed to rotated-out tokens; no bearer read on the public routes; `GET /me` `{user, profile}` and `PATCH /me` with one-pass reason codes; a `Principal` controller parameter from common; app: single-flight refresh on `AUTH_EXPIRED`, `meProvider`, `SettingsNotifier` — the language switch then one rotation, logout best-effort on the server and unconditional on the device — the locale following the account, `/profile` with the switch and logout; ✅ PASS on the AVD with a 30-s access token: kill and reopen → still signed in with the family rotated, हिन्दी → the app in Hindi, लॉग आउट → a fresh login screen with every token revoked and a reopen staying signed out, plus the curl second device; branch `d10-account-basics`, 7 task commits + the audit fix + the residuals commit + the docs commit; spec-auditor FAIL with one MAJOR — `AUTH_INVALID` on `/me` stranded a stale-key session — fixed in 70527b6 and proved with a server restart on the device, six MINOR fixed or recorded, re-audit PASS; server 306 tests, app 242; PR #9 merged by the founder 2026-09-09, merge commit cf0cd2a) · next: D11 — F1 (DLT) has not landed, so no live SMS check: the email delivery-rate logging on top of D7's `otp.sent/verified/failed/send_failed` counters and the OTP metrics dashboard stub; ✅ the OTP success metric visible |
-| Days completed / total | 10 / 84 |
+| Current day | D11 done · 2026-09-09 (OTP delivery metrics, email only — F1 has not landed so no DLT live check: `otp.failed{channel}`, `otp.verified{channel, first_attempt}`; the report `auth.api.OtpMetrics` → per channel sent / send_failed / verified / verified_first_attempt / wrong_codes / expired_unverified with `success_rate` and `first_attempt_rate` (SPEC §11's number) since the instance started; the `ops` module opened with admin-only `GET /admin/metrics/otp`, `/actuator/metrics` admin-only, `common` renders a `@PreAuthorize` refusal as `FORBIDDEN`; the hourly `key=value` delivery-rate log line; ✅ PASS on the AVD + curl: three logins (clean, wrong-then-right, a code left to die) → email `sent 5 · verified 4 · first attempt 3 · wrong 1 · expired unverified 1 · success 0.8 · first attempt 0.6` in the admin report, the actuator and the log; branch `d11-otp-metrics`, 7 task commits + the audit fix + the docs commit; spec-auditor PASS with 3 MINOR, all fixed; server 319 tests, app 242 untouched; **PR pending** — the founder pushes and opens it) · next: D12 — buffer + the **Week-2 🚩 gate** ("a stranger's email signs in first try": the D9 runbook's ten rows re-run on the AVD, the D8 mobile-data half still carried on F8; F10's SES production access is the one founder item before a real stranger) |
+| Days completed / total | 11 / 84 |
 | Schedule delta | on track |
 | Last week's gate | **Week-1 🚩 PASS** 2026-09-08 — repo, environment, plan, schema and AI seam each demonstrated in-session (transcript in the D6 day log); the only open item, the live proof on the Anthropic profiles, is an account matter, not a build one |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
@@ -38,7 +38,7 @@
 - [x] **D8** Login screens (auto-read OTP, retry, change number) · ✅ real device, mobile data — done 2026-09-09 (built 2026-09-08/09 on `d8-login-screens`, 9 commits): email entry, code entry with the sixth digit submitting, resend after the server's cooldown, change email, honest offline state with Retry, three-locale copy for every error and reason code, the `core/` foundation (ApiClient + envelope, token store, auth state, language mapper, router guard, theme); **acceptance PASS on the AVD against the local server with the sandbox inbox** — the founder's reading (plan question 1): the AVD is the device until a public endpoint exists, the mobile-data half is carried on the Week-2 gate line; 8 screenshots + db rows in the day log; spec-auditor PASS with 8 MINOR, all fixed on the branch; *D7 ruling: email first, SMS auto-read (`smart_auth`) waits for F1*; PR #7 merged by the founder 2026-09-09 (merge commit 55aea8b)
 - [x] **D9** Unhappy paths (10-failure checklist) · ✅ all graceful — done 2026-09-09 (branch `d9-unhappy-paths`, 7 code commits): server — a per-identifier advisory lock ends the simultaneous-first-login race (the D7 known edge), `ClientTimeFilter` turns `X-Client-Time` into MDC + WARN + `auth.clock_skew`, `OtpStartup` retires pending codes on an ephemeral-pepper restart, `otp_challenges.created_at` now comes from `IstClock` (a §11.1 finding: the cooldown vanished under a movable clock), `AuthUnhappyPathsTest` pins the seven server rows; app — the entry step honours cooldowns per destination ("Send code in 57 min"), a different address lifts them, `CERTIFICATE` copy names the phone clock, `body`/`content_type` reasons render, Retry after any non-envelope answer; **acceptance PASS**: `docs/runbooks/login-failure-checklist.md`, ten rows with tests + AVD observations (19 screenshots, accessibility-tree driven) and curl transcripts for rows 6–8 (see day log); server 281 tests, app 168; spec-auditor PASS with 4 MINOR, all fixed; the PR's first CI run caught a clock-precision drift, fixed at `IstClock`; PR #8 merged by the founder 2026-09-09 (merge commit ba270af)
 - [x] **D10** Profile-on-first-login, language, logout, token rotation · ✅ persistence + clean logout — done 2026-09-09 (branch `d10-account-basics`, 7 task commits + the audit fix + the residuals commit + the docs commit): server — the `student_profiles` row from `signIn` (find-or-create under the identifier lock), a new account's language from the verify call's `Accept-Language`, `POST /auth/logout` (authenticated, the caller's family, 204 either way; the reuse alarm narrowed to rotated-out tokens), no bearer read on the public routes, `PrincipalArgumentResolver` in common, `GET /me` `{user, profile}`, `PATCH /me` with one-pass reason codes; app — single-flight refresh on `AUTH_EXPIRED` (`SessionRefresher`), no bearer on the public routes, `meProvider` (once per sign-in, no auto-retry), `SettingsNotifier` (switch: server → stored user → locale → one rotation; logout: best-effort server, unconditional device), the locale follows the account, `/profile` with the switch and logout; **acceptance PASS on the AVD** against port 8082 with a 30-s access token: sign in → kill 2 min later → reopen lands signed in with the family rotated; Profile → हिन्दी re-renders in Hindi, `users.language = hi`, a third rotation; लॉग आउट → a fresh login screen, every token revoked, kill + reopen stays signed out; curl second device: `Accept-Language: hi-Latn` seeds `hinglish`, `/me`, `PATCH {language: fr}` → `language.invalid`, logout 204 ×2, the dead refresh → `AUTH_INVALID`, a stale bearer ignored, no bearer → `AUTH_REQUIRED` (9 screenshots + rows + log lines in the day log); spec-auditor FAIL → one MAJOR fixed in 70527b6 (an access token from a previous server key is now replaced through one refresh instead of stranding the student — proved on the device with a server restart) and six MINOR fixed or recorded, re-audit PASS with three residuals closed; server 306 tests, app 242; *rotation + reuse detection were live since D7 — D10 added the app's refresh and the device proof*; PR #9 merged by the founder 2026-09-09 (merge commit cf0cd2a)
-- [ ] **D11** DLT live check / delivery metrics · ✅ OTP success metric visible — *D7 ruling: email delivery metrics (`otp.sent/verified/failed/send_failed` exist since D7) + the DLT check only if F1 has landed*
+- [x] **D11** DLT live check / delivery metrics · ✅ OTP success metric visible — done 2026-09-09 (branch `d11-otp-metrics`, 7 task commits + the audit fix + the docs commit): the DLT half skipped by PLAN's own "if F1 approved" (F1 ☐; the MSG91 adapter moves to F1's day); server — `otp.failed{channel}` and `otp.verified{channel, first_attempt}` (SPEC §11's numerator), `countExpiredUnverified` (codes that died unverified — the "never arrived" proxy), `auth.api.OtpMetrics` → `OtpDeliveryReport` per channel with `success_rate` and `first_attempt_rate` since the instance started, the **`ops` module** opened with `GET /admin/metrics/otp` (`@PreAuthorize` admin; `common` now renders a method-security refusal as `FORBIDDEN` instead of a 500), `/actuator/metrics` admin-only, the hourly `key=value` delivery-rate line (`margai.auth.otp.report-every`; scheduling on in `common`); **acceptance PASS on the AVD + curl** against port 8082 with a 1-minute report and 40-s codes: a clean login, a wrong-then-right login, a code left to die, the founder-style admin flag by hand + a fresh login → `GET /admin/metrics/otp` email `sent 5 · verified 4 · first attempt 3 · wrong 1 · expired unverified 1 · success 0.8 · first attempt 0.6`, the same on the actuator and in the 16:54:18 log line; a student → 403 `FORBIDDEN`, no token → 401 (4 screenshots + rows in the day log); spec-auditor PASS with 3 MINOR, all fixed; server 319 tests (was 306), app untouched; *no live SMS check: F1 has not landed*
 - [ ] **D12** Buffer
 - [ ] **🚩 WEEK-2 GATE:** a stranger's phone signs in first try — *read as "a stranger's email" until F1 (DECISIONS D7 row 1); the "real device over mobile data" half of D8's ✅ is carried here until F8 gives a public endpoint (D8, 2026-09-09) — until then a USB phone via `adb reverse` (app/README) or the AVD*
 
@@ -145,7 +145,7 @@
 
 | ID | Task | Start | Status | Notes |
 |---|---|---|---|---|
-| F1 | Razorpay KYC + DLT SMS template | W1 D1 | ☐ not started | long lead time. 2026-09-08 (D7): DLT registration needs a registered company, so login runs on **email OTP** until F1 lands (DECISIONS D7 row 1); when it does: add `sms` to `margai.auth.otp.channels`, the MSG91 adapter (D11), the phone-attach flow (PARKED) |
+| F1 | Razorpay KYC + DLT SMS template | W1 D1 | ☐ not started | long lead time. 2026-09-08 (D7): DLT registration needs a registered company, so login runs on **email OTP** until F1 lands (DECISIONS D7 row 1); when it does: add `sms` to `margai.auth.otp.channels`, the MSG91 adapter (~~D11~~ — D11 ran on 2026-09-09 without F1, so the adapter and the DLT live check move to the day F1 lands; the `sms` channel, `OtpSender` port and per-channel metrics are ready for it), the phone-attach flow (PARKED) |
 | F10 | **SES for the OTP email channel** (D7 ruling): in the SES console, ap-south-1, verify a sender identity (address or domain); while the account is in the SES sandbox also verify the recipient addresses you test with; request production access before the first stranger (D12) or beta at the latest. Then run the founder-only live proof in `server/README.md` "Auth" (`MARGAI_AUTH_OTP_SENDER=ses MARGAI_AUTH_OTP_EMAIL_FROM=…`) | before D8's device login ideally; before D12 | ◐ 2026-09-08: the founder already has SES-verified email identities — sender covered; while sandboxed they double as the test recipients · **✅ live proof PASS 2026-09-09** (founder-run, transcript pasted in session): server on 8081 with `MARGAI_AUTH_OTP_SENDER=ses` and the verified sender, default region ap-south-1; `POST /auth/otp/request {email}` to a verified Gmail recipient (s***@gmail.com) → 200, request id 311fd2a1-…, challenge 1358d17a-…, channel email; the code arrived in the real inbox (no sandbox logger with the SES sender); `POST /auth/otp/verify` → 200 with access + refresh tokens, `expires_in` 900, `is_new_user: true`, user 49d2b89e-… — SES delivery and the identity region are settled | remaining: request production access before D12 so strangers' inboxes work (sandbox = verified recipients only); SSM keys `otp/sender`, `otp/email_from`, `otp/channels` (TECH_PLAN §7.3) at F8 |
 | F2 | NCERT licensing letter sent | W1 | ☐ | follow-up cadence: monthly |
 | F3 | Educator review of backbone booked | by W5 | ☐ | needed W8 |
@@ -174,6 +174,115 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+D11 · 2026-09-09 · PHASE 1 — Auth & identity (OTP delivery metrics: the success metric visible; email only, F1 not landed)
+Plan approved as written (8 tasks, 10 spec-silent choices, 11 doc notes, 5 closing questions → the
+  recommended option each: a d11-otp-metrics branch + PR; the report's window = the process lifetime;
+  /actuator/metrics exposed admin-only beside the admin JSON route; the reporter hourly with 1 min
+  for the demo; the JSON log encoder parked). PLAN D11's DLT half ("if F1 approved; else stay
+  sandbox") skipped by its own condition — F1 ☐, and "sandbox" today is the D7 email path whose SES
+  live proof passed this morning (F10); the MSG91 adapter the D7 DECISIONS row named for D11 moves
+  to F1's day (F1 row) — founder-gated, not a slip. Server only; no app change, no migration, no AI
+  path, SPEC untouched; every task test-first (the failing run before the code).
+Shipped (branch d11-otp-metrics, 7 task commits + the audit fix + this docs commit): dca07bc auth —
+  otp.failed{channel}, otp.verified{channel, first_attempt} (SPEC §11's numerator; OtpServiceTest
+  +1, 2 assertions moved to the tagged meters); 2f3109f auth — OtpChallengeRepository
+  .countExpiredUnverified(channel, purpose, since, now): codes that reached expiry with verified_at
+  null, the "never arrived" proxy until SES events (AuthConstraintsTest +1, seven rows in a
+  ten-year-ahead window); 657e9c2 auth — the auth.api named interface: OtpMetrics →
+  OtpDeliveryReport(since, channels[OtpChannelReport]) from the registry + the db count, rates to
+  three decimals and absent when sent = 0, every channel in enum order (OtpMetricsServiceTest 3);
+  9fdb89a ops — the ops module (common :: api, auth :: api), AdminMetricsController GET
+  /api/v1/admin/metrics/otp with @PreAuthorize("hasRole('ADMIN')"), and common's ApiExceptionHandler
+  mapping AccessDeniedException → FORBIDDEN (a method-security refusal was a logged "bug" and a 500
+  before — §9.3 did not work end to end; AdminMetricsControllerTest 2, ModularityTest pins ops);
+  8cb049c auth — management exposure health,metrics; the chain gates /actuator/** beyond health on
+  ROLE_ADMIN (SecurityChainTest +2: anonymous 401, student 403 envelope, admin 200 with the meter
+  names; the admin route's refusal over the real chain); 1039eea auth + common — OtpDeliveryReporter,
+  one key=value INFO line per enabled channel, margai.auth.otp.report-every, SchedulingConfiguration
+  in common (OtpDeliveryReporterTest 2; the three AuthProperties.Otp call sites); 79701d6 test —
+  OtpMetricsFlowTest, the ✅ in test form (clean / wrong-then-right / left to die → deltas +3 +2 +1 +1
+  +1 on the report and the same count on the actuator; a clock a day ahead so the shared database's
+  other rows stay outside the window); ffc1a9b fix after the audit (below). Server 319 tests (was
+  306; 1 skipped = the Bedrock smoke), app 242 untouched.
+Acceptance: ✅ PASS — PLAN D11 "OTP success metric visible", run on the AVD margai_android36 (Android
+  16, the D10 APK — its baked API_BASE_URL is 10.0.2.2:8082, checked in the kernel blob, so no
+  rebuild) against SERVER_PORT=8082 with MARGAI_AUTH_OTP_REPORT_EVERY=PT1M (pre-fix notation)
+  MARGAI_AUTH_OTP_TTL=40s and the sandbox sender, started 16:48:18 IST (report since =
+  2026-09-09T11:18:18Z; 8081 still held by the founder's SES server, left alone); driven by the D10
+  ui.sh from the session scratchpad (4 screenshots there). 16:49:18 the first reporter line, all
+  zeros, rates n/a. (a) pm clear → d11-clean@example.com → Send code 16:50:49 (sandbox code 721180)
+  → the six digits → /today "Signed in as d11-clean@example.com" 16:51:13 (d11-01). (b) Profile → Log
+  out → d11-retry@example.com → code 16:51:51 (293184) → 000000 at 16:52:05 → "That code didn't
+  match. Try once more." + "4 tries left.", digits kept (d11-02) → field cleared, the right code →
+  /today 16:52:15 (d11-03). (c) Log out → d11-lost@example.com → code 16:52:43 (670761), expiry
+  16:53:23, never typed (d11-04). Then the founder-style admin: update users set role = 'admin' where
+  email = 'd11-clean@example.com' over compose psql (fe945618-…), a curl login at 16:53:22 →
+  is_new_user false, user.role admin, the JWT claims {role: admin, lang: en}; a curl login for
+  d11-student@example.com → is_new_user true, role student. 16:53:37 GET /admin/metrics/otp with the
+  admin bearer → {since: 2026-09-09T11:18:18.423535Z, channels: [{sms: all 0, no rates}, {email:
+  sent 5, send_failed 0, verified 4, verified_first_attempt 3, wrong_codes 1, expired_unverified 1,
+  success_rate 0.8, first_attempt_rate 0.6}]}; the student bearer → 403 {FORBIDDEN, "You can't do
+  that here."} (message_user_lang in English: the principal's lang=en wins over Accept-Language: hi
+  on an authenticated route, §3.8); no bearer → 401 AUTH_REQUIRED. Actuator with the admin bearer:
+  otp.verified{channel=email,first_attempt=true} COUNT 3.0, otp.failed{channel=email} 1.0; the
+  student → 403 FORBIDDEN envelope; no token → 401; /actuator/health still public. Reporter lines
+  16:51:18 sent=1 verified=1 first_attempt=1 · 16:52:18 sent=2 verified=2 first_attempt=1
+  wrong_codes=1 success_rate=1.000 first_attempt_rate=0.500 · 16:53:18 sent=3 verified=2
+  expired_unverified=0 (the lost code had 5 s left) success_rate=0.667 · 16:54:18 and 16:55:18
+  sent=5 send_failed=0 verified=4 first_attempt=3 wrong_codes=1 expired_unverified=1
+  success_rate=0.800 first_attempt_rate=0.600. db: five otp_challenges rows (attempts 0/1/0/0/0,
+  verified t/t/f/t/t — d11-lost expired 16:53:23 untried); users d11-clean admin, d11-retry and
+  d11-student student. The 8082 server stopped afterwards; the founder's 8081 untouched.
+spec-auditor (branch diff + the uncommitted doc notes): PASS with 3 MINOR — [MINOR] reportEvery bound
+  and validated but never read; @Scheduled read the raw placeholder with its own ISO-8601-only
+  parser, so a value Boot accepts (1h) could fail context start → fixed in ffc1a9b: the reporter
+  schedules itself on the TaskScheduler at ApplicationReadyEvent from the record (one source of
+  truth, §11.5), yml 1h, demo 1m (OtpDeliveryReporterTest +1); [MINOR] the §10.3 note said "per
+  channel" where the code writes per enabled channel → "per enabled channel"; [MINOR] the scheduling
+  javadoc cited §1.2 unamended → a dated line in §1.2's api row (every profile carries the scheduler
+  thread; each schedule stays with its module). Residuals confirmed: no PII on the new lines (the
+  reporter line pinned verbatim), expired_unverified consistent across query / javadoc / README /
+  DECISIONS (it also counts a challenge exhausted by five wrong codes once its TTL passes — read it
+  beside wrong_codes), the process-lifetime window holds for every number, the flow test's clock and
+  deltas are not flaky while tests run sequentially, hasRole('ADMIN') matches ROLE_ADMIN. Its
+  unverifiable items closed here: the 7 task commits touch server/ only, docs/SPEC.md untouched,
+  verify green on every commit, TRACKER was dirty (the F1 row and PARKED edits, this commit).
+Doc conflicts surfaced in the plan (none blocked): PLAN D11 "DLT template live check" vs F1 ☐ →
+  skipped by PLAN's own clause; PLAN "dashboard stub" vs §10.3 dashboards at D73 → the admin JSON
+  view + the actuator, dated note; §1.3/§3.7 ops routes at D65 → the module opened at D11, dated
+  notes; §10.4 alarm otp.failed / otp.sent vs SPEC §11 "first attempt" → the alarm counts wrong-code
+  attempts, first_attempt_rate is SPEC §11's number, dated note, the alarm text left to D73; §9.3
+  @PreAuthorize vs common's catch-all → the FORBIDDEN mapping; DECISIONS D2/D7 actuator rows → amended
+  by the D11 row; §10.1 JSON logs / the server rule vs no encoder in the tree → PARKED; DECISIONS D7
+  "a delivery failure deletes the row" → send_failed counter-only → the window decision; §1.3 jobs
+  owns the sweepers' schedules vs the reporter in auth → decision; §1.2 api row (the auditor) →
+  amended; the untracked pyq/ (a NEET 2020 paper, 4.9 MB) and, mid-session, ncert/ (2026-ed Class 11
+  Chemistry Part 1, 13 files, 59 MB) in the repo root — not ignored, left out of every commit; the
+  pipeline rule keeps source PDFs in S3 content/ and pipeline/data/ is the ignored local spot —
+  founder to place them (D14/D18 inputs?).
+Spec-silent choices: 7 DECISIONS rows dated 2026-09-09 · D11.
+Parked: the logstash JSON encoder (F8/D73); SES bounce/complaint/delivery events via SNS (F8);
+  otp.time_to_verify and otp.resent; a ?hours= window once CloudWatch holds the counters; an admin
+  bootstrap (D75); ui.sh — fourth day from a scratchpad (commit at the gate if D12 drives the AVD).
+Surprise: (1) A @PreAuthorize refusal was a 500 — found while planning the first admin route: the
+  exception passes the chain's denied handler and lands in common's catch-all; §9.3's rule had never
+  been exercised. (2) Right after am start — even after force-stop + pm clear — the first uiautomator
+  dump returned the previous window (the old signed-in landing); the second dump showed the splash.
+  Dump twice before believing a stale-looking screen. (3) The debug APK carries its --dart-define
+  next to the default in the kernel blob, so an installed build's port is checkable without a
+  rebuild. (4) curl -w "HTTP %{http_code}" piped into jq breaks jq on the status line — print the
+  status separately. (5) The auditor caught the two-parser split on report-every that the plan's
+  "ISO-8601 so the same value drives @Scheduled" had rationalised; the record is the source now.
+  (6) A grep for the sandbox line right after the Send-code tap raced the log flush once; the next
+  dump showed the code step and the line was there.
+Tomorrow's first task: D12 — buffer + the Week-2 🚩 gate, "a stranger's email signs in first try":
+  the D9 runbook's ten rows re-run on the AVD (the D10 note), the D8 mobile-data half carried on F8,
+  the gate as a demo script with PASS / PARTIAL / FAIL, ui.sh's fate; F10's SES production access is
+  the one founder item before a real stranger. PR from d11-otp-metrics to be pushed and opened by the
+  founder.
+```
 
 ```
 D10 · 2026-09-09 · PHASE 1 — Auth & identity (account basics: profile on first login, language, logout, token rotation)
@@ -1032,6 +1141,11 @@ Tomorrow's first task:
 - the reusable device-proof driver (`ui.sh`: tree, tap by label, field, type, shot, launch, kill) · 2026-09-09 · used again at D10 from the session scratchpad — third day in a row; commit it under `scripts/` at the Week-2 gate if D12 drives the AVD too
 - `state_code` checked against the state list on the server (`PATCH /me` accepts any two letters today; the D25 picker is the only guard) · 2026-09-09 · spec-auditor D10 MINOR; do it when `cutoffs` land (D22) and the list exists in one place
 - ARB copy for the seven `PATCH /me` reason codes (`language|goal|category|state_code.invalid`, `time.invalid`, `decimal_min`, `decimal_max`) · 2026-09-09 · unreachable from the app until the D25 / D64 screens send those fields; the D8 fallback line renders meanwhile (DECISIONS D10 PATCH row)
+- the logstash JSON encoder for the server log (TECH_PLAN §10.1 "Logback with the logstash JSON encoder → stdout → CloudWatch Logs"; the server rule's "structured JSON logs") · 2026-09-09 · not in the tree since D2; the D11 delivery-rate line is plain text with `key=value` pairs that Logs Insights parses either way — add the encoder with a plain `local` profile at F8/D73, when something reads JSON
+- SES delivery events (bounce, complaint, delivery) through an SES configuration set → SNS → the API, so `otp.send_failed` and `expired_unverified` stop being the only delivery signals · 2026-09-09 · needs the F8 stack (a topic and an endpoint); until then the D11 report's `expired_unverified` is the "never arrived" proxy
+- `otp.time_to_verify{channel}` (a timer from `created_at` to `verified_at`) and `otp.resent{channel}` (a request whose previous code for that destination is still unverified) · 2026-09-09 · two cheap delivery-latency signals not asked for by PLAN D11; add when the D73 dashboard wants a latency panel
+- the D11 report's window is the process lifetime · 2026-09-09 · right while one API task runs and CloudWatch is absent; when the counters flow to CloudWatch (F8/D73) decide whether `GET /admin/metrics/otp` grows a `?hours=` database window (then `send_failed` would need a row per failed delivery — the D7 row deletes it) or simply points at the dashboard
+- an admin bootstrap (a seed or a CLI that flags the founder's row) · 2026-09-09 · today `users.role = 'admin'` is set by hand over psql (TECH_PLAN §3.7 "flagged by hand"), as the D11 ✅ did; D75's admin routes decide whether a `pipeline` command or an SSM-listed email does it
 
 ---
 

@@ -195,7 +195,7 @@ service at beta; the places where a second instance would need one are listed in
 
 | Profile | Started by | Does | AI client |
 |---|---|---|---|
-| `api` (default) | ECS service, `./mvnw spring-boot:run` locally | HTTP API, in-process notification dispatcher (every 60 s), sweepers (expired images hourly, unclassified errors every 5 minutes) | `fake` unless `bedrock` is also active |
+| `api` (default) | ECS service, `./mvnw spring-boot:run` locally | HTTP API, in-process notification dispatcher (every 60 s), sweepers (expired images hourly, unclassified errors every 5 minutes) *— and, since D11 (2026-09-09), the OTP delivery-rate log line every `margai.auth.otp.report-every`; scheduling is switched on in `common` for every profile, so the `nightly` and `pipeline` tasks carry a scheduler thread too, and each schedule stays with the module whose work it is (DECISIONS D11)* | `fake` unless `bedrock` is also active |
 | `nightly` | EventBridge → ECS RunTask at 00:30 IST; locally by hand | the `jobs` module's `NightlyRunner` (§1.3): §4.5 re-plan for every user active in 14 days, weekly trajectory + patterns on Sundays, purge job, ai spend rollup; exits when done | as above |
 | `pipeline` | Founder's laptop with AWS SSO, `java -jar server.jar --spring.profiles.active=pipeline <command>` | §6 content commands (picocli) | `bedrock` (human-launched) |
 | `eval` | Founder's laptop, `BEDROCK_LIVE=1 ./mvnw -Peval verify` | §4.10 live eval suite | `bedrock` |
@@ -233,7 +233,7 @@ Both names match the eval gate's `retriev*` path rule.
 | `storage` | S3 port (uploads, content), signed URLs, deletion | — | common |
 | `pipeline` | §6 CLI commands | — | ai, curriculum, storage |
 | `jobs` | `NightlyRunner` (§4.5 orchestration), the purge and rollup jobs, the export executor (gathers every module's data for `data_export_jobs`, D64), the daily document-deletion verification job (§9.6, D64), the sweepers' schedules, the weekly dump | — | every `api` package |
-| `ops` | founder admin peek, audit-queue review, cost views (`GET /admin/costs` D65, the rest D75) | — | every `api` package (read-only) |
+| `ops` | founder admin peek, audit-queue review, cost views (`GET /admin/costs` D65, the rest D75) — *opened 2026-09-09 at D11 with `GET /admin/metrics/otp`, the §10.3 stub; declares `common :: api`, `auth :: api` today and gains each module's `api` as its routes arrive* | — | every `api` package (read-only) |
 
 `chapter_status` sits in `practice` because ability estimates are written by practice and the
 diagnostic; onboarding seeds it through `practice.api`. `audit_queue` sits in `ai` because every
@@ -955,8 +955,11 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 | `POST /admin/audit-queue/{id}/resolve` | D75 | `{action, note}` → item | may invalidate cache rows |
 | `GET /admin/users/{id}/peek` | D75 | → read-only state summary | founder peek |
 | `GET /admin/costs` | D65 | `?from&to` → `ai_spend_daily` rows | |
+| `GET /admin/metrics/otp` | D11 | → `{since, channels: [{channel, sent, send_failed, verified, verified_first_attempt, wrong_codes, expired_unverified, success_rate?, first_attempt_rate?}]}` | the OTP delivery report since this instance started (§10.2, §10.3); every channel listed; the rates are absent when nothing was sent — *added 2026-09-09, D11 (DECISIONS)* |
 
-Unauthenticated: `/actuator/health` (liveness for the ALB; no details).
+Unauthenticated: `/actuator/health` (liveness for the ALB; no details). *`/actuator/metrics` is exposed
+too and needs an admin bearer — the chain gates `/actuator/**` beyond health on the admin role
+(D11, 2026-09-09).*
 
 ### 3.8 Language
 
@@ -1773,6 +1776,11 @@ includes it in the query; there is no `findById` on a student table without the 
 `@WebMvcTest` per module requests another user's resource ids and expects `NOT_FOUND` (never
 `FORBIDDEN`, which would confirm existence). Admin routes require `role = admin` via
 `@PreAuthorize`; the admin peek is read-only by construction (no write repositories in `ops`).
+*A `@PreAuthorize` refusal throws from inside the controller, past the chain's own denied handler,
+so `common`'s `ApiExceptionHandler` maps Spring Security's `AccessDeniedException` to the
+`FORBIDDEN` envelope — without it the catch-all answered a 500. Actuator endpoints carry no
+annotation, so `/actuator/**` beyond health is gated on the admin role in the chain itself
+(D11, 2026-09-09; DECISIONS).*
 
 ### 9.4 Input handling
 
@@ -1840,7 +1848,11 @@ trip), `ERROR` for anything that pages. No PII in messages (§9.6).
 
 `http.server.requests` by route and status; `ai.calls` and `ai.cost.paise` by feature, tier and
 status; `ai.latency` by tier; `doubt.cache.hit_rate`; `doubt.verify.mismatch`; `otp.sent`,
-`otp.verified`, `otp.failed`, `otp.send_failed` (D7), `auth.refresh.reuse` (D7), `auth.clock_skew{band}`
+`otp.verified`, `otp.failed`, `otp.send_failed` (D7) *— every one tagged `channel`, and `otp.verified`
+also `first_attempt` = `true|false`, the numerator of SPEC §11's "≥ 98% first attempt";
+`auth.api.OtpMetrics` reads them back, adds the count of codes that expired unverified (the one
+delivery signal no counter can carry) and answers the report of §10.3 (D11, 2026-09-09)*,
+`auth.refresh.reuse` (D7), `auth.clock_skew{band}`
 (D9); `nightly.users`, `nightly.fallbacks`, `nightly.duration`;
 `notifications.sent/skipped` by kind and reason; `outbox.sync_lag_s` (reported by the app through
 PostHog, not CloudWatch); `practice.judge.latency`.
@@ -1854,6 +1866,13 @@ PostHog, not CloudWatch); `practice.judge.latency`.
   health, RDS CPU/storage/connections, nightly run status.
 - **Cost** (admin `GET /admin/costs`, D65): `ai_spend_daily` by feature, cost per active free and
   Pro user, cache hit rate trend, breaker trips.
+- **OTP delivery** (admin `GET /admin/metrics/otp` and, for the raw counters, `/actuator/metrics`
+  — both admin only; D11): per channel since the instance started — sent, send failures, verified
+  (on the first attempt or not), wrong codes, codes that died unverified, `success_rate` and
+  `first_attempt_rate`; the same numbers go to the log every `margai.auth.otp.report-every`
+  (an hour) as one `key=value` line per enabled channel for Logs Insights. *The stub until the
+  CloudWatch dashboard above exists (F8/D73), when the counters become one-minute series and the
+  window stops being the process lifetime — added 2026-09-09, D11 (DECISIONS).*
 
 ### 10.4 Alarms
 
@@ -1863,7 +1882,7 @@ PostHog, not CloudWatch); `practice.judge.latency`.
 | Nightly missing | no `nightly.duration` datapoint by 06:00 IST | no planless morning; the API fallback covers users meanwhile |
 | Bedrock spend | `ai.cost.paise` daily sum > `global_daily_paise`, and AWS Budgets on the Bedrock service | cost surprise bounded (PLAN risk register) |
 | Verification mismatches | `doubt.verify.mismatch` > 5% over 1 h | prompt or model regression |
-| OTP failure | `otp.failed / otp.sent` > 5% over 1 h | OTP ≥ 98% first attempt (SPEC §11) |
+| OTP failure | `otp.failed / otp.sent` > 5% over 1 h | OTP ≥ 98% first attempt (SPEC §11) — *`otp.failed` counts wrong-code attempts, not deliveries: SPEC §11's number is `otp.verified{first_attempt=true} / otp.sent` (the report's `first_attempt_rate`), and a code that never arrives shows as `expired_unverified`; the D73 alarm text says which of the three it watches (D11, 2026-09-09)* |
 | RDS | free storage < 20%, CPU > 80% for 15 min | |
 | Audit queue | open items > 50 | founder review backlog |
 

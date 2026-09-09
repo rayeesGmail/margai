@@ -151,6 +151,32 @@ Bedrock: verify a sender identity in SES ap-south-1 — and, while the account i
 the recipient addresses you test with (TRACKER F10) — then
 `MARGAI_AUTH_OTP_SENDER=ses MARGAI_AUTH_OTP_EMAIL_FROM=you@yourdomain.in SERVER_PORT=8081 ./mvnw spring-boot:run`.
 
+### Seeing the OTP metric (D11)
+
+SPEC §11 sets "OTP success ≥ 98% first attempt". The server counts `otp.sent`, `otp.verified`
+(tagged `first_attempt`), `otp.failed` and `otp.send_failed` per channel (TECH_PLAN §10.2) and,
+until CloudWatch exists (F8/D73), shows them three ways — all since this instance started:
+
+```bash
+# 1. the admin report: flag your own row by hand (TECH_PLAN §3.7), then sign in again so the JWT carries role = admin
+docker compose exec -T db psql -U margai -d margai -c "update users set role = 'admin' where email = 'you@example.com'"
+curl -s localhost:8081/api/v1/admin/metrics/otp -H 'Authorization: Bearer <admin access_token>'
+# → {"since":"…","channels":[{"channel":"sms",…},{"channel":"email","sent":5,"send_failed":0,"verified":4,
+#    "verified_first_attempt":3,"wrong_codes":1,"expired_unverified":1,"success_rate":0.8,"first_attempt_rate":0.6}]}
+#    a student's token → 403 FORBIDDEN; no token → 401 AUTH_REQUIRED
+# 2. the raw counters through the actuator (admin only; health stays public)
+curl -s 'localhost:8081/actuator/metrics/otp.verified?tag=channel:email&tag=first_attempt:true' \
+     -H 'Authorization: Bearer <admin access_token>'
+# 3. the log: one line per enabled channel every margai.auth.otp.report-every (1h; 1m for a demo)
+MARGAI_AUTH_OTP_REPORT_EVERY=1m SERVER_PORT=8081 ./mvnw spring-boot:run
+#   … OtpDeliveryReporter : otp delivery channel=email since=… sent=5 send_failed=0 verified=4 first_attempt=3
+#     wrong_codes=1 expired_unverified=1 success_rate=0.800 first_attempt_rate=0.600
+```
+
+`expired_unverified` — codes that reached their expiry without ever being verified — is what an
+email that never arrived looks like from the server, and the number to watch until SES delivery
+events exist. `first_attempt_rate` is SPEC §11's number; `success_rate` counts any match.
+
 ## Modules and schema
 
 Packages `com.margai.<module>` with `api` (public), `internal` and, where a module owns HTTP, `web`

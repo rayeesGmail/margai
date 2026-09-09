@@ -176,6 +176,20 @@
 ## 📝 Day log (append newest on top)
 
 ```
+Side task · 2026-09-09 · NCERT inputs manifests for the Phase-2 content pipeline (no PLAN day)
+ncert/2022-ed/{en,hi}/manifest.md completed from the books' own edition and contents pages: title,
+  revised-edition month, latest reprint, chapter range, completeness, and a text check over every
+  page of every file (PyMuPDF; the Hindi prelims and two English books rendered to images and read).
+  All 20 books complete against their contents pages. Three example rows corrected (phy11-part2 is
+  the January 2023 revised edition; phy11-part1's latest reprint April 2026; bio12's January 2026).
+Findings → PARKED: the ten Hindi books are legacy Walkman-Chanakya glyph text with no Unicode map
+  (zero Devanagari from any extractor; Hindi ingest needs a Chanakya→Unicode step or OCR, en/ is the
+  grounding source until then); en/phy11-part1's Gravitation chapter and prelims extract as U+F0xx
+  private-use codepoints (subtract 0xF000). The 672 MB of PDFs stay untracked.
+PR #11 from ncert-manifests merged to main by the founder 2026-09-09 (merge commit cc86be7).
+```
+
+```
 D11 · 2026-09-09 · PHASE 1 — Auth & identity (OTP delivery metrics: the success metric visible; email only, F1 not landed)
 Plan approved as written (8 tasks, 10 spec-silent choices, 11 doc notes, 5 closing questions → the
   recommended option each: a d11-otp-metrics branch + PR; the report's window = the process lifetime;

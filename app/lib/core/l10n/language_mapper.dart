@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../auth/auth_state.dart';
+
 /// The student's language as the server names it: the value in `/me`, in the JWT `lang` claim
 /// and in generated content (TECH_PLAN §3.8, §5.5). Hinglish is Hindi in Latin script, the
 /// BCP-47 tag `hi-Latn`, which Flutter's gen-l10n serves as its own locale.
@@ -46,15 +48,19 @@ enum AppLanguage {
   }
 }
 
-/// The app's current locale (TECH_PLAN §5.2 `localeProvider`). Until the mentor intro (D25) and
-/// the profile switch (D10) exist, the device locale is the suggestion (SPEC §5 "language
-/// auto-suggested, changeable") and nothing else sets it.
+/// The app's current locale (TECH_PLAN §5.2 `localeProvider`, §5.5): the signed-in account's
+/// language — it is saved with `PATCH /me` and locally, and wins on every later start (D10) —
+/// and, signed out, the device locale as the suggestion (SPEC §5 "language auto-suggested,
+/// changeable"), which the login flow sends as `Accept-Language` so a new account starts in it.
 class LocaleNotifier extends Notifier<Locale> {
   @override
-  Locale build() =>
-      AppLanguage.fromLocale(PlatformDispatcher.instance.locale).locale;
-
-  void set(AppLanguage language) => state = language.locale;
+  Locale build() {
+    final auth = ref.watch(authStateProvider).value;
+    if (auth is SignedIn) {
+      return auth.user.language.locale;
+    }
+    return AppLanguage.fromLocale(PlatformDispatcher.instance.locale).locale;
+  }
 }
 
 final localeProvider = NotifierProvider<LocaleNotifier, Locale>(

@@ -195,6 +195,17 @@ class LoginNotifier extends Notifier<LoginState> {
     await requestCode();
   }
 
+  /// Typing clears the field reason; the sixth digit submits (SPEC §8 screen 1 "bulletproof",
+  /// one tap fewer on a phone keyboard).
+  void codeTyped(String value) {
+    if (state.codeReason != null) {
+      state = state.copyWith(codeReason: null);
+    }
+    if (value.trim().length == Identifiers.codeLength) {
+      verify(value);
+    }
+  }
+
   Future<void> verify(String code) async {
     final challenge = state.challenge;
     if (challenge == null || state.busy) {

@@ -1,4 +1,55 @@
 {
   "@@locale": "hi_Latn",
-  "appTitle": "MARG AI"
+  "appTitle": "MARG AI",
+
+  "loginHeadline": "Hi! Main aapka NEET mentor hoon.",
+  "loginIntro": "Apne email se sign in karo — main 6-digit code bhejta hoon.",
+  "emailLabel": "Email",
+  "emailHint": "you@example.com",
+  "sendCodeButton": "Code bhejo",
+  "sendingCode": "Bhej raha hoon…",
+
+  "codeSentTitle": "Apna email check karo",
+  "codeSentTo": "Maine {email} par 6-digit code bheja hai.",
+  "codeLabel": "6-digit code",
+  "verifyButton": "Verify karo",
+  "verifying": "Check kar raha hoon…",
+  "resendButton": "Naya code bhejo",
+  "resendIn": "Naya code {seconds}s mein",
+  "changeEmailButton": "Email badlo",
+  "attemptsLeft": "{count, plural, =0{Is code par koi try baaki nahi.} =1{1 try baaki.} other{{count} tries baaki.}}",
+  "retryButton": "Phir try karo",
+
+  "failureOffline": "Aap offline ho. Connection check karke phir try karo — jo likha hai wo safe hai.",
+  "failureMalformed": "Server se kuch aisa aaya jo main padh nahi paaya. Ek pal baad phir try karo.",
+  "failureRequestId": "Reference: {requestId}",
+
+  "errorValidationFailed": "Kuch details sahi nahi lag rahi. Ek baar dekh kar phir try karo.",
+  "errorAuthRequired": "Continue karne ke liye sign in karo.",
+  "errorAuthExpired": "Session ko ek chhota refresh chahiye.",
+  "errorAuthInvalid": "Please dobara sign in karo.",
+  "errorOtpInvalid": "Code match nahi hua. Ek baar aur try karo.",
+  "errorOtpExpired": "Yeh code ab valid nahi hai. Naya code mangao.",
+  "errorRateLimited": "Thoda tez ho gaya. Ek pal baad phir try karo.",
+  "errorOtpRateLimited": "Bahut saare codes maange gaye. Thoda wait karo.",
+  "errorInternal": "Hamari taraf se kuch gadbad hui. Please phir try karo.",
+  "errorUnknown": "Yeh kaam nahi kiya. Please phir try karo.",
+
+  "reasonNotBlank": "Yeh khaali nahi ho sakta.",
+  "reasonNotNull": "Yeh zaroori hai.",
+  "reasonMin": "Yeh bahut chhota hai.",
+  "reasonSize": "Yeh bahut lamba hai.",
+  "reasonPhoneInvalid": "Yeh Indian mobile number jaisa nahi lag raha.",
+  "reasonEmailInvalid": "Yeh email address jaisa nahi lag raha.",
+  "reasonIdentifierRequired": "Continue karne ke liye apna email likho.",
+  "reasonIdentifierOneOnly": "Email ya phone mein se ek chuno, dono nahi.",
+  "reasonChannelUnavailable": "Phone se sign in abhi available nahi hai — apna email use karo.",
+  "reasonCodeDigits": "Code 6 digits ka hota hai.",
+  "reasonBodyMalformed": "App ne kuch aisa bheja jo server padh nahi paaya. Please app update karo.",
+  "reasonContentTypeUnsupported": "App ne kuch aisa bheja jo server padh nahi paaya. Please app update karo.",
+  "reasonUnknown": "Ise ek baar dekh kar phir try karo.",
+
+  "todayPlaceholderTitle": "Aap andar aa gaye.",
+  "todayPlaceholderBody": "{identifier} ke roop mein signed in ho.",
+  "todayPlaceholderNote": "Aapka onboarding aur pehla plan agle build mein aayega. Abhi yahan aur kuch nahi karna."
 }

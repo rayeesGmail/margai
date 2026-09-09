@@ -13,7 +13,10 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_riverpod: ^3.4.2
-  flutter_secure_storage: ^11.0.0
+  # 11.x compiles against Android 17, which the SDK ships only as the minor-versioned platform
+  # android-37.0; AGP 9.1.0 cannot resolve that hash. Stay on 10.x (compileSdk 36, Flutter's own
+  # default) until the Flutter template bumps compileSdk (DECISIONS 2026-09-09, D8).
+  flutter_secure_storage: ^10.3.1
   go_router: ^18.0.1
   intl: any
   package_info_plus: ^10.2.1

@@ -55,7 +55,8 @@ call (D10). Log out from Profile (the person icon on Today) to sign the device o
 that says "on device" and the login-failure runbook (`docs/runbooks/login-failure-checklist.md`)
 can be re-run the same way every time: `tree` lists every labelled node with its bounds, `tap
 <label>` taps the node whose semantics label or text contains it, `field` focuses a text field,
-`type` types into it, `shot <name>` screenshots to `$UI_SHOTS`, and `launch` / `kill` / `clear`
+`type` types into it, `shot <name>` screenshots to `$UI_SHOTS` (default `$TMPDIR/margai-ui`, never
+the tree — the commit gate scans untracked files), and `launch` / `kill` / `clear`
 start, force-stop or wipe the app. `scripts/ui.sh help` prints the details. It needs `adb` (on
 PATH, or `ADB=…`) and `python3`.
 

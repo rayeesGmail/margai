@@ -8,6 +8,7 @@
 # label as content-desc and text fields as EditText, so every tap is by label, never by pixel.
 #
 #   scripts/ui.sh tree                 # "desc|text|class|bounds|enabled=|focused=" per labelled node
+#   scripts/ui.sh dump                 # the raw uiautomator XML of the current window
 #   scripts/ui.sh tap 'Send code'      # tap the first node whose desc or text contains the label
 #   scripts/ui.sh tap 'Log out' 2      # … the second match
 #   scripts/ui.sh field                # focus the first EditText, cursor at the end (field 2 = second)
@@ -17,25 +18,32 @@
 #   scripts/ui.sh launch | kill | clear   # start the app / force-stop it / wipe it (signed-out device)
 #
 # Environment: ADB (default: adb on PATH, else the Homebrew platform-tools path), UI_SHOTS
-# (screenshot directory, default the current directory), UI_PKG (default com.margai.app),
-# ANDROID_SERIAL (adb's own device selector when more than one is attached).
+# (screenshot directory, default $TMPDIR/margai-ui — never the tree, the commit gate scans untracked
+# files), UI_PKG (default com.margai.app), ANDROID_SERIAL (adb's own device selector when more than
+# one is attached).
 #
-# Two things learnt the hard way: right after `launch` the first dump can still show the previous
-# window, so dump again before believing a stale-looking screen; and after a round trip through
-# another screen refocus the field (`field`) before `type`, or the text goes nowhere.
+# Three things learnt the hard way: right after `launch` the first dump can still show the previous
+# window, so dump again before believing a stale-looking screen; after a round trip through another
+# screen refocus the field (`field`) before `type`, or the text goes nowhere; and a dump that fails
+# ("could not get idle state") is an error here, never a stale tree — retry it.
 set -euo pipefail
 
 ADB="${ADB:-$(command -v adb || echo /opt/homebrew/share/android-commandlinetools/platform-tools/adb)}"
-UI_SHOTS="${UI_SHOTS:-.}"
+UI_SHOTS="${UI_SHOTS:-${TMPDIR:-/tmp}/margai-ui}"
 PKG="${UI_PKG:-com.margai.app}"
 
 usage() {
   sed -n '2,/^set -euo/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//'
 }
 
-# Raw uiautomator XML of the current window.
+# Raw uiautomator XML of the current window. The old file is removed first so a failed dump can
+# never serve the previous window's tree.
 dump() {
-  "$ADB" shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1
+  "$ADB" shell rm -f /sdcard/ui.xml
+  if ! "$ADB" shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; then
+    echo "dump: uiautomator could not dump the window (device busy or not idle) — retry" >&2
+    return 1
+  fi
   "$ADB" shell cat /sdcard/ui.xml
 }
 
@@ -44,7 +52,7 @@ dump() {
 tree() {
   local xml
   xml="$(mktemp -t ui-tree)"
-  dump >"$xml"
+  if ! dump >"$xml"; then rm -f "$xml"; return 1; fi
   python3 - "$xml" <<'PY'
 import sys
 import xml.etree.ElementTree as ET
@@ -64,13 +72,15 @@ center() {
   python3 -c 'import re, sys; x1, y1, x2, y2 = map(int, re.findall(r"\d+", sys.argv[1])); print((x1 + x2) // 2, (y1 + y2) // 2)' "$1"
 }
 
-# tap <label-substring> [nth]
+# tap <label-substring> [nth]: the label is matched against the desc and the text only, never the
+# class, the bounds or the flags.
 tap() {
-  local label="${1:?tap needs a label}" nth="${2:-1}" line bounds x y
-  line="$(tree | grep -F -- "$label" | sed -n "${nth}p" || true)"
+  local label="${1:?tap needs a label}" nth="${2:-1}" nodes line bounds x y
+  nodes="$(tree)" || return 1
+  line="$(printf '%s\n' "$nodes" | awk -F'|' -v l="$label" 'index($1, l) || index($2, l)' | sed -n "${nth}p")"
   if [ -z "$line" ]; then
-    echo "tap: no node matches '$label' (match $nth); the tree is:" >&2
-    tree >&2
+    echo "tap: no node's label or text contains '$label' (match $nth); the tree is:" >&2
+    printf '%s\n' "$nodes" >&2
     return 1
   fi
   bounds="$(printf '%s' "$line" | cut -d'|' -f4)"
@@ -81,8 +91,9 @@ tap() {
 
 # field [nth]: focus the nth EditText and move the cursor to its end
 field() {
-  local nth="${1:-1}" line bounds x y
-  line="$(tree | awk -F'|' '$3 == "EditText"' | sed -n "${nth}p")"
+  local nth="${1:-1}" nodes line bounds x y
+  nodes="$(tree)" || return 1
+  line="$(printf '%s\n' "$nodes" | awk -F'|' '$3 == "EditText"' | sed -n "${nth}p")"
   if [ -z "$line" ]; then
     echo "field: no EditText number $nth on screen" >&2
     return 1
@@ -98,9 +109,11 @@ type_text() { "$ADB" shell input text "${1:?type needs text}"; }
 
 # backspace [n]: delete n characters before the cursor (a kept wrong code, for instance)
 backspace() {
-  local n="${1:-1}" keys=()
-  for ((i = 0; i < n; i++)); do keys+=(KEYCODE_DEL); done
-  "$ADB" shell input keyevent "${keys[@]}"
+  local n="${1:-1}" keys="" i
+  [ "$n" -ge 1 ] 2>/dev/null || return 0
+  for ((i = 0; i < n; i++)); do keys="$keys KEYCODE_DEL"; done
+  # shellcheck disable=SC2086  # one keyevent call with n keycodes, split on purpose
+  "$ADB" shell input keyevent $keys
 }
 
 # shot <name>: PNG screenshot to $UI_SHOTS/<name>.png

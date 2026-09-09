@@ -8,6 +8,8 @@
   "emailHint": "you@example.com",
   "sendCodeButton": "Code bhejo",
   "sendingCode": "Bhej raha hoon…",
+  "sendCodeIn": "Code {seconds}s mein bhejo",
+  "sendCodeInMinutes": "{minutes, plural, =1{Code 1 min mein bhejo} other{Code {minutes} min mein bhejo}}",
 
   "codeSentTitle": "Apna email check karo",
   "codeSentTo": "Maine {email} par 6-digit code bheja hai.",
@@ -16,12 +18,14 @@
   "verifying": "Check kar raha hoon…",
   "resendButton": "Naya code bhejo",
   "resendIn": "Naya code {seconds}s mein",
+  "resendInMinutes": "{minutes, plural, =1{Naya code 1 min mein} other{Naya code {minutes} min mein}}",
   "changeEmailButton": "Email badlo",
   "attemptsLeft": "{count, plural, =0{Is code par koi try baaki nahi — naya code mangao.} =1{1 try baaki.} other{{count} tries baaki.}}",
   "retryButton": "Phir try karo",
 
   "failureOffline": "Aap offline ho. Connection check karke phir try karo — jo likha hai wo safe hai.",
   "failureMalformed": "Server se kuch aisa aaya jo main padh nahi paaya. Ek pal baad phir try karo.",
+  "failureCertificate": "Secure connection nahi ban paaya. Apne phone ki date aur time check karo, phir try karo.",
   "failureRequestId": "Reference: {requestId}",
 
   "errorValidationFailed": "Kuch details sahi nahi lag rahi. Ek baar dekh kar phir try karo.",

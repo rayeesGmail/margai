@@ -1,8 +1,9 @@
 /// A failed API call as the screens see it (TECH_PLAN §5.4): either the server's envelope
-/// `{error: {code, message_en, message_user_lang, details}}` (§3.3) or one of the two client-only
-/// codes for a call that never produced an envelope. Screens render [messageUser] when the server
-/// sent one and fall back to ARB copy keyed by [code]; [details] hold machine-readable values only
-/// (reason codes per field, `attempts_left`, `retry_after_s`, `request_id`).
+/// `{error: {code, message_en, message_user_lang, details}}` (§3.3) or one of the three
+/// client-only codes for a call that never produced an envelope (offline, malformed, certificate;
+/// DECISIONS D8 and D9). Screens render [messageUser] when the server sent one and fall back to
+/// ARB copy keyed by [code]; [details] hold machine-readable values only (reason codes per field,
+/// `attempts_left`, `retry_after_s`, `request_id`).
 class ApiFailure implements Exception {
   const ApiFailure({
     required this.code,
@@ -21,10 +22,15 @@ class ApiFailure implements Exception {
   const ApiFailure.malformed(int? status)
     : this(code: malformedCode, status: status);
 
+  /// The TLS handshake or certificate check failed, so nothing left the phone. On Android the
+  /// usual cause is a clock that is far off (PLAN D9 row 6); the copy says so.
+  const ApiFailure.certificate() : this(code: certificateCode);
+
   static const String offlineCode = 'OFFLINE';
   static const String malformedCode = 'MALFORMED';
+  static const String certificateCode = 'CERTIFICATE';
 
-  /// An `ErrorCode` name from TECH_PLAN §3.3, or one of the two client-only codes above.
+  /// An `ErrorCode` name from TECH_PLAN §3.3, or one of the three client-only codes above.
   final String code;
 
   /// HTTP status when there was a response.
@@ -44,7 +50,10 @@ class ApiFailure implements Exception {
 
   bool get isMalformed => code == malformedCode;
 
-  bool get isEnvelope => !isOffline && !isMalformed;
+  bool get isCertificate => code == certificateCode;
+
+  /// The server answered with the §3.3 envelope; false for the three client-only codes.
+  bool get isEnvelope => !isOffline && !isMalformed && !isCertificate;
 
   /// `details.attempts_left` on `OTP_INVALID` (0 on the last attempt).
   int? get attemptsLeft => _intDetail('attempts_left');

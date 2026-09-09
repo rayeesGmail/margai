@@ -20,6 +20,24 @@
   "@sendingCode": {
     "description": "Primary button label while the code request is in flight."
   },
+  "sendCodeIn": "Send code in {seconds}s",
+  "@sendCodeIn": {
+    "description": "Primary button label on the entry step while a cooldown is pending (a 429, or a code just sent before Change email); the button is disabled (PLAN D9 rows 4-5).",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "sendCodeInMinutes": "{minutes, plural, =1{Send code in 1 min} other{Send code in {minutes} min}}",
+  "@sendCodeInMinutes": {
+    "description": "Same, for waits of a minute or more (the hourly cap answers with up to 3600 s); minutes are rounded up.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
 
   "codeSentTitle": "Check your email",
   "codeSentTo": "I've sent a 6-digit code to {email}.",
@@ -43,6 +61,15 @@
       }
     }
   },
+  "resendInMinutes": "{minutes, plural, =1{New code in 1 min} other{New code in {minutes} min}}",
+  "@resendInMinutes": {
+    "description": "Countdown on the code step for waits of a minute or more; minutes are rounded up.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "changeEmailButton": "Change email",
   "attemptsLeft": "{count, plural, =0{No tries left on this code — ask for a new one.} =1{1 try left.} other{{count} tries left.}}",
   "@attemptsLeft": {
@@ -62,6 +89,10 @@
   "failureMalformed": "The server sent something I couldn't read. Try again in a moment.",
   "@failureMalformed": {
     "description": "Client-only failure: an answer that is not the error envelope."
+  },
+  "failureCertificate": "I couldn't make a secure connection. Check your phone's date and time, then retry.",
+  "@failureCertificate": {
+    "description": "Client-only failure: the TLS handshake or certificate check failed before any request left. On Android the usual cause is a phone clock that is far off (PLAN D9 row 6)."
   },
   "failureRequestId": "Reference: {requestId}",
   "@failureRequestId": {

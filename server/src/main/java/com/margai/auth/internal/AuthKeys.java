@@ -25,11 +25,18 @@ final class AuthKeys {
     private final SecretKey jwtKey;
     private final SecretKey previousJwtKey;
     private final byte[] otpPepper;
+    private final boolean otpPepperEphemeral;
 
+    /** Configured keys (tests); the pepper counts as configured. */
     AuthKeys(SecretKey jwtKey, SecretKey previousJwtKey, byte[] otpPepper) {
+        this(jwtKey, previousJwtKey, otpPepper, false);
+    }
+
+    private AuthKeys(SecretKey jwtKey, SecretKey previousJwtKey, byte[] otpPepper, boolean otpPepperEphemeral) {
         this.jwtKey = jwtKey;
         this.previousJwtKey = previousJwtKey;
         this.otpPepper = otpPepper.clone();
+        this.otpPepperEphemeral = otpPepperEphemeral;
     }
 
     static AuthKeys from(AuthProperties properties) {
@@ -37,8 +44,14 @@ final class AuthKeys {
         SecretKey previous = isBlank(properties.jwt().secretPrevious())
                 ? null
                 : hmacKey(decode(properties.jwt().secretPrevious(), "margai.auth.jwt.secret-previous"));
+        boolean pepperEphemeral = isBlank(properties.otp().pepper());
         byte[] pepper = configuredOrEphemeral(properties.otp().pepper(), "margai.auth.otp.pepper");
-        return new AuthKeys(jwt, previous, pepper);
+        return new AuthKeys(jwt, previous, pepper, pepperEphemeral);
+    }
+
+    /** True when the pepper is this process's random one: codes from before the start are unverifiable (D9). */
+    boolean otpPepperEphemeral() {
+        return otpPepperEphemeral;
     }
 
     SecretKey jwtKey() {

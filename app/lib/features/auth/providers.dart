@@ -11,8 +11,9 @@ import 'repository.dart';
 /// Which half of SPEC §8 screen 1 is showing: the identifier entry or the code entry.
 enum LoginStep { entry, code }
 
-/// The last thing the student asked for. After an offline failure, Retry re-runs it with the
-/// same input (DEV_SPEC §6 screen 1: "must survive flaky network"; DECISIONS D8).
+/// The last thing the student asked for. After a failure that never produced a server answer,
+/// Retry re-runs it with the same input (DEV_SPEC §6 screen 1: "must survive flaky network";
+/// DECISIONS D8, D9).
 sealed class LoginIntent {
   const LoginIntent();
 }
@@ -88,18 +89,32 @@ class LoginState {
   /// May the screen offer "Send a new code" right now.
   bool get canResend => !busy && now != null && canResendAt(now!);
 
-  /// Whole seconds until a resend is allowed; 0 when it already is.
+  /// May the entry step ask for a code right now: not busy, and no cooldown pending — from a
+  /// 429, or from a code sent just before Change email (PLAN D9 rows 4–5). A fresh flow may.
+  bool get canRequest =>
+      !busy && (resendAt == null || (now != null && canResendAt(now!)));
+
+  /// A wait of a minute or more reads in minutes (the hourly cap answers with up to 3,600 s).
+  bool get longWait => resendSeconds >= 60;
+
+  /// Whole minutes until a resend is allowed, rounded up; 0 when it already is.
+  int get resendMinutes => (resendSeconds + 59) ~/ 60;
+
+  /// Whole seconds until a resend is allowed, rounded up so a blocked button never reads "0s";
+  /// 0 when it already is.
   int get resendSeconds {
     final at = resendAt;
     final current = now;
     if (at == null || current == null || !current.isBefore(at)) {
       return 0;
     }
-    return at.difference(current).inSeconds;
+    return (at.difference(current).inMilliseconds + 999) ~/ 1000;
   }
 
-  /// Retry makes sense only after a failure that never reached the server.
-  bool get canRetry => failure?.isOffline == true && lastIntent != null;
+  /// Retry makes sense only after a failure that never produced a server answer: offline, a
+  /// non-envelope reply (a captive portal's page) or a failed secure connection (D9).
+  bool get canRetry =>
+      failure != null && !failure!.isEnvelope && lastIntent != null;
 
   LoginState copyWith({
     String? email,
@@ -164,7 +179,7 @@ class LoginNotifier extends Notifier<LoginState> {
     });
     ref.onDispose(_stopTicking);
     final initial = initialState();
-    if (initial.challenge != null) {
+    if (initial.challenge != null || initial.resendAt != null) {
       _startTicking();
     }
     return initial;
@@ -177,13 +192,33 @@ class LoginNotifier extends Notifier<LoginState> {
 
   AuthRepository get _repository => ref.read(authRepositoryProvider);
 
+  /// A cooldown belongs to the destination that earned it (TECH_PLAN §3.4 keys the cap and the
+  /// cooldown per phone or email): typing a different address lifts it, so a student capped on
+  /// one inbox is not stuck for an hour on another. The server still answers 429 if the "new"
+  /// address turns out to be the same one.
   void emailChanged(String value) {
-    state = state.copyWith(email: value, emailReason: null, failure: null);
+    final differentDestination =
+        state.resendAt != null &&
+        Identifiers.normaliseEmail(value) !=
+            Identifiers.normaliseEmail(state.email);
+    if (differentDestination) {
+      _stopTicking();
+    }
+    state = state.copyWith(
+      email: value,
+      emailReason: null,
+      failure: null,
+      resendAt: differentDestination ? null : state.resendAt,
+    );
   }
 
   /// Sends a code to the typed email. From the code step this is a resend: the old challenge
-  /// stays on screen until the new one arrives, so a failed resend loses nothing.
+  /// stays on screen until the new one arrives, so a failed resend loses nothing. Inside a
+  /// cooldown this is a no-op on either step: the server would only answer 429 again.
   Future<void> requestCode() async {
+    if (state.busy || !state.canResendAt(_now)) {
+      return;
+    }
     final email = state.email.trim();
     final reason = Identifiers.emailReason(email);
     if (reason != null) {
@@ -292,20 +327,24 @@ class LoginNotifier extends Notifier<LoginState> {
         codeReason: failure.code == validationFailed
             ? failure.reasonFor('code')
             : null,
-        resendAt: failure.retryAfter == null
-            ? state.resendAt
-            : now.add(failure.retryAfter!),
+        // A 429 here comes from the per-address verify bucket (TECH_PLAN §3.4), not from the
+        // resend cooldown: the server's line is shown and the resend keeps its own clock.
       );
     }
   }
 
-  /// Back to the entry step with the email still there; any cooldown still applies.
+  /// Back to the entry step with the email still there; any cooldown still applies — and keeps
+  /// counting down on the entry step, so the ticker stays only while one is pending.
   void changeEmail() {
     if (state.busy) {
       return;
     }
-    _stopTicking();
+    final now = _now;
+    if (state.canResendAt(now)) {
+      _stopTicking();
+    }
     state = state.copyWith(
+      now: now,
       challenge: null,
       attemptsLeft: null,
       failure: null,
@@ -331,13 +370,17 @@ class LoginNotifier extends Notifier<LoginState> {
     state = state.copyWith(failure: null);
   }
 
-  /// The once-a-second clock runs only while a cooldown can be on screen: from a sent code until
-  /// the flow leaves the code step (SPEC §1 principle 5: no idle timer on a mid-range phone).
+  /// The once-a-second clock runs only while a cooldown can be on screen: on the code step from
+  /// a sent code, and on the entry step only until a pending cooldown elapses (SPEC §1
+  /// principle 5: no idle timer on a mid-range phone).
   void _startTicking() {
     _tick ??= ref.listen<AsyncValue<DateTime>>(tickerProvider, (_, next) {
       final at = next.value;
       if (at != null) {
         state = state.copyWith(now: at);
+        if (state.step == LoginStep.entry && state.canResendAt(at)) {
+          _stopTicking();
+        }
       }
     });
   }

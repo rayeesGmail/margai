@@ -12,8 +12,8 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 1 — Auth & identity (Week 2, D7–D12), running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
-| Current day | D8 done · 2026-09-09 (Flutter login on email per the D7 ruling: entry, code entry, resend after the cooldown, change email, honest offline state with Retry, ARB en / hi / hi_Latn for every error and reason code; `core/` foundation — ApiClient with the §3.3 envelope and the §3.1 headers, Keystore-backed token store, auth state, language mapper, go_router guard, theme; ✅ PASS on the AVD against the local server with the sandbox inbox (founder's reading; the mobile-data half waits for F8 on the gate line); spec-auditor PASS with 8 MINOR, all fixed on the branch; `d8-login-screens`, 9 commits, PR #7 merged by the founder 2026-09-09, merge commit 55aea8b) · next: D9 unhappy-path hardening — the 10-failure checklist (wrong code ×5, expiry, cooldown + hourly cap, clock skew via `X-Client-Time`, duplicate accounts, malformed body, offline on each step) |
-| Days completed / total | 8 / 84 |
+| Current day | D9 done · 2026-09-09 (unhappy-path hardening: simultaneous first logins serialised on a per-identifier advisory lock, `X-Client-Time` skew diagnostics on `/auth/*`, pending codes retired on an ephemeral-pepper restart, `otp_challenges.created_at` from the app clock, `AuthUnhappyPathsTest` for the server rows; app: the entry step honours cooldowns per destination with minute-scale waits, a `CERTIFICATE` failure code, request-level reasons rendered, Retry after any non-envelope answer; ✅ PASS — `docs/runbooks/login-failure-checklist.md`, ten rows each pinned by tests and observed on the AVD / by curl; `d9-unhappy-paths`, 9 code commits + 2 docs commits; the PR's first CI run failed two waits by one second on the Linux runner — nanosecond instants vs `TIMESTAMPTZ` microseconds — fixed at the clock, `IstClock.now()` truncates to microseconds; awaiting the founder's merge) · next: D10 account basics — `POST /auth/logout`, the `student_profiles` row on first login, `GET`/`PATCH /me`, the single-flight refresh interceptor; ✅ kill and reopen → still signed in, logout → clean state |
+| Days completed / total | 9 / 84 |
 | Schedule delta | on track |
 | Last week's gate | **Week-1 🚩 PASS** 2026-09-08 — repo, environment, plan, schema and AI seam each demonstrated in-session (transcript in the D6 day log); the only open item, the live proof on the Anthropic profiles, is an account matter, not a build one |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
@@ -36,7 +36,7 @@
 
 - [x] **D7** OTP request/verify + rate limits + tokens · ✅ curl happy path — done 2026-09-08, acceptance PASS (literal curl transcript in the day log: email request → sandbox code → verify → tokens with `sub/role/lang/jti` → refresh → reuse revokes the family; 429 + `Retry-After` for the cooldown and the hourly cap; phone refused while email-only; hash in the db, code only on the sandbox logger); **email OTP per the founder's D7 ruling** (DECISIONS row 1 of 2026-09-08, exit = F1); branch `d7-otp-auth`, 11 commits, PR #6 merged by the founder 2026-09-08 (merge commit af3adb3)
 - [x] **D8** Login screens (auto-read OTP, retry, change number) · ✅ real device, mobile data — done 2026-09-09 (built 2026-09-08/09 on `d8-login-screens`, 9 commits): email entry, code entry with the sixth digit submitting, resend after the server's cooldown, change email, honest offline state with Retry, three-locale copy for every error and reason code, the `core/` foundation (ApiClient + envelope, token store, auth state, language mapper, router guard, theme); **acceptance PASS on the AVD against the local server with the sandbox inbox** — the founder's reading (plan question 1): the AVD is the device until a public endpoint exists, the mobile-data half is carried on the Week-2 gate line; 8 screenshots + db rows in the day log; spec-auditor PASS with 8 MINOR, all fixed on the branch; *D7 ruling: email first, SMS auto-read (`smart_auth`) waits for F1*; PR #7 merged by the founder 2026-09-09 (merge commit 55aea8b)
-- [ ] **D9** Unhappy paths (10-failure checklist) · ✅ all graceful
+- [x] **D9** Unhappy paths (10-failure checklist) · ✅ all graceful — done 2026-09-09 (branch `d9-unhappy-paths`, 7 code commits): server — a per-identifier advisory lock ends the simultaneous-first-login race (the D7 known edge), `ClientTimeFilter` turns `X-Client-Time` into MDC + WARN + `auth.clock_skew`, `OtpStartup` retires pending codes on an ephemeral-pepper restart, `otp_challenges.created_at` now comes from `IstClock` (a §11.1 finding: the cooldown vanished under a movable clock), `AuthUnhappyPathsTest` pins the seven server rows; app — the entry step honours cooldowns per destination ("Send code in 57 min"), a different address lifts them, `CERTIFICATE` copy names the phone clock, `body`/`content_type` reasons render, Retry after any non-envelope answer; **acceptance PASS**: `docs/runbooks/login-failure-checklist.md`, ten rows with tests + AVD observations (19 screenshots, accessibility-tree driven) and curl transcripts for rows 6–8 (see day log); server 281 tests, app 168; spec-auditor PASS with 4 MINOR, all fixed; the PR's first CI run caught a clock-precision drift, fixed at `IstClock`
 - [ ] **D10** Profile-on-first-login, language, logout, token rotation · ✅ persistence + clean logout — *rotation + reuse detection already live since D7; D10 adds `POST /auth/logout`, the profile row, `/me`*
 - [ ] **D11** DLT live check / delivery metrics · ✅ OTP success metric visible — *D7 ruling: email delivery metrics (`otp.sent/verified/failed/send_failed` exist since D7) + the DLT check only if F1 has landed*
 - [ ] **D12** Buffer
@@ -174,6 +174,96 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+D9 · 2026-09-09 · PHASE 1 — Auth & identity (unhappy-path hardening, the 10-failure checklist)
+Plan approved as written (8 tasks, 8 spec-silent decisions, 9 doc notes, 4 closing questions → the
+  recommended option each: retire pending codes only when the pepper is ephemeral; a client-only
+  CERTIFICATE code with "check your phone's date and time" copy; AVD observations for the app-visible
+  rows + curl for the server-only ones; the checklist lives at docs/runbooks/login-failure-checklist.md).
+Shipped (branch d9-unhappy-paths, 7 code commits + this docs commit): ab3133f account — simultaneous
+  first logins serialised on a per-identifier pg_advisory_xact_lock in AccountService.signIn (the D7
+  known edge: 7 of 8 threads hit users_email_key before it; AccountConcurrencyTest, 5 rounds × 8
+  threads → one row, one is_new); f395a5e auth — ClientTimeFilter on /api/v1/auth/* (X-Client-Time →
+  MDC client_skew_s; one WARN + auth.clock_skew{band} past margai.auth.clock-skew-warn = 2m; never
+  echoed; a FilterRegistrationBean so @WebMvcTest slices stay unaware); 182f9f7 auth — OtpStartup
+  retires every pending challenge on ApplicationReadyEvent when AuthKeys reports the pepper ephemeral
+  (OtpChallengeRepository.retireLive); c8dc70f AuthUnhappyPathsTest (expiry, cooldown with the exact
+  wait, the hourly cap then the window passing, malformed bodies as reason codes, two parallel
+  verifies → one account, a skewed clock counted on /auth and ignored on /actuator, a verify flood 429
+  before the service) + the finding that otp_challenges.created_at came from Hibernate's VM clock
+  while the cooldown and cap compare with IstClock (§11.1) — now stamped from the app clock;
+  36d1907 app — LoginState.canRequest / longWait / resendMinutes, requestCode a no-op inside a
+  cooldown, the ticker on the entry step only while one is pending, "Send code in Ns / N min", "New
+  code in N min", ARB ×3 (sendCodeIn, sendCodeInMinutes, resendInMinutes), the D8 whole-app test walks
+  the cooldown after Change email; 3651cf3 app — ApiFailure.certificate (dio badCertificate,
+  TlsException) with its own copy in three locales, body/content_type reasons render the authored
+  "update the app" line, Retry after any non-envelope failure; 54e8566 app — a different address lifts
+  the client-side cooldown (found on the AVD, row 5), resendSeconds rounds up; + the spec-auditor
+  follow-up commit (below). Server 280 tests (was 263), app 168 (was 145); no AI path, no migration,
+  SPEC untouched; every task test-first (each new test watched failing before its code).
+Acceptance: ✅ PASS — docs/runbooks/login-failure-checklist.md: ten rows, each with trigger, server
+  answer, screen state, pinning tests and today's evidence. Run: AVD margai_android36 driven through
+  `uiautomator dump` (taps by label; 19 screenshots in the session scratchpad) against SERVER_PORT=8082
+  + the sandbox sender; curl for rows 6–8. (1) wrong ×4 → "4/3/2/1 tries left." with the server line,
+  digits kept, Verify live; (2) the 5th → the attempts line alone, field + Verify disabled, "Send a new
+  code" live; (3) server with MARGAI_AUTH_OTP_TTL=40s, the right code 45 s later → "isn't valid any
+  more — ask for a new one"; (4) resend → "New code in 26s"; app force-stopped and reopened inside the
+  cooldown, same address → the 429 rendered as the server line + a disabled countdown; Change email
+  right after a send → address kept, "Send code in 20s"; (5) the 4th code within the hour → "Too many
+  codes requested…" + "Send code in 57 min" disabled; a different address frees the button and sends;
+  (6) curl X-Client-Time 3 h ahead → 200, header not echoed, server WARN "client clock is 10799 s ahead
+  of ours on POST /api/v1/auth/otp/request (request_id=fda9dd2a-…)"; (7) "  TWINS-…@EXAMPLE.COM  " inside
+  the cooldown of twins-…@example.com → 429 (one destination); two codes 31 s apart, two verifies in
+  parallel → both 200, user 05df08ab-…, is_new_user once, users count 1; (8) `{"email":` → 400
+  {body: malformed}, text/plain → {content_type: unsupported}, challenge_id "not-a-uuid" →
+  {body: malformed}, no Java names; (9) server stopped → "You're offline… nothing you typed is lost."
+  + Retry on the code step (digits kept) and on the entry step (address kept); Retry after the restart
+  re-sent the request and reached the code screen; (10) the restarted server logged "retired 1 pending
+  OTP code(s): the OTP pepper is per process…" and the old code answered OTP_EXPIRED on Retry. Port
+  8081 was held by the founder's 09:14 server from the F10 SES proof (still running, on classes
+  recompiled underneath it since) — left alone; the run used 8082.
+spec-auditor (branch diff + the docs): PASS with 4 MINOR, all fixed on the branch before this docs
+  commit — (1) a 429 RATE_LIMITED on verify (the per-address verify bucket) was mapped onto the resend
+  cooldown, a D8 conflation the checklist tail described incompletely → verify leaves the resend clock
+  alone, the notifier test and the checklist say so, a clause in the D9 cooldown DECISIONS row;
+  (2) otp_challenges.updated_at still came from @UpdateTimestamp while created_at moved to IstClock →
+  set from the app clock by every mutation; (3) TECH_PLAN §1.5 and §10.1 disagreed with the §3.1
+  note on the filter order and the MDC keys → dated notes in both; (4) a stale "two client-only
+  codes" comment in ApiFailure → three. The one unverifiable item worth closing — no Spring-context
+  test of the boot path — got OtpStartupFlowTest (the proxied bean retires a pending code, verify
+  answers OTP_EXPIRED). Left as recorded: the device observations live outside the repo.
+CI (the PR's first run, founder-pasted log): 2 failures in AuthUnhappyPathsTest on the Linux runner
+  only — Retry-After 21 for 20 and 3508 for 3507. Root cause reproduced on the Mac by starting the
+  shared test clock on a sub-microsecond instant: Linux JDKs hand out nanosecond instants, Postgres
+  rounds them up to the next microsecond, so created_at read back a fraction later than the clock
+  that wrote it and the rounded-up wait crossed a second. Fix at the clock, not the test:
+  IstClock.now() truncates to microseconds (TIMESTAMPTZ precision), IstClockTest pins it, and the
+  flow clock now starts on 999,999,999 ns on purpose so the condition stays covered everywhere;
+  verify 281 tests green (DECISIONS row, dated §11.1 note).
+Doc conflicts surfaced in the plan (none blocked): PLAN D9 "resend limits / duplicate accounts" vs the
+  D7 server halves → the app side, the race fix and the proofs; TECH_PLAN §3.1 / JwtService "clock-skew
+  diagnostics, D9" vs the JWT's server-clock tolerance → kept separate, dated §3.1 note; §5.4 one
+  client-only code → three (dated note); §10.2 gains auth.clock_skew; §3.4 row notes the client-side
+  enforcement; §2.2 notes created_at from IstClock and the retirement; DEV_SPEC §6 "queue" → D8's one
+  Retry, widened to any non-envelope failure; SPEC §3/§8 SMS + auto-read → the D7 ruling stands;
+  app.md "no logic in widgets" → the seconds-vs-minutes label is a display branch over state getters.
+Spec-silent choices: 8 DECISIONS rows dated 2026-09-09 · D9.
+Parked: a reusable device driver under scripts/ (the uiautomator-by-label loop worked first time);
+  the OTP email reads "expires in 0 minutes" for a sub-minute TTL (demo-only; format seconds).
+Surprise: (1) @CreationTimestamp is VM time — mixing it with IstClock made the cooldown vanish under a
+  movable clock, which is how AuthUnhappyPathsTest found the §11.1 gap; (2) uiautomator dump sees
+  Flutter's semantics (labels as content-desc, fields as EditText), but `input text` only lands in a
+  focused field and a verify round trip drops focus — tap the field and MOVE_END first; (3) a background
+  `flutter build` launched from the repo root fails on "No pubspec.yaml", so the pre-fix APK was
+  reinstalled once before the fix showed; (4) the founder's morning SES server still held 8081;
+  (5) after the push: Linux nanosecond instants vs Postgres microseconds turned a 20-second wait into
+  21 on CI — the clock now truncates (see the CI paragraph above).
+Tomorrow's first task: D10 — POST /auth/logout (revoke the family), the empty student_profiles row on
+  first login, GET /me and PATCH /me (language), the app's single-flight refresh interceptor
+  (AUTH_EXPIRED → refresh once and replay, AUTH_INVALID → sign out) and the logout action; ✅ kill and
+  reopen → still signed in, logout → clean state (TECH_PLAN §3.2, §3.7 account, §5.4).
+```
 
 ```
 D8 · 2026-09-08 → 2026-09-09 · PHASE 1 — Auth & identity (Flutter login screens)
@@ -803,7 +893,8 @@ Tomorrow's first task:
 - narrow `scripts/precommit-gate.sh`'s `AI_PATHS` to `server/` and `eval/` · 2026-09-09 · D8: the app's `lib/core/router/` and `test/core/router/` matched `(router|routing|retriev)` and demanded the eval stamp; the placeholder stamp cleared it, but the rule is about the AI difficulty router
 - "real device over mobile data" for the login ✅ (PLAN D8) · 2026-09-09 · needs a public endpoint (F8 beta stack); the AVD proof stands until then, a USB phone can use `adb reverse` (app/README); tracked on the Week-2 gate line
 - `flutter_secure_storage` back to 11.x, and `platforms;android-37.0` in `scripts/dev-setup.sh` · 2026-09-09 · D8 pinned 10.x because AGP 9.1.0 cannot resolve Android 17's minor-versioned platform (DECISIONS D8 Android row); lift when the Flutter template's `compileSdk` passes 36
-- clear the code field's autofocus/keyboard on the AVD before scripted taps, or a tiny `adb` driver script for device proofs · 2026-09-09 · D8's screencap-then-tap loop worked but cost a mis-tap on the keyboard; only if device proofs grow
+- a reusable device-proof driver under `scripts/` (list the accessibility tree, tap by label, clear + type, screenshot) · 2026-09-09 · D8's screencap-then-tap loop cost a mis-tap; D9 drove the whole checklist from the session scratchpad through `adb shell uiautomator dump` (Flutter labels appear as `content-desc`, fields as `EditText`; refocus a field before typing after a round trip) — worth committing if a third day needs it
+- the OTP email says "expires in 0 minutes" when `margai.auth.otp.ttl` is under a minute (`otp.email.body` formats whole minutes) · 2026-09-09 · seen only with the D9 demo TTL of 40 s; production stays at 5 m — format seconds below a minute if a short TTL is ever configured
 
 ---
 

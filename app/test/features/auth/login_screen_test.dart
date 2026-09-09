@@ -39,6 +39,49 @@ void main() {
         expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
       });
 
+      testWidgets('inside a cooldown: Send code is disabled with the countdown, email editable', (
+        tester,
+      ) async {
+        final now = DateTime.utc(2026, 9, 8, 12);
+        await pumpScreen(
+          tester,
+          const LoginScreen(),
+          locale: locale,
+          now: now,
+          state: LoginState(
+            email: 'a@b.in',
+            resendAt: now.add(const Duration(seconds: 20)),
+            now: now,
+            failure: const ApiFailure(code: 'OTP_RATE_LIMITED', status: 429),
+            lastIntent: const RequestCodeIntent(),
+          ),
+        );
+
+        expect(find.text(l10n.sendCodeIn(20)), findsOneWidget);
+        expect(find.text(l10n.sendCodeButton), findsNothing);
+        expect(
+          tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+          isNull,
+        );
+        expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
+      });
+
+      testWidgets('a long wait reads in minutes', (tester) async {
+        final now = DateTime.utc(2026, 9, 8, 12);
+        await pumpScreen(
+          tester,
+          const LoginScreen(),
+          locale: locale,
+          now: now,
+          state: LoginState(
+            email: 'a@b.in',
+            resendAt: now.add(const Duration(seconds: 3507)),
+            now: now,
+          ),
+        );
+        expect(find.text(l10n.sendCodeInMinutes(59)), findsOneWidget);
+      });
+
       testWidgets('field reason renders from ARB, not server prose', (tester) async {
         await pumpScreen(
           tester,

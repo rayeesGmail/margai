@@ -8,6 +8,8 @@
   "emailHint": "you@example.com",
   "sendCodeButton": "कोड भेजें",
   "sendingCode": "भेज रहा हूँ…",
+  "sendCodeIn": "कोड {seconds} सेकंड में भेजें",
+  "sendCodeInMinutes": "{minutes, plural, =1{कोड 1 मिनट में भेजें} other{कोड {minutes} मिनट में भेजें}}",
 
   "codeSentTitle": "अपना ईमेल देखें",
   "codeSentTo": "मैंने {email} पर 6 अंकों का कोड भेजा है।",
@@ -16,12 +18,14 @@
   "verifying": "जाँच रहा हूँ…",
   "resendButton": "नया कोड भेजें",
   "resendIn": "नया कोड {seconds} सेकंड में",
+  "resendInMinutes": "{minutes, plural, =1{नया कोड 1 मिनट में} other{नया कोड {minutes} मिनट में}}",
   "changeEmailButton": "ईमेल बदलें",
   "attemptsLeft": "{count, plural, =0{इस कोड पर कोई कोशिश बाकी नहीं — नया कोड मंगाएँ।} =1{1 कोशिश बाकी।} other{{count} कोशिशें बाकी।}}",
   "retryButton": "फिर कोशिश करें",
 
   "failureOffline": "आप ऑफ़लाइन हैं। कनेक्शन देखकर फिर कोशिश करें — आपने जो लिखा है वह सुरक्षित है।",
   "failureMalformed": "सर्वर से कुछ ऐसा आया जो मैं पढ़ नहीं पाया। कुछ पल बाद फिर कोशिश करें।",
+  "failureCertificate": "सुरक्षित कनेक्शन नहीं बन पाया। अपने फ़ोन की तारीख़ और समय देखें, फिर कोशिश करें।",
   "failureRequestId": "संदर्भ: {requestId}",
 
   "errorValidationFailed": "कुछ जानकारी सही नहीं लग रही। एक बार देखकर फिर कोशिश करें।",

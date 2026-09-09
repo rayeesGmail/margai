@@ -47,7 +47,8 @@ class SesConfigurationTest {
         AuthProperties properties = new AuthProperties(
                 new AuthProperties.Jwt("", "", Duration.ofMinutes(15), Duration.ofDays(30)),
                 new AuthProperties.Otp("", Duration.ofMinutes(5), 5, Duration.ofSeconds(30), 6, Set.of(OtpChannel.email),
-                        AuthProperties.Sender.valueOf(sender), from, "ap-south-1"));
+                        AuthProperties.Sender.valueOf(sender), from, "ap-south-1"),
+                Duration.ofMinutes(2));
         return new ApplicationContextRunner()
                 .withPropertyValues("margai.auth.otp.sender=" + sender)
                 .withBean(AuthProperties.class, () -> properties)

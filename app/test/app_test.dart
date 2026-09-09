@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,6 +24,8 @@ void main() {
     WidgetTester tester, {
     required TokenStore store,
     FakeAuthRepository? repository,
+    DateTime Function()? clock,
+    Stream<DateTime>? ticks,
   }) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -30,8 +34,8 @@ void main() {
           authRepositoryProvider.overrideWithValue(
             repository ?? FakeAuthRepository(),
           ),
-          clockProvider.overrideWithValue(() => now),
-          tickerProvider.overrideWith((ref) => Stream.value(now)),
+          clockProvider.overrideWithValue(clock ?? () => now),
+          tickerProvider.overrideWith((ref) => ticks ?? Stream.value(now)),
         ],
         child: const MargaiApp(),
       ),
@@ -68,20 +72,41 @@ void main() {
     final repository = FakeAuthRepository()
       ..onRequest(FakeAuthRepository.challenge)
       ..onVerify(FakeAuthRepository.signedIn);
-    await pumpApp(tester, store: store, repository: repository);
+    final l10n = copyFor(allLocales.first);
+    var clock = now;
+    final ticks = StreamController<DateTime>.broadcast();
+    addTearDown(ticks.close);
+    await pumpApp(
+      tester,
+      store: store,
+      repository: repository,
+      clock: () => clock,
+      ticks: ticks.stream,
+    );
 
     await tester.enterText(find.byType(TextField), 'founder@example.com');
     await tester.tap(find.byType(FilledButton));
     await tester.pumpAndSettle();
     expect(find.byType(OtpScreen), findsOneWidget);
 
-    await tester.tap(find.text(copyFor(allLocales.first).changeEmailButton));
+    await tester.tap(find.text(l10n.changeEmailButton));
     await tester.pumpAndSettle();
     expect(find.byType(LoginScreen), findsOneWidget);
     expect(
       tester.widget<TextField>(find.byType(TextField)).controller?.text,
       'founder@example.com',
     );
+    // The cooldown of the code just sent still applies (PLAN D9 row 4): the button counts down.
+    expect(find.text(l10n.sendCodeIn(30)), findsOneWidget);
+    expect(
+      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+      isNull,
+    );
+
+    clock = now.add(const Duration(seconds: 31));
+    ticks.add(clock);
+    await tester.pumpAndSettle();
+    expect(find.text(l10n.sendCodeButton), findsOneWidget);
 
     repository.onRequest(FakeAuthRepository.challenge);
     await tester.tap(find.byType(FilledButton));

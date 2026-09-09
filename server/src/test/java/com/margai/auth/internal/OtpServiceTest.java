@@ -177,7 +177,7 @@ class OtpServiceTest {
     void theFifthWrongCodeExhaustsTheChallengeAndLaterTriesAreExpired() {
         OtpChallenge challenge = liveChallenge("111111");
         for (int i = 0; i < 4; i++) {
-            challenge.recordFailedAttempt();
+            challenge.recordFailedAttempt(NOW);
         }
         when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
 
@@ -201,7 +201,7 @@ class OtpServiceTest {
         used.markVerified(NOW.minusSeconds(60));
         when(challenges.lockById(used.getId())).thenReturn(Optional.of(used));
         OtpChallenge stale = new OtpChallenge(UUID.randomUUID(), OtpChannel.email, EMAIL.address(), OtpPurpose.login,
-                OtpCodes.hash(PEPPER, UUID.randomUUID(), "111111"), NOW.minusSeconds(1), null);
+                OtpCodes.hash(PEPPER, UUID.randomUUID(), "111111"), NOW.minusSeconds(1), null, NOW.minusSeconds(301));
         when(challenges.lockById(stale.getId())).thenReturn(Optional.of(stale));
 
         for (UUID id : List.of(unknown, used.getId(), stale.getId())) {
@@ -233,7 +233,8 @@ class OtpServiceTest {
 
     @Test
     void aPhoneChallengeSignsInByPhone() {
-        OtpChallenge challenge = new OtpChallenge(UUID.randomUUID(), OtpChannel.sms, PHONE.e164(), OtpPurpose.login, "", NOW.plusSeconds(300), null);
+        OtpChallenge challenge = new OtpChallenge(UUID.randomUUID(), OtpChannel.sms, PHONE.e164(), OtpPurpose.login, "",
+                NOW.plusSeconds(300), null, NOW);
         ReflectionTestUtils.setField(challenge, "codeHash", OtpCodes.hash(PEPPER, challenge.getId(), "777777"));
         when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
         UserSummary user = new UserSummary(UUID.randomUUID(), PHONE.e164(), null, Language.en, UserRole.student, null);
@@ -268,7 +269,8 @@ class OtpServiceTest {
         AuthProperties properties = new AuthProperties(
                 new AuthProperties.Jwt("", "", Duration.ofMinutes(15), Duration.ofDays(30)),
                 new AuthProperties.Otp("", Duration.ofMinutes(5), 5, Duration.ofSeconds(30), 6, channels,
-                        AuthProperties.Sender.log, "", "ap-south-1"));
+                        AuthProperties.Sender.log, "", "ap-south-1"),
+                Duration.ofMinutes(2));
         AuthKeys keys = new AuthKeys(new SecretKeySpec(new byte[32], "HmacSHA256"), null, PEPPER);
         return new OtpService(challenges, sender, accounts, tokens, properties, new RateLimitProperties(3, 10, 60, 60),
                 keys, new IstClock(Clock.fixed(NOW, ZoneOffset.UTC)), meters);
@@ -277,7 +279,7 @@ class OtpServiceTest {
     private static OtpChallenge liveChallenge(String code) {
         UUID id = UUID.randomUUID();
         return new OtpChallenge(id, OtpChannel.email, EMAIL.address(), OtpPurpose.login, OtpCodes.hash(PEPPER, id, code),
-                NOW.plusSeconds(300), null);
+                NOW.plusSeconds(300), null, NOW);
     }
 
     private static OtpChallenge challengeCreatedAt(Instant createdAt) {

@@ -52,6 +52,10 @@ void main() {
           FailureCopy.message(l10n, const ApiFailure.malformed(502)),
           l10n.failureMalformed,
         );
+        expect(
+          FailureCopy.message(l10n, const ApiFailure.certificate()),
+          l10n.failureCertificate,
+        );
         expect(l10n.attemptsLeft(0), isNotEmpty);
         expect(l10n.attemptsLeft(1), isNot(l10n.attemptsLeft(2)));
         expect(l10n.resendIn(27), contains('27'));
@@ -69,6 +73,46 @@ void main() {
         messageUser: 'user text',
       );
       expect(FailureCopy.message(l10n, failure), 'user text');
+    });
+
+    test('a body-level reason wins over the generic validation line (PLAN D9 row 8)', () {
+      expect(
+        FailureCopy.message(
+          l10n,
+          const ApiFailure(
+            code: 'VALIDATION_FAILED',
+            status: 400,
+            messageUser: 'Some details don\'t look right.',
+            details: {'body': 'malformed'},
+          ),
+        ),
+        l10n.reasonBodyMalformed,
+      );
+      expect(
+        FailureCopy.message(
+          l10n,
+          const ApiFailure(
+            code: 'VALIDATION_FAILED',
+            status: 400,
+            messageUser: 'Some details don\'t look right.',
+            details: {'content_type': 'unsupported'},
+          ),
+        ),
+        l10n.reasonContentTypeUnsupported,
+      );
+      // A field reason renders under its field; the line itself keeps the server's copy.
+      expect(
+        FailureCopy.message(
+          l10n,
+          const ApiFailure(
+            code: 'VALIDATION_FAILED',
+            status: 400,
+            messageUser: 'Some details don\'t look right.',
+            details: {'email': 'email.invalid'},
+          ),
+        ),
+        'Some details don\'t look right.',
+      );
     });
 
     test('then the English message, then the ARB fallback by code', () {

@@ -32,6 +32,22 @@ class AppLocalizationsHi extends AppLocalizations {
   String get sendingCode => 'भेज रहा हूँ…';
 
   @override
+  String sendCodeIn(int seconds) {
+    return 'कोड $seconds सेकंड में भेजें';
+  }
+
+  @override
+  String sendCodeInMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'कोड $minutes मिनट में भेजें',
+      one: 'कोड 1 मिनट में भेजें',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get codeSentTitle => 'अपना ईमेल देखें';
 
   @override
@@ -54,6 +70,17 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String resendIn(int seconds) {
     return 'नया कोड $seconds सेकंड में';
+  }
+
+  @override
+  String resendInMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'नया कोड $minutes मिनट में',
+      one: 'नया कोड 1 मिनट में',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -81,6 +108,10 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get failureMalformed =>
       'सर्वर से कुछ ऐसा आया जो मैं पढ़ नहीं पाया। कुछ पल बाद फिर कोशिश करें।';
+
+  @override
+  String get failureCertificate =>
+      'सुरक्षित कनेक्शन नहीं बन पाया। अपने फ़ोन की तारीख़ और समय देखें, फिर कोशिश करें।';
 
   @override
   String failureRequestId(String requestId) {
@@ -204,6 +235,22 @@ class AppLocalizationsHiLatn extends AppLocalizationsHi {
   String get sendingCode => 'Bhej raha hoon…';
 
   @override
+  String sendCodeIn(int seconds) {
+    return 'Code ${seconds}s mein bhejo';
+  }
+
+  @override
+  String sendCodeInMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Code $minutes min mein bhejo',
+      one: 'Code 1 min mein bhejo',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get codeSentTitle => 'Apna email check karo';
 
   @override
@@ -226,6 +273,17 @@ class AppLocalizationsHiLatn extends AppLocalizationsHi {
   @override
   String resendIn(int seconds) {
     return 'Naya code ${seconds}s mein';
+  }
+
+  @override
+  String resendInMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Naya code $minutes min mein',
+      one: 'Naya code 1 min mein',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -253,6 +311,10 @@ class AppLocalizationsHiLatn extends AppLocalizationsHi {
   @override
   String get failureMalformed =>
       'Server se kuch aisa aaya jo main padh nahi paaya. Ek pal baad phir try karo.';
+
+  @override
+  String get failureCertificate =>
+      'Secure connection nahi ban paaya. Apne phone ki date aur time check karo, phir try karo.';
 
   @override
   String failureRequestId(String requestId) {

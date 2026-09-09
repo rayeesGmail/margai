@@ -155,12 +155,25 @@ void main() {
       expect(state().canResend, isTrue);
     });
 
-    test('leaving the code step stops listening to the ticker', () async {
+    test('Change email keeps the ticker only while the cooldown is pending', () async {
       notifier().changeEmail();
-      ticks.add(now.add(const Duration(minutes: 5)));
+      expect(ticks.hasListener, isTrue);
+      expect(state().canRequest, isFalse);
+
+      ticks.add(now.add(const Duration(seconds: 30)));
       await Future<void>.delayed(Duration.zero);
-      expect(state().now, now);
+      expect(state().canRequest, isTrue);
+      // The auto-disposed ticker is released one microtask after its last subscriber closes.
+      await Future<void>.delayed(Duration.zero);
       expect(ticks.hasListener, isFalse);
+    });
+
+    test('Change email after the cooldown stops the ticker at once', () async {
+      now = now.add(const Duration(seconds: 31));
+      notifier().changeEmail();
+      await Future<void>.delayed(Duration.zero);
+      expect(ticks.hasListener, isFalse);
+      expect(state().canRequest, isTrue);
     });
 
     test('after the cooldown sends a new code and resets attempts', () async {
@@ -200,6 +213,134 @@ void main() {
       expect(state().step, LoginStep.code);
       expect(state().challenge?.challengeId, 'c-1');
       expect(state().failure?.isOffline, isTrue);
+    });
+  });
+
+  group('the entry step honours the cooldown (PLAN D9 rows 4-5)', () {
+    test('a fresh flow may request at once', () {
+      expect(state().canRequest, isTrue);
+      expect(state().longWait, isFalse);
+      expect(state().resendMinutes, 0);
+    });
+
+    test('a 429 on entry disables Send code, counts down, and never calls inside the wait', () async {
+      repository
+        ..onRequest(
+          const ApiFailure(
+            code: 'OTP_RATE_LIMITED',
+            status: 429,
+            retryAfter: Duration(seconds: 20),
+          ),
+        )
+        ..onRequest(FakeAuthRepository.challenge);
+      notifier().emailChanged('a@b.in');
+      await notifier().requestCode();
+      expect(state().canRequest, isFalse);
+      expect(state().resendSeconds, 20);
+      expect(ticks.hasListener, isTrue);
+
+      now = now.add(const Duration(seconds: 10));
+      ticks.add(now);
+      await Future<void>.delayed(Duration.zero);
+      expect(state().resendSeconds, 10);
+      await notifier().requestCode();
+      expect(repository.requestedEmails, hasLength(1));
+      expect(state().step, LoginStep.entry);
+
+      now = now.add(const Duration(seconds: 10));
+      ticks.add(now);
+      await Future<void>.delayed(Duration.zero);
+      expect(state().canRequest, isTrue);
+      await notifier().requestCode();
+      expect(repository.requestedEmails, hasLength(2));
+      expect(state().step, LoginStep.code);
+    });
+
+    test('once the wait elapses on the entry step the ticker stops', () async {
+      repository.onRequest(
+        const ApiFailure(
+          code: 'OTP_RATE_LIMITED',
+          status: 429,
+          retryAfter: Duration(seconds: 20),
+        ),
+      );
+      notifier().emailChanged('a@b.in');
+      await notifier().requestCode();
+
+      ticks.add(now.add(const Duration(seconds: 20)));
+      await Future<void>.delayed(Duration.zero);
+      expect(state().canRequest, isTrue);
+      await Future<void>.delayed(Duration.zero);
+      expect(ticks.hasListener, isFalse);
+    });
+
+    test('typing a different email lifts the cooldown; the same one keeps it', () async {
+      repository
+        ..onRequest(
+          const ApiFailure(
+            code: 'OTP_RATE_LIMITED',
+            status: 429,
+            retryAfter: Duration(seconds: 3507),
+          ),
+        )
+        ..onRequest(FakeAuthRepository.challenge);
+      notifier().emailChanged('capped@b.in');
+      await notifier().requestCode();
+      expect(state().canRequest, isFalse);
+
+      notifier().emailChanged(' Capped@B.in');
+      expect(state().canRequest, isFalse, reason: 'same destination, only spelled differently');
+
+      notifier().emailChanged('other@b.in');
+      expect(state().canRequest, isTrue);
+      expect(state().resendAt, isNull);
+      await Future<void>.delayed(Duration.zero);
+      expect(ticks.hasListener, isFalse);
+
+      await notifier().requestCode();
+      expect(repository.requestedEmails, ['capped@b.in', 'other@b.in']);
+      expect(state().step, LoginStep.code);
+    });
+
+    test('the countdown rounds up, so a blocked button never reads 0s', () async {
+      repository.onRequest(FakeAuthRepository.challenge);
+      notifier().emailChanged('a@b.in');
+      await notifier().requestCode();
+
+      ticks.add(now.add(const Duration(seconds: 29, milliseconds: 100)));
+      await Future<void>.delayed(Duration.zero);
+      expect(state().canResend, isFalse);
+      expect(state().resendSeconds, 1);
+
+      ticks.add(now.add(const Duration(seconds: 30)));
+      await Future<void>.delayed(Duration.zero);
+      expect(state().canResend, isTrue);
+      expect(state().resendSeconds, 0);
+    });
+
+    test('waits of a minute or more read in whole minutes, rounded up', () async {
+      repository.onRequest(
+        const ApiFailure(
+          code: 'OTP_RATE_LIMITED',
+          status: 429,
+          retryAfter: Duration(seconds: 3507),
+        ),
+      );
+      notifier().emailChanged('a@b.in');
+      await notifier().requestCode();
+      expect(state().longWait, isTrue);
+      expect(state().resendMinutes, 59);
+
+      ticks.add(now.add(const Duration(seconds: 3447)));
+      await Future<void>.delayed(Duration.zero);
+      expect(state().resendSeconds, 60);
+      expect(state().longWait, isTrue);
+      expect(state().resendMinutes, 1);
+
+      ticks.add(now.add(const Duration(seconds: 3448)));
+      await Future<void>.delayed(Duration.zero);
+      expect(state().resendSeconds, 59);
+      expect(state().longWait, isFalse);
     });
   });
 
@@ -262,7 +403,7 @@ void main() {
       expect(state().signedIn, isFalse);
     });
 
-    test('RATE_LIMITED on verify sets the cooldown', () async {
+    test('RATE_LIMITED on verify shows the line and leaves the resend alone', () async {
       repository.onVerify(
         const ApiFailure(
           code: 'RATE_LIMITED',
@@ -270,8 +411,12 @@ void main() {
           retryAfter: Duration(seconds: 7),
         ),
       );
+      final resendAt = state().resendAt;
       await notifier().verify('444771');
-      expect(state().resendAt, now.add(const Duration(seconds: 7)));
+      // The verify bucket and the resend cooldown are different limits (TECH_PLAN §3.4).
+      expect(state().failure?.code, 'RATE_LIMITED');
+      expect(state().resendAt, resendAt);
+      expect(state().codeDead, isFalse);
     });
   });
 
@@ -312,6 +457,29 @@ void main() {
         (challengeId: 'c-1', code: '444771'),
         (challengeId: 'c-1', code: '444771'),
       ]);
+      expect(state().signedIn, isTrue);
+    });
+
+    test('Retry is offered after a malformed or certificate answer and re-runs the intent', () async {
+      repository
+        ..onRequest(const ApiFailure.malformed(502))
+        ..onRequest(FakeAuthRepository.challenge)
+        ..onVerify(const ApiFailure.certificate())
+        ..onVerify(FakeAuthRepository.signedIn);
+      notifier().emailChanged('a@b.in');
+
+      await notifier().requestCode();
+      expect(state().failure?.isMalformed, isTrue);
+      expect(state().canRetry, isTrue);
+      await notifier().retry();
+      expect(repository.requestedEmails, ['a@b.in', 'a@b.in']);
+      expect(state().step, LoginStep.code);
+
+      await notifier().verify('444771');
+      expect(state().failure?.isCertificate, isTrue);
+      expect(state().canRetry, isTrue);
+      await notifier().retry();
+      expect(repository.verified, hasLength(2));
       expect(state().signedIn, isTrue);
     });
 

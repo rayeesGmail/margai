@@ -285,7 +285,8 @@ Rules, enforced by the Modulith test from D4:
    mode, so the *last* hop is the address the ALB saw and the only one a client cannot choose; the
    app keys per-address limits and `request_ip` on that last hop (D7; F8 keeps the mode at `append`).
 2. `RequestIdFilter` takes `X-Request-Id` or mints one; puts `request_id` into the MDC and echoes
-   it back.
+   it back. *On `/api/v1/auth/*` the `ClientTimeFilter` runs right after it and adds
+   `client_skew_s` from `X-Client-Time` (§3.1; D9, 2026-09-09).*
 3. Spring Security (stateless): bearer JWT → principal `{user_id, role, language}`; unauthenticated
    routes are `/auth/otp/*`, `/auth/refresh`, `/billing/webhook`, `/actuator/health` — and Boot's
    `/error` dispatch, so a failure inside a filter still renders the envelope (D7).
@@ -438,6 +439,9 @@ destination VARCHAR(254)` (the E.164 phone or the lowercased email) replace `pho
 (login|parent_consent), code_hash CHAR(64)` (SHA-256 of pepper ‖ challenge id ‖ code; the code is never
 stored), `attempts SMALLINT DEFAULT 0, expires_at, verified_at, request_ip INET`. Index
 `(destination, created_at)` — the per-destination cap and the resend cooldown (§3.4) query it.
+*`created_at` is stamped from `IstClock`, not Hibernate's VM clock, so those two checks compare
+like with like (§11.1; D9 finding, 2026-09-09). A start with an ephemeral pepper retires every
+pending challenge (`expires_at = now`), since none of them can match any more (D9).*
 
 **refresh_tokens** — D7: `user_id → users, token_hash CHAR(64) UNIQUE, family_id UUID, expires_at,
 revoked_at, replaced_by_id → refresh_tokens, device_label VARCHAR(80), last_used_at`. Index `user_id`,
@@ -734,7 +738,11 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
 - Additive changes only within v1 (new optional fields, new endpoints). A breaking change is a v2
   path, which the MVP does not plan to need.
 - Every response carries `X-Request-Id`. Clients send `X-App-Version` and `X-Client-Time`
-  (for clock-skew diagnostics in OTP flows, PLAN D9).
+  (for clock-skew diagnostics in OTP flows, PLAN D9) — *implemented 2026-09-09 (D9): read on
+  `/api/v1/auth/*` only, into the request's MDC as `client_skew_s`, with one WARN and the
+  `auth.clock_skew{band}` counter past `margai.auth.clock-skew-warn` (2 min); never echoed, and
+  never an input to token validation, which stays on the server clock (§9.1). The login flow
+  itself compares durations, never wall clocks (D8), so a skewed phone still signs in.*
 - Copy returned to the client is codes plus text in both `en` and the user's language, never text
   alone; generated content (plans, answers) comes in the user's language with a `language` field.
 - `correct_key` is returned only for questions the student has already answered, through three
@@ -786,7 +794,7 @@ app's ARB files own client copy. Both sides use the same code strings.
 | Scope | Limit |
 |---|---|
 | default, authenticated | 60 requests/min |
-| `/auth/otp/request` | 3/hour per destination (phone or email; D7), 30-second resend cooldown, 10/hour per IP |
+| `/auth/otp/request` | 3/hour per destination (phone or email; D7), 30-second resend cooldown, 10/hour per IP — *the app also honours the cooldown and the cap's `retry_after_s` client-side, per destination: the button is disabled with a countdown on both steps and a different address lifts it (D9, 2026-09-09)* |
 | `/auth/otp/verify` | 5 attempts per challenge; `verify` and `refresh` together 60/min per client address (D7, §1.5 step 4) |
 | `POST /doubts` | 10/min, plus the free-tier and fair-use rules in §4.4 |
 | `POST /plan/negotiate` | 10/min |
@@ -1343,7 +1351,10 @@ dio with interceptors, in order: request id (`X-Request-Id` UUID, logged), app v
 time headers, bearer token, single-flight refresh on 401 `AUTH_EXPIRED` (one refresh in flight,
 queued requests retried once, `AUTH_INVALID` → logout), envelope mapping (`ApiFailure(code,
 messageEn, messageUser, details)`), connectivity fallback (`ApiFailure.offline` when there is no
-network, so screens show the honest offline state rather than a timeout). Timeouts: 10 s connect,
+network, so screens show the honest offline state rather than a timeout; *since D8/D9 there are
+three client-only codes — `OFFLINE`, `MALFORMED` for a non-envelope answer such as a captive
+portal's page, and `CERTIFICATE` for a failed TLS handshake, whose copy names the phone's date and
+time — and Retry is offered after any of them, 2026-09-09*). Timeouts: 10 s connect,
 30 s receive (doubt polling uses its own schedule). Base URL from `--dart-define=API_BASE_URL`
 (local emulator: `http://10.0.2.2:8081`).
 
@@ -1794,14 +1805,16 @@ RDS not publicly accessible, S3 block-public-access on both buckets.
 
 Logback with the logstash JSON encoder → stdout → CloudWatch Logs (30 days). MDC on every line:
 `request_id`, `user_id` (when authenticated), `route`, `module`; the nightly run adds `run_id` and
-`plan_date`. Levels: `WARN` for honest fallbacks (grounding failure, unverified fallback, breaker
+`plan_date`; the public auth routes add `client_skew_s` when the app sent `X-Client-Time` (§3.1;
+D9, 2026-09-09), and `jti` travels with `user_id` (D7). Levels: `WARN` for honest fallbacks (grounding failure, unverified fallback, breaker
 trip), `ERROR` for anything that pages. No PII in messages (§9.6).
 
 ### 10.2 Metrics (Micrometer → CloudWatch, 1-minute)
 
 `http.server.requests` by route and status; `ai.calls` and `ai.cost.paise` by feature, tier and
 status; `ai.latency` by tier; `doubt.cache.hit_rate`; `doubt.verify.mismatch`; `otp.sent`,
-`otp.verified`, `otp.failed`; `nightly.users`, `nightly.fallbacks`, `nightly.duration`;
+`otp.verified`, `otp.failed`, `otp.send_failed` (D7), `auth.refresh.reuse` (D7), `auth.clock_skew{band}`
+(D9); `nightly.users`, `nightly.fallbacks`, `nightly.duration`;
 `notifications.sent/skipped` by kind and reason; `outbox.sync_lag_s` (reported by the app through
 PostHog, not CloudWatch); `practice.judge.latency`.
 
@@ -1849,7 +1862,9 @@ PostHog distinct id is the user id (UUID), and account deletion calls PostHog's 
 ### 11.1 Time
 
 One `IstClock` bean (`ZoneId.of("Asia/Kolkata")`) is the only way code learns "today"; tests inject
-a `MutableClock`. Storage is `TIMESTAMPTZ` (UTC); IST calendar dates are `DATE` columns named
+a `MutableClock`. *Its instants are truncated to microseconds — `TIMESTAMPTZ` precision — so a
+stored instant reads back equal to the clock that wrote it; Linux JDKs give nanoseconds and
+Postgres rounds them up (D9 CI finding, 2026-09-09, DECISIONS).* Storage is `TIMESTAMPTZ` (UTC); IST calendar dates are `DATE` columns named
 `*_ist_date`, `plan_date`, `week_start` (Monday). Wire format: instants ISO-8601 `Z`, dates
 `YYYY-MM-DD`. The study day, streaks, limits, notification caps and the nightly run all key on the
 IST date.

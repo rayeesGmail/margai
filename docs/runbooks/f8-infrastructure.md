@@ -23,3 +23,15 @@ PostgreSQL 18.6 on `db.t4g.small` in ap-south-1; pgvector 0.8.1 per the AWS rele
 
 2. Then let migration V1 create the extensions (`CREATE EXTENSION IF NOT EXISTS vector` and
    `pg_trgm`, TECH_PLAN §2.9); the D55 boot against RDS is the first live Flyway run.
+
+## Rotating the auth secrets (note added at D9, 2026-09-09)
+
+`margai.auth.jwt.secret` and `margai.auth.otp.pepper` are SSM SecureStrings injected as environment
+variables (TECH_PLAN §7.3, §9.2). Rotating the **pepper** makes every OTP code still pending at that
+moment unverifiable for the rest of its 5-minute life: the server retires pending codes at boot
+only when the pepper is *ephemeral* (blank — the local default; DECISIONS 2026-09-09, D9), never
+when it is configured, so a deploy does not kill in-flight codes. A student mid-flow across a
+rotation therefore sees "didn't match" until they ask for a new code. Rotate at a quiet hour and
+expect that ≤ 5-minute window; do not "fix" it by starting with a blank pepper, which is WARN-level
+and per process. JWT rotation keeps the §9.2 shape: set `secret-previous` to the old key, deploy,
+remove it after 15 minutes.

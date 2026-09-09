@@ -12,9 +12,7 @@ import jakarta.persistence.Transient;
 import java.net.InetAddress;
 import java.time.Instant;
 import java.util.UUID;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.domain.Persistable;
 
@@ -59,11 +57,15 @@ public class OtpChallenge implements Persistable<UUID> {
     @JdbcTypeCode(SqlTypes.INET)
     private InetAddress requestIp;
 
-    @CreationTimestamp
+    /**
+     * Stamped from the application clock, not Hibernate's VM time (TECH_PLAN §11.1): the resend
+     * cooldown and the hourly cap compare it with {@code IstClock.now()}, so both must come from
+     * the same clock (D9 finding — a drifting test clock made the cooldown vanish).
+     */
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    @UpdateTimestamp
+    /** Same clock as {@code createdAt} (§11.1): set by every mutation here and by {@code retireLive}. */
     @Column(nullable = false)
     private Instant updatedAt;
 
@@ -75,7 +77,7 @@ public class OtpChallenge implements Persistable<UUID> {
     }
 
     public OtpChallenge(UUID id, OtpChannel channel, String destination, OtpPurpose purpose, String codeHash,
-            Instant expiresAt, InetAddress requestIp) {
+            Instant expiresAt, InetAddress requestIp, Instant createdAt) {
         this.id = id;
         this.channel = channel;
         this.destination = destination;
@@ -84,6 +86,8 @@ public class OtpChallenge implements Persistable<UUID> {
         this.attempts = 0;
         this.expiresAt = expiresAt;
         this.requestIp = requestIp;
+        this.createdAt = createdAt;
+        this.updatedAt = createdAt;
     }
 
     @PostPersist
@@ -154,13 +158,15 @@ public class OtpChallenge implements Persistable<UUID> {
         return attempts >= maxAttempts;
     }
 
-    /** Records one wrong code and returns the attempts used so far. */
-    public short recordFailedAttempt() {
+    /** Records one wrong code at {@code now} and returns the attempts used so far. */
+    public short recordFailedAttempt(Instant now) {
         attempts++;
+        updatedAt = now;
         return attempts;
     }
 
     public void markVerified(Instant now) {
         this.verifiedAt = now;
+        this.updatedAt = now;
     }
 }

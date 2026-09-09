@@ -61,6 +61,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
           child: Text(
             state.canResend
                 ? l10n.resendButton
+                : state.longWait
+                ? l10n.resendInMinutes(state.resendMinutes)
                 : l10n.resendIn(state.resendSeconds),
           ),
         ),

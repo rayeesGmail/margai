@@ -45,6 +45,9 @@ public record AuthProperties(@NotNull @Valid Jwt jwt, @NotNull @Valid Otp otp, @
      * @param sender         the delivery adapter: {@code log} (sandbox) or {@code ses}
      * @param emailFrom      verified SES sender identity; required when {@code sender = ses}
      * @param sesRegion      region of the SES endpoint
+     * @param reportEvery    how often the delivery report is written to the log (§10.1; PLAN D11
+     *                       "delivery-rate logging"), ISO-8601 so the same value drives
+     *                       {@code @Scheduled}; also the delay before the first line
      */
     public record Otp(
             String pepper,
@@ -55,7 +58,8 @@ public record AuthProperties(@NotNull @Valid Jwt jwt, @NotNull @Valid Otp otp, @
             @NotEmpty Set<OtpChannel> channels,
             @NotNull Sender sender,
             String emailFrom,
-            @NotBlank String sesRegion) {
+            @NotBlank String sesRegion,
+            @NotNull Duration reportEvery) {
 
         public Otp {
             channels = Set.copyOf(channels);

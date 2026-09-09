@@ -305,7 +305,7 @@ class OtpServiceTest {
         AuthProperties properties = new AuthProperties(
                 new AuthProperties.Jwt("", "", Duration.ofMinutes(15), Duration.ofDays(30)),
                 new AuthProperties.Otp("", Duration.ofMinutes(5), 5, Duration.ofSeconds(30), 6, channels,
-                        AuthProperties.Sender.log, "", "ap-south-1"),
+                        AuthProperties.Sender.log, "", "ap-south-1", Duration.ofHours(1)),
                 Duration.ofMinutes(2));
         AuthKeys keys = new AuthKeys(new SecretKeySpec(new byte[32], "HmacSHA256"), null, PEPPER);
         return new OtpService(challenges, sender, accounts, tokens, properties, new RateLimitProperties(3, 10, 60, 60),

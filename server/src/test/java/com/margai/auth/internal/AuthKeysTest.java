@@ -58,7 +58,7 @@ class AuthKeysTest {
         return new AuthProperties(
                 new AuthProperties.Jwt(jwt, previous, Duration.ofMinutes(15), Duration.ofDays(30)),
                 new AuthProperties.Otp(pepper, Duration.ofMinutes(5), 5, Duration.ofSeconds(30), 6,
-                        Set.of(OtpChannel.email), AuthProperties.Sender.log, "", "ap-south-1"),
+                        Set.of(OtpChannel.email), AuthProperties.Sender.log, "", "ap-south-1", Duration.ofHours(1)),
                 Duration.ofMinutes(2));
     }
 }

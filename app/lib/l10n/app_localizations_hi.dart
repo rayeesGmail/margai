@@ -110,6 +110,10 @@ class AppLocalizationsHi extends AppLocalizations {
       'सर्वर से कुछ ऐसा आया जो मैं पढ़ नहीं पाया। कुछ पल बाद फिर कोशिश करें।';
 
   @override
+  String get failureCertificate =>
+      'सुरक्षित कनेक्शन नहीं बन पाया। अपने फ़ोन की तारीख़ और समय देखें, फिर कोशिश करें।';
+
+  @override
   String failureRequestId(String requestId) {
     return 'संदर्भ: $requestId';
   }
@@ -307,6 +311,10 @@ class AppLocalizationsHiLatn extends AppLocalizationsHi {
   @override
   String get failureMalformed =>
       'Server se kuch aisa aaya jo main padh nahi paaya. Ek pal baad phir try karo.';
+
+  @override
+  String get failureCertificate =>
+      'Secure connection nahi ban paaya. Apne phone ki date aur time check karo, phir try karo.';
 
   @override
   String failureRequestId(String requestId) {

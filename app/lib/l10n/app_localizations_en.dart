@@ -110,6 +110,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The server sent something I couldn\'t read. Try again in a moment.';
 
   @override
+  String get failureCertificate =>
+      'I couldn\'t make a secure connection. Check your phone\'s date and time, then retry.';
+
+  @override
   String failureRequestId(String requestId) {
     return 'Reference: $requestId';
   }

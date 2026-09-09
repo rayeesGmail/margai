@@ -25,6 +25,7 @@
 
   "failureOffline": "Aap offline ho. Connection check karke phir try karo — jo likha hai wo safe hai.",
   "failureMalformed": "Server se kuch aisa aaya jo main padh nahi paaya. Ek pal baad phir try karo.",
+  "failureCertificate": "Secure connection nahi ban paaya. Apne phone ki date aur time check karo, phir try karo.",
   "failureRequestId": "Reference: {requestId}",
 
   "errorValidationFailed": "Kuch details sahi nahi lag rahi. Ek baar dekh kar phir try karo.",

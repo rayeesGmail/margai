@@ -90,6 +90,10 @@
   "@failureMalformed": {
     "description": "Client-only failure: an answer that is not the error envelope."
   },
+  "failureCertificate": "I couldn't make a secure connection. Check your phone's date and time, then retry.",
+  "@failureCertificate": {
+    "description": "Client-only failure: the TLS handshake or certificate check failed before any request left. On Android the usual cause is a phone clock that is far off (PLAN D9 row 6)."
+  },
   "failureRequestId": "Reference: {requestId}",
   "@failureRequestId": {
     "description": "Shown under an INTERNAL failure so support can find the call.",

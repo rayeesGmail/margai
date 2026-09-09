@@ -227,6 +227,25 @@ void main() {
     });
   });
 
+  group('a secure connection that cannot be made (PLAN D9 row 6)', () {
+    test('a rejected certificate is its own client-only code', () async {
+      adapter.fail(
+        DioException.badCertificate(requestOptions: RequestOptions(path: '/x')),
+      );
+      final failure = await _failureOf(client().get('/me'));
+      expect(failure.isCertificate, isTrue);
+      expect(failure.code, ApiFailure.certificateCode);
+      expect(failure.isOffline, isFalse);
+      expect(failure.isEnvelope, isFalse);
+    });
+
+    test('a failed TLS handshake from the socket is the same code', () async {
+      adapter.fail(const HandshakeException('certificate has expired'));
+      final failure = await _failureOf(client().get('/me'));
+      expect(failure.isCertificate, isTrue);
+    });
+  });
+
   test('a 200 JSON object comes back decoded', () async {
     adapter.reply(
       FakeReply.json(200, {

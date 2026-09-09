@@ -231,6 +231,12 @@ abstract class AppLocalizations {
   /// **'The server sent something I couldn\'t read. Try again in a moment.'**
   String get failureMalformed;
 
+  /// Client-only failure: the TLS handshake or certificate check failed before any request left. On Android the usual cause is a phone clock that is far off (PLAN D9 row 6).
+  ///
+  /// In en, this message translates to:
+  /// **'I couldn\'t make a secure connection. Check your phone\'s date and time, then retry.'**
+  String get failureCertificate;
+
   /// Shown under an INTERNAL failure so support can find the call.
   ///
   /// In en, this message translates to:

@@ -11,8 +11,9 @@ import 'repository.dart';
 /// Which half of SPEC §8 screen 1 is showing: the identifier entry or the code entry.
 enum LoginStep { entry, code }
 
-/// The last thing the student asked for. After an offline failure, Retry re-runs it with the
-/// same input (DEV_SPEC §6 screen 1: "must survive flaky network"; DECISIONS D8).
+/// The last thing the student asked for. After a failure that never produced a server answer,
+/// Retry re-runs it with the same input (DEV_SPEC §6 screen 1: "must survive flaky network";
+/// DECISIONS D8, D9).
 sealed class LoginIntent {
   const LoginIntent();
 }
@@ -109,8 +110,10 @@ class LoginState {
     return at.difference(current).inSeconds;
   }
 
-  /// Retry makes sense only after a failure that never reached the server.
-  bool get canRetry => failure?.isOffline == true && lastIntent != null;
+  /// Retry makes sense only after a failure that never produced a server answer: offline, a
+  /// non-envelope reply (a captive portal's page) or a failed secure connection (D9).
+  bool get canRetry =>
+      failure != null && !failure!.isEnvelope && lastIntent != null;
 
   LoginState copyWith({
     String? email,

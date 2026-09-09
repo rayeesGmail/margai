@@ -412,6 +412,29 @@ void main() {
       expect(state().signedIn, isTrue);
     });
 
+    test('Retry is offered after a malformed or certificate answer and re-runs the intent', () async {
+      repository
+        ..onRequest(const ApiFailure.malformed(502))
+        ..onRequest(FakeAuthRepository.challenge)
+        ..onVerify(const ApiFailure.certificate())
+        ..onVerify(FakeAuthRepository.signedIn);
+      notifier().emailChanged('a@b.in');
+
+      await notifier().requestCode();
+      expect(state().failure?.isMalformed, isTrue);
+      expect(state().canRetry, isTrue);
+      await notifier().retry();
+      expect(repository.requestedEmails, ['a@b.in', 'a@b.in']);
+      expect(state().step, LoginStep.code);
+
+      await notifier().verify('444771');
+      expect(state().failure?.isCertificate, isTrue);
+      expect(state().canRetry, isTrue);
+      await notifier().retry();
+      expect(repository.verified, hasLength(2));
+      expect(state().signedIn, isTrue);
+    });
+
     test('Retry is not offered after a server answer', () async {
       repository
         ..onRequest(FakeAuthRepository.challenge)

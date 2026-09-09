@@ -14,8 +14,9 @@ typedef BearerSupplier = Future<String?> Function();
 /// `Accept-Language` per §3.8, the bearer), the base path `/api/v1`, 10-second connect and
 /// 30-second receive timeouts, and one mapping of every failure to [ApiFailure]: the server's
 /// envelope when there is one, [ApiFailure.offline] when the network never answered,
-/// [ApiFailure.malformed] when the answer is not the envelope. The single-flight refresh on
-/// `AUTH_EXPIRED` arrives with token rotation at D10.
+/// [ApiFailure.malformed] when the answer is not the envelope, [ApiFailure.certificate] when
+/// the secure connection could not be made (D9). The single-flight refresh on `AUTH_EXPIRED`
+/// arrives with token rotation at D10.
 class ApiClient {
   ApiClient({
     required String baseUrl,
@@ -89,6 +90,8 @@ class ApiClient {
       response = await call();
     } on DioException catch (failure) {
       throw _map(failure);
+    } on TlsException {
+      throw const ApiFailure.certificate();
     } on SocketException {
       throw const ApiFailure.offline();
     }
@@ -115,8 +118,14 @@ class ApiClient {
         // The answer arrived but could not be decoded in time: not the envelope.
         return ApiFailure.malformed(failure.response?.statusCode);
       case DioExceptionType.badCertificate:
+        return const ApiFailure.certificate();
       case DioExceptionType.cancel:
       case DioExceptionType.unknown:
+        // A handshake failure surfaces from the socket layer as a TlsException (its
+        // HandshakeException subtype), never as a SocketException.
+        if (failure.error is TlsException) {
+          return const ApiFailure.certificate();
+        }
         if (failure.error is SocketException) {
           return const ApiFailure.offline();
         }

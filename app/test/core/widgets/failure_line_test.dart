@@ -76,6 +76,21 @@ void main() {
         await pumpLine(tester, locale, const ApiFailure.malformed(502));
         expect(find.text(l10n.failureMalformed), findsOneWidget);
       });
+
+      testWidgets('a certificate failure names the phone clock and offers Retry', (
+        tester,
+      ) async {
+        var retried = 0;
+        await pumpLine(
+          tester,
+          locale,
+          const ApiFailure.certificate(),
+          onRetry: () => retried++,
+        );
+        expect(find.text(l10n.failureCertificate), findsOneWidget);
+        await tester.tap(find.text(l10n.retryButton));
+        expect(retried, 1);
+      });
     });
   }
 }

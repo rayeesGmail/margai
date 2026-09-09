@@ -1,11 +1,16 @@
 import '../../l10n/app_localizations.dart';
 import '../api/api_failure.dart';
 
-/// Turns codes into words (TECH_PLAN §3.3, §11.7; DECISIONS D7 copy rule, D8): the envelope's
-/// `message_user_lang` when the server sent one, else this app's ARB copy by error code; reason
-/// codes and the two client-only codes always come from the ARB. No prose is ever built in Java
-/// or in a widget.
+/// Turns codes into words (TECH_PLAN §3.3, §11.7; DECISIONS D7 copy rule, D8, D9): the
+/// envelope's `message_user_lang` when the server sent one, else this app's ARB copy by error
+/// code; reason codes and the three client-only codes always come from the ARB. A
+/// `VALIDATION_FAILED` about the request itself (`body`, `content_type`) renders that reason's
+/// line rather than the server's generic one, since no field can carry it (D9 row 8). No prose
+/// is ever built in Java or in a widget.
 abstract final class FailureCopy {
+  /// Reasons that describe the whole request, not a field; the D7 `ApiExceptionHandler` codes.
+  static const List<String> requestLevelKeys = <String>['body', 'content_type'];
+
   /// The one line a screen shows for [failure].
   static String message(AppLocalizations l10n, ApiFailure failure) {
     if (failure.isOffline) {
@@ -13,6 +18,13 @@ abstract final class FailureCopy {
     }
     if (failure.isMalformed) {
       return l10n.failureMalformed;
+    }
+    if (failure.isCertificate) {
+      return l10n.failureCertificate;
+    }
+    final requestReason = requestLevelReason(failure);
+    if (requestReason != null) {
+      return reason(l10n, requestReason);
     }
     final user = failure.messageUser;
     if (user != null && user.trim().isNotEmpty) {
@@ -23,6 +35,20 @@ abstract final class FailureCopy {
       return en;
     }
     return byCode(l10n, failure.code);
+  }
+
+  /// The reason code a `VALIDATION_FAILED` puts against the request itself, if any.
+  static String? requestLevelReason(ApiFailure failure) {
+    if (failure.code != 'VALIDATION_FAILED') {
+      return null;
+    }
+    for (final key in requestLevelKeys) {
+      final value = failure.reasonFor(key);
+      if (value != null) {
+        return value;
+      }
+    }
+    return null;
   }
 
   /// Fallback copy for an `ErrorCode` (TECH_PLAN §3.3) when the envelope carried no message.

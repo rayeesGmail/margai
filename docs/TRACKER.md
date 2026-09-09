@@ -12,8 +12,8 @@
 | Field | Value |
 |---|---|
 | Current phase | PHASE 1 — Auth & identity (Week 2, D7–D12), running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
-| Current day | D9 done · 2026-09-09 (unhappy-path hardening: simultaneous first logins serialised on a per-identifier advisory lock, `X-Client-Time` skew diagnostics on `/auth/*`, pending codes retired on an ephemeral-pepper restart, `otp_challenges.created_at` from the app clock, `AuthUnhappyPathsTest` for the server rows; app: the entry step honours cooldowns per destination with minute-scale waits, a `CERTIFICATE` failure code, request-level reasons rendered, Retry after any non-envelope answer; ✅ PASS — `docs/runbooks/login-failure-checklist.md`, ten rows each pinned by tests and observed on the AVD / by curl; `d9-unhappy-paths`, 9 code commits + 2 docs commits; the PR's first CI run failed two waits by one second on the Linux runner — nanosecond instants vs `TIMESTAMPTZ` microseconds — fixed at the clock, `IstClock.now()` truncates to microseconds; second CI run green, PR #8 merged by the founder 2026-09-09, merge commit ba270af) · next: D10 account basics — `POST /auth/logout`, the `student_profiles` row on first login, `GET`/`PATCH /me`, the single-flight refresh interceptor; ✅ kill and reopen → still signed in, logout → clean state |
-| Days completed / total | 9 / 84 |
+| Current day | D10 done · 2026-09-09 (account basics: the `student_profiles` row on first login and a new account's language from the verify call's `Accept-Language`; `POST /auth/logout` — authenticated, the caller's family, 204 either way, the reuse alarm narrowed to rotated-out tokens; no bearer read on the public routes; `GET /me` `{user, profile}` and `PATCH /me` with one-pass reason codes; a `Principal` controller parameter from common; app: single-flight refresh on `AUTH_EXPIRED`, `meProvider`, `SettingsNotifier` — the language switch then one rotation, logout best-effort on the server and unconditional on the device — the locale following the account, `/profile` with the switch and logout; ✅ PASS on the AVD with a 30-s access token: kill and reopen → still signed in with the family rotated, हिन्दी → the app in Hindi, लॉग आउट → a fresh login screen with every token revoked and a reopen staying signed out, plus the curl second device; branch `d10-account-basics`, 7 task commits + the audit fix + the residuals commit + the docs commit; spec-auditor FAIL with one MAJOR — `AUTH_INVALID` on `/me` stranded a stale-key session — fixed in 70527b6 and proved with a server restart on the device, six MINOR fixed or recorded, re-audit PASS; server 306 tests, app 242) · next: D11 — F1 (DLT) has not landed, so no live SMS check: the email delivery-rate logging on top of D7's `otp.sent/verified/failed/send_failed` counters and the OTP metrics dashboard stub; ✅ the OTP success metric visible |
+| Days completed / total | 10 / 84 |
 | Schedule delta | on track |
 | Last week's gate | **Week-1 🚩 PASS** 2026-09-08 — repo, environment, plan, schema and AI seam each demonstrated in-session (transcript in the D6 day log); the only open item, the live proof on the Anthropic profiles, is an account matter, not a build one |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
@@ -37,7 +37,7 @@
 - [x] **D7** OTP request/verify + rate limits + tokens · ✅ curl happy path — done 2026-09-08, acceptance PASS (literal curl transcript in the day log: email request → sandbox code → verify → tokens with `sub/role/lang/jti` → refresh → reuse revokes the family; 429 + `Retry-After` for the cooldown and the hourly cap; phone refused while email-only; hash in the db, code only on the sandbox logger); **email OTP per the founder's D7 ruling** (DECISIONS row 1 of 2026-09-08, exit = F1); branch `d7-otp-auth`, 11 commits, PR #6 merged by the founder 2026-09-08 (merge commit af3adb3)
 - [x] **D8** Login screens (auto-read OTP, retry, change number) · ✅ real device, mobile data — done 2026-09-09 (built 2026-09-08/09 on `d8-login-screens`, 9 commits): email entry, code entry with the sixth digit submitting, resend after the server's cooldown, change email, honest offline state with Retry, three-locale copy for every error and reason code, the `core/` foundation (ApiClient + envelope, token store, auth state, language mapper, router guard, theme); **acceptance PASS on the AVD against the local server with the sandbox inbox** — the founder's reading (plan question 1): the AVD is the device until a public endpoint exists, the mobile-data half is carried on the Week-2 gate line; 8 screenshots + db rows in the day log; spec-auditor PASS with 8 MINOR, all fixed on the branch; *D7 ruling: email first, SMS auto-read (`smart_auth`) waits for F1*; PR #7 merged by the founder 2026-09-09 (merge commit 55aea8b)
 - [x] **D9** Unhappy paths (10-failure checklist) · ✅ all graceful — done 2026-09-09 (branch `d9-unhappy-paths`, 7 code commits): server — a per-identifier advisory lock ends the simultaneous-first-login race (the D7 known edge), `ClientTimeFilter` turns `X-Client-Time` into MDC + WARN + `auth.clock_skew`, `OtpStartup` retires pending codes on an ephemeral-pepper restart, `otp_challenges.created_at` now comes from `IstClock` (a §11.1 finding: the cooldown vanished under a movable clock), `AuthUnhappyPathsTest` pins the seven server rows; app — the entry step honours cooldowns per destination ("Send code in 57 min"), a different address lifts them, `CERTIFICATE` copy names the phone clock, `body`/`content_type` reasons render, Retry after any non-envelope answer; **acceptance PASS**: `docs/runbooks/login-failure-checklist.md`, ten rows with tests + AVD observations (19 screenshots, accessibility-tree driven) and curl transcripts for rows 6–8 (see day log); server 281 tests, app 168; spec-auditor PASS with 4 MINOR, all fixed; the PR's first CI run caught a clock-precision drift, fixed at `IstClock`; PR #8 merged by the founder 2026-09-09 (merge commit ba270af)
-- [ ] **D10** Profile-on-first-login, language, logout, token rotation · ✅ persistence + clean logout — *rotation + reuse detection already live since D7; D10 adds `POST /auth/logout`, the profile row, `/me`*
+- [x] **D10** Profile-on-first-login, language, logout, token rotation · ✅ persistence + clean logout — done 2026-09-09 (branch `d10-account-basics`, 7 task commits + the audit fix + the residuals commit + the docs commit): server — the `student_profiles` row from `signIn` (find-or-create under the identifier lock), a new account's language from the verify call's `Accept-Language`, `POST /auth/logout` (authenticated, the caller's family, 204 either way; the reuse alarm narrowed to rotated-out tokens), no bearer read on the public routes, `PrincipalArgumentResolver` in common, `GET /me` `{user, profile}`, `PATCH /me` with one-pass reason codes; app — single-flight refresh on `AUTH_EXPIRED` (`SessionRefresher`), no bearer on the public routes, `meProvider` (once per sign-in, no auto-retry), `SettingsNotifier` (switch: server → stored user → locale → one rotation; logout: best-effort server, unconditional device), the locale follows the account, `/profile` with the switch and logout; **acceptance PASS on the AVD** against port 8082 with a 30-s access token: sign in → kill 2 min later → reopen lands signed in with the family rotated; Profile → हिन्दी re-renders in Hindi, `users.language = hi`, a third rotation; लॉग आउट → a fresh login screen, every token revoked, kill + reopen stays signed out; curl second device: `Accept-Language: hi-Latn` seeds `hinglish`, `/me`, `PATCH {language: fr}` → `language.invalid`, logout 204 ×2, the dead refresh → `AUTH_INVALID`, a stale bearer ignored, no bearer → `AUTH_REQUIRED` (9 screenshots + rows + log lines in the day log); spec-auditor FAIL → one MAJOR fixed in 70527b6 (an access token from a previous server key is now replaced through one refresh instead of stranding the student — proved on the device with a server restart) and six MINOR fixed or recorded, re-audit PASS with three residuals closed; server 306 tests, app 242; *rotation + reuse detection were live since D7 — D10 added the app's refresh and the device proof*
 - [ ] **D11** DLT live check / delivery metrics · ✅ OTP success metric visible — *D7 ruling: email delivery metrics (`otp.sent/verified/failed/send_failed` exist since D7) + the DLT check only if F1 has landed*
 - [ ] **D12** Buffer
 - [ ] **🚩 WEEK-2 GATE:** a stranger's phone signs in first try — *read as "a stranger's email" until F1 (DECISIONS D7 row 1); the "real device over mobile data" half of D8's ✅ is carried here until F8 gives a public endpoint (D8, 2026-09-09) — until then a USB phone via `adb reverse` (app/README) or the AVD*
@@ -174,6 +174,133 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+D10 · 2026-09-09 · PHASE 1 — Auth & identity (account basics: profile on first login, language, logout, token rotation)
+Plan approved as written (8 tasks, 12 spec-silent decisions, 12 doc notes, 5 closing questions → the
+  recommended option each: a new account's language from the verify call's Accept-Language; tokens
+  rotated right after a language switch; logout clears the device even offline; the D9 runbook's
+  ten-row AVD re-run left to the D12 gate; the founder's uncommitted .claude/settings.json edit left
+  out of the day's commits). The Principal argument resolver moved from task 3 to task 2, where
+  logout first needed it.
+Shipped (branch d10-account-basics, 7 code commits + the audit fix + this docs commit): 47e309c
+  account — AccountService.signIn finds-or-creates the student_profiles row under the identifier lock
+  (pre-D10 accounts heal on their next login) and a brand-new account starts in the verify call's
+  Accept-Language (OtpService.verify / AuthController pass it through; AccountServiceTest +3,
+  AccountConcurrencyTest, AuthFlowTest, OtpServiceTest +1, AuthControllerTest +1); 4b0963a auth —
+  POST /auth/logout (authenticated; TokenService.logout revokes the presented token's family when it
+  is the caller's, no-op otherwise, 204 either way), the reuse alarm narrowed to rotated-out tokens
+  (a token revoked without a successor is a stale session → AUTH_INVALID quietly), a
+  BearerTokenResolver that reads no bearer on PUBLIC_ROUTES, common's PrincipalArgumentResolver +
+  WebConfiguration (TokenServiceTest +3, AuthControllerTest +3, SecurityChainTest +2, AuthFlowTest
+  +1); 90f4015 account — GET /me {user, profile} (Me, ProfileSummary in account.api; MeController
+  in account.web; AUTH_INVALID for a deleted account or a missing profile; MeControllerTest 3,
+  AccountServiceTest +2); a99708b account — PATCH /me (ProfileUpdate typed; MePayloads.UpdateBody
+  checks the raw body in one pass with reason codes — <field>.invalid from the enum, time.invalid,
+  not_blank/size/decimal_min/decimal_max — absent = unchanged; setters on User and StudentProfile;
+  MeControllerTest +3, AccountServiceTest +2, AccountFlowTest: login → /me → PATCH hi → /me hi →
+  refresh carries lang=hi and errors speak Hindi → logout → refresh dead); da88727 app — ApiClient
+  single-flight refresh on 401 AUTH_EXPIRED through a handler (retry once with the new bearer), no
+  bearer on /auth/otp/* and /auth/refresh, PATCH, 204 → {}; SessionRefresher (one in-flight refresh,
+  rotated pair stored beside the user, AUTH_INVALID on the refresh clears the device, offline keeps
+  the session); AuthRepository.refresh/logout, TokensResult, AuthNotifier.updateUser,
+  apiAdapterProvider (api_client +10, session_refresher 6, api_wiring 2, repository +3,
+  auth_notifier +2); 7d2991a app — features/account: Me/Profile (lenient), AccountRepository,
+  MeNotifier (once per sign-in, null signed out, reload, replace, Riverpod auto-retry off),
+  SettingsNotifier.setLanguage (server → stored user → locale → one rotation) and logout
+  (best-effort server, unconditional device); LocaleNotifier follows the account (settings_notifier
+  9, me_provider 5, account repository 5, locale_provider 3); 20137e5 app — ProfileScreen at
+  /profile (identity line, the three languages each in its own language, the §6.11 note, honest
+  failure lines, Log out), Today's bar action + meProvider watch, OneHandPage.appBar, ARB ×3 +11
+  keys (profile_screen 4 states × 3 locales + 2 intents, today_placeholder +3, guard +1,
+  settings_notifier +2, app_test +3); 70527b6 fix(app) after the audit (below) and one more small
+  commit for the re-audit's residuals. Server 306 tests (was 281; 1 skipped = the Bedrock smoke),
+  app 242 (was 168); no AI path, no migration (entities
+  gained setters only), SPEC untouched; every task test-first (the failing run before the code —
+  compile-level red where the API was new, behavioural red for the rest).
+Acceptance: ✅ PASS — PLAN D10 "Kill app, reopen → still logged in; logout → clean state", run on the
+  AVD margai_android36 (Android 16) against SERVER_PORT=8082 with MARGAI_AUTH_JWT_ACCESS_TTL=30s and
+  the sandbox sender (8081 was still held by the founder's SES server from the morning, left alone),
+  driven from the session scratchpad through uiautomator dump / tap by label (ui.sh); 9 screenshots
+  there. (1) pm clear → d10-acceptance@example.com → code 190213 from the sandbox line → the sixth
+  digit submitted → /today at 15:30:32; db: users 9ae24489-… en active, student_profiles 1 row at
+  intro, refresh family 6e0af051-… 1 row (device_label margai/0.1.0+1 android). (2) force-stop at
+  15:32:33 — the 30-s token and the 60-s skew long gone — reopen at 15:32:41 → splash → /today with
+  no login; db: the family now 2 rows, the first replaced_by_id set and last_used_at 15:32:42, a new
+  live row (rotation on the reopen). (3) Profile → हिन्दी at 15:33:54 → the whole screen in Hindi
+  (title, note, वापस जाएं, लॉग आउट; shot d10-06); db users.language = hi; a third family row at
+  15:33:50 (the rotation right after the switch). (4) लॉग आउट at 15:34:04 → the entry screen, empty,
+  in English again (the device suggestion); server log "logout: family 6e0af051-… revoked (1 live
+  token(s))"; db 3 rows, 0 live; force-stop + reopen → the entry screen (clean state). (5) curl
+  second device d10-curl@example.com with Accept-Language: hi-Latn → user.language hinglish; GET /me
+  → {user, profile{is_minor false, onboarding_step intro, morning_notification_time 07:00:00, streaks
+  0}}; PATCH {language: fr} → 400 details.language language.invalid with Hinglish copy; logout → 204,
+  again → 204; refresh with that token → 401 AUTH_INVALID; refresh with a stale bearer attached →
+  the body decided (AUTH_INVALID, not AUTH_EXPIRED); GET /me without a bearer → 401 AUTH_REQUIRED in
+  Hindi; logout without a bearer → 401; db: 1 profile, 1 token, 0 live; log: "logout: family
+  cc43dad7-… revoked (1 live token(s))" then "(0 live token(s))". (6) after the audit fix, the
+  restart path the auditor called unverifiable: d10-restart@example.com signed in on server instance
+  A at 15:42:19; instance A killed 15:42:41, instance B up 15:42:45 with a new ephemeral JWT key;
+  force-stop + reopen at 15:44:26 → /today with no failure line; db: the family rotated at 15:44:26
+  (the previous-key access token was AUTH_INVALID on /me, the refresh token still good, one refresh
+  healed it); no reuse alarm, no ERROR. Not run: the ten-row runbook on the AVD (D12, per question 4).
+spec-auditor (branch diff): FAIL — [MAJOR] AUTH_INVALID ended the session only on the refresh path;
+  on /me it sat as an error state with a Retry that re-ran the dead call, so a stored access token
+  signed by a previous server key (a local restart with the ephemeral secret, a rotation past
+  secret-previous) would strand the student on Today until Profile → Log out, while the refresh
+  token beside it was still good and never used → fixed in 70527b6: ApiClient treats AUTH_INVALID on
+  an authenticated call like AUTH_EXPIRED (one refresh, one retry) and a retry still refused calls
+  the new onSessionLost (AuthNotifier.signOut) — the account, not the token; api_client +3,
+  api_wiring +2 (a previous-key token replaced, an unservable account signed out), and step 6 above
+  on the device. [MINOR ×6] the /me failure line offered Retry on every failure → gated by
+  isEnvelope like the switch (profile_screen +1); seven new PATCH /me reason codes without ARB copy
+  → unreachable from the app today, deferred to D25/D64 in the PATCH DECISIONS row + PARKED; a
+  flow test in account importing auth.internal doubles → recorded as accepted test-only drift
+  (DECISIONS); state_code accepts any two letters → PARKED for D22 (cutoffs); the language note
+  presupposed content the mentor has not made → reworded as a rule in all three ARBs; the D7
+  users-row decision not cited as amended → cited, and the D7 row carries the amendment. The
+  DECISIONS row and the §3.2/§5.4 notes drafted before the audit described the intended behaviour,
+  not the shipped one — rewritten to what ships now. Re-audit (scoped to the fix + the docs): PASS —
+  all seven findings closed or deliberately recorded, the rewritten row and notes confirmed against
+  api_client.dart / session_refresher.dart; three MINOR residuals closed in the follow-up commit:
+  the landing's envelope-means-no-Retry branch had no test (today_placeholder +1), the day log
+  carried a forward-reference placeholder (this sentence replaces it), AuthNotifier.signOut's
+  comment named one caller where there are now three. Unverifiable items closed by the run: the
+  restart path (step 6), verify/analyze/test green on every commit, the eval stamp refreshed once
+  for the router path.
+Doc conflicts surfaced in the plan (none blocked): PLAN D10 "token rotation" vs D7 (live since D7) →
+  the app's refresh + the device proof; TECH_PLAN §3.7 /me five keys vs their producers' days →
+  {user, profile} now (dated note); §1.5 step 3 (logout not public) vs DEV_SPEC §5 (no logout at
+  all) → TECH_PLAN; §5.4 silent on the bearer on public routes → decision + note; §5.5 "the chosen
+  value wins" vs AccountService's language = en → the Accept-Language seed; SPEC §5.1 "Language
+  confirm" (D25) vs §6.11's switch → the switch only; PLAN D10 ✅ "reopen → still logged in" was true
+  at D8 for a fresh token → read with an expired one (the 30-s TTL); the D9 runbook's re-run rule vs
+  the day → pins on every commit, the AVD rows at D12 (runbook note); app.md "no logic in widgets" →
+  state getters; CLAUDE.md "ARB (en/hi)" → three (known); the AuthNotifier/Accounts javadocs →
+  updated; Spring's bearer filter on permitAll routes → decision + SecurityChainTest pin.
+Spec-silent choices: 16 DECISIONS rows dated 2026-09-09 · D10.
+Parked: DELETE /me/devices on logout (D30); per-request account checks for a still-valid access
+  token after logout/deletion (D64); the app-wide Riverpod retry policy; ui.sh under scripts/ if D12
+  drives the AVD; state_code against the state list (D22); ARB copy for the seven reason codes.
+Surprise: (1) Riverpod 3 retries a failed AsyncNotifier build on its own with a backoff — the first
+  me_provider test saw getMe called twice; off for meProvider (one honest Retry). (2) Spring's
+  BearerTokenAuthenticationFilter rejects a bad token even on a permitAll route: without the
+  public-route BearerTokenResolver the app's own stale token would have 401'd /auth/refresh.
+  (3) Top-level Riverpod providers that reference each other inside closures need declared types
+  (Dart's inference reports a circularity). (4) A refresh with a logged-out token tripped D7's reuse
+  alarm in a test — the alarm now means a rotated-out token only, as §3.2 words it. (5) The
+  RadioGroup API (Flutter 3.32+) has a required onChanged, so a busy screen disables the tiles.
+  (6) The Hinglish copy pushed the /me Retry below the 600-px test fold and the tap hit Log out;
+  the fetch failure now sits under the identity line and the test scrolls first. (7) The precommit
+  gate's router regex tripped on app/lib/core/router again — eval/run.sh refreshed the stamp (still
+  PARKED). (8) The re-build for the audit fix ran from the repo root ("No pubspec.yaml") and its
+  `| tail -1` hid the exit code, so the first restart demo re-installed the old APK and failed —
+  the failure was real and the fixed build then passed; build from app/ and never pipe a build.
+Tomorrow's first task: D11 — F1 (DLT) has not landed, so no live SMS check; email delivery-rate
+  logging on top of D7's otp.sent/verified/failed/send_failed counters (a per-channel success ratio),
+  and the OTP metrics dashboard stub (TECH_PLAN §10.2/§10.3); ✅ the OTP success metric visible —
+  locally through the actuator/metrics endpoint or a log line, since CloudWatch waits for F8.
+```
 
 ```
 D9 · 2026-09-09 · PHASE 1 — Auth & identity (unhappy-path hardening, the 10-failure checklist)
@@ -897,6 +1024,12 @@ Tomorrow's first task:
 - `flutter_secure_storage` back to 11.x, and `platforms;android-37.0` in `scripts/dev-setup.sh` · 2026-09-09 · D8 pinned 10.x because AGP 9.1.0 cannot resolve Android 17's minor-versioned platform (DECISIONS D8 Android row); lift when the Flutter template's `compileSdk` passes 36
 - a reusable device-proof driver under `scripts/` (list the accessibility tree, tap by label, clear + type, screenshot) · 2026-09-09 · D8's screencap-then-tap loop cost a mis-tap; D9 drove the whole checklist from the session scratchpad through `adb shell uiautomator dump` (Flutter labels appear as `content-desc`, fields as `EditText`; refocus a field before typing after a round trip) — worth committing if a third day needs it
 - the OTP email says "expires in 0 minutes" when `margai.auth.otp.ttl` is under a minute (`otp.email.body` formats whole minutes) · 2026-09-09 · seen only with the D9 demo TTL of 40 s; production stays at 5 m — format seconds below a minute if a short TTL is ever configured
+- `DELETE /me/devices/{token}` on logout (TECH_PLAN §3.7, D30) · 2026-09-09 · D10's logout revokes the token family only; the FCM device row does not exist before D30 — wire the device delete into `SettingsNotifier.logout` then
+- per-request account checks for a still-valid access token after logout or deletion (the D7 known edge, pinned as documented behaviour in `AuthFlowTest.logoutRevokesTheFamilyButNotTheAccessTokenAlreadyIssued`) · 2026-09-09 · a logged-out device's access token opens routes for ≤ 15 min; D64 decides whether `/me`-class routes re-check the account
+- Riverpod 3 automatic retry policy for the app as a whole · 2026-09-09 · D10 switched it off for `meProvider` only (one honest Retry, the D8 discipline); decide globally — `ProviderScope(retry:)` — before the next `AsyncNotifier` that talks to the network (D25 onboarding, D29 Today)
+- the reusable device-proof driver (`ui.sh`: tree, tap by label, field, type, shot, launch, kill) · 2026-09-09 · used again at D10 from the session scratchpad — third day in a row; commit it under `scripts/` at the Week-2 gate if D12 drives the AVD too
+- `state_code` checked against the state list on the server (`PATCH /me` accepts any two letters today; the D25 picker is the only guard) · 2026-09-09 · spec-auditor D10 MINOR; do it when `cutoffs` land (D22) and the list exists in one place
+- ARB copy for the seven `PATCH /me` reason codes (`language|goal|category|state_code.invalid`, `time.invalid`, `decimal_min`, `decimal_max`) · 2026-09-09 · unreachable from the app until the D25 / D64 screens send those fields; the D8 fallback line renders meanwhile (DECISIONS D10 PATCH row)
 
 ---
 

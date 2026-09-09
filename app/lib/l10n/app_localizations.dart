@@ -398,6 +398,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your onboarding and first plan arrive in a later build. Nothing else to do here yet.'**
   String get todayPlaceholderNote;
+
+  /// Tooltip and accessibility label of the icon on Today that opens Profile & settings (SPEC §8 screen 13) until the bottom bar arrives (D29).
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileOpenButton;
+
+  /// Profile & settings screen title (SPEC §8 screen 13). At D10 it holds the language switch and logout; the rest of §6.11 arrives with its days.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileTitle;
+
+  /// No description provided for @signedInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {identifier}.'**
+  String signedInAs(String identifier);
+
+  /// No description provided for @languageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get languageLabel;
+
+  /// SPEC §6.11: the language switch regenerates future content, not history. A rule, not a claim about content that may not exist yet (SPEC §1 principle 1). Mentor voice.
+  ///
+  /// In en, this message translates to:
+  /// **'Plans and answers from now on use this language; anything from before keeps the language it was made in.'**
+  String get languageNote;
+
+  /// Each language option is written in its own language in every locale, so a student who picked the wrong one can always find the way back. Not translated.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
+
+  /// No description provided for @languageHindi.
+  ///
+  /// In en, this message translates to:
+  /// **'हिन्दी'**
+  String get languageHindi;
+
+  /// No description provided for @languageHinglish.
+  ///
+  /// In en, this message translates to:
+  /// **'Hinglish'**
+  String get languageHinglish;
+
+  /// No description provided for @logoutButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get logoutButton;
+
+  /// No description provided for @loggingOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Logging out…'**
+  String get loggingOut;
+
+  /// No description provided for @profileNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your target, study hours, subscription, data export and account deletion arrive in later builds.'**
+  String get profileNote;
 }
 
 class _AppLocalizationsDelegate

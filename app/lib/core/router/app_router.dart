@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/account/screens/profile_screen.dart';
 import '../../features/auth/providers.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/otp_screen.dart';
@@ -10,13 +11,14 @@ import '../../features/planner/screens/today_placeholder_screen.dart';
 import '../auth/auth_state.dart';
 
 /// Route names (TECH_PLAN §5.8). The bottom-bar shell and the deep links of §5.3 arrive with
-/// their screens (D29 onwards); today the tree is the splash, the two login routes and the
-/// signed-in landing.
+/// their screens (D29 onwards); today the tree is the splash, the two login routes, the
+/// signed-in landing and Profile above it (D10).
 abstract final class AppRoutes {
   static const String splash = '/';
   static const String login = '/login';
   static const String otp = '/login/otp';
   static const String today = '/today';
+  static const String profile = '/profile';
 }
 
 /// The redirect guard of TECH_PLAN §5.3 as a pure function, so it is testable without a widget
@@ -75,6 +77,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.today,
         builder: (context, state) => const TodayPlaceholderScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.profile,
+        builder: (context, state) => const ProfileScreen(),
       ),
     ],
   );

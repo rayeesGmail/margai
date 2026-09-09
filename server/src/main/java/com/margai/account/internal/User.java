@@ -112,8 +112,18 @@ public class User {
         return displayName;
     }
 
+    /** {@code PATCH /me display_name} (D10); already trimmed and bounded by the web layer. */
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
     public Language getLanguage() {
         return language;
+    }
+
+    /** {@code PATCH /me language} (SPEC §6.11, D10): new content from now on; the JWT follows on the next refresh (§3.8). */
+    public void setLanguage(Language language) {
+        this.language = language;
     }
 
     public UserRole getRole() {

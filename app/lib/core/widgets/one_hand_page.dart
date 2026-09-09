@@ -8,18 +8,23 @@ import '../theme/app_theme.dart';
 class OneHandPage extends StatelessWidget {
   const OneHandPage({
     required this.children,
+    this.appBar,
     this.primaryAction,
     this.secondaryActions = const <Widget>[],
     super.key,
   });
 
   final List<Widget> children;
+
+  /// A top bar when the route needs one (a title, a way back, the Profile action on Today).
+  final PreferredSizeWidget? appBar;
   final Widget? primaryAction;
   final List<Widget> secondaryActions;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: appBar,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

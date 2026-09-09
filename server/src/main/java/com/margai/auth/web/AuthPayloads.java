@@ -34,6 +34,10 @@ final class AuthPayloads {
     record RefreshBody(@NotBlank @Size(max = 128) String refreshToken) {
     }
 
+    /** {@code POST /auth/logout} (D10): the device's refresh token names the family to revoke. */
+    record LogoutBody(@NotBlank @Size(max = 128) String refreshToken) {
+    }
+
     record OtpRequestedResponse(UUID challengeId, long resendAfterS, OtpChannel channel) {
     }
 

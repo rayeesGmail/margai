@@ -21,9 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
  * 256-bit opaque token stored as SHA-256. A refresh rotates: the presented token is spent
  * ({@code revoked_at}, {@code replaced_by_id}) and a successor in the same family is issued with a
  * fresh 30-day life, alongside a new access token carrying the account's current role and
- * language (§3.8). Presenting a token that was already spent or revoked is reuse — somebody
+ * language (§3.8). Presenting a token that was already spent (rotated out) is reuse — somebody
  * holds a copy — so the whole family is revoked and the caller must sign in again; that
- * revocation commits even though the call fails.
+ * revocation commits even though the call fails. A token revoked without a successor (logout,
+ * D10) is merely dead. Logout revokes the caller's family (§3.7).
  */
 @Service
 public class TokenService {
@@ -66,13 +67,16 @@ public class TokenService {
         Instant now = clock.now();
         RefreshToken current = tokens.findByTokenHash(Sha256.hex(Sha256.utf8(presented == null ? "" : presented)))
                 .orElseThrow(AuthException::invalid);
-        if (current.isRevoked() || current.isReplaced()) {
+        if (current.isReplaced()) {
+            // A rotated-out token: somebody holds a copy (§3.2 "reuse of a rotated refresh token").
             int revoked = tokens.revokeFamily(current.getFamilyId(), now);
             meters.counter(REUSE_METRIC).increment();
             log.warn("refresh token reuse detected: family {} revoked ({} live token(s))", current.getFamilyId(), revoked);
             throw AuthException.invalid();
         }
-        if (current.isExpired(now)) {
+        if (current.isRevoked() || current.isExpired(now)) {
+            // Revoked without a successor — logged out (D10), or a family killed by an earlier reuse — is a
+            // stale session, not a new incident: no alarm, the caller signs in again.
             throw AuthException.invalid();
         }
         UserSummary user = accounts.findActive(current.getUserId()).orElseThrow(AuthException::invalid);
@@ -82,6 +86,25 @@ public class TokenService {
         current.rotateTo(successor.getId(), now);
         tokens.save(current);
         return new TokenPair(jwts.issue(user.toPrincipal()), refreshToken, jwts.expiresInSeconds());
+    }
+
+    /**
+     * {@code POST /auth/logout} (TECH_PLAN §3.2, §3.7; D10): revokes the family of the presented
+     * token when that family is the caller's. A spent token still names its family; an already
+     * revoked family, an unknown token or another user's token change nothing — the call is
+     * naturally idempotent and answers nothing either way (DECISIONS D10).
+     */
+    @Transactional
+    public void logout(UUID caller, String presented) {
+        if (presented == null || caller == null) {
+            return;
+        }
+        tokens.findByTokenHash(Sha256.hex(Sha256.utf8(presented)))
+                .filter(token -> caller.equals(token.getUserId()))
+                .ifPresent(token -> {
+                    int revoked = tokens.revokeFamily(token.getFamilyId(), clock.now());
+                    log.info("logout: family {} revoked ({} live token(s))", token.getFamilyId(), revoked);
+                });
     }
 
     private static String newOpaqueToken() {

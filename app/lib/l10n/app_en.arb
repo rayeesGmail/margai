@@ -147,5 +147,36 @@
       }
     }
   },
-  "todayPlaceholderNote": "Your onboarding and first plan arrive in a later build. Nothing else to do here yet."
+  "todayPlaceholderNote": "Your onboarding and first plan arrive in a later build. Nothing else to do here yet.",
+
+  "profileOpenButton": "Profile",
+  "@profileOpenButton": {
+    "description": "Tooltip and accessibility label of the icon on Today that opens Profile & settings (SPEC §8 screen 13) until the bottom bar arrives (D29)."
+  },
+  "profileTitle": "Profile",
+  "@profileTitle": {
+    "description": "Profile & settings screen title (SPEC §8 screen 13). At D10 it holds the language switch and logout; the rest of §6.11 arrives with its days."
+  },
+  "signedInAs": "Signed in as {identifier}.",
+  "@signedInAs": {
+    "placeholders": {
+      "identifier": {
+        "type": "String"
+      }
+    }
+  },
+  "languageLabel": "Language",
+  "languageNote": "Plans and answers from now on use this language; anything from before keeps the language it was made in.",
+  "@languageNote": {
+    "description": "SPEC §6.11: the language switch regenerates future content, not history. A rule, not a claim about content that may not exist yet (SPEC §1 principle 1). Mentor voice."
+  },
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "Each language option is written in its own language in every locale, so a student who picked the wrong one can always find the way back. Not translated."
+  },
+  "languageHindi": "हिन्दी",
+  "languageHinglish": "Hinglish",
+  "logoutButton": "Log out",
+  "loggingOut": "Logging out…",
+  "profileNote": "Your target, study hours, subscription, data export and account deletion arrive in later builds."
 }

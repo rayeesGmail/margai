@@ -9,6 +9,8 @@ import com.margai.account.api.LoginIdentifier;
 import com.margai.account.api.UserSummary;
 import com.margai.common.api.AuthException;
 import com.margai.common.api.ErrorCode;
+import com.margai.common.api.Language;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -23,8 +25,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * TECH_PLAN §3.2 and DECISIONS D3.12 over the real database: the token is never stored, refresh
  * rotates and links, reuse of a spent token revokes the whole family, expiry and deletion are
- * {@code AUTH_INVALID}, families are independent, and the new access token speaks the account's
- * current language (§3.8).
+ * {@code AUTH_INVALID}, families are independent, the new access token speaks the account's
+ * current language (§3.8), and logout revokes the caller's family only (§3.7, D10).
  */
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
@@ -44,6 +46,9 @@ class TokenServiceTest {
 
     @Autowired
     private JdbcTemplate jdbc;
+
+    @Autowired
+    private MeterRegistry meters;
 
     @Test
     void issueStoresAHashNeverTheToken() {
@@ -137,8 +142,57 @@ class TokenServiceTest {
                 .isAfter(Instant.now().plus(Duration.ofMinutes(14)));
     }
 
+    @Test
+    void logoutRevokesTheCallersFamilyAndLeavesOtherDevicesSignedIn() {
+        UserSummary user = newUser();
+        TokenPair phone = service.issue(user, "phone");
+        TokenPair tablet = service.issue(user, "tablet");
+
+        service.logout(user.id(), phone.refreshToken());
+
+        List<RefreshToken> phoneFamily = tokens.findByFamilyIdOrderByCreatedAt(row(phone.refreshToken()).getFamilyId());
+        assertThat(phoneFamily).hasSize(1).allMatch(RefreshToken::isRevoked);
+        assertThatThrownBy(() -> service.refresh(phone.refreshToken())).isInstanceOf(AuthException.class);
+        assertThat(service.refresh(tablet.refreshToken()).refreshToken()).as("the tablet stays signed in").isNotBlank();
+    }
+
+    @Test
+    void logoutOfASpentTokenRevokesItsFamilyWithoutAReuseAlarm() {
+        UserSummary user = newUser();
+        TokenPair first = service.issue(user, null);
+        TokenPair second = service.refresh(first.refreshToken());
+        double alarmsBefore = reuseAlarms();
+
+        service.logout(user.id(), first.refreshToken());
+        service.logout(user.id(), first.refreshToken());
+
+        List<RefreshToken> family = tokens.findByFamilyIdOrderByCreatedAt(row(first.refreshToken()).getFamilyId());
+        assertThat(family).hasSize(2).allMatch(RefreshToken::isRevoked);
+        assertThatThrownBy(() -> service.refresh(second.refreshToken())).isInstanceOf(AuthException.class);
+        assertThat(reuseAlarms()).as("logging out is not reuse; revoking twice is a no-op").isEqualTo(alarmsBefore);
+    }
+
+    @Test
+    void logoutOfAnUnknownOrAnotherUsersTokenChangesNothing() {
+        UserSummary alice = newUser();
+        UserSummary bob = newUser();
+        TokenPair alicePair = service.issue(alice, null);
+
+        service.logout(bob.id(), alicePair.refreshToken());
+        service.logout(alice.id(), "never-issued");
+        service.logout(alice.id(), null);
+
+        assertThat(row(alicePair.refreshToken()).isRevoked()).isFalse();
+        assertThat(service.refresh(alicePair.refreshToken()).refreshToken()).isNotBlank();
+    }
+
+    private double reuseAlarms() {
+        return meters.find(TokenService.REUSE_METRIC).counter() == null ? 0
+                : meters.find(TokenService.REUSE_METRIC).counter().count();
+    }
+
     private UserSummary newUser() {
-        return accounts.signIn(new LoginIdentifier.Email("tokens-" + UUID.randomUUID() + "@example.com")).user();
+        return accounts.signIn(new LoginIdentifier.Email("tokens-" + UUID.randomUUID() + "@example.com"), Language.en).user();
     }
 
     private RefreshToken row(String rawToken) {

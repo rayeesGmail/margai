@@ -206,6 +206,43 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get todayPlaceholderNote =>
       'आपका ऑनबोर्डिंग और पहला प्लान अगले बिल्ड में आएगा। अभी यहाँ और कुछ नहीं करना है।';
+
+  @override
+  String get profileOpenButton => 'प्रोफ़ाइल';
+
+  @override
+  String get profileTitle => 'प्रोफ़ाइल';
+
+  @override
+  String signedInAs(String identifier) {
+    return '$identifier के रूप में साइन इन हैं।';
+  }
+
+  @override
+  String get languageLabel => 'भाषा';
+
+  @override
+  String get languageNote =>
+      'अब से प्लान और जवाब इसी भाषा में होंगे; पहले का जो कुछ है, वह अपनी भाषा में ही रहेगा।';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageHindi => 'हिन्दी';
+
+  @override
+  String get languageHinglish => 'Hinglish';
+
+  @override
+  String get logoutButton => 'लॉग आउट';
+
+  @override
+  String get loggingOut => 'लॉग आउट हो रहा है…';
+
+  @override
+  String get profileNote =>
+      'आपका लक्ष्य, पढ़ाई के घंटे, सब्सक्रिप्शन, डेटा एक्सपोर्ट और अकाउंट हटाना — ये अगले बिल्ड में आएँगे।';
 }
 
 /// The translations for Hindi, using the Latin script (`hi_Latn`).
@@ -411,4 +448,41 @@ class AppLocalizationsHiLatn extends AppLocalizationsHi {
   @override
   String get todayPlaceholderNote =>
       'Aapka onboarding aur pehla plan agle build mein aayega. Abhi yahan aur kuch nahi karna.';
+
+  @override
+  String get profileOpenButton => 'Profile';
+
+  @override
+  String get profileTitle => 'Profile';
+
+  @override
+  String signedInAs(String identifier) {
+    return '$identifier ke roop mein signed in ho.';
+  }
+
+  @override
+  String get languageLabel => 'Language';
+
+  @override
+  String get languageNote =>
+      'Ab se plans aur answers isi language mein honge; pehle ka jo kuch hai, wo apni language mein hi rahega.';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageHindi => 'हिन्दी';
+
+  @override
+  String get languageHinglish => 'Hinglish';
+
+  @override
+  String get logoutButton => 'Log out';
+
+  @override
+  String get loggingOut => 'Log out ho raha hai…';
+
+  @override
+  String get profileNote =>
+      'Aapka target, study hours, subscription, data export aur account delete — yeh agle builds mein aayenge.';
 }

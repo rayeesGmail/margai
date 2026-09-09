@@ -10,14 +10,37 @@ import 'package:margai/features/auth/repository.dart';
 class FakeAuthRepository implements AuthRepository {
   final Queue<Object> _requests = Queue<Object>();
   final Queue<Object> _verifies = Queue<Object>();
+  final Queue<Object> _refreshes = Queue<Object>();
+  final Queue<Object> _logouts = Queue<Object>();
 
   final List<String> requestedEmails = <String>[];
   final List<({String challengeId, String code})> verified =
       <({String challengeId, String code})>[];
+  final List<String> refreshed = <String>[];
+  final List<String> loggedOut = <String>[];
 
   void onRequest(Object outcome) => _requests.add(outcome);
 
   void onVerify(Object outcome) => _verifies.add(outcome);
+
+  void onRefresh(Object outcome) => _refreshes.add(outcome);
+
+  /// Script a logout outcome; `null` completes normally (the 204), an error throws.
+  void onLogout(Object? outcome) => _logouts.add(outcome ?? _ok);
+
+  @override
+  Future<TokensResult> refresh(String refreshToken) async {
+    refreshed.add(refreshToken);
+    return _next(_refreshes, 'refresh') as TokensResult;
+  }
+
+  @override
+  Future<void> logout(String refreshToken) async {
+    loggedOut.add(refreshToken);
+    _next(_logouts, 'logout');
+  }
+
+  static const Object _ok = Object();
 
   @override
   Future<OtpChallenge> requestOtp({required String email}) async {
@@ -64,5 +87,11 @@ class FakeAuthRepository implements AuthRepository {
     expiresIn: Duration(minutes: 15),
     isNewUser: true,
     user: user,
+  );
+
+  static const TokensResult rotated = TokensResult(
+    accessToken: 'access-2',
+    refreshToken: 'refresh-2',
+    expiresIn: Duration(minutes: 15),
   );
 }

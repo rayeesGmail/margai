@@ -30,6 +30,13 @@ class ApiFailure implements Exception {
   static const String malformedCode = 'MALFORMED';
   static const String certificateCode = 'CERTIFICATE';
 
+  /// The two token outcomes of TECH_PLAN §3.3 the client acts on (§5.4): refresh, or sign out.
+  static const String authExpiredCode = 'AUTH_EXPIRED';
+  static const String authInvalidCode = 'AUTH_INVALID';
+
+  /// The session is gone for good — a revoked family, a deleted account — as the client says it.
+  const ApiFailure.authInvalid() : this(code: authInvalidCode, status: 401);
+
   /// An `ErrorCode` name from TECH_PLAN §3.3, or one of the three client-only codes above.
   final String code;
 
@@ -54,6 +61,12 @@ class ApiFailure implements Exception {
 
   /// The server answered with the §3.3 envelope; false for the three client-only codes.
   bool get isEnvelope => !isOffline && !isMalformed && !isCertificate;
+
+  /// The access token is past its 15 minutes: refresh, then retry (TECH_PLAN §5.4).
+  bool get isAuthExpired => code == authExpiredCode;
+
+  /// The session cannot be repaired: the app returns to login (TECH_PLAN §3.2).
+  bool get isAuthInvalid => code == authInvalidCode;
 
   /// `details.attempts_left` on `OTP_INVALID` (0 on the last attempt).
   int? get attemptsLeft => _intDetail('attempts_left');

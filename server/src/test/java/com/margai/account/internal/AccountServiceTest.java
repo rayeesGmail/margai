@@ -3,13 +3,19 @@ package com.margai.account.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.TestcontainersConfiguration;
+import com.margai.account.api.Goal;
 import com.margai.account.api.LoginIdentifier;
+import com.margai.account.api.Me;
+import com.margai.account.api.ProfileUpdate;
 import com.margai.account.api.SignIn;
+import com.margai.common.api.Category;
 import com.margai.common.api.IstClock;
 import com.margai.common.api.Language;
 import com.margai.common.api.UserRole;
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +25,11 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
-/** TECH_PLAN §3.7: first login creates the account, later logins find it; phone logins stamp the verification time. */
+/**
+ * TECH_PLAN §3.7: first login creates the account and its empty {@code student_profiles} row (D10),
+ * later logins find both; a new account takes the verify call's suggested language (SPEC §5
+ * "auto-suggested, changeable"; DECISIONS D10); phone logins stamp the verification time.
+ */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({TestcontainersConfiguration.class, AccountService.class, AccountServiceTest.FixedClock.class})
@@ -41,10 +51,13 @@ class AccountServiceTest {
     @Autowired
     private UserRepository users;
 
+    @Autowired
+    private StudentProfileRepository profiles;
+
     @Test
     void emailLoginCreatesThenFindsTheAccount() {
-        SignIn first = service.signIn(new LoginIdentifier.Email("first@example.com"));
-        SignIn again = service.signIn(new LoginIdentifier.Email("first@example.com"));
+        SignIn first = service.signIn(new LoginIdentifier.Email("first@example.com"), Language.en);
+        SignIn again = service.signIn(new LoginIdentifier.Email("first@example.com"), Language.en);
 
         assertThat(first.isNew()).isTrue();
         assertThat(again.isNew()).isFalse();
@@ -57,8 +70,113 @@ class AccountServiceTest {
     }
 
     @Test
+    void firstLoginCreatesTheEmptyProfileRowOnce() {
+        SignIn first = service.signIn(new LoginIdentifier.Email("profile@example.com"), Language.en);
+        service.signIn(new LoginIdentifier.Email("profile@example.com"), Language.en);
+
+        StudentProfile profile = profiles.findByUserId(first.user().id()).orElseThrow();
+        assertThat(profiles.findAll()).filteredOn(row -> row.getUserId().equals(first.user().id())).hasSize(1);
+        assertThat(profile.getOnboardingStep()).isEqualTo("intro");
+        assertThat(profile.getMorningNotificationTime()).isEqualTo(LocalTime.of(7, 0));
+        assertThat(profile.getCurrentStreak()).isZero();
+        assertThat(profile.getLongestStreak()).isZero();
+        assertThat(profile.isMinor()).isFalse();
+        assertThat(profile.getAttemptType()).isNull();
+    }
+
+    @Test
+    void anAccountWithoutAProfileGetsOneOnItsNextLogin() {
+        // A pre-D10 account: the users row exists, the profile row does not.
+        SignIn first = service.signIn(new LoginIdentifier.Email("heal@example.com"), Language.en);
+        profiles.delete(profiles.findByUserId(first.user().id()).orElseThrow());
+        profiles.flush();
+        assertThat(profiles.findByUserId(first.user().id())).isEmpty();
+
+        SignIn again = service.signIn(new LoginIdentifier.Email("heal@example.com"), Language.en);
+
+        assertThat(again.isNew()).isFalse();
+        assertThat(profiles.findByUserId(first.user().id())).isPresent();
+    }
+
+    @Test
+    void theSuggestedLanguageLandsOnANewAccountOnly() {
+        SignIn first = service.signIn(new LoginIdentifier.Email("hindi@example.com"), Language.hi);
+        SignIn again = service.signIn(new LoginIdentifier.Email("hindi@example.com"), Language.en);
+
+        assertThat(first.user().language()).isEqualTo(Language.hi);
+        assertThat(again.user().language()).as("a later login keeps the stored value").isEqualTo(Language.hi);
+        assertThat(users.findById(first.user().id()).orElseThrow().getLanguage()).isEqualTo(Language.hi);
+    }
+
+    @Test
+    void meReturnsTheAccountWithItsProfile() {
+        SignIn signIn = service.signIn(new LoginIdentifier.Email("me@example.com"), Language.hinglish);
+
+        Me me = service.me(signIn.user().id()).orElseThrow();
+
+        assertThat(me.user()).isEqualTo(signIn.user());
+        assertThat(me.user().language()).isEqualTo(Language.hinglish);
+        assertThat(me.profile().onboardingStep()).isEqualTo("intro");
+        assertThat(me.profile().morningNotificationTime()).isEqualTo(LocalTime.of(7, 0));
+        assertThat(me.profile().isMinor()).isFalse();
+        assertThat(me.profile().currentStreak()).isZero();
+        assertThat(me.profile().attemptType()).isNull();
+        assertThat(me.profile().hoursWeekday()).isNull();
+    }
+
+    @Test
+    void meIsEmptyForADeletedAccountOrAMissingProfile() {
+        SignIn deleted = service.signIn(new LoginIdentifier.Email("me-deleted@example.com"), Language.en);
+        users.saveAndFlush(markDeleted(users.findById(deleted.user().id()).orElseThrow()));
+        SignIn orphan = service.signIn(new LoginIdentifier.Email("me-orphan@example.com"), Language.en);
+        profiles.delete(profiles.findByUserId(orphan.user().id()).orElseThrow());
+        profiles.flush();
+
+        assertThat(service.me(deleted.user().id())).isEmpty();
+        assertThat(service.me(orphan.user().id())).as("a pre-D10 account without a profile: sign in again heals it").isEmpty();
+        assertThat(service.me(java.util.UUID.randomUUID())).isEmpty();
+    }
+
+    @Test
+    void updateAppliesOnlyThePresentFields() {
+        SignIn signIn = service.signIn(new LoginIdentifier.Email("update@example.com"), Language.en);
+        ProfileUpdate first = new ProfileUpdate(Language.hi, "Asha", null, new BigDecimal("5.5"), null, null, null, null);
+        ProfileUpdate second = new ProfileUpdate(null, null, LocalTime.of(6, 30), null, null, Goal.govt_mbbs, "MH",
+                Category.obc);
+
+        Me afterFirst = service.update(signIn.user().id(), first).orElseThrow();
+        Me afterSecond = service.update(signIn.user().id(), second).orElseThrow();
+
+        assertThat(afterFirst.user().language()).isEqualTo(Language.hi);
+        assertThat(afterFirst.user().displayName()).isEqualTo("Asha");
+        assertThat(afterFirst.profile().hoursWeekday()).isEqualByComparingTo("5.5");
+        assertThat(afterFirst.profile().goal()).isNull();
+        assertThat(afterFirst.profile().morningNotificationTime()).isEqualTo(LocalTime.of(7, 0));
+        assertThat(afterSecond.user().language()).as("untouched by the second update").isEqualTo(Language.hi);
+        assertThat(afterSecond.user().displayName()).isEqualTo("Asha");
+        assertThat(afterSecond.profile().hoursWeekday()).isEqualByComparingTo("5.5");
+        assertThat(afterSecond.profile().morningNotificationTime()).isEqualTo(LocalTime.of(6, 30));
+        assertThat(afterSecond.profile().goal()).isEqualTo(Goal.govt_mbbs);
+        assertThat(afterSecond.profile().stateCode()).isEqualTo("MH");
+        assertThat(afterSecond.profile().category()).isEqualTo(Category.obc);
+        assertThat(service.findActive(signIn.user().id()).orElseThrow().language())
+                .as("the refresh path sees the new language (TECH_PLAN §3.8)").isEqualTo(Language.hi);
+        assertThat(users.findById(signIn.user().id()).orElseThrow().getLanguage()).isEqualTo(Language.hi);
+    }
+
+    @Test
+    void updateOfAnUnservableAccountIsEmpty() {
+        SignIn deleted = service.signIn(new LoginIdentifier.Email("update-deleted@example.com"), Language.en);
+        users.saveAndFlush(markDeleted(users.findById(deleted.user().id()).orElseThrow()));
+
+        assertThat(service.update(deleted.user().id(), new ProfileUpdate(Language.hi, null, null, null, null, null, null, null)))
+                .isEmpty();
+        assertThat(users.findById(deleted.user().id()).orElseThrow().getLanguage()).isEqualTo(Language.en);
+    }
+
+    @Test
     void phoneLoginStampsTheVerificationTime() {
-        SignIn signIn = service.signIn(new LoginIdentifier.Phone("+919876500001"));
+        SignIn signIn = service.signIn(new LoginIdentifier.Phone("+919876500001"), Language.en);
 
         assertThat(signIn.isNew()).isTrue();
         assertThat(signIn.user().phone()).isEqualTo("+919876500001");
@@ -68,22 +186,22 @@ class AccountServiceTest {
 
     @Test
     void emailAndPhoneAccountsAreDistinct() {
-        SignIn byEmail = service.signIn(new LoginIdentifier.Email("distinct@example.com"));
-        SignIn byPhone = service.signIn(new LoginIdentifier.Phone("+919876500002"));
+        SignIn byEmail = service.signIn(new LoginIdentifier.Email("distinct@example.com"), Language.en);
+        SignIn byPhone = service.signIn(new LoginIdentifier.Phone("+919876500002"), Language.en);
 
         assertThat(byEmail.user().id()).isNotEqualTo(byPhone.user().id());
     }
 
     @Test
     void findActiveIgnoresDeletedAccounts() {
-        SignIn signIn = service.signIn(new LoginIdentifier.Email("deleted@example.com"));
+        SignIn signIn = service.signIn(new LoginIdentifier.Email("deleted@example.com"), Language.en);
         assertThat(service.findActive(signIn.user().id())).isPresent();
 
         User user = users.findById(signIn.user().id()).orElseThrow();
         users.saveAndFlush(markDeleted(user));
 
         assertThat(service.findActive(signIn.user().id())).isEmpty();
-        assertThat(service.signIn(new LoginIdentifier.Email("deleted@example.com")).isNew())
+        assertThat(service.signIn(new LoginIdentifier.Email("deleted@example.com"), Language.en).isNew())
                 .as("a deleted account's identifier can start a fresh account").isTrue();
     }
 

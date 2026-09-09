@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -11,12 +12,17 @@ void main() {
   late FakeAdapter adapter;
   String? bearer;
   String language = 'en';
+  var refreshes = 0;
+  var sessionsLost = 0;
+  Future<String> Function()? onAuthExpired;
 
   ApiClient client({String baseUrl = 'http://10.0.2.2:8081'}) => ApiClient(
     baseUrl: baseUrl,
     appVersion: 'margai/0.1.0+1 android',
     acceptLanguage: () => language,
     bearer: () async => bearer,
+    onAuthExpired: onAuthExpired,
+    onSessionLost: () async => sessionsLost++,
     adapter: adapter,
     clock: () => DateTime.utc(2026, 9, 8, 12, 30, 45, 123),
   );
@@ -25,6 +31,194 @@ void main() {
     adapter = FakeAdapter();
     bearer = null;
     language = 'en';
+    refreshes = 0;
+    sessionsLost = 0;
+    onAuthExpired = () async {
+      refreshes++;
+      return 'access-2';
+    };
+  });
+
+  group('single-flight refresh on AUTH_EXPIRED (TECH_PLAN §5.4, PLAN D10)', () {
+    test('an expired access token is refreshed once and the call retried with the new bearer', () async {
+      bearer = 'access-1';
+      adapter
+        ..reply(FakeReply.envelope(401, 'AUTH_EXPIRED'))
+        ..reply(FakeReply.json(200, {'ok': true}));
+
+      final body = await client().get('/me');
+
+      expect(body, {'ok': true});
+      expect(refreshes, 1);
+      expect(adapter.requests, hasLength(2));
+      expect(adapter.requests[0].header('Authorization'), 'Bearer access-1');
+      expect(adapter.requests[1].header('Authorization'), 'Bearer access-2');
+    });
+
+    test('calls that expire together each wait on the handler and retry once it answers', () async {
+      // The client asks the handler per expired call; sharing one refresh among them is the
+      // SessionRefresher's promise (session_refresher_test), and the two meet in api_wiring_test.
+      bearer = 'access-1';
+      final gate = Completer<String>();
+      onAuthExpired = () {
+        refreshes++;
+        return gate.future;
+      };
+      adapter
+        ..reply(FakeReply.envelope(401, 'AUTH_EXPIRED'))
+        ..reply(FakeReply.envelope(401, 'AUTH_EXPIRED'))
+        ..reply(FakeReply.envelope(401, 'AUTH_EXPIRED'))
+        ..reply(FakeReply.json(200, {'n': 1}))
+        ..reply(FakeReply.json(200, {'n': 2}))
+        ..reply(FakeReply.json(200, {'n': 3}));
+      final api = client();
+
+      final calls = Future.wait([api.get('/me'), api.get('/a'), api.get('/b')]);
+      // dio queues its interceptors asynchronously: wait until all three have hit the handler.
+      for (var i = 0; i < 100 && refreshes < 3; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      expect(adapter.requests, hasLength(3));
+      expect(refreshes, 3);
+      gate.complete('access-2');
+      final bodies = await calls;
+
+      expect(bodies.map((b) => b['n']), unorderedEquals([1, 2, 3]));
+      expect(adapter.requests, hasLength(6));
+      expect(
+        adapter.requests.skip(3).map((r) => r.header('Authorization')),
+        everyElement('Bearer access-2'),
+      );
+    });
+
+    test('a refresh that says AUTH_INVALID reaches the caller; nothing is retried', () async {
+      bearer = 'access-1';
+      onAuthExpired = () async {
+        refreshes++;
+        throw const ApiFailure(code: 'AUTH_INVALID', status: 401);
+      };
+      adapter.reply(FakeReply.envelope(401, 'AUTH_EXPIRED'));
+
+      final failure = await _failureOf(client().get('/me'));
+
+      expect(failure.code, 'AUTH_INVALID');
+      expect(refreshes, 1);
+      expect(adapter.requests, hasLength(1));
+    });
+
+    test('a refresh that goes offline surfaces as offline; the session is the refresher\'s business', () async {
+      bearer = 'access-1';
+      onAuthExpired = () async => throw const ApiFailure.offline();
+      adapter.reply(FakeReply.envelope(401, 'AUTH_EXPIRED'));
+
+      final failure = await _failureOf(client().get('/me'));
+
+      expect(failure.isOffline, isTrue);
+    });
+
+    test('a second AUTH_EXPIRED on the retry surfaces; there is no second refresh', () async {
+      bearer = 'access-1';
+      adapter
+        ..reply(FakeReply.envelope(401, 'AUTH_EXPIRED'))
+        ..reply(FakeReply.envelope(401, 'AUTH_EXPIRED'));
+
+      final failure = await _failureOf(client().get('/me'));
+
+      expect(failure.code, 'AUTH_EXPIRED');
+      expect(refreshes, 1);
+      expect(adapter.requests, hasLength(2));
+      expect(sessionsLost, 0);
+    });
+
+    test('AUTH_INVALID on an authenticated call gets the same one refresh: the key may have changed', () async {
+      // A stored access token signed by a previous server key is AUTH_INVALID, while the refresh
+      // token beside it is still good (the local ephemeral secret, or a rotation past the window).
+      bearer = 'access-old-key';
+      adapter
+        ..reply(FakeReply.envelope(401, 'AUTH_INVALID'))
+        ..reply(FakeReply.json(200, {'ok': true}));
+
+      final body = await client().get('/me');
+
+      expect(body, {'ok': true});
+      expect(refreshes, 1);
+      expect(adapter.requests[1].header('Authorization'), 'Bearer access-2');
+      expect(sessionsLost, 0);
+    });
+
+    test('a retry that is still AUTH_INVALID ends the session: the account, not the token', () async {
+      bearer = 'access-1';
+      adapter
+        ..reply(FakeReply.envelope(401, 'AUTH_INVALID'))
+        ..reply(FakeReply.envelope(401, 'AUTH_INVALID'));
+
+      final failure = await _failureOf(client().get('/me'));
+
+      expect(failure.code, 'AUTH_INVALID');
+      expect(refreshes, 1);
+      expect(sessionsLost, 1);
+      expect(adapter.requests, hasLength(2));
+    });
+
+    test('AUTH_REQUIRED passes through untouched: there was no token to replace', () async {
+      adapter.reply(FakeReply.envelope(401, 'AUTH_REQUIRED'));
+
+      final failure = await _failureOf(client().get('/me'));
+
+      expect(failure.code, 'AUTH_REQUIRED');
+      expect(refreshes, 0);
+      expect(sessionsLost, 0);
+    });
+
+    test('the public auth routes carry no bearer and never refresh, even with a stored session', () async {
+      bearer = 'stale-access';
+      adapter
+        ..reply(FakeReply.envelope(401, 'AUTH_INVALID'))
+        ..reply(FakeReply.json(200, {'challenge_id': 'c-1'}))
+        ..reply(FakeReply.json(200, {'expires_in': 900}))
+        ..reply(FakeReply.envelope(401, 'AUTH_EXPIRED'));
+      final api = client();
+
+      final dead = await _failureOf(api.post('/auth/refresh', {'refresh_token': 'r'}));
+      await api.post('/auth/otp/request', {'email': 'a@b.in'});
+      await api.post('/auth/otp/verify', {'challenge_id': 'c-1', 'code': '1'});
+      final expired = await _failureOf(api.post('/auth/refresh', {'refresh_token': 'r'}));
+
+      expect(dead.code, 'AUTH_INVALID');
+      expect(expired.code, 'AUTH_EXPIRED');
+      expect(refreshes, 0);
+      expect(adapter.requests.map((r) => r.header('Authorization')), everyElement(isNull));
+    });
+
+    test('without a refresher an expiry is just the failure', () async {
+      bearer = 'access-1';
+      onAuthExpired = null;
+      adapter.reply(FakeReply.envelope(401, 'AUTH_EXPIRED'));
+
+      final failure = await _failureOf(client().get('/me'));
+
+      expect(failure.code, 'AUTH_EXPIRED');
+      expect(adapter.requests, hasLength(1));
+    });
+  });
+
+  group('the shapes /me and logout need (D10)', () {
+    test('patch sends PATCH with a JSON body', () async {
+      adapter.reply(FakeReply.json(200, {'user': {}}));
+      bearer = 'access-1';
+
+      await client().patch('/me', {'language': 'hi'});
+
+      expect(adapter.last.options.method, 'PATCH');
+      expect(adapter.last.json, {'language': 'hi'});
+      expect(adapter.last.header('Authorization'), 'Bearer access-1');
+    });
+
+    test('a 204 without a body is an empty object, not malformed', () async {
+      adapter.reply(const FakeReply(204, '', contentType: 'text/plain'));
+      final body = await client().post('/auth/logout', {'refresh_token': 'r'});
+      expect(body, isEmpty);
+    });
   });
 
   group('request shape (TECH_PLAN §3.1, §3.8, §5.4)', () {

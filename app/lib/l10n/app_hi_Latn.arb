@@ -55,5 +55,17 @@
 
   "todayPlaceholderTitle": "Aap andar aa gaye.",
   "todayPlaceholderBody": "{identifier} ke roop mein signed in ho.",
-  "todayPlaceholderNote": "Aapka onboarding aur pehla plan agle build mein aayega. Abhi yahan aur kuch nahi karna."
+  "todayPlaceholderNote": "Aapka onboarding aur pehla plan agle build mein aayega. Abhi yahan aur kuch nahi karna.",
+
+  "profileOpenButton": "Profile",
+  "profileTitle": "Profile",
+  "signedInAs": "{identifier} ke roop mein signed in ho.",
+  "languageLabel": "Language",
+  "languageNote": "Ab se plans aur answers isi language mein honge; pehle ka jo kuch hai, wo apni language mein hi rahega.",
+  "languageEnglish": "English",
+  "languageHindi": "हिन्दी",
+  "languageHinglish": "Hinglish",
+  "logoutButton": "Log out",
+  "loggingOut": "Log out ho raha hai…",
+  "profileNote": "Aapka target, study hours, subscription, data export aur account delete — yeh agle builds mein aayenge."
 }

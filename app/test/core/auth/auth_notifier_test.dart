@@ -63,6 +63,39 @@ void main() {
     expect(await store.read(), isNull);
   });
 
+  test('updateUser rewrites the stored user and keeps both tokens (D10 language switch)', () async {
+    final store = InMemoryTokenStore();
+    await store.write(session);
+    final container = containerOver(store);
+    await container.read(authStateProvider.future);
+    const hindi = UserSummary(
+      id: 'u-1',
+      email: 'a@b.in',
+      language: AppLanguage.hi,
+      role: 'student',
+    );
+
+    await container.read(authStateProvider.notifier).updateUser(hindi);
+
+    final state = container.read(authStateProvider).value;
+    expect((state! as SignedIn).user.language, AppLanguage.hi);
+    final stored = await store.read();
+    expect(stored?.user.language, AppLanguage.hi);
+    expect(stored?.accessToken, 'access-1');
+    expect(stored?.refreshToken, 'refresh-1');
+  });
+
+  test('updateUser while signed out changes nothing', () async {
+    final store = InMemoryTokenStore();
+    final container = containerOver(store);
+    await container.read(authStateProvider.future);
+
+    await container.read(authStateProvider.notifier).updateUser(user);
+
+    expect(container.read(authStateProvider).value, isA<SignedOut>());
+    expect(await store.read(), isNull);
+  });
+
   test('a corrupt blob on the device is signed out, not a crash', () async {
     final state = await containerOver(
       InMemoryTokenStore('{"access":1}'),

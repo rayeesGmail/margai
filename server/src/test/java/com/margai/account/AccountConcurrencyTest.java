@@ -6,6 +6,7 @@ import com.margai.TestcontainersConfiguration;
 import com.margai.account.api.Accounts;
 import com.margai.account.api.LoginIdentifier;
 import com.margai.account.api.SignIn;
+import com.margai.common.api.Language;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -61,6 +62,9 @@ class AccountConcurrencyTest {
                 assertThat(outcomes.stream().filter(SignIn::isNew)).as("exactly one login created the row").hasSize(1);
                 assertThat(jdbc.queryForObject("select count(*) from users where email = ?", Integer.class, email))
                         .isEqualTo(1);
+                assertThat(jdbc.queryForObject("select count(*) from student_profiles p join users u on u.id = p.user_id"
+                        + " where u.email = ?", Integer.class, email))
+                        .as("one profile row too (D10)").isEqualTo(1);
             }
         } finally {
             pool.shutdownNow();
@@ -70,7 +74,7 @@ class AccountConcurrencyTest {
     private Callable<SignIn> signInAtTheBarrier(String email, CyclicBarrier start) {
         return () -> {
             start.await();
-            return accounts.signIn(new LoginIdentifier.Email(email));
+            return accounts.signIn(new LoginIdentifier.Email(email), Language.en);
         };
     }
 }

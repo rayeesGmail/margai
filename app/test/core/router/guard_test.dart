@@ -35,4 +35,10 @@ void main() {
     expect(go(signedIn, LoginStep.code, AppRoutes.otp), AppRoutes.today);
     expect(go(signedIn, LoginStep.entry, AppRoutes.today), isNull);
   });
+
+  test('Profile (SPEC §8 screen 13) is a signed-in route (D10)', () {
+    expect(go(signedIn, LoginStep.entry, AppRoutes.profile), isNull);
+    expect(go(signedOut, LoginStep.entry, AppRoutes.profile), AppRoutes.login);
+    expect(go(loading, LoginStep.entry, AppRoutes.profile), AppRoutes.splash);
+  });
 }

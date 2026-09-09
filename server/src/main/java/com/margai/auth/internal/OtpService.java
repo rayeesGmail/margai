@@ -92,8 +92,12 @@ public class OtpService {
         return new OtpRequested(challengeId, policy.resendCooldown().toSeconds(), channel);
     }
 
+    /**
+     * {@code suggested} is the caller's {@code Accept-Language}: the language a brand-new account
+     * starts in (SPEC §5; DECISIONS D10). An existing account keeps its own.
+     */
     @Transactional(noRollbackFor = ApiException.class)
-    public OtpVerified verify(UUID challengeId, String code, String deviceLabel) {
+    public OtpVerified verify(UUID challengeId, String code, String deviceLabel, Language suggested) {
         Instant now = clock.now();
         // Row lock: parallel guesses at one challenge serialise, so attempts can never pass the cap.
         OtpChallenge challenge = challenges.lockById(challengeId).orElseThrow(OtpException::expired);
@@ -110,7 +114,7 @@ public class OtpService {
         challenge.markVerified(now);
         challenges.save(challenge);
 
-        SignIn signIn = accounts.signIn(Identifiers.of(challenge.getChannel(), challenge.getDestination()));
+        SignIn signIn = accounts.signIn(Identifiers.of(challenge.getChannel(), challenge.getDestination()), suggested);
         TokenPair pair = tokens.issue(signIn.user(), deviceLabel);
         meters.counter(VERIFIED_METRIC, "channel", challenge.getChannel().name()).increment();
         log.info("otp verified for {} (challenge {}, new user: {})",

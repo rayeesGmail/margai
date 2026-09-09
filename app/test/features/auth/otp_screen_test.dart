@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:margai/core/api/api_failure.dart';
 import 'package:margai/core/auth/auth_state.dart';
+import 'package:margai/features/auth/models.dart';
 import 'package:margai/features/auth/providers.dart';
 import 'package:margai/features/auth/screens/otp_screen.dart';
 
@@ -171,6 +172,33 @@ void main() {
     expect(tester.widget<TextField>(find.byType(TextField)).controller?.text, '12');
     expect(find.text(copyFor(allLocales.first).reasonCodeDigits), findsOneWidget);
     expect(repository.verified, isEmpty);
+  });
+
+  testWidgets('a new code empties the stale digits from the field', (tester) async {
+    final repository = FakeAuthRepository()
+      ..onRequest(
+        const OtpChallenge(
+          challengeId: 'c-2',
+          resendAfter: Duration(seconds: 30),
+          channel: 'email',
+        ),
+      );
+    await pumpScreen(
+      tester,
+      const OtpScreen(),
+      locale: allLocales.first,
+      repository: repository,
+      state: sent,
+      now: now.add(const Duration(seconds: 30)),
+    );
+    await tester.enterText(find.byType(TextField), '00000');
+    expect(tester.widget<TextField>(find.byType(TextField)).controller?.text, '00000');
+
+    await tester.tap(find.text(copyFor(allLocales.first).resendButton));
+    await tester.pumpAndSettle();
+
+    expect(repository.requestedEmails, ['founder@example.com']);
+    expect(tester.widget<TextField>(find.byType(TextField)).controller?.text, isEmpty);
   });
 
   testWidgets('Change email drops the challenge and keeps the email', (tester) async {

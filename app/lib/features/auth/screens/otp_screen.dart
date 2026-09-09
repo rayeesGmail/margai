@@ -37,6 +37,15 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final state = ref.watch(loginProvider);
     final notifier = ref.read(loginProvider.notifier);
     final now = ref.watch(tickerProvider).value ?? ref.read(clockProvider)();
+    // A new code makes the old digits stale: empty the field when the challenge changes.
+    ref.listen(loginProvider.select((s) => s.challenge?.challengeId), (
+      previous,
+      next,
+    ) {
+      if (previous != null && next != null && next != previous) {
+        _code.clear();
+      }
+    });
     final canResend = state.canResend(now) && !state.busy;
     final failure = state.failure;
     final codeReason = state.codeReason;

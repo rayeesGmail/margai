@@ -51,8 +51,10 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     state = AsyncData(SignedIn(user));
   }
 
-  /// Clears the device and moves to [SignedOut]. The Profile screen's logout calls the server
-  /// first (`POST /auth/logout`, D10); a dead family on refresh (`AUTH_INVALID`) calls this alone.
+  /// Clears the device and moves to [SignedOut]. Three callers (D10): the Profile screen's logout,
+  /// after `POST /auth/logout`; `SessionRefresher`, when the refresh itself answers `AUTH_INVALID`
+  /// (a dead family); and `ApiClient`, when a call retried with a freshly refreshed token is still
+  /// `AUTH_INVALID` (the account, not the token). The D8 guard and `LoginNotifier` do the rest.
   Future<void> signOut() async {
     await ref.read(tokenStoreProvider).clear();
     state = const AsyncData(SignedOut());

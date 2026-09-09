@@ -64,4 +64,34 @@ void main() {
       expect(find.text(l10n.appTitle), findsOneWidget);
     });
   }
+
+  testWidgets('a /me the server answered with an error shows the line without Retry (the D8 rule)', (
+    tester,
+  ) async {
+    final locale = allLocales.first;
+    final l10n = copyFor(locale);
+    final store = InMemoryTokenStore();
+    await store.write(FakeAuthRepository.signedIn.toSession());
+    final accounts = FakeAccountRepository()
+      ..onGetMe(
+        const ApiFailure(
+          code: 'INTERNAL',
+          status: 500,
+          details: {'request_id': 'req-7'},
+        ),
+      );
+
+    await pumpScreen(
+      tester,
+      const TodayPlaceholderScreen(),
+      locale: locale,
+      store: store,
+      accounts: accounts,
+    );
+
+    expect(find.text(l10n.errorInternal), findsOneWidget);
+    expect(find.text(l10n.failureRequestId('req-7')), findsOneWidget);
+    expect(find.text(l10n.retryButton), findsNothing);
+    expect(accounts.gets, 1);
+  });
 }

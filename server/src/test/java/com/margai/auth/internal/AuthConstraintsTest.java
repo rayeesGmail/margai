@@ -156,6 +156,25 @@ class AuthConstraintsTest {
         assertThat(tokens.revokeFamily(phoneFamily, Instant.now())).as("revoking again is a no-op").isZero();
     }
 
+    @Test
+    void retiringLiveChallengesExpiresOnlyPendingOnes() {
+        Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+        OtpChallenge pending = challenges.saveAndFlush(challenge("pending@example.com", HASH_A, now));
+        OtpChallenge verified = challenge("verified@example.com", HASH_B, now);
+        verified.markVerified(now);
+        challenges.saveAndFlush(verified);
+        OtpChallenge alreadyDead = challenges.saveAndFlush(new OtpChallenge(UUID.randomUUID(), OtpChannel.email,
+                "dead@example.com", OtpPurpose.login, "c".repeat(64), now.minusSeconds(1), null));
+
+        int retired = challenges.retireLive(now);
+
+        // Module-flow tests commit challenges into the same database, so the count is a floor.
+        assertThat(retired).isGreaterThanOrEqualTo(1);
+        assertThat(challenges.findById(pending.getId()).orElseThrow().isExpired(now)).isTrue();
+        assertThat(challenges.findById(verified.getId()).orElseThrow().getExpiresAt()).isEqualTo(now.plusSeconds(300));
+        assertThat(challenges.findById(alreadyDead.getId()).orElseThrow().getExpiresAt()).isEqualTo(now.minusSeconds(1));
+    }
+
     private static OtpChallenge challenge(String destination, String hash, Instant now) {
         return new OtpChallenge(UUID.randomUUID(), OtpChannel.email, destination, OtpPurpose.login, hash,
                 now.plusSeconds(300), null);

@@ -49,6 +49,24 @@ Android Keystore and survives a kill and reopen; an expired access token is refr
 call (D10). Log out from Profile (the person icon on Today) to sign the device out;
 `adb shell pm clear com.margai.app` wipes it for a fresh-install test.
 
+### Device proofs
+
+`scripts/ui.sh` drives the app through the accessibility tree instead of by pixel, so a PLAN ✅
+that says "on device" and the login-failure runbook (`docs/runbooks/login-failure-checklist.md`)
+can be re-run the same way every time: `tree` lists every labelled node with its bounds, `tap
+<label>` taps the node whose semantics label or text contains it, `field` focuses a text field,
+`type` types into it, `shot <name>` screenshots to `$UI_SHOTS` (default `$TMPDIR/margai-ui`, never
+the tree — the commit gate scans untracked files), and `launch` / `kill` / `clear`
+start, force-stop or wipe the app. `scripts/ui.sh help` prints the details. It needs `adb` (on
+PATH, or `ADB=…`) and `python3`.
+
+```bash
+scripts/ui.sh clear && scripts/ui.sh launch
+scripts/ui.sh field && scripts/ui.sh type you@example.com && scripts/ui.sh tap 'Send code'
+scripts/ui.sh tree                        # the code screen's nodes; dump twice right after launch
+UI_SHOTS=/tmp/shots scripts/ui.sh shot 01-code-screen
+```
+
 ## Lint and test
 
 `cd app && flutter analyze && flutter test` — required before every commit (enforced by

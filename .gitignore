@@ -40,3 +40,8 @@ pipeline/.venv/
 pipeline/__pycache__/
 pipeline/**/__pycache__/
 pipeline/data/
+
+# Founder-placed content inputs (NCERT 2022-ed books, PYQ papers): the manifests beside them are
+# tracked, the PDFs stay local until the pipeline's S3 content/ home (TECH_PLAN §6.2, D13 decides)
+ncert/**/*.pdf
+pyq/**/*.pdf

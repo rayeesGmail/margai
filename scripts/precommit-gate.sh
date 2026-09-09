@@ -6,8 +6,12 @@
 # Checks, in order (docs/DEV_SPEC.md §13.3, CLAUDE.md hard rules):
 #   1. no credential-like content in the change set   (scripts/detect-secrets.sh)
 #   2. no todo-style markers in added code lines       (CLAUDE.md: raise them in session)
-#   3. AI-touching paths (prompts/, routing, retrieval, eval fixtures) require
-#      eval/run.sh to have PASSED on exactly this content (eval/.last-pass stamp)
+#   3. AI-touching paths (server prompts/ and ai/, any path segment naming a router, routing
+#      or retrieval under server/ or eval/ in either case — DifficultyRouter,
+#      ParagraphRetrievalRepository — and eval fixtures) require eval/run.sh to have PASSED on
+#      exactly this content (eval/.last-pass stamp). The app's go_router lives in
+#      app/lib/core/router/ and is not the AI difficulty router, so app/ is outside the router
+#      alternative (D12).
 #   4. server: ./mvnw verify        — SKIPPED with a loud warning while server/mvnw is absent
 #   5. app:    flutter analyze      — SKIPPED with a loud warning while app/pubspec.yaml is absent
 #
@@ -20,7 +24,7 @@ trap 'echo "precommit-gate: internal error at line $LINENO — failing closed" >
 ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 cd "$ROOT"
 
-AI_PATHS='^server/src/main/resources/prompts/|^server/.*/ai/|(^|/)[^/]*(router|routing|retriev)[^/]*(/|$)|^eval/fixtures/.+\.(json|jsonl|ya?ml|csv)$'
+AI_PATHS='^server/src/main/resources/prompts/|^server/.*/ai/|^(server|eval)/([^/]*/)*[^/]*([Rr]outer|[Rr]outing|[Rr]etriev)[^/]*(/|$)|^eval/fixtures/.+\.(json|jsonl|ya?ml|csv)$'
 CODE_EXT='\.(java|kt|kts|dart|py|sh|sql|ya?ml|json|xml|properties|gradle|st|stg|toml|arb|ts|js)$'
 
 sha256() { if command -v sha256sum >/dev/null 2>&1; then sha256sum; else shasum -a 256; fi; }

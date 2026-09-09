@@ -33,8 +33,26 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     state = AsyncData(SignedIn(session.user));
   }
 
-  /// Clears the device and moves to [SignedOut]. `POST /auth/logout` (D10) calls the server first;
-  /// `AUTH_INVALID` on refresh (family revoked) calls this alone.
+  /// Rewrites the stored user beside the tokens as they are (a language switch through
+  /// `PATCH /me`, D10) and republishes [SignedIn]. A no-op while signed out.
+  Future<void> updateUser(UserSummary user) async {
+    final store = ref.read(tokenStoreProvider);
+    final session = await store.read();
+    if (session == null || state.value is! SignedIn) {
+      return;
+    }
+    await store.write(
+      StoredSession(
+        accessToken: session.accessToken,
+        refreshToken: session.refreshToken,
+        user: user,
+      ),
+    );
+    state = AsyncData(SignedIn(user));
+  }
+
+  /// Clears the device and moves to [SignedOut]. The Profile screen's logout calls the server
+  /// first (`POST /auth/logout`, D10); a dead family on refresh (`AUTH_INVALID`) calls this alone.
   Future<void> signOut() async {
     await ref.read(tokenStoreProvider).clear();
     state = const AsyncData(SignedOut());

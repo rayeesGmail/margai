@@ -24,6 +24,26 @@ class OtpChallenge {
   final String channel;
 }
 
+/// `POST /auth/refresh` → `{access_token, refresh_token, expires_in}` (TECH_PLAN §3.7): the
+/// rotated pair of the same family; the user is unchanged and stays as stored.
+class TokensResult {
+  const TokensResult({
+    required this.accessToken,
+    required this.refreshToken,
+    required this.expiresIn,
+  });
+
+  factory TokensResult.fromJson(Map<String, Object?> json) => TokensResult(
+    accessToken: json['access_token'] as String,
+    refreshToken: json['refresh_token'] as String,
+    expiresIn: Duration(seconds: (json['expires_in'] as num).toInt()),
+  );
+
+  final String accessToken;
+  final String refreshToken;
+  final Duration expiresIn;
+}
+
 /// `POST /auth/otp/verify` → `{access_token, refresh_token, expires_in, is_new_user, user}`.
 class SignedInResult {
   const SignedInResult({

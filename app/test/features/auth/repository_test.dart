@@ -135,4 +135,42 @@ void main() {
       );
     });
   });
+
+  group('refresh and logout (TECH_PLAN §3.2, §3.7; D10)', () {
+    test('refresh posts {refresh_token} and parses the rotated pair', () async {
+      adapter.reply(
+        FakeReply.json(200, {
+          'access_token': 'access-2',
+          'refresh_token': 'refresh-2',
+          'expires_in': 900,
+        }),
+      );
+
+      final tokens = await repository.refresh('refresh-1');
+
+      expect(adapter.last.options.uri.path, '/api/v1/auth/refresh');
+      expect(adapter.last.json, {'refresh_token': 'refresh-1'});
+      expect(tokens.accessToken, 'access-2');
+      expect(tokens.refreshToken, 'refresh-2');
+      expect(tokens.expiresIn, const Duration(minutes: 15));
+    });
+
+    test('a spent refresh token is AUTH_INVALID', () async {
+      adapter.reply(FakeReply.envelope(401, 'AUTH_INVALID'));
+
+      await expectLater(
+        repository.refresh('refresh-1'),
+        throwsA(isA<ApiFailure>().having((f) => f.code, 'code', 'AUTH_INVALID')),
+      );
+    });
+
+    test('logout posts {refresh_token} and completes on the empty 204', () async {
+      adapter.reply(const FakeReply(204, '', contentType: 'text/plain'));
+
+      await repository.logout('refresh-1');
+
+      expect(adapter.last.options.uri.path, '/api/v1/auth/logout');
+      expect(adapter.last.json, {'refresh_token': 'refresh-1'});
+    });
+  });
 }

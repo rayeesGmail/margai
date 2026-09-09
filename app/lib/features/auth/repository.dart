@@ -5,9 +5,10 @@ import '../../core/api/api_failure.dart';
 import '../../core/api/api_providers.dart';
 import 'models.dart';
 
-/// The two public auth calls of TECH_PLAN §3.7 as the login flow needs them. Every failure
-/// reaches the caller as an [ApiFailure]; a 200 that is not the documented shape is
-/// [ApiFailure.malformed], never a crash.
+/// The auth calls of TECH_PLAN §3.7 as the login flow and the session need them: the two public
+/// OTP calls, the public refresh, and the authenticated logout (D10). Every failure reaches the
+/// caller as an [ApiFailure]; a 200 that is not the documented shape is [ApiFailure.malformed],
+/// never a crash.
 class AuthRepository {
   const AuthRepository(this._api);
 
@@ -32,6 +33,17 @@ class AuthRepository {
     return _parse(body, SignedInResult.fromJson);
   }
 
+  /// `{refresh_token}` → the rotated pair (§3.2). A spent or revoked token is `AUTH_INVALID`.
+  Future<TokensResult> refresh(String refreshToken) async {
+    final body = await _api.post('/auth/refresh', {'refresh_token': refreshToken});
+    return _parse(body, TokensResult.fromJson);
+  }
+
+  /// `{refresh_token}` → 204: this device's family is revoked (§3.7). Authenticated.
+  Future<void> logout(String refreshToken) async {
+    await _api.post('/auth/logout', {'refresh_token': refreshToken});
+  }
+
   static T _parse<T>(
     Map<String, Object?> body,
     T Function(Map<String, Object?>) fromJson,
@@ -44,6 +56,6 @@ class AuthRepository {
   }
 }
 
-final authRepositoryProvider = Provider<AuthRepository>(
+final Provider<AuthRepository> authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepository(ref.watch(apiClientProvider)),
 );

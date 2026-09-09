@@ -1862,7 +1862,9 @@ PostHog distinct id is the user id (UUID), and account deletion calls PostHog's 
 ### 11.1 Time
 
 One `IstClock` bean (`ZoneId.of("Asia/Kolkata")`) is the only way code learns "today"; tests inject
-a `MutableClock`. Storage is `TIMESTAMPTZ` (UTC); IST calendar dates are `DATE` columns named
+a `MutableClock`. *Its instants are truncated to microseconds — `TIMESTAMPTZ` precision — so a
+stored instant reads back equal to the clock that wrote it; Linux JDKs give nanoseconds and
+Postgres rounds them up (D9 CI finding, 2026-09-09, DECISIONS).* Storage is `TIMESTAMPTZ` (UTC); IST calendar dates are `DATE` columns named
 `*_ist_date`, `plan_date`, `week_start` (Monday). Wire format: instants ISO-8601 `Z`, dates
 `YYYY-MM-DD`. The study day, streaks, limits, notification caps and the nightly run all key on the
 IST date.

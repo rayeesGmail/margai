@@ -110,6 +110,32 @@ class SecurityChainTest {
     }
 
     @Test
+    void logoutIsNotAPublicRoute() {
+        MvcTestResult result = mvc.post().uri("/api/v1/auth/logout").contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .content("{\"refresh_token\":\"whatever\"}").exchange();
+
+        assertThat(result).hasStatus(401);
+        assertThat(result).bodyJson().extractingPath("$.error.code").isEqualTo("AUTH_REQUIRED");
+    }
+
+    @Test
+    void aStaleBearerOnAPublicRouteIsIgnored() {
+        // An expired access token still in a client's store must not 401 the refresh meant to replace it (D10).
+        String stale = jwts.issue(STUDENT, Instant.now().minus(Duration.ofMinutes(20)));
+
+        MvcTestResult refresh = mvc.post().uri("/api/v1/auth/refresh").contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + stale).header("X-Forwarded-For", "203.0.113.70")
+                .content("{\"refresh_token\":\"never-issued\"}").exchange();
+        MvcTestResult request = mvc.post().uri("/api/v1/auth/otp/request")
+                .header("Authorization", "Bearer " + stale).header("X-Forwarded-For", "203.0.113.70").exchange();
+
+        assertThat(refresh).hasStatus(401);
+        assertThat(refresh).bodyJson().extractingPath("$.error.code").as("the body decided, not the bearer").isEqualTo("AUTH_INVALID");
+        assertThat(request).hasStatus(400);
+        assertThat(request).bodyJson().extractingPath("$.error.code").isEqualTo("VALIDATION_FAILED");
+    }
+
+    @Test
     void otpRequestsAreLimitedPerClientAddressBeforeAnyController() {
         for (int i = 0; i < 10; i++) {
             assertThat(mvc.post().uri("/api/v1/auth/otp/request").header("X-Forwarded-For", "203.0.113.60").exchange())

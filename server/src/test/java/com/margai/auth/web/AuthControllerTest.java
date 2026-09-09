@@ -3,6 +3,7 @@ package com.margai.auth.web;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -17,6 +18,7 @@ import com.margai.auth.internal.TokenService;
 import com.margai.common.api.AuthException;
 import com.margai.common.api.Language;
 import com.margai.common.api.OtpException;
+import com.margai.common.api.Principal;
 import com.margai.common.api.RateLimitedException;
 import com.margai.common.api.UserRole;
 import java.net.InetAddress;
@@ -223,6 +225,44 @@ class AuthControllerTest {
         assertThat(reused).bodyJson().extractingPath("$.error.code").isEqualTo("AUTH_INVALID");
         assertThat(empty).hasStatus(400);
         assertThat(empty).bodyJson().extractingPath("$.error.details.refresh_token").isEqualTo("not_blank");
+    }
+
+    @Test
+    void logoutAnswers204AndHandsTheCallersIdToTheService() throws Exception {
+        Principal caller = new Principal(USER.id(), UserRole.student, Language.en);
+
+        MvcTestResult result = mvc.post().uri("/api/v1/auth/logout").contentType(MediaType.APPLICATION_JSON)
+                .requestAttr(Principal.REQUEST_ATTRIBUTE, caller)
+                .content("{\"refresh_token\":\"refresh-1\"}").exchange();
+
+        assertThat(result).hasStatus(204);
+        assertThat(result.getResponse().getContentAsString()).isEmpty();
+        verify(tokens).logout(USER.id(), "refresh-1");
+    }
+
+    @Test
+    void logoutValidatesItsBody() {
+        Principal caller = new Principal(USER.id(), UserRole.student, Language.en);
+
+        MvcTestResult blank = mvc.post().uri("/api/v1/auth/logout").contentType(MediaType.APPLICATION_JSON)
+                .requestAttr(Principal.REQUEST_ATTRIBUTE, caller).content("{\"refresh_token\":\" \"}").exchange();
+
+        assertThat(blank).hasStatus(400);
+        assertThat(blank).bodyJson().extractingPath("$.error.code").isEqualTo("VALIDATION_FAILED");
+        assertThat(blank).bodyJson().extractingPath("$.error.details.refresh_token").isEqualTo("not_blank");
+        verify(tokens, never()).logout(any(), any());
+    }
+
+    @Test
+    void logoutWithoutAPublishedPrincipalIsAuthRequired() {
+        // The chain never lets this happen; the resolver's own answer is the envelope, not a 500.
+        MvcTestResult result = mvc.post().uri("/api/v1/auth/logout").contentType(MediaType.APPLICATION_JSON)
+                .header("Accept-Language", "hi").content("{\"refresh_token\":\"refresh-1\"}").exchange();
+
+        assertThat(result).hasStatus(401);
+        assertThat(result).bodyJson().extractingPath("$.error.code").isEqualTo("AUTH_REQUIRED");
+        assertThat(result).bodyJson().extractingPath("$.error.message_user_lang").isEqualTo("जारी रखने के लिए साइन इन करें।");
+        verify(tokens, never()).logout(any(), any());
     }
 
     @Test

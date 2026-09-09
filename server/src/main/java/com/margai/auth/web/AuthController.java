@@ -8,20 +8,24 @@ import com.margai.auth.internal.OtpService;
 import com.margai.auth.internal.OtpVerified;
 import com.margai.auth.internal.TokenPair;
 import com.margai.auth.internal.TokenService;
+import com.margai.auth.web.AuthPayloads.LogoutBody;
 import com.margai.auth.web.AuthPayloads.OtpRequestBody;
 import com.margai.auth.web.AuthPayloads.OtpRequestedResponse;
 import com.margai.auth.web.AuthPayloads.OtpVerifyBody;
 import com.margai.auth.web.AuthPayloads.RefreshBody;
 import com.margai.auth.web.AuthPayloads.SignedInResponse;
 import com.margai.auth.web.AuthPayloads.TokensResponse;
+import com.margai.common.api.Principal;
 import com.margai.common.api.RequestLanguage;
 import com.margai.common.api.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -64,6 +68,13 @@ class AuthController {
     TokensResponse refresh(@Valid @RequestBody RefreshBody body) {
         TokenPair pair = tokens.refresh(body.refreshToken());
         return new TokensResponse(pair.accessToken(), pair.refreshToken(), pair.expiresIn());
+    }
+
+    /** Authenticated (§1.5 step 3 lists the public routes; this is not one): revokes the caller's family (§3.2, D10). */
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void logout(@Valid @RequestBody LogoutBody body, Principal caller) {
+        tokens.logout(caller.userId(), body.refreshToken());
     }
 
     /** Reason codes for the app's ARB copy (TECH_PLAN §3.3): exactly one identifier per request. */

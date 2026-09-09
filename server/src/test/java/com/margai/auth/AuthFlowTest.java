@@ -168,6 +168,36 @@ class AuthFlowTest {
     }
 
     @Test
+    void logoutRevokesTheFamilyButNotTheAccessTokenAlreadyIssued() throws Exception {
+        String email = "logout-" + UUID.randomUUID() + "@example.com";
+        MvcTestResult requested = post("/api/v1/auth/otp/request", "{\"email\":\"" + email + "\"}");
+        String challengeId = requested.getResponse().getContentAsString().replaceAll(".*\"challenge_id\":\"([^\"]+)\".*", "$1");
+        String code = Inbox.DELIVERIES.stream().filter(d -> d.destination().equals(email)).reduce((a, b) -> b).orElseThrow().code();
+        String body = post("/api/v1/auth/otp/verify", "{\"challenge_id\":\"" + challengeId + "\",\"code\":\"" + code + "\"}")
+                .getResponse().getContentAsString();
+        String access = field(body, "access_token");
+        String refresh = field(body, "refresh_token");
+        String userId = body.replaceAll(".*\"user\":\\{\"id\":\"([^\"]+)\".*", "$1");
+
+        MvcTestResult loggedOut = mvc.post().uri("/api/v1/auth/logout").contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + access).header("X-Forwarded-For", FROM)
+                .content("{\"refresh_token\":\"" + refresh + "\"}").exchange();
+        assertThat(loggedOut).hasStatus(204);
+        MvcTestResult again = mvc.post().uri("/api/v1/auth/logout").contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + access).header("X-Forwarded-For", FROM)
+                .content("{\"refresh_token\":\"" + refresh + "\"}").exchange();
+        assertThat(again).as("naturally idempotent (TECH_PLAN §3.7)").hasStatus(204);
+
+        MvcTestResult dead = post("/api/v1/auth/refresh", "{\"refresh_token\":\"" + refresh + "\"}");
+        assertThat(dead).hasStatus(401);
+        assertThat(dead).bodyJson().extractingPath("$.error.code").isEqualTo("AUTH_INVALID");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM refresh_tokens WHERE user_id = ?::uuid AND revoked_at IS NULL",
+                Integer.class, userId)).isZero();
+        // The D7 known edge, kept as documented behaviour: an access token lives out its 15 minutes (D64 decides).
+        assertThat(mvc.get().uri("/api/v1/probe/whoami").header("Authorization", "Bearer " + access).exchange()).hasStatusOk();
+    }
+
+    @Test
     void wrongCodesCountDownThenTheChallengeDies() throws Exception {
         String email = "attempts-" + UUID.randomUUID() + "@example.com";
         MvcTestResult requested = post("/api/v1/auth/otp/request", "{\"email\":\"" + email + "\"}");

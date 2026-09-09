@@ -75,6 +75,17 @@ The server's `X-Forwarded-For` last hop is the address every per-address limit k
   is configured, so codes are left alone) but the old codes can no longer match — a rotation is a
   ≤ 5-minute window of "didn't match"; the F8 runbook notes it.
 
+## Runs after D9
+
+- **D10 (2026-09-09)** — `auth`, `account` and the app's `core/api` all changed (logout, `/me`,
+  the single-flight refresh, no bearer on the public routes). Every row's pinning tests ran green
+  inside the gate on each of the nine commits (server 306 tests, app 242); the ten-row device
+  re-run is the Week-2 gate's (D12), three days on, per the D10 plan's closing question 4. Two
+  rows gained pins in passing: row 9's offline handling now also covers a refresh that goes
+  offline (the session stays, `session_refresher_test`), and row 10's per-process secrets now
+  end a signed-in session gracefully — the dead family answers `AUTH_INVALID` and the app returns
+  to login (`api_wiring_test`).
+
 ## D9 run — 2026-09-09 · PASS
 
 AVD `margai_android36` (Android 16, 1080×2400) driven through the accessibility tree

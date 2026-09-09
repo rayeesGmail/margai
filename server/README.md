@@ -126,7 +126,20 @@ curl -s -X POST localhost:8081/api/v1/auth/otp/verify -H 'Content-Type: applicat
      -d '{"challenge_id":"…","code":"123456"}'
 curl -s -X POST localhost:8081/api/v1/auth/refresh -H 'Content-Type: application/json' \
      -d '{"refresh_token":"…"}'
+# D10: the account behind the token, and the language switch; logout revokes this device's family
+curl -s localhost:8081/api/v1/me -H 'Authorization: Bearer <access_token>'
+curl -s -X PATCH localhost:8081/api/v1/me -H 'Content-Type: application/json' \
+     -H 'Authorization: Bearer <access_token>' -d '{"language":"hi"}'
+curl -s -i -X POST localhost:8081/api/v1/auth/logout -H 'Content-Type: application/json' \
+     -H 'Authorization: Bearer <access_token>' -d '{"refresh_token":"…"}'     # → 204
 ```
+
+Since D10 a first login also creates the empty `student_profiles` row, and a brand-new account
+starts in the `Accept-Language` of the verify call (`hi`, `hi-Latn`, else English); `GET /me`
+answers `{user, profile}`, `PATCH /me` takes any of the TECH_PLAN §3.7 fields (absent = unchanged)
+and names every bad one with a reason code, and `POST /auth/logout` needs a bearer and answers 204
+whatever the token's state. For a short access-token life in a demo, `MARGAI_AUTH_JWT_ACCESS_TTL=30s`
+(the JWT validator allows a further 60 s of clock skew).
 
 Secrets: `MARGAI_AUTH_JWT_SECRET` and `MARGAI_AUTH_OTP_PEPPER` (base64, 256-bit; from SSM in AWS,
 TECH_PLAN §7.3). When unset the server makes a random value per boot and says so with a WARN, so

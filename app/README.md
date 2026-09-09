@@ -45,7 +45,9 @@ flutter run -d <phone-id> --dart-define=API_BASE_URL=http://127.0.0.1:8081
 ```
 
 Mobile data needs a public endpoint (the beta stack, TRACKER F8). The stored session lives in the
-Android Keystore; `adb shell pm clear com.margai.app` signs the device out until D10 ships logout.
+Android Keystore and survives a kill and reopen; an expired access token is refreshed on the first
+call (D10). Log out from Profile (the person icon on Today) to sign the device out;
+`adb shell pm clear com.margai.app` wipes it for a fresh-install test.
 
 ## Lint and test
 

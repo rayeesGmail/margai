@@ -289,13 +289,20 @@ Rules, enforced by the Modulith test from D4:
    `client_skew_s` from `X-Client-Time` (§3.1; D9, 2026-09-09).*
 3. Spring Security (stateless): bearer JWT → principal `{user_id, role, language}`; unauthenticated
    routes are `/auth/otp/*`, `/auth/refresh`, `/billing/webhook`, `/actuator/health` — and Boot's
-   `/error` dispatch, so a failure inside a filter still renders the envelope (D7).
+   `/error` dispatch, so a failure inside a filter still renders the envelope (D7). *On those
+   routes no bearer is read at all, so a stale token in a client's store cannot 401 the refresh
+   meant to replace it; `/auth/logout` is not among them and needs a bearer (D10, 2026-09-09).*
 4. `RateLimitFilter`: in-process token buckets keyed by user id, or by client address for the public
    `/auth/*` routes (D7: 10/hour on `otp/request`, 60/min on `otp/verify` and `refresh`; the
    per-destination cap is a durable check in the service), limits from config (§3.4).
 5. `IdempotencyFilter` on routes marked idempotent: replays a stored response for a seen
    `Idempotency-Key` (§3.5).
-6. Controller validates the DTO (Bean Validation) and calls one service method.
+6. Controller validates the DTO (Bean Validation) and calls one service method. *A `Principal`
+   parameter on a controller is the caller published in step 3 (`common.internal
+   .PrincipalArgumentResolver`; absent → `AUTH_REQUIRED`), so no module depends on Spring
+   Security for it (D10, 2026-09-09). A body whose vocabulary is an enum — `PATCH /me` — is
+   checked in one pass by its payload record instead of annotations, so every bad field is
+   named at once and the enum stays the single source of the vocabulary (D10, DECISIONS).*
 7. Service runs in one transaction; AI calls happen outside the transaction (§4.8) with their own
    ledger rows.
 8. `ApiExceptionHandler` maps any exception to the envelope `{error:{code, message_en,
@@ -761,8 +768,15 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
   token: opaque 256-bit random, 30 days, stored as SHA-256 in `refresh_tokens`, one family per
   device; each refresh rotates the token and links `replaced_by_id`.
 - Reuse of a rotated refresh token revokes the whole family and returns `AUTH_INVALID`; the app
-  returns to login (DEV_SPEC §5, PLAN D10 "token rotation").
-- `POST /auth/logout` revokes the family. Account deletion revokes every family.
+  returns to login (DEV_SPEC §5, PLAN D10 "token rotation"). *Since D10 (2026-09-09) the reuse
+  alarm is exactly that — a rotated-out token; a token revoked without a successor (logout) is a
+  stale session and answers `AUTH_INVALID` without `auth.refresh.reuse`.*
+- `POST /auth/logout` revokes the family. Account deletion revokes every family. *Implemented
+  2026-09-09 (D10): authenticated (§1.5 step 3); the family of the presented token when it is the
+  caller's, a no-op otherwise, 204 either way. On the device, an `AUTH_INVALID` on an
+  authenticated call is first met with one refresh — the access token may simply predate the
+  server's current signing key while the refresh token is still good — and the session ends only
+  when the refresh itself, or the retried call, is still refused (§5.4).*
 - Admin endpoints (§3.7 ops) require `role = admin`; the founder's user row is flagged by hand.
 
 ### 3.3 Error envelope and codes
@@ -829,7 +843,7 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 | Method, path | Day | Request → response | Notes |
 |---|---|---|---|
 | `POST /auth/otp/request` | D7 | `{phone}` or `{email}` (exactly one) → `{challenge_id, resend_after_s, channel}` | public; email via SES while F1 (DLT) is blocked, `sms` behind `margai.auth.otp.channels` (D7 ruling, 2026-09-08); the `log` sender is the sandbox |
-| `POST /auth/otp/verify` | D7 | `{challenge_id, code, invite_code?}` → tokens + `user` + `is_new_user` | public; creates the `users` row on first login at D7 (the JWT `sub` needs it) and the empty `student_profiles` row at D10; `invite_code` accepted from D7, required for new users while `margai.flags.invite_only` is on (D75) |
+| `POST /auth/otp/verify` | D7 | `{challenge_id, code, invite_code?}` → tokens + `user` + `is_new_user` | public; creates the `users` row on first login at D7 (the JWT `sub` needs it) and the empty `student_profiles` row at D10 *(done 2026-09-09: find-or-create on every login; a new account's language is the call's `Accept-Language`, SPEC §5 "auto-suggested")*; `invite_code` accepted from D7, required for new users while `margai.flags.invite_only` is on (D75) |
 | `POST /auth/refresh` | D7 | `{refresh_token}` → tokens | public; rotation + reuse detection |
 | `POST /auth/logout` | D10 | `{refresh_token}` → 204 | naturally idempotent: revoking a revoked family is a no-op |
 
@@ -837,8 +851,8 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 
 | Method, path | Day | Request → response | Notes |
 |---|---|---|---|
-| `GET /me` | D10 | → `{user, profile, subscription, limits, consent_state}` | one call on app start |
-| `PATCH /me` | D10 | `{language?, display_name?, morning_notification_time?, hours_weekday?, hours_weekend?, goal?, state_code?, category?}` → `me` | language switch regenerates future content only (DEV_SPEC §8.3) |
+| `GET /me` | D10 | → `{user, profile, subscription, limits, consent_state}` | one call on app start. *D10 (2026-09-09) ships `{user, profile}` — `profile` is the scalar columns of §2.2; `subscription` (D61), `limits` (D37) and `consent_state` (D27) join as optional fields (§3.1). An account that cannot be served (deleted, or without its profile row) is `AUTH_INVALID`* |
+| `PATCH /me` | D10 | `{language?, display_name?, morning_notification_time?, hours_weekday?, hours_weekend?, goal?, state_code?, category?}` → `me` | language switch regenerates future content only (DEV_SPEC §8.3). *D10: absent = unchanged, nothing can be cleared yet; every bad field is named at once with a reason code (`<field>.invalid`, `time.invalid`, `not_blank`, `size`, `decimal_min`, `decimal_max`); the app sends `language` today, the other fields are D25/D64's* |
 | `POST /me/devices` | D30 | `{fcm_token, platform, app_version}` → 204 | upsert |
 | `DELETE /me/devices/{token}` | D30 | → 204 | on logout |
 | `POST /me/consent/request` | D27 | `{parent_phone}` → `{challenge_id, resend_after_s}` | minors only; called from the DOB step of onboarding and again from Profile's "consent pending" state or a gated re-prompt (§0.5 item 8); served by `auth.web` (§1.3) |
@@ -950,7 +964,9 @@ The principal's `lang` claim decides `message_user_lang` and the language of gen
 `Accept-Language` is honoured only on the public auth routes. Changing `language` via `PATCH /me`
 re-issues the access token on next refresh and affects new content only (DEV_SPEC §8.3). The three
 values `en | hi | hinglish` are the same strings on the server, in the JWT and in the app's locale
-mapping (§5.5).
+mapping (§5.5). *D10 (2026-09-09): the `Accept-Language` of the verify call is also the language a
+brand-new account starts in (SPEC §5 "auto-suggested"); and the app refreshes its tokens right
+after a `PATCH /me {language}`, so the claim and the UI agree from the next call on.*
 
 ### 3.9 Pagination
 
@@ -1334,7 +1350,9 @@ computing is a smell the reviewer rejects.
   the decision is revisited then in DECISIONS.md, not before.
 - Global providers: `authStateProvider`, `meProvider` (the `/me` payload), `localeProvider`,
   `connectivityProvider`, `outboxProvider`. Feature providers depend on those, never on each other's
-  internals.
+  internals. *D10 (2026-09-09): `meProvider` is fetched once per sign-in by the landing screen and
+  never retries on its own (Riverpod 3's automatic retry is off for it — one honest Retry instead);
+  `localeProvider` follows the signed-in account and falls back to the device locale.*
 - Tests inject fake repositories through `ProviderScope(overrides: …)` (§8.4).
 
 ### 5.3 Navigation and deep links
@@ -1356,7 +1374,13 @@ three client-only codes — `OFFLINE`, `MALFORMED` for a non-envelope answer suc
 portal's page, and `CERTIFICATE` for a failed TLS handshake, whose copy names the phone's date and
 time — and Retry is offered after any of them, 2026-09-09*). Timeouts: 10 s connect,
 30 s receive (doubt polling uses its own schedule). Base URL from `--dart-define=API_BASE_URL`
-(local emulator: `http://10.0.2.2:8081`).
+(local emulator: `http://10.0.2.2:8081`). *The refresh landed 2026-09-09 (D10): the client asks a
+handler for a new access token on 401 `AUTH_EXPIRED` — and on `AUTH_INVALID`, since a token
+signed by a previous server key looks the same while the refresh token is still good — and retries
+the call once with it; `core/auth/SessionRefresher` keeps one refresh in flight for every caller
+and stores the rotated pair beside the unchanged user; the session ends (device cleared, sign-out)
+when the refresh answers `AUTH_INVALID` or the retried call is still refused with it; no bearer
+is sent on `/auth/otp/*` or `/auth/refresh` (the server reads none there, §1.5).*
 
 ### 5.5 Localisation and the Hinglish decision
 
@@ -1370,6 +1394,9 @@ time — and Retry is offered after any of them, 2026-09-09*). Timeouts: 10 s co
   and back. The value travels in `/me`, in the JWT `lang` claim and in generated content.
 - Device locale is only a suggestion for the mentor intro ("language auto-suggested, changeable",
   SPEC §5); the chosen value is saved with `PATCH /me` and locally, and wins on every later start.
+  *Implemented 2026-09-09 (D10): the login flow sends the suggestion as `Accept-Language`, which
+  seeds a new account's language (§3.8); signed in, `localeProvider` is the stored user's language;
+  the Profile switch saves on the server, then locally, and the locale follows.*
 - Hinglish copy is authored, not transliterated; the D67 mentor-voice pass reviews all three files.
   Server-side copy (`messages_hinglish.properties`) follows the same authored approach.
 
@@ -1438,7 +1465,7 @@ amends the rule (§13.4).
 | 10 Notebook views | `/notebook`, `/notebook/entries`, `/notebook/healed`, `/notebook/danger` | `notebook` · `NotebookNotifier` | D50, D52 |
 | 11 Weekly report | `/report/weekly` | `trajectory` · `WeeklyReportNotifier` | D58 |
 | 12 Paywall · subscription | `/paywall?trigger=`, `/profile/subscription` | `billing` · `PaywallNotifier`, `SubscriptionNotifier` | D61–D63 |
-| 13 Profile & settings | `/profile`, `/profile/*` | `account` · `SettingsNotifier` | D10, D64 |
+| 13 Profile & settings | `/profile`, `/profile/*` | `account` · `SettingsNotifier` | D10, D64 — *D10 (2026-09-09): the language switch and logout at `/profile`, a full-screen route reached from Today's bar until the D29 shell; the rest of §6.11 with D61–D64* |
 | 14 Exam-mode Today | `/today` (variant by `mode`) | `planner` | with D55–D59, D68 |
 | 15 Result flows | `/onboarding/*` reused for continuity | graduation package Phase 2; continuity re-onboarding unscheduled (§12.2) | — |
 

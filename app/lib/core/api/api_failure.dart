@@ -30,7 +30,7 @@ class ApiFailure implements Exception {
   static const String malformedCode = 'MALFORMED';
   static const String certificateCode = 'CERTIFICATE';
 
-  /// An `ErrorCode` name from TECH_PLAN §3.3, or one of the two client-only codes above.
+  /// An `ErrorCode` name from TECH_PLAN §3.3, or one of the three client-only codes above.
   final String code;
 
   /// HTTP status when there was a response.

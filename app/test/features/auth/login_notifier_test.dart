@@ -403,7 +403,7 @@ void main() {
       expect(state().signedIn, isFalse);
     });
 
-    test('RATE_LIMITED on verify sets the cooldown', () async {
+    test('RATE_LIMITED on verify shows the line and leaves the resend alone', () async {
       repository.onVerify(
         const ApiFailure(
           code: 'RATE_LIMITED',
@@ -411,8 +411,12 @@ void main() {
           retryAfter: Duration(seconds: 7),
         ),
       );
+      final resendAt = state().resendAt;
       await notifier().verify('444771');
-      expect(state().resendAt, now.add(const Duration(seconds: 7)));
+      // The verify bucket and the resend cooldown are different limits (TECH_PLAN §3.4).
+      expect(state().failure?.code, 'RATE_LIMITED');
+      expect(state().resendAt, resendAt);
+      expect(state().codeDead, isFalse);
     });
   });
 

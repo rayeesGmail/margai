@@ -102,7 +102,7 @@ public class OtpService {
             throw OtpException.expired();
         }
         if (!OtpCodes.matches(challenge.getCodeHash(), pepper, challenge.getId(), code)) {
-            int used = challenge.recordFailedAttempt();
+            int used = challenge.recordFailedAttempt(now);
             challenges.save(challenge);
             meters.counter(FAILED_METRIC).increment();
             throw OtpException.invalid(Math.max(0, policy.maxAttempts() - used));

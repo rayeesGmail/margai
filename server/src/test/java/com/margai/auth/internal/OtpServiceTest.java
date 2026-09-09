@@ -177,7 +177,7 @@ class OtpServiceTest {
     void theFifthWrongCodeExhaustsTheChallengeAndLaterTriesAreExpired() {
         OtpChallenge challenge = liveChallenge("111111");
         for (int i = 0; i < 4; i++) {
-            challenge.recordFailedAttempt();
+            challenge.recordFailedAttempt(NOW);
         }
         when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
 

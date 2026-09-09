@@ -327,9 +327,8 @@ class LoginNotifier extends Notifier<LoginState> {
         codeReason: failure.code == validationFailed
             ? failure.reasonFor('code')
             : null,
-        resendAt: failure.retryAfter == null
-            ? state.resendAt
-            : now.add(failure.retryAfter!),
+        // A 429 here comes from the per-address verify bucket (TECH_PLAN §3.4), not from the
+        // resend cooldown: the server's line is shown and the resend keeps its own clock.
       );
     }
   }

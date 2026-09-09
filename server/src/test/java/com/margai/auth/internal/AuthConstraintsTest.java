@@ -175,8 +175,41 @@ class AuthConstraintsTest {
         assertThat(challenges.findById(alreadyDead.getId()).orElseThrow().getExpiresAt()).isEqualTo(now.minusSeconds(1));
     }
 
+    @Test
+    void expiredUnverifiedChallengesAreCountedPerChannelInsideTheWindow() {
+        // A window ten years out: module-flow tests commit real-time rows into this database.
+        Instant since = Instant.now().plus(3650, ChronoUnit.DAYS).truncatedTo(ChronoUnit.MILLIS);
+        Instant now = since.plusSeconds(600);
+        challenges.saveAndFlush(challengeAt(OtpChannel.email, since.plusSeconds(60)));          // died untried
+        OtpChallenge tried = challengeAt(OtpChannel.email, since.plusSeconds(60));
+        tried.recordFailedAttempt(since.plusSeconds(90));
+        tried.recordFailedAttempt(since.plusSeconds(120));
+        challenges.saveAndFlush(tried);                                                          // died after wrong codes
+        OtpChallenge verified = challengeAt(OtpChannel.email, since.plusSeconds(60));
+        verified.markVerified(since.plusSeconds(100));
+        challenges.saveAndFlush(verified);                                                       // verified: not counted
+        challenges.saveAndFlush(challengeAt(OtpChannel.email, since.plusSeconds(480)));         // still live at now
+        challenges.saveAndFlush(challengeAt(OtpChannel.email, since.minusSeconds(60)));         // before the window
+        challenges.saveAndFlush(challengeAt(OtpChannel.sms, since.plusSeconds(60)));            // the other channel
+        OtpChallenge consent = new OtpChallenge(UUID.randomUUID(), OtpChannel.email, "parent@example.com",
+                OtpPurpose.parent_consent, HASH_B, since.plusSeconds(360), null, since.plusSeconds(60));
+        challenges.saveAndFlush(consent);                                                        // another purpose
+
+        assertThat(challenges.countExpiredUnverified(OtpChannel.email, OtpPurpose.login, since, now)).isEqualTo(2);
+        assertThat(challenges.countExpiredUnverified(OtpChannel.sms, OtpPurpose.login, since, now)).isEqualTo(1);
+        assertThat(challenges.countExpiredUnverified(OtpChannel.email, OtpPurpose.login, since, since.plusSeconds(300)))
+                .as("nothing has expired yet at five minutes").isZero();
+    }
+
     private static OtpChallenge challenge(String destination, String hash, Instant now) {
         return new OtpChallenge(UUID.randomUUID(), OtpChannel.email, destination, OtpPurpose.login, hash,
                 now.plusSeconds(300), null, now);
+    }
+
+    /** A login challenge created at {@code createdAt}, alive for the five minutes of §3.2. */
+    private static OtpChallenge challengeAt(OtpChannel channel, Instant createdAt) {
+        String destination = channel == OtpChannel.email ? "window@example.com" : "+919876543210";
+        return new OtpChallenge(UUID.randomUUID(), channel, destination, OtpPurpose.login, HASH_A,
+                createdAt.plusSeconds(300), null, createdAt);
     }
 }

@@ -16,10 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
  * the identifier the OTP verified; the language starts at {@code en} until the mentor intro
  * (SPEC §5, D25) or {@code PATCH /me} (D10) sets it. A phone login stamps
  * {@code phone_verified_at} each time; an email account's proof is the verified email itself.
+ * Simultaneous first logins for one identifier are serialised on a per-identifier advisory lock
+ * held for the transaction (PLAN D9), so the second one finds the row the first one created.
  */
 @Service
 @Transactional
 class AccountService implements Accounts {
+
+    static final String LOCK_PREFIX = "users:";
 
     private final UserRepository users;
     private final IstClock clock;
@@ -31,6 +35,7 @@ class AccountService implements Accounts {
 
     @Override
     public SignIn signIn(LoginIdentifier identifier) {
+        users.lockIdentifier(LOCK_PREFIX + identifier.value());
         Optional<User> existing = switch (identifier) {
             case LoginIdentifier.Phone phone -> users.findByPhoneAndStatus(phone.e164(), UserStatus.active);
             case LoginIdentifier.Email email -> users.findByEmailAndStatus(email.address(), UserStatus.active);

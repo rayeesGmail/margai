@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.TestcontainersConfiguration;
 import com.margai.account.api.LoginIdentifier;
+import com.margai.account.api.Me;
 import com.margai.account.api.SignIn;
 import com.margai.common.api.IstClock;
 import com.margai.common.api.Language;
@@ -101,6 +102,35 @@ class AccountServiceTest {
         assertThat(first.user().language()).isEqualTo(Language.hi);
         assertThat(again.user().language()).as("a later login keeps the stored value").isEqualTo(Language.hi);
         assertThat(users.findById(first.user().id()).orElseThrow().getLanguage()).isEqualTo(Language.hi);
+    }
+
+    @Test
+    void meReturnsTheAccountWithItsProfile() {
+        SignIn signIn = service.signIn(new LoginIdentifier.Email("me@example.com"), Language.hinglish);
+
+        Me me = service.me(signIn.user().id()).orElseThrow();
+
+        assertThat(me.user()).isEqualTo(signIn.user());
+        assertThat(me.user().language()).isEqualTo(Language.hinglish);
+        assertThat(me.profile().onboardingStep()).isEqualTo("intro");
+        assertThat(me.profile().morningNotificationTime()).isEqualTo(LocalTime.of(7, 0));
+        assertThat(me.profile().isMinor()).isFalse();
+        assertThat(me.profile().currentStreak()).isZero();
+        assertThat(me.profile().attemptType()).isNull();
+        assertThat(me.profile().hoursWeekday()).isNull();
+    }
+
+    @Test
+    void meIsEmptyForADeletedAccountOrAMissingProfile() {
+        SignIn deleted = service.signIn(new LoginIdentifier.Email("me-deleted@example.com"), Language.en);
+        users.saveAndFlush(markDeleted(users.findById(deleted.user().id()).orElseThrow()));
+        SignIn orphan = service.signIn(new LoginIdentifier.Email("me-orphan@example.com"), Language.en);
+        profiles.delete(profiles.findByUserId(orphan.user().id()).orElseThrow());
+        profiles.flush();
+
+        assertThat(service.me(deleted.user().id())).isEmpty();
+        assertThat(service.me(orphan.user().id())).as("a pre-D10 account without a profile: sign in again heals it").isEmpty();
+        assertThat(service.me(java.util.UUID.randomUUID())).isEmpty();
     }
 
     @Test

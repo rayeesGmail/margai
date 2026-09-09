@@ -2,6 +2,8 @@ package com.margai.account.internal;
 
 import com.margai.account.api.Accounts;
 import com.margai.account.api.LoginIdentifier;
+import com.margai.account.api.Me;
+import com.margai.account.api.ProfileSummary;
 import com.margai.account.api.SignIn;
 import com.margai.account.api.UserSummary;
 import com.margai.common.api.IstClock;
@@ -59,6 +61,24 @@ class AccountService implements Accounts {
         return users.findById(userId)
                 .filter(user -> user.getStatus() == UserStatus.active)
                 .map(AccountService::summary);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Me> me(UUID userId) {
+        return users.findById(userId)
+                .filter(user -> user.getStatus() == UserStatus.active)
+                .flatMap(user -> profiles.findByUserId(userId)
+                        .map(profile -> new Me(summary(user), summary(profile))));
+    }
+
+    private static ProfileSummary summary(StudentProfile profile) {
+        return new ProfileSummary(profile.getAttemptType(), profile.getTargetYear(), profile.getCoachingMode(),
+                profile.getCoachingProvider(), profile.getHoursWeekday(), profile.getHoursWeekend(), profile.getGoal(),
+                profile.getStateCode(), profile.getCategory(), profile.getDob(), profile.isMinor(),
+                profile.getLastNeetYear(), profile.getLastNeetScore(), profile.getLastNeetRank(),
+                profile.getOnboardingStep(), profile.getOnboardingCompletedAt(), profile.getExamDate(),
+                profile.getMorningNotificationTime(), profile.getCurrentStreak(), profile.getLongestStreak());
     }
 
     private static User newUser(LoginIdentifier identifier, Language language) {

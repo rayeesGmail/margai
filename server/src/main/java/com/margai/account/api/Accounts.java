@@ -21,4 +21,10 @@ public interface Accounts {
 
     /** The account when it exists and is not deleted (§2.10: deletion revokes every token). */
     Optional<UserSummary> findActive(UUID userId);
+
+    /**
+     * {@code GET /me} (§3.7): the active account with its profile row; empty when either is
+     * missing, which the caller answers as {@code AUTH_INVALID} (D10).
+     */
+    Optional<Me> me(UUID userId);
 }

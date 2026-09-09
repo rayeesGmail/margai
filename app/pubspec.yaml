@@ -28,5 +28,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  # ARB strings in lib/l10n (en, hi); generated into lib/l10n/app_localizations*.dart (l10n.yaml).
+  # ARB strings in lib/l10n (en, hi, hi_Latn); generated into lib/l10n/app_localizations*.dart (l10n.yaml).
   generate: true

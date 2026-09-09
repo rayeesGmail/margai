@@ -192,7 +192,7 @@ abstract class AppLocalizations {
   /// After a wrong code: details.attempts_left from OTP_INVALID (5 per code).
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =0{No tries left on this code.} =1{1 try left.} other{{count} tries left.}}'**
+  /// **'{count, plural, =0{No tries left on this code — ask for a new one.} =1{1 try left.} other{{count} tries left.}}'**
   String attemptsLeft(int count);
 
   /// No description provided for @retryButton.

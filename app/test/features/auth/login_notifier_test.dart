@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:margai/core/api/api_failure.dart';
 import 'package:margai/core/auth/auth_state.dart';
 import 'package:margai/core/auth/token_store.dart';
 import 'package:margai/core/clock.dart';
+import 'package:margai/core/ticker.dart';
 import 'package:margai/features/auth/models.dart';
 import 'package:margai/features/auth/providers.dart';
 import 'package:margai/features/auth/repository.dart';
@@ -14,6 +17,7 @@ void main() {
   late FakeAuthRepository repository;
   late InMemoryTokenStore store;
   late DateTime now;
+  late StreamController<DateTime> ticks;
   late ProviderContainer container;
 
   LoginNotifier notifier() => container.read(loginProvider.notifier);
@@ -23,15 +27,23 @@ void main() {
     repository = FakeAuthRepository();
     store = InMemoryTokenStore();
     now = DateTime.utc(2026, 9, 8, 12, 0, 0);
+    ticks = StreamController<DateTime>.broadcast();
     container = ProviderContainer.test(
       overrides: [
         authRepositoryProvider.overrideWithValue(repository),
         tokenStoreProvider.overrideWithValue(store),
         clockProvider.overrideWithValue(() => now),
+        tickerProvider.overrideWith((ref) => ticks.stream),
       ],
     );
     await container.read(authStateProvider.future);
+    // Riverpod 3 pauses a provider's own subscriptions while nothing listens to it; in the app
+    // the screen watches loginProvider, so the test keeps one listener open the same way.
+    final keepAlive = container.listen(loginProvider, (_, _) {});
+    addTearDown(keepAlive.close);
   });
+
+  tearDown(() => ticks.close());
 
   group('happy path (PLAN D8 ✅, TECH_PLAN §3.7)', () {
     test('email → code → signed in, session stored, auth state flips', () async {
@@ -46,8 +58,9 @@ void main() {
       expect(state().step, LoginStep.code);
       expect(state().challenge?.challengeId, 'c-1');
       expect(state().resendAt, now.add(const Duration(seconds: 30)));
-      expect(state().canResend(now), isFalse);
-      expect(state().resendIn(now), const Duration(seconds: 30));
+      expect(state().now, now);
+      expect(state().canResend, isFalse);
+      expect(state().resendSeconds, 30);
       expect(state().busy, isFalse);
 
       await notifier().verify(' 444771 ');
@@ -109,13 +122,14 @@ void main() {
 
       expect(state().failure?.code, 'OTP_RATE_LIMITED');
       expect(state().resendAt, now.add(const Duration(seconds: 3507)));
-      expect(state().canResend(now), isFalse);
+      expect(state().canResend, isFalse);
+      expect(state().resendSeconds, 3507);
       expect(state().step, LoginStep.entry);
       expect(state().email, 'a@b.in');
     });
   });
 
-  group('resend', () {
+  group('resend and the countdown', () {
     setUp(() async {
       repository.onRequest(FakeAuthRepository.challenge);
       notifier().emailChanged('a@b.in');
@@ -126,6 +140,27 @@ void main() {
       now = now.add(const Duration(seconds: 10));
       await notifier().resend();
       expect(repository.requestedEmails, hasLength(1));
+    });
+
+    test('the ticker moves the countdown while a code is pending', () async {
+      ticks.add(now.add(const Duration(seconds: 12)));
+      await Future<void>.delayed(Duration.zero);
+      expect(state().now, now.add(const Duration(seconds: 12)));
+      expect(state().resendSeconds, 18);
+      expect(state().canResend, isFalse);
+
+      ticks.add(now.add(const Duration(seconds: 30)));
+      await Future<void>.delayed(Duration.zero);
+      expect(state().resendSeconds, 0);
+      expect(state().canResend, isTrue);
+    });
+
+    test('leaving the code step stops listening to the ticker', () async {
+      notifier().changeEmail();
+      ticks.add(now.add(const Duration(minutes: 5)));
+      await Future<void>.delayed(Duration.zero);
+      expect(state().now, now);
+      expect(ticks.hasListener, isFalse);
     });
 
     test('after the cooldown sends a new code and resets attempts', () async {
@@ -154,6 +189,7 @@ void main() {
       expect(state().attemptsLeft, isNull);
       expect(state().codeDead, isFalse);
       expect(state().failure, isNull);
+      expect(state().resendSeconds, 30);
     });
 
     test('a failed resend keeps the old challenge on screen', () async {
@@ -182,12 +218,13 @@ void main() {
       expect(repository.verified, isEmpty);
     });
 
-    test('OTP_INVALID counts attempts down; zero kills the code', () async {
+    test('OTP_INVALID counts attempts down; zero kills the code without a contradiction', () async {
       repository
         ..onVerify(
           const ApiFailure(
             code: 'OTP_INVALID',
             status: 401,
+            messageUser: 'try once more',
             details: {'attempts_left': 1},
           ),
         )
@@ -195,6 +232,7 @@ void main() {
           const ApiFailure(
             code: 'OTP_INVALID',
             status: 401,
+            messageUser: 'try once more',
             details: {'attempts_left': 0},
           ),
         );
@@ -202,11 +240,17 @@ void main() {
       await notifier().verify('000001');
       expect(state().attemptsLeft, 1);
       expect(state().codeDead, isFalse);
+      expect(state().failure?.messageUser, 'try once more');
       expect(state().step, LoginStep.code);
 
       await notifier().verify('000002');
       expect(state().attemptsLeft, 0);
       expect(state().codeDead, isTrue);
+      // "Try once more" next to "no tries left" would contradict itself: only the attempts line.
+      expect(state().failure, isNull);
+
+      await notifier().verify('000003');
+      expect(repository.verified, hasLength(2));
     });
 
     test('OTP_EXPIRED kills the code; the challenge stays for the screen', () async {
@@ -282,8 +326,8 @@ void main() {
     });
   });
 
-  group('change email', () {
-    test('returns to entry with the email kept and the challenge dropped', () async {
+  group('change email and sign-out', () {
+    test('Change email returns to entry with the email kept and the challenge dropped', () async {
       repository
         ..onRequest(FakeAuthRepository.challenge)
         ..onVerify(const ApiFailure(code: 'OTP_EXPIRED', status: 401));
@@ -300,7 +344,26 @@ void main() {
       expect(state().codeDead, isFalse);
       expect(state().attemptsLeft, isNull);
       // The cooldown from the earlier send still applies to the next request.
-      expect(state().canResend(now), isFalse);
+      expect(state().canResendAt(now), isFalse);
+    });
+
+    test('a sign-out starts the flow over, so the guard lands on /login (TECH_PLAN §5.3)', () async {
+      repository
+        ..onRequest(FakeAuthRepository.challenge)
+        ..onVerify(FakeAuthRepository.signedIn);
+      notifier().emailChanged('a@b.in');
+      await notifier().requestCode();
+      await notifier().verify('444771');
+      expect(state().signedIn, isTrue);
+
+      await container.read(authStateProvider.notifier).signOut();
+
+      expect(state().step, LoginStep.entry);
+      expect(state().signedIn, isFalse);
+      expect(state().email, isEmpty);
+      // The auto-disposed ticker is released one microtask after its last subscriber closes.
+      await Future<void>.delayed(Duration.zero);
+      expect(ticks.hasListener, isFalse);
     });
   });
 }

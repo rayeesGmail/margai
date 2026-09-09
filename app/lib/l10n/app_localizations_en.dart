@@ -66,7 +66,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other: '$count tries left.',
       one: '1 try left.',
-      zero: 'No tries left on this code.',
+      zero: 'No tries left on this code — ask for a new one.',
     );
     return '$_temp0';
   }

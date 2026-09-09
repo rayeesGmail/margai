@@ -17,7 +17,7 @@
   "resendButton": "Naya code bhejo",
   "resendIn": "Naya code {seconds}s mein",
   "changeEmailButton": "Email badlo",
-  "attemptsLeft": "{count, plural, =0{Is code par koi try baaki nahi.} =1{1 try baaki.} other{{count} tries baaki.}}",
+  "attemptsLeft": "{count, plural, =0{Is code par koi try baaki nahi — naya code mangao.} =1{1 try baaki.} other{{count} tries baaki.}}",
   "retryButton": "Phir try karo",
 
   "failureOffline": "Aap offline ho. Connection check karke phir try karo — jo likha hai wo safe hai.",

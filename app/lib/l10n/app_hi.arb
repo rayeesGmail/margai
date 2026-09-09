@@ -17,7 +17,7 @@
   "resendButton": "नया कोड भेजें",
   "resendIn": "नया कोड {seconds} सेकंड में",
   "changeEmailButton": "ईमेल बदलें",
-  "attemptsLeft": "{count, plural, =0{इस कोड पर कोई कोशिश बाकी नहीं।} =1{1 कोशिश बाकी।} other{{count} कोशिशें बाकी।}}",
+  "attemptsLeft": "{count, plural, =0{इस कोड पर कोई कोशिश बाकी नहीं — नया कोड मंगाएँ।} =1{1 कोशिश बाकी।} other{{count} कोशिशें बाकी।}}",
   "retryButton": "फिर कोशिश करें",
 
   "failureOffline": "आप ऑफ़लाइन हैं। कनेक्शन देखकर फिर कोशिश करें — आपने जो लिखा है वह सुरक्षित है।",

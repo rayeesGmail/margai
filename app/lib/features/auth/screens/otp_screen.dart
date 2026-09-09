@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/clock.dart';
 import '../../../core/l10n/failure_copy.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/ticker.dart';
 import '../../../core/widgets/failure_line.dart';
 import '../../../core/widgets/one_hand_page.dart';
 import '../../../l10n/app_localizations.dart';
@@ -15,6 +13,7 @@ import '../providers.dart';
 /// SPEC §8 screen 1, the code half: six digits, verify, resend after the cooldown, change the
 /// identifier, and the honest failure states. SMS auto-read joins when the SMS channel does
 /// (TRACKER F1); the email code is typed or pasted (Android's one-time-code autofill hint).
+/// Renders [LoginState] and dispatches intents; every rule, the countdown included, is state.
 class OtpScreen extends ConsumerStatefulWidget {
   const OtpScreen({super.key});
 
@@ -36,7 +35,6 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(loginProvider);
     final notifier = ref.read(loginProvider.notifier);
-    final now = ref.watch(tickerProvider).value ?? ref.read(clockProvider)();
     // A new code makes the old digits stale: empty the field when the challenge changes.
     ref.listen(loginProvider.select((s) => s.challenge?.challengeId), (
       previous,
@@ -46,7 +44,6 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
         _code.clear();
       }
     });
-    final canResend = state.canResend(now) && !state.busy;
     final failure = state.failure;
     final codeReason = state.codeReason;
     final attemptsLeft = state.attemptsLeft;
@@ -60,11 +57,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       ),
       secondaryActions: [
         TextButton(
-          onPressed: canResend ? notifier.resend : null,
+          onPressed: state.canResend ? notifier.resend : null,
           child: Text(
-            canResend
+            state.canResend
                 ? l10n.resendButton
-                : l10n.resendIn(state.resendIn(now).inSeconds),
+                : l10n.resendIn(state.resendSeconds),
           ),
         ),
         TextButton(

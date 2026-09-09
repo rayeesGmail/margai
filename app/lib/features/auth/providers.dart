@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api/api_failure.dart';
 import '../../core/auth/auth_state.dart';
 import '../../core/clock.dart';
+import '../../core/ticker.dart';
 import 'identifiers.dart';
 import 'models.dart';
 import 'repository.dart';
@@ -26,12 +27,14 @@ class VerifyIntent extends LoginIntent {
   final String code;
 }
 
-/// Everything the two login screens render. Typed input is never dropped by a failure.
+/// Everything the two login screens render. Typed input is never dropped by a failure, and every
+/// decision a screen shows (may I resend, how long until then) is a getter here, not in a widget.
 class LoginState {
   const LoginState({
     this.email = '',
     this.challenge,
     this.resendAt,
+    this.now,
     this.attemptsLeft,
     this.failure,
     this.emailReason,
@@ -51,6 +54,10 @@ class LoginState {
   /// When a resend is allowed again: the server's `resend_after_s`, or `retry_after_s` after a
   /// 429 (TECH_PLAN §3.4).
   final DateTime? resendAt;
+
+  /// The notifier's view of the time, stamped on every intent and refreshed once a second while
+  /// a cooldown is running, so the countdown is state, not a widget computation.
+  final DateTime? now;
 
   /// From `details.attempts_left` after `OTP_INVALID`; `null` before the first wrong code.
   final int? attemptsLeft;
@@ -76,14 +83,19 @@ class LoginState {
 
   LoginStep get step => challenge == null ? LoginStep.entry : LoginStep.code;
 
-  bool canResend(DateTime now) => resendAt == null || !now.isBefore(resendAt!);
+  bool canResendAt(DateTime at) => resendAt == null || !at.isBefore(resendAt!);
 
-  Duration resendIn(DateTime now) {
+  /// May the screen offer "Send a new code" right now.
+  bool get canResend => !busy && now != null && canResendAt(now!);
+
+  /// Whole seconds until a resend is allowed; 0 when it already is.
+  int get resendSeconds {
     final at = resendAt;
-    if (at == null || !now.isBefore(at)) {
-      return Duration.zero;
+    final current = now;
+    if (at == null || current == null || !current.isBefore(at)) {
+      return 0;
     }
-    return at.difference(now);
+    return at.difference(current).inSeconds;
   }
 
   /// Retry makes sense only after a failure that never reached the server.
@@ -93,6 +105,7 @@ class LoginState {
     String? email,
     Object? challenge = _keep,
     Object? resendAt = _keep,
+    Object? now = _keep,
     Object? attemptsLeft = _keep,
     Object? failure = _keep,
     Object? emailReason = _keep,
@@ -107,6 +120,7 @@ class LoginState {
         ? this.challenge
         : challenge as OtpChallenge?,
     resendAt: identical(resendAt, _keep) ? this.resendAt : resendAt as DateTime?,
+    now: identical(now, _keep) ? this.now : now as DateTime?,
     attemptsLeft: identical(attemptsLeft, _keep)
         ? this.attemptsLeft
         : attemptsLeft as int?,
@@ -136,8 +150,28 @@ class LoginNotifier extends Notifier<LoginState> {
   static const String otpInvalid = 'OTP_INVALID';
   static const String otpExpired = 'OTP_EXPIRED';
 
+  ProviderSubscription<AsyncValue<DateTime>>? _tick;
+
   @override
-  LoginState build() => const LoginState();
+  LoginState build() {
+    // A sign-out (D10 logout, or a revoked family on refresh) starts the flow over: the old
+    // challenge is spent and the guard must land on /login, not /login/otp (TECH_PLAN §5.3).
+    ref.listen<AsyncValue<AuthState>>(authStateProvider, (previous, next) {
+      if (previous?.value is SignedIn && next.value is SignedOut) {
+        _stopTicking();
+        state = const LoginState();
+      }
+    });
+    ref.onDispose(_stopTicking);
+    final initial = initialState();
+    if (initial.challenge != null) {
+      _startTicking();
+    }
+    return initial;
+  }
+
+  /// The state the flow starts in; tests seed a screen by overriding this.
+  LoginState initialState() => const LoginState();
 
   DateTime get _now => ref.read(clockProvider)();
 
@@ -161,35 +195,44 @@ class LoginNotifier extends Notifier<LoginState> {
       failure: null,
       emailReason: null,
       codeReason: null,
+      now: _now,
       lastIntent: const RequestCodeIntent(),
     );
     try {
       final challenge = await _repository.requestOtp(email: email);
+      final now = _now;
       state = state.copyWith(
         busy: false,
         challenge: challenge,
-        resendAt: _now.add(challenge.resendAfter),
+        resendAt: now.add(challenge.resendAfter),
+        now: now,
         attemptsLeft: null,
         codeDead: false,
         failure: null,
       );
+      _startTicking();
     } on ApiFailure catch (failure) {
+      final now = _now;
       state = state.copyWith(
         busy: false,
         failure: failure,
+        now: now,
         resendAt: failure.retryAfter == null
             ? state.resendAt
-            : _now.add(failure.retryAfter!),
+            : now.add(failure.retryAfter!),
         emailReason: failure.code == validationFailed
             ? failure.reasonFor('email')
             : null,
       );
+      if (state.resendAt != null) {
+        _startTicking();
+      }
     }
   }
 
   /// A resend inside the cooldown is a no-op; the screen shows the countdown instead.
   Future<void> resend() async {
-    if (state.busy || !state.canResend(_now)) {
+    if (state.busy || !state.canResendAt(_now)) {
       return;
     }
     await requestCode();
@@ -208,7 +251,7 @@ class LoginNotifier extends Notifier<LoginState> {
 
   Future<void> verify(String code) async {
     final challenge = state.challenge;
-    if (challenge == null || state.busy) {
+    if (challenge == null || state.busy || state.codeDead) {
       return;
     }
     final digits = code.trim();
@@ -221,6 +264,7 @@ class LoginNotifier extends Notifier<LoginState> {
       busy: true,
       failure: null,
       codeReason: null,
+      now: _now,
       lastIntent: VerifyIntent(digits),
     );
     try {
@@ -229,24 +273,28 @@ class LoginNotifier extends Notifier<LoginState> {
         code: digits,
       );
       await ref.read(authStateProvider.notifier).signIn(result.toSession());
+      _stopTicking();
       state = state.copyWith(busy: false, failure: null, signedIn: true);
     } on ApiFailure catch (failure) {
+      final now = _now;
       final attemptsLeft = failure.code == otpInvalid
           ? failure.attemptsLeft
           : state.attemptsLeft;
+      final exhausted = failure.code == otpInvalid && attemptsLeft == 0;
       state = state.copyWith(
         busy: false,
-        failure: failure,
+        // On the last attempt the server's "try once more" would contradict "no tries left";
+        // the attempts line carries the remedy alone (SPEC §1 principle 3, mentor voice: direct).
+        failure: exhausted ? null : failure,
+        now: now,
         attemptsLeft: attemptsLeft,
-        codeDead:
-            failure.code == otpExpired ||
-            (failure.code == otpInvalid && attemptsLeft == 0),
+        codeDead: failure.code == otpExpired || exhausted,
         codeReason: failure.code == validationFailed
             ? failure.reasonFor('code')
             : null,
         resendAt: failure.retryAfter == null
             ? state.resendAt
-            : _now.add(failure.retryAfter!),
+            : now.add(failure.retryAfter!),
       );
     }
   }
@@ -256,6 +304,7 @@ class LoginNotifier extends Notifier<LoginState> {
     if (state.busy) {
       return;
     }
+    _stopTicking();
     state = state.copyWith(
       challenge: null,
       attemptsLeft: null,
@@ -280,6 +329,22 @@ class LoginNotifier extends Notifier<LoginState> {
 
   void dismissFailure() {
     state = state.copyWith(failure: null);
+  }
+
+  /// The once-a-second clock runs only while a cooldown can be on screen: from a sent code until
+  /// the flow leaves the code step (SPEC §1 principle 5: no idle timer on a mid-range phone).
+  void _startTicking() {
+    _tick ??= ref.listen<AsyncValue<DateTime>>(tickerProvider, (_, next) {
+      final at = next.value;
+      if (at != null) {
+        state = state.copyWith(now: at);
+      }
+    });
+  }
+
+  void _stopTicking() {
+    _tick?.close();
+    _tick = null;
   }
 }
 

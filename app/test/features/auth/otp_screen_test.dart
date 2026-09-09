@@ -15,6 +15,7 @@ void main() {
     email: 'founder@example.com',
     challenge: FakeAuthRepository.challenge,
     resendAt: now.add(const Duration(seconds: 27)),
+    now: now,
     lastIntent: const RequestCodeIntent(),
   );
 
@@ -99,6 +100,21 @@ void main() {
         expect(verifyButton(tester).onPressed, isNull);
         expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
         expect(find.text(l10n.resendButton), findsOneWidget);
+      });
+
+      testWidgets('attempts exhausted: the attempts line alone, verify disabled', (
+        tester,
+      ) async {
+        await pumpScreen(
+          tester,
+          const OtpScreen(),
+          locale: locale,
+          now: now,
+          state: sent.copyWith(codeDead: true, attemptsLeft: 0),
+        );
+        expect(find.text(l10n.attemptsLeft(0)), findsOneWidget);
+        expect(find.text(l10n.errorOtpInvalid), findsNothing);
+        expect(verifyButton(tester).onPressed, isNull);
       });
 
       testWidgets('offline on verify: honest copy and Retry', (tester) async {

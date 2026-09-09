@@ -11,7 +11,10 @@ import 'package:margai/l10n/app_localizations.dart';
 
 import 'fake_auth_repository.dart';
 
-/// The three locales every widget test runs in (TECH_PLAN §8.4): a missing ARB key fails here.
+/// The three locales every widget test runs in (TECH_PLAN §8.4). Key parity between the ARB
+/// files is enforced by test/l10n/arb_parity_test.dart (gen-l10n would otherwise fill a missing
+/// translation with the English template silently); these loops prove each screen state renders
+/// the locale's own copy.
 final List<Locale> allLocales = AppLanguage.values
     .map((language) => language.locale)
     .toList();
@@ -26,7 +29,7 @@ class SeededLoginNotifier extends LoginNotifier {
   final LoginState initial;
 
   @override
-  LoginState build() => initial;
+  LoginState initialState() => initial;
 }
 
 /// Pumps [screen] inside a localised MaterialApp with the auth providers faked: the login state

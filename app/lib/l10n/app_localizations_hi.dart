@@ -66,7 +66,7 @@ class AppLocalizationsHi extends AppLocalizations {
       locale: localeName,
       other: '$count कोशिशें बाकी।',
       one: '1 कोशिश बाकी।',
-      zero: 'इस कोड पर कोई कोशिश बाकी नहीं।',
+      zero: 'इस कोड पर कोई कोशिश बाकी नहीं — नया कोड मंगाएँ।',
     );
     return '$_temp0';
   }
@@ -238,7 +238,7 @@ class AppLocalizationsHiLatn extends AppLocalizationsHi {
       locale: localeName,
       other: '$count tries baaki.',
       one: '1 try baaki.',
-      zero: 'Is code par koi try baaki nahi.',
+      zero: 'Is code par koi try baaki nahi — naya code mangao.',
     );
     return '$_temp0';
   }

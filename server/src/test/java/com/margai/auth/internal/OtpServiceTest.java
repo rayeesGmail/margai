@@ -161,7 +161,7 @@ class OtpServiceTest {
         OtpChallenge challenge = liveChallenge("111111");
         when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
 
-        assertThatThrownBy(() -> service.verify(challenge.getId(), "222222", "dev"))
+        assertThatThrownBy(() -> service.verify(challenge.getId(), "222222", "dev", Language.en))
                 .isInstanceOf(OtpException.class)
                 .satisfies(failure -> {
                     assertThat(((OtpException) failure).code()).isEqualTo(ErrorCode.OTP_INVALID);
@@ -169,7 +169,7 @@ class OtpServiceTest {
                 });
         assertThat(challenge.getAttempts()).isEqualTo((short) 1);
         verify(challenges).save(challenge);
-        verify(accounts, never()).signIn(any());
+        verify(accounts, never()).signIn(any(), any());
         assertThat(meters.counter(OtpService.FAILED_METRIC).count()).isEqualTo(1.0);
     }
 
@@ -181,13 +181,13 @@ class OtpServiceTest {
         }
         when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
 
-        assertThatThrownBy(() -> service.verify(challenge.getId(), "000000", "dev"))
+        assertThatThrownBy(() -> service.verify(challenge.getId(), "000000", "dev", Language.en))
                 .isInstanceOf(OtpException.class)
                 .satisfies(failure -> {
                     assertThat(((OtpException) failure).code()).isEqualTo(ErrorCode.OTP_INVALID);
                     assertThat(((OtpException) failure).details()).containsEntry("attempts_left", 0);
                 });
-        assertThatThrownBy(() -> service.verify(challenge.getId(), "111111", "dev"))
+        assertThatThrownBy(() -> service.verify(challenge.getId(), "111111", "dev", Language.en))
                 .as("even the right code is refused once the challenge is exhausted")
                 .isInstanceOf(OtpException.class)
                 .satisfies(failure -> assertThat(((OtpException) failure).code()).isEqualTo(ErrorCode.OTP_EXPIRED));
@@ -205,11 +205,11 @@ class OtpServiceTest {
         when(challenges.lockById(stale.getId())).thenReturn(Optional.of(stale));
 
         for (UUID id : List.of(unknown, used.getId(), stale.getId())) {
-            assertThatThrownBy(() -> service.verify(id, "111111", "dev"))
+            assertThatThrownBy(() -> service.verify(id, "111111", "dev", Language.en))
                     .isInstanceOf(OtpException.class)
                     .satisfies(failure -> assertThat(((OtpException) failure).code()).isEqualTo(ErrorCode.OTP_EXPIRED));
         }
-        verify(accounts, never()).signIn(any());
+        verify(accounts, never()).signIn(any(), any());
     }
 
     @Test
@@ -217,11 +217,11 @@ class OtpServiceTest {
         OtpChallenge challenge = liveChallenge("424242");
         when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
         UserSummary user = new UserSummary(UUID.randomUUID(), null, EMAIL.address(), Language.en, UserRole.student, null);
-        when(accounts.signIn(EMAIL)).thenReturn(new SignIn(user, true));
+        when(accounts.signIn(EMAIL, Language.en)).thenReturn(new SignIn(user, true));
         TokenPair pair = new TokenPair("access", "refresh", 900);
         when(tokens.issue(user, "Pixel")).thenReturn(pair);
 
-        OtpVerified verified = service.verify(challenge.getId(), " 424242 ", "Pixel");
+        OtpVerified verified = service.verify(challenge.getId(), " 424242 ", "Pixel", Language.en);
 
         assertThat(verified.tokens()).isEqualTo(pair);
         assertThat(verified.user()).isEqualTo(user);
@@ -238,11 +238,23 @@ class OtpServiceTest {
         ReflectionTestUtils.setField(challenge, "codeHash", OtpCodes.hash(PEPPER, challenge.getId(), "777777"));
         when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
         UserSummary user = new UserSummary(UUID.randomUUID(), PHONE.e164(), null, Language.en, UserRole.student, null);
-        when(accounts.signIn(PHONE)).thenReturn(new SignIn(user, false));
+        when(accounts.signIn(PHONE, Language.en)).thenReturn(new SignIn(user, false));
         when(tokens.issue(eq(user), anyString())).thenReturn(new TokenPair("a", "r", 900));
 
-        assertThat(service.verify(challenge.getId(), "777777", "dev").isNewUser()).isFalse();
-        verify(accounts).signIn(PHONE);
+        assertThat(service.verify(challenge.getId(), "777777", "dev", Language.en).isNewUser()).isFalse();
+        verify(accounts).signIn(PHONE, Language.en);
+    }
+
+    @Test
+    void theCallersLanguageIsTheSuggestionForANewAccount() {
+        OtpChallenge challenge = liveChallenge("424242");
+        when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
+        UserSummary user = new UserSummary(UUID.randomUUID(), null, EMAIL.address(), Language.hi, UserRole.student, null);
+        when(accounts.signIn(EMAIL, Language.hi)).thenReturn(new SignIn(user, true));
+        when(tokens.issue(eq(user), anyString())).thenReturn(new TokenPair("a", "r", 900));
+
+        assertThat(service.verify(challenge.getId(), "424242", "dev", Language.hi).user().language()).isEqualTo(Language.hi);
+        verify(accounts).signIn(EMAIL, Language.hi);
     }
 
     @Test
@@ -254,10 +266,10 @@ class OtpServiceTest {
         OtpChallenge challenge = liveChallenge(code);
         when(challenges.lockById(challenge.getId())).thenReturn(Optional.of(challenge));
         UserSummary user = new UserSummary(UUID.randomUUID(), null, EMAIL.address(), Language.en, UserRole.student, null);
-        when(accounts.signIn(EMAIL)).thenReturn(new SignIn(user, true));
+        when(accounts.signIn(EMAIL, Language.en)).thenReturn(new SignIn(user, true));
         when(tokens.issue(any(), any())).thenReturn(new TokenPair("a", "r", 900));
-        assertThatThrownBy(() -> service.verify(challenge.getId(), "000000", "dev")).isInstanceOf(OtpException.class);
-        service.verify(challenge.getId(), code, "dev");
+        assertThatThrownBy(() -> service.verify(challenge.getId(), "000000", "dev", Language.en)).isInstanceOf(OtpException.class);
+        service.verify(challenge.getId(), code, "dev", Language.en);
 
         assertThat(authLog.list).isNotEmpty();
         assertThat(authLog.list).extracting(ILoggingEvent::getFormattedMessage)

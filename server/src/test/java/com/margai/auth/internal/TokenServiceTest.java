@@ -9,6 +9,7 @@ import com.margai.account.api.LoginIdentifier;
 import com.margai.account.api.UserSummary;
 import com.margai.common.api.AuthException;
 import com.margai.common.api.ErrorCode;
+import com.margai.common.api.Language;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -138,7 +139,7 @@ class TokenServiceTest {
     }
 
     private UserSummary newUser() {
-        return accounts.signIn(new LoginIdentifier.Email("tokens-" + UUID.randomUUID() + "@example.com")).user();
+        return accounts.signIn(new LoginIdentifier.Email("tokens-" + UUID.randomUUID() + "@example.com"), Language.en).user();
     }
 
     private RefreshToken row(String rawToken) {

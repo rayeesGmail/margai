@@ -91,25 +91,31 @@ class AuthFlowTest {
         assertThat(challengeRow.get("verified_at")).isNull();
         assertThat(challengeRow.get("destination")).isEqualTo(email);
 
-        // 2. verify → tokens + user, first login
+        // 2. verify → tokens + user, first login; the phone's Accept-Language is the new account's
+        //    language (SPEC §5 "auto-suggested, changeable"; D10) and the empty profile row exists
         MvcTestResult verified = mvc.post().uri("/api/v1/auth/otp/verify").contentType(MediaType.APPLICATION_JSON)
                 .header("X-Forwarded-For", FROM).header("X-App-Version", "margai/0.1.0 (android 14)")
+                .header("Accept-Language", "hi")
                 .content("{\"challenge_id\":\"" + challengeId + "\",\"code\":\"" + delivery.code() + "\"}").exchange();
         assertThat(verified).hasStatusOk();
         assertThat(verified).bodyJson().extractingPath("$.is_new_user").isEqualTo(true);
         assertThat(verified).bodyJson().extractingPath("$.expires_in").isEqualTo(900);
         assertThat(verified).bodyJson().extractingPath("$.user.email").isEqualTo(email);
-        assertThat(verified).bodyJson().extractingPath("$.user.language").isEqualTo("en");
+        assertThat(verified).bodyJson().extractingPath("$.user.language").isEqualTo("hi");
         String body = verified.getResponse().getContentAsString();
         String access = field(body, "access_token");
         String refresh = field(body, "refresh_token");
         String userId = body.replaceAll(".*\"user\":\\{\"id\":\"([^\"]+)\".*", "$1");
         Jwt jwt = jwts.decode(access);
         assertThat(jwt.getSubject()).isEqualTo(userId);
-        assertThat(jwt.getClaimAsString("lang")).isEqualTo("en");
+        assertThat(jwt.getClaimAsString("lang")).isEqualTo("hi");
         assertThat(jwt.getClaimAsString("role")).isEqualTo("student");
         assertThat(jwt.getId()).isNotBlank();
         assertThat(jdbc.queryForObject("SELECT email FROM users WHERE id = ?::uuid", String.class, userId)).isEqualTo(email);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM student_profiles WHERE user_id = ?::uuid", Integer.class, userId))
+                .as("the empty student_profiles row of TECH_PLAN §3.7 (D10)").isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT onboarding_step FROM student_profiles WHERE user_id = ?::uuid", String.class, userId))
+                .isEqualTo("intro");
         assertThat(jdbc.queryForObject("SELECT verified_at IS NOT NULL FROM otp_challenges WHERE id = ?::uuid", Boolean.class, challengeId)).isTrue();
         assertThat(jdbc.queryForObject("SELECT device_label FROM refresh_tokens WHERE user_id = ?::uuid", String.class, userId))
                 .isEqualTo("margai/0.1.0 (android 14)");
@@ -146,6 +152,10 @@ class AuthFlowTest {
         assertThat(verifiedAgain).hasStatusOk();
         assertThat(verifiedAgain).bodyJson().extractingPath("$.is_new_user").isEqualTo(false);
         assertThat(verifiedAgain).bodyJson().extractingPath("$.user.id").isEqualTo(userId);
+        assertThat(verifiedAgain).bodyJson().extractingPath("$.user.language")
+                .as("a later login without Accept-Language keeps the stored language").isEqualTo("hi");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM student_profiles WHERE user_id = ?::uuid", Integer.class, userId))
+                .as("the second login adds no profile row").isEqualTo(1);
 
         // 6. the third code in the hour is the last; the fourth waits
         Inbox.CLOCK.advance(Duration.ofSeconds(31));

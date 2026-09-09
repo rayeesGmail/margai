@@ -130,7 +130,7 @@ class AuthControllerTest {
 
     @Test
     void verifyReturnsTokensAndTheUserWithoutNulls() {
-        when(otp.verify(eq(CHALLENGE), eq("482913"), eq("margai/0.1.0 (android 14)")))
+        when(otp.verify(eq(CHALLENGE), eq("482913"), eq("margai/0.1.0 (android 14)"), eq(Language.en)))
                 .thenReturn(new OtpVerified(new TokenPair("jwt-1", "refresh-1", 900), USER, true));
 
         MvcTestResult result = mvc.post().uri("/api/v1/auth/otp/verify").contentType(MediaType.APPLICATION_JSON)
@@ -151,6 +151,20 @@ class AuthControllerTest {
     }
 
     @Test
+    void verifyPassesTheCallersLanguageAsTheNewAccountsSuggestion() {
+        // SPEC §5 "language auto-suggested": the app sends its device locale as Accept-Language (D10).
+        when(otp.verify(eq(CHALLENGE), eq("482913"), any(), eq(Language.hi)))
+                .thenReturn(new OtpVerified(new TokenPair("jwt-1", "refresh-1", 900), USER, true));
+
+        MvcTestResult result = mvc.post().uri("/api/v1/auth/otp/verify").contentType(MediaType.APPLICATION_JSON)
+                .header("Accept-Language", "hi-IN")
+                .content("{\"challenge_id\":\"" + CHALLENGE + "\",\"code\":\"482913\"}").exchange();
+
+        assertThat(result).hasStatusOk();
+        verify(otp).verify(eq(CHALLENGE), eq("482913"), any(), eq(Language.hi));
+    }
+
+    @Test
     void verifyValidatesItsBody() {
         MvcTestResult shortCode = mvc.post().uri("/api/v1/auth/otp/verify").contentType(MediaType.APPLICATION_JSON)
                 .content("{\"challenge_id\":\"" + CHALLENGE + "\",\"code\":\"12\"}").exchange();
@@ -165,7 +179,7 @@ class AuthControllerTest {
 
     @Test
     void aWrongCodeIsOtpInvalidInTheCallersLanguage() {
-        when(otp.verify(any(), any(), any())).thenThrow(OtpException.invalid(3));
+        when(otp.verify(any(), any(), any(), any())).thenThrow(OtpException.invalid(3));
 
         MvcTestResult result = mvc.post().uri("/api/v1/auth/otp/verify").contentType(MediaType.APPLICATION_JSON)
                 .header("Accept-Language", "hi")

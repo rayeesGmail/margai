@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.margai.TestcontainersConfiguration;
 import com.margai.common.api.ErrorCode;
 import com.margai.common.api.IstClock;
+import com.margai.common.api.Language;
 import com.margai.common.api.OtpException;
 import java.time.Instant;
 import java.util.UUID;
@@ -49,7 +50,7 @@ class OtpStartupFlowTest {
 
         startup.retirePendingCodes();
 
-        assertThatThrownBy(() -> otp.verify(id, "123456", "test"))
+        assertThatThrownBy(() -> otp.verify(id, "123456", "test", Language.en))
                 .isInstanceOf(OtpException.class)
                 .extracting(failure -> ((OtpException) failure).code())
                 .isEqualTo(ErrorCode.OTP_EXPIRED);

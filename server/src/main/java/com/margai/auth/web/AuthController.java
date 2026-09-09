@@ -53,7 +53,8 @@ class AuthController {
 
     @PostMapping("/otp/verify")
     SignedInResponse verify(@Valid @RequestBody OtpVerifyBody body, HttpServletRequest request) {
-        OtpVerified verified = otp.verify(body.challengeId(), body.code(), deviceLabel(request));
+        OtpVerified verified = otp.verify(body.challengeId(), body.code(), deviceLabel(request),
+                RequestLanguage.of(request));
         TokenPair pair = verified.tokens();
         return new SignedInResponse(pair.accessToken(), pair.refreshToken(), pair.expiresIn(), verified.isNewUser(),
                 verified.user());

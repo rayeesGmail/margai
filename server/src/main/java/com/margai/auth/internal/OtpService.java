@@ -31,10 +31,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class OtpService {
 
+    /**
+     * The four counters of TECH_PLAN §10.2, every one tagged with the {@code channel}; the verified
+     * one also says whether the code matched on the student's first try ({@code first_attempt}),
+     * which is the number SPEC §11 sets a target for (D11).
+     */
     static final String SENT_METRIC = "otp.sent";
     static final String VERIFIED_METRIC = "otp.verified";
     static final String FAILED_METRIC = "otp.failed";
     static final String SEND_FAILED_METRIC = "otp.send_failed";
+    static final String CHANNEL_TAG = "channel";
+    static final String FIRST_ATTEMPT_TAG = "first_attempt";
     /** Reason code on the identifier field when its channel is not enabled (TECH_PLAN §3.3 details). */
     static final String CHANNEL_UNAVAILABLE = "channel.unavailable";
 
@@ -83,11 +90,11 @@ public class OtpService {
             sender.send(new OtpDelivery(channel, destination, code, language, policy.ttl()));
         } catch (OtpSendException failed) {
             challenges.deleteById(challengeId);
-            meters.counter(SEND_FAILED_METRIC, "channel", channel.name()).increment();
+            meters.counter(SEND_FAILED_METRIC, CHANNEL_TAG, channel.name()).increment();
             log.warn("otp delivery failed to {} via {}: {}", Identifiers.mask(identifier), channel, failed.getMessage());
             throw failed;
         }
-        meters.counter(SENT_METRIC, "channel", channel.name()).increment();
+        meters.counter(SENT_METRIC, CHANNEL_TAG, channel.name()).increment();
         log.info("otp sent to {} via {} (challenge {})", Identifiers.mask(identifier), channel, challengeId);
         return new OtpRequested(challengeId, policy.resendCooldown().toSeconds(), channel);
     }
@@ -108,15 +115,17 @@ public class OtpService {
         if (!OtpCodes.matches(challenge.getCodeHash(), pepper, challenge.getId(), code)) {
             int used = challenge.recordFailedAttempt(now);
             challenges.save(challenge);
-            meters.counter(FAILED_METRIC).increment();
+            meters.counter(FAILED_METRIC, CHANNEL_TAG, challenge.getChannel().name()).increment();
             throw OtpException.invalid(Math.max(0, policy.maxAttempts() - used));
         }
+        boolean firstAttempt = challenge.getAttempts() == 0;
         challenge.markVerified(now);
         challenges.save(challenge);
 
         SignIn signIn = accounts.signIn(Identifiers.of(challenge.getChannel(), challenge.getDestination()), suggested);
         TokenPair pair = tokens.issue(signIn.user(), deviceLabel);
-        meters.counter(VERIFIED_METRIC, "channel", challenge.getChannel().name()).increment();
+        meters.counter(VERIFIED_METRIC, CHANNEL_TAG, challenge.getChannel().name(),
+                FIRST_ATTEMPT_TAG, Boolean.toString(firstAttempt)).increment();
         log.info("otp verified for {} (challenge {}, new user: {})",
                 Identifiers.mask(challenge.getChannel(), challenge.getDestination()), challengeId, signIn.isNew());
         return new OtpVerified(pair, signIn.user(), signIn.isNew());

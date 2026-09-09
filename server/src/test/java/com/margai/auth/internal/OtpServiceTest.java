@@ -170,7 +170,30 @@ class OtpServiceTest {
         assertThat(challenge.getAttempts()).isEqualTo((short) 1);
         verify(challenges).save(challenge);
         verify(accounts, never()).signIn(any(), any());
-        assertThat(meters.counter(OtpService.FAILED_METRIC).count()).isEqualTo(1.0);
+        assertThat(meters.counter(OtpService.FAILED_METRIC, "channel", "email").count())
+                .as("otp.failed carries the channel like the other three (D11)").isEqualTo(1.0);
+    }
+
+    @Test
+    void aCleanVerifyIsAFirstAttemptAndOneAfterAWrongCodeIsNot() {
+        UserSummary user = new UserSummary(UUID.randomUUID(), null, EMAIL.address(), Language.en, UserRole.student, null);
+        when(accounts.signIn(EMAIL, Language.en)).thenReturn(new SignIn(user, false));
+        when(tokens.issue(any(), any())).thenReturn(new TokenPair("a", "r", 900));
+        OtpChallenge clean = liveChallenge("111111");
+        when(challenges.lockById(clean.getId())).thenReturn(Optional.of(clean));
+        OtpChallenge retried = liveChallenge("222222");
+        when(challenges.lockById(retried.getId())).thenReturn(Optional.of(retried));
+
+        service.verify(clean.getId(), "111111", "dev", Language.en);
+        assertThatThrownBy(() -> service.verify(retried.getId(), "999999", "dev", Language.en)).isInstanceOf(OtpException.class);
+        service.verify(retried.getId(), "222222", "dev", Language.en);
+
+        // SPEC §11 "OTP success ≥ 98% first attempt": the tag makes that ratio computable from the counters.
+        assertThat(meters.counter(OtpService.VERIFIED_METRIC, "channel", "email", "first_attempt", "true").count())
+                .isEqualTo(1.0);
+        assertThat(meters.counter(OtpService.VERIFIED_METRIC, "channel", "email", "first_attempt", "false").count())
+                .isEqualTo(1.0);
+        assertThat(meters.find(OtpService.VERIFIED_METRIC).counters()).hasSize(2);
     }
 
     @Test
@@ -228,7 +251,8 @@ class OtpServiceTest {
         assertThat(verified.isNewUser()).isTrue();
         assertThat(challenge.isVerified()).isTrue();
         assertThat(challenge.getVerifiedAt()).isEqualTo(NOW);
-        assertThat(meters.counter(OtpService.VERIFIED_METRIC, "channel", "email").count()).isEqualTo(1.0);
+        assertThat(meters.counter(OtpService.VERIFIED_METRIC, "channel", "email", "first_attempt", "true").count())
+                .isEqualTo(1.0);
     }
 
     @Test

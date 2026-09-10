@@ -11,8 +11,8 @@
 
 | Field | Value |
 |---|---|
-| Current phase | PHASE 1 — Auth & identity (Week 2, D7–D12) **closed at the Week-2 gate 2026-09-09**, running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS); next PHASE 2 — Content pipeline v1 (Weeks 3–4, D13–D24, M3) |
-| Current day | D12 done · 2026-09-09 (buffer + the **Week-2 🚩 gate PASS** as "a stranger's email signs in first try" — the build's half, proved on the AVD: a never-seen address on a fresh install of the `db98a49` build, one code typed once, Today, reopen still signed in, `first_attempt_rate=1.000` on the reporter line; the D9 runbook's ten rows re-run clean on the same build; carried, named: the phone channel (F1), mobile data (F8), an unverified stranger's inbox (F10 production access — overdue against its own "before D12" date, slippage log). Buffer: `scripts/ui.sh` in the tree, the eval gate's router/retrieval alternative scoped to `server/` + `eval/` and case-insensitive, the 200 input PDFs ignored; branch `d12-week2-gate`, 4 chore commits + the audit fix + the docs commit, no feature code; spec-auditor FAIL → 3 MAJOR (a stale dashboard row, the PASS label, the case gap) and 8 MINOR, all fixed except the label, kept as the founder's approved reading with the tick naming what it proves; server 319 tests, app 242; PR #12 merged by the founder 2026-09-09, merge commit 4301296) · next: D13 — taxonomy CSV loaded + prerequisite graph + archetype drafts (✅ no cycles), Week 3 / PHASE 2 (M3): TECH_PLAN §6.2/§6.3, §2.3, the §0.2 D13 rule edit; en/ NCERT first (the Hindi Chanakya→Unicode step is PARKED) |
+| Current phase | **PHASE 2 — Content pipeline v1 (Weeks 3–4, D13–D24, M3)**, D13 in progress since 2026-09-10; PHASE 1 — Auth & identity (Week 2, D7–D12) closed at the Week-2 gate 2026-09-09, running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
+| Current day | D12 done · 2026-09-09 (buffer + the **Week-2 🚩 gate PASS** as "a stranger's email signs in first try" — the build's half, proved on the AVD: a never-seen address on a fresh install of the `db98a49` build, one code typed once, Today, reopen still signed in, `first_attempt_rate=1.000` on the reporter line; the D9 runbook's ten rows re-run clean on the same build; carried, named: the phone channel (F1), mobile data (F8), an unverified stranger's inbox (F10 production access — overdue against its own "before D12" date, slippage log). Buffer: `scripts/ui.sh` in the tree, the eval gate's router/retrieval alternative scoped to `server/` + `eval/` and case-insensitive, the 200 input PDFs ignored; branch `d12-week2-gate`, 4 chore commits + the audit fix + the docs commit, no feature code; spec-auditor FAIL → 3 MAJOR (a stale dashboard row, the PASS label, the case gap) and 8 MINOR, all fixed except the label, kept as the founder's approved reading with the tick naming what it proves; server 319 tests, app 242; PR #12 merged by the founder 2026-09-09, merge commit 4301296) · next: D13 — taxonomy CSV loaded + prerequisite graph + archetype drafts (✅ no cycles), Week 3 / PHASE 2 (M3): TECH_PLAN §6.2/§6.3, §2.3, the §0.2 D13 rule edit; en/ NCERT first (the Hindi Chanakya→Unicode step is PARKED) · **D13 in progress 2026-09-10** on `d13-taxonomy`: the four founder inputs drafted under `pipeline/inputs/` from the NEET (UG) 2026 syllabus for the founder's review (516 nodes, 103 edges, 4 tracks, 35 cut-off rows; README there lists the review checklist); loader commands, the pipeline profile and the `pipeline.md` rule edit still to do |
 | Days completed / total | 12 / 84 |
 | Schedule delta | on track (the build); one founder item slipped — F10's SES production access was due "before D12" and is still open (slippage log) |
 | Last week's gate | **Week-2 🚩 PASS** 2026-09-09 — a stranger's email signs in first try on the AVD (fresh install of the `db98a49` build, one code typed once, Today, reopen still signed in, `first_attempt_rate=1.000`) and the D9 runbook's ten rows re-run clean on the same build (transcript in the D12 day log, table in the runbook); carried, not failed: the phone channel (F1), mobile data (F8), an unverified stranger's inbox (F10 production access). Week-1 🚩 PASS 2026-09-08 stands (D6 day log) |
@@ -174,6 +174,37 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+D13 · 2026-09-10 · IN PROGRESS · PHASE 2 — Content pipeline v1 (taxonomy + prerequisite graph + archetype drafts)
+Session 1 (branch d13-taxonomy): the four founder inputs of TECH_PLAN §6.2 drafted from the syllabus
+  PDFs for the founder's review — the bounded design approved as written (12 numbered decisions, the
+  recommended option each). syllabus-2025 and syllabus-2026 diffed: identical content (50 NTA units),
+  the 2026 file adds NMC cover letters; the 79 NCERT chapter titles verified from the books.
+  pipeline/inputs/taxonomy.csv 516 nodes (4 subjects, 55 units, 83 chapters incl. 3 syllabus-only +
+  the Unit 8 split, 374 topics); prerequisites.csv 103 chapter edges, acyclic; archetypes.yaml 4
+  tracks / 744 steps (learn by chapter, revision by unit, mocks by subject; prerequisite-ordered,
+  timing-checked across streams); cutoffs.csv 35 NTA qualifying rows 2019–2025. syllabus/*.pdf
+  ignored with syllabus/manifest.md; 6 DECISIONS rows. Deviation from the approved design, item 8:
+  biology prerequisite edges cross botany↔zoology where the discipline does (DECISIONS conventions
+  row, README). Files reached the tree through the Write/Edit tools (the generator wrote to the
+  scratchpad; repo copies diffed byte-identical before the audit).
+  spec-auditor on the change set: FAIL → 1 MAJOR fixed (within a week the steps were sequenced by node
+  code, so two chapters preceded their prerequisite on the day scale — the generator now orders a
+  stream's chapters topologically inside the week and checks every edge at sequence granularity) and
+  10 MINOR fixed (D25→D26 cross-references, the Unit 8 section numbers were 8.6–8.8 and are 8.8–8.10
+  per the chapter PDF and no longer sit in a student-facing name, DECISIONS cited by content not row
+  number, the dashboard phase cell, the .gitignore comment and the S3 content/ home deferred to D14,
+  the fresher_1yr mock cadence text, track names now the SPEC §5.1 interview labels, the step
+  conventions as a DECISIONS row, name_hi provenance stated as recall, the 2024 cut-off source names
+  the revised 26 July notice). Not verified by the auditor and still open: the Hindi names (native
+  reader), the cut-off values against the notices.
+  Still to do for the ✅: the loader commands + pipeline profile (the cross-stream check at sequence
+  granularity; the §6.3 orphans report must surface the D4 seed's PHY.11.MECH / PHY.11.KIN shapes on
+  a seeded local db), the §0.2 pipeline.md rule edit (also stale on command order: TECH_PLAN §6.3 puts
+  backbone and cutoffs at D13), the no-cycles repository test naming the data it runs on, the
+  committed pipeline/reports/<date>-<command>.md evidence, the founder's review of the drafts.
+```
 
 ```
 D12 · 2026-09-09 · PHASE 1 — Auth & identity (buffer + 🚩 Week-2 gate: a stranger's email signs in first try)
@@ -1268,6 +1299,8 @@ Tomorrow's first task:
 - the D11 report's window is the process lifetime · 2026-09-09 · right while one API task runs and CloudWatch is absent; when the counters flow to CloudWatch (F8/D73) decide whether `GET /admin/metrics/otp` grows a `?hours=` database window (then `send_failed` would need a row per failed delivery — the D7 row deletes it) or simply points at the dashboard
 - an admin bootstrap (a seed or a CLI that flags the founder's row) · 2026-09-09 · today `users.role = 'admin'` is set by hand over psql (TECH_PLAN §3.7 "flagged by hand"), as the D11 ✅ did; D75's admin routes decide whether a `pipeline` command or an SSM-listed email does it
 - a Chanakya→Unicode step (or OCR) before any Hindi NCERT chunk is embedded · 2026-09-09 · found while writing `ncert/2022-ed/hi/manifest.md`: all ten Hindi books are selectable text set in the legacy 8-bit Walkman-Chanakya fonts with no ToUnicode map, so extraction yields glyph codes and zero Devanagari across 1,976 pages; the Phase-2 content pipeline (D13+) grounds on `en/` until this exists, and the manifest's "text OK" column stays ✗ until a converted sample passes a native-reader check
+- topic-level `name_hi` for the 374 taxonomy topics (batch translation through the CHEAP tier + a native-reader check), and a native-reader pass over the unit and chapter Hindi · 2026-09-10 · the D13 draft fills Hindi for subjects, units and chapters only; needed before the D26 syllabus grid shows topics in Hindi
+- cut-off rows the founder must source: the 2026 `qualifying` row (NTA 2026 result notice) and every `govt_mbbs` / `private_mbbs` / `bds` closing-marks row by year, category and quota scope (MCC and state counselling) · 2026-09-10 · the D13 draft carries only the 2019–2025 NTA qualifying cut-offs; the personal target (SPEC §9.4) needs seat-type rows by D22/D25
 - private-use-area decoding in the ingest text extractor · 2026-09-09 · `ncert/2022-ed/en/phy11-part1/keph107.pdf` (Gravitation, 7 of 17 pages) and its prelims extract as U+F020–U+F0FF (cp1252 byte + 0xF000); subtract 0xF000 or Chapter 7 loses those pages — the only English file affected (every page of every file was scanned)
 
 ---

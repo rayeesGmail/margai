@@ -148,7 +148,7 @@
 | F1 | Razorpay KYC + DLT SMS template | W1 D1 | ☐ not started | long lead time. 2026-09-08 (D7): DLT registration needs a registered company, so login runs on **email OTP** until F1 lands (DECISIONS D7 row 1); when it does: add `sms` to `margai.auth.otp.channels`, the MSG91 adapter (~~D11~~ — D11 ran on 2026-09-09 without F1, so the adapter and the DLT live check move to the day F1 lands; the `sms` channel, `OtpSender` port and per-channel metrics are ready for it), the phone-attach flow (PARKED) |
 | F10 | **SES for the OTP email channel** (D7 ruling): in the SES console, ap-south-1, verify a sender identity (address or domain); while the account is in the SES sandbox also verify the recipient addresses you test with; request production access before the first stranger (D12) or beta at the latest. Then run the founder-only live proof in `server/README.md` "Auth" (`MARGAI_AUTH_OTP_SENDER=ses MARGAI_AUTH_OTP_EMAIL_FROM=…`) | before D8's device login ideally; before D12 | ◐ 2026-09-08: the founder already has SES-verified email identities — sender covered; while sandboxed they double as the test recipients · **✅ live proof PASS 2026-09-09** (founder-run, transcript pasted in session): server on 8081 with `MARGAI_AUTH_OTP_SENDER=ses` and the verified sender, default region ap-south-1; `POST /auth/otp/request {email}` to a verified Gmail recipient (s***@gmail.com) → 200, request id 311fd2a1-…, challenge 1358d17a-…, channel email; the code arrived in the real inbox (no sandbox logger with the SES sender); `POST /auth/otp/verify` → 200 with access + refresh tokens, `expires_in` 900, `is_new_user: true`, user 49d2b89e-… — SES delivery and the identity region are settled | remaining: request production access before D12 so strangers' inboxes work (sandbox = verified recipients only); SSM keys `otp/sender`, `otp/email_from`, `otp/channels` (TECH_PLAN §7.3) at F8 · 2026-09-09 (D12): the Week-2 gate ran on the sandbox inbox with this live proof as the real-inbox evidence; **production access is the one open step before an unverified stranger's inbox, and overdue against this row's own "before D12" date** — named as carried in the gate verdict; slippage log |
 | F2 | NCERT licensing letter sent | W1 | ☐ | follow-up cadence: monthly |
-| F3 | Educator review of backbone booked | by W5 | ☐ | needed W8 |
+| F3 | Educator review of backbone booked | by W5 | ☐ | needed W8 · 2026-09-11 (D13): the draft to review exists — `pipeline/inputs/archetypes.yaml` (4 tracks, 744 steps) with the track windows and the weightage-first list explained in `pipeline/inputs/README.md`; the founder's sniff test passed, so booking the educator is the open step |
 | F4 | Beta recruitment playbook + group scouting | W10–13 | ☐ | 2–3 Telegram groups |
 | F5 | Marketing site copy + deploy | W11 | ☐ | |
 | F6 | Trademark search (Class 41 + 9) for final name | anytime | ☐ | before public launch |
@@ -206,9 +206,15 @@ Session 2 · 2026-09-11 · the founder's review of the drafts, checklist items 1
   year), PBLOCK's two topics match the slimmed syllabus, the GOC → GOCTECH edge is wired; (3) topic
   granularity approved with no merges — every two-topic chapter matches the rationalised 2022
   edition and the deleted chapters (Solid State, Polymers, Transport in Plants, Digestion) are absent.
-  DECISIONS rows amended with the closures; README checklist items 1–3 struck. Items 4–7 stay open:
-  Hindi names (native reader), prerequisite edges, track weeks + the weightage-first list (F3), cut-off
-  values plus the 2026 and seat-type rows.
+  DECISIONS rows amended with the closures; README checklist items 1–3 struck. Later the same day:
+  (5) all 103 edges approved, nothing removed, one addition — BOT.11.CLASSIF → ZOO.11.ANIMALK, the
+  mirror of Classification → Plant Kingdom (104 edges; this is the edge dropped on 2026-09-10 for
+  cross-stream timing, so the generator now lets a prerequisite inherit the priority of its dependants
+  and delays a chapter to its cross-stream prerequisite's week — Classification moves from week 10–15
+  to week 2 in the dropper and repeater, Animal Kingdom follows it in the same week, 0 warnings, the
+  archetypes regenerated); (6) track windows pass the founder's sniff test, F3 decides — booking the
+  educator review is the founder's open step (F3 row). Items 4 and 7 stay open: Hindi names (native
+  reader), cut-off values plus the 2026 and seat-type rows.
   Still to do for the ✅: the loader commands + pipeline profile (the cross-stream check at sequence
   granularity; the §6.3 orphans report must surface the D4 seed's PHY.11.MECH / PHY.11.KIN shapes on
   a seeded local db), the §0.2 pipeline.md rule edit (also stale on command order: TECH_PLAN §6.3 puts

@@ -9,7 +9,7 @@ dated 2026-09-10 record the spec-silent choices.
 | file | loads into | command (§6.3) | rows |
 |---|---|---|---|
 | `taxonomy.csv` | `syllabus_nodes` | `taxonomy load` | 516 nodes: 4 subjects, 55 units, 83 chapters, 374 topics |
-| `prerequisites.csv` | `syllabus_prerequisites` | `taxonomy prerequisites` | 103 chapter-to-chapter edges, acyclic |
+| `prerequisites.csv` | `syllabus_prerequisites` | `taxonomy prerequisites` | 104 chapter-to-chapter edges, acyclic |
 | `archetypes.yaml` | `archetype_tracks`, `archetype_track_steps` | `backbone load` | 4 tracks, 744 steps |
 | `cutoffs.csv` | `cutoffs` | `cutoffs load` | 35 qualifying rows, 2019–2025 |
 
@@ -70,11 +70,12 @@ Conventions in this draft:
 
 ## prerequisites.csv
 
-`from_code` is learned before `to_code` (DECISIONS 2026-09-06 D4). Chapter level only, 103 edges.
+`from_code` is learned before `to_code` (DECISIONS 2026-09-06 D4). Chapter level only, 104 edges.
 Physics and Chemistry edges stay within the subject; Biology edges cross between botany and zoology
-where the discipline does (Cell Cycle before Human Reproduction, Genetics before Evolution). The graph
-is acyclic (Kahn's algorithm, the check the D13 loader repeats). Soft dependencies were left out on
-purpose: an edge here constrains every track's ordering.
+where the discipline does (Cell Cycle before Human Reproduction, Genetics before Evolution, and, added
+at the founder's review on 2026-09-11, Biological Classification before Animal Kingdom, the mirror of
+Classification before Plant Kingdom). The graph is acyclic (Kahn's algorithm, the check the D13 loader
+repeats). Soft dependencies were left out on purpose: an edge here constrains every track's ordering.
 
 ## archetypes.yaml
 
@@ -84,9 +85,12 @@ Four tracks per the `archetype_tracks` CHECK: `fresher_2yr` (96 weeks), `fresher
 - **learn** steps name chapters. Each track learns all 83 chapters in four parallel subject streams.
   Freshers go class 11 then class 12 in NCERT order; the dropper and repeater go weightage-first, using
   a draft priority list that D22's computed `weightage_marks_avg` should replace. Within every stream
-  the order respects `prerequisites.csv` (a priority topological sort); inside a week a stream's chapters
-  keep that order, and the generator checked every edge across streams at both week and `sequence`
-  granularity, so no `sequence` places a chapter ahead of its prerequisite.
+  the order respects `prerequisites.csv` (a priority topological sort in which a prerequisite inherits
+  the priority of the chapters that need it, so Classification is not left until week 14 because Plant
+  Kingdom is wanted early); a chapter whose prerequisite lives in another stream waits for that
+  prerequisite's week and the rest of its stream slides with it; inside a week the chapters are ordered
+  topologically over every edge. The generator checked every edge across streams at both week and
+  `sequence` granularity, so no `sequence` places a chapter ahead of its prerequisite.
 - **revision** steps name NTA units, spread over the revision window.
 - **mock** steps name the subject node, four per mock week, since a step needs a node.
 - `target_week` is the week of the track by which the step should be reached; `sequence` is the upsert key
@@ -124,8 +128,13 @@ draft carries no number Claude could not vouch for.
    chapters deleted by rationalisation (Solid State, Polymers, Transport in Plants, Digestion) are
    absent throughout.
 4. Hindi names of units and chapters (native-reader pass); topic Hindi is deliberately empty.
-5. The prerequisite edges: anything missing that should constrain the plan, anything too strict.
-6. Track weeks and windows, and the weightage-first list, ahead of the F3 educator review.
+5. ~~The prerequisite edges: anything missing that should constrain the plan, anything too strict.~~
+   **Closed 2026-09-11, approved with one addition**: every edge passes the "cannot learn B without A"
+   test, nothing removed; Biological Classification before Animal Kingdom added (104 edges).
+6. ~~Track weeks and windows, and the weightage-first list, ahead of the F3 educator review.~~
+   **Closed 2026-09-11, sniff test passed**: shapes, mock cadence and revision windows are sane and the
+   weightage-first list is marked as the D22 placeholder; the real verdict is F3's, so the open step is
+   booking the educator review (TRACKER F3).
 7. Cut-off values against the NTA notices; add the 2026 and seat-type rows.
 
 ## How the draft was produced

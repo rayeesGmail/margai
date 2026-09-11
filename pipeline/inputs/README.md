@@ -111,10 +111,18 @@ draft carries no number Claude could not vouch for.
 
 ## Review checklist (founder, before the D13 tick)
 
-1. Botany/zoology assignment of the split units, and of Cell (with Biomolecules) and Biotechnology.
-2. The three syllabus-only chapters and the Unit 8 split: keep, or fold their topics elsewhere.
-3. Topic granularity per chapter: 374 topics, 2 to 10 per chapter, median 4. Merge or split where a
-   topic is too coarse for "≥ 30 usable questions per topic" (SPEC §9.3) or too fine to matter.
+1. ~~Botany/zoology assignment of the split units, and of Cell (with Biomolecules) and Biotechnology.~~
+   **Closed 2026-09-11, approved as drafted**: the prevalent coaching convention; Ecology under botany
+   confirmed (DECISIONS row).
+2. ~~The three syllabus-only chapters and the Unit 8 split: keep, or fold their topics elsewhere.~~
+   **Closed 2026-09-11, keep all**: EXPSKILL's ten experiments cover the one or two experimental-skills
+   questions NTA reliably asks, PRACTICAL's seven topics stand, PBLOCK's two match the slimmed p-block
+   content of the current syllabus, the GOC → GOCTECH edge is wired.
+3. ~~Topic granularity per chapter: 374 topics, 2 to 10 per chapter, median 4.~~ **Closed 2026-09-11,
+   no merges**: every two-topic chapter (ELAST, ATOMS, STRUCTANI, ORGPOP, ANAT) matches the 2022
+   edition's slimmed content, the high end (EXPSKILL 10, INHERIT 8) fits those chapters, and the
+   chapters deleted by rationalisation (Solid State, Polymers, Transport in Plants, Digestion) are
+   absent throughout.
 4. Hindi names of units and chapters (native-reader pass); topic Hindi is deliberately empty.
 5. The prerequisite edges: anything missing that should constrain the plan, anything too strict.
 6. Track weeks and windows, and the weightage-first list, ahead of the F3 educator review.

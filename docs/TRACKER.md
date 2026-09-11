@@ -199,6 +199,16 @@ Session 1 (branch d13-taxonomy): the four founder inputs of TECH_PLAN §6.2 draf
   conventions as a DECISIONS row, name_hi provenance stated as recall, the 2024 cut-off source names
   the revised 26 July notice). Not verified by the auditor and still open: the Hindi names (native
   reader), the cut-off values against the notices.
+Session 2 · 2026-09-11 · the founder's review of the drafts, checklist items 1–3 CLOSED (commit
+  75f4661 reviewed): (1) botany/zoology split approved as drafted, the prevalent coaching convention,
+  Ecology under botany confirmed via the ORGPOP → ECOSYS → BIODIV chain; (2) the three syllabus-only
+  chapters and the Unit 8 split all kept — EXPSKILL's ten experiments matter (NTA asks one or two a
+  year), PBLOCK's two topics match the slimmed syllabus, the GOC → GOCTECH edge is wired; (3) topic
+  granularity approved with no merges — every two-topic chapter matches the rationalised 2022
+  edition and the deleted chapters (Solid State, Polymers, Transport in Plants, Digestion) are absent.
+  DECISIONS rows amended with the closures; README checklist items 1–3 struck. Items 4–7 stay open:
+  Hindi names (native reader), prerequisite edges, track weeks + the weightage-first list (F3), cut-off
+  values plus the 2026 and seat-type rows.
   Still to do for the ✅: the loader commands + pipeline profile (the cross-stream check at sequence
   granularity; the §6.3 orphans report must surface the D4 seed's PHY.11.MECH / PHY.11.KIN shapes on
   a seeded local db), the §0.2 pipeline.md rule edit (also stale on command order: TECH_PLAN §6.3 puts

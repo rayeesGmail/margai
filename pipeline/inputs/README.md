@@ -11,7 +11,7 @@ dated 2026-09-10 record the spec-silent choices.
 | `taxonomy.csv` | `syllabus_nodes` | `taxonomy load` | 516 nodes: 4 subjects, 55 units, 83 chapters, 374 topics |
 | `prerequisites.csv` | `syllabus_prerequisites` | `taxonomy prerequisites` | 104 chapter-to-chapter edges, acyclic |
 | `archetypes.yaml` | `archetype_tracks`, `archetype_track_steps` | `backbone load` | 4 tracks, 744 steps |
-| `cutoffs.csv` | `cutoffs` | `cutoffs load` | 35 qualifying rows, 2019–2025 |
+| `cutoffs.csv` | `cutoffs` | `cutoffs load` | 40 qualifying rows, 2019–2026 |
 
 Sources: `syllabus/manifest.md` (the 2025 and 2026 syllabus PDFs: identical content, 50 NTA units),
 `ncert/2022-ed/en/manifest.md` (the 79 NCERT chapters; titles verified from each book's contents page
@@ -105,13 +105,16 @@ every two from 24, revises in 25–38. This is the draft the F3 educator review 
 
 ## cutoffs.csv
 
-Only `seat_type = qualifying` rows: the NTA qualifying cut-off per category for 2019 to 2025, taken as
+Only `seat_type = qualifying` rows: the NTA qualifying cut-off per category for 2019 to 2026, taken as
 the lower bound of the published score range, with EWS equal to general as NTA publishes it. The 2024
 row is the revised result of 26 July 2024 (the 4 June notice read 164 and 129), and its `source` says so.
-`quota_scope` is `AIQ` (the DECISIONS 2026-09-10 D13 row on qualifying cut-offs). **Missing, founder-sourced:** the 2026
-qualifying row once NTA's 2026 result notice is confirmed, and every `govt_mbbs`, `private_mbbs` and
-`bds` closing-marks row by year, category and quota scope from MCC and state counselling data. The
-draft carries no number Claude could not vouch for.
+`quota_scope` is `AIQ` (the DECISIONS 2026-09-10 D13 row on qualifying cut-offs). The 2026 rows come from the
+NTA result notice of 16 July 2026 for the Re-NEET of 21 June (the May exam was cancelled), supplied by
+the founder at the review; **2026 is a historical outlier** (general 144 → 213) and the D58 trajectory
+feature must anchor to a smoothed reference, not the latest year alone (DECISIONS 2026-09-11 D13).
+**Still founder-sourced, later:** every `govt_mbbs`, `private_mbbs` and `bds` closing-marks row by year,
+category and quota scope from MCC and state counselling data, not needed before the trajectory work
+around D58.
 
 ## Review checklist (founder, before the D13 tick)
 
@@ -127,7 +130,9 @@ draft carries no number Claude could not vouch for.
    edition's slimmed content, the high end (EXPSKILL 10, INHERIT 8) fits those chapters, and the
    chapters deleted by rationalisation (Solid State, Polymers, Transport in Plants, Digestion) are
    absent throughout.
-4. Hindi names of units and chapters (native-reader pass); topic Hindi is deliberately empty.
+4. ~~Hindi names of units and chapters (native-reader pass); topic Hindi is deliberately empty.~~
+   **Closed 2026-09-11, approved for D13**: the sampled units and chapters read correctly; a final
+   native-reader skim of the full `name_hi` column is PARKED for before D26, with the topic translations.
 5. ~~The prerequisite edges: anything missing that should constrain the plan, anything too strict.~~
    **Closed 2026-09-11, approved with one addition**: every edge passes the "cannot learn B without A"
    test, nothing removed; Biological Classification before Animal Kingdom added (104 edges).
@@ -135,7 +140,9 @@ draft carries no number Claude could not vouch for.
    **Closed 2026-09-11, sniff test passed**: shapes, mock cadence and revision windows are sane and the
    weightage-first list is marked as the D22 placeholder; the real verdict is F3's, so the open step is
    booking the educator review (TRACKER F3).
-7. Cut-off values against the NTA notices; add the 2026 and seat-type rows.
+7. ~~Cut-off values against the NTA notices; add the 2026 and seat-type rows.~~ **Closed 2026-09-11**:
+   the seven drafted years verified against the official notices; the five 2026 rows added from the
+   16 July 2026 notice; seat-type rows stay founder-sourced for around D58.
 
 ## How the draft was produced
 

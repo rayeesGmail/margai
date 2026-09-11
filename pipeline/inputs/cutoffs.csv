@@ -34,3 +34,8 @@ year,category,quota_scope,seat_type,qualifying_marks,source
 2025,obc,AIQ,qualifying,113,NTA NEET (UG) 2025 result notice: OBC/SC/ST qualifying range 143-113
 2025,sc,AIQ,qualifying,113,NTA NEET (UG) 2025 result notice: OBC/SC/ST qualifying range 143-113
 2025,st,AIQ,qualifying,113,NTA NEET (UG) 2025 result notice: OBC/SC/ST qualifying range 143-113
+2026,general,AIQ,qualifying,213,NTA NEET (UG) 2026 result notice (16 July 2026): UR/EWS qualifying range 715-213 (Re-NEET)
+2026,ews,AIQ,qualifying,213,NTA NEET (UG) 2026 result notice (16 July 2026): UR/EWS qualifying range 715-213 (Re-NEET)
+2026,obc,AIQ,qualifying,177,NTA NEET (UG) 2026 result notice (16 July 2026): OBC/SC/ST qualifying range 212-177 (Re-NEET)
+2026,sc,AIQ,qualifying,177,NTA NEET (UG) 2026 result notice (16 July 2026): OBC/SC/ST qualifying range 212-177 (Re-NEET)
+2026,st,AIQ,qualifying,177,NTA NEET (UG) 2026 result notice (16 July 2026): OBC/SC/ST qualifying range 212-177 (Re-NEET)

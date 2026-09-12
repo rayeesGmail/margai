@@ -147,7 +147,11 @@ from-pyq half alone ships value and the from-inputs half can land in any later b
 3. **PLAN/TRACKER:** map work: `collective from-pyq` + record schema into the D19–D24
    window (name it in D22–D24 scopes); `from-inputs`/`review`/`load` into D24 buffer with
    explicit permission to slip to any later buffer; planner two-source behavior into
-   D55–D56 scopes; diagnosis bootstrap into D49; add founder workstream **F11: collect
+   D55–D56 scopes (amended 2026-09-12, founder ruling: the day-1 first plan's read of the
+   collective record — pacing multipliers, priority, templated collectively-attributed
+   reasons, graceful degradation when records are absent or below threshold — goes into
+   D29; the evidence-weighted prior→posterior blend stays in D55–D56); diagnosis bootstrap
+   into D49; add founder workstream **F11: collect
    public-discourse excerpt files + source list** (needed before `from-inputs`; not
    blocking anything else). Update TRACKER day lines and workstreams accordingly.
 4. **DECISIONS.md:** one row for the CIL adoption citing this change spec; one for the

@@ -276,7 +276,8 @@ flowchart LR
 
 **Block types:** Learn (directs outside study: chapter + NCERT sections + why today),
 Practice (timed in-app MCQ set), Revise (notebook variants due), and later Mock.
-Every block carries a one-line **reason drawn from the student's data** (Evidence rule).
+Every block carries a one-line **reason drawn from the student's data or, attributed as such, from
+the collective record** (Evidence rule; §9.6).
 
 **Two sources (CS-1):** the planner reads two things — the *collective record* of each
 topic (how NEET students in general experience it: struggle, realistic pacing, exam

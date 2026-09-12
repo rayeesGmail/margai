@@ -628,7 +628,8 @@ row exists only when `sample_size` meets the configured minimum (Evidence rule, 
 inputs_snapshot JSONB, ai_call_id → ai_calls, version INTEGER, UNIQUE (user_id, plan_date)`.
 **plan_blocks** — D29: `plan_id → daily_plans, position SMALLINT, type CHECK
 (learn|practice|revise|mock|diagnostic), node_id, minutes SMALLINT, reason_md TEXT NOT NULL
-CHECK (length(reason_md) > 0), reason_evidence JSONB, payload JSONB, status CHECK
+CHECK (length(reason_md) > 0), reason_evidence JSONB, attribution VARCHAR(10) NOT NULL CHECK
+(collective|individual) (CS-1 §5.5; the D29 first plan already writes it — founder ruling 2026-09-12), payload JSONB, status CHECK
 (pending|done|skipped|deferred) DEFAULT 'pending', status_at, session_id`. Blocks are rows rather than
 DEV_SPEC's JSONB array because `POST /plan/blocks/{id}/status` addresses them and streaks count them.
 `payload` for practice and revise blocks carries `drill ∈ {standard, easy_first, checking, pacing,
@@ -722,7 +723,7 @@ Numbers are indicative; the agent takes the next free integer.
 | V11 `batch_positions` | D25 | batch_positions (§0.5 item 3) |
 | V12 `parent_consents` | D27 | parent_consents |
 | V13 `documents` | D28 | document_extractions, idempotency_keys |
-| V14 `plans` | D29 | daily_plans, plan_blocks |
+| V14 `plans` | D29 | daily_plans, plan_blocks (with `attribution`, CS-1) |
 | V15 `notifications` | D30 | user_devices, notification_log |
 | V16 `practice_sessions` | D31 | practice_sessions, practice_session_questions |
 | V17 `practice_events` | D33 | practice_events |
@@ -1246,21 +1247,26 @@ this node → 65% your data") and the eval's `claim` fixtures (§4.10) can trace
 before CS-1, which is also what CS-1 §7 (c) measures by running the same synthetic students with the
 records table empty.
 
-Proposed 2026-09-12 (the audit found CS-1 §2 defines `momentum_trend` and `strategy_notes` but §5
-names no consumer), pending the founder's confirmation (TRACKER, CS-1 open items): `momentum_trend`
-scales the weightage term of a node's priority (`rising` × `margai.planner.collective.momentum_boost`,
-default 1.1; `falling` by its inverse; `flat` unchanged) and may be quoted in a collective reason
-("NTA has asked more of this each year"); `strategy_notes` choose a node's block order ("PYQ-first"
-→ a practice block before its learn block) and the learn block's copy. Both sit in the snapshot
-either way.
+`momentum_trend` and `strategy_notes` (CS-1 §2 defines them, §5 names no consumer; founder ruling
+2026-09-12, DECISIONS): `momentum_trend` scales a node's weightage in candidate priority (`rising` ×
+`margai.planner.collective.momentum_boost`, default 1.1; `falling` by its inverse; `flat` unchanged)
+and may be cited as what it is, a PYQ-data claim ("NTA has asked this more in recent years" — the
+Evidence rule's collective form); `strategy_notes` influence a node's block composition and order
+("PYQ-first" → a practice block before its learn block) and the mentor copy, cited as collective
+consensus. The standard riders apply to both: consumed only from records at or above
+`min_confidence`, attributed as collective when cited, and never overriding a prerequisite edge or
+an individual-evidence signal. Both sit in the snapshot.
 
 The same `DeterministicPlanner` produces the onboarding first plan (D29, no AI call, < 6 s) and the
-on-the-fly fallback in `GET /plan/today`. Whether the D29 first plan already reads the collective
-record is open for the founder (TRACKER, CS-1 open items): CS-1 §1 says the day-1 plan reads two
-sources, §9.3 maps the two-source read to D55–D56, and the D29 scope in PLAN stays as it is until
-ruled — recommended: D29 reads the approved records for pacing, priority and collective-attributed
-templated reasons at zero evidence (the honest-ramp line of SPEC §6.1 either way), the evidence-level
-weighting arriving at D55. `POST /plan/negotiate` runs `MentorMessageTask` (CHEAP)
+on-the-fly fallback in `GET /plan/today`. The D29 first plan reads the collective record (founder
+ruling 2026-09-12, DECISIONS; CS-1 §1 "the day-1 plan reads two sources", §9.3 amended): pacing
+multipliers, priority from `struggle_score`, templated collectively-attributed reasons and the
+honest-ramp line of SPEC §6.1 — and it degrades gracefully: with records absent or below
+`min_confidence` (the `from-inputs` half may slip, so D29 may see from-pyq-only records or none) a
+node gets its default learn minutes, its backbone priority and a plain weightage-based reason, and
+the plan is sound either way (PLAN D29 ✅ runs with the table populated and with it empty). The
+first plan's snapshot stores `record_confidence` and the applied multiplier per node; the evidence
+level and weight arrive with the nightly re-planner at D55–D56. `POST /plan/negotiate` runs `MentorMessageTask` (CHEAP)
 to classify intent and extract constraints ("Fri–Sun unavailable"), then re-runs steps 4–6 for the
 affected days with the constraints applied and `generated_by = renegotiation`. The `mentor_reply`
 and `trade_off` are validated the same way: every block the reply says was moved or dropped must be
@@ -1335,9 +1341,9 @@ Two layers, one fixture set.
   tolerance?}, expected_anchor: {book_code, chapter_no}, is_numerical, tags[]}`. Hand-verified by
   the founder; ~60 at D23, ~150 at D47, ~200 target. The harness gains the `claim` fixture kind at D47 (CS-1 §7)
   — a reason or mentor-note line attributed as collective, sampled from generated plans, with the
-  record it must trace to (`node_code`, `season_version`, field) — populated from D56, when the
-  first attributed reason lines exist (§4.5); a claim that traces to no approved record fails the
-  suite.
+  record it must trace to (`node_code`, `season_version`, field) — first populated from the D29
+  first plan's templated reasons (attributed lines exist from D29, founder ruling 2026-09-12), the
+  AI reason lines joining at D56 (§4.5); a claim that traces to no approved record fails the suite.
 - **Live layer** (the real gate): `BEDROCK_LIVE=1 ./mvnw -Peval verify` runs `EvalSuiteIT`, which
   drives `DoubtSolveService` end to end with `BedrockAiClient` against a Testcontainers database
   loaded with the NCERT and question tables from a snapshot in the content bucket. Per fixture it
@@ -2076,11 +2082,11 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 | D13 taxonomy | §6.2, §6.3 `taxonomy`, `backbone`, `cutoffs` commands; §2.3 |
 | D14–D18 NCERT | §6.1, §6.3 `ncert *`, §6.4, §2.3 `ncert_*`, §4.9 |
 | D19–D24 PYQ + eval v1 | §6.3 `pyq *`, `stats`, `traps`, `anchors`, `eval snapshot`, `collective *` (CS-1); §2.3 questions, `collective_records`; §4.10; §6.5 |
-| D25–D30 onboarding + first plan | §3.7 onboarding, documents (timetable `doc_type` at D29), consent (inside the flow, D27, §0.5 item 8); §2.2, §2.7 `batch_positions` (self-report at D25, §0.5 item 3); §4.5 `DeterministicPlanner`; §5.5 language; §5.8 screens 2–5; §2.7 `notification_log`, `user_devices` |
+| D25–D30 onboarding + first plan | §3.7 onboarding, documents (timetable `doc_type` at D29), consent (inside the flow, D27, §0.5 item 8); §2.2, §2.7 `batch_positions` (self-report at D25, §0.5 item 3); §4.5 `DeterministicPlanner` with the first plan's collective read and graceful degradation (CS-1; the D29 ruling), `plan_blocks.attribution` (§2.7); §5.5 language; §5.8 screens 2–5; §2.7 `notification_log`, `user_devices` |
 | D31–D36 practice | §3.7 practice and `POST /plan/blocks/{id}/session`, §2.4, §5.6 offline Option A (§0.5 item 1b) with the D34 pack test, §8.3 correct-key test, §4.6 trigger; `kind = mock` sessions at D35 (§0.5 item 2) |
 | D37–D48 doubts | §4.2–§4.4, §4.9, §4.11–§4.13, §3.6, §3.7 doubts, §2.5, §5.8 screen 9, §4.10 expansion at D47 |
 | D49–D54 notebook | §4.6 (with the CS-1 misconception seed), §4.7, §2.6, §3.7 notebook, §5.8 screen 10; the `payload.drill` variants (§2.7, §4.5 step 4) at D51–D52; the mock autopsy in D54's buffer (§0.5 item 2): per-mark cause classification over a `kind = mock` session, gamble score (marks lost to answered questions the student should have skipped), pace map (time per question vs the norm), all deterministic over `practice_events` plus the §4.6 causes |
-| D55–D60 nightly brain | §4.5 (with the CS-1 two-source read and weighting paragraph), §1.6, §2.7, §7.2 scheduled task, §3.7 plan negotiate/week, trajectory; the first `claim` eval fixtures (§4.10) at D56 |
+| D55–D60 nightly brain | §4.5 (with the CS-1 two-source read and weighting paragraph), §1.6, §2.7, §7.2 scheduled task, §3.7 plan negotiate/week, trajectory; the AI-reason `claim` eval fixtures (§4.10) at D56 |
 | D61–D66 money & trust | §3.7 billing and account export/delete, §2.8, §9.5, §9.6 (incl. the D64 document-deletion verification job), §2.10, §1.3 `jobs` export executor, §4.8 breaker demo, §10.3 cost view |
 | D67–D72 hardening | §11.7 copy, §2.7 and §8.3 notification caps, §10.3 p95 targets, §7.5 drills, §9.7 checklist |
 | D73–D78 beta prep | §10.3 dashboards (with the CS-1 §10.2 metrics), §5.9 flavours, §3.7 ops and the D75 `invite_code` on OTP verify (§2.2 `invite_codes`), §6.3 `cache seed`, §7.6 D74 |

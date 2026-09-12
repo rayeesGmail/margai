@@ -142,10 +142,14 @@ tools; your reviews focus on output quality.)*
   extract correctly; storage verifiably empty after.*
 - **D29 —** 12th-marksheet variant (shared pattern) + deterministic first-plan
   generator (archetype track + interview inputs) + first-plan reveal screen with target
-  line; the reveal's copy is honest about the ramp — the plan sharpens as the app learns
-  the student (SPEC §6.1, CS-1 §1 principle 3 — added 2026-09-12; whether this first plan
-  already reads the collective record is the founder's open ruling, TRACKER CS-1 items).
-  ✅ *New user reaches a personalized plan end-to-end.*
+  line; the first plan reads the approved collective records — pacing multipliers, priority
+  from `struggle_score`, templated collectively-attributed reasons — and degrades gracefully
+  when records are absent or below the confidence threshold (from-pyq-only records or none:
+  a sound plan with default learn minutes and plain weightage-based reasons); the reveal's
+  copy is honest about the ramp — the plan sharpens as the app learns the student (SPEC
+  §6.1, CS-1 §1 principle 3; founder ruling 2026-09-12 — the evidence-weighted blend arrives
+  at D55–D56). ✅ *New user reaches a personalized plan end-to-end, with the records table
+  populated and with it empty.*
 - **D30 —** Notification permission moment + morning notification skeleton.
   **Week-5 gate:** install → interview → (optional scorecard) → first plan < 5 minutes,
   demoed cold on a fresh device.
@@ -193,8 +197,8 @@ tools; your reviews focus on output quality.)*
 - **D46 —** Doubt history screen + follow-up threading. ✅ *Follow-ups keep context.*
 - **D47 —** Eval suite expansion to ~150 questions; wire the eval gate into pre-commit
   for AI-touching changes; the harness gains the `claim` fixture kind — a collective-attributed
-  line and the record it must trace to — populated from D56 when attributed reasons exist
-  (CS-1 §7; TECH_PLAN §4.10 — added 2026-09-12).
+  line and the record it must trace to — first populated from the D29 first plan's templated
+  reasons, the AI reason lines joining at D56 (CS-1 §7; TECH_PLAN §4.10 — added 2026-09-12).
   ✅ *Gate demonstrably blocks a prompt change that fails.*
 - **D48 —** Buffer + **Week-8 gate:** hero feature demo-ready; eval ≥ target; founder
   audit error list empty or ticketed.
@@ -230,8 +234,8 @@ tools; your reviews focus on output quality.)*
   deterministic fallback (a plan must ALWAYS exist); reasons carry an attribution —
   collective lines cite the record, individual lines the student's data, never blended —
   and the season prior softens volume and tone before individual slump signals fire
-  (CS-1 §5.4–§5.5; TECH_PLAN §4.5, SPEC §10.9 — added 2026-09-12); the first attributed
-  plans seed the eval's `claim` fixtures (CS-1 §7). ✅ *Kill the AI
+  (CS-1 §5.4–§5.5; TECH_PLAN §4.5, SPEC §10.9 — added 2026-09-12); the AI reason
+  lines join the eval's `claim` fixtures (CS-1 §7). ✅ *Kill the AI
   mid-run → fallback plan appears; no planless morning possible.*
 - **D57 —** Batch execution for all active users + morning notification with plan
   deep-link. ✅ *Two devices, different profiles, different 7 AM plans.*

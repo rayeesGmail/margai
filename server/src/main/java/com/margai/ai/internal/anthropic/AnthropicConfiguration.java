@@ -40,7 +40,7 @@ class AnthropicConfiguration {
     @Bean
     InnerAiClient liveAiClient(AnthropicClient client, AiProperties properties, PromptRegistry prompts,
             StructuredOutput codec, EmbeddingClient embeddings) {
-        return new InnerAiClient(AiProperties.ANTHROPIC,
+        return new InnerAiClient(AiProperties.Provider.anthropic.name(),
                 new CompositeAiClient(new AnthropicAiClient(client, properties, prompts, codec), embeddings));
     }
 

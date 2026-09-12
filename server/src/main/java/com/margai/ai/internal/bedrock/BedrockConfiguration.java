@@ -44,6 +44,7 @@ class BedrockConfiguration {
     @Bean
     InnerAiClient liveAiClient(BedrockRuntimeClient runtime, AiProperties properties, PromptRegistry prompts,
             StructuredOutput codec) {
-        return new InnerAiClient(AiProperties.BEDROCK, new BedrockAiClient(runtime, properties, prompts, codec));
+        return new InnerAiClient(AiProperties.Provider.bedrock.name(),
+                new BedrockAiClient(runtime, properties, prompts, codec));
     }
 }

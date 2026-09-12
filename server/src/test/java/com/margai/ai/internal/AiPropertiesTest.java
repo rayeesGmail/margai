@@ -26,7 +26,11 @@ class AiPropertiesTest {
     void localDefaultsBindFromApplicationYml() {
         runner.run(context -> {
             AiProperties properties = context.getBean(AiProperties.class);
-            assertThat(properties.provider()).isEqualTo(AiProperties.ANTHROPIC);
+            assertThat(properties.provider()).isEqualTo(AiProperties.Provider.anthropic);
+            assertThat(AiProperties.Provider.valueOf(AiProperties.ANTHROPIC))
+                    .as("the conditional's constant and the enum cannot drift apart")
+                    .isEqualTo(AiProperties.Provider.anthropic);
+            assertThat(AiProperties.Provider.valueOf(AiProperties.BEDROCK)).isEqualTo(AiProperties.Provider.bedrock);
             assertThat(properties.bedrock().region()).isEqualTo("ap-south-1");
             assertThat(properties.modelFor(Tier.cheap)).isNotBlank().isEqualTo(properties.modelFor(Tier.vision));
             assertThat(properties.modelFor(Tier.reason)).isNotBlank().isNotEqualTo(properties.modelFor(Tier.cheap));
@@ -121,6 +125,19 @@ class AiPropertiesTest {
         runner.withPropertyValues("margai.ai.embed.model=unpriced-embed").run(context -> {
             assertThat(context).hasFailed();
             assertThat(context.getStartupFailure()).rootCause().hasMessageContaining("unpriced-embed");
+        });
+    }
+
+    /**
+     * The fail-open hole the spec-auditor found on 2026-09-12: both provider configurations are
+     * conditional on this value, so a value matching neither would have left the chain on the fake
+     * and started the application anyway. A typed provider refuses to bind instead.
+     */
+    @Test
+    void anUnknownProviderDoesNotBoot() {
+        runner.withPropertyValues("margai.ai.provider=anthropik").run(context -> {
+            assertThat(context).hasFailed();
+            assertThat(context.getStartupFailure()).hasStackTraceContaining("margai.ai.provider");
         });
     }
 

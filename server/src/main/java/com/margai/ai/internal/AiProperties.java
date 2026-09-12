@@ -41,7 +41,7 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "margai.ai")
 @Validated
 public record AiProperties(
-        @NotBlank String provider,
+        @NotNull Provider provider,
         @NotNull @Valid Tiers tier,
         @NotNull @Valid Embed embed,
         @NotBlank String pricesJson,
@@ -55,7 +55,18 @@ public record AiProperties(
         @NotNull @Valid Bedrock bedrock,
         Map<String, @Valid Prompt> prompts) {
 
-    /** The provider values {@code margai.ai.provider} accepts. */
+    /**
+     * The completion providers a build knows how to wire. Typed, so an unknown value fails binding
+     * at startup instead of matching neither provider's condition and leaving the chain on the fake
+     * — which is what a bare string allowed. The constants below are the same names, because
+     * {@code @ConditionalOnProperty(havingValue = …)} needs a compile-time constant.
+     */
+    public enum Provider {
+        anthropic,
+        bedrock
+    }
+
+    /** The provider values {@code margai.ai.provider} accepts; {@link Provider} is the authority. */
     public static final String ANTHROPIC = "anthropic";
     public static final String BEDROCK = "bedrock";
 

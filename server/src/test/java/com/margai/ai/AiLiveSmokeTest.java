@@ -3,9 +3,6 @@ package com.margai.ai;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.anthropic.client.AnthropicClient;
-import com.anthropic.models.messages.batches.BatchCreateParams;
-import com.anthropic.models.messages.batches.MessageBatch;
-import com.anthropic.models.messages.batches.MessageBatchIndividualResponse;
 import com.margai.TestcontainersConfiguration;
 import com.margai.ai.api.AiCallContext;
 import com.margai.ai.api.AiClient;
@@ -23,8 +20,6 @@ import com.margai.ai.tasks.SmokeAnswer;
 import com.margai.ai.tasks.SmokeTask;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import javax.imageio.ImageIO;
@@ -47,19 +42,23 @@ import org.springframework.test.context.ActiveProfiles;
  *
  * <p>Together the tests close the open items of the provider switch: the configured ids exist,
  * forced tool use and prompt caching work on the cheap model, the reasoning model accepts its own
- * request shape, the vision tier takes an image, the embedding provider returns a vector of the
- * pinned width, and the batch lane accepts the reasoning model — each completion and embedding
- * logged to {@code ai_calls} with token counts and a cost.
+ * request shape, the vision tier takes an image, and the embedding provider returns a vector of the
+ * pinned width — each completion and embedding logged to {@code ai_calls} with token counts and a
+ * cost. Only the id check reaches the provider outside the seam, and it bills nothing: it reads
+ * model metadata, it does not run inference.
+ *
+ * <p>The batch lane is <b>not</b> probed here. Submitting one would be a billable model call with no
+ * {@code ai_calls} row, and "every model call logs an {@code ai_calls} row" is a hard rule with no
+ * exception written for a test (CLAUDE.md; TECH_PLAN §4.13). The lane's support is recorded from the
+ * provider's own reference (§13.2 item 2); confirming it live belongs with D55, which builds the
+ * ledgered batch path — {@code completeBatch} overridden down the decorator chain and the
+ * {@code batch} column and batch price threaded into the ledger.
  */
 @SpringBootTest
 @ActiveProfiles("live")
 @Import(TestcontainersConfiguration.class)
 @EnabledIfEnvironmentVariable(named = "AI_LIVE", matches = "1")
 class AiLiveSmokeTest {
-
-    /** A one-record batch is usually minutes; the cap keeps a stuck job from hanging the build. */
-    private static final Duration BATCH_LIMIT = Duration.ofMinutes(10);
-    private static final Duration BATCH_POLL = Duration.ofSeconds(15);
 
     @Autowired
     private SmokeTask smoke;
@@ -161,59 +160,6 @@ class AiLiveSmokeTest {
             assertThat(row.getInputTokens()).as("input tokens").isPositive();
             assertThat(row.getCostPaise()).as("cost").isPositive();
         });
-    }
-
-    /**
-     * The finding the offline lane rests on (DECISIONS 2026-09-12): the batch endpoint accepts the
-     * reasoning model. A probe, not the nightly runner — the seam's batch path is D55 work, so
-     * this writes no ledger row and prints the usage instead.
-     */
-    @Test
-    void theBatchLaneAcceptsTheReasoningModel() throws Exception {
-        String customId = "smoke-batch-" + UUID.randomUUID();
-        MessageBatch submitted = provider.messages().batches().create(BatchCreateParams.builder()
-                .addRequest(BatchCreateParams.Request.builder()
-                        .customId(customId)
-                        .params(BatchCreateParams.Request.Params.builder()
-                                .model(properties.modelFor(Tier.reason))
-                                .maxTokens(16)
-                                .addUserMessage("Reply with the single word ok.")
-                                .build())
-                        .build())
-                .build());
-
-        MessageBatch ended = awaitEnd(submitted.id());
-        assertThat(ended.processingStatus()).isEqualTo(MessageBatch.ProcessingStatus.ENDED);
-
-        try (var results = provider.messages().batches().resultsStreaming(ended.id())) {
-            List<MessageBatchIndividualResponse> responses = results.stream().toList();
-            assertThat(responses).hasSize(1);
-            MessageBatchIndividualResponse response = responses.get(0);
-            assertThat(response.customId()).isEqualTo(customId);
-            assertThat(response.result().isSucceeded())
-                    .as("the reasoning model is supported on the batch endpoint")
-                    .isTrue();
-            var usage = response.result().asSucceeded().message().usage();
-            System.out.printf("=== batch lane: %s | in=%d out=%d ===%n",
-                    properties.modelFor(Tier.reason), usage.inputTokens(), usage.outputTokens());
-            assertThat(usage.inputTokens()).isPositive();
-        }
-    }
-
-    private MessageBatch awaitEnd(String batchId) throws InterruptedException {
-        Instant deadline = Instant.now().plus(BATCH_LIMIT);
-        while (true) {
-            MessageBatch batch = provider.messages().batches().retrieve(batchId);
-            if (batch.processingStatus().equals(MessageBatch.ProcessingStatus.ENDED)) {
-                return batch;
-            }
-            if (Instant.now().isAfter(deadline)) {
-                throw new AssertionError("batch " + batchId + " was still " + batch.processingStatus()
-                        + " after " + BATCH_LIMIT + "; results arrive within 24 h, so re-run rather than read this"
-                        + " as a lack of support");
-            }
-            Thread.sleep(BATCH_POLL.toMillis());
-        }
     }
 
     private void assertOkRow(AiCall row, Tier tier) {

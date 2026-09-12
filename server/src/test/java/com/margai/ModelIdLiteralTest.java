@@ -21,7 +21,8 @@ import org.junit.jupiter.api.Test;
 class ModelIdLiteralTest {
 
     static final Pattern MODEL_ID = Pattern.compile(
-            "anthropic\\.claude-|cohere\\.embed-|amazon\\.titan-|global\\.anthropic|apac\\.anthropic|claude-[a-z]+-\\d");
+            "anthropic\\.claude-|cohere\\.embed-|amazon\\.titan-|global\\.anthropic|apac\\.anthropic|claude-[a-z]+-\\d"
+                    + "|embed-v\\d|embed-multilingual");
 
     @Test
     void noModelIdLiteralInTheAiModule() throws IOException {
@@ -47,5 +48,16 @@ class ModelIdLiteralTest {
         assertThat(MODEL_ID.matcher("cohere.embed-multilingual-v3").find()).isTrue();
         assertThat(MODEL_ID.matcher("amazon.titan-embed-text-v2:0").find()).isTrue();
         assertThat(MODEL_ID.matcher("modelId.startsWith(\"amazon.titan\")").find()).isFalse();
+    }
+
+    /** The direct APIs use bare ids, with no vendor prefix to catch them by (2026-09-12). */
+    @Test
+    void theScanRecognisesTheBareDirectApiIds() {
+        assertThat(MODEL_ID.matcher("claude-haiku-4-5").find()).isTrue();
+        assertThat(MODEL_ID.matcher("claude-sonnet-5").find()).isTrue();
+        assertThat(MODEL_ID.matcher("embed-v4.0").find()).isTrue();
+        assertThat(MODEL_ID.matcher("embed-multilingual-v3.0").find()).isTrue();
+        assertThat(MODEL_ID.matcher("EmbedRequest.InputType.search_document").find()).isFalse();
+        assertThat(MODEL_ID.matcher("properties.embed().model()").find()).isFalse();
     }
 }

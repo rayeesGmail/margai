@@ -18,7 +18,7 @@ public record ImagePart(byte[] bytes, String mediaType) {
         }
     }
 
-    /** The Bedrock image format name: the subtype of the media type. */
+    /** The bare image format name (the media type's subtype), which some providers want instead. */
     public String format() {
         return mediaType.substring("image/".length());
     }

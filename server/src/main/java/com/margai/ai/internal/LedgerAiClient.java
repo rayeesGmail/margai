@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
- * The outermost decorator (TECH_PLAN §4.1, §4.8, §4.13 "every Bedrock call logs an
+ * The outermost decorator (TECH_PLAN §4.1, §4.8, §4.13 "every model call logs an
  * {@code ai_calls} row"): one ledger row per call for every outcome — {@code ok},
  * {@code invalid_output} (with the tokens the failed attempts consumed), {@code timeout},
  * {@code error} and {@code breaker} — with {@code cost_paise} computed at insert and the

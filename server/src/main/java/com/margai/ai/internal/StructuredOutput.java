@@ -26,7 +26,7 @@ import tools.jackson.databind.json.JsonMapper;
  * The structured-output contract (TECH_PLAN §4.11, DECISIONS D3.21 and D5): one JSON schema is
  * derived from the output record — snake_case property names, every component required except
  * {@link Optional} ones (optional and nullable), no additional properties, enums as their
- * constant names — and serves both as the forced Bedrock tool's input schema and as the schema
+ * constant names — and serves both as the forced tool's input schema and as the schema
  * the model's answer is validated against before it is decoded into the record. Required-ness
  * and types are the validator's job; Jackson only rejects unknown properties and null
  * primitives. A mismatch is an {@link InvalidOutputException} that carries the validation

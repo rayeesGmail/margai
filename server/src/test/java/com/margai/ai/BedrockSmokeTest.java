@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -30,15 +31,17 @@ import org.springframework.test.context.ActiveProfiles;
  * needs that provider's model ids and price rows supplied by environment, since the defaults
  * price the direct-API models; {@link AiLiveSmokeTest} is the D5 acceptance now.
  *
- * <p>Founder-run only: {@code BEDROCK_LIVE=1} plus AWS credentials in the SDK's default chain —
- * the IAM Identity Center profile F8 created (TECH_PLAN §7.4), after
- * {@code aws sso login --profile margai}; otherwise the test is skipped and the build never
- * touches AWS. Two calls on the {@code cheap} tier prove that the forced tool returns the record,
- * that the ledger gets real token counts, and that the second call reads the prompt cache the
- * first one wrote.
+ * <p>Founder-run only, and behind the same single switch as every live run: {@code AI_LIVE=1} is
+ * what unlocks billable calls anywhere (DECISIONS 2026-09-12 — it replaced {@code BEDROCK_LIVE=1}
+ * with no alias, so this test selects the dormant path with a system property rather than a second
+ * environment variable that could unlock spend on its own). It also needs AWS credentials in the
+ * SDK's default chain — the IAM Identity Center profile F8 created (TECH_PLAN §7.4), after
+ * {@code aws sso login --profile margai}. Two calls on the {@code cheap} tier prove that the forced
+ * tool returns the record, that the ledger gets real token counts, and that the second call reads
+ * the prompt cache the first one wrote.
  *
  * <pre>
- * cd server && AWS_PROFILE=margai BEDROCK_LIVE=1 \
+ * cd server && AWS_PROFILE=margai AI_LIVE=1 -Dbedrock.smoke=true \
  *   MARGAI_AI_TIER_CHEAP_ID=… MARGAI_AI_PRICES_JSON=… \
  *   MARGAI_AI_EMBED_PROVIDER=bedrock MARGAI_AI_EMBED_MODEL=… \
  *   ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
@@ -51,7 +54,8 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(properties = "margai.ai.provider=bedrock")
 @ActiveProfiles("live")
 @Import(TestcontainersConfiguration.class)
-@EnabledIfEnvironmentVariable(named = "BEDROCK_LIVE", matches = "1")
+@EnabledIfEnvironmentVariable(named = "AI_LIVE", matches = "1")
+@EnabledIfSystemProperty(named = "bedrock.smoke", matches = "true")
 class BedrockSmokeTest {
 
     @Autowired

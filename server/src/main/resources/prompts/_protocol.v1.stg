@@ -1,7 +1,8 @@
-// _protocol v1 — model-facing fragments shared by every Converse request (TECH_PLAN §4.11).
+// _protocol v1 — model-facing fragments shared by every model request (TECH_PLAN §4.11).
 // A group file whose name starts with "_" is a fragment group: it defines no system/user
-// prompt, only named fragments rendered by the Bedrock request mapper. Under the eval gate and
-// the prompt changelog like any prompt (.claude/rules/ai-layer.md: never inline prompt strings).
+// prompt, only named fragments rendered by whichever provider's request mapper is active. Under
+// the eval gate and the prompt changelog like any prompt (.claude/rules/ai-layer.md: never
+// inline prompt strings).
 
 // The description of the one forced tool; v.task is the prompt name.
 tool_description(v) ::= <<

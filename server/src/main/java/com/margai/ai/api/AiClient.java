@@ -7,7 +7,7 @@ import java.util.List;
  * images to a typed JSON record, and text to a vector. Feature behaviour lives in the task
  * classes of {@code ai.tasks}, the only callers; every implementation and decorator runs behind
  * the same interface so the ledger, breaker, tier policy, schema validation and retries apply to
- * the Bedrock and the fake client alike.
+ * every provider and to the fake client alike.
  */
 public interface AiClient {
 
@@ -15,10 +15,13 @@ public interface AiClient {
     <T> AiResponse<T> complete(AiRequest<T> request);
 
     /**
-     * The same contract for many requests: one response and one ledger row per request. At D5
-     * this is the bounded on-demand loop of §4.11 (concurrency 4) over {@link #complete}; a
-     * Bedrock batch job for ≥ {@code margai.ai.batch-min-records} requests arrives with its first
-     * caller (D55+). Runs to completion; the first failure is rethrown with the others suppressed.
+     * The same contract for many requests: one response and one ledger row per request. Today this
+     * is the bounded on-demand loop of §4.11 (concurrency 4) over {@link #complete}. A real batch
+     * submission for ≥ {@code margai.ai.batch-min-records} requests arrives with its first caller
+     * (D55+) and needs this method overridden down the decorator chain, not only on the inner
+     * client, plus the {@code batch} column and batch price in the ledger; the provider's batch
+     * endpoint has no minimum of its own, so the threshold is a latency choice (§4.11). Runs to
+     * completion; the first failure is rethrown with the others suppressed.
      */
     default <T> List<AiResponse<T>> completeBatch(List<AiRequest<T>> requests) {
         return OnDemandBatch.run(requests, this::complete, OnDemandBatch.CONCURRENCY);

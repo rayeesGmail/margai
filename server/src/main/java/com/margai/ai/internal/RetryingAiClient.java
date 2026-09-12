@@ -88,12 +88,14 @@ public final class RetryingAiClient implements AiClient {
     }
 
     /**
-     * The provider's own hint when it sent one and it is no longer than {@link #MAX_RETRY_AFTER},
-     * otherwise the computed backoff.
+     * The provider's own hint when it sent one, clamped to {@link #MAX_RETRY_AFTER}, otherwise the
+     * computed backoff. Clamped rather than discarded: dropping a long hint would fall back to a
+     * sub-second backoff and retry far sooner than the provider asked, which is the opposite of
+     * what the hint is for.
      */
     Duration delayFor(AiUnavailableException failure, int retry) {
         return failure.retryAfter()
-                .filter(hint -> hint.compareTo(MAX_RETRY_AFTER) <= 0)
+                .map(hint -> hint.compareTo(MAX_RETRY_AFTER) > 0 ? MAX_RETRY_AFTER : hint)
                 .orElseGet(() -> backoff(retry));
     }
 

@@ -26,7 +26,7 @@ public final class TestAiProperties {
     }
 
     public static AiProperties withEmbed(String model, int dimensions) {
-        return new AiProperties("anthropic",
+        return new AiProperties(AiProperties.Provider.anthropic,
                 new AiProperties.Tiers(model(CHEAP), model(REASON), model(VISION)),
                 new AiProperties.Embed("cohere", model, dimensions, true),
                 "{}", BigDecimal.ONE, new AiProperties.Budget(1, 1), 100, 1024, Duration.ofSeconds(20),

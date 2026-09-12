@@ -7,8 +7,9 @@ in your plan. If code and SPEC conflict, say so — do not silently pick one.
 ## Stack (fixed — do not substitute)
 - server/: Java (latest LTS), Spring Boot 4, Maven, Postgres 18 (Flyway migrations), pgvector
 - app/: Flutter (Android target), Riverpod, drift for offline
-- ai: AWS Bedrock ONLY via AiClient interface (server/.../ai/). Model IDs from config.
-- infra: ap-south-1; secrets via SSM; never write AWS keys anywhere
+- ai: direct provider APIs ONLY via AiClient interface (server/.../ai/) — Anthropic for models,
+  Cohere for embeddings. Model IDs from config. Bedrock is dormant, not deleted.
+- infra: ap-south-1; secrets via SSM; never write AWS keys or provider API keys anywhere
 
 ## Commands
 - server: `cd server && ./mvnw verify` (must pass before any commit)
@@ -20,7 +21,10 @@ in your plan. If code and SPEC conflict, say so — do not silently pick one.
 - correct_key is never sent before that student's answer to the question is recorded server-side;
   judging is server-side (DEV_SPEC §5, TECH_PLAN §0.4 #4)
 - no AI answer path without retrieval grounding + numerical verification (DEV_SPEC §4.2, R2)
-- every Bedrock call logs an ai_calls row (DEV_SPEC §3.4)
+- every model call logs an ai_calls row (DEV_SPEC §3.4)
+- provider API keys are the auth model for AI: SSM SecureString in a deployed environment, an
+  untracked local file on a laptop, never in code, config, logs or a repo file. Rotation:
+  docs/runbooks/ai-provider-keys.md
 - money endpoints idempotent; Razorpay webhook signature verified (DEV_SPEC §5)
 - uploaded images: S3 uploads/ bucket only (24h lifecycle) (DEV_SPEC R6)
 - schema changes ONLY via Flyway migration + matching JPA entity update
@@ -36,10 +40,13 @@ When compacting: preserve API contract changes + rationale, migration list,
 open TODOs from the current /week task list, eval gate status. Summarize exploration.
 
 ---
-The block above is DEV_SPEC §13.2 verbatim, except that its "SPEC §3–5" citations now
-read "DEV_SPEC" (they were written when the Developer Spec was docs/SPEC.md), and hard rule 1
-carries the D3 rewording the founder approved on 2026-09-04 (TECH_PLAN §0.4 #4: SPEC §6.2/§6.4
-verdicts show the correct option after an answer is recorded).
+The block above is DEV_SPEC §13.2 verbatim, except for three approved deviations. Its "SPEC §3–5"
+citations now read "DEV_SPEC" (they were written when the Developer Spec was docs/SPEC.md). Hard
+rule 1 carries the D3 rewording the founder approved on 2026-09-04 (TECH_PLAN §0.4 #4: SPEC §6.2/§6.4
+verdicts show the correct option after an answer is recorded). And the AI stack line, the ai_calls
+hard rule and the API-key rule carry the provider switch the founder approved on 2026-09-12
+(DECISIONS, TECH_PLAN §4.11): Bedrock is blocked for this account, so model access is direct.
+DEV_SPEC §13 keeps its original wording as the historical record.
 
 ## Documents and precedence (read before proposing anything)
 1. docs/SPEC.md — Product Spec v2.0, **the contract**: behaviour, every screen and rule,
@@ -63,8 +70,8 @@ When these disagree, say so out loud and cite both — never silently pick one.
   `sed -i`. The path and secret guards hook Write/Edit fully; Bash is guarded by heuristics only.
 - Run `git add` and `git commit` as separate commands; the commit gate inspects the change set.
 - Claude commits; the human reviews and pushes. `git push`, `aws *`, `.env*` reads and
-  WebFetch are denied. FakeAiClient is the default; live Bedrock needs a human-launched
-  `BEDROCK_LIVE=1` profile with the cost breaker active (DEV_SPEC §13.7).
+  WebFetch are denied. FakeAiClient is the default; a live provider needs a human-launched
+  `AI_LIVE=1` profile with the cost breaker active (DEV_SPEC §13.7).
 - Phase-2 items (SPEC §12) are out of scope. Where the spec is silent choose the boring,
   maintainable option and record it in docs/DECISIONS.md; where it conflicts, surface it.
 - docs/SPEC.md is amended only by the founder, or by Claude on an explicit per-edit instruction in

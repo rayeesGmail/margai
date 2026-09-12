@@ -29,6 +29,8 @@ PATTERNS=(
   'SLACK_TOKEN|-|xox[baprs]-[A-Za-z0-9-]{10,}'
   'GOOGLE_API_KEY|-|AIza[0-9A-Za-z_-]{35}'
   'RAZORPAY_KEY|-|rzp_(live|test)_[A-Za-z0-9]{10,}'
+  'MODEL_PROVIDER_KEY|-|sk-ant-[a-z0-9]{3,12}-[A-Za-z0-9_-]{24,}'
+  'EMBED_PROVIDER_KEY|i|cohere[a-z0-9_-]{0,24}[ ]*[=:][ ]*["'"'"']?[A-Za-z0-9]{30,}'
   'JWT|-|eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}'
   'GENERIC_SECRET_ASSIGNMENT|i|(api[_-]?key|apikey|secret|token|passwd|password|auth[_-]?key)[a-z0-9_]{0,20}[ ]*[=:][ ]*["'"'"'][^"'"'"' ]{16,}["'"'"']'
 )

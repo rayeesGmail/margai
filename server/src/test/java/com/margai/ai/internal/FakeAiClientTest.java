@@ -32,10 +32,7 @@ class FakeAiClientTest {
 
     private static final AiCallContext CTX = AiCallContext.system("req-1");
 
-    private final AiProperties properties = new AiProperties("ap-south-1",
-            new AiProperties.Tiers("cheap-model", "reason-model", "vision-model"),
-            new AiProperties.Embed("embed-model"), "{}", BigDecimal.ONE,
-            new AiProperties.Budget(1, 1), 100, 1024, java.time.Duration.ofSeconds(20), Map.of());
+    private final AiProperties properties = TestAiProperties.standard();
 
     private final PromptRegistry prompts = PromptRegistry.fromClasspath(new PathMatchingResourcePatternResolver(), Map.of());
 
@@ -141,7 +138,7 @@ class FakeAiClientTest {
         AiResponse<float[]> other = fake.embed(new EmbedRequest(AiFeature.embed, "Le Chatelier's principle",
                 EmbedRequest.InputType.search_document, CTX));
 
-        assertThat(once.output()).hasSize(FakeAiClient.VECTOR_DIMENSIONS).containsExactly(again.output());
+        assertThat(once.output()).hasSize(properties.embed().dimensions()).containsExactly(again.output());
         assertThat(once.output()).isNotEqualTo(other.output());
         double norm = 0;
         for (float component : once.output()) {

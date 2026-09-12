@@ -96,6 +96,20 @@ public final class StructuredOutput {
         return mapper.writeValueAsString(value);
     }
 
+    /**
+     * A tree as plain Java values ({@link Map}, {@link List}, String, Number, Boolean, null).
+     * Provider SDKs carry JSON in their own tree types; handing them plain values keeps their
+     * JSON library — Jackson 2 in the Anthropic SDK — out of this module's imports entirely.
+     */
+    public Object toPlain(JsonNode node) {
+        return mapper.convertValue(node, Object.class);
+    }
+
+    /** The inverse: plain Java values, as an SDK hands them back, as a tree. */
+    public JsonNode fromPlain(Object value) {
+        return mapper.convertValue(value, JsonNode.class);
+    }
+
     /** Validates against the record's schema, then decodes; {@code usage} and {@code modelId} attribute a failure. */
     public <T> T decode(Class<T> type, JsonNode json, Usage usage, String modelId) {
         List<String> errors = validate(type, json);

@@ -23,10 +23,13 @@ class AiPropertiesTest {
     void localDefaultsBindFromApplicationYml() {
         runner.run(context -> {
             AiProperties properties = context.getBean(AiProperties.class);
-            assertThat(properties.region()).isEqualTo("ap-south-1");
-            assertThat(properties.tier().cheap()).isNotBlank().isEqualTo(properties.tier().vision());
-            assertThat(properties.tier().reason()).isNotBlank().isNotEqualTo(properties.tier().cheap());
+            assertThat(properties.provider()).isEqualTo(AiProperties.ANTHROPIC);
+            assertThat(properties.bedrock().region()).isEqualTo("ap-south-1");
+            assertThat(properties.modelFor(Tier.cheap)).isNotBlank().isEqualTo(properties.modelFor(Tier.vision));
+            assertThat(properties.modelFor(Tier.reason)).isNotBlank().isNotEqualTo(properties.modelFor(Tier.cheap));
             assertThat(properties.embed().model()).isNotBlank();
+            assertThat(properties.embed().provider()).isNotBlank();
+            assertThat(properties.embed().dimensions()).isEqualTo(1024);
             assertThat(properties.modelFor(Tier.embed)).isEqualTo(properties.embed().model());
             assertThat(properties.usdInr()).isPositive();
             assertThat(properties.budget().userDailyPaise()).isEqualTo(2_500L);
@@ -35,20 +38,43 @@ class AiPropertiesTest {
             assertThat(properties.maxOutputTokens()).isEqualTo(1024);
             assertThat(properties.callTimeout()).isEqualTo(java.time.Duration.ofSeconds(20));
             assertThat(properties.promptVersions()).containsEntry("smoke", 1);
+            assertThat(properties.anthropic().apiKey()).isEmpty();
+            assertThat(properties.cohere().apiKey()).isEmpty();
+            assertThat(properties.cohere().baseUrl()).startsWith("https://");
 
             PriceTable prices = context.getBean(PriceTable.class);
-            assertThat(prices.modelIds()).contains(properties.tier().cheap(), properties.tier().reason(),
-                    properties.tier().vision(), properties.embed().model());
-            assertThat(prices.priceOf(properties.tier().reason()).output())
-                    .isGreaterThan(prices.priceOf(properties.tier().cheap()).output());
+            assertThat(prices.modelIds()).contains(properties.modelFor(Tier.cheap), properties.modelFor(Tier.reason),
+                    properties.modelFor(Tier.vision), properties.embed().model());
+            assertThat(prices.priceOf(properties.modelFor(Tier.reason)).output())
+                    .isGreaterThan(prices.priceOf(properties.modelFor(Tier.cheap)).output());
             assertThat(context.getBean(CostCalculator.class)).isNotNull();
             assertThat(context.getBean(PromptRegistry.class).names()).contains("smoke");
         });
     }
 
+    /**
+     * §4.11: the request shape is per model, and "send nothing" has to be expressible — the
+     * reasoning model rejects a temperature outright and the cheap one rejects an effort.
+     */
+    @Test
+    void eachTierCarriesTheRequestShapeItsModelAccepts() {
+        runner.run(context -> {
+            AiProperties properties = context.getBean(AiProperties.class);
+            AiProperties.Model cheap = properties.modelOf(Tier.cheap);
+            AiProperties.Model reason = properties.modelOf(Tier.reason);
+
+            assertThat(cheap.temperature()).isZero();
+            assertThat(cheap.effort()).isNull();
+            assertThat(reason.temperature()).isNull();
+            assertThat(reason.effort()).isEqualTo(AiProperties.Effort.medium);
+            assertThat(reason.thinking()).isEqualTo(AiProperties.Thinking.disabled);
+            assertThat(cheap.cacheMinTokens()).isGreaterThan(reason.cacheMinTokens());
+        });
+    }
+
     @Test
     void aTierPointingAtAnUnpricedModelDoesNotBoot() {
-        runner.withPropertyValues("margai.ai.tier.reason=unpriced-model").run(context -> {
+        runner.withPropertyValues("margai.ai.tier.reason.id=unpriced-model").run(context -> {
             assertThat(context).hasFailed();
             assertThat(context.getStartupFailure()).rootCause().hasMessageContaining("unpriced-model");
         });
@@ -63,10 +89,12 @@ class AiPropertiesTest {
     }
 
     @Test
-    void validationRejectsABlankRegionAndAZeroBudget() {
-        runner.withPropertyValues("margai.ai.region=").run(context -> assertThat(context).hasFailed());
+    void validationRejectsABlankProviderABlankRegionAndAZeroBudget() {
+        runner.withPropertyValues("margai.ai.provider=").run(context -> assertThat(context).hasFailed());
+        runner.withPropertyValues("margai.ai.bedrock.region=").run(context -> assertThat(context).hasFailed());
         runner.withPropertyValues("margai.ai.budget.user-daily-paise=0")
                 .run(context -> assertThat(context).hasFailed());
+        runner.withPropertyValues("margai.ai.embed.dimensions=0").run(context -> assertThat(context).hasFailed());
     }
 
     @Test

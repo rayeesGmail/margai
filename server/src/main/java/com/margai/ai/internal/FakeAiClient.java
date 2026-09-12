@@ -23,7 +23,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import tools.jackson.databind.JsonNode;
 
 /**
- * The default {@link AiClient} outside the {@code bedrock} profile (TECH_PLAN §4.1, DEV_SPEC
+ * The default {@link AiClient} outside the {@code live} profile (TECH_PLAN §4.1, DEV_SPEC
  * §13.7 item 6). Answers come from fixtures {@code ai-fixtures/<prompt>.<case>.json} — the
  * output object only — under main resources (the runtime default, shipped in the image) and test
  * resources (extra cases). The case is {@code variables.fixture_case} when present; otherwise a
@@ -39,7 +39,6 @@ public final class FakeAiClient implements AiClient {
 
     static final String LOCATION = "classpath*:ai-fixtures/*.json";
     static final String CASE_VARIABLE = "fixture_case";
-    static final int VECTOR_DIMENSIONS = 1024;
     static final int IMAGE_TOKENS = 1500;
     private static final Pattern FILENAME = Pattern.compile("([a-z][a-z0-9_]*)\\.(_?[a-z0-9_]+?)(\\.repaired)?\\.json");
 
@@ -92,7 +91,7 @@ public final class FakeAiClient implements AiClient {
     public AiResponse<float[]> embed(EmbedRequest request) {
         long started = System.nanoTime();
         Random random = new Random(request.text().hashCode());
-        float[] vector = new float[VECTOR_DIMENSIONS];
+        float[] vector = new float[properties.embed().dimensions()];
         double norm = 0;
         for (int i = 0; i < vector.length; i++) {
             vector[i] = (float) random.nextGaussian();

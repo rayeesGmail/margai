@@ -24,20 +24,27 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * The D5 live smoke (PLAN D5 ✅ "one live call logged with token counts"; TECH_PLAN §4.1 last
- * paragraph, §13.2 item 1). Founder-run only: {@code BEDROCK_LIVE=1} plus AWS credentials in the
- * SDK's default chain — the IAM Identity Center profile F8 created (TECH_PLAN §7.4), after
- * {@code aws sso login --profile margai}; otherwise
- * the test is skipped and the build never touches AWS. Two calls on the {@code cheap} tier prove
- * that the forced tool returns the record, that the ledger gets real token counts, and that the
- * second call reads the prompt cache the first one wrote.
+ * The same smoke against the dormant provider (TECH_PLAN §4.11), kept so the way back is proven
+ * rather than assumed: since the 2026-09-12 switch the live client is chosen by
+ * {@code margai.ai.provider}, and this test is the only place that asks for {@code bedrock}. It
+ * needs that provider's model ids and price rows supplied by environment, since the defaults
+ * price the direct-API models; {@link AiLiveSmokeTest} is the D5 acceptance now.
+ *
+ * <p>Founder-run only: {@code BEDROCK_LIVE=1} plus AWS credentials in the SDK's default chain —
+ * the IAM Identity Center profile F8 created (TECH_PLAN §7.4), after
+ * {@code aws sso login --profile margai}; otherwise the test is skipped and the build never
+ * touches AWS. Two calls on the {@code cheap} tier prove that the forced tool returns the record,
+ * that the ledger gets real token counts, and that the second call reads the prompt cache the
+ * first one wrote.
  *
  * <pre>
- * cd server && AWS_PROFILE=margai BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
+ * cd server && AWS_PROFILE=margai BEDROCK_LIVE=1 MARGAI_AI_PROVIDER=bedrock \
+ *   MARGAI_AI_TIER_CHEAP_ID=… MARGAI_AI_PRICES_JSON=… \
+ *   ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
  * </pre>
  */
-@SpringBootTest
-@ActiveProfiles("bedrock")
+@SpringBootTest(properties = "margai.ai.provider=bedrock")
+@ActiveProfiles("live")
 @Import(TestcontainersConfiguration.class)
 @EnabledIfEnvironmentVariable(named = "BEDROCK_LIVE", matches = "1")
 class BedrockSmokeTest {
@@ -65,7 +72,7 @@ class BedrockSmokeTest {
         assertThat(first.output().number()).isEqualTo(7);
         assertThat(second.output().number()).isEqualTo(8);
         assertThat(first.output().greeting()).isNotBlank();
-        assertThat(first.modelId()).isEqualTo(properties.tier().cheap());
+        assertThat(first.modelId()).isEqualTo(properties.modelFor(Tier.cheap));
 
         List<AiCall> rows = calls.findByRequestIdOrderByCreatedAt(requestId);
         System.out.println("=== D5 live smoke: ai_calls rows ===");
@@ -76,7 +83,7 @@ class BedrockSmokeTest {
             assertThat(row.getStatus()).isEqualTo(AiCallStatus.ok);
             assertThat(row.getFeature()).isEqualTo(AiFeature.smoke);
             assertThat(row.getTier()).isEqualTo(Tier.cheap);
-            assertThat(row.getModelId()).isEqualTo(properties.tier().cheap());
+            assertThat(row.getModelId()).isEqualTo(properties.modelFor(Tier.cheap));
             assertThat(row.getPromptName()).isEqualTo("smoke");
             assertThat(row.getPromptVersion()).isEqualTo((short) 1);
             assertThat(row.getInputTokens()).as("input tokens").isPositive();

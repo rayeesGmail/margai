@@ -14,8 +14,9 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 /**
  * Wires the one {@link AiClient} bean as the decorator chain of TECH_PLAN §4.1, outermost
  * first: ledger → breaker → tier policy → schema validation → retry → the inner client, which
- * is {@link FakeAiClient} unless the {@code bedrock} profile supplies an {@link InnerAiClient}
- * (§1.2). The same breaker and ledger therefore run in every profile (DEV_SPEC §13.7 item 6).
+ * is {@link FakeAiClient} unless the {@code live} profile supplies an {@link InnerAiClient}
+ * (§1.2). The same breaker and ledger therefore run in every profile (DEV_SPEC §13.7 item 6),
+ * and against every provider.
  */
 @Configuration(proxyBeanMethods = false)
 class AiClientConfiguration {
@@ -32,7 +33,7 @@ class AiClientConfiguration {
     @Bean
     AiClientInfo aiClientInfo(ObjectProvider<InnerAiClient> live) {
         InnerAiClient inner = live.getIfAvailable();
-        return new AiClientInfo(inner == null ? "fake" : inner.name(), CHAIN);
+        return new AiClientInfo(inner == null ? AiClientInfo.FAKE : inner.name(), CHAIN);
     }
 
     @Bean
@@ -40,7 +41,7 @@ class AiClientConfiguration {
             ResourcePatternResolver resolver, AiCallLedger ledger, CostCalculator cost, MeterRegistry meters,
             ObjectProvider<InnerAiClient> live, AiClientInfo info) {
         InnerAiClient inner = live.getIfAvailable(
-                () -> new InnerAiClient("fake", new FakeAiClient(properties, prompts, codec, resolver)));
+                () -> new InnerAiClient(AiClientInfo.FAKE, new FakeAiClient(properties, prompts, codec, resolver)));
         AiClient chain = new LedgerAiClient(
                 new BudgetBreakerAiClient(
                         new TierPolicyAiClient(

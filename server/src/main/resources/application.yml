@@ -29,38 +29,66 @@ server:
 # (§7.3, e.g. MARGAI_AI_TIER_CHEAP). Model ids, prices and limits never appear in code.
 margai:
   ai:
-    region: ap-south-1
-    # Tier defaults from console check #1 (TECH_PLAN §13.2 item 1, DECISIONS 2026-09-06): the
-    # current Anthropic models are reachable only through global. inference profiles.
+    # Completion provider (DECISIONS 2026-09-12): direct provider APIs, not a cloud reseller.
+    # `bedrock` keeps the dormant client reachable by configuration alone, nothing more.
+    provider: anthropic
+    # Tier defaults after the switch to the direct API: the 4.5 cheap model for CHEAP and VISION,
+    # the current Sonnet for REASON in both the real-time and the batch lane. Each tier also
+    # carries the request shape its model accepts (§4.11) — the reasoning model rejects
+    # `temperature` outright and the cheap one rejects `effort`, so an omitted key means
+    # "send nothing", never a default. `cache-min-tokens` is the model's minimum cacheable
+    # prefix: below it a cache point is a silent no-op, and AiConfiguration refuses that.
     tier:
-      cheap: global.anthropic.claude-haiku-4-5-20251001-v1:0
-      reason: global.anthropic.claude-sonnet-4-6
-      vision: global.anthropic.claude-haiku-4-5-20251001-v1:0
+      cheap:
+        id: claude-haiku-4-5
+        temperature: 0
+        thinking: disabled
+        cache-min-tokens: 4096
+      reason:
+        id: claude-sonnet-5
+        thinking: disabled     # D23/D39 compare thinking-on on hard numericals before beta
+        effort: medium
+        cache-min-tokens: 1024
+      vision:
+        id: claude-haiku-4-5
+        temperature: 0
+        thinking: disabled
+        cache-min-tokens: 4096
+    # The embedding pin (§4.9): provider, model and width move together — changing any of them
+    # means re-embedding the corpus, so the D17 retrieval harness settles Hindi and Hinglish
+    # quality before D16 fills the tables (DECISIONS 2026-09-12).
     embed:
-      model: cohere.embed-multilingual-v3
-    # USD per 1M tokens from the Bedrock pricing page, Asia Pacific (Mumbai), global cross-region
-    # inference, recorded 2026-09-06 (§13.2 item 1). cache_write is the 5-minute rate (§4.8).
+      provider: cohere
+      model: embed-v4.0
+      dimensions: 1024
+      send-output-dimension: true   # the v4 line accepts the width; the v3 line errors on it
+    # Keys are the auth model for AI now (§9.2): SSM SecureStrings in a deployed environment,
+    # an untracked local file on a laptop, blank here, never a value in this repository.
+    anthropic:
+      api-key: ""
+    cohere:
+      api-key: ""
+      base-url: https://api.cohere.com
+    bedrock:
+      region: ap-south-1
+    # USD per 1M tokens at direct-API rates (DECISIONS 2026-09-12): cache reads are a tenth of
+    # input, a 5-minute cache write 1.25× input — the rate the ledger's single cache_write key
+    # means (§4.8) — and every batch token half of on-demand. The embedding price is the founder's
+    # to confirm when the provider account is funded.
     prices-json: >-
-      {"global.anthropic.claude-haiku-4-5-20251001-v1:0":
+      {"claude-haiku-4-5":
          {"input": 1.00, "output": 5.00, "cache_read": 0.10, "cache_write": 1.25,
           "batch_input": 0.50, "batch_output": 2.50},
-       "global.anthropic.claude-sonnet-4-6":
-         {"input": 3.00, "output": 15.00, "cache_read": 0.30, "cache_write": 3.75,
-          "batch_input": 1.50, "batch_output": 7.50},
-       "cohere.embed-multilingual-v3":
-         {"input": 0.10},
-       "apac.amazon.nova-lite-v1:0":
-         {"input": 0.06, "output": 0.24, "cache_read": 0.006, "cache_write": 0,
-          "batch_input": 0.03, "batch_output": 0.12}}
-    # The Nova Lite row is a diagnostic entry (2026-09-08): an Amazon-owned model reachable while
-    # the account's Marketplace subscription for the Anthropic models is blocked. Public list
-    # prices (Nova cache writes are free, reads are 90% off input); founder to confirm the Mumbai
-    # column on the pricing page. It is not a tier default — select it with MARGAI_AI_TIER_CHEAP.
+       "claude-sonnet-5":
+         {"input": 2.00, "output": 10.00, "cache_read": 0.20, "cache_write": 2.50,
+          "batch_input": 1.00, "batch_output": 5.00},
+       "embed-v4.0":
+         {"input": 0.12}}
     usd-inr: 90
     budget:
       user-daily-paise: 2500      # ₹25 per user per IST day (§4.8)
       global-daily-paise: 50000   # ₹500 across all users per IST day (local placeholder)
-    batch-min-records: 100        # Bedrock minimum per batch job; 0 disables batch mode (§4.11)
+    batch-min-records: 100        # below this completeBatch stays on-demand; 0 disables batch (§4.11)
     max-output-tokens: 1024
     call-timeout: 20s             # one real-time model call (§4.11); retries are RetryingAiClient's
     prompts:

@@ -147,10 +147,21 @@
       <artifactId>json-schema-validator</artifactId>
       <version>3.0.7</version>
     </dependency>
-    <!-- Bedrock Converse + InvokeModel behind BedrockAiClient, active only in the bedrock profile
-         (TECH_PLAN §1.2, §4.11). Credentials come from the default chain (locally the Identity
-         Center profile of TECH_PLAN §7.4, created at F8 on 2026-09-12; the task role in AWS),
-         never from configuration. -->
+    <!-- The model provider's official Java SDK behind AnthropicAiClient, active only in the live
+         profile (TECH_PLAN §1.2, §4.11; DECISIONS 2026-09-12). The key is the whole auth model and
+         comes from configuration, never from code. The SDK carries its own JSON library, which is
+         why the mapper crosses that boundary with plain Java values (StructuredOutput#toPlain)
+         rather than importing a second Jackson generation into this module. -->
+    <dependency>
+      <groupId>com.anthropic</groupId>
+      <artifactId>anthropic-java</artifactId>
+      <version>2.35.0</version>
+    </dependency>
+    <!-- Bedrock Converse + InvokeModel behind BedrockAiClient — dormant since the 2026-09-12
+         provider switch: reachable only with margai.ai.provider=bedrock in the live profile, kept
+         whole so the way back needs no code (TECH_PLAN §1.2, §4.11). Credentials come from the
+         default chain (locally the Identity Center profile of TECH_PLAN §7.4, created at F8 on
+         2026-09-12; the task role in AWS), never from configuration. -->
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>bedrockruntime</artifactId>

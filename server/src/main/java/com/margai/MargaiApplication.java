@@ -11,8 +11,11 @@ import org.springframework.core.env.Environment;
 @SpringBootApplication
 public class MargaiApplication {
 
-    /** The environment variable a human sets to swap FakeAiClient for Bedrock (DEV_SPEC §13.7 item 6). */
-    static final String BEDROCK_LIVE = "BEDROCK_LIVE";
+    /** The environment variable a human sets to swap FakeAiClient for a provider (DEV_SPEC §13.7 item 6). */
+    static final String AI_LIVE = "AI_LIVE";
+
+    /** The profile that wires a real provider; which one is {@code margai.ai.provider} (§1.2). */
+    static final String LIVE_PROFILE = "live";
 
     /** The profile that runs one content command and exits (TECH_PLAN §1.2, §6.1). */
     static final String PIPELINE_PROFILE = "pipeline";
@@ -35,10 +38,11 @@ public class MargaiApplication {
     }
 
     /**
-     * TECH_PLAN §1.2: {@code BEDROCK_LIVE=1} adds the {@code bedrock} profile on top of whatever
+     * TECH_PLAN §1.2: {@code AI_LIVE=1} adds the {@code live} profile on top of whatever
      * {@code spring.profiles.active} says; the ECS task definition sets the profile directly.
+     * The provider inside that profile is configuration, so one switch covers every provider.
      */
     static List<String> additionalProfiles(Map<String, String> environment) {
-        return "1".equals(environment.get(BEDROCK_LIVE)) ? List.of("bedrock") : List.of();
+        return "1".equals(environment.get(AI_LIVE)) ? List.of(LIVE_PROFILE) : List.of();
     }
 }

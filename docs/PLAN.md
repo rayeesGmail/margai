@@ -118,13 +118,14 @@ tools; your reviews focus on output quality.)*
 - **D23 —** Anchor-linking questions↔NCERT; seed the eval suite v1 (~60 questions
   across subjects). ✅ *Eval harness runs and reports.*
 - **D24 —** Buffer + **Week-4 gate:** solved, tagged, anchored PYQ bank + eval suite
-  running in CI. In the buffer (CS-1 §4, §7; added 2026-09-12): `collective from-pyq`
-  misconception drafts from the distractor maps, `collective review` (the founder-review
-  sheet), `collective load` of the founder-edited sheet; `collective from-inputs` over the
-  F11 excerpt files if they exist, with explicit permission to slip to any later buffer
-  (CS-1 §8). ✅ *Approved collective records exist for the top-50 weightage nodes at or
-  above the confidence threshold; the review sheet is founder-signed; every record carries
-  `season_version`.*
+  running in CI. In the buffer (CS-1 §4, §7, §9.3; added 2026-09-12): `collective from-pyq`
+  misconception drafts from the distractor maps; `collective from-inputs` over the F11
+  excerpt files if they exist; `collective review` (the founder-review sheet) and
+  `collective load` of the founder-edited sheet — the last three with explicit permission
+  to slip to any later buffer (CS-1 §8, §9.3), so the Week-4 gate never waits on a founder
+  review. ✅ *travels with `collective load`, here or in the buffer it slips to: approved
+  collective records exist for the top-50 weightage nodes at or above the confidence
+  threshold; the review sheet is founder-signed; every record carries `season_version`.*
 
 ### PHASE 3 — Onboarding & first plan (Week 5, Days 25–30) — Modules M2 + M4(v0)
 
@@ -141,7 +142,10 @@ tools; your reviews focus on output quality.)*
   extract correctly; storage verifiably empty after.*
 - **D29 —** 12th-marksheet variant (shared pattern) + deterministic first-plan
   generator (archetype track + interview inputs) + first-plan reveal screen with target
-  line. ✅ *New user reaches a personalized plan end-to-end.*
+  line; the reveal's copy is honest about the ramp — the plan sharpens as the app learns
+  the student (SPEC §6.1, CS-1 §1 principle 3 — added 2026-09-12; whether this first plan
+  already reads the collective record is the founder's open ruling, TRACKER CS-1 items).
+  ✅ *New user reaches a personalized plan end-to-end.*
 - **D30 —** Notification permission moment + morning notification skeleton.
   **Week-5 gate:** install → interview → (optional scorecard) → first plan < 5 minutes,
   demoed cold on a fresh device.
@@ -158,7 +162,9 @@ tools; your reviews focus on output quality.)*
 - **D34 —** Offline mode: today's blocks + questions cached; outbox sync for results.
   ✅ *Airplane-mode test: complete a session, land, sync.*
 - **D35 —** Diagnostic test (30-question adaptive flavor) reusing the session engine;
-  ability estimates update chapter status. ✅ *Diagnostic shifts a seeded user's plan.*
+  ability estimates update chapter status; the intro names the diagnostic as the fastest
+  way to shift the weight from “students like you” to “you” (SPEC §6.1, CS-1 §5.6 — added
+  2026-09-12). ✅ *Diagnostic shifts a seeded user's plan.*
 - **D36 —** Buffer + **Week-6 gate:** practice loop end-to-end incl. offline + diagnostic.
 
 ### PHASE 5 — Doubt solver (Weeks 7–8, Days 37–48) — Module M6 (the hero)
@@ -186,8 +192,9 @@ tools; your reviews focus on output quality.)*
   tomorrow's plan with the reason line.*
 - **D46 —** Doubt history screen + follow-up threading. ✅ *Follow-ups keep context.*
 - **D47 —** Eval suite expansion to ~150 questions; wire the eval gate into pre-commit
-  for AI-touching changes; collective-attributed claims join the suite — a sampled claim
-  must trace to its record (CS-1 §7; TECH_PLAN §4.10 — added 2026-09-12).
+  for AI-touching changes; the harness gains the `claim` fixture kind — a collective-attributed
+  line and the record it must trace to — populated from D56 when attributed reasons exist
+  (CS-1 §7; TECH_PLAN §4.10 — added 2026-09-12).
   ✅ *Gate demonstrably blocks a prompt change that fails.*
 - **D48 —** Buffer + **Week-8 gate:** hero feature demo-ready; eval ≥ target; founder
   audit error list empty or ticketed.
@@ -223,7 +230,8 @@ tools; your reviews focus on output quality.)*
   deterministic fallback (a plan must ALWAYS exist); reasons carry an attribution —
   collective lines cite the record, individual lines the student's data, never blended —
   and the season prior softens volume and tone before individual slump signals fire
-  (CS-1 §5.4–§5.5; TECH_PLAN §4.5, SPEC §10.9 — added 2026-09-12). ✅ *Kill the AI
+  (CS-1 §5.4–§5.5; TECH_PLAN §4.5, SPEC §10.9 — added 2026-09-12); the first attributed
+  plans seed the eval's `claim` fixtures (CS-1 §7). ✅ *Kill the AI
   mid-run → fallback plan appears; no planless morning possible.*
 - **D57 —** Batch execution for all active users + morning notification with plan
   deep-link. ✅ *Two devices, different profiles, different 7 AM plans.*

@@ -55,7 +55,7 @@
 - [ ] **D21** Solutions all subjects + distractor maps · ✅ 50-Q audit #2 under threshold
 - [ ] **D22** Weightage & difficulty stats → nodes + `collective_records` migration + `collective from-pyq` momentum (CS-1) · ✅ top-10 chapters sanity check
 - [ ] **D23** Anchor linking + eval suite v1 (~60 Q) · ✅ harness runs
-- [ ] **D24** Buffer: `collective from-pyq` misconceptions, `review`, `load`; `from-inputs` if F11 has delivered, else any later buffer (CS-1 §8) · ✅ approved records for the top-50 weightage nodes ≥ threshold, sheet founder-signed, all versioned · **🚩 WEEK-4 GATE:** solved/tagged/anchored PYQ bank + eval in CI
+- [ ] **D24** Buffer: `collective from-pyq` misconceptions; `from-inputs` (if F11 has delivered), `review`, `load` — these three may slip to any later buffer (CS-1 §8, §9.3) · ✅ with `load`, wherever it runs: approved records for the top-50 weightage nodes ≥ threshold, sheet founder-signed, all versioned · **🚩 WEEK-4 GATE:** solved/tagged/anchored PYQ bank + eval in CI
 
 ## PHASE 3 — Onboarding & first plan (Week 5) · M2 + M4v0
 
@@ -63,7 +63,7 @@
 - [ ] **D26** Syllabus grid + hours sliders + goal/target (+optional category) · ✅ interview <5 min
 - [ ] **D27** DOB + minors parent-consent OTP sent at the DOB step; onboarding completes regardless; "consent pending" state on Profile + re-prompt at gated moments (D3 decision 8) · ✅ photo doubts and uploads blocked until consent; text features and the first plan work
 - [ ] **D28** Scorecard capture → extract → confirm → delete · ✅ 3 sample cards correct; storage empty after
-- [ ] **D29** 12th-marksheet + batch-timetable doc_types (D3 decision 3) + deterministic first plan + reveal screen · ✅ end-to-end new user
+- [ ] **D29** 12th-marksheet + batch-timetable doc_types (D3 decision 3) + deterministic first plan + reveal screen (copy honest about the ramp — CS-1 §1; whether the first plan reads the collective record: founder's open ruling, CS-1 day log) · ✅ end-to-end new user
 - [ ] **D30** Notification permission moment + morning notif skeleton
 - [ ] **🚩 WEEK-5 GATE:** install → plan < 5 min, cold demo on fresh device
 
@@ -73,7 +73,7 @@
 - [ ] **D32** Practice UI (timer, verdict, solution, anchor chip) · ✅ smooth on mid-range phone
 - [ ] **D33** Session summary + event stream · ✅ timing data in DB
 - [ ] **D34** Offline cache + outbox sync, offline pack per Option A (D3 decision 1b) · ✅ airplane-mode test + the pack is the only pre-answer carrier
-- [ ] **D35** Diagnostic test (30-Q adaptive) → ability estimates, plus `kind=mock` sessions (D3 decision 2; may slip into D36) · ✅ shifts a seeded plan
+- [ ] **D35** Diagnostic test (30-Q adaptive) → ability estimates (intro copy: the fastest shift from “students like you” to “you” — CS-1 §5.6), plus `kind=mock` sessions (D3 decision 2; may slip into D36) · ✅ shifts a seeded plan
 - [ ] **D36** Buffer · **🚩 WEEK-6 GATE:** practice loop incl. offline + diagnostic
 
 ## PHASE 5 — Doubt solver (Weeks 7–8) · M6 ⭐
@@ -88,7 +88,7 @@
 - [ ] **D44** Free limits (5/day, cached=½) + meter + graceful limit screen · ✅ IST day-boundary math
 - [ ] **D45** Doubt → state write-back visible in next plan · ✅ reason line appears
 - [ ] **D46** Doubt history + follow-up threading · ✅ context kept
-- [ ] **D47** Eval → ~150 Q + pre-commit eval gate for AI changes + collective-claim fixtures (CS-1 §7) · ✅ gate blocks failing prompt
+- [ ] **D47** Eval → ~150 Q + pre-commit eval gate for AI changes + the `claim` fixture kind (CS-1 §7; populated from D56) · ✅ gate blocks failing prompt
 - [ ] **D48** Buffer · **🚩 WEEK-8 GATE:** hero demo-ready; eval ≥ target; audit list empty/ticketed
 
 ## PHASE 6 — Notebook, SRS & nightly brain (Weeks 9–10) · M7 + M8
@@ -100,7 +100,7 @@
 - [ ] **D53** Patterns engine v1 (plain-language insights) · ✅ fires only with enough data
 - [ ] **D54** Buffer + mock autopsy (per-mark classification, gamble score, pace map — D3 decision 2; may slip) · **🚩 WEEK-9 GATE:** capture→diagnose→resurface→heal end-to-end
 - [ ] **D55** Nightly snapshot (two sources: collective record + student state, evidence-level weighting, pacing multiplier — CS-1 §5.1–§5.3) + deterministic candidate blocks · ✅ sensible plans for 5 synthetic students; CS-1 §7 (a)(b)(c)
-- [ ] **D56** AI selection + attributed reasons (collective vs individual, never blended — CS-1 §5.5) + season prior (§5.4) + mentor note + validated output + fallback · ✅ no planless morning possible
+- [ ] **D56** AI selection + attributed reasons (collective vs individual, never blended — CS-1 §5.5) + season prior (§5.4) + mentor note + validated output + fallback + the first `claim` eval fixtures (§7) · ✅ no planless morning possible
 - [ ] **D57** Batch run all users + morning deep-link notification · ✅ 2 devices, 2 different 7 AM plans
 - [ ] **D58** Streaks + trajectory card + plan-negotiation chat v1 · ✅ "wedding weekend" rebalances
 - [ ] **D59** Slump rules + light-day + mood chip · ✅ 3 dark days → gentler plan
@@ -154,7 +154,7 @@
 | F6 | Trademark search (Class 41 + 9) for final name | anytime | ☐ | before public launch |
 | F7 | Domain + social handles for final name | anytime | ☐ | MARGAI = working name |
 | F9 | DPDP legal review of the minors' consent flow (TECH_PLAN §0.5 item 8, §9.6): consent OTP at the DOB step, gated photo doubts and uploads until consent | before D27 ideally; before beta at the latest | ☐ | not a build blocker; may tighten the gating |
-| F11 | **Collect public-discourse excerpt files + a source list** for the collective intelligence layer (CS-1 §3, `docs/changes/CS-1-collective-intelligence.md`): excerpts from open forums, public comments and published topper/teacher material as `pipeline/inputs/collective/excerpts/*.md` (per file: source, date collected, node codes) with `sources.csv`; within CS-1's hard boundaries — nothing paywalled or login-gated, no competitor content or question banks, robots/ToS respected, no identifiable students. The pipeline reads the files and never crawls | any time from now; ideally before the D24 buffer | ☐ added 2026-09-12 | needed only before `collective from-inputs`; blocks nothing else — `from-pyq`, `review` and `load` run without it, and `from-inputs` may slip to any later buffer (CS-1 §8; TECH_PLAN §12.2) |
+| F11 | **Collect public-discourse excerpt files + a source list** for the collective intelligence layer (CS-1 §3, `docs/changes/CS-1-collective-intelligence.md`): excerpts from open forums, public comments and published topper/teacher material as `pipeline/inputs/collective/excerpts/*.md` (per file: source, date collected, node codes; the directory is git-ignored — list each file with its SHA-256 in `pipeline/inputs/collective/manifest.md`, DECISIONS 2026-09-12) with `sources.csv`; within CS-1's hard boundaries — nothing paywalled or login-gated, no competitor content or question banks, robots/ToS respected, no identifiable students. The pipeline reads the files and never crawls | any time from now; ideally before the D24 buffer | ☐ added 2026-09-12 | needed only before `collective from-inputs`; blocks nothing else — `from-pyq`, `review` and `load` run without it, and `from-inputs` may slip to any later buffer (CS-1 §8; TECH_PLAN §12.2) |
 | F8 | AWS beta stack (Terraform) per TECH_PLAN §7.6 — accepted at D3 (decision 5). Claude drafts Terraform in a separate infra session profile (plan allowed, apply denied), created when the first milestone is due; founder runs every apply | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ accepted 2026-09-04 | PLAN has no infra day (TECH_PLAN §0.4 #1); console checks §13.2 before D5. Bedrock access confirmed 2026-09-06 for Haiku 4.5 + Sonnet 4.6; optional AWS Sales allowlist request for the Claude 5 family / Opus 4.x (REASON upgrade path, not a blocker). 2026-09-07: the account's payment instrument blocks the Marketplace subscription for the Anthropic models (D5 blocker) — fix in Billing; and the local CLI session is the root user — create a non-root identity (IAM Identity Center or an IAM user) with Bedrock permissions for daily use before more live work (§7.4, §9.2). 2026-09-08 (D7): the ALB must keep `xff_header_processing.mode = append` — the app keys rate limits and `request_ip` on the *last* `X-Forwarded-For` hop (§1.5 step 1); the task role needs `ses:SendEmail` on the F10 identity (§7.4); SSM gains `otp/sender`, `otp/email_from`, `otp/channels` (§7.3). 2026-09-09 (D12): the Terraform variable behind `otp/sender` needs a validation that refuses `log` — the sandbox sender must never reach a deployed task, and a startup refusal in the server was rejected at D12 because most test contexts boot without a profile (PARKED) |
 
 ---
@@ -207,6 +207,30 @@ Founder-issued change spec docs/changes/CS-1-collective-intelligence.md (committ
   exclusion list, so no exclusion was lifted. Nothing under server/, app/ or eval/ changed; the
   eval stamp was not needed. Founder-side after this: review and push d13-taxonomy; F11 whenever
   convenient; F3 booking; the D14 prerequisites unchanged.
+spec-auditor on the integration, run after the five commits (a deviation from "audit before the
+  day's final commit" — the fixes are a sixth commit): FAIL → 1 MAJOR fixed (CS-1 §9.3 gives
+  `review` and `load` the slip permission too; the integration had pinned them to D24 and made the
+  founder-signed sheet a Week-4 gate criterion — the permission is now on all three and the CS-1 §7
+  pipeline acceptance travels with `load`, wherever it runs) and 11 MINOR fixed (claim fixtures need
+  attributed reasons, so the `claim` kind is defined at D47 and populated from D56; CS-1 §5.6's
+  diagnostic copy and the honest-ramp reveal mapped to D35 and D29; the command order stated once —
+  from-pyq's momentum half after stats at D22, the rest after anchors; CS-1 §4's "after anchors"
+  is not an input dependency and §9.3 names D22; `collective_records` owned by `curriculum`; the
+  two config roots in §11.5; the season prior reads the nodes in play; `confidence` computed by
+  `load` from source counts, lowered but never raised in the sheet; `measured_accuracy` with no
+  attempts is `1 − struggle_score`; the SPEC §1 DECISIONS row cites the founder's decision-1
+  approval, not CS-1 §9.1; excerpt files ignored by git with a manifest (DECISIONS); the §12.1
+  map). Three findings are the founder's to rule on, not fixed:
+Open for the founder (CS-1): (1) SPEC §6.1's unamended sentence "Every block carries a one-line
+  reason drawn from the student's data (Evidence rule)" now contradicts the Two-sources paragraph
+  two lines below it — proposed per-edit amendment: "…drawn from the student's data or, attributed
+  as such, from the collective record (Evidence rule; §9.6)"; needs the founder's instruction, not
+  edited. (2) Does the D29 first plan already read the collective record? CS-1 §1 says the day-1
+  plan reads two sources; §9.3 maps the read to D55–D56 — recommended: yes at D29 (pacing,
+  priority, collective-attributed templated reasons at zero evidence), the evidence-level weighting
+  at D55; PLAN D29 unchanged until ruled. (3) `momentum_trend` and `strategy_notes` have no consumer
+  in CS-1 §5 — TECH_PLAN §4.5 proposes momentum as a priority factor and a citable reason, strategy
+  notes as block order and copy; confirm or strike.
 ```
 
 ```

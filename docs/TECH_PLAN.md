@@ -47,6 +47,8 @@ surfaced in that session rather than now:
 | D12 — **applied 2026-09-09** (not scheduled here; a PARKED item taken into the buffer, DECISIONS D12) | `scripts/precommit-gate.sh`, `eval/README.md` | the `AI_PATHS` router/routing/retrieval alternative is scoped to `server/` and `eval/` (the app's go_router under `app/lib/core/router/` tripped the eval stamp at D8) and matches either case, so §1.3's `curriculum.api.ParagraphRetrievalRepository` and `ai.retrieval.HybridRetriever` match as §1.3 says; the D23 row below is unchanged |
 | D13 — **applied 2026-09-12** | `.claude/rules/pipeline.md` | `paths` adds `server/**/pipeline/**` (the first pipeline command lands at D13); founder inputs live in `pipeline/inputs/` (§6.2); command order per §6.3 — the DEV_SPEC §7 order the rule carried (backbone and cutoffs after stats) gave way to §6.3's, which loads both at D13; "Bedrock batch mode" becomes "`completeBatch`, batch above the configured minimum" (§4.11, §0.4 #2); the rule also names `pipeline/reports/<date>-<command>.md` as the committed evidence (§6.3) |
 | D23 | `scripts/precommit-gate.sh`, `.claude/rules/ai-layer.md`, `eval/README.md`, `.gitignore` | the eval stamp becomes the committed `eval/last-pass.json` (§4.10); `cd eval && ./run.sh` stays the command |
+| D24 — *CS-1 §9.2, added 2026-09-12* | `.claude/rules/pipeline.md` | the `collective` commands join the order after `anchors link` (CS-1 §4: after pyq, stats and anchors) and `pipeline/inputs/collective/` joins the founder-owned inputs, read and never stored |
+| D56 — *CS-1 §9.2, added 2026-09-12* | `.claude/rules/ai-layer.md` | reason lines and mentor notes carry an attribution; a collective-attributed line cites only the record, an individual one only the student's evidence keys (SPEC §10.9, §4.5) |
 | D3 close — **applied 2026-09-04** (founder accepted the §0.4 #4 reading, §0.5 item 1a) | CLAUDE.md hard rule 1, `.claude/rules/server.md`, `.claude/commands/endpoint.md` step 4, `.claude/agents/spec-auditor.md` check 2, PLAN D31 ✅ wording | "`correct_key` never leaves the server" became "`correct_key` is never sent before that student's answer to the question is recorded server-side; judging is server-side". DEV_SPEC §13.2 keeps the original sentence; CLAUDE.md's note records the divergence. The offline clause for Option A (§0.5 item 1b) is added at D34 with the pack test |
 
 ### 0.3 Disposition of DEV_SPEC §2–§12
@@ -492,6 +494,29 @@ Loaded from `pipeline/inputs/archetypes.yaml` (SPEC §9.5; educator review is TR
 (AIQ or state code), seat_type VARCHAR(16) CHECK (govt_mbbs|private_mbbs|bds|qualifying),
 qualifying_marks SMALLINT, source VARCHAR(120), UNIQUE (year, category, quota_scope, seat_type)`.
 
+**collective_records** — D22 (CS-1 §2; approved rows from D24, `collective load`)
+```
+node_id → syllabus_nodes NOT NULL, season_version VARCHAR(16) NOT NULL ('2027-prep'),
+status VARCHAR(8) NOT NULL CHECK (draft|approved),
+struggle_score NUMERIC(3,2), pacing_multiplier NUMERIC(3,2),
+momentum_trend VARCHAR(8) CHECK (rising|flat|falling),
+misconceptions JSONB NOT NULL DEFAULT '[]'   ([{label, description, distractor_patterns[], question_ids[]}]),
+season_notes JSONB NOT NULL DEFAULT '[]'     ([{month_offset, effect, prevalence, note}]),
+strategy_notes JSONB NOT NULL DEFAULT '[]'   ([{note, source_count}]),
+confidence NUMERIC(3,2) NOT NULL DEFAULT 0,
+source_summary JSONB NOT NULL DEFAULT '{}'   ({pyq_years, questions, excerpt_files, excerpts, sources}),
+reviewed_at, created_at, updated_at, UNIQUE (node_id, season_version, status)
+```
+Index `(node_id, season_version)`. Draft rows are what `collective from-pyq` and `collective from-inputs`
+write and `collective review` reads; `collective load` writes the approved row from the founder-edited
+sheet, so a review never touches what the planner reads mid-season. The planner reads approved rows of
+the configured season (`margai.planner.collective.season`) with `confidence ≥
+margai.planner.collective.min_confidence` (default 0.5) and treats the rest as absent (CS-1 §2, the
+Evidence rule). Misconception question ids stay inside the JSONB and `collective load` refuses an id
+that names no question — no join table (integration decision 4; DECISIONS 2026-09-12). The list
+fields are JSONB because the review sheet edits them as text and their shape is CS-1 §2's, not a
+query's. *Added 2026-09-12 with CS-1.*
+
 **ncert_books** — D14: `code VARCHAR(16) UNIQUE (keph1 …), subject, class_level, part SMALLINT,
 title_en, title_hi, edition_year SMALLINT, s3_key_en, s3_key_hi, pages_en, pages_hi`.
 
@@ -656,7 +681,7 @@ response_status SMALLINT, response_body JSONB, expires_at, PRIMARY KEY (key, use
 id, user_id (nullable), feature VARCHAR(24) NOT NULL CHECK (doubt|doubt_route|doubt_verify|
   doubt_render|doubt_extract|plan|mentor_message|classify|srs_variant|extract_document|embed|
   pipeline_extract|pipeline_solution|pipeline_verify|pipeline_distractor|pipeline_difficulty|
-  pipeline_trap|pipeline_generate|eval|smoke),
+  pipeline_trap|pipeline_generate|pipeline_collective|eval|smoke),   -- pipeline_collective: CS-1, with the D22 migration
 model_id VARCHAR(120) NOT NULL, tier VARCHAR(8) NOT NULL CHECK (cheap|reason|vision|embed),
 prompt_name VARCHAR(64), prompt_version SMALLINT,
 input_tokens INTEGER, output_tokens INTEGER, cache_read_tokens INTEGER, cache_write_tokens INTEGER,
@@ -692,6 +717,7 @@ Numbers are indicative; the agent takes the next free integer.
 | V7 `ncert` | D14 | ncert_books, ncert_paragraphs (embedding column nullable) |
 | V8 `ncert_hnsw` | D17 | HNSW index on `ncert_paragraphs.embedding` (created once rows exist) |
 | V9 `questions` | D19 | questions, question_topics |
+| next free `collective_records` — *added 2026-09-12, CS-1* | D22 | collective_records (§2.3); the `ai_calls.feature` CHECK gains `pipeline_collective` (§2.8) |
 | V10 `question_anchors` | D23 | question_anchors; HNSW on `questions.embedding` |
 | V11 `batch_positions` | D25 | batch_positions (§0.5 item 3) |
 | V12 `parent_consents` | D27 | parent_consents |
@@ -1063,6 +1089,7 @@ are the task classes in `ai.tasks`, each owning one prompt and one output record
 | `PyqSolveTask` | REASON | pipeline `pyq solve` |
 | `DistractorMapTask`, `DifficultyEstimateTask`, `TrapNoteTask` | CHEAP | pipeline `pyq distractors`, `stats compute`, `traps mine` |
 | `QuestionGenerateTask` | REASON (generation decision) | pipeline `questions generate` (feature `pipeline_generate`), verified by `NumericalVerifyTask` before save |
+| `CollectiveMineTask` | CHEAP (batch) | pipeline `collective from-inputs` (feature `pipeline_collective`; CS-1 §3–§4): thematic mining of founder-collected excerpt files into draft struggle, pacing, season and strategy signals with source counts — derived signals only, never quotes. `collective from-pyq` is deterministic over `questions` and `distractor_map` and makes no model call |
 | `EmbeddingService` | EMBED | cache lookup, `HybridRetriever`, pipeline `ncert embed`, `anchors link` |
 
 The D5 smoke test is a `smoke` feature call under `BEDROCK_LIVE=1` that asserts one `ai_calls` row
@@ -1130,7 +1157,9 @@ per user, in this order:
 1. `SnapshotAssembler` builds `StudentStateSnapshot`: profile and hours, `chapter_status`, the last
    7 days of block outcomes, accuracy and speed by node, open `error_entries` due, the week's doubt
    nodes, `wellbeing_signals`, streak, days to exam, batch positions with confidence, the archetype
-   track position. The snapshot is stored in `daily_plans.inputs_snapshot` (the evidence trail).
+   track position, and — CS-1 — the season's approved collective record for every node in play with
+   the node's individual evidence level and blend weight (the weighting paragraph below). The
+   snapshot is stored in `daily_plans.inputs_snapshot` (the evidence trail).
 2. `SlumpDetector` (deterministic, DEV_SPEC §4.3): trailing 3-day session minutes < 40% of the
    14-day median, or accuracy down > 15 points → `inferred_slump = true`.
 3. `ModeResolver` (deterministic): `normal`; `light` (slump or `mood = low`: one or two recall
@@ -1140,7 +1169,12 @@ per user, in this order:
    T-21 days (no new content, danger zones + high-yield recall, volume decreasing); `final_week` from
    T-7 (sleep protected, volume down); `light_recall` from T-3 (light recall only); `exam_eve` at T-1
    (one message); `silence` from T-0 to T+14. SPEC §4 Phases 5–6, DEV_SPEC §8.6. Thresholds are
-   config (`margai.exam.*`).
+   config (`margai.exam.*`). CS-1 §5.4 season prior: when the student's month of preparation
+   (from the track start) matches a `season_notes` entry whose prevalence ≥
+   `margai.planner.collective.season_min_prevalence`, the resolver keeps the mode but applies the
+   volume factor `margai.planner.collective.season_volume_factor` (default 0.85) and the softer
+   note copy — before any individual slump signal fires; `SlumpDetector`'s individual signal always
+   overrides, and the applied prior is named in the snapshot.
 4. `CandidateBlockBuilder` (deterministic): SRS reviews due (capped at 40% of the day's minutes),
    practice for weak nodes (`feels_weak`, low ability, doubt signals), the next backbone learn node
    whose prerequisites are covered (mentions the batch only at confidence ≥ 0.7), a mock in mock
@@ -1152,18 +1186,26 @@ per user, in this order:
    20%); `gamble` → a `skip_discipline` drill (mixed band where skipping a question the student
    cannot place scores better than a wrong pick). Drills are practice blocks with `payload.drill`
    (§2.7) and the reason cites the error entries behind them ("31% of your Physics errors are
-   unit slips — Friday's drill"). The minutes budget is the profile's hours for that weekday. Every
-   candidate carries `reason_evidence` keys. Drill payloads land with the SRS work at D51–D52 and
+   unit slips — Friday's drill"). The minutes budget is the profile's hours for that weekday. Learn minutes for a node are
+   `default_learn_minutes × pacing_multiplier` of its collective record until the student's measured
+   pace on the node or its adjacent nodes exists (evidence `e_p ≥ pace_evidence`), then the measured
+   pace (CS-1 §5.3); weak-node priority blends the collective `struggle_score` with measured accuracy
+   by the node's weight (the weighting paragraph below). Every candidate carries `reason_evidence`
+   keys and its attribution, `collective` or `individual` (CS-1 §5.5). Drill payloads land with the SRS work at D51–D52 and
    the candidate rules at D55.
 5. `PlanSelectTask` (CHEAP; batch when the run has ≥ `margai.ai.batch_min_records` users, else
    on-demand with concurrency 4): chooses and orders a subset that fits the budget, writes
    `reason_md` per block and the `mentor_note_md`, softens the day when the mode says so. Output
    schema: block ids ⊆ candidates, minutes ≤ budget, every `reason_md` non-empty and citing at least
-   one evidence key it was given.
+   one evidence key it was given, worded for the candidate's attribution (CS-1 §5.5): a collective
+   reason quotes only the record ("carries ~12 marks; most students underestimate it — I've given it
+   extra room"), an individual reason only the student's evidence keys, and the two are never blended
+   (SPEC §10.9).
 6. `PlanValidator` re-checks those constraints in Java, and two more: `mentor_note_md` must cite at
    least one evidence key from the snapshot (a note like "we lost the weekend" needs the skipped
    blocks behind it), and every quoted number in a reason or note must appear in the evidence it
-   cites. Any failure, timeout, breaker trip or missing model output → `DeterministicPlanner`
+   cites, and — CS-1 — a reason's attribution matches the keys it cites: a collective-attributed
+   reason may cite only `collective:*` keys, an individual one only the student's. Any failure, timeout, breaker trip or missing model output → `DeterministicPlanner`
    produces the plan from the candidates with templated reasons and a templated note
    (`generated_by = fallback`). **A plan row always exists before the task moves to the next user**
    (PLAN D56 ✅ "no planless morning").
@@ -1184,7 +1226,27 @@ per user, in this order:
    D3.27). `PatternsEngine` (rules over the notebook, minimum sample sizes from config) writes its
    rows the same way.
 
-The same `DeterministicPlanner` produces the onboarding first plan (D29, no AI call, < 6 s) and the
+**Prior and posterior weighting (CS-1 §5.2; DECISIONS 2026-09-12).** Per node and student, an
+*evidence level* `e ∈ [0, 1]` combines three saturating terms — practice `e_p = min(1,
+attempts_on_node / P)`, diagnostic `e_d = min(1, diagnostic_items_on_node / D)`, doubts `e_q = min(1,
+doubts_on_node / Q)` — as `e = 1 − (1 − e_p)(1 − e_d)(1 − e_q)`, so any one source can raise it and
+none is required. The *individual weight* is the line `w = w0 + (w1 − w0) · e` (defaults `w0 = 0.10`,
+`w1 = 0.95`: ~90/10 collective at zero evidence, CS-1 §5.2); at `e ≥ e_conflict` (default 0.6) the
+individual value is used alone and the record is not consulted for that node. The blend applies to
+priority (`(1 − w) · struggle_score + w · (1 − measured_accuracy)`), pacing (the multiplier until
+`e_p ≥ pace_evidence`, then the measured pace) and attribution (`w < attribution_threshold`, default
+0.5, → `collective`). Every constant lives under `margai.planner.collective.*` (`P`, `D`, `Q`, `w0`,
+`w1`, `e_conflict`, `pace_evidence`, `attribution_threshold`, `min_confidence`, `season`,
+`season_min_prevalence`, `season_volume_factor`), and the snapshot stores `{e_p, e_d, e_q, e, w,
+record_confidence}` per node, so a reason is explainable from stored numbers alone ("12 questions on
+this node → 65% your data") and the eval's `claim` fixtures (§4.10) can trace it. A record below
+`min_confidence` counts as absent: the node is planned from the student's data and the backbone as
+before CS-1, which is also what CS-1 §7 (c) measures by running the same synthetic students with the
+records table empty.
+
+The same `DeterministicPlanner` produces the onboarding first plan (D29, no AI call, < 6 s) — at
+zero evidence the collective record decides pacing and priority and every templated reason is
+collective-attributed, with the honest-ramp line of SPEC §6.1 — and the
 on-the-fly fallback in `GET /plan/today`. `POST /plan/negotiate` runs `MentorMessageTask` (CHEAP)
 to classify intent and extract constraints ("Fri–Sun unavailable"), then re-runs steps 4–6 for the
 affected days with the constraints applied and `generated_by = renegotiation`. The `mentor_reply`
@@ -1202,7 +1264,11 @@ stored beyond the row and a `mentor.distress` metric, and no audit item is raise
 practice transaction commits (§1.7): it writes the `error_entries` row (`cause = unclassified`,
 idempotent on `practice_event_id`) and then runs `ErrorClassifyTask` (CHEAP) asynchronously with
 `distractor_map[chosen_key]`, time taken vs the user's node median, position in session, the user's
-history on the node, difficulty vs ability, and the user's last five corrections as examples. Output
+history on the node, difficulty vs ability, and the user's last five corrections as examples, plus — CS-1 §6 — the node's approved
+`misconceptions[]`: when `distractor_map[chosen_key]` matches a misconception's `distractor_patterns`,
+the output may name it in `evidence.collective_misconception` and the notebook copy attributes it
+collectively ("classic sign-convention trap — trips most students"), the student's own history and
+corrections overriding as below. Output
 `{cause, confidence, evidence}`; `confidence < 0.6` keeps `unclassified` and the UI asks the one-tap
 question. `POST /notebook/entries/{id}/cause` sets `cause_source = student`, which no later
 classification overwrites (SPEC §10.7). A 5-minute sweeper in `notebook` repairs both failure
@@ -1254,7 +1320,10 @@ Two layers, one fixture set.
 - **Fixtures** `eval/fixtures/<subject>/<id>.json`: `{id, subject, node_code, language, input:
   {text} | {image: "eval/images/<file>"}, expected: {type: option|numeric|text, value, unit?,
   tolerance?}, expected_anchor: {book_code, chapter_no}, is_numerical, tags[]}`. Hand-verified by
-  the founder; ~60 at D23, ~150 at D47, ~200 target.
+  the founder; ~60 at D23, ~150 at D47, ~200 target. From D47 (CS-1 §7) the set also holds `claim`
+  fixtures — a reason or mentor-note line attributed as collective, sampled from generated plans,
+  with the record it must trace to (`node_code`, `season_version`, field); a claim that traces to no
+  approved record fails the suite.
 - **Live layer** (the real gate): `BEDROCK_LIVE=1 ./mvnw -Peval verify` runs `EvalSuiteIT`, which
   drives `DoubtSolveService` end to end with `BedrockAiClient` against a Testcontainers database
   loaded with the NCERT and question tables from a snapshot in the content bucket. Per fixture it
@@ -1506,6 +1575,8 @@ JSONL plus Java ingest (two toolchains, and the AI calls would still need the Ja
 | `pipeline/inputs/cutoffs.csv` | `year, category, quota_scope, seat_type, qualifying_marks, source` | `cutoffs load` |
 | `pipeline/inputs/books.yaml` | book codes, titles, edition year, S3 keys of the PDFs | `ncert register` (D14) |
 | `pipeline/inputs/papers/<exam>-<year>.json` | PYQ papers as structured JSON (stem, options, key, paper code) | `pyq load` (D19) |
+| `pipeline/inputs/collective/excerpts/*.md` + `sources.csv` | founder-collected public-discourse and study-advice excerpts (per file: source, date collected, node codes) and the curated source list — CS-1 §3, founder workstream F11; read by the pipeline, never stored, never crawled | `collective from-inputs` (D24 buffer or any later buffer) |
+| `pipeline/inputs/collective/review-<season>.csv` | the founder-edited review sheet: one row per node and field with the approved value and the evidence kept (CS-1 §4) | `collective load` (D24) |
 
 Source PDFs, page images, JSONL artefacts and eval snapshots live in the content bucket, not in git.
 
@@ -1526,6 +1597,10 @@ Source PDFs, page images, JSONL artefacts and eval snapshots live in the content
 | `pyq verify --year --subject` | D20–D21 | question id | verified vs flagged; flagged → `audit_queue(pipeline_flag)` |
 | `pyq distractors --year --subject` | D21 | question id | distractor maps written; 10% sample listed |
 | `stats compute` | D22 | node id | **top-10 weightage chapters** (PLAN D22 ✅), difficulty distribution |
+| `collective from-pyq --season` | D22 (momentum), D24 (misconceptions) | draft row (node, season) | momentum per node from year-over-year tagged-question frequency (§6.5); misconception drafts from distractor clusters with ≥ 2 questions; no model call (CS-1 §4) |
+| `collective from-inputs --season` | D24 buffer, may slip to any later buffer (CS-1 §8) | draft row (node, season) | struggle, pacing, season and strategy signals per node with source counts (`CollectiveMineTask`, CHEAP batch); excerpts read, never stored; cost |
+| `collective review --season` | D24 | — | the review sheet `pipeline/reports/<date>-collective-review.csv`: every draft value with its evidence, per node and field, for the founder to edit into `pipeline/inputs/collective/review-<season>.csv` |
+| `collective load --season` | D24 | approved row (node, season) | records approved, confidence distribution, **top-50 weightage coverage at or above `min_confidence`** (CS-1 §7 ✅), misconception question ids that name nothing (refused) |
 | `traps mine` | unscheduled; proposed for the D24 buffer (§12.2) | `(node_id, note)` with evidence rows | traps per node with their PYQ ids |
 | `anchors link` | D23 | `(question_id, paragraph_id)` | anchor coverage %, questions with none |
 | `eval snapshot` | D23 | — | dumps curriculum tables to `snapshots/<date>/` for the eval database |
@@ -1553,7 +1628,10 @@ taxonomy CSV. `traps mine` clusters a node's PYQs by distractor concept and asks
 a one-line "how NTA twists this" note per cluster with ≥ 2 supporting questions; the note and its
 evidence rows are written in one transaction that the service refuses when the evidence list is
 empty, so an unbacked note cannot exist (a repository test inserts a trap with no evidence and
-expects the rollback).
+expects the rollback). `momentum_trend` (CS-1 §2) is the sign of the slope of tagged questions per
+year over the last five years against the 15-year mean — rising, flat or falling with a dead band
+from `margai.pipeline.collective.momentum_dead_band` — written to the node's draft collective record
+by `collective from-pyq` (§6.3).
 
 ## 7. Infrastructure (AWS ap-south-1)
 
@@ -1856,12 +1934,17 @@ delivery signal no counter can carry) and answers the report of §10.3 (D11, 202
 `auth.refresh.reuse` (D7), `auth.clock_skew{band}`
 (D9); `nightly.users`, `nightly.fallbacks`, `nightly.duration`;
 `notifications.sent/skipped` by kind and reason; `outbox.sync_lag_s` (reported by the app through
-PostHog, not CloudWatch); `practice.judge.latency`.
+PostHog, not CloudWatch); `practice.judge.latency`; CS-1 §7 (integration decision 2: here, not in
+SPEC §11): `plan.blocks.completion{day_since_start}` (the day-1 → day-7 completion trend, the
+"visible responsiveness" promise), `plan.reasons{attribution}` (collective vs individual),
+`plan.collective.coverage` (the share of served blocks whose node has an approved record).
 
 ### 10.3 Dashboards (D73)
 
 - **Product funnel** (PostHog): install → OTP success → first plan (< 5 min) → first doubt (48 h) →
-  D7 active; paywall shown/dismissed/paid by trigger; cache hit rate as seen by the client.
+  D7 active; paywall shown/dismissed/paid by trigger; cache hit rate as seen by the client; the CS-1
+  responsiveness view — day-1 → day-7 plan-block completion, reason lines by attribution, collective
+  coverage of served blocks (D73).
 - **Operations** (CloudWatch): p95 latency per route against DEV_SPEC §9 targets (plan fetch 400 ms,
   judge 250 ms, cached doubt 1.5 s, fresh CHEAP 8 s, REASON with verify 25 s), 5xx rate, ALB
   health, RDS CPU/storage/connections, nightly run status.
@@ -1999,6 +2082,7 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 | Crash reporting SDK | §11 crash-free ≥ 99.5% | PostHog error tracking (§5.7); amend the SDK rule only if it proves insufficient |
 | Offline verdicts | §6.2 vs §3 | decision §5.6 before D31 |
 | Continuity re-onboarding after a result that falls short (SPEC §4 Fork B, §7.2, §8 screen 15) | §4 Phase 6, §7.2 | not excluded by §12 (which names referral and graduation automation only); it is a re-run of onboarding with history kept and the dropper track, so it fits a later day once results exist — after the beta window; the founder decides whether to schedule or park. Graduation package and referral gift stay Phase 2; the auto-pause rule ships at D63 |
+| Collective intelligence — the `from-inputs` half depends on founder-collected excerpts (F11) | CS-1 §3–§4, §8; SPEC §9.6 | `from-pyq`, `review` and `load` in the D24 buffer after the PYQ bank exists; `from-inputs` runs in D24 if F11 has delivered, else in any later buffer (D36, D48, D54, D60, D72) with no schedule change (CS-1 §8); a season with only the from-pyq half still ships momentum and misconception seeds, and the planner treats missing fields as absent |
 
 ## 13. Risks and open questions for the founder
 

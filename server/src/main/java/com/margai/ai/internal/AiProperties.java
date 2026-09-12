@@ -103,14 +103,15 @@ public record AiProperties(
      * @param thinking        {@code disabled} or {@code adaptive} (§4.11)
      * @param effort          reasoning effort, or null where the model rejects the field
      * @param cacheMinTokens  the model's minimum cacheable prefix; below it a cache point is a
-     *                        silent no-op, which {@code AiConfiguration} refuses to ship blind
+     *                        silent no-op, which {@code AiConfiguration} warns about at startup.
+     *                        Required, so that adding a tier means looking the figure up
      */
     public record Model(
             @NotBlank String id,
             @DecimalMin("0.0") @DecimalMax("1.0") Double temperature,
             @NotNull Thinking thinking,
             Effort effort,
-            @Min(0) int cacheMinTokens) {
+            @Positive int cacheMinTokens) {
     }
 
     /** Whether a tier's calls carry reasoning (§4.11); constants are the config spellings. */

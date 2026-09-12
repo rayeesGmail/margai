@@ -3,6 +3,9 @@ package com.margai.ai.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.ai.api.Tier;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.annotation.UserConfigurations;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
@@ -70,6 +73,39 @@ class AiPropertiesTest {
             assertThat(reason.thinking()).isEqualTo(AiProperties.Thinking.disabled);
             assertThat(cheap.cacheMinTokens()).isGreaterThan(reason.cacheMinTokens());
         });
+    }
+
+    /**
+     * The cache tripwire's own subject (founder ruling 2026-09-12): the prompts that ship must
+     * actually be cacheable on the tier they run on, or the cost model's cache rate is fiction.
+     * Test-only prompts are excluded — "shipped" means present in main resources.
+     */
+    @Test
+    void everyShippedPromptsCachedPrefixClearsTheCheapModelsMinimum() {
+        runner.run(context -> {
+            AiProperties properties = context.getBean(AiProperties.class);
+            PromptRegistry prompts = context.getBean(PromptRegistry.class);
+            int floor = properties.modelOf(Tier.cheap).cacheMinTokens();
+
+            List<String> shipped = prompts.names().stream()
+                    .filter(name -> !name.startsWith(PromptRegistry.FRAGMENT_PREFIX))
+                    .filter(name -> Files.exists(Path.of("src/main/resources/prompts",
+                            name + ".v" + prompts.activeVersion(name) + ".stg")))
+                    .toList();
+
+            assertThat(shipped).isNotEmpty();
+            for (String name : shipped) {
+                assertThat(FakeAiClient.tokens(prompts.systemPrefix(name)))
+                        .as("cached prefix of prompt %s against the cheap tier's %d-token minimum", name, floor)
+                        .isGreaterThanOrEqualTo(floor);
+            }
+        });
+    }
+
+    @Test
+    void aTierWithoutItsModelsCacheMinimumDoesNotBoot() {
+        runner.withPropertyValues("margai.ai.tier.cheap.cache-min-tokens=0")
+                .run(context -> assertThat(context).hasFailed());
     }
 
     @Test

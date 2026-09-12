@@ -36,6 +36,6 @@ public final class TestAiProperties {
 
     /** A cheap-shaped model: a temperature, no reasoning, no effort. */
     public static AiProperties.Model model(String id) {
-        return new AiProperties.Model(id, 0.0, AiProperties.Thinking.disabled, null, 0);
+        return new AiProperties.Model(id, 0.0, AiProperties.Thinking.disabled, null, 4096);
     }
 }

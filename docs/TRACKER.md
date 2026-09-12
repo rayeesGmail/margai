@@ -224,8 +224,9 @@ Session 3 · 2026-09-11 · FOUNDER REVIEW COMPLETE — all seven checklist items
   founder-sourced for around D58 (PARKED); the biology-split DECISIONS row carries the founder's
   Kota/Allen-convention wording; a new DECISIONS row for D58: 2026 is an outlier season and the
   trajectory feature anchors to a smoothed reference, not the latest year — the founder's "CIL
-  season-note" and "from-inputs" terms are recorded verbatim, neither exists in the docs yet
-  (question raised). Surfaced instead of resolved: the four loader commands the founder asked to run
+  season-note" and "from-inputs" terms were recorded verbatim; at the D13 close the founder expanded
+  CIL to Collective Intelligence Layer, absent from SPEC and TECH_PLAN, so PARKED; "from-inputs" is
+  still undefined. Surfaced instead of resolved: the four loader commands the founder asked to run
   do not exist yet — building them is the remaining D13 work, plan presented for approval.
 Session 4 · 2026-09-12 · the build — 7 tasks approved as written (the D2 shape), one commit each on
   d13-taxonomy: 090baf1 task 1 the pipeline module (picocli command tree, the pipeline profile without
@@ -289,8 +290,8 @@ spec-auditor on the build, before this commit: FAIL → 1 MAJOR and 11 MINOR, al
   a DECISIONS row; the 360-line service split into TaxonomyImporter, PrerequisiteImporter,
   BackboneImporter, CutoffImporter behind the CurriculumImportService facade; this audit recorded
   here. Four tests added for the new refusals and failure paths: 356 → 360.
-Open for the founder: the meaning of "CIL season-note" and "from-inputs" in the D58 DECISIONS row;
-  the F3 booking (in progress); the PR from d13-taxonomy.
+Open for the founder: what the Collective Intelligence Layer's "from-inputs" step is (CIL itself
+  expanded and PARKED at the close); the F3 booking (in progress); the PR from d13-taxonomy.
 ```
 
 ```
@@ -1391,6 +1392,7 @@ Tomorrow's first task:
 - replace or reconcile the D4 `db/seed` test taxonomy (`PHY.11.MECH`, `CHE.11.PHYS`, `PHY.11.KIN`, `CHE.11.MOLE`, four edges, one track, three cut-offs) now that the real inputs exist · 2026-09-12 · a local database that carries the seed shows them as loader orphans (`CurriculumImportSeedTest` pins the shape); `SeedTaxonomyTest` and the constraint tests rely on the seed's fixed UUIDs — decide at D14 whether the seed becomes a subset of the real taxonomy or those tests fixture their own rows
 - a `--prune` option for the loaders (delete orphans that nothing references) · 2026-09-12 · today orphans are reported and left in place (DECISIONS 2026-09-12); only needed if a renamed chapter must go
 - cost lines in the run reports from the AI ledger · 2026-09-12 · the D13 reports carry counts only; `ncert extract` (D14) is the first command that spends
+- a Collective Intelligence Layer (CIL) carrying season notes — the 2026 cancellation and Re-NEET is the first candidate — built by a "from-inputs" step · 2026-09-12 · the founder's terms in the D58 cut-off ruling, expanded at the D13 close; the layer is in neither SPEC (§12 lists the Phase-2 exclusions) nor TECH_PLAN, and "from-inputs" is undefined, so this is an idea to scope with the founder before D58, not work
 - private-use-area decoding in the ingest text extractor · 2026-09-09 · `ncert/2022-ed/en/phy11-part1/keph107.pdf` (Gravitation, 7 of 17 pages) and its prelims extract as U+F020–U+F0FF (cp1252 byte + 0xF000); subtract 0xF000 or Chapter 7 loses those pages — the only English file affected (every page of every file was scanned)
 
 ---

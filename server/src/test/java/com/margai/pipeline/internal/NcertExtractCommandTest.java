@@ -162,6 +162,17 @@ class NcertExtractCommandTest {
         assertThat(spend.asked).hasSize(1).allMatch(id -> id.startsWith("pipeline-ncert-extract-"));
     }
 
+    /** An interrupted render leaves gaps; the pages that exist are the pages extracted. */
+    @Test
+    void aPartlyRenderedChapterIsExtractedForThePagesThatExist() {
+        store.objects.remove(ContentKeys.page("phy11-part2", BookLanguage.en, (short) 8, 1));
+        page(8, 5);
+
+        assertThat(run()).isZero();
+
+        assertThat(extract.calls).containsExactly("8/2", "8/5", "9/1");
+    }
+
     @Test
     void anUnrenderedChapterFailsTheRunAndSaysWhatToDo() {
         store.objects.keySet().removeIf(key -> key.startsWith("pages/phy11-part2/en/9/"));

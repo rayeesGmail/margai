@@ -32,4 +32,15 @@ final class ContentKeys {
     static String extract(String book, BookLanguage language) {
         return "extract/" + book + "/" + language + ".jsonl";
     }
+
+    /**
+     * The page number a page key carries. Read back from the listing rather than assumed from the
+     * count, so a chapter rendered in part — the state an interrupted render leaves — is extracted
+     * for the pages that exist instead of for 1..n.
+     */
+    static int pageNumber(String pageKey) {
+        String name = pageKey.substring(pageKey.lastIndexOf('/') + 1);
+        int dot = name.indexOf('.');
+        return Integer.parseInt(dot < 0 ? name : name.substring(0, dot));
+    }
 }

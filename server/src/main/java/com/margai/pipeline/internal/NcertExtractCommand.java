@@ -91,7 +91,8 @@ class NcertExtractCommand extends NcertBookCommand {
             int chapterCalled = 0;
             int chapterParagraphs = 0;
             String tail = null;
-            for (int page = 1; page <= pageKeys.size(); page++) {
+            for (String pageKey : pageKeys) {
+                int page = ContentKeys.pageNumber(pageKey);
                 if (pages != null && !pages.isEmpty() && !pages.contains(page)) {
                     continue;
                 }
@@ -102,9 +103,8 @@ class NcertExtractCommand extends NcertBookCommand {
                     tail = tailOf(existing);
                     continue;
                 }
-                String key = ContentKeys.page(definition.code(), language, chapter.no(), page);
                 AiResponse<NcertPage> response = extract.read(definition.row().titleEn(), chapter.no(), page,
-                        new ImagePart(content.get(key), PdfPageRenderer.MEDIA_TYPE), tail, ctx);
+                        new ImagePart(content.get(pageKey), PdfPageRenderer.MEDIA_TYPE), tail, ctx);
                 ExtractedPage read = ExtractedPage.of(chapter.no(), page, response.output(), response.aiCallId());
                 done.put(read.address(), read);
                 called++;

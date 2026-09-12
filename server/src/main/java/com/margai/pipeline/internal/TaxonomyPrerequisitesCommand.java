@@ -35,10 +35,13 @@ class TaxonomyPrerequisitesCommand extends InputFileCommand {
         List<PrerequisiteRow> rows = PrerequisitesCsvReader.read(inputFile);
         report.read(rows.size() + " edges");
         PrerequisiteLoadReport result = imports.loadPrerequisites(rows);
+        // A report exists only when Kahn's remainder over every edge in the database was empty: a cycle
+        // throws inside the transaction and the run ends with exit 1 and a FAILED report instead.
         report.section("syllabus_prerequisites")
-                .table(List.of("inserted", "already present", "edges in the database", "nodes with edges", "cycle"),
+                .table(List.of("inserted", "already present", "edges in the database", "nodes with edges", "cycle check"),
                         List.of(List.of(String.valueOf(result.inserted()), String.valueOf(result.unchanged()),
-                                String.valueOf(result.edgesInDatabase()), String.valueOf(result.nodesWithEdges()), "none")));
+                                String.valueOf(result.edgesInDatabase()), String.valueOf(result.nodesWithEdges()),
+                                "passed (Kahn's remainder empty; a remainder fails the run)")));
         report.section("orphan edges (in the database, not in the file)").list(result.orphanEdges());
     }
 }

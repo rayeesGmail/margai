@@ -232,7 +232,7 @@ Both names match the eval gate's `retriev*` path rule.
 | `notifications` | FCM devices, scheduling from plan events, 2/day cap, quiet periods, dispatcher (§6.10) | `notification_log` | common, account, planner.api (events) |
 | `ai` | `AiClient`, Bedrock/Fake, ledger, breaker, router, retrieval, prompts, verification, embeddings (§4) | `ai_calls`, `ai_spend_daily`, `audit_queue` | common, curriculum |
 | `storage` | S3 port (uploads, content), signed URLs, deletion | — | common |
-| `pipeline` | §6 CLI commands | — | ai, curriculum, storage |
+| `pipeline` | §6 CLI commands | — | common, curriculum (D13); ai, storage (D14) — *`common` added 2026-09-12 (DECISIONS): the run report's IST clock* |
 | `jobs` | `NightlyRunner` (§4.5 orchestration), the purge and rollup jobs, the export executor (gathers every module's data for `data_export_jobs`, D64), the daily document-deletion verification job (§9.6, D64), the sweepers' schedules, the weekly dump | — | every `api` package |
 | `ops` | founder admin peek, audit-queue review, cost views (`GET /admin/costs` D65, the rest D75) — *opened 2026-09-09 at D11 with `GET /admin/metrics/otp`, the §10.3 stub; declares `common :: api`, `auth :: api` today and gains each module's `api` as its routes arrive* | — | every `api` package (read-only) |
 

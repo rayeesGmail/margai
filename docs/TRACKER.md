@@ -11,9 +11,9 @@
 
 | Field | Value |
 |---|---|
-| Current phase | **PHASE 2 — Content pipeline v1 (Weeks 3–4, D13–D24, M3)**, D13 in progress since 2026-09-10; PHASE 1 — Auth & identity (Week 2, D7–D12) closed at the Week-2 gate 2026-09-09, running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
-| Current day | D12 done · 2026-09-09 (buffer + the **Week-2 🚩 gate PASS** as "a stranger's email signs in first try" — the build's half, proved on the AVD: a never-seen address on a fresh install of the `db98a49` build, one code typed once, Today, reopen still signed in, `first_attempt_rate=1.000` on the reporter line; the D9 runbook's ten rows re-run clean on the same build; carried, named: the phone channel (F1), mobile data (F8), an unverified stranger's inbox (F10 production access — overdue against its own "before D12" date, slippage log). Buffer: `scripts/ui.sh` in the tree, the eval gate's router/retrieval alternative scoped to `server/` + `eval/` and case-insensitive, the 200 input PDFs ignored; branch `d12-week2-gate`, 4 chore commits + the audit fix + the docs commit, no feature code; spec-auditor FAIL → 3 MAJOR (a stale dashboard row, the PASS label, the case gap) and 8 MINOR, all fixed except the label, kept as the founder's approved reading with the tick naming what it proves; server 319 tests, app 242; PR #12 merged by the founder 2026-09-09, merge commit 4301296) · next: D13 — taxonomy CSV loaded + prerequisite graph + archetype drafts (✅ no cycles), Week 3 / PHASE 2 (M3): TECH_PLAN §6.2/§6.3, §2.3, the §0.2 D13 rule edit; en/ NCERT first (the Hindi Chanakya→Unicode step is PARKED) · **D13 in progress 2026-09-10** on `d13-taxonomy`: the four founder inputs drafted under `pipeline/inputs/` from the NEET (UG) 2026 syllabus for the founder's review (516 nodes, 103 edges, 4 tracks, 35 cut-off rows; README there lists the review checklist); loader commands, the pipeline profile and the `pipeline.md` rule edit still to do |
-| Days completed / total | 12 / 84 |
+| Current phase | **PHASE 2 — Content pipeline v1 (Weeks 3–4, D13–D24, M3)**, D13 done 2026-09-12, D14 next (the NCERT extraction pilot, the first live VISION day — the Anthropic 403 and the F8 bucket in the Blockers row); PHASE 1 — Auth & identity (Week 2, D7–D12) closed at the Week-2 gate 2026-09-09, running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
+| Current day | D13 done · 2026-09-12 (built 2026-09-10 → 12 on `d13-taxonomy`: the four founder inputs drafted from the NEET (UG) 2026 syllabus and reviewed by the founder in full — all seven checklist items closed 2026-09-11 — 516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-off rows; then the `pipeline` module in six task commits: picocli commands under the `pipeline` profile, `CurriculumImport` in `curriculum.api`, strict readers, run reports with the input's SHA-256; **acceptance PASS** run literally against a fresh database `margai_d13` in the compose container: `taxonomy load`, `taxonomy prerequisites`, `backbone load`, `cutoffs load` all exit 0 with 516 / 104 / 744 / 40 rows, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path over psql, an idempotent re-run changes nothing; reports committed under `pipeline/reports/`; server tests 356 (was 319), app untouched; spec-auditor on the build: see the day log) · next: D14 — NCERT extraction pilot, 2 books EN (✅ 20-paragraph spot check): TECH_PLAN §6.1 VISION extraction over page images, §6.3 `ncert register|render|extract|load`, `books.yaml` (§6.2), the S3 `content/` home (F8) or the ignored `pipeline/data/`, the Bedrock 403 (Blockers) and the D3 text-extraction escape hatch, the PUA decoding for `keph107.pdf` (PARKED), the D4 seed decision (PARKED) |
+| Days completed / total | 13 / 84 |
 | Schedule delta | on track (the build); one founder item slipped — F10's SES production access was due "before D12" and is still open (slippage log) |
 | Last week's gate | **Week-2 🚩 PASS** 2026-09-09 — a stranger's email signs in first try on the AVD (fresh install of the `db98a49` build, one code typed once, Today, reopen still signed in, `first_attempt_rate=1.000`) and the D9 runbook's ten rows re-run clean on the same build (transcript in the D12 day log, table in the runbook); carried, not failed: the phone channel (F1), mobile data (F8), an unverified stranger's inbox (F10 production access). Week-1 🚩 PASS 2026-09-08 stands (D6 day log) |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
@@ -44,7 +44,7 @@
 
 ## PHASE 2 — Content pipeline v1 (Weeks 3–4) · M3
 
-- [ ] **D13** Taxonomy CSV loaded + prerequisite graph + archetype drafts · ✅ no cycles
+- [x] **D13** Taxonomy CSV loaded + prerequisite graph + archetype drafts · ✅ no cycles — done 2026-09-12 (drafted 2026-09-10 from the syllabus PDFs, founder review complete 2026-09-11 with all seven checklist items closed, built 2026-09-12): `pipeline/inputs/` (516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-offs), the `pipeline` module with `taxonomy load|prerequisites`, `backbone load`, `cutoffs load` under the `pipeline` profile and `CurriculumImport` in `curriculum.api`; **acceptance PASS** on a fresh database — all four commands exit 0, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path, idempotent re-run; reports in `pipeline/reports/2026-09-12-*.md`; server tests 356 (day log); branch `d13-taxonomy`, PR pending the founder's review and push
 - [ ] **D14** NCERT extraction pilot (2 books, EN) · ✅ 20-paragraph spot check
 - [ ] **D15** All EN books extracted · ✅ coverage report/book
 - [ ] **D16** Hindi ingest + EN↔HI alignment · ✅ 20 aligned pairs checked
@@ -176,7 +176,7 @@
 ## 📝 Day log (append newest on top)
 
 ```
-D13 · 2026-09-10 · IN PROGRESS · PHASE 2 — Content pipeline v1 (taxonomy + prerequisite graph + archetype drafts)
+D13 · 2026-09-10 → 2026-09-12 · DONE · PHASE 2 — Content pipeline v1 (taxonomy + prerequisite graph + archetype drafts)
 Session 1 (branch d13-taxonomy): the four founder inputs of TECH_PLAN §6.2 drafted from the syllabus
   PDFs for the founder's review — the bounded design approved as written (12 numbered decisions, the
   recommended option each). syllabus-2025 and syllabus-2026 diffed: identical content (50 NTA units),
@@ -227,11 +227,70 @@ Session 3 · 2026-09-11 · FOUNDER REVIEW COMPLETE — all seven checklist items
   season-note" and "from-inputs" terms are recorded verbatim, neither exists in the docs yet
   (question raised). Surfaced instead of resolved: the four loader commands the founder asked to run
   do not exist yet — building them is the remaining D13 work, plan presented for approval.
-  Still to do for the ✅: the loader commands + pipeline profile (the cross-stream check at sequence
-  granularity; the §6.3 orphans report must surface the D4 seed's PHY.11.MECH / PHY.11.KIN shapes on
-  a seeded local db), the §0.2 pipeline.md rule edit (also stale on command order: TECH_PLAN §6.3 puts
-  backbone and cutoffs at D13), the no-cycles repository test naming the data it runs on, the
-  committed pipeline/reports/<date>-<command>.md evidence, the founder's review of the drafts.
+Session 4 · 2026-09-12 · the build — 7 tasks approved as written (the D2 shape), one commit each on
+  d13-taxonomy: 090baf1 task 1 the pipeline module (picocli command tree, the pipeline profile without
+  a web server, the JVM exits with picocli's code; the security chain became a servlet-only bean);
+  20b73f6 task 2 the four input readers (RFC 4180 CSV via Commons CSV, Jackson YAML, refusals with file
+  and line); 4142194 task 3 CurriculumImport in curriculum.api with loadTaxonomy and loadPrerequisites
+  — Kahn's algorithm over the whole database graph inside the transaction, orphans reported never
+  deleted, the D4 seed's stale shapes proved as orphans; bd8aa04 task 4 loadBackbone and loadCutoffs
+  (stale step sequences removed, step-phase conventions enforced); e5c23eb task 5 the run report
+  pipeline/reports/<date>-<command>.md with the input's SHA-256, written for failed runs too; f501a50
+  task 6 the §0.2 rule edit and the pipeline/README run instructions. Tests 319 (D12) → 356 after
+  task 5 (+37: 10 at task 1, 27 over tasks 2–5), 0 failures, 1 skipped; ./mvnw verify green after
+  every task. Surprise: one full verify failed with
+  "FATAL: sorry, too many clients already" although the targeted run was green — the shared
+  Testcontainers Postgres hit its default 100 connections when three profile-scoped test contexts
+  joined (each caches a pool of 10); max_connections raised to 300 in TestcontainersConfiguration.
+Acceptance ✅ "Taxonomy queryable; graph has no cycles" — PASS, run literally 2026-09-12 (first at
+  09:04 IST; the committed reports are the 09:20 run on a recreated empty database, after the
+  spec-auditor's fixes below — the report's input path repo-relative so a committed report reads the
+  same on every machine, the backbone report widened, the cycle-check cell reading as a mechanism).
+  A fresh database margai_d13 created in the compose container (the developer db keeps its seed until
+  D14), `./mvnw -q -DskipTests package`, then from server/ with DB_URL=jdbc:postgresql://localhost:5432/margai_d13:
+    java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline taxonomy load
+      → read 516 nodes, inserted 516, orphans none, exit 0 (subjects/units/chapters/topics: physics
+        1/20/29/134, chemistry 1/20/22/109, botany 1/9/20/79, zoology 1/6/12/52)
+    … taxonomy prerequisites → read 104 edges, inserted 104, 104 edges over 83 nodes, cycle none, exit 0
+    … backbone load → 4 tracks / 744 steps inserted (210/166/178/190), chapters in no track none, exit 0
+    … cutoffs load → 40 rows inserted, 5 per year 2019–2026, orphans none, exit 0
+  Reports committed: pipeline/reports/2026-09-12-{taxonomy-load,taxonomy-prerequisites,backbone-load,
+  cutoffs-load}.md, input SHA-256 3c204a5c…, dc17b8da…, e23a162c…, c6569a36….
+  Queryable, over `docker compose exec db psql -d margai_d13` (the 09:04 load; the 09:08 and 09:20
+  re-loads produced the same counts): kind counts subject 4 / unit 55 /
+  chapter 83 / topic 374; the chapters of PHY.U07 by join — PHY.11.ELAST (90 min), PHY.11.FLUID (225),
+  PHY.11.THERMP (180), class 11, Hindi names present; the path BOT.12.INHERIT.MENDEL < BOT.12.INHERIT <
+  BOT.U07 < BOT by a recursive CTE.
+  No cycles, twice: the loader's Kahn check ("cycle | none" in the report) and an independent SQL
+  recursive walk — 0 nodes reachable from themselves over 104 edges (52 sources, 75 targets); the
+  longest chains are 9 (PHY.11.UNITS → PHY.12.EMW and → PHY.12.AC, CHE.11.BASICS → CHE.12.AMINES).
+  Tracks: 4, each learning all 83 chapters, last weeks 96/44/40/40. Cut-offs 2026: general/ews 213,
+  obc/sc/st 177 with the Re-NEET source.
+  Idempotent re-run of all four (reports to the scratchpad): 0 inserted, 516 unchanged; 104 already
+  present; 744 unchanged; 40 unchanged; every exit 0.
+Deviations from the approved plan: the "fresh compose database" became a second database inside the
+  running container rather than a `down -v`, so the developer's seeded db and its D7–D12 test accounts
+  survive; a shell slip (zsh does not word-split "$cmd") sent one-word commands on the first attempt —
+  four usage errors, nothing loaded, re-run correctly. Decisions: 7 DECISIONS rows dated 2026-09-12
+  (servlet-only chain, picocli core, `--inputs` default, strict readers, orphans reported, steps follow
+  the file, the run report). Parked: the D4 seed's fate (D14), a `--prune` option, report cost lines.
+spec-auditor on the build, before this commit: FAIL → 1 MAJOR and 11 MINOR, all fixed. MAJOR: the
+  inputs README claimed the loader re-implements every generator check — the loader now also refuses
+  duplicate sibling sort orders, a topic whose class level differs from its chapter's, a chapter
+  learned twice by one track and a chapter learned before a prerequisite the same track learns
+  (sequence granularity, the drafts' session-1 MAJOR now guarded in the loader), and the README names
+  the two checks that stay with the generator. MINOR: the `pipeline → common :: api` edge recorded
+  (DECISIONS + TECH_PLAN §1.3); the "never delete" headline narrowed to nodes, edges, tracks and
+  cut-offs; the backbone report widened to every subject, unit and chapter no step names plus orphan
+  tracks (§6.3 "nodes not in any track"); every failure now leaves a report, unexpected ones a stack
+  trace too, both paths tested; the cycle cell reads "passed (Kahn's remainder empty; a remainder
+  fails the run)" instead of a bare "none"; the readers' bounds are sanity limits, not exam facts;
+  structured log lines at start and end of every command; the max_connections departure recorded as
+  a DECISIONS row; the 360-line service split into TaxonomyImporter, PrerequisiteImporter,
+  BackboneImporter, CutoffImporter behind the CurriculumImportService facade; this audit recorded
+  here. Four tests added for the new refusals and failure paths: 356 → 360.
+Open for the founder: the meaning of "CIL season-note" and "from-inputs" in the D58 DECISIONS row;
+  the F3 booking (in progress); the PR from d13-taxonomy.
 ```
 
 ```
@@ -1329,6 +1388,9 @@ Tomorrow's first task:
 - a Chanakya→Unicode step (or OCR) before any Hindi NCERT chunk is embedded · 2026-09-09 · found while writing `ncert/2022-ed/hi/manifest.md`: all ten Hindi books are selectable text set in the legacy 8-bit Walkman-Chanakya fonts with no ToUnicode map, so extraction yields glyph codes and zero Devanagari across 1,976 pages; the Phase-2 content pipeline (D13+) grounds on `en/` until this exists, and the manifest's "text OK" column stays ✗ until a converted sample passes a native-reader check
 - topic-level `name_hi` for the 374 taxonomy topics (batch translation through the CHEAP tier + a native-reader check), and a final native-reader skim of the full unit and chapter `name_hi` column · 2026-09-10 · the D13 draft fills Hindi for subjects, units and chapters only; needed before the D26 syllabus grid shows topics in Hindi · 2026-09-11 (D13 review): the sampled unit and chapter Hindi reviewed and approved for D13; the full-column skim stays parked for before D26
 - cut-off seat-type rows the founder must source: every `govt_mbbs` / `private_mbbs` / `bds` closing-marks row by year, category and quota scope (MCC and state counselling) · 2026-09-10 · the D13 draft carries only the NTA qualifying cut-offs · 2026-09-11: the 2026 qualifying rows landed at the review (Re-NEET, 16 July 2026 notice; an outlier season, DECISIONS D13 row for D58); seat-type rows are not needed before the trajectory work around D58
+- replace or reconcile the D4 `db/seed` test taxonomy (`PHY.11.MECH`, `CHE.11.PHYS`, `PHY.11.KIN`, `CHE.11.MOLE`, four edges, one track, three cut-offs) now that the real inputs exist · 2026-09-12 · a local database that carries the seed shows them as loader orphans (`CurriculumImportSeedTest` pins the shape); `SeedTaxonomyTest` and the constraint tests rely on the seed's fixed UUIDs — decide at D14 whether the seed becomes a subset of the real taxonomy or those tests fixture their own rows
+- a `--prune` option for the loaders (delete orphans that nothing references) · 2026-09-12 · today orphans are reported and left in place (DECISIONS 2026-09-12); only needed if a renamed chapter must go
+- cost lines in the run reports from the AI ledger · 2026-09-12 · the D13 reports carry counts only; `ncert extract` (D14) is the first command that spends
 - private-use-area decoding in the ingest text extractor · 2026-09-09 · `ncert/2022-ed/en/phy11-part1/keph107.pdf` (Gravitation, 7 of 17 pages) and its prelims extract as U+F020–U+F0FF (cp1252 byte + 0xF000); subtract 0xF000 or Chapter 7 loses those pages — the only English file affected (every page of every file was scanned)
 
 ---

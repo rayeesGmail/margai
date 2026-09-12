@@ -1,6 +1,8 @@
 package com.margai.pipeline.internal;
 
 import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.ExitCodeGenerator;
@@ -26,6 +28,8 @@ class PipelineRunner implements ApplicationRunner, ExitCodeGenerator {
     /** Spring's own arguments ({@code --spring.profiles.active=…}) are not picocli's business. */
     private static final String SPRING_ARGUMENT_PREFIX = "--spring.";
 
+    private static final Logger log = LoggerFactory.getLogger(PipelineRunner.class);
+
     private final ApplicationContext context;
     private volatile int exitCode;
 
@@ -35,7 +39,10 @@ class PipelineRunner implements ApplicationRunner, ExitCodeGenerator {
 
     @Override
     public void run(ApplicationArguments args) {
-        exitCode = commandLine(new SpringPicocliFactory(context)).execute(commandArgs(args.getSourceArgs()));
+        String[] command = commandArgs(args.getSourceArgs());
+        log.info("{} {}", COMMAND_NAME, String.join(" ", command));
+        exitCode = commandLine(new SpringPicocliFactory(context)).execute(command);
+        log.info("{} {} exit {}", COMMAND_NAME, String.join(" ", command), exitCode);
     }
 
     @Override

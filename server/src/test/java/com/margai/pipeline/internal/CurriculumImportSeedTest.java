@@ -66,8 +66,9 @@ class CurriculumImportSeedTest {
         assertThat(backbone.stepsUpdated()).isEqualTo(7);
         assertThat(backbone.stepsInserted()).isEqualTo(744 - 7);
         assertThat(backbone.stepsRemoved()).isZero();
-        // The seed's stale chapters PHY.11.KIN and CHE.11.MOLE are chapters no real track learns.
-        assertThat(backbone.chaptersInNoTrack()).containsExactly("CHE.11.MOLE", "PHY.11.KIN");
+        // The seed's stale units and chapters are the nodes no real track names; the seed's own track is in the file.
+        assertThat(backbone.nodesInNoTrack()).containsExactly("CHE.11.MOLE", "CHE.11.PHYS", "PHY.11.KIN", "PHY.11.MECH");
+        assertThat(backbone.orphanTracks()).isEmpty();
         assertThat(jdbc.queryForObject("SELECT name_en FROM archetype_tracks WHERE code = 'dropper'", String.class))
                 .isEqualTo("Dropper (1st repeat)");
 

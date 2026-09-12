@@ -19,11 +19,13 @@ final class CutoffsCsvReader {
     static final String[] HEADER = {"year", "category", "quota_scope", "seat_type", "qualifying_marks", "source"};
     static final int QUOTA_SCOPE_MAX_LENGTH = 8;
     static final int SOURCE_MAX_LENGTH = 120;
-    /** NEET began in 2013; the upper bound only catches a typo. */
-    static final int FIRST_YEAR = 2013;
+    /**
+     * Sanity bounds that catch a typo, not exam parameters: the exam's total marks and first year
+     * belong under {@code margai.exam.*} (TECH_PLAN §11.5) the day a feature computes with them (D22).
+     */
+    static final int FIRST_YEAR = 2000;
     static final int LAST_YEAR = 2100;
-    /** The paper carries 720 marks. */
-    static final int MAX_MARKS = 720;
+    static final int MAX_MARKS = 1000;
 
     private CutoffsCsvReader() {
     }

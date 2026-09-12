@@ -153,4 +153,12 @@ prerequisite endpoints present with no self-loops, duplicates or cycles, every c
 per track, sequences unique, target weeks inside the track, prerequisite order across streams at week and
 sequence granularity, cut-off natural keys unique with enum values valid, and the chapter set per NCERT
 book matching the manifests.
-The D13 loader re-implements these checks in Java; the CSVs are the artefact, edit them directly.
+The D13 loader (`CurriculumImport`, the `pipeline` commands) repeats every check that concerns the
+database: unique codes, parents present with the kind and subject the tree demands, a topic's class
+level equal to its chapter's, sort orders unique among siblings, chapter-level prerequisite endpoints
+that exist, Kahn's cycle check over every edge in the database, every step naming a node of its
+phase's kind, a chapter learned at most once per track, and prerequisites before dependants within a
+track at sequence granularity. Two checks stay with the generator because they compare against files
+the loader never sees: the chapter set per NCERT book against the manifests, and the week-level
+cross-stream timing (the loader's sequence-level check covers each track on its own). The CSVs are
+the artefact; edit them directly.

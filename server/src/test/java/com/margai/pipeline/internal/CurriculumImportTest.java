@@ -196,7 +196,8 @@ class CurriculumImportTest {
         assertThat(first.stepsPerTrack())
                 .containsEntry(AttemptType.fresher_2yr, 210).containsEntry(AttemptType.fresher_1yr, 166)
                 .containsEntry(AttemptType.dropper, 178).containsEntry(AttemptType.repeater, 190);
-        assertThat(first.chaptersInNoTrack()).isEmpty();
+        assertThat(first.nodesInNoTrack()).isEmpty();
+        assertThat(first.orphanTracks()).isEmpty();
         assertThat(again.tracksUnchanged()).isEqualTo(4);
         assertThat(again.stepsUnchanged()).isEqualTo(744);
         assertThat(again.stepsInserted()).isZero();
@@ -228,7 +229,10 @@ class CurriculumImportTest {
         assertThat(report.stepsUpdated()).isEqualTo(1);
         assertThat(report.stepsUnchanged()).isEqualTo(49);
         assertThat(report.stepsRemoved()).isEqualTo(128);
-        assertThat(report.chaptersInNoTrack()).isNotEmpty().contains("CHE.00.PRACTICAL", "BOT.12.MICROBES");
+        // Chapters the first 50 steps never learn, and every unit: revision steps start at sequence 100.
+        assertThat(report.nodesInNoTrack()).contains("CHE.00.PRACTICAL", "BOT.12.MICROBES", "PHY.U01", "ZOO.U08")
+                .doesNotContain("PHY", "CHE", "BOT", "ZOO", "PHY.11.UNITS");
+        assertThat(report.orphanTracks()).containsExactly("fresher_1yr", "fresher_2yr", "repeater");
         assertThat(jdbc.queryForObject(
                 "SELECT count(*) FROM archetype_track_steps s JOIN archetype_tracks t ON t.id = s.track_id WHERE t.code = 'dropper'",
                 Long.class)).isEqualTo(50);
@@ -251,6 +255,43 @@ class CurriculumImportTest {
         assertThatThrownBy(() -> imports.loadBackbone(List.of(unknown)))
                 .isInstanceOf(CurriculumImportException.class)
                 .hasMessage("track steps name nodes not in the taxonomy: [PHY.11.NOSUCH]");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM archetype_tracks", Long.class)).isZero();
+    }
+
+    @Test
+    void aDuplicateSiblingSortOrderAndATopicClassMismatchAreRefused() {
+        SyllabusNodeRow physics = new SyllabusNodeRow("PHY", Subject.physics, null, null, NodeKind.subject, "Physics", null, 1, null, true);
+        SyllabusNodeRow unit1 = new SyllabusNodeRow("PHY.U01", Subject.physics, null, "PHY", NodeKind.unit, "Measurement", null, 1, null, true);
+        SyllabusNodeRow unit2SameOrder = new SyllabusNodeRow("PHY.U02", Subject.physics, null, "PHY", NodeKind.unit, "Kinematics", null, 1, null, true);
+        SyllabusNodeRow chapter = new SyllabusNodeRow("PHY.11.UNITS", Subject.physics, (short) 11, "PHY.U01", NodeKind.chapter, "Units", null, 1, null, true);
+        SyllabusNodeRow topicOfClass12 = new SyllabusNodeRow("PHY.11.UNITS.SI", Subject.physics, (short) 12, "PHY.11.UNITS", NodeKind.topic, "SI units", null, 1, 45, true);
+
+        assertThatThrownBy(() -> imports.loadTaxonomy(List.of(physics, unit1, unit2SameOrder)))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessage("sort_order 1 appears twice under PHY (PHY.U01 and PHY.U02)");
+        assertThatThrownBy(() -> imports.loadTaxonomy(List.of(physics, unit1, chapter, topicOfClass12)))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessage("topic PHY.11.UNITS.SI has class_level 12 but its chapter PHY.11.UNITS has 11");
+        assertThat(count("TRUE")).isZero();
+    }
+
+    @Test
+    void aChapterLearnedTwiceOrBeforeItsPrerequisiteIsRefused() {
+        imports.loadTaxonomy(TaxonomyCsvReader.read(TAXONOMY));
+        imports.loadPrerequisites(PrerequisitesCsvReader.read(PREREQUISITES));
+        ArchetypeTrackRow twice = track(
+                new ArchetypeStepRow(1, "PHY.11.UNITS", TrackPhase.learn, (short) 1),
+                new ArchetypeStepRow(2, "PHY.11.UNITS", TrackPhase.learn, (short) 2));
+        ArchetypeTrackRow outOfOrder = track(
+                new ArchetypeStepRow(1, "PHY.11.KIN1D", TrackPhase.learn, (short) 1),
+                new ArchetypeStepRow(2, "PHY.11.UNITS", TrackPhase.learn, (short) 1));
+
+        assertThatThrownBy(() -> imports.loadBackbone(List.of(twice)))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessage("track dropper: chapter PHY.11.UNITS is learned twice (sequences 1 and 2)");
+        assertThatThrownBy(() -> imports.loadBackbone(List.of(outOfOrder)))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessage("track dropper: PHY.11.KIN1D (sequence 1) is learned before its prerequisite PHY.11.UNITS (sequence 2)");
         assertThat(jdbc.queryForObject("SELECT count(*) FROM archetype_tracks", Long.class)).isZero();
     }
 
@@ -294,7 +335,7 @@ class CurriculumImportTest {
                 row.nameHi(), row.sortOrder(), row.defaultLearnMinutes(), row.neetRelevant());
     }
 
-    private static ArchetypeTrackRow track(ArchetypeStepRow step) {
-        return new ArchetypeTrackRow(AttemptType.dropper, "Dropper (1st repeat)", null, (short) 40, null, List.of(step));
+    private static ArchetypeTrackRow track(ArchetypeStepRow... steps) {
+        return new ArchetypeTrackRow(AttemptType.dropper, "Dropper (1st repeat)", null, (short) 40, null, List.of(steps));
     }
 }

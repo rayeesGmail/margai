@@ -38,7 +38,7 @@ class ReportTest {
         String text = report.render(CLOCK.nowIst());
 
         assertThat(report.slug()).isEqualTo("taxonomy-load");
-        assertThat(text).startsWith("# margai-pipeline taxonomy load\n\n- run: 2026-09-12 10:00 IST\n- input: " + input.toAbsolutePath().normalize()
+        assertThat(text).startsWith("# margai-pipeline taxonomy load\n\n- run: 2026-09-12 10:00 IST\n- input: " + input.normalize()
                 + "\n- sha256: ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\n- read: 516 nodes\n- result: ok\n");
         assertThat(text).contains("\n## syllabus_nodes\n\n| inserted | updated |\n|---|---|\n| 516 | 0 |\n");
         assertThat(text).endsWith("## orphans\n\nnone\n");

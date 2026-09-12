@@ -48,6 +48,7 @@ class BackboneLoadCommand extends InputFileCommand {
                 .table(List.of("track", "steps"), result.stepsPerTrack().entrySet().stream()
                         .map(entry -> List.of(entry.getKey().name(), String.valueOf(entry.getValue())))
                         .toList());
-        report.section("chapters in no track").list(result.chaptersInNoTrack());
+        report.section("nodes in no track (subjects, units and chapters no step names)").list(result.nodesInNoTrack());
+        report.section("orphan tracks (in the database, not in the file)").list(result.orphanTracks());
     }
 }

@@ -31,10 +31,15 @@ final class Report {
     private String read = "nothing yet";
     private String result = "ok";
 
-    /** {@code title} is the command's qualified name, e.g. {@code margai-pipeline taxonomy load}. */
+    /**
+     * {@code title} is the command's qualified name, e.g. {@code margai-pipeline taxonomy load}. The
+     * input path is kept as given (normalised, not made absolute): a committed report must read the
+     * same on every machine, and the run location is documented ({@code ../pipeline/inputs} from
+     * {@code server/}); the SHA-256 is what pins the exact file.
+     */
     Report(String title, Path input) {
         this.title = title;
-        this.input = input.toAbsolutePath().normalize();
+        this.input = input.normalize();
         this.sha256 = sha256(input);
     }
 
@@ -46,6 +51,14 @@ final class Report {
 
     String result() {
         return result;
+    }
+
+    String sha256() {
+        return sha256;
+    }
+
+    String read() {
+        return read;
     }
 
     Report read(String what) {

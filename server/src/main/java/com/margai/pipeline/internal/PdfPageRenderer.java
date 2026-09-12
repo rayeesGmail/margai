@@ -22,10 +22,28 @@ final class PdfPageRenderer {
 
     private static final String FORMAT = "png";
 
+    /**
+     * The image formats NCERT's PDFs embed that Java cannot decode out of the box. PDFBox reacts to
+     * a missing decoder by logging and rendering the page <em>without</em> that image, so the whole
+     * corpus would degrade silently: 21 of the 30 chapter files in the two pilot books carry
+     * JPEG2000. This is a tripwire on the classpath, checked once, loudly (found on the first real
+     * render, D14).
+     */
+    private static final String JPEG_2000 = "jpeg2000";
+
     private final int dpi;
 
     PdfPageRenderer(int dpi) {
+        requireImageReader(JPEG_2000);
         this.dpi = dpi;
+    }
+
+    private static void requireImageReader(String format) {
+        if (!ImageIO.getImageReadersByFormatName(format).hasNext()) {
+            throw new IllegalStateException("no ImageIO reader for " + format
+                    + ": NCERT pages embed " + format + " images and PDFBox would render them blank "
+                    + "rather than fail. Check that jai-imageio-" + format + " is on the classpath.");
+        }
     }
 
     /**

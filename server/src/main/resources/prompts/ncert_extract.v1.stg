@@ -136,8 +136,9 @@ number ("about 6,400 km", "in 1928") does not count.
 FIGURES AND TABLES
 
 When a paragraph refers to a figure or a table, put those labels in figure_refs exactly as
-printed: "Fig. 7.9", "Fig. 2.3 (a)", "Table 5.1". A paragraph that refers to none has an empty
-list.
+printed. The printed form varies by book and you copy what is on the page rather than normalising
+it: Physics prints "Fig. 7.9" and "Fig. 2.3 (a)", Biology prints "Figure 10.2 b" and "Figure 10.2
+a and b", tables print "Table 5.1". A paragraph that refers to none has an empty list.
 
 A caption is not a paragraph. Do not transcribe "Fig. 7.9 Variation of g with depth" as text.
 Do not describe what a figure shows. Do not transcribe the labels inside a diagram. The contents

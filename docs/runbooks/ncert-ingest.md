@@ -45,7 +45,14 @@ Reads `source/ncert/2022-ed/en/<book>/*.pdf`, writes `pages/{book}/{lang}/{chapt
 and requests only.
 
 Re-runnable: a page already in the bucket is not rendered again. `--chapters 7,8` renders a subset
-(and then leaves the page count alone, because a subset is not the book's total).
+(and then leaves the page count alone, because a subset is not the book's total). **`--redo`
+re-renders pages that are already there** — needed whenever the pages in the bucket are wrong
+rather than missing, which is not hypothetical: the first real run rendered without a JPEG2000
+decoder and PDFBox answered by drawing those pages *without their figures* instead of failing.
+
+If a render ever logs `Cannot read JPEG2000 image`, every page it wrote is suspect and must be
+re-rendered with `--redo`. The renderer now refuses to start at all when that decoder is missing,
+so this cannot recur silently.
 
 Expect roughly 264 pages for `bio11` and 184 for `phy11-part1`, matching `ncert/2022-ed/en/manifest.md`.
 

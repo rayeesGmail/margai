@@ -9,6 +9,7 @@ import java.util.Set;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 /**
  * {@code ncert render}: every page of every selected chapter as a PNG in the content bucket
@@ -19,12 +20,20 @@ import picocli.CommandLine.Command;
  * interrupted halfway resumes for the cost of one listing per chapter. The total is written back
  * to {@code ncert_books.pages_*}, which is what the coverage percentage at {@code ncert load}
  * divides by.
+ *
+ * <p>{@code --redo} exists because that skip is a liability when the pages already there are
+ * wrong: the first real run rendered with no JPEG2000 decoder on the classpath, which PDFBox
+ * answers by drawing the page without the image rather than failing, so the bucket held pages
+ * whose figures were blank and a plain re-run would have kept every one of them (D14).
  */
 @Component
 @Profile("pipeline")
 @Command(name = "render", mixinStandardHelpOptions = true,
         description = "Render each source PDF page to a PNG in the content bucket; skips pages already there.")
 class NcertRenderCommand extends NcertBookCommand {
+
+    @Option(names = "--redo", description = "Render pages again even when they are already in the bucket.")
+    boolean redo;
 
     private final ObjectStore content;
     private final CurriculumImport imports;
@@ -48,7 +57,7 @@ class NcertRenderCommand extends NcertBookCommand {
         for (BookDefinition.Chapter chapter : selected) {
             String sourceKey = definition.sourceKey(language, chapter);
             String prefix = ContentKeys.pagePrefix(definition.code(), language, chapter.no());
-            Set<String> existing = new HashSet<>(content.list(prefix));
+            Set<String> existing = redo ? Set.of() : new HashSet<>(content.list(prefix));
             byte[] pdf = content.get(sourceKey);
 
             int[] chapterRendered = {0};

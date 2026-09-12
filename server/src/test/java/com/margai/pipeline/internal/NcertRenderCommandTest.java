@@ -118,6 +118,26 @@ class NcertRenderCommandTest {
                 .contains("| 2 | 5 | 0 | 5 |");
     }
 
+    /**
+     * The skip is a liability when what is already there is wrong — as it was on the first real run,
+     * whose pages were drawn without their JPEG2000 figures (D14).
+     */
+    @Test
+    void redoRendersPagesAlreadyInTheBucket() {
+        render();
+        store.puts.clear();
+
+        assertThat(commandLine.execute("ncert", "render", "--book", "phy11-part2", "--redo",
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(store.puts).containsExactly(
+                "pages/phy11-part2/en/8/001.png",
+                "pages/phy11-part2/en/8/002.png",
+                "pages/phy11-part2/en/8/003.png",
+                "pages/phy11-part2/en/9/001.png",
+                "pages/phy11-part2/en/9/002.png");
+    }
+
     @Test
     void theReportNamesTheStoreItWroteTo() {
         render();

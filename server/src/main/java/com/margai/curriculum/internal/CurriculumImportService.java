@@ -1,13 +1,20 @@
 package com.margai.curriculum.internal;
 
+import com.margai.common.api.AttemptType;
+import com.margai.curriculum.api.ArchetypeStepRow;
+import com.margai.curriculum.api.ArchetypeTrackRow;
+import com.margai.curriculum.api.BackboneLoadReport;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.CurriculumImportException;
+import com.margai.curriculum.api.CutoffLoadReport;
+import com.margai.curriculum.api.CutoffRow;
 import com.margai.curriculum.api.NodeKind;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import com.margai.curriculum.api.Subject;
 import com.margai.curriculum.api.SyllabusNodeRow;
 import com.margai.curriculum.api.TaxonomyLoadReport;
+import com.margai.curriculum.api.TrackPhase;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.function.Function;
@@ -31,8 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
  * {@link CurriculumImport} over the D4 tables (TECH_PLAN §2.3, §6.3). Each load is one
  * transaction: the file is checked against itself and against the database first, rows are
  * upserted by natural key, and a {@link CurriculumImportException} anywhere rolls everything
- * back. Nothing is deleted — rows the file no longer names are reported as orphans (DECISIONS
- * 2026-09-12 D13).
+ * back. Nothing is deleted except a track's stale step sequences — rows the file no longer names
+ * are reported as orphans (DECISIONS 2026-09-12 D13).
  */
 @Service
 @Transactional
@@ -44,12 +52,25 @@ class CurriculumImportService implements CurriculumImport {
             NodeKind.chapter, NodeKind.unit,
             NodeKind.topic, NodeKind.chapter);
 
+    /** The node kind each step phase names (DECISIONS 2026-09-10 D13, archetype conventions). */
+    private static final Map<TrackPhase, NodeKind> STEP_KIND = Map.of(
+            TrackPhase.learn, NodeKind.chapter,
+            TrackPhase.revision, NodeKind.unit,
+            TrackPhase.mock, NodeKind.subject);
+
     private final SyllabusNodeRepository nodes;
     private final SyllabusPrerequisiteRepository prerequisites;
+    private final ArchetypeTrackRepository tracks;
+    private final ArchetypeTrackStepRepository steps;
+    private final CutoffRepository cutoffs;
 
-    CurriculumImportService(SyllabusNodeRepository nodes, SyllabusPrerequisiteRepository prerequisites) {
+    CurriculumImportService(SyllabusNodeRepository nodes, SyllabusPrerequisiteRepository prerequisites,
+            ArchetypeTrackRepository tracks, ArchetypeTrackStepRepository steps, CutoffRepository cutoffs) {
         this.nodes = nodes;
         this.prerequisites = prerequisites;
+        this.tracks = tracks;
+        this.steps = steps;
+        this.cutoffs = cutoffs;
     }
 
     @Override
@@ -131,12 +152,7 @@ class CurriculumImportService implements CurriculumImport {
         Set<String> codes = rows.stream()
                 .flatMap(row -> Stream.of(row.fromCode(), row.toCode()))
                 .collect(Collectors.toCollection(TreeSet::new));
-        Map<String, SyllabusNode> byCode = nodes.findByCodeIn(codes).stream()
-                .collect(Collectors.toMap(SyllabusNode::getCode, Function.identity()));
-        List<String> missing = codes.stream().filter(code -> !byCode.containsKey(code)).toList();
-        if (!missing.isEmpty()) {
-            throw new CurriculumImportException("prerequisite endpoints not in the taxonomy: " + missing);
-        }
+        Map<String, SyllabusNode> byCode = resolve(codes, "prerequisite endpoints");
         List<String> notChapters = codes.stream().filter(code -> byCode.get(code).getKind() != NodeKind.chapter).toList();
         if (!notChapters.isEmpty()) {
             throw new CurriculumImportException("prerequisites are chapter-level (TECH_PLAN §2.3); not chapters: " + notChapters);
@@ -212,5 +228,133 @@ class CurriculumImportService implements CurriculumImport {
             }
         }
         return indegree.entrySet().stream().filter(entry -> entry.getValue() > 0).map(Map.Entry::getKey).toList();
+    }
+
+    @Override
+    public BackboneLoadReport loadBackbone(List<ArchetypeTrackRow> rows) {
+        Set<AttemptType> codes = new HashSet<>();
+        for (ArchetypeTrackRow row : rows) {
+            if (!codes.add(row.code())) {
+                throw new CurriculumImportException("track '" + row.code() + "' appears twice in the file");
+            }
+        }
+        Set<String> nodeCodes = rows.stream()
+                .flatMap(row -> row.steps().stream())
+                .map(ArchetypeStepRow::nodeCode)
+                .collect(Collectors.toCollection(TreeSet::new));
+        Map<String, SyllabusNode> byCode = resolve(nodeCodes, "track steps name nodes");
+        for (ArchetypeTrackRow row : rows) {
+            for (ArchetypeStepRow step : row.steps()) {
+                NodeKind expected = STEP_KIND.get(step.phase());
+                NodeKind actual = byCode.get(step.nodeCode()).getKind();
+                if (actual != expected) {
+                    throw new CurriculumImportException("track " + row.code() + " step " + step.sequence() + ": a "
+                            + step.phase() + " step names a " + expected + ", not the " + actual + " " + step.nodeCode());
+                }
+            }
+        }
+
+        int tracksInserted = 0;
+        int tracksUpdated = 0;
+        int tracksUnchanged = 0;
+        int stepsInserted = 0;
+        int stepsUpdated = 0;
+        int stepsUnchanged = 0;
+        int stepsRemoved = 0;
+        Map<AttemptType, Integer> stepsPerTrack = new EnumMap<>(AttemptType.class);
+        Set<UUID> learned = new HashSet<>();
+        for (ArchetypeTrackRow row : rows) {
+            ArchetypeTrack track = tracks.findByCode(row.code()).orElse(null);
+            if (track == null) {
+                track = new ArchetypeTrack(row.code(), row.nameEn(), row.weeks());
+                track.apply(row);
+                track = tracks.save(track);
+                tracksInserted++;
+            } else if (track.apply(row)) {
+                tracksUpdated++;
+            } else {
+                tracksUnchanged++;
+            }
+            Map<Integer, ArchetypeTrackStep> existing = new HashMap<>();
+            steps.findByTrackIdOrderBySequence(track.getId()).forEach(step -> existing.put(step.getSequence(), step));
+            Set<Integer> inFile = new HashSet<>();
+            for (ArchetypeStepRow stepRow : row.steps()) {
+                inFile.add(stepRow.sequence());
+                UUID nodeId = byCode.get(stepRow.nodeCode()).getId();
+                if (stepRow.phase() == TrackPhase.learn) {
+                    learned.add(nodeId);
+                }
+                ArchetypeTrackStep step = existing.get(stepRow.sequence());
+                if (step == null) {
+                    steps.save(new ArchetypeTrackStep(track.getId(), nodeId, stepRow.sequence(), stepRow.phase(),
+                            stepRow.targetWeek()));
+                    stepsInserted++;
+                } else if (step.apply(nodeId, stepRow.phase(), stepRow.targetWeek())) {
+                    stepsUpdated++;
+                } else {
+                    stepsUnchanged++;
+                }
+            }
+            for (Map.Entry<Integer, ArchetypeTrackStep> stale : existing.entrySet()) {
+                if (!inFile.contains(stale.getKey())) {
+                    steps.delete(stale.getValue());
+                    stepsRemoved++;
+                }
+            }
+            stepsPerTrack.put(row.code(), row.steps().size());
+        }
+        steps.flush();
+
+        List<String> chaptersInNoTrack = nodes.findByKindOrderBySortOrder(NodeKind.chapter).stream()
+                .filter(chapter -> !learned.contains(chapter.getId()))
+                .map(SyllabusNode::getCode)
+                .sorted()
+                .toList();
+        return new BackboneLoadReport(tracksInserted, tracksUpdated, tracksUnchanged,
+                stepsInserted, stepsUpdated, stepsUnchanged, stepsRemoved, stepsPerTrack, chaptersInNoTrack);
+    }
+
+    @Override
+    public CutoffLoadReport loadCutoffs(List<CutoffRow> rows) {
+        Map<String, Cutoff> existing = new HashMap<>();
+        cutoffs.findAll().forEach(cutoff -> existing.put(cutoff.naturalKey(), cutoff));
+
+        int inserted = 0;
+        int updated = 0;
+        int unchanged = 0;
+        Set<String> inFile = new HashSet<>();
+        Map<Short, Integer> rowsPerYear = new TreeMap<>();
+        for (CutoffRow row : rows) {
+            String key = row.year() + " " + row.category() + " " + row.quotaScope() + " " + row.seatType();
+            if (!inFile.add(key)) {
+                throw new CurriculumImportException("the key " + key + " appears twice in the file");
+            }
+            rowsPerYear.merge(row.year(), 1, Integer::sum);
+            Cutoff cutoff = existing.get(key);
+            if (cutoff == null) {
+                cutoffs.save(new Cutoff(row.year(), row.category(), row.quotaScope(), row.seatType(),
+                        row.qualifyingMarks(), row.source()));
+                inserted++;
+            } else if (cutoff.apply(row.qualifyingMarks(), row.source())) {
+                updated++;
+            } else {
+                unchanged++;
+            }
+        }
+        cutoffs.flush();
+
+        List<String> orphans = existing.keySet().stream().filter(key -> !inFile.contains(key)).sorted().toList();
+        return new CutoffLoadReport(inserted, updated, unchanged, rowsPerYear, orphans);
+    }
+
+    /** The nodes the given codes name, or a {@link CurriculumImportException} listing the codes that name nothing. */
+    private Map<String, SyllabusNode> resolve(Set<String> codes, String what) {
+        Map<String, SyllabusNode> byCode = nodes.findByCodeIn(codes).stream()
+                .collect(Collectors.toMap(SyllabusNode::getCode, Function.identity()));
+        List<String> missing = codes.stream().filter(code -> !byCode.containsKey(code)).toList();
+        if (!missing.isEmpty()) {
+            throw new CurriculumImportException(what + " not in the taxonomy: " + missing);
+        }
+        return byCode;
     }
 }

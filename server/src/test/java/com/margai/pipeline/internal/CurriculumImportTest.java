@@ -4,14 +4,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.margai.TestcontainersConfiguration;
+import com.margai.common.api.AttemptType;
+import com.margai.common.api.Category;
+import com.margai.curriculum.api.ArchetypeStepRow;
+import com.margai.curriculum.api.ArchetypeTrackRow;
+import com.margai.curriculum.api.BackboneLoadReport;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.CurriculumImportException;
+import com.margai.curriculum.api.CutoffLoadReport;
+import com.margai.curriculum.api.CutoffRow;
 import com.margai.curriculum.api.NodeKind;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
+import com.margai.curriculum.api.SeatType;
 import com.margai.curriculum.api.Subject;
 import com.margai.curriculum.api.SyllabusNodeRow;
 import com.margai.curriculum.api.TaxonomyLoadReport;
+import com.margai.curriculum.api.TrackPhase;
 import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +35,8 @@ import org.springframework.test.context.ActiveProfiles;
  * The D13 loads end to end — the committed inputs through the readers into
  * {@link CurriculumImport} against a database of their own in the shared container (the
  * {@code importtest} profile has no seed): parents before children, idempotent re-runs, updates
- * counted, refusals that write nothing, and the cycle check that PLAN D13's ✅ asks for.
+ * counted, refusals that write nothing, the cycle check that PLAN D13's ✅ asks for, tracks whose
+ * stale steps go, and cut-offs by natural key.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ActiveProfiles("importtest")
@@ -35,6 +45,8 @@ class CurriculumImportTest {
 
     private static final Path TAXONOMY = InputReadersTest.INPUTS.resolve(TaxonomyLoadCommand.FILE);
     private static final Path PREREQUISITES = InputReadersTest.INPUTS.resolve(TaxonomyPrerequisitesCommand.FILE);
+    private static final Path ARCHETYPES = InputReadersTest.INPUTS.resolve(BackboneLoadCommand.FILE);
+    private static final Path CUTOFFS = InputReadersTest.INPUTS.resolve(CutoffsLoadCommand.FILE);
 
     @Autowired
     private CurriculumImport imports;
@@ -46,8 +58,10 @@ class CurriculumImportTest {
     void emptyTheCurriculumTables() {
         jdbc.update("DELETE FROM syllabus_prerequisites");
         jdbc.update("DELETE FROM archetype_track_steps");
+        jdbc.update("DELETE FROM archetype_tracks");
         jdbc.update("DELETE FROM chapter_status");
         jdbc.update("DELETE FROM syllabus_nodes");
+        jdbc.update("DELETE FROM cutoffs");
     }
 
     @Test
@@ -168,6 +182,103 @@ class CurriculumImportTest {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM syllabus_prerequisites", Long.class)).isZero();
     }
 
+    @Test
+    void loadsTheBackboneAndEveryChapterIsLearnedByATrack() {
+        imports.loadTaxonomy(TaxonomyCsvReader.read(TAXONOMY));
+        List<ArchetypeTrackRow> tracks = ArchetypesYamlReader.read(ARCHETYPES);
+
+        BackboneLoadReport first = imports.loadBackbone(tracks);
+        BackboneLoadReport again = imports.loadBackbone(tracks);
+
+        assertThat(first.tracksInserted()).isEqualTo(4);
+        assertThat(first.stepsInserted()).isEqualTo(744);
+        assertThat(first.stepsRemoved()).isZero();
+        assertThat(first.stepsPerTrack())
+                .containsEntry(AttemptType.fresher_2yr, 210).containsEntry(AttemptType.fresher_1yr, 166)
+                .containsEntry(AttemptType.dropper, 178).containsEntry(AttemptType.repeater, 190);
+        assertThat(first.chaptersInNoTrack()).isEmpty();
+        assertThat(again.tracksUnchanged()).isEqualTo(4);
+        assertThat(again.stepsUnchanged()).isEqualTo(744);
+        assertThat(again.stepsInserted()).isZero();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM archetype_track_steps", Long.class)).isEqualTo(744);
+        assertThat(jdbc.queryForObject(
+                "SELECT n.code FROM archetype_track_steps s JOIN archetype_tracks t ON t.id = s.track_id"
+                        + " JOIN syllabus_nodes n ON n.id = s.node_id WHERE t.code = 'dropper' AND s.sequence = 1",
+                String.class)).isEqualTo("PHY.11.UNITS");
+        assertThat(jdbc.queryForObject("SELECT weeks FROM archetype_tracks WHERE code = 'fresher_2yr'", Integer.class))
+                .isEqualTo(96);
+    }
+
+    @Test
+    void aShortenedTrackLosesItsStaleStepsAndAChangedStepIsAnUpdate() {
+        imports.loadTaxonomy(TaxonomyCsvReader.read(TAXONOMY));
+        List<ArchetypeTrackRow> tracks = ArchetypesYamlReader.read(ARCHETYPES);
+        imports.loadBackbone(tracks);
+        // The dropper's first 50 steps learn about half the chapters; the file's last learn step is sequence 95.
+        ArchetypeTrackRow dropper = tracks.get(2);
+        List<ArchetypeStepRow> kept = dropper.steps().subList(0, 50).stream()
+                .map(step -> step.sequence() == 1 ? new ArchetypeStepRow(1, step.nodeCode(), step.phase(), (short) 2) : step)
+                .toList();
+        ArchetypeTrackRow shortened = new ArchetypeTrackRow(dropper.code(), dropper.nameEn(), dropper.nameHi(),
+                dropper.weeks(), dropper.descriptionMd(), kept);
+
+        BackboneLoadReport report = imports.loadBackbone(List.of(shortened));
+
+        assertThat(report.tracksUnchanged()).isEqualTo(1);
+        assertThat(report.stepsUpdated()).isEqualTo(1);
+        assertThat(report.stepsUnchanged()).isEqualTo(49);
+        assertThat(report.stepsRemoved()).isEqualTo(128);
+        assertThat(report.chaptersInNoTrack()).isNotEmpty().contains("CHE.00.PRACTICAL", "BOT.12.MICROBES");
+        assertThat(jdbc.queryForObject(
+                "SELECT count(*) FROM archetype_track_steps s JOIN archetype_tracks t ON t.id = s.track_id WHERE t.code = 'dropper'",
+                Long.class)).isEqualTo(50);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM archetype_track_steps", Long.class)).isEqualTo(744 - 128);
+    }
+
+    @Test
+    void aStepNamingTheWrongKindOfNodeOrAnUnknownNodeIsRefused() {
+        imports.loadTaxonomy(TaxonomyCsvReader.read(TAXONOMY));
+        ArchetypeTrackRow learnsAUnit = track(new ArchetypeStepRow(1, "PHY.U01", TrackPhase.learn, (short) 1));
+        ArchetypeTrackRow mocksAChapter = track(new ArchetypeStepRow(1, "PHY.11.UNITS", TrackPhase.mock, (short) 1));
+        ArchetypeTrackRow unknown = track(new ArchetypeStepRow(1, "PHY.11.NOSUCH", TrackPhase.learn, (short) 1));
+
+        assertThatThrownBy(() -> imports.loadBackbone(List.of(learnsAUnit)))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessage("track dropper step 1: a learn step names a chapter, not the unit PHY.U01");
+        assertThatThrownBy(() -> imports.loadBackbone(List.of(mocksAChapter)))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessage("track dropper step 1: a mock step names a subject, not the chapter PHY.11.UNITS");
+        assertThatThrownBy(() -> imports.loadBackbone(List.of(unknown)))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessage("track steps name nodes not in the taxonomy: [PHY.11.NOSUCH]");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM archetype_tracks", Long.class)).isZero();
+    }
+
+    @Test
+    void loadsTheCutoffsByNaturalKey() {
+        List<CutoffRow> rows = CutoffsCsvReader.read(CUTOFFS);
+
+        CutoffLoadReport first = imports.loadCutoffs(rows);
+        CutoffLoadReport again = imports.loadCutoffs(rows);
+        CutoffLoadReport changed = imports.loadCutoffs(rows.stream()
+                .map(row -> row.year() == 2026 && row.category() == Category.general
+                        ? new CutoffRow(row.year(), row.category(), row.quotaScope(), row.seatType(), (short) 214, row.source())
+                        : row)
+                .toList());
+
+        assertThat(first.inserted()).isEqualTo(40);
+        assertThat(first.rowsPerYear()).containsEntry((short) 2019, 5).containsEntry((short) 2026, 5).hasSize(8);
+        assertThat(first.orphans()).isEmpty();
+        assertThat(again.unchanged()).isEqualTo(40);
+        assertThat(changed.updated()).isEqualTo(1);
+        assertThat(changed.unchanged()).isEqualTo(39);
+        assertThat(jdbc.queryForObject(
+                "SELECT qualifying_marks FROM cutoffs WHERE year = 2026 AND category = 'general' AND seat_type = 'qualifying'",
+                Integer.class)).isEqualTo(214);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM cutoffs", Long.class)).isEqualTo(40);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM cutoffs WHERE seat_type = 'qualifying'", Long.class)).isEqualTo(40);
+    }
+
     private long count(String where) {
         return jdbc.queryForObject("SELECT count(*) FROM syllabus_nodes WHERE " + where, Long.class);
     }
@@ -181,5 +292,9 @@ class CurriculumImportTest {
     private static SyllabusNodeRow renamed(SyllabusNodeRow row, String nameEn) {
         return new SyllabusNodeRow(row.code(), row.subject(), row.classLevel(), row.parentCode(), row.kind(), nameEn,
                 row.nameHi(), row.sortOrder(), row.defaultLearnMinutes(), row.neetRelevant());
+    }
+
+    private static ArchetypeTrackRow track(ArchetypeStepRow step) {
+        return new ArchetypeTrackRow(AttemptType.dropper, "Dropper (1st repeat)", null, (short) 40, null, List.of(step));
     }
 }

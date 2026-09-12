@@ -2,7 +2,11 @@ package com.margai.pipeline.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.margai.curriculum.api.ArchetypeTrackRow;
+import com.margai.curriculum.api.BackboneLoadReport;
 import com.margai.curriculum.api.CurriculumImport;
+import com.margai.curriculum.api.CutoffLoadReport;
+import com.margai.curriculum.api.CutoffRow;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import com.margai.curriculum.api.SyllabusNodeRow;
@@ -47,6 +51,12 @@ class PipelineCommandTest {
                 if (cls == TaxonomyPrerequisitesCommand.class) {
                     return cls.cast(new TaxonomyPrerequisitesCommand(imports));
                 }
+                if (cls == BackboneLoadCommand.class) {
+                    return cls.cast(new BackboneLoadCommand(imports));
+                }
+                if (cls == CutoffsLoadCommand.class) {
+                    return cls.cast(new CutoffsLoadCommand(imports));
+                }
                 return CommandLine.defaultFactory().create(cls);
             }
         };
@@ -66,6 +76,8 @@ class PipelineCommandTest {
 
         assertThat(imports.nodes).hasSize(516);
         assertThat(imports.edges).hasSize(104);
+        assertThat(imports.tracks).hasSize(4);
+        assertThat(imports.cutoffs).hasSize(40);
         assertThat(out.toString())
                 .contains("taxonomy.csv: 516 nodes read")
                 .contains("syllabus_nodes: 516 inserted, 0 updated, 0 unchanged")
@@ -73,7 +85,11 @@ class PipelineCommandTest {
                 .contains("prerequisites.csv: 104 edges read")
                 .contains("syllabus_prerequisites: 104 inserted, 0 already present; 104 edges over 83 nodes, no cycle")
                 .contains("archetypes.yaml: 4 tracks, 744 steps read")
-                .contains("cutoffs.csv: 40 rows read");
+                .contains("archetype_tracks: 4 inserted, 0 updated, 0 unchanged")
+                .contains("archetype_track_steps: 744 inserted, 0 updated, 0 unchanged, 0 removed")
+                .contains("chapters in no track: none")
+                .contains("cutoffs.csv: 40 rows read")
+                .contains("cutoffs: 40 inserted, 0 updated, 0 unchanged");
         assertThat(err.toString()).isEmpty();
     }
 
@@ -145,6 +161,8 @@ class PipelineCommandTest {
 
         List<SyllabusNodeRow> nodes;
         List<PrerequisiteRow> edges;
+        List<ArchetypeTrackRow> tracks;
+        List<CutoffRow> cutoffs;
 
         @Override
         public TaxonomyLoadReport loadTaxonomy(List<SyllabusNodeRow> rows) {
@@ -156,6 +174,19 @@ class PipelineCommandTest {
         public PrerequisiteLoadReport loadPrerequisites(List<PrerequisiteRow> rows) {
             edges = rows;
             return new PrerequisiteLoadReport(rows.size(), 0, rows.size(), 83, List.of());
+        }
+
+        @Override
+        public BackboneLoadReport loadBackbone(List<ArchetypeTrackRow> rows) {
+            tracks = rows;
+            int steps = rows.stream().mapToInt(track -> track.steps().size()).sum();
+            return new BackboneLoadReport(rows.size(), 0, 0, steps, 0, 0, 0, Map.of(), List.of());
+        }
+
+        @Override
+        public CutoffLoadReport loadCutoffs(List<CutoffRow> rows) {
+            cutoffs = rows;
+            return new CutoffLoadReport(rows.size(), 0, 0, Map.of(), List.of());
         }
     }
 }

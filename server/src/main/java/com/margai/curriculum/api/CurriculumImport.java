@@ -4,10 +4,11 @@ import java.util.List;
 
 /**
  * The curriculum module's door for the pipeline (TECH_PLAN §1.3, §6.3): the D13 loads. Every
- * method is one transaction that upserts by the natural key, never deletes, reports what it found
- * in the database that the file no longer names (orphans, listed for the founder, kept in place —
- * DECISIONS 2026-09-12 D13), and throws {@link CurriculumImportException} — rolling the whole run
- * back — when the file contradicts the taxonomy it is loading into.
+ * method is one transaction that upserts by the natural key, reports what it found in the
+ * database that the file no longer names (orphans, listed for the founder, kept in place —
+ * DECISIONS 2026-09-12 D13; the one exception is a track's own steps, which follow the file), and
+ * throws {@link CurriculumImportException} — rolling the whole run back — when the file
+ * contradicts the taxonomy it is loading into.
  */
 public interface CurriculumImport {
 
@@ -23,4 +24,14 @@ public interface CurriculumImport {
      * run (PLAN D13 ✅ "graph has no cycles").
      */
     PrerequisiteLoadReport loadPrerequisites(List<PrerequisiteRow> rows);
+
+    /**
+     * {@code backbone load}: tracks upserted on {@code code}, steps on (track, sequence) with a
+     * {@code learn} step naming a chapter, {@code revision} a unit, {@code mock} a subject; sequences
+     * the file no longer has are removed, so a shortened track leaves no ghost steps.
+     */
+    BackboneLoadReport loadBackbone(List<ArchetypeTrackRow> tracks);
+
+    /** {@code cutoffs load}: upsert on (year, category, quota_scope, seat_type). */
+    CutoffLoadReport loadCutoffs(List<CutoffRow> rows);
 }

@@ -1159,6 +1159,16 @@ parent's context and is usually CHEAP). Over the Pro fair-use cap, the solve is 
 `queued`, and processed by a low-priority single-thread executor with on-demand calls; the client
 sees "in a few minutes" and polls. Nothing is refused for a Pro user (SPEC §6.3).
 
+*Amended 2026-09-12 (founder ruling, DECISIONS).* "Nothing is refused for a Pro user" governs the
+**money breaker too**, not just this cap: the first measured costs put a warm verified numerical at
+≈ ₹2.50, so §4.8's ₹25 stops a Pro user at ~10 of them while this section promises 30 — and the two
+limits were failing differently, one queueing politely and the other returning
+`AI_BUDGET_EXCEEDED`. Both now accept the solve and queue it for Pro; only the free tier keeps a
+hard stop, where the limit is the product's boundary. The **waits differ and so must the copy**: over
+this fair-use cap the on-demand executor above still makes "in a few minutes" true, while a
+breaker-queued solve waits for the IST budget reset and its copy says tonight (§4.8). D44 owns the
+copy and routing; D65 owns the wiring.
+
 **Priority speed** (SPEC §6.9): Pro solves run on a dedicated executor (concurrency 4) while free
 solves share a smaller one (concurrency 2); when the global breaker or Bedrock throttling bites,
 free solves are queued first and Pro last. It is a scheduling preference, not a different pipeline.
@@ -1323,7 +1333,10 @@ a re-learn block candidate.
   transaction so a rolled-back feature transaction still leaves the cost on record.
 - Price table: config JSON keyed by model id with per-million-token prices for input, output, cache
   read and cache write, plus `usd_inr`. `cost_paise` is computed at insert; a price change never
-  rewrites history.
+  rewrites history. *A corrected price therefore gets an append-only note here naming the date and
+  the rows priced on the old figure, never a backfill — the first such correction is due when the
+  embedding provider's direct-API price is confirmed, since every embedding row written from
+  2026-09-12 is priced off a placeholder carried over from the Bedrock page (F8).*
 - **Measured 2026-09-12** (the D5 live re-run, TRACKER day log — first real numbers for this cost
   model): a reasoning call against a **cold** cache cost **232 paise**, of which 96% was the 9,860-token
   cache write; the same call **warm** is ≈ 28 paise. On the cheap model the write was 81 paise and each
@@ -1336,6 +1349,15 @@ a re-learn block candidate.
   with the honest copy and the solve is queued for after midnight; the planner uses the deterministic
   path; classification waits for the sweeper. Active in every profile, including `local` with the
   fake client (DEV_SPEC §13.7). The D65 acceptance simulates a runaway loop and expects the trip.
+  **Amended 2026-09-12 (founder ruling, DECISIONS): `AI_BUDGET_EXCEEDED` is a free-tier outcome
+  only.** For a Pro user the breaker takes the same shape as the §4.4 fair-use cap — accept the
+  solve, queue it, honest copy, never a refusal — because SPEC §6.3's promise is a trust
+  commitment and the amount stays at ₹25 (a breaker, not a budget: 4–7× expected usage). The wait is
+  the honest difference: a breaker-queued solve cannot run until the IST reset, so its copy says
+  tonight rather than minutes, and the nightly batch lane (00:30 IST, half price, §4.11) is its
+  natural home because the wait already crosses midnight. The ₹25 is unchanged and the free tier's
+  hard stop is unchanged. D44 owns the copy and routing; **D65's simulation must cover the Pro queue
+  path, not only the trip**.
 - Daily alarm: the nightly run rebuilds `ai_spend_daily`; CloudWatch metric `ai.cost.paise` per
   feature; *amended 2026-09-12 — the independent backstop is no longer AWS Budgets on a Bedrock
   line item but a spend limit and alert on the provider's own console workspace, set by the founder

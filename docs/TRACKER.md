@@ -314,6 +314,36 @@ Two findings worth carrying into the cost model, both new information: **the cac
   it bounds the tripwire's precision — our ~4-chars-per-token estimate came to 6,879, which is 4%
   *high* for the cheap model, so a prompt designed to sit just above its 4,096 floor could still
   fail to cache. Design prompts with margin, not to the line (§4.11).
+**Founder rulings on the smoke report, 2026-09-12** (this thread closes with them):
+  (1) **₹25/user/day stands** — a circuit breaker at 4–7× expected honest usage, not a budget;
+  D65's runaway simulation remains its acceptance test. Deliberately not sized to the ₹299/mo
+  subscription (₹9.97/day), because the breaker's job is the loop, not the margin.
+  (2) **A Pro user is never refused.** The money breaker takes the same shape as the §4.4 fair-use
+  cap — accept, queue, honest copy — and `AI_BUDGET_EXCEEDED` becomes a free-tier outcome only,
+  where the limit is the product's boundary. SPEC §6.3 is a trust promise, not a limit.
+  *Refinement I surfaced and the ruling absorbed:* one policy, two waits, so two copies. The ruling
+  said "queue it (batch lane), 'answer in a few minutes'" — but a breaker-queued solve cannot run
+  until the IST budget reset, so "a few minutes" would be false, and §4.4's fair-use queue is
+  explicitly an on-demand low-priority executor, not batch. Adopted instead: over the *cap*, the
+  on-demand executor and "in a few minutes" (unchanged); over the *money breaker*, a wait to the day
+  boundary with copy that says tonight — and the nightly batch lane is its natural home precisely
+  because that wait already crosses 00:30 IST, at half price (D55). Recorded in §4.4, §4.8,
+  DECISIONS, and PLAN D44 (copy + routing) and D65 (wiring; the simulation must cover the queue
+  path, not only the trip).
+  (3) **D23's eval produces the first honest per-doubt cost**, and that number triggers a founder
+  re-run of the milestone economics — founder-pending at D23 below. Today's figures stay directional
+  (±40%: a smoke prompt with 50-token outputs against a solver prompt that does not exist until
+  D37); they are recorded in §4.8 as what was measured and are **not** propagated into §7.7.
+  (4) **Prompt economy for D37** written where it survives eight weeks: the substance in
+  `.claude/rules/ai-layer.md` (auto-loaded whenever prompts are touched) with a pointer on PLAN
+  D37's scope line — margin over the cache floor, and prompt length as a per-model cost variable.
+  (5) **Embed price stays open**; on receipt, `prices-json` is updated and the ledger docs get an
+  **append-only correction note** — every embedding `cost_paise` written to date was priced off the
+  0.12 placeholder and is never retroactively rewritten (§4.8's existing rule: a price change never
+  rewrites history).
+Founder-pending: **tonight** — the Anthropic workspace spend limit + alert; Cohere's exact
+  `embed-v4.0` $/1M confirmed and reported next session; funding confirmed. **At D23** — re-run the
+  milestone economics against the eval's first honest per-doubt cost (ruling 3).
 Open after this: the **workspace spend limit and alert** (the independent backstop, §10.4) and the
   **direct-API embed price** — the row is still the Bedrock placeholder (0.12) and every
   `cost_paise` is computed from it, so it mis-sizes the breaker in whichever direction it is wrong.

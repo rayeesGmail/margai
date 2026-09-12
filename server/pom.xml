@@ -110,6 +110,14 @@
       <artifactId>ST4</artifactId>
       <version>4.3.4</version>
     </dependency>
+    <!-- Content pipeline commands under the pipeline profile (TECH_PLAN §1.2, §6.1; D13). picocli core
+         only: commands are Spring beans through a 15-line IFactory, so the starter's Boot-version
+         coupling is not needed (DECISIONS 2026-09-12 D13). -->
+    <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
+      <version>4.7.7</version>
+    </dependency>
     <!-- Structured output (TECH_PLAN §4.11, DECISIONS D3.21): the output record's JSON schema is
          generated once (victools, Jackson 3 line) and serves both as the forced Bedrock tool's
          input schema and as the validator's schema (networknt, Jackson 3 line). -->

@@ -1,0 +1,8 @@
+# pipeline profile (TECH_PLAN §1.2, §6.1): the founder's laptop runs one §6 content command —
+# `java -jar server.jar --spring.profiles.active=pipeline <command>` — and the JVM exits with its
+# code. No HTTP server; the production Flyway locations only, so the db/seed test taxonomy never
+# meets a real load. Live model calls need the bedrock profile on top, as everywhere (DEV_SPEC §13.7).
+spring:
+  main:
+    web-application-type: none
+    banner-mode: off

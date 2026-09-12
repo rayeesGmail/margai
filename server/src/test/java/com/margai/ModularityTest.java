@@ -22,8 +22,8 @@ class ModularityTest {
 
     @Test
     void modulesAreDetected() {
-        // A green verify() over zero modules would prove nothing; pin the modules D4, D5, D7 and D11 introduce.
+        // A green verify() over zero modules would prove nothing; pin the modules D4, D5, D7, D11 and D13 introduce.
         assertThat(MODULES.stream().map(ApplicationModule::getIdentifier).map(Object::toString))
-                .contains("common", "account", "curriculum", "practice", "ai", "auth", "ops");
+                .contains("common", "account", "curriculum", "practice", "ai", "auth", "ops", "pipeline");
     }
 }

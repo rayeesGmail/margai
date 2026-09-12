@@ -9,6 +9,7 @@ import com.margai.ai.api.ImagePart;
 import com.margai.ai.api.Usage;
 import com.margai.ai.tasks.NcertPage;
 import com.margai.ai.tasks.NcertPageExtractor;
+import com.margai.ai.tasks.PreviousPage;
 import com.margai.curriculum.api.BookLanguage;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -101,6 +102,30 @@ class NcertExtractCommandTest {
         run();
 
         assertThat(extract.tails).containsExactly(null, "text of 8/1", null);
+    }
+
+    /**
+     * The D14 blocker: the tail alone cannot tell a model what paragraph number to continue from,
+     * so the address travels with it and a new chapter starts from nothing.
+     */
+    @Test
+    void eachPageAlsoCarriesTheAddressThePreviousPageEndedAt() {
+        run();
+
+        assertThat(extract.addresses).containsExactly(null, "7.9 ¶1", null);
+    }
+
+    /** A resumed run must continue the numbering too, not restart it at the first uncalled page. */
+    @Test
+    void aResumedRunCarriesTheAddressFromThePageAlreadyInTheJsonl() {
+        commandLine.execute("ncert", "extract", "--book", "phy11-part2", "--chapters", "8", "--pages", "1",
+                "--inputs", inputs.toString(), "--reports", reports.toString());
+        extract.addresses.clear();
+
+        run();
+
+        assertThat(extract.calls).contains("8/2");
+        assertThat(extract.addresses).containsExactly("7.9 ¶1", null);
     }
 
     @Test
@@ -198,15 +223,17 @@ class NcertExtractCommandTest {
 
         final List<String> calls = new ArrayList<>();
         final List<String> tails = new ArrayList<>();
+        final List<String> addresses = new ArrayList<>();
         final List<String> empty = new ArrayList<>();
         final List<String> lowConfidence = new ArrayList<>();
 
         @Override
         public AiResponse<NcertPage> read(String bookTitle, short chapter, int page, ImagePart image,
-                String previousTail, AiCallContext ctx) {
+                PreviousPage previous, AiCallContext ctx) {
             String address = chapter + "/" + page;
             calls.add(address);
-            tails.add(previousTail);
+            tails.add(previous == null ? null : previous.tail());
+            addresses.add(previous == null ? null : previous.section() + " ¶" + previous.paraNo());
             List<NcertPage.Paragraph> paragraphs = empty.contains(address) ? List.of()
                     : List.of(new NcertPage.Paragraph("7.9", 1, "text of " + address, false, List.of()));
             BigDecimal confidence = lowConfidence.contains(address) ? new BigDecimal("0.40") : new BigDecimal("0.95");

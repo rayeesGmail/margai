@@ -10,7 +10,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
@@ -59,8 +62,14 @@ public class NcertParagraph {
     @Column(nullable = false)
     private boolean hasEquations;
 
+    /**
+     * Provenance per edition, {@code {"en": {…}, "hi": {…}}}. Keyed by language because the two
+     * editions are read from different page images by different calls: a single object let D16's
+     * Hindi pass erase the English text's pages, confidence and {@code ai_call_id}, against the
+     * traceability {@link ParagraphExtraction} promises (spec-auditor, D14).
+     */
     @JdbcTypeCode(SqlTypes.JSON)
-    private ParagraphExtraction extraction;
+    private Map<BookLanguage, ParagraphExtraction> extraction = new EnumMap<>(BookLanguage.class);
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -88,21 +97,37 @@ public class NcertParagraph {
      * standing. Returns whether anything changed.
      */
     public boolean apply(NcertParagraphRow row, BookLanguage language) {
+        List<String> mergedRefs = mergeFigureRefs(row.figureRefs());
+        boolean mergedEquations = hasEquations || row.hasEquations();
         boolean changed = !Objects.equals(text(language), row.text())
-                || hasEquations != row.hasEquations()
-                || !Objects.equals(figureRefs, row.figureRefs())
-                || !Objects.equals(extraction, row.extraction());
+                || hasEquations != mergedEquations
+                || !Objects.equals(figureRefs, mergedRefs)
+                || !Objects.equals(extraction.get(language), row.extraction());
         if (changed) {
             if (language == BookLanguage.en) {
                 this.textEn = row.text();
             } else {
                 this.textHi = row.text();
             }
-            this.hasEquations = row.hasEquations();
-            this.figureRefs = row.figureRefs();
-            this.extraction = row.extraction();
+            // Both editions print the same paragraph, so these describe it rather than one reading
+            // of it: union the figures and keep an equation seen in either, instead of letting the
+            // second edition loaded erase what the first found.
+            this.hasEquations = mergedEquations;
+            this.figureRefs = mergedRefs;
+            Map<BookLanguage, ParagraphExtraction> updated = new EnumMap<>(extraction);
+            updated.put(language, row.extraction());
+            this.extraction = updated;
         }
         return changed;
+    }
+
+    private List<String> mergeFigureRefs(List<String> incoming) {
+        if (figureRefs == null || figureRefs.isEmpty()) {
+            return incoming;
+        }
+        List<String> merged = new ArrayList<>(figureRefs);
+        incoming.stream().filter(ref -> !merged.contains(ref)).forEach(merged::add);
+        return merged;
     }
 
     public String text(BookLanguage language) {
@@ -154,8 +179,13 @@ public class NcertParagraph {
         return hasEquations;
     }
 
-    public ParagraphExtraction getExtraction() {
-        return extraction;
+    /** How this edition's text was read; null when that edition has not been loaded. */
+    public ParagraphExtraction getExtraction(BookLanguage language) {
+        return extraction.get(language);
+    }
+
+    public Map<BookLanguage, ParagraphExtraction> getExtraction() {
+        return Map.copyOf(extraction);
     }
 
     public Instant getCreatedAt() {

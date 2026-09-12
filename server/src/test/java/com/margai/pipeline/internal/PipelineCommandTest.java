@@ -266,6 +266,7 @@ class PipelineCommandTest {
         List<CutoffRow> cutoffs;
         List<NcertBookRow> books;
         final List<String> renderedPages = new ArrayList<>();
+        Integer renderedPagesAnswer;
         RuntimeException failure;
 
         @Override
@@ -312,6 +313,11 @@ class PipelineCommandTest {
         @Override
         public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
             return new NcertLoadReport(rows.size(), 0, 0, Map.of(), List.of());
+        }
+
+        @Override
+        public Integer renderedPages(String bookCode, BookLanguage language) {
+            return renderedPagesAnswer;
         }
     }
 }

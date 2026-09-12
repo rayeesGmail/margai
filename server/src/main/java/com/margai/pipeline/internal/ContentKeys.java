@@ -15,6 +15,9 @@ import com.margai.curriculum.api.BookLanguage;
  */
 final class ContentKeys {
 
+    /** What a refusal names when the offending content came from an extraction, not a file. */
+    static final String EXTRACT = "extract/<book>/<lang>.jsonl";
+
     /** Page numbers are zero-padded so a plain key listing sorts into reading order. */
     private static final String PAGE_FORMAT = "%03d.png";
 

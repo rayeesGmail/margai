@@ -6,6 +6,7 @@ import com.margai.TestcontainersConfiguration;
 import com.margai.ai.api.AiCallContext;
 import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.ImagePart;
+import com.margai.ai.internal.PromptRegistry;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -19,30 +20,31 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * The D14 extraction task on the fake client: the page decodes into {@link NcertPage}, the call
- * is ledgered as a {@code vision} {@code pipeline_extract} row (CLAUDE.md's "every model call
- * logs an ai_calls row"), and the tail handed to the next page is the last paragraph's ending.
+ * The D14 extraction task on the fake client: the page decodes into {@link NcertPage}, the call is
+ * ledgered as a {@code vision} {@code pipeline_extract} row (CLAUDE.md's "every model call logs an
+ * ai_calls row"), and the state handed to the next page carries the address it must continue from,
+ * not only the text.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ActiveProfiles("importtest")
 @Import(TestcontainersConfiguration.class)
-class NcertExtractTaskTest {
+class PageExtractTaskTest {
 
     @Autowired
-    private NcertExtractTask task;
+    private PageExtractTask task;
 
     @Autowired
     private JdbcTemplate jdbc;
 
     @Autowired
-    private com.margai.ai.internal.PromptRegistry prompts;
+    private PromptRegistry prompts;
 
     @Test
     void readsAPageAndLedgersTheCallOnTheVisionTier() {
         UUID requestId = UUID.randomUUID();
 
         AiResponse<NcertPage> response = task.read("Physics Part-I, Textbook for Class XI",
-                (short) 7, 12, image(), null, new AiCallContext(null, requestId.toString(), false));
+                (short) 7, 12, image(), PreviousPage.none(), new AiCallContext(null, requestId.toString(), false));
 
         NcertPage page = response.output();
         assertThat(page.confidence()).isEqualByComparingTo(new BigDecimal("0.96"));
@@ -62,12 +64,25 @@ class NcertExtractTaskTest {
         assertThat(row.get("status")).isEqualTo("ok");
     }
 
+    /**
+     * The defect the spec-auditor found: with only the tail, a model cannot know the running
+     * paragraph number, so the state handed forward has to carry the address as well.
+     */
     @Test
-    void theTailIsTheLastParagraphsEnding() {
-        NcertPage page = task.read("Physics Part-I, Textbook for Class XI", (short) 7, 12, image(), null,
-                new AiCallContext(null, UUID.randomUUID().toString(), false)).output();
+    void theStateHandedForwardCarriesTheAddressNotOnlyTheText() {
+        NcertPage page = task.read("Physics Part-I, Textbook for Class XI", (short) 7, 12, image(),
+                PreviousPage.none(), new AiCallContext(null, UUID.randomUUID().toString(), false)).output();
 
-        assertThat(page.tail()).isEqualTo(page.paragraphs().getLast().text());
+        PreviousPage previous = PreviousPage.of(page);
+
+        assertThat(previous.section()).isEqualTo("7.9");
+        assertThat(previous.paraNo()).isEqualTo(2);
+        assertThat(previous.tail()).isEqualTo(page.paragraphs().getLast().text());
+    }
+
+    @Test
+    void aPageWithNoParagraphsHandsNothingForward() {
+        assertThat(PreviousPage.of(new NcertPage(List.of(), BigDecimal.ONE))).isNull();
         assertThat(new NcertPage(List.of(), BigDecimal.ONE).tail()).isNull();
     }
 
@@ -86,6 +101,14 @@ class NcertExtractTaskTest {
         String system = prompts.systemPrefix("ncert_extract");
 
         assertThat(system).contains("a reversible reaction as \"<->\"").doesNotContain("\\<");
+    }
+
+    /** The prompt must tell the model to continue numbering, not restart it (the D14 blocker). */
+    @Test
+    void theSystemPrefixForbidsRestartingTheNumberingOnEveryPage() {
+        String system = prompts.systemPrefix("ncert_extract");
+
+        assertThat(system).contains("Numbering runs across pages, not within them");
     }
 
     private static ImagePart image() {

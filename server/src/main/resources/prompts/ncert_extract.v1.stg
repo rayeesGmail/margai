@@ -60,16 +60,20 @@ Text before the first numbered section of a chapter — the chapter's opening pa
 epigraph, an unnumbered introduction — takes the chapter's own number as its section. On a page
 of Chapter 7 that text has section "7".
 
-A page that begins in the middle of a section carries that section forward. You are told the
-chapter number, and the previous page's ending text is quoted to you when there is one. If the
-page shows no heading at all, every paragraph on it belongs to the section that was running.
-Infer that section from the previous page's text when you can; when you cannot, use the chapter
-number and lower your confidence, saying so through the confidence value rather than by guessing
-a section number that may be wrong.
+A page that begins in the middle of a section carries that section forward. When there is a
+previous page you are told exactly where it ended — its section and the number of its last
+paragraph — so a page with no heading on it continues that section rather than guessing one. On
+the first page of a chapter there is no such state; use the heading printed on the page, or the
+chapter's own number for text above the first one.
 
 Paragraph numbers start at 1 within each section and count upward in reading order. Reading order
 is top to bottom; on a two-column page it is the whole of the left column, then the whole of the
 right column. When a new section begins mid-page, its paragraph numbering starts again at 1.
+
+Numbering runs across pages, not within them. If you are told the previous page ended at section
+7.9 paragraph 4, then the next new paragraph of section 7.9 is paragraph 5 — never paragraph 1.
+Restarting at 1 on each page collides two different paragraphs at one address, and the pipeline
+cannot tell them apart afterwards.
 
 A paragraph that began on the previous page and continues onto this one is not a new paragraph.
 Transcribe only the part printed on this page, and give it the paragraph number it would have had
@@ -269,7 +273,7 @@ will continue it. The caption of Fig. 5.4 and the contents of Table 5.1 appear n
 PITFALLS TO AVOID
 
 - Do not renumber paragraphs from 1 at the top of every page. Numbering restarts with a section,
-  not with a page.
+  not with a page — and when you are told where the previous page ended, continue from that number.
 - Do not invent a section number you cannot see and cannot infer; use the chapter number and
   lower the confidence instead.
 - Do not merge two printed paragraphs because they are about the same thing, and do not split one
@@ -301,9 +305,18 @@ Call the tool exactly once, with the paragraphs in reading order.
 user(v) ::= <<
 This is page <v.page> of Chapter <v.chapter> of <v.book_title>.
 <if(v.previous_tail)>
-The previous page ended with the text below. If this page's first paragraph continues it,
-transcribe only the part printed on THIS page: do not repeat the text below, and give the
-continuation the paragraph number it already had rather than a new one.
+The previous page ended inside section <v.previous_section>, at paragraph <v.previous_para_no> of
+that section, with the text below.
+
+Number this page's paragraphs from there, not from 1:
+
+- If this page's first paragraph CONTINUES the text below — the sentence or paragraph runs on —
+  it is still section <v.previous_section>, paragraph <v.previous_para_no>. Transcribe only the
+  part printed on THIS page and do not repeat any of the quoted text.
+- If this page starts a new paragraph in the same section <v.previous_section>, that paragraph is
+  number <v.previous_para_no> plus one, and the numbering continues upward from there.
+- If this page opens a new numbered section, numbering restarts at 1 under that new section, as
+  always.
 
 --- end of the previous page ---
 <v.previous_tail>

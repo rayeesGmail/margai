@@ -6,6 +6,7 @@ import com.margai.ai.api.AiSpend;
 import com.margai.ai.api.ImagePart;
 import com.margai.ai.tasks.NcertPage;
 import com.margai.ai.tasks.NcertPageExtractor;
+import com.margai.ai.tasks.PreviousPage;
 import com.margai.storage.api.ObjectStore;
 import java.math.BigDecimal;
 import java.nio.file.Path;
@@ -90,7 +91,7 @@ class NcertExtractCommand extends NcertBookCommand {
             }
             int chapterCalled = 0;
             int chapterParagraphs = 0;
-            String tail = null;
+            PreviousPage previous = PreviousPage.none();
             for (String pageKey : pageKeys) {
                 int page = ContentKeys.pageNumber(pageKey);
                 if (pages != null && !pages.isEmpty() && !pages.contains(page)) {
@@ -100,17 +101,17 @@ class NcertExtractCommand extends NcertBookCommand {
                 if (existing != null && !redo) {
                     skipped++;
                     chapterParagraphs += existing.paragraphs().size();
-                    tail = tailOf(existing);
+                    previous = previousOf(existing);
                     continue;
                 }
                 AiResponse<NcertPage> response = extract.read(definition.row().titleEn(), chapter.no(), page,
-                        new ImagePart(content.get(pageKey), PdfPageRenderer.MEDIA_TYPE), tail, ctx);
+                        new ImagePart(content.get(pageKey), PdfPageRenderer.MEDIA_TYPE), previous, ctx);
                 ExtractedPage read = ExtractedPage.of(chapter.no(), page, response.output(), response.aiCallId());
                 done.put(read.address(), read);
                 called++;
                 chapterCalled++;
                 chapterParagraphs += read.paragraphs().size();
-                tail = response.output().tail();
+                previous = PreviousPage.of(response.output());
                 if (read.confidence() != null && read.confidence().compareTo(LOW_CONFIDENCE) < 0) {
                     lowConfidence.add("ch " + chapter.no() + " page " + page + " — confidence "
                             + read.confidence() + ", " + read.paragraphs().size() + " paragraphs");
@@ -153,7 +154,8 @@ class NcertExtractCommand extends NcertBookCommand {
         content.put(key, ExtractJsonl.write(ordered), "application/jsonl");
     }
 
-    private static String tailOf(ExtractedPage page) {
-        return new NcertPage(page.paragraphs(), page.confidence()).tail();
+    /** Where a page already in the JSONL left off, so a resumed run continues the numbering too. */
+    private static PreviousPage previousOf(ExtractedPage page) {
+        return PreviousPage.of(new NcertPage(page.paragraphs(), page.confidence()));
     }
 }

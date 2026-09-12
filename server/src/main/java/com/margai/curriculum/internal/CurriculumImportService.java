@@ -77,6 +77,11 @@ class CurriculumImportService implements CurriculumImport {
     }
 
     @Override
+    public Integer renderedPages(String bookCode, BookLanguage language) {
+        return ncertBooks.renderedPages(bookCode, language);
+    }
+
+    @Override
     public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
         return ncertParagraphs.load(bookCode, language, rows);
     }

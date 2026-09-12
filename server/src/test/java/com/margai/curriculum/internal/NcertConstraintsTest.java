@@ -85,6 +85,9 @@ class NcertConstraintsTest {
         assertThat(paragraph.getTextEn()).isEqualTo("The English paragraph.");
         assertThat(paragraph.getTextHi()).isEqualTo("हिन्दी पाठ");
         assertThat(paragraphs.countByBookId(book.getId())).isEqualTo(1);
+        // The Hindi pass must not erase how the English text was read (spec-auditor, D14).
+        assertThat(paragraph.getExtraction(BookLanguage.en)).isNotNull();
+        assertThat(paragraph.getExtraction(BookLanguage.hi)).isNotNull();
     }
 
     /**
@@ -115,8 +118,9 @@ class NcertConstraintsTest {
         NcertParagraph reloaded = paragraphs.findById(id).orElseThrow();
         assertThat(reloaded.getFigureRefs()).containsExactly("Fig 7.9", "Fig 7.10");
         assertThat(reloaded.isHasEquations()).isTrue();
-        assertThat(reloaded.getExtraction().pages()).containsExactly(12, 13);
-        assertThat(reloaded.getExtraction().confidence()).isEqualByComparingTo("0.94");
+        assertThat(reloaded.getExtraction(BookLanguage.en).pages()).containsExactly(12, 13);
+        assertThat(reloaded.getExtraction(BookLanguage.en).confidence()).isEqualByComparingTo("0.94");
+        assertThat(reloaded.getExtraction(BookLanguage.hi)).isNull();
         assertThat(reloaded.getNodeId()).isNull();
     }
 

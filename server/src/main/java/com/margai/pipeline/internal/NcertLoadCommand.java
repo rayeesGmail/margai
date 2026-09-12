@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
@@ -34,6 +35,14 @@ import picocli.CommandLine.Command;
 @Command(name = "load", mixinStandardHelpOptions = true,
         description = "Upsert the book's extracted paragraphs into ncert_paragraphs; reports coverage per chapter.")
 class NcertLoadCommand extends NcertBookCommand {
+
+    /** {@code ncert_paragraphs.section} is VARCHAR(16); a printed section is "7" or "7.9.2". */
+    static final int SECTION_MAX_LENGTH = 16;
+
+    /** A page holds a handful of paragraphs; a number beyond this is a misread, not a long page. */
+    static final int PARA_NO_MAX = 200;
+
+    private static final Pattern SECTION = Pattern.compile("\\d{1,2}(\\.\\d{1,3})*");
 
     private final ObjectStore content;
     private final CurriculumImport imports;
@@ -78,14 +87,29 @@ class NcertLoadCommand extends NcertBookCommand {
             perChapter.add(List.of(String.valueOf(chapter.no()), String.valueOf(chapterPages),
                     String.valueOf(withText), String.valueOf(paragraphs), percent(withText, chapterPages)));
         }
-        report.section("coverage per chapter")
-                .table(List.of("chapter", "pages extracted", "pages with text", "paragraphs", "coverage"), perChapter);
+        report.section("pages per chapter")
+                .table(List.of("chapter", "pages extracted", "pages with text", "paragraphs", "text yield"),
+                        perChapter);
 
+        // Coverage divides by the pages `ncert render` produced, not by the pages this JSONL happens
+        // to carry: an extraction that stopped at page 40 of 240 must not report itself complete.
+        Integer rendered = imports.renderedPages(definition.code(), language);
         long pagesWithText = pages.stream().filter(page -> !page.paragraphs().isEmpty()).count();
+        boolean wholeBook = chapters.size() == definition.chapters().size();
         report.section("coverage for the book").table(
-                List.of("pages extracted", "pages with text", "paragraphs", "coverage"),
-                List.of(List.of(String.valueOf(pages.size()), String.valueOf(pagesWithText),
-                        String.valueOf(result.total()), percent(pagesWithText, pages.size()))));
+                List.of("pages rendered", "pages extracted", "pages with text", "paragraphs", "coverage"),
+                List.of(List.of(
+                        rendered == null ? "unknown" : String.valueOf(rendered),
+                        String.valueOf(pages.size()), String.valueOf(pagesWithText),
+                        String.valueOf(result.total()),
+                        rendered == null || !wholeBook ? "—" : percent(pages.size(), rendered))));
+        if (rendered == null) {
+            report.line("coverage unavailable: ncert_books.pages_" + language + " is not set — "
+                    + "`ncert render` records it, and a chapter-subset render deliberately leaves it alone");
+        } else if (wholeBook && pages.size() < rendered) {
+            report.line("INCOMPLETE: " + (rendered - pages.size()) + " rendered pages are not in the "
+                    + "extraction — run `ncert extract` again before trusting this load");
+        }
         report.section("addresses in the database this extraction no longer carries").list(result.orphans());
     }
 
@@ -94,17 +118,75 @@ class NcertLoadCommand extends NcertBookCommand {
      * break: same address, page order, one space between. The row's extraction then names every
      * page it came from, and carries the lowest confidence of them — a paragraph is only as
      * trustworthy as the least certain page it was read from.
+     *
+     * <p>Only a genuine continuation is joined: the same address, on the page immediately after,
+     * as that page's first paragraph. Any other collision means the extraction numbered two
+     * different paragraphs the same — the failure mode of a model that restarts at 1 on every page
+     * — and it fails the run by name instead of quietly concatenating unrelated text, which is
+     * what a 20-paragraph spot check would not catch (spec-auditor, D14).
      */
     static List<NcertParagraphRow> join(List<ExtractedPage> pages) {
         Map<String, Joined> byAddress = new LinkedHashMap<>();
         for (ExtractedPage page : pages) {
-            for (NcertPage.Paragraph paragraph : page.paragraphs()) {
+            List<NcertPage.Paragraph> paragraphs = page.paragraphs();
+            for (int index = 0; index < paragraphs.size(); index++) {
+                NcertPage.Paragraph paragraph = paragraphs.get(index);
+                check(page, paragraph);
                 String address = page.chapterNo() + " " + paragraph.section() + " " + paragraph.paraNo();
-                byAddress.computeIfAbsent(address, key -> new Joined(page.chapterNo(), paragraph))
-                        .add(page, paragraph);
+                Joined joined = byAddress.get(address);
+                if (joined == null) {
+                    byAddress.put(address, new Joined(page.chapterNo(), paragraph, page));
+                    continue;
+                }
+                if (index != 0 || page.page() != joined.lastPage() + 1) {
+                    throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                            "ch " + page.chapterNo() + " §" + paragraph.section() + " ¶" + paragraph.paraNo()
+                                    + " is claimed by page " + joined.lastPage() + " and page " + page.page()
+                                    + ", which cannot be one paragraph continuing across a page break — "
+                                    + "re-extract those pages (`ncert extract --redo --chapters "
+                                    + page.chapterNo() + " --pages " + joined.lastPage() + "," + page.page() + "`)");
+                }
+                joined.add(page, paragraph);
             }
         }
         return byAddress.values().stream().map(Joined::row).toList();
+    }
+
+    /**
+     * The model's own fields, checked before they reach the schema — the same strictness every D13
+     * reader applies to a founder's file (DECISIONS 2026-09-12 D13), and for a sharper reason: the
+     * section is what the app shows as the anchor a student taps (SPEC §6.3), so a section that
+     * does not belong to this chapter is a student sent to the wrong page of a book they are
+     * holding. Refusing by name beats a raw constraint violation at the end of a 260-page load.
+     */
+    private static void check(ExtractedPage page, NcertPage.Paragraph paragraph) {
+        String where = "ch " + page.chapterNo() + " page " + page.page() + ": ";
+        String section = paragraph.section() == null ? "" : paragraph.section().strip();
+        if (section.isEmpty()) {
+            throw refuse(where + "a paragraph has no section");
+        }
+        if (section.length() > SECTION_MAX_LENGTH) {
+            throw refuse(where + "section '" + section + "' is longer than " + SECTION_MAX_LENGTH + " characters");
+        }
+        if (!SECTION.matcher(section).matches()) {
+            throw refuse(where + "section '" + section + "' is not a printed section number");
+        }
+        String chapterOfSection = section.contains(".") ? section.substring(0, section.indexOf('.')) : section;
+        if (!chapterOfSection.equals(String.valueOf(page.chapterNo()))) {
+            throw refuse(where + "section '" + section + "' belongs to chapter " + chapterOfSection
+                    + ", not to chapter " + page.chapterNo() + " — the page was read as the wrong chapter");
+        }
+        if (paragraph.paraNo() < 1 || paragraph.paraNo() > PARA_NO_MAX) {
+            throw refuse(where + "§" + section + " has paragraph number " + paragraph.paraNo());
+        }
+        if (paragraph.text() == null || paragraph.text().isBlank()) {
+            throw refuse(where + "§" + section + " ¶" + paragraph.paraNo() + " has no text");
+        }
+    }
+
+    private static InputFormatException refuse(String reason) {
+        return new InputFormatException(Path.of(ContentKeys.EXTRACT), 0, reason
+                + " — re-extract that page (`ncert extract --redo --pages N`) or fix the prompt");
     }
 
     private static String percent(long part, long whole) {
@@ -123,9 +205,14 @@ class NcertLoadCommand extends NcertBookCommand {
         private UUID aiCallId;
         private boolean hasEquations;
 
-        private Joined(short chapterNo, NcertPage.Paragraph first) {
+        private Joined(short chapterNo, NcertPage.Paragraph first, ExtractedPage page) {
             this.chapterNo = chapterNo;
             this.first = first;
+            add(page, first);
+        }
+
+        private int lastPage() {
+            return pages.getLast();
         }
 
         private void add(ExtractedPage page, NcertPage.Paragraph paragraph) {

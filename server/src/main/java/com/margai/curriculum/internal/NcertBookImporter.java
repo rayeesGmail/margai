@@ -34,6 +34,13 @@ class NcertBookImporter {
         books.flush();
     }
 
+    Integer renderedPages(String bookCode, BookLanguage language) {
+        return books.findByCode(bookCode)
+                .orElseThrow(() -> new CurriculumImportException(
+                        "book '" + bookCode + "' is not registered — run `ncert register` first"))
+                .getPages(language);
+    }
+
     NcertRegisterReport register(List<NcertBookRow> rows) {
         Map<String, NcertBook> existing = new HashMap<>();
         books.findAll().forEach(book -> existing.put(book.getCode(), book));

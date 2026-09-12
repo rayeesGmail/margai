@@ -42,8 +42,9 @@ pipeline/**/__pycache__/
 pipeline/data/
 
 # Founder-placed content inputs (NCERT 2022-ed books, PYQ papers, NEET syllabus PDFs): the manifests
-# beside them are tracked, the PDFs stay local until the pipeline's S3 content/ home (TECH_PLAN §6.2;
-# D14's `ncert register` decides, DECISIONS 2026-09-10 D13)
+# beside them are tracked, the files themselves live in the content bucket — `margai-beta-content`
+# under `source/`, mirroring this tree so a key is derivable from a path (DECISIONS 2026-09-12 F8;
+# synced 2026-09-12, 216 objects). `books.yaml` addresses them by that prefix (D14).
 ncert/**/*.pdf
 pyq/**/*.pdf
 syllabus/*.pdf

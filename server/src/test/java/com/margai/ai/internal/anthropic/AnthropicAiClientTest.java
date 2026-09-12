@@ -64,11 +64,27 @@ class AnthropicAiClientTest {
 
     @Test
     void aResponseWithoutAToolCallIsInvalidOutputNamingTheStopReason() {
+        Message response = message(StopReason.END_TURN).build();
+
+        assertThatThrownBy(() -> AnthropicAiClient.toolInput(response, Usage.none(), "model-x", codec))
+                .isInstanceOf(InvalidOutputException.class)
+                .hasMessageContaining("no tool call")
+                .hasMessageContaining("end_turn");
+    }
+
+    /**
+     * A truncated tool input still parses — the SDK completes what arrived — so a page
+     * transcription cut off at the token limit would have looked like a valid short page
+     * (spec-auditor, D14). The stop reason is checked before the content is read.
+     */
+    @Test
+    void aResponseCutOffAtTheTokenLimitIsInvalidOutputNamingTheKnob() {
         Message response = message(StopReason.MAX_TOKENS).build();
 
         assertThatThrownBy(() -> AnthropicAiClient.toolInput(response, Usage.none(), "model-x", codec))
                 .isInstanceOf(InvalidOutputException.class)
-                .hasMessageContaining("no tool call");
+                .hasMessageContaining("cut off at the output-token limit")
+                .hasMessageContaining("margai.ai.max-output-tokens");
     }
 
     @Test

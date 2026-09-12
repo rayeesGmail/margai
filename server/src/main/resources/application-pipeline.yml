@@ -19,6 +19,15 @@ margai:
     render-dpi: 150
     extract-batch-size: 10
   ai:
+    # A page transcription is not an answer. The 1,024 default sizes a reasoning answer inside the
+    # 20 s budget (§4.11); a full NCERT body page is 400–900 words plus JSON field names, escapes
+    # and figure_refs, which lands at or over that on most pages and over it reliably in Biology —
+    # and a truncated tool input still parses, so the failure would have been silently short pages
+    # (spec-auditor, D14). The provider client now refuses a max_tokens stop outright.
+    max-output-tokens: 8192
+    # A page image is ~2,800 input tokens and the answer can be long, so give the call room; the
+    # default 20 s is sized for a short reasoning answer, not a page.
+    call-timeout: 120s
     budget:
       # A pipeline day is not a student day: extracting two pilot books is ~450 VISION calls in
       # one run, against a global-daily-paise placeholder sized for student traffic (₹500). The

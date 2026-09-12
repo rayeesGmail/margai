@@ -90,8 +90,10 @@ class NcertLoadCommandTest {
         assertThat(straddling.extraction().confidence()).isEqualByComparingTo("0.80");
     }
 
+    /** A figure page is read correctly and yields nothing; that is text yield, not lost coverage. */
     @Test
-    void aFigureOnlyPageCountsAgainstCoverageWithoutBecomingARow() {
+    void aFigureOnlyPageLowersTextYieldNotCoverage() {
+        imports.renderedPagesAnswer = 4;
         jsonl(
                 page(7, 1, "0.95", paragraph("7.1", 1, "Text.")),
                 page(7, 2, "0.99"),
@@ -102,10 +104,94 @@ class NcertLoadCommandTest {
 
         assertThat(imports.rows).hasSize(2);
         assertThat(out.toString())
-                .contains("| chapter | pages extracted | pages with text | paragraphs | coverage |")
+                .contains("| chapter | pages extracted | pages with text | paragraphs | text yield |")
                 .contains("| 7 | 4 | 2 | 2 | 50.0% |")
-                .contains("| pages extracted | pages with text | paragraphs | coverage |")
-                .contains("| 4 | 2 | 2 | 50.0% |");
+                .contains("| pages rendered | pages extracted | pages with text | paragraphs | coverage |")
+                .contains("| 4 | 4 | 2 | 2 | 100.0% |");
+    }
+
+    /**
+     * The figure the founder reads must divide by what was rendered: an extraction that stopped a
+     * third of the way in reported itself complete before this (spec-auditor, D14).
+     */
+    @Test
+    void coverageDividesByTheRenderedPagesAndSaysSoWhenPagesAreMissing() {
+        imports.renderedPagesAnswer = 12;
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "Text.")),
+                page(7, 2, "0.95", paragraph("7.1", 2, "More.")),
+                page(7, 3, "0.95", paragraph("7.1", 3, "Still more.")));
+
+        run();
+
+        assertThat(out.toString())
+                .contains("| 12 | 3 | 3 | 3 | 25.0% |")
+                .contains("INCOMPLETE: 9 rendered pages are not in the extraction");
+    }
+
+    @Test
+    void coverageIsUnavailableUntilRenderHasRecordedThePageCount() {
+        imports.renderedPagesAnswer = null;
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "Text.")));
+
+        run();
+
+        assertThat(out.toString())
+                .contains("| unknown | 1 | 1 | 1 | — |")
+                .contains("coverage unavailable: ncert_books.pages_en is not set");
+    }
+
+    /**
+     * The failure mode the blocker created: a model that restarts numbering at 1 on every page
+     * collides two different paragraphs at one address. Merging them silently is what the
+     * 20-paragraph spot check would not catch, so the run stops and names both pages.
+     */
+    @Test
+    void twoDifferentParagraphsAtOneAddressFailTheRun() {
+        imports.renderedPagesAnswer = 3;
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first paragraph.")),
+                page(7, 2, "0.95", paragraph("7.1", 2, "Second page, second paragraph.")),
+                page(7, 3, "0.95", paragraph("7.1", 1, "Third page restarting at one.")));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString())
+                .contains("ch 7 §7.1 ¶1 is claimed by page 1 and page 3")
+                .contains("cannot be one paragraph continuing across a page break")
+                .contains("ncert extract --redo --chapters 7 --pages 1,3");
+        assertThat(imports.rows).isNull();
+    }
+
+    @Test
+    void aSectionFromAnotherChapterFailsTheRun() {
+        imports.renderedPagesAnswer = 1;
+        jsonl(page(7, 1, "0.95", paragraph("12.4", 1, "A section from the wrong chapter.")));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString())
+                .contains("section '12.4' belongs to chapter 12, not to chapter 7")
+                .contains("the page was read as the wrong chapter");
+        assertThat(imports.rows).isNull();
+    }
+
+    @Test
+    void aSectionThatIsNotASectionNumberFailsTheRun() {
+        imports.renderedPagesAnswer = 1;
+        jsonl(page(7, 1, "0.95", paragraph("Gravitation", 1, "A heading, not a number.")));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("section 'Gravitation' is not a printed section number");
+    }
+
+    @Test
+    void aParagraphNumberBelowOneFailsTheRun() {
+        imports.renderedPagesAnswer = 1;
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 0, "Numbered from zero.")));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("§7.1 has paragraph number 0");
     }
 
     @Test

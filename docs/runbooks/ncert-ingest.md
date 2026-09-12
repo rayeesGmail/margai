@@ -50,9 +50,15 @@ re-renders pages that are already there** — needed whenever the pages in the b
 rather than missing, which is not hypothetical: the first real run rendered without a JPEG2000
 decoder and PDFBox answered by drawing those pages *without their figures* instead of failing.
 
-If a render ever logs `Cannot read JPEG2000 image`, every page it wrote is suspect and must be
-re-rendered with `--redo`. The renderer now refuses to start at all when that decoder is missing,
-so this cannot recur silently.
+A page PDFBox cannot draw completely now **fails the run**, whatever the reason. That guarantee is
+structural, not a list of formats: NCERT needed two different image decoders and the second was
+found only after a guard written for the first, on a run that reported `result: ok` while writing a
+page with a blanked image. If a render ever *did* write such pages, every page it wrote is suspect
+and `--redo` is the only way back.
+
+Before a book is rendered for the first time, the cheap pre-flight is
+`./mvnw test -Dtest=PdfPageRendererTest`: with the PDFs on the machine it draws every page of both
+pilot books and fails on any decoder gap, for free, in about 90 seconds.
 
 Expect roughly 264 pages for `bio11` and 184 for `phy11-part1`, matching `ncert/2022-ed/en/manifest.md`.
 

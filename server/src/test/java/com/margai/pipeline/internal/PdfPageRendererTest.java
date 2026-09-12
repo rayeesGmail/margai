@@ -28,18 +28,36 @@ class PdfPageRendererTest {
     private static final Path NCERT = Path.of("..", "ncert", "2022-ed", "en");
 
     @Test
-    void aJpeg2000ReaderIsOnTheClasspath() {
+    void theDecodersNcertNeedsAreOnTheClasspath() {
         assertThat(ImageIO.getImageReadersByFormatName("jpeg2000").hasNext())
-                .as("jai-imageio-jpeg2000 must stay on the classpath: without it NCERT pages render "
-                        + "with their figures blank and nothing fails")
-                .isTrue();
+                .as("jai-imageio-jpeg2000 must stay on the classpath").isTrue();
+        assertThat(ImageIO.getImageReadersByFormatName("jbig2").hasNext())
+                .as("jbig2-imageio must stay on the classpath").isTrue();
     }
 
+    /**
+     * The real guarantee is not a list of formats — it is that a page PDFBox cannot draw completely
+     * fails instead of arriving blank. Both decoder gaps were found on real books, one after the
+     * other, and the second one was found *after* a format-specific tripwire had been added (D14).
+     */
     @Test
-    void theRendererRefusesToStartWithoutADecoder() {
-        // The constructor's tripwire is proved by the reader above being required at construction;
-        // this pins the message a future classpath change would produce.
-        assertThat(new PdfPageRenderer(72)).isNotNull();
+    void everyPageOfBothPilotBooksRendersWithNoMissingDecoder() throws IOException {
+        assumeTrue(Files.isDirectory(NCERT), "founder's NCERT PDFs not on this machine");
+
+        int pages = 0;
+        for (String book : List.of("phy11-part1", "bio11")) {
+            try (var files = Files.list(NCERT.resolve(book))) {
+                for (Path chapter : files.filter(path -> path.toString().endsWith(".pdf")).sorted().toList()) {
+                    byte[] pdf = Files.readAllBytes(chapter);
+                    int[] drawn = {0};
+                    // 72 DPI: this is a decoder sweep, not a quality check — it only has to draw.
+                    new PdfPageRenderer(72).render(pdf, page -> false, (png, page) -> drawn[0]++);
+                    assertThat(drawn[0]).as("pages drawn of %s", chapter.getFileName()).isPositive();
+                    pages += drawn[0];
+                }
+            }
+        }
+        assertThat(pages).isGreaterThan(400);
     }
 
     /**

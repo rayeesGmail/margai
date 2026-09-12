@@ -28,6 +28,7 @@
     <!-- D14: page rendering for the NCERT ingest (TECH_PLAN §6.1). Not managed by the Boot BOM. -->
     <pdfbox.version>3.0.5</pdfbox.version>
     <jai-imageio-jpeg2000.version>1.4.0</jai-imageio-jpeg2000.version>
+    <jbig2-imageio.version>3.0.4</jbig2-imageio.version>
   </properties>
 
   <dependencyManagement>
@@ -214,14 +215,20 @@
       <artifactId>pdfbox</artifactId>
       <version>${pdfbox.version}</version>
     </dependency>
-    <!-- D14: NCERT embeds JPEG2000 images — 21 of the 30 chapter files in the two pilot books alone.
-         PDFBox cannot decode them without an ImageIO plugin: it logs "Cannot read JPEG2000 image"
-         per page and renders the page WITHOUT that image, so the failure is a silently degraded
-         page rather than an error. PdfPageRenderer refuses to start if this reader is absent. -->
+    <!-- D14: NCERT embeds image formats Java cannot decode out of the box — JPEG2000 across most
+         chapter files, JBIG2 in at least some. PDFBox answers a missing decoder by logging
+         "Cannot read … image" and rendering the page WITHOUT that image, so the failure is a
+         silently degraded page rather than an error; both were found that way on real books.
+         PdfPageRenderer now also makes any missing decoder throw, whatever the format. -->
     <dependency>
       <groupId>com.github.jai-imageio</groupId>
       <artifactId>jai-imageio-jpeg2000</artifactId>
       <version>${jai-imageio-jpeg2000.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.pdfbox</groupId>
+      <artifactId>jbig2-imageio</artifactId>
+      <version>${jbig2-imageio.version}</version>
     </dependency>
 
     <!-- test -->

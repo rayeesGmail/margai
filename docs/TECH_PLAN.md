@@ -1387,9 +1387,10 @@ a re-learn block candidate.
   mispriced. The same model charges **0.47 for image tokens** — irrelevant today, since
   `EmbedRequest` carries text only and the client sends `texts` — but §4.8's table holds **one
   `input` price per model**, so the day anything embeds an image the ledger under-bills it about
-  fourfold. Embed 4 is multimodal with a 128K window, so that day is plausible (diagram retrieval
-  for figure-heavy NCERT chapters); it would be a change to the price table's shape, not a config
-  edit, and this note is the warning that it is not free.
+  fourfold. Using that capability is PARKED as **diagram retrieval with multimodal embeddings**
+  (TRACKER, 2026-09-12), and the price key is its precondition: adding image embedding means giving
+  the price table a second key per model first, which is a change to its shape rather than a config
+  edit.
 - Indexes: HNSW cosine on `ncert_paragraphs.embedding`, `questions.embedding`,
   `doubt_cache.embedding` (`m = 16, ef_construction = 64`); GIN on `ncert_paragraphs.tsv`.
 - `HybridRetriever` is the one retrieval component (§4.3 stage 6) and is also used by the pipeline

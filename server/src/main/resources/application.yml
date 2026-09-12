@@ -77,7 +77,9 @@ margai:
     # the provider's own pricing page 2026-09-12 and is the same 0.12 the Bedrock page gave, so no
     # row was ever mispriced. That figure is the model's TEXT rate; the same model charges 0.47 for
     # image tokens, and this table has one input price per model — embedding an image would
-    # under-bill ~4× (§4.9). We send text only, and EmbedRequest carries no image.
+    # under-bill ~4×. We send text only (EmbedRequest carries no image); using the model's image
+    # side is PARKED as "diagram retrieval with multimodal embeddings" and needs a second price key
+    # per model before it bills honestly (§4.9, TRACKER PARKED 2026-09-12).
     prices-json: >-
       {"claude-haiku-4-5":
          {"input": 1.00, "output": 5.00, "cache_read": 0.10, "cache_write": 1.25,

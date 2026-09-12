@@ -180,7 +180,7 @@ flowchart LR
     SCHED[EventBridge Scheduler<br/>00:30 IST] --> NIGHT[Same image<br/>profile nightly]
     API --> RDS[(RDS PostgreSQL 18<br/>pgvector · pg_trgm)]
     NIGHT --> RDS
-    API --> BR[Amazon Bedrock<br/>CHEAP · REASON · VISION · EMBED]
+    API --> BR[Provider APIs<br/>models: CHEAP · REASON · VISION<br/>embeddings: EMBED]
     NIGHT --> BR
     API --> S3U[(S3 uploads<br/>1-day lifecycle)]
     API --> EXT[SES OTP email · MSG91 OTP SMS after F1 · Razorpay · FCM · PostHog]
@@ -235,7 +235,7 @@ Both names match the eval gate's `retriev*` path rule.
 | `trajectory` | weekly predicted band, peer line, deep report (§6.5, §8 screen 11) | `trajectory_snapshots` | common, account, curriculum, practice.api, notebook.api, billing.api |
 | `billing` | subscriptions, Razorpay, webhooks, paywall triggers, cancel/refund, auto-pause (§6.9, §8 screen 12) | `subscriptions`, `payments`, `billing_events`, `paywall_impressions` | common, account |
 | `notifications` | FCM devices, scheduling from plan events, 2/day cap, quiet periods, dispatcher (§6.10) | `notification_log` | common, account, planner.api (events) |
-| `ai` | `AiClient`, Bedrock/Fake, ledger, breaker, router, retrieval, prompts, verification, embeddings (§4) | `ai_calls`, `ai_spend_daily`, `audit_queue` | common, curriculum |
+| `ai` | `AiClient`, one package per provider plus the fake, ledger, breaker, router, retrieval, prompts, verification, embeddings (§4) | `ai_calls`, `ai_spend_daily`, `audit_queue` | common, curriculum |
 | `storage` | S3 port (uploads, content), signed URLs, deletion | — | common |
 | `pipeline` | §6 CLI commands | — | common, curriculum (D13); ai, storage (D14) — *`common` added 2026-09-12 (DECISIONS): the run report's IST clock* |
 | `jobs` | `NightlyRunner` (§4.5 orchestration), the purge and rollup jobs, the export executor (gathers every module's data for `data_export_jobs`, D64), the daily document-deletion verification job (§9.6, D64), the sweepers' schedules, the weekly dump | — | every `api` package |
@@ -277,10 +277,13 @@ Rules, enforced by the Modulith test from D4:
 - `jobs` and `ops` sit on top: they may use every module's `api` and nothing uses them. `jobs`
   orchestrates (the nightly run calls `planner.api`, `trajectory.api`, `notebook.api`, `account.api`
   and `ai.api` in turn); `ops` only reads.
-- Only `ai` imports `software.amazon.awssdk.services.bedrock*`. Only `storage` imports S3. Only
+- Only `ai` talks to a model or embedding provider, and inside `ai` each provider is confined to one
+  package (*extended 2026-09-12*): the model SDK to `ai.internal.anthropic`, the embedding provider's
+  HTTP calls to `ai.internal.cohere`, `software.amazon.awssdk.services.bedrock*` to the dormant
+  `ai.internal.bedrock`. Only `storage` imports S3. Only
   `billing` imports the Razorpay SDK; only `notifications` the FCM client; only `auth` the SMS client
   and, since the D7 ruling (2026-09-08, DECISIONS), the SES client for the email OTP channel — inside
-  `auth` only its `internal.email` package, as Bedrock is confined to `ai.internal.bedrock` (ArchUnit).
+  `auth` only its `internal.email` package, on the same principle (ArchUnit enforces all of these).
 - Feature modules never read another module's tables directly; they call `<module>.api` or listen to
   events. `ops` is the one exception: read-only queries across `api` packages.
 - Controllers live in `<module>.web`, are thin, and map to one service call.
@@ -319,7 +322,8 @@ Rules, enforced by the Modulith test from D4:
 ### 1.6 Nightly execution model
 
 - EventBridge Scheduler fires at 19:00 UTC (00:30 IST) and runs the image as an ECS task with
-  `--spring.profiles.active=nightly,bedrock`. The task processes users in a fixed order, commits per
+  `--spring.profiles.active=nightly,live` *(2026-09-12: the profile was renamed from `bedrock`;
+  a run left on the old name would start on `FakeAiClient` and fabricate plans)*. The task processes users in a fixed order, commits per
   user, and exits. Re-running it is safe: `daily_plans` is unique on `(user_id, plan_date)` and a
   rerun overwrites only plans it generated itself (`generated_by = nightly`), never a renegotiated one.
 - If no plan exists for a user at `GET /plan/today`, the API builds the deterministic fallback on the
@@ -828,7 +832,7 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
 | 409 | `STATE_CONFLICT` (e.g. answering a finished session, onboarding step out of order) |
 | 422 | `DOUBT_LIMIT_REACHED` (details: resets_at), `DOUBT_UNVERIFIED` (the honest fallback, with the audit reference), `NOT_A_QUESTION` (photo has no question) |
 | 429 | `RATE_LIMITED` (header `Retry-After`), `OTP_RATE_LIMITED` |
-| 502/503 | `AI_UNAVAILABLE` (Bedrock failure after retries, DEV_SPEC §4.1 "couldn't solve this right now"), `AI_BUDGET_EXCEEDED` (breaker; details: degraded mode) |
+| 502/503 | `AI_UNAVAILABLE` (provider failure after retries, DEV_SPEC §4.1 "couldn't solve this right now"), `AI_BUDGET_EXCEEDED` (breaker; details: degraded mode) |
 | 500 | `INTERNAL` (request id in details; never a stack trace) |
 
 Messages come from `messages_{en,hi,hinglish}.properties` in `common` (server-side copy); the
@@ -1040,10 +1044,11 @@ package com.margai.ai.api;
 public interface AiClient {
     <T> AiResponse<T> complete(AiRequest<T> request);        // text + optional images → typed JSON
     <T> List<AiResponse<T>> completeBatch(List<AiRequest<T>> requests);
-                                                             // same contract for many requests: a Bedrock
-                                                             // batch job when the flag and minimum allow,
-                                                             // otherwise a bounded on-demand loop; one
-                                                             // AiResponse and one ledger row per request
+                                                             // same contract for many requests: a provider
+                                                             // batch submission when the flag and threshold
+                                                             // allow (D55; §4.11), otherwise a bounded
+                                                             // on-demand loop; one AiResponse and one
+                                                             // ledger row per request either way
     AiResponse<float[]> embed(EmbedRequest request);         // text → vector(1024)
 }
 
@@ -1625,7 +1630,8 @@ human-held and never in the tree (`key.properties` is gitignored).
 ### 6.1 Where it runs and why
 
 AI-touching pipeline steps are Java, inside the server image, under the `pipeline` Spring profile
-with picocli commands (`java -jar server.jar --spring.profiles.active=pipeline,bedrock <command>`).
+with picocli commands (`java -jar server.jar --spring.profiles.active=pipeline,live <command>`;
+*the profile was renamed from `bedrock` on 2026-09-12 — the old name silently extracts on the fake*).
 Reason: `.claude/rules/pipeline.md` requires every pipeline AI call to go through `AiClient` with the
 cost ledger, and the entities, Flyway schema and `HybridRetriever` already exist there. PDF page
 rendering uses PDFBox; paragraph extraction uses the VISION tier on page images rather than text
@@ -1731,14 +1737,14 @@ rebuilt from Terraform if it drifts.
 | Network | One VPC, two AZs; public subnets for the ALB and the Fargate tasks; private subnets for RDS | Tasks in public subnets with a security group that only accepts the ALB avoid a NAT gateway (the classic ~₹3k/month surprise). S3 gateway endpoint is free and added. |
 | Ingress | ALB, ACM certificate, Route 53 record on the final domain (TRACKER F7) | HTTP → HTTPS redirect; health check `/actuator/health` |
 | Compute | ECS Fargate service, 1 task, 1 vCPU / 2 GB, ARM64 (Graviton) | Java 25 with `-XX:MaxRAMPercentage=70`. Rolling deploy with min 100% / max 200% |
-| Nightly | ECS RunTask from EventBridge Scheduler, same task definition with the `nightly,bedrock` profiles, 2 vCPU / 4 GB | 60-minute timeout; failure alarm (§10.4) |
+| Nightly | ECS RunTask from EventBridge Scheduler, same task definition with the `nightly,live` profiles *(renamed 2026-09-12)*, 2 vCPU / 4 GB | 60-minute timeout; failure alarm (§10.4) |
 | Registry | ECR, one repository, images tagged with the git SHA | lifecycle: keep last 20 |
 | Database | RDS PostgreSQL 18, `db.t4g.small`, single-AZ, 20 GB gp3, automated backups 7 days, deletion protection | `pgvector` and `pg_trgm` created by migration V1. PG18 availability on RDS and its pgvector version are a console check (§13.2) |
 | Object storage | `margai-beta-uploads`: SSE-S3, block public access, lifecycle expires objects after 1 day, prefixes `uploads/doubts/`, `uploads/documents/`, `exports/`. `margai-beta-content`: source PDFs, page images, JSONL artefacts, weekly logical dumps; versioning on | The hard rule "uploaded images: uploads bucket only" (CLAUDE.md) maps to the first bucket |
-| AI | Bedrock model access enabled for the CHEAP, REASON, VISION and EMBED models named in config; global cross-region inference profiles called from ap-south-1 | Data may be processed outside India: disclosed in the privacy copy (SPEC §6.11) |
+| AI | *Amended 2026-09-12 (DECISIONS):* the providers' own APIs, reached with the two keys in SSM (§7.3) — no AWS-side model access, no inference profiles, no IAM statement for models. The dormant Bedrock path (§4.11) would need its model access re-enabled | Data may be processed outside India: disclosed in the privacy copy (SPEC §6.11) |
 | Config and secrets | SSM Parameter Store under `/margai/beta/…`; SecureString for secrets | injected into the task as environment variables through the task definition's `secrets` (`valueFrom` SSM ARN). No library, no runtime fetch; a config change is a task restart (~2 min) |
 | Scheduling | EventBridge Scheduler: nightly 19:00 UTC; weekly dump Sunday 21:00 UTC | both target ECS RunTask |
-| Logs and metrics | CloudWatch Logs (JSON), 30-day retention; CloudWatch metrics from Micrometer; AWS Budgets for the Bedrock daily spend alarm | §10 |
+| Logs and metrics | CloudWatch Logs (JSON), 30-day retention; CloudWatch metrics from Micrometer; the daily AI spend alarm from the `ai_calls` ledger, with the provider's console workspace limit as the independent backstop and AWS Budgets for the AWS bill *(amended 2026-09-12, §10.4)* | §10 |
 | Push, OTP, payments, analytics | FCM (Firebase project), SES (verified sender identity + production access via TRACKER F10; the OTP email channel since the D7 ruling), MSG91 (DLT template via TRACKER F1; SMS once it lands), Razorpay (KYC via F1), PostHog Cloud | credentials in SSM only; SES needs none (task role) |
 
 ### 7.3 Configuration and secrets layout
@@ -1818,13 +1824,13 @@ IDs, prices, limits, flags and prompt versions never appear as code constants (`
 
 | By PLAN day | Needed for | Build |
 |---|---|---|
-| D5 | one live Bedrock smoke call | AWS account, Bedrock model access, SSO profile on the laptop |
+| D5 | one live model smoke call | *amended 2026-09-12: two funded provider accounts, their keys in SSM, and a console spend limit per workspace — the AWS account and SSO profile stay for RDS, S3 and SES* |
 | D14 | NCERT PDFs in S3 | content bucket |
 | D28 | scorecard upload with 24-hour deletion | uploads bucket with the 1-day lifecycle, IAM for local dev |
 | D55 | nightly loop, D57 two-device morning plans, D60 three unattended days | the full beta stack: VPC, RDS, ECR, ECS service + scheduled task, ALB + certificate, SSM parameters, log group |
 | D64 | export and deletion promises | exports prefix, purge job scheduled |
 | D70 | failure drills | backups, alarms, restore runbook |
-| D73 | dashboards | CloudWatch dashboard, PostHog project, AWS Budgets alarm |
+| D73 | dashboards | CloudWatch dashboard, PostHog project, AWS Budgets alarm *(for the AWS bill; the AI spend alarm is the ledger's, §10.4)* |
 | D74 | Play Store internal track | release signing key (human-held), `--dart-define` production API URL |
 
 ### 7.7 Beta cost estimate (monthly, order of magnitude)
@@ -1851,8 +1857,8 @@ list prices at the time of writing and are re-estimated at D65 with real ledger 
 | Repository slice | `@DataJpaTest` + Testcontainers `pgvector/pgvector:pg18` | migrations apply, constraints (CHECKs, partial uniques), vector and tsv queries, `HybridRetriever` SQL | every `mvnw verify` |
 | Controller slice | `@WebMvcTest` + `MockMvcTester` | envelope for every error code, auth failures, validation, idempotency replay, **no `correct_key` before judging** | every `mvnw verify` |
 | Module flow | `@SpringBootTest` + Testcontainers + `FakeAiClient` | end-to-end paths per PLAN day (onboarding → first plan; session → notebook entry; doubt → cache), events between modules, breaker and ledger behaviour | every `mvnw verify` |
-| Architecture | Spring Modulith `ApplicationModules.verify()`, ArchUnit | §1.4 dependency rules, SDK import restrictions, no model-id literals, controllers only in `web` | every `mvnw verify` |
-| Live | `-Peval` profile, `BEDROCK_LIVE=1` | §4.10 live eval; D5 smoke | founder-launched |
+| Architecture | Spring Modulith `ApplicationModules.verify()`, ArchUnit | §1.4 dependency rules, the per-provider SDK import restrictions, no model-id literals (models *and* embeddings), the embedding width against the migrations, controllers only in `web` | every `mvnw verify` |
+| Live | `-Peval` profile, `AI_LIVE=1` *(renamed 2026-09-12; it is the one switch that unlocks billable calls)* | §4.10 live eval; D5 smoke | founder-launched |
 
 Every service-layer change ships with tests in the same commit (CLAUDE.md). `./mvnw verify` stays
 under ~3 minutes by keeping one shared Testcontainers instance per JVM (singleton container pattern)
@@ -1929,6 +1935,14 @@ human-edited `.env` that Claude can neither read nor write (`.claude/settings.js
 `scripts/block-paths.sh`); `scripts/detect-secrets.sh` scans every write and CI scans the tree.
 JWT key rotation: `jwt/secret_previous` is accepted for 15 minutes after a rotation. Razorpay and
 MSG91 keys rotate by SSM update plus task restart.
+
+*Added 2026-09-12 (DECISIONS):* the two **AI provider keys** (`ai/anthropic/api_key`,
+`ai/cohere/api_key`) are the auth model for every model and embedding call — there is no cloud role
+behind those calls and no session to expire — so they rotate by SSM update plus a forced deployment,
+and there is **no dual-accept window** like the JWT secret's: the overlap has to come from two valid
+keys at the provider, because we do not decide what a key is worth. A live client refuses to start on
+a blank key. The full procedure, including what a leaked key can and cannot reach, is
+`docs/runbooks/ai-provider-keys.md`.
 
 ### 9.3 Authorisation and IDOR
 
@@ -2139,7 +2153,7 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 | PLAN days | Sections that define the work |
 |---|---|
 | D4 core schema | §2.1–§2.4 (D4 tables column by column), §2.9 V1–V4 and the seed location, §8.2 reversibility test, §1.3 first module packages, Modulith verification |
-| D5 AiClient seam | §4.1, §4.8 ledger and breaker, §2.8 `ai_calls`, §1.2 `bedrock` profile, §4.1 smoke |
+| D5 AiClient seam | §4.1, §4.8 ledger and breaker, §2.8 `ai_calls`, §1.2 `live` profile *(renamed 2026-09-12)*, §4.1 smoke |
 | D6 buffer / Week-1 gate | §0.3 dispositions closed, §14 in DECISIONS.md |
 | D7–D12 auth | §3.2, §3.4, §3.7 auth and account, §2.2 auth tables, §9.1, §5.4 refresh interceptor, §5.8 login |
 | D13 taxonomy | §6.2, §6.3 `taxonomy`, `backbone`, `cutoffs` commands; §2.3 |
@@ -2182,7 +2196,7 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 | Hindi legacy fonts in older NCERT scans | vision extraction reads glyphs as images; alignment report catches the misses |
 | NCERT licensing (TRACKER F2) | the app shows one anchored paragraph at a time and never a chapter (§2.10); text is retrieval-only |
 | Solo-founder operations | alarms to email, admin peek, runbooks from D70, no on-call rotation pretended |
-| Bedrock batch minimum | on-demand path is the default; batch is a flag (§4.11) |
+| ~~Bedrock batch minimum~~ *(void 2026-09-12: the direct batch endpoint has no minimum; the threshold is a latency choice)* — the live risk is now the **provider rate-limit tier**, unread until the founder reports it (F8) | on-demand path is the default; batch is a flag (§4.11) |
 
 ### 13.2 Facts to confirm in the AWS console (extends DEV_SPEC §12 item 4)
 
@@ -2325,7 +2339,7 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 | In-process notification dispatcher and sweepers | one API task | ShedLock on the Postgres table, or move them into the nightly/ops task family |
 | Async classification via Spring events + `@Async` | one JVM, restarts tolerated by the sweeper | SQS queue with the same listener code |
 | Idempotency keys in Postgres | always fine | — |
-| Batch inference disabled | < 100 users active | flip `margai.ai.batch_min_records` |
+| Batch inference disabled | < 100 users active *(a latency choice since 2026-09-12, not a provider minimum)* | flip `margai.ai.batch_min_records`, and build the ledgered batch path (§4.11, D55) |
 
 ### 13.4 Decisions only the founder can take
 

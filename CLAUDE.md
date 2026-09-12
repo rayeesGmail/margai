@@ -43,10 +43,11 @@ open TODOs from the current /week task list, eval gate status. Summarize explora
 The block above is DEV_SPEC §13.2 verbatim, except for three approved deviations. Its "SPEC §3–5"
 citations now read "DEV_SPEC" (they were written when the Developer Spec was docs/SPEC.md). Hard
 rule 1 carries the D3 rewording the founder approved on 2026-09-04 (TECH_PLAN §0.4 #4: SPEC §6.2/§6.4
-verdicts show the correct option after an answer is recorded). And the AI stack line, the ai_calls
-hard rule and the API-key rule carry the provider switch the founder approved on 2026-09-12
-(DECISIONS, TECH_PLAN §4.11): Bedrock is blocked for this account, so model access is direct.
-DEV_SPEC §13 keeps its original wording as the historical record.
+verdicts show the correct option after an answer is recorded). And four lines carry the provider
+switch the founder approved on 2026-09-12 (DECISIONS, TECH_PLAN §4.11) — the AI stack line, the
+infra line (which now says "or provider API keys"), the ai_calls hard rule and the new API-key
+rule: Bedrock is blocked for this account, so model access is direct. DEV_SPEC §13 keeps its
+original wording as the historical record.
 
 ## Documents and precedence (read before proposing anything)
 1. docs/SPEC.md — Product Spec v2.0, **the contract**: behaviour, every screen and rule,

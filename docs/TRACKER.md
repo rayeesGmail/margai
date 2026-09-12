@@ -210,10 +210,40 @@ Built, in the approved order, each commit green: 6925a41 the adapters (Anthropic
   provider, AiLiveSmokeTest); 7f2cff4 the startup guards (the cache tripwire warns per prompt and
   tier, cache-min-tokens required, EmbeddingDimensionTest holds config and the migrations' vector(n)
   equal); 411095a the key patterns in detect-secrets.sh, the rotation runbook and CLAUDE.md;
-  <docs commit> SPEC §3, the TECH_PLAN AI sections with dated notes, six DECISIONS rows; then this
-  entry. `./mvnw verify` 392 tests green, 0 failures, 7 skipped; eval stamp re-run before each
-  AI-path commit; no migration was needed — ai_calls.model_id is VARCHAR(120), batch already exists,
-  and no vector column exists yet.
+  292374f SPEC §3, the TECH_PLAN AI sections with dated notes, six DECISIONS rows; 3530bce this
+  tracker, the rules and the READMEs; e7dc0e5 a gap found re-reading the wiring (the dormant path
+  needs the embedding provider moved with it too). `./mvnw verify` 392 tests green, 0 failures,
+  7 skipped; eval stamp re-run before each AI-path commit; no migration was needed —
+  ai_calls.model_id is VARCHAR(120), batch already exists, and no vector column exists yet.
+Then the spec-auditor ran on those commits and returned FAIL with five MAJOR findings, three of them
+  real defects rather than documentation drift. All fixed in the follow-up commit:
+  (1) **provider selection failed open** — both provider configurations are conditional on
+  margai.ai.provider, so one mistyped character in the deployed parameter matched neither and the
+  chain fell back to FakeAiClient *inside the live profile*: the app would have started normally and
+  served students fixtures, with no retrieval grounding, no verification, no honest fallback and one
+  log line as the only sign. Now a typed enum (the typo fails binding) plus a refusal when the live
+  profile has no provider client, both tested;
+  (2) **a long retry-after was discarded rather than capped**, so a provider asking for two minutes
+  got a retry in under a second — the opposite of the hint's purpose, and not what the javadoc said;
+  (3) **the batch probe was a billable call with no ai_calls row**, a hard rule with no test
+  exception — removed rather than carved out (see the deviation note above; it was in the approved
+  acceptance list, so the founder may want it back once D55 makes it ledgerable);
+  (4) three TECH_PLAN run commands still activated the deleted `bedrock` profile
+  (`nightly,bedrock`, `pipeline,bedrock`) — the nightly re-planner and the content pipeline would
+  have run on the fake and fabricated plans and extracted content silently;
+  (5) §7.2's component table still asserted Bedrock as the current provider and AWS Budgets as the
+  spend backstop, contradicting sections amended the same day.
+  From the MINOR list: BEDROCK_LIVE had survived as a second switch able to unlock billable calls on
+  its own, contradicting this session's own "no alias" row (the dormant smoke now needs AI_LIVE=1
+  plus a `-Dbedrock.smoke=true` selector); ModelIdLiteralTest was blind to the bare embedding ids the
+  switch introduced; the prompt-changelog entry was missing although the rule covers tier routing and
+  both the REASON model and the embedding model changed; stale "Bedrock" wording in §1.1's diagram,
+  §1.3, §1.4, §3.3, §4.1, §7.6, §8.1, §13.1, §13.3, PLAN D70 and seven javadoc / prompt-header spots;
+  §9.2 gained the provider keys it was already cited for; the DECISIONS dormant-path row now names
+  both config keys; CLAUDE.md's except-note counts the infra line as a fourth altered line.
+  Recorded, not fixed: this change also edited the auditor's own instructions, so the file that
+  defines the check is downstream of what it checks — worth a founder eye.
+  `./mvnw verify` after the fixes: 396 tests, 0 failures, 6 skipped.
 Deviation to flag, not hidden: the acceptance line asked for the batch probe to write an ai_calls row
   with the batch columns. It does not, and building that today would have been a bigger change than
   the approved plan — `completeBatch` fans out to `complete` at the **outermost** decorator, so a

@@ -272,7 +272,7 @@ tools; your reviews focus on output quality.)*
   ✅ *A day of simulated triggers never exceeds caps.*
 - **D69 —** Performance pass: cold start, Today load, solver latency streaming, low-end
   device test. ✅ *Spec p95 targets met on the cheap test phone.*
-- **D70 —** Failure drills: DB restore from backup, Bedrock outage behavior (honest
+- **D70 —** Failure drills: DB restore from backup, AI provider outage behavior (honest
   errors + queue), payment webhook replay. ✅ *Each drill scripted and passing.*
 - **D71 —** Security review checklist (auth, IDOR probes, rate limits, secrets scan,
   dependency audit). ✅ *Checklist committed with findings fixed.*

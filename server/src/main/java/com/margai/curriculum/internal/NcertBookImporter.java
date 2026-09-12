@@ -1,5 +1,6 @@
 package com.margai.curriculum.internal;
 
+import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.CurriculumImportException;
 import com.margai.curriculum.api.NcertBookRow;
 import com.margai.curriculum.api.NcertRegisterReport;
@@ -23,6 +24,14 @@ class NcertBookImporter {
 
     NcertBookImporter(NcertBookRepository books) {
         this.books = books;
+    }
+
+    void recordRenderedPages(String bookCode, BookLanguage language, int pages) {
+        NcertBook book = books.findByCode(bookCode)
+                .orElseThrow(() -> new CurriculumImportException(
+                        "book '" + bookCode + "' is not registered — run `ncert register` first"));
+        book.applyRenderedPages(language, pages);
+        books.flush();
     }
 
     NcertRegisterReport register(List<NcertBookRow> rows) {

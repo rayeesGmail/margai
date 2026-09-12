@@ -2,6 +2,7 @@ package com.margai.curriculum.internal;
 
 import com.margai.curriculum.api.ArchetypeTrackRow;
 import com.margai.curriculum.api.BackboneLoadReport;
+import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.CutoffLoadReport;
 import com.margai.curriculum.api.CutoffRow;
@@ -64,5 +65,10 @@ class CurriculumImportService implements CurriculumImport {
     @Override
     public NcertRegisterReport registerBooks(List<NcertBookRow> rows) {
         return ncertBooks.register(rows);
+    }
+
+    @Override
+    public void recordRenderedPages(String bookCode, BookLanguage language, int pages) {
+        ncertBooks.recordRenderedPages(bookCode, language, pages);
     }
 }

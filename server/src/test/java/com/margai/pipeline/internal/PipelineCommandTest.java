@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.margai.common.api.AttemptType;
 import com.margai.curriculum.api.ArchetypeTrackRow;
 import com.margai.curriculum.api.BackboneLoadReport;
+import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.CurriculumImportException;
 import com.margai.curriculum.api.CutoffLoadReport;
@@ -20,6 +21,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +72,10 @@ class PipelineCommandTest {
                 }
                 if (cls == NcertRegisterCommand.class) {
                     return cls.cast(new NcertRegisterCommand(imports, writer));
+                }
+                if (cls == NcertRenderCommand.class) {
+                    return cls.cast(new NcertRenderCommand(new NcertRenderCommandTest.RecordingStore(), imports,
+                            new PipelineProperties(72, 10), writer));
                 }
                 return CommandLine.defaultFactory().create(cls);
             }
@@ -240,6 +246,7 @@ class PipelineCommandTest {
         List<ArchetypeTrackRow> tracks;
         List<CutoffRow> cutoffs;
         List<NcertBookRow> books;
+        final List<String> renderedPages = new ArrayList<>();
         RuntimeException failure;
 
         @Override
@@ -276,6 +283,11 @@ class PipelineCommandTest {
         public NcertRegisterReport registerBooks(List<NcertBookRow> rows) {
             books = rows;
             return new NcertRegisterReport(rows.size(), 0, 0, List.of());
+        }
+
+        @Override
+        public void recordRenderedPages(String bookCode, BookLanguage language, int pages) {
+            renderedPages.add(bookCode + " " + language + " " + pages);
         }
     }
 }

@@ -13,6 +13,11 @@ margai:
   # default chain — AWS_PROFILE=margai on the laptop (TECH_PLAN §7.4).
   storage:
     content-bucket: margai-beta-content
+  pipeline:
+    # 150 DPI puts an A4 page at about 1240×1754 — just under the provider's 1568-pixel long-edge
+    # limit, above which it downscales before the model sees the image (§6.1).
+    render-dpi: 150
+    extract-batch-size: 10
   ai:
     budget:
       # A pipeline day is not a student day: extracting two pilot books is ~450 VISION calls in

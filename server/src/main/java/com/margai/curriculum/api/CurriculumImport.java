@@ -45,4 +45,10 @@ public interface CurriculumImport {
      * "Class 11 Physics Part-I" means, which two books would make ambiguous.
      */
     NcertRegisterReport registerBooks(List<NcertBookRow> rows);
+
+    /**
+     * {@code ncert render} (D14): the page count of one edition, which the coverage percentage at
+     * {@code ncert load} divides by. Refused when the book is not registered.
+     */
+    void recordRenderedPages(String bookCode, BookLanguage language, int pages);
 }

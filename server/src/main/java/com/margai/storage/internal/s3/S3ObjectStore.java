@@ -21,7 +21,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
  * the SDK's default chain — the Identity Center profile {@code margai} on a laptop, the task role
  * in AWS (DECISIONS 2026-09-12 F8) — never from configuration.
  */
-class S3ObjectStore implements ObjectStore {
+class S3ObjectStore implements ObjectStore, AutoCloseable {
 
     private final S3Client s3;
     private final String bucket;
@@ -90,5 +90,11 @@ class S3ObjectStore implements ObjectStore {
     @Override
     public String describe() {
         return "s3://" + bucket;
+    }
+
+    /** Spring's default destroy-method inference finds this and closes the SDK client on shutdown. */
+    @Override
+    public void close() {
+        s3.close();
     }
 }

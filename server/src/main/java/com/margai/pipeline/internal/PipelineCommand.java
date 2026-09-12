@@ -73,7 +73,7 @@ final class PipelineCommand implements Runnable {
 
     @Command(name = "ncert", mixinStandardHelpOptions = true,
             description = "The NCERT layer: register the books, render their pages, extract and load paragraphs (D14–D16).",
-            subcommands = {NcertRegisterCommand.class})
+            subcommands = {NcertRegisterCommand.class, NcertRenderCommand.class})
     static final class Ncert implements Runnable {
 
         @Spec

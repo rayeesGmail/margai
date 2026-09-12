@@ -79,12 +79,23 @@ AWS_PROFILE=margai DB_URL=… \
   ncert load --book bio11 --lang en
 ```
 
-No model, no cost. Upserts on the paragraph address and reports coverage per chapter and for the
-book. A paragraph that straddles a page break is joined into one row carrying both page numbers.
+No model, no cost. Upserts on the paragraph address. A paragraph that straddles a page break — with
+or without a figure page in between — is joined into one row carrying every page it came from.
 
-Coverage counts pages that produced text against pages extracted, so chapter-opening plates and
-full-page figures pull it below 100% legitimately. What matters is that no chapter is near zero —
-that would mean the pages were rendered but not read.
+The report gives two different numbers, and they answer different questions:
+
+- **Coverage** = pages extracted ÷ pages rendered. This is the D14/D15 ✅ number: it asks whether
+  the whole book was read. Anything below 100% on a whole-book load prints `INCOMPLETE` and names
+  how many pages are missing — run `ncert extract` again before trusting the load.
+- **Text yield** (per chapter) = pages that produced paragraphs ÷ pages extracted. This is expected
+  to sit below 100%: chapter-opening plates, full-page figures and exercise pages produce nothing
+  and are read correctly. What matters is that no chapter is near *zero*, which would mean pages
+  were rendered but not read.
+
+The load refuses rather than guesses. It stops, names the page and prints the `--redo` that fixes
+it, when a section does not belong to its chapter, when a section is not a printed section number,
+when a paragraph number is out of range, or when two different paragraphs claim one address — the
+signature of a page whose numbering restarted. Nothing is written when it refuses.
 
 ## The D14 ✅ — 20 random paragraphs against the PDFs
 

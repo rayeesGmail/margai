@@ -119,11 +119,13 @@ class NcertLoadCommand extends NcertBookCommand {
      * page it came from, and carries the lowest confidence of them — a paragraph is only as
      * trustworthy as the least certain page it was read from.
      *
-     * <p>Only a genuine continuation is joined: the same address, on the page immediately after,
-     * as that page's first paragraph. Any other collision means the extraction numbered two
+     * <p>Only a genuine continuation is joined: the same address, as that page's first paragraph,
+     * with nothing but text-free pages in between. The gap matters — a paragraph can run from page
+     * 10 to page 12 across a full-page figure, and requiring strict adjacency refused that
+     * legitimate book (spec-auditor, D14). Any other collision means the extraction numbered two
      * different paragraphs the same — the failure mode of a model that restarts at 1 on every page
      * — and it fails the run by name instead of quietly concatenating unrelated text, which is
-     * what a 20-paragraph spot check would not catch (spec-auditor, D14).
+     * what a 20-paragraph spot check would not catch.
      */
     static List<NcertParagraphRow> join(List<ExtractedPage> pages) {
         Map<String, Joined> byAddress = new LinkedHashMap<>();
@@ -131,16 +133,16 @@ class NcertLoadCommand extends NcertBookCommand {
             List<NcertPage.Paragraph> paragraphs = page.paragraphs();
             for (int index = 0; index < paragraphs.size(); index++) {
                 NcertPage.Paragraph paragraph = paragraphs.get(index);
-                check(page, paragraph);
-                String address = page.chapterNo() + " " + paragraph.section() + " " + paragraph.paraNo();
+                String section = check(page, paragraph);
+                String address = page.chapterNo() + " " + section + " " + paragraph.paraNo();
                 Joined joined = byAddress.get(address);
                 if (joined == null) {
-                    byAddress.put(address, new Joined(page.chapterNo(), paragraph, page));
+                    byAddress.put(address, new Joined(page.chapterNo(), section, paragraph, page));
                     continue;
                 }
-                if (index != 0 || page.page() != joined.lastPage() + 1) {
-                    throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
-                            "ch " + page.chapterNo() + " §" + paragraph.section() + " ¶" + paragraph.paraNo()
+                if (index != 0 || textBetween(pages, page.chapterNo(), joined.lastPage(), page.page())) {
+                    throw new InputFormatException(Path.of(ContentKeys.EXTRACT), 0,
+                            "ch " + page.chapterNo() + " §" + section + " ¶" + paragraph.paraNo()
                                     + " is claimed by page " + joined.lastPage() + " and page " + page.page()
                                     + ", which cannot be one paragraph continuing across a page break — "
                                     + "re-extract those pages (`ncert extract --redo --chapters "
@@ -153,50 +155,78 @@ class NcertLoadCommand extends NcertBookCommand {
     }
 
     /**
+     * Whether any page strictly between these two carried text. A figure page between two halves of
+     * a paragraph is not a break in the paragraph; a page of prose between them means the two are
+     * different paragraphs that were given the same number.
+     */
+    private static boolean textBetween(List<ExtractedPage> pages, short chapter, int from, int to) {
+        return pages.stream().anyMatch(page -> page.chapterNo() == chapter
+                && page.page() > from && page.page() < to
+                && !page.paragraphs().isEmpty());
+    }
+
+    /**
      * The model's own fields, checked before they reach the schema — the same strictness every D13
      * reader applies to a founder's file (DECISIONS 2026-09-12 D13), and for a sharper reason: the
      * section is what the app shows as the anchor a student taps (SPEC §6.3), so a section that
      * does not belong to this chapter is a student sent to the wrong page of a book they are
      * holding. Refusing by name beats a raw constraint violation at the end of a 260-page load.
      */
-    private static void check(ExtractedPage page, NcertPage.Paragraph paragraph) {
+    private static String check(ExtractedPage page, NcertPage.Paragraph paragraph) {
         String where = "ch " + page.chapterNo() + " page " + page.page() + ": ";
+        // Normalised once and returned, so the address, the stored row and these checks all use the
+        // same string: validating the stripped value while keying on the raw one let "7.9 " pass
+        // every guard, split a section in two and slip past the collision check (spec-auditor, D14).
         String section = paragraph.section() == null ? "" : paragraph.section().strip();
         if (section.isEmpty()) {
-            throw refuse(where + "a paragraph has no section");
+            throw refuse(page, where + "a paragraph has no section");
         }
         if (section.length() > SECTION_MAX_LENGTH) {
-            throw refuse(where + "section '" + section + "' is longer than " + SECTION_MAX_LENGTH + " characters");
+            throw refuse(page, where + "section '" + section + "' is longer than "
+                    + SECTION_MAX_LENGTH + " characters");
         }
         if (!SECTION.matcher(section).matches()) {
-            throw refuse(where + "section '" + section + "' is not a printed section number");
+            throw refuse(page, where + "section '" + section + "' is not a printed section number");
         }
         String chapterOfSection = section.contains(".") ? section.substring(0, section.indexOf('.')) : section;
         if (!chapterOfSection.equals(String.valueOf(page.chapterNo()))) {
-            throw refuse(where + "section '" + section + "' belongs to chapter " + chapterOfSection
+            throw refuse(page, where + "section '" + section + "' belongs to chapter " + chapterOfSection
                     + ", not to chapter " + page.chapterNo() + " — the page was read as the wrong chapter");
         }
         if (paragraph.paraNo() < 1 || paragraph.paraNo() > PARA_NO_MAX) {
-            throw refuse(where + "§" + section + " has paragraph number " + paragraph.paraNo());
+            throw refuse(page, where + "§" + section + " has paragraph number " + paragraph.paraNo());
         }
         if (paragraph.text() == null || paragraph.text().isBlank()) {
-            throw refuse(where + "§" + section + " ¶" + paragraph.paraNo() + " has no text");
+            throw refuse(page, where + "§" + section + " ¶" + paragraph.paraNo() + " has no text");
         }
+        return section;
     }
 
-    private static InputFormatException refuse(String reason) {
+    /** The remedy names the offending page and its chapter: `--pages N` alone re-extracts page N of every chapter. */
+    private static InputFormatException refuse(ExtractedPage page, String reason) {
         return new InputFormatException(Path.of(ContentKeys.EXTRACT), 0, reason
-                + " — re-extract that page (`ncert extract --redo --pages N`) or fix the prompt");
+                + " — re-extract that page (`ncert extract --redo --chapters " + page.chapterNo()
+                + " --pages " + page.page() + "`) or fix the prompt");
     }
 
+    /**
+     * A ratio the founder reads as a percentage. It is capped at 100 and flagged when the parts
+     * exceed the whole — an extraction holding pages a later render no longer produces (a reprint
+     * with fewer pages, a stale JSONL) is a state to notice, not to report as 112% coverage.
+     */
     private static String percent(long part, long whole) {
-        return whole == 0 ? "—" : "%.1f%%".formatted(100.0 * part / whole);
+        if (whole == 0) {
+            return "—";
+        }
+        return part > whole ? "100% (stale: " + part + " extracted of " + whole + " rendered)"
+                : "%.1f%%".formatted(100.0 * part / whole);
     }
 
     /** One paragraph while its halves are still arriving. */
     private static final class Joined {
 
         private final short chapterNo;
+        private final String section;
         private final NcertPage.Paragraph first;
         private final StringBuilder text = new StringBuilder();
         private final List<Integer> pages = new ArrayList<>();
@@ -205,8 +235,9 @@ class NcertLoadCommand extends NcertBookCommand {
         private UUID aiCallId;
         private boolean hasEquations;
 
-        private Joined(short chapterNo, NcertPage.Paragraph first, ExtractedPage page) {
+        private Joined(short chapterNo, String section, NcertPage.Paragraph first, ExtractedPage page) {
             this.chapterNo = chapterNo;
+            this.section = section;
             this.first = first;
             add(page, first);
         }
@@ -232,7 +263,7 @@ class NcertLoadCommand extends NcertBookCommand {
         }
 
         private NcertParagraphRow row() {
-            return new NcertParagraphRow(chapterNo, first.section(), (short) first.paraNo(), text.toString(),
+            return new NcertParagraphRow(chapterNo, section, (short) first.paraNo(), text.toString(),
                     hasEquations, figureRefs, new ParagraphExtraction(pages, confidence, aiCallId));
         }
     }

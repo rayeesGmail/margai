@@ -21,10 +21,19 @@ public record PreviousPage(String section, int paraNo, String tail) {
         return null;
     }
 
-    /** What {@code page} leaves behind for the next call, or null when it carried no paragraphs. */
-    public static PreviousPage of(NcertPage page) {
+    /**
+     * What {@code page} leaves behind for the next call, given what the page before it left.
+     *
+     * <p>A page with no paragraphs — a chapter plate, a full-page figure, a blank verso, a page of
+     * pure table — does not reset the address: it carries the running section and paragraph number
+     * across untouched and drops only the tail, because there is no text on it for the next page to
+     * continue from. Letting such a page return nothing was the first fix's own defect: the next
+     * page would have restarted numbering at 1, which is the failure the address was added to
+     * prevent, and figure pages are common mid-chapter in Biology (spec-auditor, D14).
+     */
+    public static PreviousPage of(NcertPage page, PreviousPage before) {
         if (page.paragraphs().isEmpty()) {
-            return null;
+            return before == null ? null : new PreviousPage(before.section(), before.paraNo(), null);
         }
         NcertPage.Paragraph last = page.paragraphs().getLast();
         return new PreviousPage(last.section(), last.paraNo(), page.tail());

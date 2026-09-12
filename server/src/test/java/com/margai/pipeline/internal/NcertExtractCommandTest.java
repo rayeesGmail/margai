@@ -115,6 +115,23 @@ class NcertExtractCommandTest {
         assertThat(extract.addresses).containsExactly(null, "7.9 ¶1", null);
     }
 
+    /**
+     * A figure page must not reset the address: it has no text of its own, so it carries the
+     * running section and paragraph number across and drops only the tail. Without this the next
+     * page restarts at 1 — the original blocker, reintroduced by its own first fix.
+     */
+    @Test
+    void aTextFreePageCarriesTheAddressAcrossAndDropsOnlyTheTail() {
+        page(8, 3);
+        extract.empty.add("8/2");
+
+        assertThat(run()).isZero();
+
+        assertThat(extract.calls).containsExactly("8/1", "8/2", "8/3", "9/1");
+        assertThat(extract.addresses).containsExactly(null, "7.9 ¶1", "7.9 ¶1", null);
+        assertThat(extract.tails).containsExactly(null, "text of 8/1", null, null);
+    }
+
     /** A resumed run must continue the numbering too, not restart it at the first uncalled page. */
     @Test
     void aResumedRunCarriesTheAddressFromThePageAlreadyInTheJsonl() {
@@ -137,6 +154,26 @@ class NcertExtractCommandTest {
 
         assertThat(extract.calls).isEmpty();
         assertThat(out.toString()).contains("| 3 | 0 | 3 | 3 |");
+    }
+
+    /**
+     * The remedy a load refusal prints is `--redo --chapters C --pages N`. If a `--pages`-filtered
+     * page did not advance the address, that command would call page N with nothing to continue
+     * from, the model would restart at 1, and the founder would pay to reproduce the same collision
+     * (spec-auditor, D14).
+     */
+    @Test
+    void aTargetedRedoStillCarriesTheAddressFromTheSkippedPages() {
+        run();
+        extract.calls.clear();
+        extract.addresses.clear();
+
+        assertThat(commandLine.execute("ncert", "extract", "--book", "phy11-part2", "--redo",
+                "--chapters", "8", "--pages", "2",
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(extract.calls).containsExactly("8/2");
+        assertThat(extract.addresses).containsExactly("7.9 ¶1");
     }
 
     @Test

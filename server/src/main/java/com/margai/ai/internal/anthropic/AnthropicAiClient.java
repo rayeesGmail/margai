@@ -99,7 +99,7 @@ public final class AnthropicAiClient implements CompletionClient {
         if (stopReason.toLowerCase(Locale.ROOT).contains("max_tokens")) {
             throw new InvalidOutputException(List.of("the answer was cut off at the output-token limit ("
                     + usage.outputTokens() + " tokens) — raise margai.ai.max-output-tokens for this workload"),
-                    null, usage, modelId);
+                    null, usage, modelId, false);
         }
         for (ContentBlock block : response.content()) {
             Optional<ToolUseBlock> toolUse = block.toolUse();

@@ -161,6 +161,71 @@ class NcertLoadCommandTest {
         assertThat(imports.rows).isNull();
     }
 
+    /** A paragraph may legitimately run from page 10 to page 12 across a full-page figure. */
+    @Test
+    void aParagraphContinuesAcrossAnInterveningFigurePage() {
+        imports.renderedPagesAnswer = 3;
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "A sentence that runs on")),
+                page(7, 2, "0.99"),
+                page(7, 3, "0.95", paragraph("7.1", 1, "and finishes after the figure.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).hasSize(1);
+        assertThat(imports.rows.getFirst().text())
+                .isEqualTo("A sentence that runs on and finishes after the figure.");
+        assertThat(imports.rows.getFirst().extraction().pages()).containsExactly(1, 3);
+    }
+
+    /** But a page of prose in between means they are two different paragraphs, not one. */
+    @Test
+    void aParagraphSeparatedByAPageOfTextIsACollision() {
+        imports.renderedPagesAnswer = 3;
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first.")),
+                page(7, 2, "0.95", paragraph("7.1", 2, "The second.")),
+                page(7, 3, "0.95", paragraph("7.1", 1, "Restarted at one.")));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("is claimed by page 1 and page 3");
+    }
+
+    /** Validating a stripped section while keying on the raw one split a section in two. */
+    @Test
+    void aSectionIsNormalisedOnceSoWhitespaceCannotSplitIt() {
+        imports.renderedPagesAnswer = 2;
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "First half")),
+                page(7, 2, "0.95", paragraph(" 7.1 ", 1, "and second half.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).hasSize(1);
+        assertThat(imports.rows.getFirst().section()).isEqualTo("7.1");
+        assertThat(imports.rows.getFirst().text()).isEqualTo("First half and second half.");
+    }
+
+    @Test
+    void aRefusalNamesTheChapterAndThePageToReExtract() {
+        imports.renderedPagesAnswer = 1;
+        jsonl(page(7, 4, "0.95", paragraph("12.4", 1, "Wrong chapter.")));
+
+        run();
+
+        assertThat(out.toString()).contains("ncert extract --redo --chapters 7 --pages 4");
+    }
+
+    @Test
+    void anExtractionHoldingMorePagesThanWereRenderedIsFlaggedNotReportedOverAHundred() {
+        imports.renderedPagesAnswer = 2;
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "One.")),
+                page(7, 2, "0.95", paragraph("7.2", 1, "Two.")),
+                page(7, 3, "0.95", paragraph("7.3", 1, "Three.")));
+
+        run();
+
+        assertThat(out.toString()).contains("100% (stale: 3 extracted of 2 rendered)");
+    }
+
     @Test
     void aSectionFromAnotherChapterFailsTheRun() {
         imports.renderedPagesAnswer = 1;

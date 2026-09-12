@@ -10,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -96,12 +95,21 @@ public class NcertParagraph {
      * the column of the edition being loaded, so loading Hindi at D16 leaves the English text
      * standing. Returns whether anything changed.
      */
+    /**
+     * The edition being loaded supplies the text, its own provenance, and the paragraph's figure
+     * references and equation flag.
+     *
+     * <p>Those last two are <em>replaced</em>, not merged. Merging them across loads looked kinder
+     * — the two editions print the same figures — but it made the load non-idempotent within one
+     * edition: a re-extraction correcting a hallucinated {@code Fig. 7.9} could never clear it, and
+     * because {@code changed} compared against the merged value the report called the row
+     * unchanged while discarding the correction (spec-auditor, D14). `--redo` then `load` is the
+     * founder's only remedy for a bad page, so the current JSONL has to win outright.
+     */
     public boolean apply(NcertParagraphRow row, BookLanguage language) {
-        List<String> mergedRefs = mergeFigureRefs(row.figureRefs());
-        boolean mergedEquations = hasEquations || row.hasEquations();
         boolean changed = !Objects.equals(text(language), row.text())
-                || hasEquations != mergedEquations
-                || !Objects.equals(figureRefs, mergedRefs)
+                || hasEquations != row.hasEquations()
+                || !Objects.equals(figureRefs, row.figureRefs())
                 || !Objects.equals(extraction.get(language), row.extraction());
         if (changed) {
             if (language == BookLanguage.en) {
@@ -109,25 +117,13 @@ public class NcertParagraph {
             } else {
                 this.textHi = row.text();
             }
-            // Both editions print the same paragraph, so these describe it rather than one reading
-            // of it: union the figures and keep an equation seen in either, instead of letting the
-            // second edition loaded erase what the first found.
-            this.hasEquations = mergedEquations;
-            this.figureRefs = mergedRefs;
+            this.hasEquations = row.hasEquations();
+            this.figureRefs = row.figureRefs();
             Map<BookLanguage, ParagraphExtraction> updated = new EnumMap<>(extraction);
             updated.put(language, row.extraction());
             this.extraction = updated;
         }
         return changed;
-    }
-
-    private List<String> mergeFigureRefs(List<String> incoming) {
-        if (figureRefs == null || figureRefs.isEmpty()) {
-            return incoming;
-        }
-        List<String> merged = new ArrayList<>(figureRefs);
-        incoming.stream().filter(ref -> !merged.contains(ref)).forEach(merged::add);
-        return merged;
     }
 
     public String text(BookLanguage language) {

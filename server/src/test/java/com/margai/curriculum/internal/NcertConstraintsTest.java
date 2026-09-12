@@ -91,6 +91,28 @@ class NcertConstraintsTest {
     }
 
     /**
+     * A re-load must be able to correct a hallucinated figure reference. Merging figure refs across
+     * loads made that impossible and reported the row unchanged while discarding the correction
+     * (spec-auditor, D14), so the current extraction wins outright.
+     */
+    @Test
+    void aReloadCorrectsFigureRefsAndEquationsRatherThanAccumulatingThem() {
+        NcertBook book = books.saveAndFlush(new NcertBook(book("phy11-part1")));
+        NcertParagraph paragraph = paragraphs.saveAndFlush(new NcertParagraph(book.getId(),
+                new NcertParagraphRow((short) 7, "7.9", (short) 1, "Text.", true,
+                        List.of("Fig. 7.9", "Fig. 7.10"), extraction()),
+                BookLanguage.en));
+
+        boolean changed = paragraph.apply(new NcertParagraphRow((short) 7, "7.9", (short) 1, "Text.", false,
+                List.of("Fig. 7.9"), extraction()), BookLanguage.en);
+        paragraphs.saveAndFlush(paragraph);
+
+        assertThat(changed).isTrue();
+        assertThat(paragraph.getFigureRefs()).containsExactly("Fig. 7.9");
+        assertThat(paragraph.isHasEquations()).isFalse();
+    }
+
+    /**
      * The row record refuses null text, so a textless paragraph cannot be built through the api at
      * all; this pins the database's own guard against anything that writes around it.
      */

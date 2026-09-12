@@ -73,17 +73,33 @@ class PageExtractTaskTest {
         NcertPage page = task.read("Physics Part-I, Textbook for Class XI", (short) 7, 12, image(),
                 PreviousPage.none(), new AiCallContext(null, UUID.randomUUID().toString(), false)).output();
 
-        PreviousPage previous = PreviousPage.of(page);
+        PreviousPage previous = PreviousPage.of(page, PreviousPage.none());
 
         assertThat(previous.section()).isEqualTo("7.9");
         assertThat(previous.paraNo()).isEqualTo(2);
         assertThat(previous.tail()).isEqualTo(page.paragraphs().getLast().text());
     }
 
+    /**
+     * A text-free page keeps the address and drops the tail: a chapter plate or a full-page figure
+     * mid-section must not send the next page back to paragraph 1 (spec-auditor, D14).
+     */
     @Test
-    void aPageWithNoParagraphsHandsNothingForward() {
-        assertThat(PreviousPage.of(new NcertPage(List.of(), BigDecimal.ONE))).isNull();
-        assertThat(new NcertPage(List.of(), BigDecimal.ONE).tail()).isNull();
+    void aPageWithNoParagraphsCarriesTheAddressAcrossWithoutATail() {
+        NcertPage empty = new NcertPage(List.of(), BigDecimal.ONE);
+        PreviousPage before = new PreviousPage("7.9", 4, "the text of the page before");
+
+        PreviousPage after = PreviousPage.of(empty, before);
+
+        assertThat(after.section()).isEqualTo("7.9");
+        assertThat(after.paraNo()).isEqualTo(4);
+        assertThat(after.tail()).isNull();
+        assertThat(empty.tail()).isNull();
+    }
+
+    @Test
+    void aTextFreeFirstPageOfAChapterStillHandsNothingForward() {
+        assertThat(PreviousPage.of(new NcertPage(List.of(), BigDecimal.ONE), PreviousPage.none())).isNull();
     }
 
     @Test

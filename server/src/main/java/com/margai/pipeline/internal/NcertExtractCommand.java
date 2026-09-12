@@ -94,14 +94,20 @@ class NcertExtractCommand extends NcertBookCommand {
             PreviousPage previous = PreviousPage.none();
             for (String pageKey : pageKeys) {
                 int page = ContentKeys.pageNumber(pageKey);
+                ExtractedPage existing = done.get(chapter.no() + "/" + page);
+                // A page this run is not calling for still advances the address, when we know it:
+                // otherwise `--pages 3` would call page 3 with no previous address, the model would
+                // restart numbering, and the collision the founder was re-extracting to fix would
+                // come straight back — the remedy printed by the load's refusal could never work
+                // (spec-auditor, D14).
                 if (pages != null && !pages.isEmpty() && !pages.contains(page)) {
+                    previous = existing == null ? null : previousOf(existing, previous);
                     continue;
                 }
-                ExtractedPage existing = done.get(chapter.no() + "/" + page);
                 if (existing != null && !redo) {
                     skipped++;
                     chapterParagraphs += existing.paragraphs().size();
-                    previous = previousOf(existing);
+                    previous = previousOf(existing, previous);
                     continue;
                 }
                 AiResponse<NcertPage> response = extract.read(definition.row().titleEn(), chapter.no(), page,
@@ -111,7 +117,7 @@ class NcertExtractCommand extends NcertBookCommand {
                 called++;
                 chapterCalled++;
                 chapterParagraphs += read.paragraphs().size();
-                previous = PreviousPage.of(response.output());
+                previous = PreviousPage.of(response.output(), previous);
                 if (read.confidence() != null && read.confidence().compareTo(LOW_CONFIDENCE) < 0) {
                     lowConfidence.add("ch " + chapter.no() + " page " + page + " — confidence "
                             + read.confidence() + ", " + read.paragraphs().size() + " paragraphs");
@@ -155,7 +161,7 @@ class NcertExtractCommand extends NcertBookCommand {
     }
 
     /** Where a page already in the JSONL left off, so a resumed run continues the numbering too. */
-    private static PreviousPage previousOf(ExtractedPage page) {
-        return PreviousPage.of(new NcertPage(page.paragraphs(), page.confidence()));
+    private static PreviousPage previousOf(ExtractedPage page, PreviousPage before) {
+        return PreviousPage.of(new NcertPage(page.paragraphs(), page.confidence()), before);
     }
 }

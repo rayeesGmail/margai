@@ -68,29 +68,14 @@ class NcertRenderCommandTest {
 
         Reports writer = new Reports(ReportTest.CLOCK);
         PipelineProperties properties = new PipelineProperties(72, 10);
+        CommandLine.IFactory siblings = PipelineCommandTest.siblingFactory(imports, writer);
         CommandLine.IFactory factory = new CommandLine.IFactory() {
             @Override
             public <K> K create(Class<K> cls) throws Exception {
                 if (cls == NcertRenderCommand.class) {
                     return cls.cast(new NcertRenderCommand(store, imports, properties, writer));
                 }
-                // picocli builds the whole tree, so every sibling leaf needs its constructor too.
-                if (cls == NcertRegisterCommand.class) {
-                    return cls.cast(new NcertRegisterCommand(imports, writer));
-                }
-                if (cls == TaxonomyLoadCommand.class) {
-                    return cls.cast(new TaxonomyLoadCommand(imports, writer));
-                }
-                if (cls == TaxonomyPrerequisitesCommand.class) {
-                    return cls.cast(new TaxonomyPrerequisitesCommand(imports, writer));
-                }
-                if (cls == BackboneLoadCommand.class) {
-                    return cls.cast(new BackboneLoadCommand(imports, writer));
-                }
-                if (cls == CutoffsLoadCommand.class) {
-                    return cls.cast(new CutoffsLoadCommand(imports, writer));
-                }
-                return CommandLine.defaultFactory().create(cls);
+                return siblings.create(cls);
             }
         };
         PrintWriter writerOut = new PrintWriter(out, true);

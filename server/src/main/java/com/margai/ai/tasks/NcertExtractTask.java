@@ -26,10 +26,7 @@ import org.springframework.stereotype.Component;
  * file sequence (DECISIONS D14).
  */
 @Component
-public class NcertExtractTask {
-
-    /** How much of the previous page travels with the next call. Enough for a long paragraph. */
-    static final int TAIL_LENGTH = 600;
+public class NcertExtractTask implements NcertPageExtractor {
 
     private final AiClient ai;
     private final PromptRef prompt;
@@ -39,15 +36,7 @@ public class NcertExtractTask {
         this.prompt = prompts.require("ncert_extract");
     }
 
-    /**
-     * Reads one page.
-     *
-     * @param bookTitle    the book as printed on its cover, for the model's orientation
-     * @param chapter      the chapter number printed in the book
-     * @param page         the 1-based page within the chapter's source PDF
-     * @param image        the rendered page
-     * @param previousTail the tail of the previous page's last paragraph, or null for the first
-     */
+    @Override
     public AiResponse<NcertPage> read(String bookTitle, short chapter, int page, ImagePart image,
             String previousTail, AiCallContext ctx) {
         Map<String, Object> variables = new LinkedHashMap<>();
@@ -58,14 +47,5 @@ public class NcertExtractTask {
         return ai.complete(AiRequest.of(AiFeature.pipeline_extract, Tier.vision, prompt, variables,
                         NcertPage.class, ctx)
                 .withImages(List.of(image)));
-    }
-
-    /** The tail of a page's text, as the next page's call will receive it. */
-    public static String tailOf(NcertPage page) {
-        if (page.paragraphs().isEmpty()) {
-            return null;
-        }
-        String text = page.paragraphs().getLast().text();
-        return text.length() <= TAIL_LENGTH ? text : text.substring(text.length() - TAIL_LENGTH);
     }
 }

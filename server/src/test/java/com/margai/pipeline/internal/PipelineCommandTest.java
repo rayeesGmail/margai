@@ -55,32 +55,7 @@ class PipelineCommandTest {
     @BeforeEach
     void commandLine() {
         Reports writer = new Reports(ReportTest.CLOCK);
-        CommandLine.IFactory factory = new CommandLine.IFactory() {
-            @Override
-            public <K> K create(Class<K> cls) throws Exception {
-                if (cls == TaxonomyLoadCommand.class) {
-                    return cls.cast(new TaxonomyLoadCommand(imports, writer));
-                }
-                if (cls == TaxonomyPrerequisitesCommand.class) {
-                    return cls.cast(new TaxonomyPrerequisitesCommand(imports, writer));
-                }
-                if (cls == BackboneLoadCommand.class) {
-                    return cls.cast(new BackboneLoadCommand(imports, writer));
-                }
-                if (cls == CutoffsLoadCommand.class) {
-                    return cls.cast(new CutoffsLoadCommand(imports, writer));
-                }
-                if (cls == NcertRegisterCommand.class) {
-                    return cls.cast(new NcertRegisterCommand(imports, writer));
-                }
-                if (cls == NcertRenderCommand.class) {
-                    return cls.cast(new NcertRenderCommand(new NcertRenderCommandTest.RecordingStore(), imports,
-                            new PipelineProperties(72, 10), writer));
-                }
-                return CommandLine.defaultFactory().create(cls);
-            }
-        };
-        commandLine = PipelineRunner.commandLine(factory)
+        commandLine = PipelineRunner.commandLine(siblingFactory(imports, writer))
                 .setOut(new PrintWriter(out, true))
                 .setErr(new PrintWriter(err, true));
     }
@@ -233,6 +208,44 @@ class PipelineCommandTest {
 
     private int run(String group, String command) {
         return commandLine.execute(group, command, "--inputs", inputs.toString(), "--reports", reports.toString());
+    }
+
+    /**
+     * The leaf commands every test in this package needs picocli to be able to build, whatever it
+     * is actually exercising: the tree is constructed whole, so a sibling without a constructor
+     * fails the run before the command under test is reached.
+     */
+    static CommandLine.IFactory siblingFactory(CurriculumImport imports, Reports writer) {
+        return new CommandLine.IFactory() {
+            @Override
+            public <K> K create(Class<K> cls) throws Exception {
+                if (cls == TaxonomyLoadCommand.class) {
+                    return cls.cast(new TaxonomyLoadCommand(imports, writer));
+                }
+                if (cls == TaxonomyPrerequisitesCommand.class) {
+                    return cls.cast(new TaxonomyPrerequisitesCommand(imports, writer));
+                }
+                if (cls == BackboneLoadCommand.class) {
+                    return cls.cast(new BackboneLoadCommand(imports, writer));
+                }
+                if (cls == CutoffsLoadCommand.class) {
+                    return cls.cast(new CutoffsLoadCommand(imports, writer));
+                }
+                if (cls == NcertRegisterCommand.class) {
+                    return cls.cast(new NcertRegisterCommand(imports, writer));
+                }
+                if (cls == NcertRenderCommand.class) {
+                    return cls.cast(new NcertRenderCommand(new NcertRenderCommandTest.RecordingStore(), imports,
+                            new PipelineProperties(72, 10), writer));
+                }
+                if (cls == NcertExtractCommand.class) {
+                    return cls.cast(new NcertExtractCommand(new NcertRenderCommandTest.RecordingStore(),
+                            new NcertExtractCommandTest.RecordingExtract(), new NcertExtractCommandTest.StubSpend(),
+                            new PipelineProperties(72, 10), writer));
+                }
+                return CommandLine.defaultFactory().create(cls);
+            }
+        };
     }
 
     /**

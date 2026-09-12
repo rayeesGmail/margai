@@ -23,4 +23,11 @@ paths:
   ledger, batched through `completeBatch` above the configured minimum (§4.11); generated solutions
   are `verified=false` until the verification pass passes.
 - Every run prints a coverage/quality report the founder can spot-check (PLAN.md D13–D22 ✅ checks).
-- Source PDFs and large artefacts live in S3 `content/`, not in git; `pipeline/data/` is ignored.
+  A command that spends reports its cost from the `ai_calls` ledger, never from its own arithmetic
+  (§10.5); a command that reads or writes objects names the store it used, so a run against the
+  in-memory stand-in can never be mistaken for a real one.
+- Source PDFs and large artefacts live in the **content bucket** (`margai-beta-content`), not in git,
+  with the pipeline's prefixes at its root — `source/{ncert,syllabus,pyq}/…`,
+  `pages/{book}/{lang}/{chapter}/{page}.png`, `extract/{book}/{lang}.jsonl`, `snapshots/<date>/`
+  (DECISIONS 2026-09-12 F8, D14). Object access goes through `storage.api.ObjectStore`; only
+  `storage.internal.s3` names the S3 SDK (TECH_PLAN §1.4). `pipeline/data/` stays gitignored.

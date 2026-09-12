@@ -15,8 +15,24 @@ import java.util.List;
  */
 public record NcertPage(List<Paragraph> paragraphs, BigDecimal confidence) {
 
+    /** How much of a page travels with the next page's call. Enough for a long paragraph. */
+    public static final int TAIL_LENGTH = 600;
+
     public NcertPage {
         paragraphs = paragraphs == null ? List.of() : List.copyOf(paragraphs);
+    }
+
+    /**
+     * The ending of this page's text, as the next page's call receives it (TECH_PLAN §6.3, "the
+     * previous page's tail for paragraph continuity"): null when the page carried no paragraphs,
+     * so a plate or a figure page does not hand the next page a stale tail.
+     */
+    public String tail() {
+        if (paragraphs.isEmpty()) {
+            return null;
+        }
+        String text = paragraphs.getLast().text();
+        return text.length() <= TAIL_LENGTH ? text : text.substring(text.length() - TAIL_LENGTH);
     }
 
     /**

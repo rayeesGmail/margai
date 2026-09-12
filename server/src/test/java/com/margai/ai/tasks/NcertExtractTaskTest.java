@@ -67,19 +67,17 @@ class NcertExtractTaskTest {
         NcertPage page = task.read("Physics Part-I, Textbook for Class XI", (short) 7, 12, image(), null,
                 new AiCallContext(null, UUID.randomUUID().toString(), false)).output();
 
-        assertThat(NcertExtractTask.tailOf(page)).isEqualTo(page.paragraphs().getLast().text());
-        assertThat(NcertExtractTask.tailOf(new NcertPage(List.of(), BigDecimal.ONE))).isNull();
+        assertThat(page.tail()).isEqualTo(page.paragraphs().getLast().text());
+        assertThat(new NcertPage(List.of(), BigDecimal.ONE).tail()).isNull();
     }
 
     @Test
     void aLongTailIsCutToItsEnd() {
-        String long1 = "x".repeat(NcertExtractTask.TAIL_LENGTH + 200) + "the end.";
+        String paragraph = "x".repeat(NcertPage.TAIL_LENGTH + 200) + "the end.";
         NcertPage page = new NcertPage(
-                List.of(new NcertPage.Paragraph("7.9", 1, long1, false, List.of())), BigDecimal.ONE);
+                List.of(new NcertPage.Paragraph("7.9", 1, paragraph, false, List.of())), BigDecimal.ONE);
 
-        String tail = NcertExtractTask.tailOf(page);
-
-        assertThat(tail).hasSize(NcertExtractTask.TAIL_LENGTH).endsWith("the end.");
+        assertThat(page.tail()).hasSize(NcertPage.TAIL_LENGTH).endsWith("the end.");
     }
 
     /** {@code <} opens a StringTemplate expression, so the reversible-reaction arrow is escaped. */

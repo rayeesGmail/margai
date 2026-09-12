@@ -38,4 +38,11 @@ public interface CurriculumImport {
 
     /** {@code cutoffs load}: upsert on (year, category, quota_scope, seat_type). */
     CutoffLoadReport loadCutoffs(List<CutoffRow> rows);
+
+    /**
+     * {@code ncert register} (D14): upsert on {@code ncert_books.code}. Refused: one code claimed
+     * twice, and two books claiming the same (subject, class level, part) — the pair a student's
+     * "Class 11 Physics Part-I" means, which two books would make ambiguous.
+     */
+    NcertRegisterReport registerBooks(List<NcertBookRow> rows);
 }

@@ -5,6 +5,8 @@ import com.margai.curriculum.api.BackboneLoadReport;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.CutoffLoadReport;
 import com.margai.curriculum.api.CutoffRow;
+import com.margai.curriculum.api.NcertBookRow;
+import com.margai.curriculum.api.NcertRegisterReport;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import com.margai.curriculum.api.SyllabusNodeRow;
@@ -28,13 +30,15 @@ class CurriculumImportService implements CurriculumImport {
     private final PrerequisiteImporter prerequisites;
     private final BackboneImporter backbone;
     private final CutoffImporter cutoffs;
+    private final NcertBookImporter ncertBooks;
 
     CurriculumImportService(TaxonomyImporter taxonomy, PrerequisiteImporter prerequisites, BackboneImporter backbone,
-            CutoffImporter cutoffs) {
+            CutoffImporter cutoffs, NcertBookImporter ncertBooks) {
         this.taxonomy = taxonomy;
         this.prerequisites = prerequisites;
         this.backbone = backbone;
         this.cutoffs = cutoffs;
+        this.ncertBooks = ncertBooks;
     }
 
     @Override
@@ -55,5 +59,10 @@ class CurriculumImportService implements CurriculumImport {
     @Override
     public CutoffLoadReport loadCutoffs(List<CutoffRow> rows) {
         return cutoffs.load(rows);
+    }
+
+    @Override
+    public NcertRegisterReport registerBooks(List<NcertBookRow> rows) {
+        return ncertBooks.register(rows);
     }
 }

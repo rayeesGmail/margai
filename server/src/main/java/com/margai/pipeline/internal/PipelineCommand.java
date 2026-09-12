@@ -6,13 +6,15 @@ import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Spec;
 
 /**
- * The command tree of TECH_PLAN §6.3, D13's part: {@code taxonomy load}, {@code taxonomy
- * prerequisites}, {@code backbone load}, {@code cutoffs load}. The group commands only route;
+ * The command tree of TECH_PLAN §6.3: D13's {@code taxonomy load}, {@code taxonomy
+ * prerequisites}, {@code backbone load}, {@code cutoffs load}, and D14's {@code ncert register},
+ * {@code ncert render}, {@code ncert extract}, {@code ncert load}. The group commands only route;
  * calling a group without a subcommand is a usage error.
  */
 @Command(name = PipelineRunner.COMMAND_NAME, mixinStandardHelpOptions = true,
         description = "MARG AI content pipeline (TECH_PLAN §6). Every command is idempotent and writes a report.",
-        subcommands = {PipelineCommand.Taxonomy.class, PipelineCommand.Backbone.class, PipelineCommand.Cutoffs.class})
+        subcommands = {PipelineCommand.Taxonomy.class, PipelineCommand.Backbone.class, PipelineCommand.Cutoffs.class,
+                PipelineCommand.Ncert.class})
 final class PipelineCommand implements Runnable {
 
     @Spec
@@ -59,6 +61,20 @@ final class PipelineCommand implements Runnable {
             description = "The qualifying and seat-type cut-off rows (D13).",
             subcommands = {CutoffsLoadCommand.class})
     static final class Cutoffs implements Runnable {
+
+        @Spec
+        CommandSpec spec;
+
+        @Override
+        public void run() {
+            throw missingSubcommand(spec);
+        }
+    }
+
+    @Command(name = "ncert", mixinStandardHelpOptions = true,
+            description = "The NCERT layer: register the books, render their pages, extract and load paragraphs (D14–D16).",
+            subcommands = {NcertRegisterCommand.class})
+    static final class Ncert implements Runnable {
 
         @Spec
         CommandSpec spec;

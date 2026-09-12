@@ -9,10 +9,13 @@ import com.margai.common.api.Category;
 import com.margai.curriculum.api.ArchetypeStepRow;
 import com.margai.curriculum.api.ArchetypeTrackRow;
 import com.margai.curriculum.api.BackboneLoadReport;
+import com.margai.curriculum.api.BookSubject;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.CurriculumImportException;
 import com.margai.curriculum.api.CutoffLoadReport;
 import com.margai.curriculum.api.CutoffRow;
+import com.margai.curriculum.api.NcertBookRow;
+import com.margai.curriculum.api.NcertRegisterReport;
 import com.margai.curriculum.api.NodeKind;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
@@ -47,6 +50,7 @@ class CurriculumImportTest {
     private static final Path PREREQUISITES = InputReadersTest.INPUTS.resolve(TaxonomyPrerequisitesCommand.FILE);
     private static final Path ARCHETYPES = InputReadersTest.INPUTS.resolve(BackboneLoadCommand.FILE);
     private static final Path CUTOFFS = InputReadersTest.INPUTS.resolve(CutoffsLoadCommand.FILE);
+    private static final Path BOOKS = InputReadersTest.INPUTS.resolve(NcertRegisterCommand.FILE);
 
     @Autowired
     private CurriculumImport imports;
@@ -60,8 +64,55 @@ class CurriculumImportTest {
         jdbc.update("DELETE FROM archetype_track_steps");
         jdbc.update("DELETE FROM archetype_tracks");
         jdbc.update("DELETE FROM chapter_status");
+        jdbc.update("DELETE FROM ncert_paragraphs");
+        jdbc.update("DELETE FROM ncert_books");
         jdbc.update("DELETE FROM syllabus_nodes");
         jdbc.update("DELETE FROM cutoffs");
+    }
+
+    @Test
+    void registersTheCommittedBooksAndIsIdempotent() {
+        List<NcertBookRow> rows = BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList();
+
+        NcertRegisterReport first = imports.registerBooks(rows);
+        assertThat(first.inserted()).isEqualTo(10);
+        assertThat(first.updated()).isZero();
+        assertThat(first.orphans()).isEmpty();
+
+        NcertRegisterReport again = imports.registerBooks(rows);
+        assertThat(again.inserted()).isZero();
+        assertThat(again.unchanged()).isEqualTo(10);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_books", Long.class)).isEqualTo(10);
+        assertThat(jdbc.queryForObject(
+                "SELECT s3_key_en FROM ncert_books WHERE code = 'phy11-part2'", String.class))
+                .isEqualTo("source/ncert/2022-ed/en/phy11-part2/");
+        assertThat(jdbc.queryForObject("SELECT pages_en FROM ncert_books WHERE code = 'bio11'", Integer.class))
+                .isNull();
+    }
+
+    @Test
+    void aBookTheFileNoLongerNamesIsAnOrphanAndIsKept() {
+        List<NcertBookRow> rows = BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList();
+        imports.registerBooks(rows);
+
+        NcertRegisterReport report = imports.registerBooks(rows.stream()
+                .filter(row -> !row.code().equals("bio12")).toList());
+
+        assertThat(report.orphans()).containsExactly("bio12");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_books", Long.class)).isEqualTo(10);
+    }
+
+    @Test
+    void twoBooksMayNotClaimTheSameEdition() {
+        NcertBookRow bio11 = new NcertBookRow("bio11", BookSubject.biology, (short) 11, null,
+                "Biology, Textbook for Class XI", null, (short) 2022, "source/a/", null);
+        NcertBookRow duplicate = new NcertBookRow("bio11-reprint", BookSubject.biology, (short) 11, null,
+                "Biology, Textbook for Class XI", null, (short) 2022, "source/b/", null);
+
+        assertThatThrownBy(() -> imports.registerBooks(List.of(bio11, duplicate)))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessageContaining("two books claim to be biology class 11 part null");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_books", Long.class)).isZero();
     }
 
     @Test

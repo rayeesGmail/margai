@@ -9,6 +9,8 @@ import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.CurriculumImportException;
 import com.margai.curriculum.api.CutoffLoadReport;
 import com.margai.curriculum.api.CutoffRow;
+import com.margai.curriculum.api.NcertBookRow;
+import com.margai.curriculum.api.NcertRegisterReport;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import com.margai.curriculum.api.SyllabusNodeRow;
@@ -66,6 +68,9 @@ class PipelineCommandTest {
                 if (cls == CutoffsLoadCommand.class) {
                     return cls.cast(new CutoffsLoadCommand(imports, writer));
                 }
+                if (cls == NcertRegisterCommand.class) {
+                    return cls.cast(new NcertRegisterCommand(imports, writer));
+                }
                 return CommandLine.defaultFactory().create(cls);
             }
         };
@@ -107,6 +112,26 @@ class PipelineCommandTest {
                         "2026-09-12-backbone-load.md", "2026-09-12-cutoffs-load.md");
         assertThat(Files.readString(reports.resolve("2026-09-12-backbone-load.md")))
                 .contains("| track | steps |\n|---|---|\n| fresher_2yr | 210 |\n| fresher_1yr | 166 |\n| dropper | 178 |\n| repeater | 190 |\n");
+    }
+
+    @Test
+    void ncertRegisterReadsBooksYamlHandsTheRowsOnAndWritesItsReport() throws IOException {
+        String committed = InputReadersTest.INPUTS.toString();
+
+        assertThat(commandLine.execute("ncert", "register", "--inputs", committed, "--reports", reports.toString()))
+                .isZero();
+
+        assertThat(imports.books).hasSize(10);
+        assertThat(imports.books).extracting(NcertBookRow::code).contains("bio11", "phy11-part1");
+        assertThat(out.toString())
+                .contains("# margai-pipeline ncert register\n")
+                .contains("- read: 10 books\n- result: ok\n")
+                .contains("| inserted | updated | unchanged |\n|---|---|---|\n| 10 | 0 | 0 |\n")
+                .contains("| bio11 | biology | 11 | — | 1–19 | 19 | en + hi |\n")
+                .contains("| phy11-part2 | physics | 11 | 2 | 8–14 | 7 | en + hi |\n")
+                .contains("## books in the database that books.yaml no longer names\n\nnone\n")
+                .contains("report: " + reports.resolve("2026-09-12-ncert-register.md"));
+        assertThat(err.toString()).isEmpty();
     }
 
     @Test
@@ -214,6 +239,7 @@ class PipelineCommandTest {
         List<PrerequisiteRow> edges;
         List<ArchetypeTrackRow> tracks;
         List<CutoffRow> cutoffs;
+        List<NcertBookRow> books;
         RuntimeException failure;
 
         @Override
@@ -244,6 +270,12 @@ class PipelineCommandTest {
         public CutoffLoadReport loadCutoffs(List<CutoffRow> rows) {
             cutoffs = rows;
             return new CutoffLoadReport(rows.size(), 0, 0, Map.of(), List.of());
+        }
+
+        @Override
+        public NcertRegisterReport registerBooks(List<NcertBookRow> rows) {
+            books = rows;
+            return new NcertRegisterReport(rows.size(), 0, 0, List.of());
         }
     }
 }

@@ -1,0 +1,207 @@
+# NCERT books for `ncert register|render|extract|load` (D14–D16). TECH_PLAN §6.2, §2.3
+# (ncert_books), SPEC §9 item 2. Founder-owned: the pipeline reads this file and never writes it.
+#
+# One entry per book, both editions on it. `source` is the book's PREFIX in the content bucket —
+# NCERT publishes chapter-wise PDFs, not one file per book — and `chapters` maps each PDF to the
+# chapter number printed in the book. That mapping is the reason this list is explicit rather than
+# derived: a Part-II folder numbers its files from 01 while its chapters start at 8
+# (keph201.pdf = Chapter 8), and NTA, the syllabus and every anchor a student sees mean the
+# printed number (SPEC §6.3 "Class 11 Physics, Ch 7, §7.9").
+#
+# `subject` is the book's, so Biology is one book while the taxonomy splits it into botany and
+# zoology; paragraphs reach that split through node_id at the D23 anchor pass (DECISIONS D14).
+#
+# Prelims (*ps), answers (*an) and appendices (*a1) are deliberately absent: they carry no
+# paragraph a student anchors to. `title_hi` is absent everywhere until a native reader supplies
+# it — the ten Hindi books are legacy Chanakya glyph text with no Unicode map (TRACKER PARKED
+# 2026-09-09), which is also why nothing renders or extracts `hi` before D16.
+#
+# Editions and reprints are recorded in ncert/2022-ed/{en,hi}/manifest.md, checked against each
+# book's own edition page on 2026-09-09; edition_year is the "Revised" year from that line.
+books:
+  - code: phy11-part1
+    subject: physics
+    class_level: 11
+    part: 1
+    title_en: "Physics Part-I, Textbook for Class XI"
+    edition_year: 2022
+    source:
+      en: source/ncert/2022-ed/en/phy11-part1/
+      hi: source/ncert/2022-ed/hi/phy11-part1/
+    chapters:
+      - {no: 1, en: keph101.pdf, hi: khph101.pdf}
+      - {no: 2, en: keph102.pdf, hi: khph102.pdf}
+      - {no: 3, en: keph103.pdf, hi: khph103.pdf}
+      - {no: 4, en: keph104.pdf, hi: khph104.pdf}
+      - {no: 5, en: keph105.pdf, hi: khph105.pdf}
+      - {no: 6, en: keph106.pdf, hi: khph106.pdf}
+      - {no: 7, en: keph107.pdf, hi: khph107.pdf}
+
+  - code: phy11-part2
+    subject: physics
+    class_level: 11
+    part: 2
+    title_en: "Physics Part-II, Textbook for Class XI"
+    edition_year: 2023
+    source:
+      en: source/ncert/2022-ed/en/phy11-part2/
+      hi: source/ncert/2022-ed/hi/phy11-part2/
+    chapters:
+      - {no: 8, en: keph201.pdf, hi: khph201.pdf}
+      - {no: 9, en: keph202.pdf, hi: khph202.pdf}
+      - {no: 10, en: keph203.pdf, hi: khph203.pdf}
+      - {no: 11, en: keph204.pdf, hi: khph204.pdf}
+      - {no: 12, en: keph205.pdf, hi: khph205.pdf}
+      - {no: 13, en: keph206.pdf, hi: khph206.pdf}
+      - {no: 14, en: keph207.pdf, hi: khph207.pdf}
+
+  - code: phy12-part1
+    subject: physics
+    class_level: 12
+    part: 1
+    title_en: "Physics Part-I, Textbook for Class XII"
+    edition_year: 2022
+    source:
+      en: source/ncert/2022-ed/en/phy12-part1/
+      hi: source/ncert/2022-ed/hi/phy12-part1/
+    chapters:
+      - {no: 1, en: leph101.pdf, hi: lhph101.pdf}
+      - {no: 2, en: leph102.pdf, hi: lhph102.pdf}
+      - {no: 3, en: leph103.pdf, hi: lhph103.pdf}
+      - {no: 4, en: leph104.pdf, hi: lhph104.pdf}
+      - {no: 5, en: leph105.pdf, hi: lhph105.pdf}
+      - {no: 6, en: leph106.pdf, hi: lhph106.pdf}
+      - {no: 7, en: leph107.pdf, hi: lhph107.pdf}
+      - {no: 8, en: leph108.pdf, hi: lhph108.pdf}
+
+  - code: phy12-part2
+    subject: physics
+    class_level: 12
+    part: 2
+    title_en: "Physics Part-II, Textbook for Class XII"
+    edition_year: 2022
+    source:
+      en: source/ncert/2022-ed/en/phy12-part2/
+      hi: source/ncert/2022-ed/hi/phy12-part2/
+    chapters:
+      - {no: 9, en: leph201.pdf, hi: lhph201.pdf}
+      - {no: 10, en: leph202.pdf, hi: lhph202.pdf}
+      - {no: 11, en: leph203.pdf, hi: lhph203.pdf}
+      - {no: 12, en: leph204.pdf, hi: lhph204.pdf}
+      - {no: 13, en: leph205.pdf, hi: lhph205.pdf}
+      - {no: 14, en: leph206.pdf, hi: lhph206.pdf}
+
+  - code: chem11-part1
+    subject: chemistry
+    class_level: 11
+    part: 1
+    title_en: "Chemistry Part-I, Textbook for Class XI"
+    edition_year: 2022
+    source:
+      en: source/ncert/2022-ed/en/chem11-part1/
+      hi: source/ncert/2022-ed/hi/chem11-part1/
+    chapters:
+      - {no: 1, en: kech101.pdf, hi: khch101.pdf}
+      - {no: 2, en: kech102.pdf, hi: khch102.pdf}
+      - {no: 3, en: kech103.pdf, hi: khch103.pdf}
+      - {no: 4, en: kech104.pdf, hi: khch104.pdf}
+      - {no: 5, en: kech105.pdf, hi: khch105.pdf}
+      - {no: 6, en: kech106.pdf, hi: khch106.pdf}
+
+  - code: chem11-part2
+    subject: chemistry
+    class_level: 11
+    part: 2
+    title_en: "Chemistry Part-II, Textbook for Class XI"
+    edition_year: 2022
+    source:
+      en: source/ncert/2022-ed/en/chem11-part2/
+      hi: source/ncert/2022-ed/hi/chem11-part2/
+    chapters:
+      - {no: 7, en: kech201.pdf, hi: khch201.pdf}
+      - {no: 8, en: kech202.pdf, hi: khch202.pdf}
+      - {no: 9, en: kech203.pdf, hi: khch203.pdf}
+
+  - code: chem12-part1
+    subject: chemistry
+    class_level: 12
+    part: 1
+    title_en: "Chemistry Part-I, Textbook for Class XII"
+    edition_year: 2022
+    source:
+      en: source/ncert/2022-ed/en/chem12-part1/
+      hi: source/ncert/2022-ed/hi/chem12-part1/
+    chapters:
+      - {no: 1, en: lech101.pdf, hi: lhch101.pdf}
+      - {no: 2, en: lech102.pdf, hi: lhch102.pdf}
+      - {no: 3, en: lech103.pdf, hi: lhch103.pdf}
+      - {no: 4, en: lech104.pdf, hi: lhch104.pdf}
+      - {no: 5, en: lech105.pdf, hi: lhch105.pdf}
+
+  - code: chem12-part2
+    subject: chemistry
+    class_level: 12
+    part: 2
+    title_en: "Chemistry Part-II, Textbook for Class XII"
+    edition_year: 2022
+    source:
+      en: source/ncert/2022-ed/en/chem12-part2/
+      hi: source/ncert/2022-ed/hi/chem12-part2/
+    chapters:
+      - {no: 6, en: lech201.pdf, hi: lhch201.pdf}
+      - {no: 7, en: lech202.pdf, hi: lhch202.pdf}
+      - {no: 8, en: lech203.pdf, hi: lhch203.pdf}
+      - {no: 9, en: lech204.pdf, hi: lhch204.pdf}
+      - {no: 10, en: lech205.pdf, hi: lhch205.pdf}
+
+  - code: bio11
+    subject: biology
+    class_level: 11
+    title_en: "Biology, Textbook for Class XI"
+    edition_year: 2022
+    source:
+      en: source/ncert/2022-ed/en/bio11/
+      hi: source/ncert/2022-ed/hi/bio11/
+    chapters:
+      - {no: 1, en: kebo101.pdf, hi: khbo101.pdf}
+      - {no: 2, en: kebo102.pdf, hi: khbo102.pdf}
+      - {no: 3, en: kebo103.pdf, hi: khbo103.pdf}
+      - {no: 4, en: kebo104.pdf, hi: khbo104.pdf}
+      - {no: 5, en: kebo105.pdf, hi: khbo105.pdf}
+      - {no: 6, en: kebo106.pdf, hi: khbo106.pdf}
+      - {no: 7, en: kebo107.pdf, hi: khbo107.pdf}
+      - {no: 8, en: kebo108.pdf, hi: khbo108.pdf}
+      - {no: 9, en: kebo109.pdf, hi: khbo109.pdf}
+      - {no: 10, en: kebo110.pdf, hi: khbo110.pdf}
+      - {no: 11, en: kebo111.pdf, hi: khbo111.pdf}
+      - {no: 12, en: kebo112.pdf, hi: khbo112.pdf}
+      - {no: 13, en: kebo113.pdf, hi: khbo113.pdf}
+      - {no: 14, en: kebo114.pdf, hi: khbo114.pdf}
+      - {no: 15, en: kebo115.pdf, hi: khbo115.pdf}
+      - {no: 16, en: kebo116.pdf, hi: khbo116.pdf}
+      - {no: 17, en: kebo117.pdf, hi: khbo117.pdf}
+      - {no: 18, en: kebo118.pdf, hi: khbo118.pdf}
+      - {no: 19, en: kebo119.pdf, hi: khbo119.pdf}
+
+  - code: bio12
+    subject: biology
+    class_level: 12
+    title_en: "Biology, Textbook for Class XII"
+    edition_year: 2022
+    source:
+      en: source/ncert/2022-ed/en/bio12/
+      hi: source/ncert/2022-ed/hi/bio12/
+    chapters:
+      - {no: 1, en: lebo101.pdf, hi: lhbo101.pdf}
+      - {no: 2, en: lebo102.pdf, hi: lhbo102.pdf}
+      - {no: 3, en: lebo103.pdf, hi: lhbo103.pdf}
+      - {no: 4, en: lebo104.pdf, hi: lhbo104.pdf}
+      - {no: 5, en: lebo105.pdf, hi: lhbo105.pdf}
+      - {no: 6, en: lebo106.pdf, hi: lhbo106.pdf}
+      - {no: 7, en: lebo107.pdf, hi: lhbo107.pdf}
+      - {no: 8, en: lebo108.pdf, hi: lhbo108.pdf}
+      - {no: 9, en: lebo109.pdf, hi: lhbo109.pdf}
+      - {no: 10, en: lebo110.pdf, hi: lhbo110.pdf}
+      - {no: 11, en: lebo111.pdf, hi: lhbo111.pdf}
+      - {no: 12, en: lebo112.pdf, hi: lhbo112.pdf}
+      - {no: 13, en: lebo113.pdf, hi: lhbo113.pdf}

@@ -226,13 +226,17 @@ class NcertLoadCommandTest {
     }
 
     @Test
-    void aRefusalNamesTheChapterAndThePageToReExtract() {
+    void aRefusalNamesTheChapterThePageAndTheRealJsonlKey() {
         imports.renderedPagesAnswer = 1;
         jsonl(page(7, 4, "0.95", paragraph("12.4", 1, "Wrong chapter.")));
 
         run();
 
-        assertThat(out.toString()).contains("ncert extract --redo --chapters 7 --pages 4");
+        // The report's own header names the book; the refusal names the edition's file, the
+        // chapter and the page — never the literal "<lang>" of the key template.
+        assertThat(out.toString()).contains("ncert extract --redo --chapters 7 --pages 4")
+                .contains("en.jsonl")
+                .doesNotContain("<lang>");
     }
 
     @Test

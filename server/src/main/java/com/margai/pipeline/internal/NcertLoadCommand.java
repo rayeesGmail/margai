@@ -70,7 +70,7 @@ class NcertLoadCommand extends NcertBookCommand {
                         : Integer.compare(left.page(), right.page()))
                 .toList();
 
-        List<NcertParagraphRow> rows = join(pages);
+        List<NcertParagraphRow> rows = join(pages, jsonlKey);
         NcertLoadReport result = imports.loadParagraphs(definition.code(), language, rows);
 
         report.section("ncert_paragraphs")
@@ -127,13 +127,13 @@ class NcertLoadCommand extends NcertBookCommand {
      * — and it fails the run by name instead of quietly concatenating unrelated text, which is
      * what a 20-paragraph spot check would not catch.
      */
-    static List<NcertParagraphRow> join(List<ExtractedPage> pages) {
+    static List<NcertParagraphRow> join(List<ExtractedPage> pages, String jsonlKey) {
         Map<String, Joined> byAddress = new LinkedHashMap<>();
         for (ExtractedPage page : pages) {
             List<NcertPage.Paragraph> paragraphs = page.paragraphs();
             for (int index = 0; index < paragraphs.size(); index++) {
                 NcertPage.Paragraph paragraph = paragraphs.get(index);
-                String section = check(page, paragraph);
+                String section = check(page, paragraph, jsonlKey);
                 String address = page.chapterNo() + " " + section + " " + paragraph.paraNo();
                 Joined joined = byAddress.get(address);
                 if (joined == null) {
@@ -143,7 +143,7 @@ class NcertLoadCommand extends NcertBookCommand {
                 String why = index != 0 ? "it is not that page's first paragraph"
                         : gap(pages, page.chapterNo(), joined.lastPage(), page.page());
                 if (why != null) {
-                    throw new InputFormatException(Path.of(ContentKeys.EXTRACT), 0,
+                    throw new InputFormatException(Path.of(jsonlKey), 0,
                             "ch " + page.chapterNo() + " §" + section + " ¶" + paragraph.paraNo()
                                     + " is claimed by page " + joined.lastPage() + " and page " + page.page()
                                     + ", which cannot be one paragraph continuing across a page break: " + why
@@ -191,39 +191,39 @@ class NcertLoadCommand extends NcertBookCommand {
      * does not belong to this chapter is a student sent to the wrong page of a book they are
      * holding. Refusing by name beats a raw constraint violation at the end of a 260-page load.
      */
-    private static String check(ExtractedPage page, NcertPage.Paragraph paragraph) {
+    private static String check(ExtractedPage page, NcertPage.Paragraph paragraph, String jsonlKey) {
         String where = "ch " + page.chapterNo() + " page " + page.page() + ": ";
         // Normalised once and returned, so the address, the stored row and these checks all use the
         // same string: validating the stripped value while keying on the raw one let "7.9 " pass
         // every guard, split a section in two and slip past the collision check (spec-auditor, D14).
         String section = paragraph.section() == null ? "" : paragraph.section().strip();
         if (section.isEmpty()) {
-            throw refuse(page, where + "a paragraph has no section");
+            throw refuse(page, jsonlKey, where + "a paragraph has no section");
         }
         if (section.length() > SECTION_MAX_LENGTH) {
-            throw refuse(page, where + "section '" + section + "' is longer than "
+            throw refuse(page, jsonlKey, where + "section '" + section + "' is longer than "
                     + SECTION_MAX_LENGTH + " characters");
         }
         if (!SECTION.matcher(section).matches()) {
-            throw refuse(page, where + "section '" + section + "' is not a printed section number");
+            throw refuse(page, jsonlKey, where + "section '" + section + "' is not a printed section number");
         }
         String chapterOfSection = section.contains(".") ? section.substring(0, section.indexOf('.')) : section;
         if (!chapterOfSection.equals(String.valueOf(page.chapterNo()))) {
-            throw refuse(page, where + "section '" + section + "' belongs to chapter " + chapterOfSection
+            throw refuse(page, jsonlKey, where + "section '" + section + "' belongs to chapter " + chapterOfSection
                     + ", not to chapter " + page.chapterNo() + " — the page was read as the wrong chapter");
         }
         if (paragraph.paraNo() < 1 || paragraph.paraNo() > PARA_NO_MAX) {
-            throw refuse(page, where + "§" + section + " has paragraph number " + paragraph.paraNo());
+            throw refuse(page, jsonlKey, where + "§" + section + " has paragraph number " + paragraph.paraNo());
         }
         if (paragraph.text() == null || paragraph.text().isBlank()) {
-            throw refuse(page, where + "§" + section + " ¶" + paragraph.paraNo() + " has no text");
+            throw refuse(page, jsonlKey, where + "§" + section + " ¶" + paragraph.paraNo() + " has no text");
         }
         return section;
     }
 
     /** The remedy names the offending page and its chapter: `--pages N` alone re-extracts page N of every chapter. */
-    private static InputFormatException refuse(ExtractedPage page, String reason) {
-        return new InputFormatException(Path.of(ContentKeys.EXTRACT), 0, reason
+    private static InputFormatException refuse(ExtractedPage page, String jsonlKey, String reason) {
+        return new InputFormatException(Path.of(jsonlKey), 0, reason
                 + " — re-extract that page (`ncert extract --redo --chapters " + page.chapterNo()
                 + " --pages " + page.page() + "`) or fix the prompt");
     }

@@ -71,14 +71,15 @@ class PdfPageRendererTest {
         assumeTrue(Files.exists(chapter), "founder's NCERT PDFs not on this machine");
 
         byte[] pdf = Files.readAllBytes(chapter);
+        int wanted = Integer.getInteger("render.page", 4);
         List<byte[]> pages = new ArrayList<>();
-        int count = new PdfPageRenderer(150).render(pdf, page -> page > 4, (png, page) -> pages.add(png));
+        int count = new PdfPageRenderer(150).render(pdf, page -> page > wanted, (png, page) -> pages.add(png));
 
-        assertThat(count).isGreaterThan(4);
-        assertThat(pages).hasSize(4);
+        assertThat(count).isGreaterThanOrEqualTo(wanted);
+        assertThat(pages).hasSize(wanted);
         String dump = System.getProperty("render.dump");
         if (dump != null) {
-            Files.write(Path.of(dump), pages.get(3));
+            Files.write(Path.of(dump), pages.getLast());
         }
         for (byte[] png : pages) {
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(png));

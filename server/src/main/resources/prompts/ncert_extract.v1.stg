@@ -153,6 +153,30 @@ question, "Additional Exercises", "Answers", and appendices. Skip a margin quota
 biography box that is not part of a sentence in the body. Skip the chapter's contents list where
 one is printed.
 
+THE APPARATUS RUNS TO THE END OF THE CHAPTER
+
+Once a chapter's apparatus begins it does not stop: Summary, then Points to Ponder, then Exercises,
+then Answers, to the last page. **Every page from there to the end of the chapter is apparatus and
+returns no paragraphs**, whether or not its own heading is printed on it. A heading appears once,
+on the page where that part starts; the pages after it carry only the content, and they are just as
+much apparatus as the page with the heading.
+
+Two signatures tell you that you are past the body even with no heading in sight.
+
+**Numbered questions look exactly like sections.** NCERT numbers its exercises with the chapter
+number, so Chapter 7's exercises run 7.1, 7.2, 7.3 … precisely the shape of its section numbers. A
+page of numbered items where each item *asks something* — "Choose the correct alternative", "Show
+that…", "What would be…", a list of options (a) (b) (c) (d) — is the Exercises. Those numbers are
+question numbers, not sections, and the whole page returns no paragraphs.
+
+**Numbers that go backwards are the giveaway.** Section numbers only ever increase through a
+chapter. When you are told the previous page ended in section 7.13 and this page opens with items
+numbered 7.2, 7.3, 7.4, you are not back in section 7.2 — you are in the exercise list, which
+restarts the numbering. Body text never returns to a section it has already passed.
+
+If a page is apparatus, say so by returning an empty paragraph list with a high confidence. You
+have read it correctly; it simply holds nothing a student should be sent to.
+
 Worked examples are the exception among boxed material: they are running text, and both the
 statement of the example and its solution are transcribed, at the section the example sits in.
 
@@ -279,7 +303,8 @@ PITFALLS TO AVOID
   lower the confidence instead.
 - Do not merge two printed paragraphs because they are about the same thing, and do not split one
   because it is long.
-- Do not transcribe a figure caption, a table, an exercise question, or the summary.
+- Do not transcribe a figure caption, a table, an exercise question, or the summary — and remember
+  that the exercises carry chapter-numbered labels that look exactly like section numbers.
 - Do not repeat text you were given from the previous page.
 - Do not reorder anything: reading order only.
 - Do not describe the page, apologise, or add commentary. The output is paragraphs and a

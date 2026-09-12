@@ -18,7 +18,9 @@ sure they never repeat a mistake — all adapted nightly to that one student.
 **Principles (every feature must obey these):**
 
 1. **Evidence rule** — the app never says anything about a student it cannot back with
-   that student's own data. Every recommendation shows its reason.
+   that student's own data. Every recommendation shows its reason. A claim about students
+   in general may rest on the collective record (§9.6) and is worded as such; it never
+   stands in for knowledge of this student.
 2. **Trust rule** — verified answers only; honest pricing; one-tap cancel; instant
    refunds; no dark patterns; uploaded documents deleted after reading.
 3. **Mentor voice** — warm, direct, Hinglish-capable, never guilt-tripping, never fake-human.
@@ -274,7 +276,20 @@ flowchart LR
 
 **Block types:** Learn (directs outside study: chapter + NCERT sections + why today),
 Practice (timed in-app MCQ set), Revise (notebook variants due), and later Mock.
-Every block carries a one-line **reason drawn from the student's data** (Evidence rule).
+Every block carries a one-line **reason drawn from the student's data or, attributed as such, from
+the collective record** (Evidence rule; §9.6).
+
+**Two sources (CS-1):** the planner reads two things — the *collective record* of each
+topic (how NEET students in general experience it: struggle, realistic pacing, exam
+momentum, common misconceptions, season effects; §9.6) and the *student's own data*. On
+day one the collective dominates; as the student's practice, diagnostic and doubt history
+accumulate on a topic, their own data takes over, and where the two disagree at sufficient
+evidence the student's data wins. Every reason line says which source it rests on: “most
+students underestimate this chapter — I've given it extra room” is a collective claim and
+is worded as one; “4/10 on Tuesday, all sign-convention slips” is personal. Early copy is
+honest about the ramp — the plan sharpens as the app learns the student — and names the
+diagnostic as the fastest way to shift the weight from “students like you” to “you”.
+Collective-backed confidence never masquerades as personal knowledge.
 
 **Nightly re-planning behavior (product rules, not implementation):**
 - Reads: what was done/skipped, accuracy & speed, doubts asked, notebook dues, mood,
@@ -595,6 +610,21 @@ they're built and stored):
 5. **Plan backbone** — archetype tracks (2-year, 1-year fresher, dropper, repeater)
    over the syllabus map; educator-reviewed once before launch; pacing self-corrects
    from measured student data every season.
+6. **Collective intelligence** (CS-1) — per-topic *collective records* describing how
+   NEET students in general experience each topic: how consistently it is called hard,
+   realistic pacing against the naive estimate, NTA's recent emphasis, named common
+   misconceptions with the PYQ distractors that expose them, month-relative season
+   effects, and topper/teacher consensus on how to study it — each with a confidence
+   and a source summary, versioned by season. Compiled before we have users, from our
+   own PYQ bank and from founder-collected public discourse and published study advice,
+   then founder-reviewed before the planner may use it (the same governance as the
+   taxonomy). The planner and error diagnosis read it as a prior that yields to the
+   student's own data (§6.1, §6.4). Boundaries: signals about students, never content —
+   no other platform's questions, answers or material is ingested or reproduced; nothing
+   paywalled or login-gated; derived signals with aggregate source counts only, never
+   quotes or identifiable students; no live crawling. Records are aggregate priors, not
+   cohorts: the §12 exclusion of community and leaderboards beyond the single percentile
+   line is untouched.
 
 ---
 
@@ -610,6 +640,8 @@ they're built and stored):
    with one optional anonymous peer percentile for belonging.
 7. Corrections from the student always override AI judgments and are remembered.
 8. The AI never pretends to be human, never diagnoses health, never shames.
+9. Collective claims are attributed as collective (“most students…”); personal claims
+   require personal data — the two are never blended into a false personal claim (§9.6).
 
 ---
 

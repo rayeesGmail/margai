@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -68,6 +69,21 @@ public class Cutoff {
         this.seatType = seatType;
         this.qualifyingMarks = qualifyingMarks;
         this.source = source;
+    }
+
+    /** The D13 loader's upsert (TECH_PLAN §6.3), matched on the natural key; returns whether anything changed. */
+    public boolean apply(short qualifyingMarks, String source) {
+        boolean changed = this.qualifyingMarks != qualifyingMarks || !Objects.equals(this.source, source);
+        if (changed) {
+            this.qualifyingMarks = qualifyingMarks;
+            this.source = source;
+        }
+        return changed;
+    }
+
+    /** {@code "year category quota_scope seat_type"}: the natural key as the report prints it. */
+    public String naturalKey() {
+        return year + " " + category + " " + quotaScope + " " + seatType;
     }
 
     public UUID getId() {

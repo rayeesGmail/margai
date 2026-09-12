@@ -9,7 +9,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import com.margai.curriculum.api.ArchetypeTrackRow;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -57,6 +59,21 @@ public class ArchetypeTrack {
         this.code = code;
         this.nameEn = nameEn;
         this.weeks = weeks;
+    }
+
+    /** The D13 loader's upsert (TECH_PLAN §6.3), matched on {@code code}; returns whether anything changed. */
+    public boolean apply(ArchetypeTrackRow row) {
+        boolean changed = !nameEn.equals(row.nameEn())
+                || !Objects.equals(nameHi, row.nameHi())
+                || !Objects.equals(weeks, row.weeks())
+                || !Objects.equals(descriptionMd, row.descriptionMd());
+        if (changed) {
+            this.nameEn = row.nameEn();
+            this.nameHi = row.nameHi();
+            this.weeks = row.weeks();
+            this.descriptionMd = row.descriptionMd();
+        }
+        return changed;
     }
 
     public UUID getId() {

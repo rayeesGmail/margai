@@ -41,7 +41,14 @@ pipeline/__pycache__/
 pipeline/**/__pycache__/
 pipeline/data/
 
-# Founder-placed content inputs (NCERT 2022-ed books, PYQ papers): the manifests beside them are
-# tracked, the PDFs stay local until the pipeline's S3 content/ home (TECH_PLAN §6.2, D13 decides)
+# Founder-placed content inputs (NCERT 2022-ed books, PYQ papers, NEET syllabus PDFs): the manifests
+# beside them are tracked, the PDFs stay local until the pipeline's S3 content/ home (TECH_PLAN §6.2;
+# D14's `ncert register` decides, DECISIONS 2026-09-10 D13)
 ncert/**/*.pdf
 pyq/**/*.pdf
+syllabus/*.pdf
+
+# Founder-collected public-discourse excerpts for the collective intelligence layer (CS-1 §3, F11):
+# third-party text never enters the repo; manifest.md and sources.csv beside them are tracked
+# (DECISIONS 2026-09-12 CS-1)
+pipeline/inputs/collective/excerpts/

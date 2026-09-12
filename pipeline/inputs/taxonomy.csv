@@ -1,0 +1,517 @@
+code,subject,class_level,parent_code,kind,name_en,name_hi,sort_order,default_learn_minutes,neet_relevant
+PHY,physics,,,subject,Physics,भौतिकी,1,,true
+CHE,chemistry,,,subject,Chemistry,रसायन विज्ञान,2,,true
+BOT,botany,,,subject,Botany,वनस्पति विज्ञान,3,,true
+ZOO,zoology,,,subject,Zoology,प्राणि विज्ञान,4,,true
+PHY.U01,physics,,PHY,unit,Physics and Measurement,भौतिकी और मापन,1,,true
+PHY.U02,physics,,PHY,unit,Kinematics,शुद्धगतिकी,2,,true
+PHY.U03,physics,,PHY,unit,Laws of Motion,गति के नियम,3,,true
+PHY.U04,physics,,PHY,unit,"Work, Energy and Power","कार्य, ऊर्जा और शक्ति",4,,true
+PHY.U05,physics,,PHY,unit,Rotational Motion,घूर्णी गति,5,,true
+PHY.U06,physics,,PHY,unit,Gravitation,गुरुत्वाकर्षण,6,,true
+PHY.U07,physics,,PHY,unit,Properties of Solids and Liquids,ठोसों और द्रवों के गुण,7,,true
+PHY.U08,physics,,PHY,unit,Thermodynamics,ऊष्मागतिकी,8,,true
+PHY.U09,physics,,PHY,unit,Kinetic Theory of Gases,गैसों का अणुगति सिद्धांत,9,,true
+PHY.U10,physics,,PHY,unit,Oscillations and Waves,दोलन और तरंगें,10,,true
+PHY.U11,physics,,PHY,unit,Electrostatics,स्थिरवैद्युतिकी,11,,true
+PHY.U12,physics,,PHY,unit,Current Electricity,विद्युत धारा,12,,true
+PHY.U13,physics,,PHY,unit,Magnetic Effects of Current and Magnetism,धारा के चुंबकीय प्रभाव और चुंबकत्व,13,,true
+PHY.U14,physics,,PHY,unit,Electromagnetic Induction and Alternating Currents,वैद्युतचुंबकीय प्रेरण और प्रत्यावर्ती धारा,14,,true
+PHY.U15,physics,,PHY,unit,Electromagnetic Waves,वैद्युतचुंबकीय तरंगें,15,,true
+PHY.U16,physics,,PHY,unit,Optics,प्रकाशिकी,16,,true
+PHY.U17,physics,,PHY,unit,Dual Nature of Matter and Radiation,द्रव्य और विकिरण की द्वैत प्रकृति,17,,true
+PHY.U18,physics,,PHY,unit,Atoms and Nuclei,परमाणु और नाभिक,18,,true
+PHY.U19,physics,,PHY,unit,Electronic Devices,इलेक्ट्रॉनिक युक्तियाँ,19,,true
+PHY.U20,physics,,PHY,unit,Experimental Skills,प्रायोगिक कौशल,20,,true
+CHE.U01,chemistry,,CHE,unit,Some Basic Concepts in Chemistry,रसायन विज्ञान की कुछ मूल अवधारणाएँ,1,,true
+CHE.U02,chemistry,,CHE,unit,Atomic Structure,परमाणु संरचना,2,,true
+CHE.U03,chemistry,,CHE,unit,Chemical Bonding and Molecular Structure,रासायनिक आबंधन और आण्विक संरचना,3,,true
+CHE.U04,chemistry,,CHE,unit,Chemical Thermodynamics,रासायनिक ऊष्मागतिकी,4,,true
+CHE.U05,chemistry,,CHE,unit,Solutions,विलयन,5,,true
+CHE.U06,chemistry,,CHE,unit,Equilibrium,साम्यावस्था,6,,true
+CHE.U07,chemistry,,CHE,unit,Redox Reactions and Electrochemistry,अपचयोपचय अभिक्रियाएँ और वैद्युतरसायन,7,,true
+CHE.U08,chemistry,,CHE,unit,Chemical Kinetics,रासायनिक बलगतिकी,8,,true
+CHE.U09,chemistry,,CHE,unit,Classification of Elements and Periodicity in Properties,तत्वों का वर्गीकरण और गुणधर्मों में आवर्तिता,9,,true
+CHE.U10,chemistry,,CHE,unit,p-Block Elements,p-ब्लॉक तत्व,10,,true
+CHE.U11,chemistry,,CHE,unit,d- and f-Block Elements,d- और f-ब्लॉक तत्व,11,,true
+CHE.U12,chemistry,,CHE,unit,Coordination Compounds,उपसहसंयोजन यौगिक,12,,true
+CHE.U13,chemistry,,CHE,unit,Purification and Characterisation of Organic Compounds,कार्बनिक यौगिकों का शोधन और अभिलक्षणन,13,,true
+CHE.U14,chemistry,,CHE,unit,Some Basic Principles of Organic Chemistry,कार्बनिक रसायन के कुछ मूल सिद्धांत,14,,true
+CHE.U15,chemistry,,CHE,unit,Hydrocarbons,हाइड्रोकार्बन,15,,true
+CHE.U16,chemistry,,CHE,unit,Organic Compounds Containing Halogens,हैलोजनयुक्त कार्बनिक यौगिक,16,,true
+CHE.U17,chemistry,,CHE,unit,Organic Compounds Containing Oxygen,ऑक्सीजनयुक्त कार्बनिक यौगिक,17,,true
+CHE.U18,chemistry,,CHE,unit,Organic Compounds Containing Nitrogen,नाइट्रोजनयुक्त कार्बनिक यौगिक,18,,true
+CHE.U19,chemistry,,CHE,unit,Biomolecules,जैव-अणु,19,,true
+CHE.U20,chemistry,,CHE,unit,Principles Related to Practical Chemistry,प्रायोगिक रसायन से संबंधित सिद्धांत,20,,true
+BOT.U01,botany,,BOT,unit,Diversity in Living World: Plants and Microbes,जीव जगत में विविधता: पादप और सूक्ष्मजीव,1,,true
+ZOO.U01,zoology,,ZOO,unit,Diversity in Living World: Animals,जीव जगत में विविधता: प्राणी,1,,true
+BOT.U02,botany,,BOT,unit,Structural Organisation in Plants,पादपों में संरचनात्मक संगठन,2,,true
+ZOO.U02,zoology,,ZOO,unit,Structural Organisation in Animals,प्राणियों में संरचनात्मक संगठन,2,,true
+BOT.U03,botany,,BOT,unit,Cell Structure and Function,कोशिका संरचना और कार्य,3,,true
+BOT.U04,botany,,BOT,unit,Plant Physiology,पादप कार्यिकी,4,,true
+ZOO.U05,zoology,,ZOO,unit,Human Physiology,मानव कार्यिकी,3,,true
+BOT.U06,botany,,BOT,unit,Reproduction: Flowering Plants,जनन: पुष्पी पादप,5,,true
+ZOO.U06,zoology,,ZOO,unit,Reproduction: Human Reproduction and Reproductive Health,जनन: मानव जनन और जनन स्वास्थ्य,4,,true
+BOT.U07,botany,,BOT,unit,Genetics and Evolution: Heredity and Molecular Basis,आनुवंशिकी और विकास: वंशागति और आणविक आधार,6,,true
+ZOO.U07,zoology,,ZOO,unit,Genetics and Evolution: Evolution,आनुवंशिकी और विकास: विकास,5,,true
+BOT.U08,botany,,BOT,unit,Biology and Human Welfare: Microbes,जीव विज्ञान और मानव कल्याण: सूक्ष्मजीव,7,,true
+ZOO.U08,zoology,,ZOO,unit,Biology and Human Welfare: Health and Disease,जीव विज्ञान और मानव कल्याण: स्वास्थ्य और रोग,6,,true
+BOT.U09,botany,,BOT,unit,Biotechnology and Its Applications,जैव प्रौद्योगिकी और उसके अनुप्रयोग,8,,true
+BOT.U10,botany,,BOT,unit,Ecology and Environment,पारिस्थितिकी और पर्यावरण,9,,true
+PHY.11.UNITS,physics,11,PHY.U01,chapter,Units and Measurement,मात्रक और मापन,1,135,true
+PHY.11.UNITS.SIUNITS,physics,11,PHY.11.UNITS,topic,"Units of measurement, SI units, fundamental and derived units",,1,45,true
+PHY.11.UNITS.ERRORS,physics,11,PHY.11.UNITS,topic,"Least count, significant figures and errors in measurement",,2,45,true
+PHY.11.UNITS.DIMENS,physics,11,PHY.11.UNITS,topic,Dimensions of physical quantities and dimensional analysis,,3,45,true
+PHY.11.KIN1D,physics,11,PHY.U02,chapter,Motion in a Straight Line,सरल रेखा में गति,1,135,true
+PHY.11.KIN1D.FRAMES,physics,11,PHY.11.KIN1D,topic,"Frame of reference, position-time graph, speed and velocity",,1,45,true
+PHY.11.KIN1D.ACCEL,physics,11,PHY.11.KIN1D,topic,"Uniform and non-uniform motion, uniformly accelerated motion and its relations",,2,45,true
+PHY.11.KIN1D.GRAPHS,physics,11,PHY.11.KIN1D,topic,Velocity-time and position-time graphs,,3,45,true
+PHY.11.KIN2D,physics,11,PHY.U02,chapter,Motion in a Plane,समतल में गति,2,225,true
+PHY.11.KIN2D.VECTORS,physics,11,PHY.11.KIN2D,topic,"Scalars and vectors: addition, subtraction, unit vectors and resolution",,1,45,true
+PHY.11.KIN2D.PRODUCTS,physics,11,PHY.11.KIN2D,topic,Scalar and vector products,,2,45,true
+PHY.11.KIN2D.RELVEL,physics,11,PHY.11.KIN2D,topic,Relative velocity,,3,45,true
+PHY.11.KIN2D.PROJ,physics,11,PHY.11.KIN2D,topic,Projectile motion,,4,45,true
+PHY.11.KIN2D.UCM,physics,11,PHY.11.KIN2D,topic,Uniform circular motion,,5,45,true
+PHY.11.NLM,physics,11,PHY.U03,chapter,Laws of Motion,गति के नियम,1,225,true
+PHY.11.NLM.LAWS,physics,11,PHY.11.NLM,topic,"Force and inertia, Newton's three laws, momentum and impulse",,1,45,true
+PHY.11.NLM.CONSMOM,physics,11,PHY.11.NLM,topic,Conservation of linear momentum and its applications,,2,45,true
+PHY.11.NLM.EQUILIB,physics,11,PHY.11.NLM,topic,Equilibrium of concurrent forces,,3,45,true
+PHY.11.NLM.FRICTION,physics,11,PHY.11.NLM,topic,"Static, kinetic and rolling friction and the laws of friction",,4,45,true
+PHY.11.NLM.CIRCDYN,physics,11,PHY.11.NLM,topic,"Dynamics of uniform circular motion: centripetal force, level and banked roads",,5,45,true
+PHY.11.WEP,physics,11,PHY.U04,chapter,"Work, Energy and Power","कार्य, ऊर्जा और शक्ति",1,270,true
+PHY.11.WEP.WORK,physics,11,PHY.11.WEP,topic,Work done by a constant force and a variable force,,1,45,true
+PHY.11.WEP.KEPE,physics,11,PHY.11.WEP,topic,Kinetic and potential energies and the work-energy theorem,,2,45,true
+PHY.11.WEP.POWER,physics,11,PHY.11.WEP,topic,Power,,3,45,true
+PHY.11.WEP.CONSERV,physics,11,PHY.11.WEP,topic,"Spring potential energy, conservative forces and conservation of mechanical energy",,4,45,true
+PHY.11.WEP.VERTCIRC,physics,11,PHY.11.WEP,topic,Motion in a vertical circle,,5,45,true
+PHY.11.WEP.COLLIS,physics,11,PHY.11.WEP,topic,Elastic and inelastic collisions in one and two dimensions,,6,45,true
+PHY.11.ROT,physics,11,PHY.U05,chapter,Systems of Particles and Rotational Motion,कणों के निकाय तथा घूर्णी गति,1,270,true
+PHY.11.ROT.COM,physics,11,PHY.11.ROT,topic,Centre of mass of a two-particle system and of a rigid body,,1,45,true
+PHY.11.ROT.TORQUE,physics,11,PHY.11.ROT,topic,"Moment of a force, torque and angular momentum",,2,45,true
+PHY.11.ROT.CONSANG,physics,11,PHY.11.ROT,topic,Conservation of angular momentum and its applications,,3,45,true
+PHY.11.ROT.MOI,physics,11,PHY.11.ROT,topic,"Moment of inertia, radius of gyration and simple geometrical objects",,4,45,true
+PHY.11.ROT.AXES,physics,11,PHY.11.ROT,topic,Parallel and perpendicular axes theorems,,5,45,true
+PHY.11.ROT.RIGID,physics,11,PHY.11.ROT,topic,"Equilibrium of rigid bodies, equations of rotational motion, linear versus rotational",,6,45,true
+PHY.11.GRAV,physics,11,PHY.U06,chapter,Gravitation,गुरुत्वाकर्षण,1,225,true
+PHY.11.GRAV.LAW,physics,11,PHY.11.GRAV,topic,Universal law of gravitation,,1,45,true
+PHY.11.GRAV.GVAR,physics,11,PHY.11.GRAV,topic,Acceleration due to gravity and its variation with altitude and depth,,2,45,true
+PHY.11.GRAV.KEPLER,physics,11,PHY.11.GRAV,topic,Kepler's laws of planetary motion,,3,45,true
+PHY.11.GRAV.POTEN,physics,11,PHY.11.GRAV,topic,Gravitational potential energy and gravitational potential,,4,45,true
+PHY.11.GRAV.SATELL,physics,11,PHY.11.GRAV,topic,"Escape velocity, satellite motion: orbital velocity, time period and energy",,5,45,true
+PHY.11.ELAST,physics,11,PHY.U07,chapter,Mechanical Properties of Solids,ठोसों के यांत्रिक गुण,1,90,true
+PHY.11.ELAST.STRESS,physics,11,PHY.11.ELAST,topic,"Elastic behaviour, stress-strain relationship and Hooke's law",,1,45,true
+PHY.11.ELAST.MODULI,physics,11,PHY.11.ELAST,topic,"Young's modulus, bulk modulus and modulus of rigidity",,2,45,true
+PHY.11.FLUID,physics,11,PHY.U07,chapter,Mechanical Properties of Fluids,तरलों के यांत्रिकी गुण,2,225,true
+PHY.11.FLUID.PRESS,physics,11,PHY.11.FLUID,topic,"Pressure due to a fluid column, Pascal's law and the effect of gravity",,1,45,true
+PHY.11.FLUID.VISC,physics,11,PHY.11.FLUID,topic,"Viscosity, Stokes' law and terminal velocity",,2,45,true
+PHY.11.FLUID.FLOW,physics,11,PHY.11.FLUID,topic,"Streamline and turbulent flow, critical velocity and Bernoulli's principle",,3,45,true
+PHY.11.FLUID.SURF,physics,11,PHY.11.FLUID,topic,"Surface energy, surface tension, angle of contact and excess pressure",,4,45,true
+PHY.11.FLUID.CAPILL,physics,11,PHY.11.FLUID,topic,"Drops, bubbles and capillary rise",,5,45,true
+PHY.11.THERMP,physics,11,PHY.U07,chapter,Thermal Properties of Matter,द्रव्य के तापीय गुण,3,180,true
+PHY.11.THERMP.TEMP,physics,11,PHY.11.THERMP,topic,"Heat, temperature and thermal expansion",,1,45,true
+PHY.11.THERMP.CALOR,physics,11,PHY.11.THERMP,topic,Specific heat capacity and calorimetry,,2,45,true
+PHY.11.THERMP.STATE,physics,11,PHY.11.THERMP,topic,Change of state and latent heat,,3,45,true
+PHY.11.THERMP.TRANSFER,physics,11,PHY.11.THERMP,topic,"Heat transfer: conduction, convection and radiation",,4,45,true
+PHY.11.THERMO,physics,11,PHY.U08,chapter,Thermodynamics,ऊष्मागतिकी,1,180,true
+PHY.11.THERMO.ZEROTH,physics,11,PHY.11.THERMO,topic,"Thermal equilibrium, zeroth law and the concept of temperature",,1,45,true
+PHY.11.THERMO.FIRST,physics,11,PHY.11.THERMO,topic,"Heat, work, internal energy and the first law of thermodynamics",,2,45,true
+PHY.11.THERMO.PROCESS,physics,11,PHY.11.THERMO,topic,Isothermal and adiabatic processes,,3,45,true
+PHY.11.THERMO.SECOND,physics,11,PHY.11.THERMO,topic,"Second law of thermodynamics, reversible and irreversible processes",,4,45,true
+PHY.11.KTG,physics,11,PHY.U09,chapter,Kinetic Theory,अणुगति सिद्धांत,1,225,true
+PHY.11.KTG.EQSTATE,physics,11,PHY.11.KTG,topic,Equation of state of a perfect gas and work done in compressing a gas,,1,45,true
+PHY.11.KTG.ASSUMP,physics,11,PHY.11.KTG,topic,Assumptions of kinetic theory and the concept of pressure,,2,45,true
+PHY.11.KTG.RMS,physics,11,PHY.11.KTG,topic,Kinetic interpretation of temperature and RMS speed,,3,45,true
+PHY.11.KTG.EQUIPART,physics,11,PHY.11.KTG,topic,"Degrees of freedom, equipartition of energy and specific heat capacities",,4,45,true
+PHY.11.KTG.MFP,physics,11,PHY.11.KTG,topic,Mean free path and Avogadro's number,,5,45,true
+PHY.11.OSC,physics,11,PHY.U10,chapter,Oscillations,दोलन,1,225,true
+PHY.11.OSC.PERIODIC,physics,11,PHY.11.OSC,topic,"Periodic motion: time period, frequency, displacement and periodic functions",,1,45,true
+PHY.11.OSC.SHM,physics,11,PHY.11.OSC,topic,"Simple harmonic motion, its equation and phase",,2,45,true
+PHY.11.OSC.SPRING,physics,11,PHY.11.OSC,topic,Oscillations of a spring: restoring force and force constant,,3,45,true
+PHY.11.OSC.ENERGY,physics,11,PHY.11.OSC,topic,Kinetic and potential energy in SHM,,4,45,true
+PHY.11.OSC.PENDULUM,physics,11,PHY.11.OSC,topic,Simple pendulum and the derivation of its time period,,5,45,true
+PHY.11.WAVES,physics,11,PHY.U10,chapter,Waves,तरंगें,2,225,true
+PHY.11.WAVES.TYPES,physics,11,PHY.11.WAVES,topic,"Wave motion: longitudinal and transverse waves, speed of a travelling wave",,1,45,true
+PHY.11.WAVES.PROGRESS,physics,11,PHY.11.WAVES,topic,Displacement relation for a progressive wave,,2,45,true
+PHY.11.WAVES.SUPERPOS,physics,11,PHY.11.WAVES,topic,Principle of superposition and reflection of waves,,3,45,true
+PHY.11.WAVES.STANDING,physics,11,PHY.11.WAVES,topic,"Standing waves in strings and organ pipes, fundamental mode and harmonics",,4,45,true
+PHY.11.WAVES.BEATS,physics,11,PHY.11.WAVES,topic,Beats,,5,45,true
+PHY.12.ECF,physics,12,PHY.U11,chapter,Electric Charges and Fields,वैद्युत आवेश तथा क्षेत्र,1,225,true
+PHY.12.ECF.CHARGE,physics,12,PHY.12.ECF,topic,"Electric charge, its conservation and Coulomb's law",,1,45,true
+PHY.12.ECF.SUPERPOS,physics,12,PHY.12.ECF,topic,Superposition principle and continuous charge distributions,,2,45,true
+PHY.12.ECF.FIELD,physics,12,PHY.12.ECF,topic,Electric field due to a point charge and electric field lines,,3,45,true
+PHY.12.ECF.DIPOLE,physics,12,PHY.12.ECF,topic,"Electric dipole, its field and torque in a uniform field",,4,45,true
+PHY.12.ECF.GAUSS,physics,12,PHY.12.ECF,topic,"Electric flux, Gauss's law and its applications",,5,45,true
+PHY.12.EPC,physics,12,PHY.U11,chapter,Electrostatic Potential and Capacitance,स्थिरवैद्युत विभव तथा धारिता,2,270,true
+PHY.12.EPC.POTENTIAL,physics,12,PHY.12.EPC,topic,"Electric potential of a point charge, a dipole and a system of charges",,1,45,true
+PHY.12.EPC.EQUIPOT,physics,12,PHY.12.EPC,topic,Potential difference and equipotential surfaces,,2,45,true
+PHY.12.EPC.PE,physics,12,PHY.12.EPC,topic,Electrostatic potential energy of two charges and of a dipole,,3,45,true
+PHY.12.EPC.CONDUCT,physics,12,PHY.12.EPC,topic,"Conductors, insulators, dielectrics and electric polarisation",,4,45,true
+PHY.12.EPC.CAPAC,physics,12,PHY.12.EPC,topic,Capacitors and the parallel plate capacitor with and without dielectric,,5,45,true
+PHY.12.EPC.COMBINE,physics,12,PHY.12.EPC,topic,Combination of capacitors and energy stored in a capacitor,,6,45,true
+PHY.12.CURR,physics,12,PHY.U12,chapter,Current Electricity,विद्युत धारा,1,315,true
+PHY.12.CURR.DRIFT,physics,12,PHY.12.CURR,topic,"Electric current, drift velocity and mobility",,1,45,true
+PHY.12.CURR.OHM,physics,12,PHY.12.CURR,topic,"Ohm's law, resistance and V-I characteristics of ohmic and non-ohmic conductors",,2,45,true
+PHY.12.CURR.RESIST,physics,12,PHY.12.CURR,topic,"Resistivity, conductivity and temperature dependence of resistance",,3,45,true
+PHY.12.CURR.POWER,physics,12,PHY.12.CURR,topic,Electrical energy and power,,4,45,true
+PHY.12.CURR.COMBINE,physics,12,PHY.12.CURR,topic,Series and parallel combinations of resistors,,5,45,true
+PHY.12.CURR.CELLS,physics,12,PHY.12.CURR,topic,"EMF, internal resistance and combinations of cells",,6,45,true
+PHY.12.CURR.KIRCH,physics,12,PHY.12.CURR,topic,"Kirchhoff's laws, Wheatstone bridge and metre bridge",,7,45,true
+PHY.12.MCM,physics,12,PHY.U13,chapter,Moving Charges and Magnetism,गतिमान आवेश और चुंबकत्व,1,270,true
+PHY.12.MCM.BIOT,physics,12,PHY.12.MCM,topic,Biot-Savart law and the current-carrying circular loop,,1,45,true
+PHY.12.MCM.AMPERE,physics,12,PHY.12.MCM,topic,Ampere's law: infinitely long straight wire and solenoid,,2,45,true
+PHY.12.MCM.LORENTZ,physics,12,PHY.12.MCM,topic,Force on a moving charge in uniform magnetic and electric fields,,3,45,true
+PHY.12.MCM.CONDFORCE,physics,12,PHY.12.MCM,topic,Force on a current-carrying conductor and between parallel currents,,4,45,true
+PHY.12.MCM.LOOP,physics,12,PHY.12.MCM,topic,Torque on a current loop and the loop as a magnetic dipole,,5,45,true
+PHY.12.MCM.GALVAN,physics,12,PHY.12.MCM,topic,"Moving coil galvanometer, its sensitivity, ammeter and voltmeter",,6,45,true
+PHY.12.MAGM,physics,12,PHY.U13,chapter,Magnetism and Matter,चुंबकत्व एवं द्रव्य,2,135,true
+PHY.12.MAGM.BARMAG,physics,12,PHY.12.MAGM,topic,"Bar magnet as an equivalent solenoid, field lines and dipole field",,1,45,true
+PHY.12.MAGM.TORQUE,physics,12,PHY.12.MAGM,topic,Torque on a magnetic dipole in a uniform magnetic field,,2,45,true
+PHY.12.MAGM.MATERIALS,physics,12,PHY.12.MAGM,topic,"Para-, dia- and ferromagnetic substances and the effect of temperature",,3,45,true
+PHY.12.EMI,physics,12,PHY.U14,chapter,Electromagnetic Induction,वैद्युतचुंबकीय प्रेरण,1,135,true
+PHY.12.EMI.FARADAY,physics,12,PHY.12.EMI,topic,"Faraday's law, induced emf and current",,1,45,true
+PHY.12.EMI.LENZ,physics,12,PHY.12.EMI,topic,Lenz's law and eddy currents,,2,45,true
+PHY.12.EMI.INDUCT,physics,12,PHY.12.EMI,topic,Self and mutual inductance,,3,45,true
+PHY.12.AC,physics,12,PHY.U14,chapter,Alternating Current,प्रत्यावर्ती धारा,2,180,true
+PHY.12.AC.RMS,physics,12,PHY.12.AC,topic,Alternating current and voltage: peak and RMS values,,1,45,true
+PHY.12.AC.LCR,physics,12,PHY.12.AC,topic,"Reactance, impedance, LCR series circuit and resonance",,2,45,true
+PHY.12.AC.POWER,physics,12,PHY.12.AC,topic,Power in AC circuits and wattless current,,3,45,true
+PHY.12.AC.DEVICES,physics,12,PHY.12.AC,topic,AC generator and transformer,,4,45,true
+PHY.12.EMW,physics,12,PHY.U15,chapter,Electromagnetic Waves,वैद्युतचुंबकीय तरंगें,1,135,true
+PHY.12.EMW.DISPCURR,physics,12,PHY.12.EMW,topic,Displacement current,,1,45,true
+PHY.12.EMW.NATURE,physics,12,PHY.12.EMW,topic,"Electromagnetic waves, their characteristics and transverse nature",,2,45,true
+PHY.12.EMW.SPECTRUM,physics,12,PHY.12.EMW,topic,Electromagnetic spectrum and applications of electromagnetic waves,,3,45,true
+PHY.12.RAYOPT,physics,12,PHY.U16,chapter,Ray Optics and Optical Instruments,किरण प्रकाशिकी एवं प्रकाशिक यंत्र,1,315,true
+PHY.12.RAYOPT.MIRROR,physics,12,PHY.12.RAYOPT,topic,"Reflection of light, spherical mirrors and the mirror formula",,1,45,true
+PHY.12.RAYOPT.REFRACT,physics,12,PHY.12.RAYOPT,topic,Refraction at plane and spherical surfaces,,2,45,true
+PHY.12.RAYOPT.LENS,physics,12,PHY.12.RAYOPT,topic,"Thin lens formula, lens maker formula, magnification and power",,3,45,true
+PHY.12.RAYOPT.TIR,physics,12,PHY.12.RAYOPT,topic,Total internal reflection and its applications,,4,45,true
+PHY.12.RAYOPT.COMBINE,physics,12,PHY.12.RAYOPT,topic,Combination of thin lenses in contact,,5,45,true
+PHY.12.RAYOPT.PRISM,physics,12,PHY.12.RAYOPT,topic,Refraction of light through a prism,,6,45,true
+PHY.12.RAYOPT.INSTRUM,physics,12,PHY.12.RAYOPT,topic,Microscope and astronomical telescopes and their magnifying powers,,7,45,true
+PHY.12.WAVOPT,physics,12,PHY.U16,chapter,Wave Optics,तरंग-प्रकाशिकी,2,225,true
+PHY.12.WAVOPT.HUYGENS,physics,12,PHY.12.WAVOPT,topic,"Wavefront, Huygens' principle and the laws of reflection and refraction",,1,45,true
+PHY.12.WAVOPT.INTERF,physics,12,PHY.12.WAVOPT,topic,"Interference, Young's double-slit experiment and fringe width",,2,45,true
+PHY.12.WAVOPT.COHERENT,physics,12,PHY.12.WAVOPT,topic,Coherent sources and sustained interference,,3,45,true
+PHY.12.WAVOPT.DIFFRACT,physics,12,PHY.12.WAVOPT,topic,Diffraction due to a single slit and the width of the central maximum,,4,45,true
+PHY.12.WAVOPT.POLAR,physics,12,PHY.12.WAVOPT,topic,"Polarisation, Brewster's law and uses of polaroids",,5,45,true
+PHY.12.DUAL,physics,12,PHY.U17,chapter,Dual Nature of Radiation and Matter,विकिरण तथा द्रव्य की द्वैत प्रकृति,1,135,true
+PHY.12.DUAL.PHOTOEL,physics,12,PHY.12.DUAL,topic,Photoelectric effect and the observations of Hertz and Lenard,,1,45,true
+PHY.12.DUAL.EINSTEIN,physics,12,PHY.12.DUAL,topic,Einstein's photoelectric equation and the particle nature of light,,2,45,true
+PHY.12.DUAL.MATTERW,physics,12,PHY.12.DUAL,topic,Matter waves and the de Broglie relation,,3,45,true
+PHY.12.ATOMS,physics,12,PHY.U18,chapter,Atoms,परमाणु,1,90,true
+PHY.12.ATOMS.RUTHER,physics,12,PHY.12.ATOMS,topic,Alpha-particle scattering and Rutherford's model of the atom,,1,45,true
+PHY.12.ATOMS.BOHR,physics,12,PHY.12.ATOMS,topic,"Bohr model, energy levels and the hydrogen spectrum",,2,45,true
+PHY.12.NUCLEI,physics,12,PHY.U18,chapter,Nuclei,नाभिक,2,135,true
+PHY.12.NUCLEI.COMPOS,physics,12,PHY.12.NUCLEI,topic,Composition and size of the nucleus and atomic masses,,1,45,true
+PHY.12.NUCLEI.BINDING,physics,12,PHY.12.NUCLEI,topic,"Mass-energy relation, mass defect and binding energy per nucleon",,2,45,true
+PHY.12.NUCLEI.FISSION,physics,12,PHY.12.NUCLEI,topic,Nuclear fission and fusion,,3,45,true
+PHY.12.SEMI,physics,12,PHY.U19,chapter,"Semiconductor Electronics: Materials, Devices and Simple Circuits","अर्धचालक इलेक्ट्रॉनिकी: पदार्थ, युक्तियाँ तथा सरल परिपथ",1,180,true
+PHY.12.SEMI.SEMIC,physics,12,PHY.12.SEMI,topic,Semiconductors and the diode's I-V characteristics in forward and reverse bias,,1,45,true
+PHY.12.SEMI.RECTIF,physics,12,PHY.12.SEMI,topic,Diode as a rectifier,,2,45,true
+PHY.12.SEMI.SPECIAL,physics,12,PHY.12.SEMI,topic,"LED, photodiode, solar cell and the Zener diode as a voltage regulator",,3,45,true
+PHY.12.SEMI.LOGIC,physics,12,PHY.12.SEMI,topic,"Logic gates: OR, AND, NOT, NAND and NOR",,4,45,true
+PHY.00.EXPSKILL,physics,,PHY.U20,chapter,Experimental Skills,प्रायोगिक कौशल,1,450,true
+PHY.00.EXPSKILL.VERNIER,physics,,PHY.00.EXPSKILL,topic,Vernier callipers and screw gauge,,1,45,true
+PHY.00.EXPSKILL.PENDULUM,physics,,PHY.00.EXPSKILL,topic,Simple pendulum: dissipation of energy,,2,45,true
+PHY.00.EXPSKILL.MOMENTS,physics,,PHY.00.EXPSKILL,topic,Metre scale: mass by the principle of moments,,3,45,true
+PHY.00.EXPSKILL.YOUNG,physics,,PHY.00.EXPSKILL,topic,Young's modulus of a metallic wire,,4,45,true
+PHY.00.EXPSKILL.SURFVISC,physics,,PHY.00.EXPSKILL,topic,Surface tension by capillary rise and viscosity by terminal velocity,,5,45,true
+PHY.00.EXPSKILL.SOUND,physics,,PHY.00.EXPSKILL,topic,Speed of sound with a resonance tube,,6,45,true
+PHY.00.EXPSKILL.SPHEAT,physics,,PHY.00.EXPSKILL,topic,Specific heat capacity of a solid and a liquid by the method of mixtures,,7,45,true
+PHY.00.EXPSKILL.ELECTRIC,physics,,PHY.00.EXPSKILL,topic,"Metre bridge resistivity, Ohm's law resistance and galvanometer figure of merit",,8,45,true
+PHY.00.EXPSKILL.OPTICS,physics,,PHY.00.EXPSKILL,topic,"Focal lengths by parallax, prism deviation curve and refractive index of a glass slab",,9,45,true
+PHY.00.EXPSKILL.DIODES,physics,,PHY.00.EXPSKILL,topic,Characteristic curves of p-n and Zener diodes and identification of components,,10,45,true
+CHE.11.BASICS,chemistry,11,CHE.U01,chapter,Some Basic Concepts of Chemistry,रसायन विज्ञान की कुछ मूल अवधारणाएँ,1,225,true
+CHE.11.BASICS.MATTER,chemistry,11,CHE.11.BASICS,topic,"Matter and its nature, Dalton's atomic theory, atoms, molecules, elements and compounds",,1,45,true
+CHE.11.BASICS.LAWS,chemistry,11,CHE.11.BASICS,topic,Laws of chemical combination,,2,45,true
+CHE.11.BASICS.MOLE,chemistry,11,CHE.11.BASICS,topic,"Atomic and molecular masses, the mole concept and molar mass",,3,45,true
+CHE.11.BASICS.FORMULAE,chemistry,11,CHE.11.BASICS,topic,"Percentage composition, empirical and molecular formulae",,4,45,true
+CHE.11.BASICS.STOICH,chemistry,11,CHE.11.BASICS,topic,Chemical equations and stoichiometry,,5,45,true
+CHE.11.ATOM,chemistry,11,CHE.U02,chapter,Structure of Atom,परमाणु की संरचना,1,270,true
+CHE.11.ATOM.RADIATION,chemistry,11,CHE.11.ATOM,topic,"Electromagnetic radiation, photoelectric effect and the hydrogen spectrum",,1,45,true
+CHE.11.ATOM.BOHR,chemistry,11,CHE.11.ATOM,topic,"Bohr model of the hydrogen atom: postulates, energy, radii and limitations",,2,45,true
+CHE.11.ATOM.DUAL,chemistry,11,CHE.11.ATOM,topic,"Dual nature of matter, de Broglie relationship and Heisenberg uncertainty",,3,45,true
+CHE.11.ATOM.QMMODEL,chemistry,11,CHE.11.ATOM,topic,Quantum mechanical model of the atom and orbitals as wave functions,,4,45,true
+CHE.11.ATOM.QNUMBERS,chemistry,11,CHE.11.ATOM,topic,"Quantum numbers, shapes of s, p and d orbitals and electron spin",,5,45,true
+CHE.11.ATOM.CONFIG,chemistry,11,CHE.11.ATOM,topic,"Aufbau principle, Pauli exclusion, Hund's rule and electronic configurations",,6,45,true
+CHE.11.BOND,chemistry,11,CHE.U03,chapter,Chemical Bonding and Molecular Structure,रासायनिक आबंधन तथा आण्विक संरचना,1,315,true
+CHE.11.BOND.LEWIS,chemistry,11,CHE.11.BOND,topic,"Kossel-Lewis approach, ionic and covalent bonds",,1,45,true
+CHE.11.BOND.IONIC,chemistry,11,CHE.11.BOND,topic,"Ionic bonding: formation, influencing factors and lattice enthalpy",,2,45,true
+CHE.11.BOND.COVALENT,chemistry,11,CHE.11.BOND,topic,"Electronegativity, Fajans' rules and dipole moment",,3,45,true
+CHE.11.BOND.VSEPR,chemistry,11,CHE.11.BOND,topic,VSEPR theory and shapes of simple molecules,,4,45,true
+CHE.11.BOND.VBT,chemistry,11,CHE.11.BOND,topic,"Valence bond theory, hybridisation of s, p and d orbitals and resonance",,5,45,true
+CHE.11.BOND.MOT,chemistry,11,CHE.11.BOND,topic,"Molecular orbital theory, homonuclear diatomics, bond order, length and energy",,6,45,true
+CHE.11.BOND.HBOND,chemistry,11,CHE.11.BOND,topic,Metallic bonding and hydrogen bonding,,7,45,true
+CHE.11.THERMO,chemistry,11,CHE.U04,chapter,Thermodynamics,ऊष्मागतिकी,1,225,true
+CHE.11.THERMO.BASICS,chemistry,11,CHE.11.THERMO,topic,"System and surroundings, extensive and intensive properties, state functions, processes",,1,45,true
+CHE.11.THERMO.FIRSTLAW,chemistry,11,CHE.11.THERMO,topic,"First law: work, heat, internal energy, enthalpy and heat capacities",,2,45,true
+CHE.11.THERMO.HESS,chemistry,11,CHE.11.THERMO,topic,"Hess's law and enthalpies of bond dissociation, combustion, formation and others",,3,45,true
+CHE.11.THERMO.SPONTAN,chemistry,11,CHE.11.THERMO,topic,"Second law: spontaneity, entropy of the universe and Gibbs energy",,4,45,true
+CHE.11.THERMO.GIBBSK,chemistry,11,CHE.11.THERMO,topic,Standard Gibbs energy change and the equilibrium constant,,5,45,true
+CHE.12.SOLN,chemistry,12,CHE.U05,chapter,Solutions,विलयन,1,180,true
+CHE.12.SOLN.CONC,chemistry,12,CHE.12.SOLN,topic,"Concentration terms: molality, molarity, mole fraction and percentages",,1,45,true
+CHE.12.SOLN.RAOULT,chemistry,12,CHE.12.SOLN,topic,"Vapour pressure of solutions, Raoult's law, ideal and non-ideal solutions",,2,45,true
+CHE.12.SOLN.COLLIG,chemistry,12,CHE.12.SOLN,topic,Colligative properties of dilute solutions,,3,45,true
+CHE.12.SOLN.MOLMASS,chemistry,12,CHE.12.SOLN,topic,"Molar mass from colligative properties, abnormal values and the van't Hoff factor",,4,45,true
+CHE.11.EQUIL,chemistry,11,CHE.U06,chapter,Equilibrium,साम्यावस्था,1,315,true
+CHE.11.EQUIL.DYNAMIC,chemistry,11,CHE.11.EQUIL,topic,Meaning of equilibrium and dynamic equilibrium,,1,45,true
+CHE.11.EQUIL.PHYSICAL,chemistry,11,CHE.11.EQUIL,topic,Equilibria in physical processes and Henry's law,,2,45,true
+CHE.11.EQUIL.CHEMICAL,chemistry,11,CHE.11.EQUIL,topic,"Law of chemical equilibrium, Kp and Kc and the role of Gibbs energy",,3,45,true
+CHE.11.EQUIL.LECHAT,chemistry,11,CHE.11.EQUIL,topic,Factors affecting equilibrium and Le Chatelier's principle,,4,45,true
+CHE.11.EQUIL.ACIDBASE,chemistry,11,CHE.11.EQUIL,topic,"Electrolytes, acid-base concepts and ionisation constants",,5,45,true
+CHE.11.EQUIL.PH,chemistry,11,CHE.11.EQUIL,topic,"Ionisation of water, pH scale, common ion effect and hydrolysis of salts",,6,45,true
+CHE.11.EQUIL.KSP,chemistry,11,CHE.11.EQUIL,topic,"Solubility of sparingly soluble salts, solubility product and buffer solutions",,7,45,true
+CHE.11.REDOX,chemistry,11,CHE.U07,chapter,Redox Reactions,अपचयोपचय अभिक्रियाएँ,1,135,true
+CHE.11.REDOX.CONCEPT,chemistry,11,CHE.11.REDOX,topic,Electronic concept of oxidation and reduction and redox reactions,,1,45,true
+CHE.11.REDOX.OXNUM,chemistry,11,CHE.11.REDOX,topic,Oxidation number and the rules for assigning it,,2,45,true
+CHE.11.REDOX.BALANCE,chemistry,11,CHE.11.REDOX,topic,Balancing of redox reactions,,3,45,true
+CHE.12.ELECHEM,chemistry,12,CHE.U07,chapter,Electrochemistry,वैद्युतरसायन,2,225,true
+CHE.12.ELECHEM.CONDUCT,chemistry,12,CHE.12.ELECHEM,topic,"Electrolytic and metallic conduction, conductance and molar conductivity",,1,45,true
+CHE.12.ELECHEM.KOHLR,chemistry,12,CHE.12.ELECHEM,topic,Kohlrausch's law and its applications,,2,45,true
+CHE.12.ELECHEM.CELLS,chemistry,12,CHE.12.ELECHEM,topic,"Electrolytic and galvanic cells, electrodes and electrode potentials",,3,45,true
+CHE.12.ELECHEM.NERNST,chemistry,12,CHE.12.ELECHEM,topic,"EMF of a galvanic cell, Nernst equation and the relation to Gibbs energy",,4,45,true
+CHE.12.ELECHEM.BATTERIES,chemistry,12,CHE.12.ELECHEM,topic,"Dry cell, lead accumulator and fuel cells",,5,45,true
+CHE.12.KINET,chemistry,12,CHE.U08,chapter,Chemical Kinetics,रासायनिक बलगतिकी,1,270,true
+CHE.12.KINET.RATE,chemistry,12,CHE.12.KINET,topic,Rate of a chemical reaction and the factors affecting it,,1,45,true
+CHE.12.KINET.ORDER,chemistry,12,CHE.12.KINET,topic,"Elementary and complex reactions, order and molecularity",,2,45,true
+CHE.12.KINET.RATELAW,chemistry,12,CHE.12.KINET,topic,"Rate law, rate constant and zero- and first-order reactions",,3,45,true
+CHE.12.KINET.HALFLIFE,chemistry,12,CHE.12.KINET,topic,Integrated rate equations and half-lives,,4,45,true
+CHE.12.KINET.ARRHEN,chemistry,12,CHE.12.KINET,topic,"Effect of temperature, Arrhenius equation and activation energy",,5,45,true
+CHE.12.KINET.COLLISION,chemistry,12,CHE.12.KINET,topic,Collision theory of bimolecular gaseous reactions,,6,45,true
+CHE.11.PERIOD,chemistry,11,CHE.U09,chapter,Classification of Elements and Periodicity in Properties,तत्वों का वर्गीकरण एवं गुणधर्मों में आवर्तिता,1,135,true
+CHE.11.PERIOD.TABLE,chemistry,11,CHE.11.PERIOD,topic,"Modern periodic law, the present periodic table and s, p, d and f blocks",,1,45,true
+CHE.11.PERIOD.TRENDS,chemistry,11,CHE.11.PERIOD,topic,"Periodic trends: atomic and ionic radii, ionisation and electron gain enthalpy",,2,45,true
+CHE.11.PERIOD.VALENCE,chemistry,11,CHE.11.PERIOD,topic,"Trends in valence, oxidation states and chemical reactivity",,3,45,true
+CHE.00.PBLOCK,chemistry,,CHE.U10,chapter,p-Block Elements,p-ब्लॉक तत्व,1,90,true
+CHE.00.PBLOCK.CONFIG,chemistry,,CHE.00.PBLOCK,topic,Groups 13 to 18: electronic configuration and general trends across periods and groups,,1,45,true
+CHE.00.PBLOCK.FIRSTEL,chemistry,,CHE.00.PBLOCK,topic,Unique behaviour of the first element in each group,,2,45,true
+CHE.12.DFBLOCK,chemistry,12,CHE.U11,chapter,The d- and f-Block Elements,d- एवं f- ब्लॉक के तत्व,1,270,true
+CHE.12.DFBLOCK.INTRO,chemistry,12,CHE.12.DFBLOCK,topic,"Transition elements: electronic configuration, occurrence and characteristics",,1,45,true
+CHE.12.DFBLOCK.TRENDS,chemistry,12,CHE.12.DFBLOCK,topic,"Trends in the first-row transition series: ionisation enthalpy, oxidation states, radii, colour",,2,45,true
+CHE.12.DFBLOCK.PROPS,chemistry,12,CHE.12.DFBLOCK,topic,"Catalytic behaviour, magnetic properties, complex, interstitial and alloy formation",,3,45,true
+CHE.12.DFBLOCK.KMNO4,chemistry,12,CHE.12.DFBLOCK,topic,"Preparation, properties and uses of potassium dichromate and potassium permanganate",,4,45,true
+CHE.12.DFBLOCK.LANTH,chemistry,12,CHE.12.DFBLOCK,topic,"Lanthanoids: electronic configuration, oxidation states and lanthanoid contraction",,5,45,true
+CHE.12.DFBLOCK.ACTIN,chemistry,12,CHE.12.DFBLOCK,topic,Actinoids: electronic configuration and oxidation states,,6,45,true
+CHE.12.COORD,chemistry,12,CHE.U12,chapter,Coordination Compounds,उपसहसंयोजन यौगिक,1,225,true
+CHE.12.COORD.WERNER,chemistry,12,CHE.12.COORD,topic,"Werner's theory, ligands, coordination number, denticity and chelation",,1,45,true
+CHE.12.COORD.NOMENCL,chemistry,12,CHE.12.COORD,topic,IUPAC nomenclature of mononuclear coordination compounds,,2,45,true
+CHE.12.COORD.ISOMER,chemistry,12,CHE.12.COORD,topic,Isomerism in coordination compounds,,3,45,true
+CHE.12.COORD.BONDING,chemistry,12,CHE.12.COORD,topic,"Valence bond approach, crystal field theory, colour and magnetic properties",,4,45,true
+CHE.12.COORD.IMPORT,chemistry,12,CHE.12.COORD,topic,"Importance in qualitative analysis, extraction of metals and biological systems",,5,45,true
+CHE.11.GOCTECH,chemistry,11,CHE.U13,chapter,Organic Chemistry: Purification and Analysis,कार्बनिक रसायन: शोधन और विश्लेषण,1,180,true
+CHE.11.GOCTECH.PURIFY,chemistry,11,CHE.11.GOCTECH,topic,"Crystallisation, sublimation, distillation, differential extraction and chromatography",,1,45,true
+CHE.11.GOCTECH.QUALIT,chemistry,11,CHE.11.GOCTECH,topic,"Qualitative analysis: detection of nitrogen, sulphur, phosphorus and halogens",,2,45,true
+CHE.11.GOCTECH.QUANTIT,chemistry,11,CHE.11.GOCTECH,topic,"Quantitative analysis: estimation of carbon, hydrogen, nitrogen, halogens, sulphur, phosphorus",,3,45,true
+CHE.11.GOCTECH.FORMULAE,chemistry,11,CHE.11.GOCTECH,topic,Empirical and molecular formulae from organic quantitative analysis,,4,45,true
+CHE.11.GOC,chemistry,11,CHE.U14,chapter,Organic Chemistry: Some Basic Principles and Techniques,कार्बनिक रसायन: कुछ आधारभूत सिद्धांत तथा तकनीकें,1,315,true
+CHE.11.GOC.TETRAVAL,chemistry,11,CHE.11.GOC,topic,"Tetravalency of carbon, hybridisation and shapes of simple molecules",,1,45,true
+CHE.11.GOC.CLASSIF,chemistry,11,CHE.11.GOC,topic,Classification by functional group and homologous series,,2,45,true
+CHE.11.GOC.ISOMER,chemistry,11,CHE.11.GOC,topic,Structural isomerism and stereoisomerism,,3,45,true
+CHE.11.GOC.NOMENCL,chemistry,11,CHE.11.GOC,topic,Trivial and IUPAC nomenclature,,4,45,true
+CHE.11.GOC.FISSION,chemistry,11,CHE.11.GOC,topic,"Covalent bond fission: free radicals, carbocations, carbanions, electrophiles, nucleophiles",,5,45,true
+CHE.11.GOC.EFFECTS,chemistry,11,CHE.11.GOC,topic,"Inductive, electromeric, resonance and hyperconjugation effects",,6,45,true
+CHE.11.GOC.REACTIONS,chemistry,11,CHE.11.GOC,topic,"Substitution, addition, elimination and rearrangement reactions",,7,45,true
+CHE.11.HYDROC,chemistry,11,CHE.U15,chapter,Hydrocarbons,हाइड्रोकार्बन,1,270,true
+CHE.11.HYDROC.GENERAL,chemistry,11,CHE.11.HYDROC,topic,"Classification, isomerism, nomenclature and general methods of preparation",,1,45,true
+CHE.11.HYDROC.ALKANES,chemistry,11,CHE.11.HYDROC,topic,"Alkanes: sawhorse and Newman conformations, mechanism of halogenation",,2,45,true
+CHE.11.HYDROC.ALKENES,chemistry,11,CHE.11.HYDROC,topic,"Alkenes: geometrical isomerism, electrophilic addition, ozonolysis and polymerisation",,3,45,true
+CHE.11.HYDROC.ALKYNES,chemistry,11,CHE.11.HYDROC,topic,"Alkynes: acidic character, addition reactions and polymerisation",,4,45,true
+CHE.11.HYDROC.AROMATIC,chemistry,11,CHE.11.HYDROC,topic,"Benzene: structure, aromaticity and electrophilic substitution",,5,45,true
+CHE.11.HYDROC.DIRECTIVE,chemistry,11,CHE.11.HYDROC,topic,"Friedel-Crafts alkylation and acylation, directive influence of substituents",,6,45,true
+CHE.12.HALO,chemistry,12,CHE.U16,chapter,Haloalkanes and Haloarenes,हैलोऐल्केन तथा हैलोऐरीन,1,135,true
+CHE.12.HALO.GENERAL,chemistry,12,CHE.12.HALO,topic,"General preparation, properties and reactions; nature of the C-X bond",,1,45,true
+CHE.12.HALO.MECHAN,chemistry,12,CHE.12.HALO,topic,Mechanisms of substitution reactions,,2,45,true
+CHE.12.HALO.ENVIRON,chemistry,12,CHE.12.HALO,topic,"Uses and environmental effects of chloroform, iodoform, freons and DDT",,3,45,true
+CHE.12.ALCPHE,chemistry,12,CHE.U17,chapter,"Alcohols, Phenols and Ethers","ऐल्कोहॉल, फ़ीनॉल एवं ईथर",1,135,true
+CHE.12.ALCPHE.ALCOHOLS,chemistry,12,CHE.12.ALCPHE,topic,"Alcohols: preparation, properties, identification of primary to tertiary, dehydration mechanism",,1,45,true
+CHE.12.ALCPHE.PHENOLS,chemistry,12,CHE.12.ALCPHE,topic,"Phenols: acidic nature, electrophilic substitution and the Reimer-Tiemann reaction",,2,45,true
+CHE.12.ALCPHE.ETHERS,chemistry,12,CHE.12.ALCPHE,topic,"Ethers: structure, preparation and properties",,3,45,true
+CHE.12.CARBONYL,chemistry,12,CHE.U17,chapter,"Aldehydes, Ketones and Carboxylic Acids","ऐल्डिहाइड, कीटोन एवं कार्बोक्सिलिक अम्ल",2,270,true
+CHE.12.CARBONYL.CARBONYL,chemistry,12,CHE.12.CARBONYL,topic,Nature of the carbonyl group and relative reactivities of aldehydes and ketones,,1,45,true
+CHE.12.CARBONYL.NUCADD,chemistry,12,CHE.12.CARBONYL,topic,"Nucleophilic addition: HCN, ammonia and its derivatives, Grignard reagent",,2,45,true
+CHE.12.CARBONYL.REDOX,chemistry,12,CHE.12.CARBONYL,topic,Oxidation and reduction including Wolff-Kishner and Clemmensen,,3,45,true
+CHE.12.CARBONYL.ALPHAH,chemistry,12,CHE.12.CARBONYL,topic,"Acidity of alpha-hydrogen, aldol condensation, Cannizzaro and haloform reactions",,4,45,true
+CHE.12.CARBONYL.TESTS,chemistry,12,CHE.12.CARBONYL,topic,Chemical tests to distinguish aldehydes and ketones,,5,45,true
+CHE.12.CARBONYL.ACIDS,chemistry,12,CHE.12.CARBONYL,topic,Carboxylic acids: acidic strength and the factors affecting it,,6,45,true
+CHE.12.AMINES,chemistry,12,CHE.U18,chapter,Amines,ऐमीन,1,135,true
+CHE.12.AMINES.AMINES,chemistry,12,CHE.12.AMINES,topic,"Amines: nomenclature, classification, structure and preparation",,1,45,true
+CHE.12.AMINES.BASIC,chemistry,12,CHE.12.AMINES,topic,"Basic character and identification of primary, secondary and tertiary amines",,2,45,true
+CHE.12.AMINES.DIAZON,chemistry,12,CHE.12.AMINES,topic,Diazonium salts and their importance in synthesis,,3,45,true
+CHE.12.BIOMOL,chemistry,12,CHE.U19,chapter,Biomolecules,जैव-अणु,1,270,true
+CHE.12.BIOMOL.CARBS,chemistry,12,CHE.12.BIOMOL,topic,"Carbohydrates: classification, monosaccharides and oligosaccharides",,1,45,true
+CHE.12.BIOMOL.PROTEINS,chemistry,12,CHE.12.BIOMOL,topic,"Amino acids, peptide bond, protein structure and denaturation",,2,45,true
+CHE.12.BIOMOL.ENZYMES,chemistry,12,CHE.12.BIOMOL,topic,Enzymes,,3,45,true
+CHE.12.BIOMOL.VITAMINS,chemistry,12,CHE.12.BIOMOL,topic,Vitamins: classification and functions,,4,45,true
+CHE.12.BIOMOL.NUCLEIC,chemistry,12,CHE.12.BIOMOL,topic,Nucleic acids: chemical constitution and biological functions of DNA and RNA,,5,45,true
+CHE.12.BIOMOL.HORMONES,chemistry,12,CHE.12.BIOMOL,topic,Hormones: general introduction,,6,45,true
+CHE.00.PRACTICAL,chemistry,,CHE.U20,chapter,Principles Related to Practical Chemistry,प्रायोगिक रसायन से संबंधित सिद्धांत,1,315,true
+CHE.00.PRACTICAL.ELEMENTS,chemistry,,CHE.00.PRACTICAL,topic,"Detection of nitrogen, sulphur and halogens in organic compounds",,1,45,true
+CHE.00.PRACTICAL.FUNCGRP,chemistry,,CHE.00.PRACTICAL,topic,"Detection of hydroxyl, carbonyl, carboxyl and amino groups",,2,45,true
+CHE.00.PRACTICAL.INORGPREP,chemistry,,CHE.00.PRACTICAL,topic,Preparation of Mohr's salt and potash alum,,3,45,true
+CHE.00.PRACTICAL.ORGPREP,chemistry,,CHE.00.PRACTICAL,topic,"Preparation of acetanilide, p-nitroacetanilide, aniline yellow and iodoform",,4,45,true
+CHE.00.PRACTICAL.TITRATION,chemistry,,CHE.00.PRACTICAL,topic,"Titrimetric exercises: indicators, oxalic acid and Mohr's salt against permanganate",,5,45,true
+CHE.00.PRACTICAL.SALTANAL,chemistry,,CHE.00.PRACTICAL,topic,Qualitative salt analysis: cations and anions,,6,45,true
+CHE.00.PRACTICAL.EXPERIM,chemistry,,CHE.00.PRACTICAL,topic,"Enthalpy of solution and neutralisation, sols, iodide and hydrogen peroxide kinetics",,7,45,true
+BOT.11.LIVING,botany,11,BOT.U01,chapter,The Living World,जीव जगत,1,135,true
+BOT.11.LIVING.LIVING,botany,11,BOT.11.LIVING,topic,What is living; biodiversity and the need for classification,,1,45,true
+BOT.11.LIVING.TAXONOMY,botany,11,BOT.11.LIVING,topic,"Taxonomy and systematics, concept of species and the taxonomical hierarchy",,2,45,true
+BOT.11.LIVING.NOMENCL,botany,11,BOT.11.LIVING,topic,Binomial nomenclature,,3,45,true
+BOT.11.CLASSIF,botany,11,BOT.U01,chapter,Biological Classification,जीव जगत का वर्गीकरण,2,225,true
+BOT.11.CLASSIF.FIVEKING,botany,11,BOT.11.CLASSIF,topic,Five kingdom classification,,1,45,true
+BOT.11.CLASSIF.MONERA,botany,11,BOT.11.CLASSIF,topic,Monera: salient features and classification,,2,45,true
+BOT.11.CLASSIF.PROTISTA,botany,11,BOT.11.CLASSIF,topic,Protista: salient features and classification,,3,45,true
+BOT.11.CLASSIF.FUNGI,botany,11,BOT.11.CLASSIF,topic,Fungi and lichens,,4,45,true
+BOT.11.CLASSIF.VIRUSES,botany,11,BOT.11.CLASSIF,topic,Viruses and viroids,,5,45,true
+BOT.11.PLANTK,botany,11,BOT.U01,chapter,Plant Kingdom,वनस्पति जगत,3,180,true
+BOT.11.PLANTK.ALGAE,botany,11,BOT.11.PLANTK,topic,Algae,,1,45,true
+BOT.11.PLANTK.BRYO,botany,11,BOT.11.PLANTK,topic,Bryophytes,,2,45,true
+BOT.11.PLANTK.PTERIDO,botany,11,BOT.11.PLANTK,topic,Pteridophytes,,3,45,true
+BOT.11.PLANTK.GYMNO,botany,11,BOT.11.PLANTK,topic,Gymnosperms,,4,45,true
+ZOO.11.ANIMALK,zoology,11,ZOO.U01,chapter,Animal Kingdom,प्राणि जगत,1,135,true
+ZOO.11.ANIMALK.BASIS,zoology,11,ZOO.11.ANIMALK,topic,Basis of classification of animals,,1,45,true
+ZOO.11.ANIMALK.NONCHORD,zoology,11,ZOO.11.ANIMALK,topic,Non-chordates up to the phylum level,,2,45,true
+ZOO.11.ANIMALK.CHORD,zoology,11,ZOO.11.ANIMALK,topic,Chordates up to the class level,,3,45,true
+BOT.11.MORPH,botany,11,BOT.U02,chapter,Morphology of Flowering Plants,पुष्पी पादपों की आकारिकी,1,225,true
+BOT.11.MORPH.ROOTSTEM,botany,11,BOT.11.MORPH,topic,Root and stem: morphology and modifications,,1,45,true
+BOT.11.MORPH.LEAF,botany,11,BOT.11.MORPH,topic,Leaf: morphology and modifications,,2,45,true
+BOT.11.MORPH.INFLOR,botany,11,BOT.11.MORPH,topic,Inflorescence: racemose and cymose,,3,45,true
+BOT.11.MORPH.FLOWER,botany,11,BOT.11.MORPH,topic,"Flower, fruit and seed",,4,45,true
+BOT.11.MORPH.FAMILIES,botany,11,BOT.11.MORPH,topic,"Families: Malvaceae, Cruciferae, Leguminosae, Compositae and Gramineae",,5,45,true
+BOT.11.ANAT,botany,11,BOT.U02,chapter,Anatomy of Flowering Plants,पुष्पी पादपों का शारीर,2,90,true
+BOT.11.ANAT.TISSUES,botany,11,BOT.11.ANAT,topic,Plant tissues and tissue systems,,1,45,true
+BOT.11.ANAT.ANATOMY,botany,11,BOT.11.ANAT,topic,"Anatomy of root, stem and leaf in dicots and monocots",,2,45,true
+ZOO.11.STRUCTANI,zoology,11,ZOO.U02,chapter,Structural Organisation in Animals,प्राणियों में संरचनात्मक संगठन,1,90,true
+ZOO.11.STRUCTANI.TISSUES,zoology,11,ZOO.11.STRUCTANI,topic,Animal tissues,,1,45,true
+ZOO.11.STRUCTANI.FROG,zoology,11,ZOO.11.STRUCTANI,topic,"Frog: morphology and the digestive, circulatory, respiratory, nervous and reproductive systems",,2,45,true
+BOT.11.CELL,botany,11,BOT.U03,chapter,Cell: The Unit of Life,कोशिका: जीवन की इकाई,1,270,true
+BOT.11.CELL.THEORY,botany,11,BOT.11.CELL,topic,"Cell theory, prokaryotic and eukaryotic cells, plant and animal cells",,1,45,true
+BOT.11.CELL.ENVELOPE,botany,11,BOT.11.CELL,topic,"Cell envelope, cell membrane and cell wall",,2,45,true
+BOT.11.CELL.ENDOMEMB,botany,11,BOT.11.CELL,topic,"Endomembrane system: endoplasmic reticulum, Golgi bodies, lysosomes and vacuoles",,3,45,true
+BOT.11.CELL.ORGANELL,botany,11,BOT.11.CELL,topic,"Mitochondria, ribosomes, plastids and microbodies",,4,45,true
+BOT.11.CELL.CYTOSKEL,botany,11,BOT.11.CELL,topic,"Cytoskeleton, cilia, flagella and centrioles",,5,45,true
+BOT.11.CELL.NUCLEUS,botany,11,BOT.11.CELL,topic,"Nucleus: nuclear membrane, chromatin and nucleolus",,6,45,true
+BOT.11.BIOMOL,botany,11,BOT.U03,chapter,Biomolecules,जैव अणु,2,135,true
+BOT.11.BIOMOL.CONSTIT,botany,11,BOT.11.BIOMOL,topic,Chemical constituents of living cells,,1,45,true
+BOT.11.BIOMOL.MACROMOL,botany,11,BOT.11.BIOMOL,topic,"Proteins, carbohydrates, lipids and nucleic acids: structure and function",,2,45,true
+BOT.11.BIOMOL.ENZYMES,botany,11,BOT.11.BIOMOL,topic,"Enzymes: types, properties, action, classification and nomenclature",,3,45,true
+BOT.11.CELLCYC,botany,11,BOT.U03,chapter,Cell Cycle and Cell Division,कोशिका चक्र और कोशिका विभाजन,3,135,true
+BOT.11.CELLCYC.CYCLE,botany,11,BOT.11.CELLCYC,topic,Cell cycle,,1,45,true
+BOT.11.CELLCYC.MITOSIS,botany,11,BOT.11.CELLCYC,topic,Mitosis and its significance,,2,45,true
+BOT.11.CELLCYC.MEIOSIS,botany,11,BOT.11.CELLCYC,topic,Meiosis and its significance,,3,45,true
+BOT.11.PHOTOSYN,botany,11,BOT.U04,chapter,Photosynthesis in Higher Plants,उच्च पादपों में प्रकाश संश्लेषण,1,180,true
+BOT.11.PHOTOSYN.SITE,botany,11,BOT.11.PHOTOSYN,topic,"Photosynthesis as autotrophic nutrition, its site and pigments",,1,45,true
+BOT.11.PHOTOSYN.LIGHT,botany,11,BOT.11.PHOTOSYN,topic,"Photochemical phase: cyclic and non-cyclic photophosphorylation, chemiosmosis",,2,45,true
+BOT.11.PHOTOSYN.DARK,botany,11,BOT.11.PHOTOSYN,topic,Biosynthetic phase: C3 and C4 pathways and photorespiration,,3,45,true
+BOT.11.PHOTOSYN.FACTORS,botany,11,BOT.11.PHOTOSYN,topic,Factors affecting photosynthesis,,4,45,true
+BOT.11.RESP,botany,11,BOT.U04,chapter,Respiration in Plants,पादप में श्वसन,2,135,true
+BOT.11.RESP.GLYCOL,botany,11,BOT.11.RESP,topic,"Exchange of gases, glycolysis and fermentation",,1,45,true
+BOT.11.RESP.TCA,botany,11,BOT.11.RESP,topic,TCA cycle and the electron transport system,,2,45,true
+BOT.11.RESP.ATP,botany,11,BOT.11.RESP,topic,"Energy relations: ATP yield, amphibolic pathways and respiratory quotient",,3,45,true
+BOT.11.GROWTH,botany,11,BOT.U04,chapter,Plant Growth and Development,पादप वृद्धि एवं परिवर्धन,3,135,true
+BOT.11.GROWTH.PHASES,botany,11,BOT.11.GROWTH,topic,"Seed germination, phases of growth, growth rate and conditions of growth",,1,45,true
+BOT.11.GROWTH.DIFFER,botany,11,BOT.11.GROWTH,topic,"Differentiation, dedifferentiation and redifferentiation; developmental sequence",,2,45,true
+BOT.11.GROWTH.REGUL,botany,11,BOT.11.GROWTH,topic,"Growth regulators: auxin, gibberellin, cytokinin, ethylene and ABA",,3,45,true
+ZOO.11.BREATH,zoology,11,ZOO.U05,chapter,Breathing and Exchange of Gases,श्वसन और गैसों का विनिमय,1,180,true
+ZOO.11.BREATH.SYSTEM,zoology,11,ZOO.11.BREATH,topic,Respiratory organs in animals and the human respiratory system,,1,45,true
+ZOO.11.BREATH.MECHAN,zoology,11,ZOO.11.BREATH,topic,"Mechanism of breathing, its regulation and respiratory volumes",,2,45,true
+ZOO.11.BREATH.EXCHANGE,zoology,11,ZOO.11.BREATH,topic,Exchange and transport of gases,,3,45,true
+ZOO.11.BREATH.DISORDER,zoology,11,ZOO.11.BREATH,topic,"Disorders: asthma, emphysema and occupational respiratory disorders",,4,45,true
+ZOO.11.CIRC,zoology,11,ZOO.U05,chapter,Body Fluids and Circulation,शरीर द्रव तथा परिसंचरण,2,270,true
+ZOO.11.CIRC.BLOOD,zoology,11,ZOO.11.CIRC,topic,"Composition of blood, blood groups and coagulation",,1,45,true
+ZOO.11.CIRC.LYMPH,zoology,11,ZOO.11.CIRC,topic,Composition and function of lymph,,2,45,true
+ZOO.11.CIRC.HEART,zoology,11,ZOO.11.CIRC,topic,"Human heart, blood vessels and double circulation",,3,45,true
+ZOO.11.CIRC.CYCLE,zoology,11,ZOO.11.CIRC,topic,"Cardiac cycle, cardiac output and ECG",,4,45,true
+ZOO.11.CIRC.REGUL,zoology,11,ZOO.11.CIRC,topic,Regulation of cardiac activity,,5,45,true
+ZOO.11.CIRC.DISORDER,zoology,11,ZOO.11.CIRC,topic,"Disorders: hypertension, coronary artery disease, angina pectoris, heart failure",,6,45,true
+ZOO.11.EXCRET,zoology,11,ZOO.U05,chapter,Excretory Products and their Elimination,उत्सर्जी उत्पाद एवं उनका निष्कासन,3,270,true
+ZOO.11.EXCRET.MODES,zoology,11,ZOO.11.EXCRET,topic,"Modes of excretion: ammonotelism, ureotelism and uricotelism",,1,45,true
+ZOO.11.EXCRET.SYSTEM,zoology,11,ZOO.11.EXCRET,topic,Human excretory system: structure and function,,2,45,true
+ZOO.11.EXCRET.URINE,zoology,11,ZOO.11.EXCRET,topic,Urine formation and osmoregulation,,3,45,true
+ZOO.11.EXCRET.REGUL,zoology,11,ZOO.11.EXCRET,topic,"Regulation of kidney function: renin-angiotensin, ANF, ADH and diabetes insipidus",,4,45,true
+ZOO.11.EXCRET.OTHERS,zoology,11,ZOO.11.EXCRET,topic,Role of other organs in excretion,,5,45,true
+ZOO.11.EXCRET.DISORDER,zoology,11,ZOO.11.EXCRET,topic,"Disorders: uraemia, renal failure, renal calculi, nephritis; dialysis and artificial kidney",,6,45,true
+ZOO.11.LOCOMOT,zoology,11,ZOO.U05,chapter,Locomotion and Movement,गमन एवं संचलन,4,180,true
+ZOO.11.LOCOMOT.MOVEMENT,zoology,11,ZOO.11.LOCOMOT,topic,"Types of movement: ciliary, flagellar and muscular",,1,45,true
+ZOO.11.LOCOMOT.MUSCLE,zoology,11,ZOO.11.LOCOMOT,topic,Skeletal muscle: contractile proteins and muscle contraction,,2,45,true
+ZOO.11.LOCOMOT.SKELETON,zoology,11,ZOO.11.LOCOMOT,topic,"Skeletal system, its functions and joints",,3,45,true
+ZOO.11.LOCOMOT.DISORDER,zoology,11,ZOO.11.LOCOMOT,topic,"Disorders: myasthenia gravis, tetany, muscular dystrophy, arthritis, osteoporosis, gout",,4,45,true
+ZOO.11.NEURAL,zoology,11,ZOO.U05,chapter,Neural Control and Coordination,तंत्रिकीय नियंत्रण एवं समन्वय,5,135,true
+ZOO.11.NEURAL.NEURON,zoology,11,ZOO.11.NEURAL,topic,Neuron and nerves,,1,45,true
+ZOO.11.NEURAL.SYSTEM,zoology,11,ZOO.11.NEURAL,topic,"Central, peripheral and visceral nervous systems",,2,45,true
+ZOO.11.NEURAL.IMPULSE,zoology,11,ZOO.11.NEURAL,topic,Generation and conduction of nerve impulse,,3,45,true
+ZOO.11.ENDOCR,zoology,11,ZOO.U05,chapter,Chemical Coordination and Integration,रासायनिक समन्वय तथा एकीकरण,6,180,true
+ZOO.11.ENDOCR.GLANDS,zoology,11,ZOO.11.ENDOCR,topic,Endocrine glands and hormones,,1,45,true
+ZOO.11.ENDOCR.HUMAN,zoology,11,ZOO.11.ENDOCR,topic,"Human endocrine system: hypothalamus, pituitary, pineal, thyroid, parathyroid, adrenal, pancreas, gonads",,2,45,true
+ZOO.11.ENDOCR.MECHAN,zoology,11,ZOO.11.ENDOCR,topic,Mechanism of hormone action; hormones as messengers and regulators,,3,45,true
+ZOO.11.ENDOCR.DISORDER,zoology,11,ZOO.11.ENDOCR,topic,Hypo- and hyperactivity and related disorders,,4,45,true
+BOT.12.SEXREPRO,botany,12,BOT.U06,chapter,Sexual Reproduction in Flowering Plants,पुष्पी पादपों में लैंगिक जनन,1,225,true
+BOT.12.SEXREPRO.FLOWER,botany,12,BOT.12.SEXREPRO,topic,Flower structure and development of male and female gametophytes,,1,45,true
+BOT.12.SEXREPRO.POLLIN,botany,12,BOT.12.SEXREPRO,topic,"Pollination: types, agencies and examples; outbreeding devices",,2,45,true
+BOT.12.SEXREPRO.FERTIL,botany,12,BOT.12.SEXREPRO,topic,Pollen-pistil interaction and double fertilisation,,3,45,true
+BOT.12.SEXREPRO.POSTFERT,botany,12,BOT.12.SEXREPRO,topic,"Post-fertilisation events: endosperm, embryo, seed and fruit",,4,45,true
+BOT.12.SEXREPRO.SPECIAL,botany,12,BOT.12.SEXREPRO,topic,"Apomixis, parthenocarpy and polyembryony; significance of seed and fruit",,5,45,true
+ZOO.12.HUMREPRO,zoology,12,ZOO.U06,chapter,Human Reproduction,मानव जनन,1,225,true
+ZOO.12.HUMREPRO.SYSTEMS,zoology,12,ZOO.12.HUMREPRO,topic,Male and female reproductive systems; microscopic anatomy of testis and ovary,,1,45,true
+ZOO.12.HUMREPRO.GAMETO,zoology,12,ZOO.12.HUMREPRO,topic,Gametogenesis: spermatogenesis and oogenesis,,2,45,true
+ZOO.12.HUMREPRO.MENSTR,zoology,12,ZOO.12.HUMREPRO,topic,Menstrual cycle,,3,45,true
+ZOO.12.HUMREPRO.FERTIL,zoology,12,ZOO.12.HUMREPRO,topic,"Fertilisation, embryo development up to blastocyst and implantation",,4,45,true
+ZOO.12.HUMREPRO.PREGN,zoology,12,ZOO.12.HUMREPRO,topic,"Pregnancy, placenta formation, parturition and lactation",,5,45,true
+ZOO.12.REPROHLTH,zoology,12,ZOO.U06,chapter,Reproductive Health,जनन स्वास्थ्य,2,135,true
+ZOO.12.REPROHLTH.STD,zoology,12,ZOO.12.REPROHLTH,topic,Need for reproductive health and prevention of sexually transmitted diseases,,1,45,true
+ZOO.12.REPROHLTH.CONTRA,zoology,12,ZOO.12.REPROHLTH,topic,"Birth control: need and methods, contraception and medical termination of pregnancy",,2,45,true
+ZOO.12.REPROHLTH.ART,zoology,12,ZOO.12.REPROHLTH,topic,"Amniocentesis, infertility and assisted reproductive technologies",,3,45,true
+BOT.12.INHERIT,botany,12,BOT.U07,chapter,Principles of Inheritance and Variation,वंशागति तथा विविधता के सिद्धांत,1,360,true
+BOT.12.INHERIT.MENDEL,botany,12,BOT.12.INHERIT,topic,Mendelian inheritance,,1,45,true
+BOT.12.INHERIT.DEVIAT,botany,12,BOT.12.INHERIT,topic,"Deviations from Mendelism: incomplete dominance, co-dominance, multiple alleles, pleiotropy",,2,45,true
+BOT.12.INHERIT.POLYGEN,botany,12,BOT.12.INHERIT,topic,Polygenic inheritance,,3,45,true
+BOT.12.INHERIT.CHROMTH,botany,12,BOT.12.INHERIT,topic,Chromosome theory of inheritance; chromosomes and genes,,4,45,true
+BOT.12.INHERIT.SEXDET,botany,12,BOT.12.INHERIT,topic,"Sex determination in humans, birds and honey bee",,5,45,true
+BOT.12.INHERIT.LINKAGE,botany,12,BOT.12.INHERIT,topic,Linkage and crossing over,,6,45,true
+BOT.12.INHERIT.SEXLINK,botany,12,BOT.12.INHERIT,topic,Sex-linked inheritance: haemophilia and colour blindness,,7,45,true
+BOT.12.INHERIT.DISORDER,botany,12,BOT.12.INHERIT,topic,Mendelian and chromosomal disorders in humans,,8,45,true
+BOT.12.MOLBASIS,botany,12,BOT.U07,chapter,Molecular Basis of Inheritance,वंशागति के आणविक आधार,2,270,true
+BOT.12.MOLBASIS.GENMAT,botany,12,BOT.12.MOLBASIS,topic,Search for genetic material and DNA as genetic material,,1,45,true
+BOT.12.MOLBASIS.STRUCT,botany,12,BOT.12.MOLBASIS,topic,Structure of DNA and RNA and DNA packaging,,2,45,true
+BOT.12.MOLBASIS.REPLIC,botany,12,BOT.12.MOLBASIS,topic,DNA replication,,3,45,true
+BOT.12.MOLBASIS.DOGMA,botany,12,BOT.12.MOLBASIS,topic,"Central dogma: transcription, genetic code and translation",,4,45,true
+BOT.12.MOLBASIS.LACOP,botany,12,BOT.12.MOLBASIS,topic,Gene expression and regulation: the lac operon,,5,45,true
+BOT.12.MOLBASIS.GENOME,botany,12,BOT.12.MOLBASIS,topic,"Genome, the Human Genome Project and DNA fingerprinting",,6,45,true
+ZOO.12.EVOL,zoology,12,ZOO.U07,chapter,Evolution,विकास,1,315,true
+ZOO.12.EVOL.ORIGIN,zoology,12,ZOO.12.EVOL,topic,Origin of life,,1,45,true
+ZOO.12.EVOL.EVIDENCE,zoology,12,ZOO.12.EVOL,topic,"Evidences for evolution: paleontology, comparative anatomy, embryology, molecular",,2,45,true
+ZOO.12.EVOL.DARWIN,zoology,12,ZOO.12.EVOL,topic,Darwin's contribution and the modern synthetic theory,,3,45,true
+ZOO.12.EVOL.MECHAN,zoology,12,ZOO.12.EVOL,topic,"Mechanism of evolution: variation, natural selection and its types",,4,45,true
+ZOO.12.EVOL.HARDYW,zoology,12,ZOO.12.EVOL,topic,"Gene flow, genetic drift and the Hardy-Weinberg principle",,5,45,true
+ZOO.12.EVOL.RADIAT,zoology,12,ZOO.12.EVOL,topic,Adaptive radiation,,6,45,true
+ZOO.12.EVOL.HUMAN,zoology,12,ZOO.12.EVOL,topic,Human evolution,,7,45,true
+ZOO.12.HEALTH,zoology,12,ZOO.U08,chapter,Human Health and Disease,मानव स्वास्थ्य तथा रोग,1,225,true
+ZOO.12.HEALTH.PATHOGEN,zoology,12,ZOO.12.HEALTH,topic,Pathogens and parasites causing human diseases,,1,45,true
+ZOO.12.HEALTH.IMMUNE,zoology,12,ZOO.12.HEALTH,topic,Basic concepts of immunology and vaccines,,2,45,true
+ZOO.12.HEALTH.CANCER,zoology,12,ZOO.12.HEALTH,topic,Cancer,,3,45,true
+ZOO.12.HEALTH.HIV,zoology,12,ZOO.12.HEALTH,topic,HIV and AIDS,,4,45,true
+ZOO.12.HEALTH.ABUSE,zoology,12,ZOO.12.HEALTH,topic,"Adolescence; drug, alcohol and tobacco abuse",,5,45,true
+BOT.12.MICROBES,botany,12,BOT.U08,chapter,Microbes in Human Welfare,मानव कल्याण में सूक्ष्मजीव,1,135,true
+BOT.12.MICROBES.HOUSEHOLD,botany,12,BOT.12.MICROBES,topic,Microbes in household food processing and industrial production,,1,45,true
+BOT.12.MICROBES.SEWAGE,botany,12,BOT.12.MICROBES,topic,Microbes in sewage treatment and energy generation,,2,45,true
+BOT.12.MICROBES.BIOCONT,botany,12,BOT.12.MICROBES,topic,Microbes as biocontrol agents and biofertilisers,,3,45,true
+BOT.12.BIOTECHP,botany,12,BOT.U09,chapter,Biotechnology: Principles and Processes,जैव प्रौद्योगिकी: सिद्धांत व प्रक्रम,1,135,true
+BOT.12.BIOTECHP.PRINCIPLE,botany,12,BOT.12.BIOTECHP,topic,Principles of biotechnology and genetic engineering,,1,45,true
+BOT.12.BIOTECHP.TOOLS,botany,12,BOT.12.BIOTECHP,topic,Tools of recombinant DNA technology,,2,45,true
+BOT.12.BIOTECHP.PROCESS,botany,12,BOT.12.BIOTECHP,topic,Processes of recombinant DNA technology,,3,45,true
+BOT.12.BIOTECHA,botany,12,BOT.U09,chapter,Biotechnology and its Applications,जैव प्रौद्योगिकी एवं उसके उपयोग,2,180,true
+BOT.12.BIOTECHA.HEALTH,botany,12,BOT.12.BIOTECHA,topic,"Applications in health: human insulin, vaccines and gene therapy",,1,45,true
+BOT.12.BIOTECHA.AGRI,botany,12,BOT.12.BIOTECHA,topic,Applications in agriculture: genetically modified organisms and Bt crops,,2,45,true
+BOT.12.BIOTECHA.TRANSGEN,botany,12,BOT.12.BIOTECHA,topic,Transgenic animals,,3,45,true
+BOT.12.BIOTECHA.ETHICS,botany,12,BOT.12.BIOTECHA,topic,"Biosafety issues, biopiracy and patents",,4,45,true
+BOT.12.ORGPOP,botany,12,BOT.U10,chapter,Organisms and Populations,जीव और समष्टियाँ,1,90,true
+BOT.12.ORGPOP.INTERACT,botany,12,BOT.12.ORGPOP,topic,"Population interactions: mutualism, competition, predation and parasitism",,1,45,true
+BOT.12.ORGPOP.ATTRIB,botany,12,BOT.12.ORGPOP,topic,"Population attributes: growth, birth rate, death rate and age distribution",,2,45,true
+BOT.12.ECOSYS,botany,12,BOT.U10,chapter,Ecosystem,पारितंत्र,2,180,true
+BOT.12.ECOSYS.STRUCT,botany,12,BOT.12.ECOSYS,topic,Ecosystem patterns and components,,1,45,true
+BOT.12.ECOSYS.PRODUCT,botany,12,BOT.12.ECOSYS,topic,Productivity and decomposition,,2,45,true
+BOT.12.ECOSYS.ENERGY,botany,12,BOT.12.ECOSYS,topic,Energy flow,,3,45,true
+BOT.12.ECOSYS.PYRAMID,botany,12,BOT.12.ECOSYS,topic,"Pyramids of number, biomass and energy",,4,45,true
+BOT.12.BIODIV,botany,12,BOT.U10,chapter,Biodiversity and Conservation,जैव विविधता एवं संरक्षण,3,135,true
+BOT.12.BIODIV.CONCEPT,botany,12,BOT.12.BIODIV,topic,"Concept, patterns and importance of biodiversity",,1,45,true
+BOT.12.BIODIV.LOSS,botany,12,BOT.12.BIODIV,topic,Loss of biodiversity,,2,45,true
+BOT.12.BIODIV.CONSERV,botany,12,BOT.12.BIODIV,topic,"Conservation: hotspots, endangered organisms, Red Data Book, reserves, parks, sanctuaries, sacred groves",,3,45,true

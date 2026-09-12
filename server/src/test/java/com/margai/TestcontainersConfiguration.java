@@ -28,6 +28,11 @@ import org.testcontainers.utility.DockerImageName;
  * the {@code db/seed} repeatable migration would fail validation in a context that does not
  * configure that location. Tests that need an empty schema of their own create a further database
  * through {@link #createDatabase(String)}.
+ *
+ * <p>Spring caches every distinct test context for the JVM's lifetime and each keeps a Hikari pool
+ * of ten connections, so the server's default {@code max_connections = 100} ran out at D13 when the
+ * pipeline tests added three profile-scoped contexts ("FATAL: sorry, too many clients already" in
+ * whichever context started last). The limit is raised to 300 here; idle connections cost little.
  */
 @TestConfiguration(proxyBeanMethods = false)
 public class TestcontainersConfiguration {
@@ -38,6 +43,7 @@ public class TestcontainersConfiguration {
     private static final Set<String> CREATED = new HashSet<>();
 
     static {
+        POSTGRES.withCommand("postgres", "-c", "max_connections=300");
         POSTGRES.start();
     }
 

@@ -11,9 +11,9 @@
 
 | Field | Value |
 |---|---|
-| Current phase | PHASE 1 — Auth & identity (Week 2, D7–D12) **closed at the Week-2 gate 2026-09-09**, running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS); next PHASE 2 — Content pipeline v1 (Weeks 3–4, D13–D24, M3) |
-| Current day | D12 done · 2026-09-09 (buffer + the **Week-2 🚩 gate PASS** as "a stranger's email signs in first try" — the build's half, proved on the AVD: a never-seen address on a fresh install of the `db98a49` build, one code typed once, Today, reopen still signed in, `first_attempt_rate=1.000` on the reporter line; the D9 runbook's ten rows re-run clean on the same build; carried, named: the phone channel (F1), mobile data (F8), an unverified stranger's inbox (F10 production access — overdue against its own "before D12" date, slippage log). Buffer: `scripts/ui.sh` in the tree, the eval gate's router/retrieval alternative scoped to `server/` + `eval/` and case-insensitive, the 200 input PDFs ignored; branch `d12-week2-gate`, 4 chore commits + the audit fix + the docs commit, no feature code; spec-auditor FAIL → 3 MAJOR (a stale dashboard row, the PASS label, the case gap) and 8 MINOR, all fixed except the label, kept as the founder's approved reading with the tick naming what it proves; server 319 tests, app 242; PR #12 merged by the founder 2026-09-09, merge commit 4301296) · next: D13 — taxonomy CSV loaded + prerequisite graph + archetype drafts (✅ no cycles), Week 3 / PHASE 2 (M3): TECH_PLAN §6.2/§6.3, §2.3, the §0.2 D13 rule edit; en/ NCERT first (the Hindi Chanakya→Unicode step is PARKED) |
-| Days completed / total | 12 / 84 |
+| Current phase | **PHASE 2 — Content pipeline v1 (Weeks 3–4, D13–D24, M3)**, D13 done 2026-09-12, D14 next (the NCERT extraction pilot, the first live VISION day — the Anthropic 403 and the F8 bucket in the Blockers row); PHASE 1 — Auth & identity (Week 2, D7–D12) closed at the Week-2 gate 2026-09-09, running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
+| Current day | D13 done · 2026-09-12 (built 2026-09-10 → 12 on `d13-taxonomy`: the four founder inputs drafted from the NEET (UG) 2026 syllabus and reviewed by the founder in full — all seven checklist items closed 2026-09-11 — 516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-off rows; then the `pipeline` module in six task commits: picocli commands under the `pipeline` profile, `CurriculumImport` in `curriculum.api`, strict readers, run reports with the input's SHA-256; **acceptance PASS** run literally against a fresh database `margai_d13` in the compose container: `taxonomy load`, `taxonomy prerequisites`, `backbone load`, `cutoffs load` all exit 0 with 516 / 104 / 744 / 40 rows, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path over psql, an idempotent re-run changes nothing; reports committed under `pipeline/reports/`; server tests 356 (was 319), app untouched; spec-auditor on the build: see the day log) · next: D14 — NCERT extraction pilot, 2 books EN (✅ 20-paragraph spot check): TECH_PLAN §6.1 VISION extraction over page images, §6.3 `ncert register|render|extract|load`, `books.yaml` (§6.2), the S3 `content/` home (F8) or the ignored `pipeline/data/`, the Bedrock 403 (Blockers) and the D3 text-extraction escape hatch, the PUA decoding for `keph107.pdf` (PARKED), the D4 seed decision (PARKED) · 2026-09-12 after the D13 close: change spec **CS-1 (Collective Intelligence Layer)** integrated into SPEC, TECH_PLAN, PLAN and this tracker (day log "CS-1"); it adds scope to D22, D24, D29, D35, D47, D49, D55, D56, D73 and founder workstream F11, and changes nothing before D22; the founder's three rulings of 2026-09-12 (SPEC §6.1 sentence, the D29 read with graceful degradation, the momentum/strategy consumers) are applied |
+| Days completed / total | 13 / 84 |
 | Schedule delta | on track (the build); one founder item slipped — F10's SES production access was due "before D12" and is still open (slippage log) |
 | Last week's gate | **Week-2 🚩 PASS** 2026-09-09 — a stranger's email signs in first try on the AVD (fresh install of the `db98a49` build, one code typed once, Today, reopen still signed in, `first_attempt_rate=1.000`) and the D9 runbook's ten rows re-run clean on the same build (transcript in the D12 day log, table in the runbook); carried, not failed: the phone channel (F1), mobile data (F8), an unverified stranger's inbox (F10 production access). Week-1 🚩 PASS 2026-09-08 stands (D6 day log) |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
@@ -44,7 +44,7 @@
 
 ## PHASE 2 — Content pipeline v1 (Weeks 3–4) · M3
 
-- [ ] **D13** Taxonomy CSV loaded + prerequisite graph + archetype drafts · ✅ no cycles
+- [x] **D13** Taxonomy CSV loaded + prerequisite graph + archetype drafts · ✅ no cycles — done 2026-09-12 (drafted 2026-09-10 from the syllabus PDFs, founder review complete 2026-09-11 with all seven checklist items closed, built 2026-09-12): `pipeline/inputs/` (516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-offs), the `pipeline` module with `taxonomy load|prerequisites`, `backbone load`, `cutoffs load` under the `pipeline` profile and `CurriculumImport` in `curriculum.api`; **acceptance PASS** on a fresh database — all four commands exit 0, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path, idempotent re-run; reports in `pipeline/reports/2026-09-12-*.md`; server tests 356 (day log); branch `d13-taxonomy`, PR pending the founder's review and push
 - [ ] **D14** NCERT extraction pilot (2 books, EN) · ✅ 20-paragraph spot check
 - [ ] **D15** All EN books extracted · ✅ coverage report/book
 - [ ] **D16** Hindi ingest + EN↔HI alignment · ✅ 20 aligned pairs checked
@@ -53,9 +53,9 @@
 - [ ] **D19** PYQ ingest + tagging · ✅ counts match official papers
 - [ ] **D20** AI solutions (1 subject) + verification wired · ✅ founder 50-Q audit #1
 - [ ] **D21** Solutions all subjects + distractor maps · ✅ 50-Q audit #2 under threshold
-- [ ] **D22** Weightage & difficulty stats → nodes · ✅ top-10 chapters sanity check
+- [ ] **D22** Weightage & difficulty stats → nodes + `collective_records` migration + `collective from-pyq` momentum (CS-1) · ✅ top-10 chapters sanity check
 - [ ] **D23** Anchor linking + eval suite v1 (~60 Q) · ✅ harness runs
-- [ ] **D24** Buffer · **🚩 WEEK-4 GATE:** solved/tagged/anchored PYQ bank + eval in CI
+- [ ] **D24** Buffer: `collective from-pyq` misconceptions; `from-inputs` (if F11 has delivered), `review`, `load` — these three may slip to any later buffer (CS-1 §8, §9.3) · ✅ with `load`, wherever it runs: approved records for the top-50 weightage nodes ≥ threshold, sheet founder-signed, all versioned · **🚩 WEEK-4 GATE:** solved/tagged/anchored PYQ bank + eval in CI
 
 ## PHASE 3 — Onboarding & first plan (Week 5) · M2 + M4v0
 
@@ -63,7 +63,7 @@
 - [ ] **D26** Syllabus grid + hours sliders + goal/target (+optional category) · ✅ interview <5 min
 - [ ] **D27** DOB + minors parent-consent OTP sent at the DOB step; onboarding completes regardless; "consent pending" state on Profile + re-prompt at gated moments (D3 decision 8) · ✅ photo doubts and uploads blocked until consent; text features and the first plan work
 - [ ] **D28** Scorecard capture → extract → confirm → delete · ✅ 3 sample cards correct; storage empty after
-- [ ] **D29** 12th-marksheet + batch-timetable doc_types (D3 decision 3) + deterministic first plan + reveal screen · ✅ end-to-end new user
+- [ ] **D29** 12th-marksheet + batch-timetable doc_types (D3 decision 3) + deterministic first plan + reveal screen; the first plan reads the collective records (pacing, priority, attributed templated reasons) and degrades gracefully without them (founder ruling 2026-09-12; copy honest about the ramp — CS-1 §1) · ✅ end-to-end new user, records populated and empty
 - [ ] **D30** Notification permission moment + morning notif skeleton
 - [ ] **🚩 WEEK-5 GATE:** install → plan < 5 min, cold demo on fresh device
 
@@ -73,7 +73,7 @@
 - [ ] **D32** Practice UI (timer, verdict, solution, anchor chip) · ✅ smooth on mid-range phone
 - [ ] **D33** Session summary + event stream · ✅ timing data in DB
 - [ ] **D34** Offline cache + outbox sync, offline pack per Option A (D3 decision 1b) · ✅ airplane-mode test + the pack is the only pre-answer carrier
-- [ ] **D35** Diagnostic test (30-Q adaptive) → ability estimates, plus `kind=mock` sessions (D3 decision 2; may slip into D36) · ✅ shifts a seeded plan
+- [ ] **D35** Diagnostic test (30-Q adaptive) → ability estimates (intro copy: the fastest shift from “students like you” to “you” — CS-1 §5.6), plus `kind=mock` sessions (D3 decision 2; may slip into D36) · ✅ shifts a seeded plan
 - [ ] **D36** Buffer · **🚩 WEEK-6 GATE:** practice loop incl. offline + diagnostic
 
 ## PHASE 5 — Doubt solver (Weeks 7–8) · M6 ⭐
@@ -88,19 +88,19 @@
 - [ ] **D44** Free limits (5/day, cached=½) + meter + graceful limit screen · ✅ IST day-boundary math
 - [ ] **D45** Doubt → state write-back visible in next plan · ✅ reason line appears
 - [ ] **D46** Doubt history + follow-up threading · ✅ context kept
-- [ ] **D47** Eval → ~150 Q + pre-commit eval gate for AI changes · ✅ gate blocks failing prompt
+- [ ] **D47** Eval → ~150 Q + pre-commit eval gate for AI changes + the `claim` fixture kind (CS-1 §7; from the D29 templated reasons, AI lines at D56) · ✅ gate blocks failing prompt
 - [ ] **D48** Buffer · **🚩 WEEK-8 GATE:** hero demo-ready; eval ≥ target; audit list empty/ticketed
 
 ## PHASE 6 — Notebook, SRS & nightly brain (Weeks 9–10) · M7 + M8
 
-- [ ] **D49** Error capture + cause classification + one-tap correction · ✅ diagnosed in minutes; overrides stick
+- [ ] **D49** Error capture + cause classification seeded with approved `misconceptions[]` (CS-1 §6) + one-tap correction · ✅ diagnosed in minutes; overrides stick
 - [ ] **D50** Notebook UI (summary/entries/cause chips + free cap) · ✅ matches wireframe
 - [ ] **D51** SRS 3/10/25 + variant selection (real Q preferred, else generate+verify) · ✅ day-3 variants appear
 - [ ] **D52** Healed flow + ✓ gallery + Danger Zones · ✅ healing demo
 - [ ] **D53** Patterns engine v1 (plain-language insights) · ✅ fires only with enough data
 - [ ] **D54** Buffer + mock autopsy (per-mark classification, gamble score, pace map — D3 decision 2; may slip) · **🚩 WEEK-9 GATE:** capture→diagnose→resurface→heal end-to-end
-- [ ] **D55** Nightly snapshot + deterministic candidate blocks · ✅ sensible plans for 5 synthetic students
-- [ ] **D56** AI selection + reasons + mentor note + validated output + fallback · ✅ no planless morning possible
+- [ ] **D55** Nightly snapshot (two sources: collective record + student state, evidence-level weighting, pacing multiplier — CS-1 §5.1–§5.3) + deterministic candidate blocks · ✅ sensible plans for 5 synthetic students; CS-1 §7 (a)(b)(c)
+- [ ] **D56** AI selection + attributed reasons (collective vs individual, never blended — CS-1 §5.5) + season prior (§5.4) + mentor note + validated output + fallback + AI-reason `claim` eval fixtures (§7) · ✅ no planless morning possible
 - [ ] **D57** Batch run all users + morning deep-link notification · ✅ 2 devices, 2 different 7 AM plans
 - [ ] **D58** Streaks + trajectory card + plan-negotiation chat v1 · ✅ "wedding weekend" rebalances
 - [ ] **D59** Slump rules + light-day + mood chip · ✅ 3 dark days → gentler plan
@@ -123,7 +123,7 @@
 - [ ] **D70** Failure drills (DB restore, Bedrock outage, webhook replay) · ✅ scripted & passing
 - [ ] **D71** Security checklist (auth, IDOR, rate limits, deps) · ✅ findings fixed
 - [ ] **D72** Buffer · **🚩 WEEK-12 GATE:** boringly reliable
-- [ ] **D73** Analytics funnels + crash triage flow · ✅ dashboards on real test traffic
+- [ ] **D73** Analytics funnels + crash triage flow + the CS-1 §7 metrics (completion trend, reasons by attribution, collective coverage) · ✅ dashboards on real test traffic
 - [ ] **D74** Play Store listing + data-safety + internal track · ✅ installable from track
 - [ ] **D75** Beta tooling (invites, admin peek, audit-review screen, feedback link) · ✅ flag review in 2 taps
 - [ ] **D76** Seed cache: top ~500 predicted doubts batch-solved · ✅ hit-rate head start measured
@@ -148,12 +148,13 @@
 | F1 | Razorpay KYC + DLT SMS template | W1 D1 | ☐ not started | long lead time. 2026-09-08 (D7): DLT registration needs a registered company, so login runs on **email OTP** until F1 lands (DECISIONS D7 row 1); when it does: add `sms` to `margai.auth.otp.channels`, the MSG91 adapter (~~D11~~ — D11 ran on 2026-09-09 without F1, so the adapter and the DLT live check move to the day F1 lands; the `sms` channel, `OtpSender` port and per-channel metrics are ready for it), the phone-attach flow (PARKED) |
 | F10 | **SES for the OTP email channel** (D7 ruling): in the SES console, ap-south-1, verify a sender identity (address or domain); while the account is in the SES sandbox also verify the recipient addresses you test with; request production access before the first stranger (D12) or beta at the latest. Then run the founder-only live proof in `server/README.md` "Auth" (`MARGAI_AUTH_OTP_SENDER=ses MARGAI_AUTH_OTP_EMAIL_FROM=…`) | before D8's device login ideally; before D12 | ◐ 2026-09-08: the founder already has SES-verified email identities — sender covered; while sandboxed they double as the test recipients · **✅ live proof PASS 2026-09-09** (founder-run, transcript pasted in session): server on 8081 with `MARGAI_AUTH_OTP_SENDER=ses` and the verified sender, default region ap-south-1; `POST /auth/otp/request {email}` to a verified Gmail recipient (s***@gmail.com) → 200, request id 311fd2a1-…, challenge 1358d17a-…, channel email; the code arrived in the real inbox (no sandbox logger with the SES sender); `POST /auth/otp/verify` → 200 with access + refresh tokens, `expires_in` 900, `is_new_user: true`, user 49d2b89e-… — SES delivery and the identity region are settled | remaining: request production access before D12 so strangers' inboxes work (sandbox = verified recipients only); SSM keys `otp/sender`, `otp/email_from`, `otp/channels` (TECH_PLAN §7.3) at F8 · 2026-09-09 (D12): the Week-2 gate ran on the sandbox inbox with this live proof as the real-inbox evidence; **production access is the one open step before an unverified stranger's inbox, and overdue against this row's own "before D12" date** — named as carried in the gate verdict; slippage log |
 | F2 | NCERT licensing letter sent | W1 | ☐ | follow-up cadence: monthly |
-| F3 | Educator review of backbone booked | by W5 | ☐ | needed W8 |
+| F3 | Educator review of backbone booked | by W5 | ☐ | needed W8 · 2026-09-11 (D13): the draft to review exists — `pipeline/inputs/archetypes.yaml` (4 tracks, 744 steps) with the track windows and the weightage-first list explained in `pipeline/inputs/README.md`; the founder's sniff test passed, so booking the educator is the open step · booking in progress (founder, 2026-09-11) |
 | F4 | Beta recruitment playbook + group scouting | W10–13 | ☐ | 2–3 Telegram groups |
 | F5 | Marketing site copy + deploy | W11 | ☐ | |
 | F6 | Trademark search (Class 41 + 9) for final name | anytime | ☐ | before public launch |
 | F7 | Domain + social handles for final name | anytime | ☐ | MARGAI = working name |
 | F9 | DPDP legal review of the minors' consent flow (TECH_PLAN §0.5 item 8, §9.6): consent OTP at the DOB step, gated photo doubts and uploads until consent | before D27 ideally; before beta at the latest | ☐ | not a build blocker; may tighten the gating |
+| F11 | **Collect public-discourse excerpt files + a source list** for the collective intelligence layer (CS-1 §3, `docs/changes/CS-1-collective-intelligence.md`): excerpts from open forums, public comments and published topper/teacher material as `pipeline/inputs/collective/excerpts/*.md` (per file: source, date collected, node codes; the directory is git-ignored — list each file with its SHA-256 in `pipeline/inputs/collective/manifest.md`, DECISIONS 2026-09-12) with `sources.csv`; within CS-1's hard boundaries — nothing paywalled or login-gated, no competitor content or question banks, robots/ToS respected, no identifiable students. The pipeline reads the files and never crawls | any time from now; ideally before the D24 buffer | ☐ added 2026-09-12 | needed only before `collective from-inputs`; blocks nothing else — `from-pyq`, `review` and `load` run without it, and `from-inputs` may slip to any later buffer (CS-1 §8; TECH_PLAN §12.2) |
 | F8 | AWS beta stack (Terraform) per TECH_PLAN §7.6 — accepted at D3 (decision 5). Claude drafts Terraform in a separate infra session profile (plan allowed, apply denied), created when the first milestone is due; founder runs every apply | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ accepted 2026-09-04 | PLAN has no infra day (TECH_PLAN §0.4 #1); console checks §13.2 before D5. Bedrock access confirmed 2026-09-06 for Haiku 4.5 + Sonnet 4.6; optional AWS Sales allowlist request for the Claude 5 family / Opus 4.x (REASON upgrade path, not a blocker). 2026-09-07: the account's payment instrument blocks the Marketplace subscription for the Anthropic models (D5 blocker) — fix in Billing; and the local CLI session is the root user — create a non-root identity (IAM Identity Center or an IAM user) with Bedrock permissions for daily use before more live work (§7.4, §9.2). 2026-09-08 (D7): the ALB must keep `xff_header_processing.mode = append` — the app keys rate limits and `request_ip` on the *last* `X-Forwarded-For` hop (§1.5 step 1); the task role needs `ses:SendEmail` on the F10 identity (§7.4); SSM gains `otp/sender`, `otp/email_from`, `otp/channels` (§7.3). 2026-09-09 (D12): the Terraform variable behind `otp/sender` needs a validation that refuses `log` — the sandbox sender must never reach a deployed task, and a startup refusal in the server was rejected at D12 because most test contexts boot without a profile (PARKED) |
 
 ---
@@ -174,6 +175,196 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+CS-1 · 2026-09-12 · DOCS (not a PLAN day) · change spec CS-1 — Collective Intelligence Layer — integrated
+Founder-issued change spec docs/changes/CS-1-collective-intelligence.md (committed verbatim first as
+  b685f46, renamed to the §9.5 path in the closing commit). The integration plan was shown before
+  any edit and approved as written with the recommended option on each of its five questions:
+  (1) the SPEC §1 Evidence rule gains one sentence so §9.6's collective claims do not contradict it;
+  (2) CS-1 §7's metrics live in TECH_PLAN §10.2/§10.3 and §4.10, not SPEC §11; (3) the file is
+  renamed by git mv in the integration; (4) misconception → question links stay inside the JSONB,
+  validated by collective load, no join table; (5) one commit per document. Commits on d13-taxonomy
+  after the D13 close: ee1b494 SPEC — §9.6 Collective intelligence (§1–§2 of CS-1 in product
+  language), §6.1 "Two sources" with the honest-ramp copy rule, charter principle §10.9, the §1
+  sentence; each amendment a DECISIONS row citing CS-1 §9.1, plus the CIL-adoption row (§9.4).
+  c38d8e1 TECH_PLAN — §2.3 collective_records (node × season × status, JSONB lists), §2.8/§2.9 the
+  D22 migration and the pipeline_collective feature, §4.1 CollectiveMineTask (CHEAP; from-pyq is
+  deterministic), §4.5 the two-source snapshot and the prior-and-posterior weighting (saturating
+  evidence level e over practice/diagnostic/doubts, linear weight 0.10 → 0.95, individual alone at
+  e ≥ 0.6, collective attribution below w = 0.5, all under margai.planner.collective.*, per-node
+  numbers in the snapshot), pacing multiplier, season prior in ModeResolver, attributed reason lines
+  and the validator rule, §4.6 the classifier's misconception seed, §4.10 claim fixtures from D47,
+  §6.2 the pipeline/inputs/collective/ inputs, §6.3 collective from-pyq | from-inputs | review |
+  load, §6.5 momentum_trend, §10.2/§10.3 the three metrics, §0.2 the two rules follow-ons (D24
+  pipeline.md, D56 ai-layer.md), §12.2 from-inputs may slip; two DECISIONS rows (record shape,
+  weighting function). Then PLAN — D22, D24 (with the CS-1 §7 pipeline ✅), D47, D49, D55 (with
+  §7 a–c in the ✅), D56, D73 scopes, each marked "added 2026-09-12"; this TRACKER — the same day
+  lines, founder workstream F11 (excerpt files + source list; needed only before from-inputs),
+  the CIL PARKED row retired, the D13 open item closed, this entry. Surfaced, not resolved
+  silently, at planning: the §9.5 file path vs the attached name; SPEC §1 vs §9.6 (the sentence);
+  the metrics' home; the D22 migration outside PLAN's D22 text; CS-1 is not on the SPEC §12
+  exclusion list, so no exclusion was lifted. Nothing under server/, app/ or eval/ changed; the
+  eval stamp was not needed. Founder-side after this: review and push d13-taxonomy; F11 whenever
+  convenient; F3 booking; the D14 prerequisites unchanged.
+spec-auditor on the integration, run after the five commits (a deviation from "audit before the
+  day's final commit" — the fixes are a sixth commit): FAIL → 1 MAJOR fixed (CS-1 §9.3 gives
+  `review` and `load` the slip permission too; the integration had pinned them to D24 and made the
+  founder-signed sheet a Week-4 gate criterion — the permission is now on all three and the CS-1 §7
+  pipeline acceptance travels with `load`, wherever it runs) and 11 MINOR fixed (claim fixtures need
+  attributed reasons, so the `claim` kind is defined at D47 and populated from D56; CS-1 §5.6's
+  diagnostic copy and the honest-ramp reveal mapped to D35 and D29; the command order stated once —
+  from-pyq's momentum half after stats at D22, the rest after anchors; CS-1 §4's "after anchors"
+  is not an input dependency and §9.3 names D22; `collective_records` owned by `curriculum`; the
+  two config roots in §11.5; the season prior reads the nodes in play; `confidence` computed by
+  `load` from source counts, lowered but never raised in the sheet; `measured_accuracy` with no
+  attempts is `1 − struggle_score`; the SPEC §1 DECISIONS row cites the founder's decision-1
+  approval, not CS-1 §9.1; excerpt files ignored by git with a manifest (DECISIONS); the §12.1
+  map). Three findings are the founder's to rule on, not fixed:
+Open for the founder (CS-1): (1) SPEC §6.1's unamended sentence "Every block carries a one-line
+  reason drawn from the student's data (Evidence rule)" now contradicts the Two-sources paragraph
+  two lines below it — proposed per-edit amendment: "…drawn from the student's data or, attributed
+  as such, from the collective record (Evidence rule; §9.6)"; needs the founder's instruction, not
+  edited. (2) Does the D29 first plan already read the collective record? CS-1 §1 says the day-1
+  plan reads two sources; §9.3 maps the read to D55–D56 — recommended: yes at D29 (pacing,
+  priority, collective-attributed templated reasons at zero evidence), the evidence-level weighting
+  at D55; PLAN D29 unchanged until ruled. (3) `momentum_trend` and `strategy_notes` have no consumer
+  in CS-1 §5 — TECH_PLAN §4.5 proposes momentum as a priority factor and a citable reason, strategy
+  notes as block order and copy; confirm or strike.
+Rulings 2026-09-12 (the founder, same day; three DECISIONS rows; the closing commit): (1) approved as
+  proposed — SPEC §6.1's sentence amended on the founder's per-edit instruction, the only SPEC edit
+  outside CS-1 §9.1 besides the §1 sentence; (2) yes at D29, with two riders — graceful degradation
+  when records are absent or below threshold (from-pyq-only or none → a sound plan with default
+  minutes and plain weightage-based reasons), and CS-1 §9.3 amended to name the D29 read, the first
+  edit to the change spec since its verbatim commit; (3) the §4.5 consumers stand for both fields
+  with the standard riders (above threshold only, attributed as collective, never over a
+  prerequisite edge or an individual signal). Downstream touched and applied: `plan_blocks` gains
+  `attribution` in the D29 migration V14 (§2.7, §2.9); the D29 ✅ runs with the records table
+  populated and empty; the `claim` eval fixtures are populated from D47 after all — the D29
+  templated reasons are attributed lines — with the AI lines joining at D56 (§4.10, PLAN/TRACKER
+  D47 and D56); §12.1's D25–D30 row; the dashboard's CS-1 note names D29 and D35. Nothing before
+  D22 moves; the D14 prerequisites are unchanged. Open for the founder (CS-1): nothing.
+```
+
+```
+D13 · 2026-09-10 → 2026-09-12 · DONE · PHASE 2 — Content pipeline v1 (taxonomy + prerequisite graph + archetype drafts)
+Session 1 (branch d13-taxonomy): the four founder inputs of TECH_PLAN §6.2 drafted from the syllabus
+  PDFs for the founder's review — the bounded design approved as written (12 numbered decisions, the
+  recommended option each). syllabus-2025 and syllabus-2026 diffed: identical content (50 NTA units),
+  the 2026 file adds NMC cover letters; the 79 NCERT chapter titles verified from the books.
+  pipeline/inputs/taxonomy.csv 516 nodes (4 subjects, 55 units, 83 chapters incl. 3 syllabus-only +
+  the Unit 8 split, 374 topics); prerequisites.csv 103 chapter edges, acyclic; archetypes.yaml 4
+  tracks / 744 steps (learn by chapter, revision by unit, mocks by subject; prerequisite-ordered,
+  timing-checked across streams); cutoffs.csv 35 NTA qualifying rows 2019–2025. syllabus/*.pdf
+  ignored with syllabus/manifest.md; 6 DECISIONS rows. Deviation from the approved design, item 8:
+  biology prerequisite edges cross botany↔zoology where the discipline does (DECISIONS conventions
+  row, README). Files reached the tree through the Write/Edit tools (the generator wrote to the
+  scratchpad; repo copies diffed byte-identical before the audit).
+  spec-auditor on the change set: FAIL → 1 MAJOR fixed (within a week the steps were sequenced by node
+  code, so two chapters preceded their prerequisite on the day scale — the generator now orders a
+  stream's chapters topologically inside the week and checks every edge at sequence granularity) and
+  10 MINOR fixed (D25→D26 cross-references, the Unit 8 section numbers were 8.6–8.8 and are 8.8–8.10
+  per the chapter PDF and no longer sit in a student-facing name, DECISIONS cited by content not row
+  number, the dashboard phase cell, the .gitignore comment and the S3 content/ home deferred to D14,
+  the fresher_1yr mock cadence text, track names now the SPEC §5.1 interview labels, the step
+  conventions as a DECISIONS row, name_hi provenance stated as recall, the 2024 cut-off source names
+  the revised 26 July notice). Not verified by the auditor and still open: the Hindi names (native
+  reader), the cut-off values against the notices.
+Session 2 · 2026-09-11 · the founder's review of the drafts, checklist items 1–3 CLOSED (commit
+  75f4661 reviewed): (1) botany/zoology split approved as drafted, the prevalent coaching convention,
+  Ecology under botany confirmed via the ORGPOP → ECOSYS → BIODIV chain; (2) the three syllabus-only
+  chapters and the Unit 8 split all kept — EXPSKILL's ten experiments matter (NTA asks one or two a
+  year), PBLOCK's two topics match the slimmed syllabus, the GOC → GOCTECH edge is wired; (3) topic
+  granularity approved with no merges — every two-topic chapter matches the rationalised 2022
+  edition and the deleted chapters (Solid State, Polymers, Transport in Plants, Digestion) are absent.
+  DECISIONS rows amended with the closures; README checklist items 1–3 struck. Later the same day:
+  (5) all 103 edges approved, nothing removed, one addition — BOT.11.CLASSIF → ZOO.11.ANIMALK, the
+  mirror of Classification → Plant Kingdom (104 edges; this is the edge dropped on 2026-09-10 for
+  cross-stream timing, so the generator now lets a prerequisite inherit the priority of its dependants
+  and delays a chapter to its cross-stream prerequisite's week — Classification moves from week 10–15
+  to week 2 in the dropper and repeater, Animal Kingdom follows it in the same week, 0 warnings, the
+  archetypes regenerated); (6) track windows pass the founder's sniff test, F3 decides — booking the
+  educator review is the founder's open step (F3 row). Items 4 and 7 stay open: Hindi names (native
+  reader), cut-off values plus the 2026 and seat-type rows.
+Session 3 · 2026-09-11 · FOUNDER REVIEW COMPLETE — all seven checklist items resolved (the founder's
+  message of 2026-09-11): (4) Hindi names approved for D13 on the sampled units and chapters, the
+  full-column native-reader skim parked for before D26 with the topic translations; (7) the seven
+  drafted cut-off years verified against the official notices, five 2026 qualifying rows added from
+  the NTA result notice of 16 July 2026 (Re-NEET of 21 June; general 213, EWS 213, OBC/SC/ST 177 —
+  founder-supplied, the notice postdates Claude's knowledge, recorded as given), seat-type rows stay
+  founder-sourced for around D58 (PARKED); the biology-split DECISIONS row carries the founder's
+  Kota/Allen-convention wording; a new DECISIONS row for D58: 2026 is an outlier season and the
+  trajectory feature anchors to a smoothed reference, not the latest year — the founder's "CIL
+  season-note" and "from-inputs" terms were recorded verbatim; at the D13 close the founder expanded
+  CIL to Collective Intelligence Layer, absent from SPEC and TECH_PLAN, so PARKED; "from-inputs" is
+  still undefined. Surfaced instead of resolved: the four loader commands the founder asked to run
+  do not exist yet — building them is the remaining D13 work, plan presented for approval.
+Session 4 · 2026-09-12 · the build — 7 tasks approved as written (the D2 shape), one commit each on
+  d13-taxonomy: 090baf1 task 1 the pipeline module (picocli command tree, the pipeline profile without
+  a web server, the JVM exits with picocli's code; the security chain became a servlet-only bean);
+  20b73f6 task 2 the four input readers (RFC 4180 CSV via Commons CSV, Jackson YAML, refusals with file
+  and line); 4142194 task 3 CurriculumImport in curriculum.api with loadTaxonomy and loadPrerequisites
+  — Kahn's algorithm over the whole database graph inside the transaction, orphans reported never
+  deleted, the D4 seed's stale shapes proved as orphans; bd8aa04 task 4 loadBackbone and loadCutoffs
+  (stale step sequences removed, step-phase conventions enforced); e5c23eb task 5 the run report
+  pipeline/reports/<date>-<command>.md with the input's SHA-256, written for failed runs too; f501a50
+  task 6 the §0.2 rule edit and the pipeline/README run instructions. Tests 319 (D12) → 356 after
+  task 5 (+37: 10 at task 1, 27 over tasks 2–5), 0 failures, 1 skipped; ./mvnw verify green after
+  every task. Surprise: one full verify failed with
+  "FATAL: sorry, too many clients already" although the targeted run was green — the shared
+  Testcontainers Postgres hit its default 100 connections when three profile-scoped test contexts
+  joined (each caches a pool of 10); max_connections raised to 300 in TestcontainersConfiguration.
+Acceptance ✅ "Taxonomy queryable; graph has no cycles" — PASS, run literally 2026-09-12 (first at
+  09:04 IST; the committed reports are the 09:20 run on a recreated empty database, after the
+  spec-auditor's fixes below — the report's input path repo-relative so a committed report reads the
+  same on every machine, the backbone report widened, the cycle-check cell reading as a mechanism).
+  A fresh database margai_d13 created in the compose container (the developer db keeps its seed until
+  D14), `./mvnw -q -DskipTests package`, then from server/ with DB_URL=jdbc:postgresql://localhost:5432/margai_d13:
+    java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline taxonomy load
+      → read 516 nodes, inserted 516, orphans none, exit 0 (subjects/units/chapters/topics: physics
+        1/20/29/134, chemistry 1/20/22/109, botany 1/9/20/79, zoology 1/6/12/52)
+    … taxonomy prerequisites → read 104 edges, inserted 104, 104 edges over 83 nodes, cycle none, exit 0
+    … backbone load → 4 tracks / 744 steps inserted (210/166/178/190), chapters in no track none, exit 0
+    … cutoffs load → 40 rows inserted, 5 per year 2019–2026, orphans none, exit 0
+  Reports committed: pipeline/reports/2026-09-12-{taxonomy-load,taxonomy-prerequisites,backbone-load,
+  cutoffs-load}.md, input SHA-256 3c204a5c…, dc17b8da…, e23a162c…, c6569a36….
+  Queryable, over `docker compose exec db psql -d margai_d13` (the 09:04 load; the 09:08 and 09:20
+  re-loads produced the same counts): kind counts subject 4 / unit 55 /
+  chapter 83 / topic 374; the chapters of PHY.U07 by join — PHY.11.ELAST (90 min), PHY.11.FLUID (225),
+  PHY.11.THERMP (180), class 11, Hindi names present; the path BOT.12.INHERIT.MENDEL < BOT.12.INHERIT <
+  BOT.U07 < BOT by a recursive CTE.
+  No cycles, twice: the loader's Kahn check ("cycle | none" in the report) and an independent SQL
+  recursive walk — 0 nodes reachable from themselves over 104 edges (52 sources, 75 targets); the
+  longest chains are 9 (PHY.11.UNITS → PHY.12.EMW and → PHY.12.AC, CHE.11.BASICS → CHE.12.AMINES).
+  Tracks: 4, each learning all 83 chapters, last weeks 96/44/40/40. Cut-offs 2026: general/ews 213,
+  obc/sc/st 177 with the Re-NEET source.
+  Idempotent re-run of all four (reports to the scratchpad): 0 inserted, 516 unchanged; 104 already
+  present; 744 unchanged; 40 unchanged; every exit 0.
+Deviations from the approved plan: the "fresh compose database" became a second database inside the
+  running container rather than a `down -v`, so the developer's seeded db and its D7–D12 test accounts
+  survive; a shell slip (zsh does not word-split "$cmd") sent one-word commands on the first attempt —
+  four usage errors, nothing loaded, re-run correctly. Decisions: 7 DECISIONS rows dated 2026-09-12
+  (servlet-only chain, picocli core, `--inputs` default, strict readers, orphans reported, steps follow
+  the file, the run report). Parked: the D4 seed's fate (D14), a `--prune` option, report cost lines.
+spec-auditor on the build, before this commit: FAIL → 1 MAJOR and 11 MINOR, all fixed. MAJOR: the
+  inputs README claimed the loader re-implements every generator check — the loader now also refuses
+  duplicate sibling sort orders, a topic whose class level differs from its chapter's, a chapter
+  learned twice by one track and a chapter learned before a prerequisite the same track learns
+  (sequence granularity, the drafts' session-1 MAJOR now guarded in the loader), and the README names
+  the two checks that stay with the generator. MINOR: the `pipeline → common :: api` edge recorded
+  (DECISIONS + TECH_PLAN §1.3); the "never delete" headline narrowed to nodes, edges, tracks and
+  cut-offs; the backbone report widened to every subject, unit and chapter no step names plus orphan
+  tracks (§6.3 "nodes not in any track"); every failure now leaves a report, unexpected ones a stack
+  trace too, both paths tested; the cycle cell reads "passed (Kahn's remainder empty; a remainder
+  fails the run)" instead of a bare "none"; the readers' bounds are sanity limits, not exam facts;
+  structured log lines at start and end of every command; the max_connections departure recorded as
+  a DECISIONS row; the 360-line service split into TaxonomyImporter, PrerequisiteImporter,
+  BackboneImporter, CutoffImporter behind the CurriculumImportService facade; this audit recorded
+  here. Four tests added for the new refusals and failure paths: 356 → 360.
+Open for the founder: ~~what the Collective Intelligence Layer's "from-inputs" step is (CIL itself
+  expanded and PARKED at the close)~~ — answered the same day by change spec CS-1 (the CS-1 block
+  above); the F3 booking (in progress); the PR from d13-taxonomy.
+```
 
 ```
 D12 · 2026-09-09 · PHASE 1 — Auth & identity (buffer + 🚩 Week-2 gate: a stranger's email signs in first try)
@@ -1268,6 +1459,12 @@ Tomorrow's first task:
 - the D11 report's window is the process lifetime · 2026-09-09 · right while one API task runs and CloudWatch is absent; when the counters flow to CloudWatch (F8/D73) decide whether `GET /admin/metrics/otp` grows a `?hours=` database window (then `send_failed` would need a row per failed delivery — the D7 row deletes it) or simply points at the dashboard
 - an admin bootstrap (a seed or a CLI that flags the founder's row) · 2026-09-09 · today `users.role = 'admin'` is set by hand over psql (TECH_PLAN §3.7 "flagged by hand"), as the D11 ✅ did; D75's admin routes decide whether a `pipeline` command or an SSM-listed email does it
 - a Chanakya→Unicode step (or OCR) before any Hindi NCERT chunk is embedded · 2026-09-09 · found while writing `ncert/2022-ed/hi/manifest.md`: all ten Hindi books are selectable text set in the legacy 8-bit Walkman-Chanakya fonts with no ToUnicode map, so extraction yields glyph codes and zero Devanagari across 1,976 pages; the Phase-2 content pipeline (D13+) grounds on `en/` until this exists, and the manifest's "text OK" column stays ✗ until a converted sample passes a native-reader check
+- topic-level `name_hi` for the 374 taxonomy topics (batch translation through the CHEAP tier + a native-reader check), and a final native-reader skim of the full unit and chapter `name_hi` column · 2026-09-10 · the D13 draft fills Hindi for subjects, units and chapters only; needed before the D26 syllabus grid shows topics in Hindi · 2026-09-11 (D13 review): the sampled unit and chapter Hindi reviewed and approved for D13; the full-column skim stays parked for before D26
+- cut-off seat-type rows the founder must source: every `govt_mbbs` / `private_mbbs` / `bds` closing-marks row by year, category and quota scope (MCC and state counselling) · 2026-09-10 · the D13 draft carries only the NTA qualifying cut-offs · 2026-09-11: the 2026 qualifying rows landed at the review (Re-NEET, 16 July 2026 notice; an outlier season, DECISIONS D13 row for D58); seat-type rows are not needed before the trajectory work around D58
+- replace or reconcile the D4 `db/seed` test taxonomy (`PHY.11.MECH`, `CHE.11.PHYS`, `PHY.11.KIN`, `CHE.11.MOLE`, four edges, one track, three cut-offs) now that the real inputs exist · 2026-09-12 · a local database that carries the seed shows them as loader orphans (`CurriculumImportSeedTest` pins the shape); `SeedTaxonomyTest` and the constraint tests rely on the seed's fixed UUIDs — decide at D14 whether the seed becomes a subset of the real taxonomy or those tests fixture their own rows
+- a `--prune` option for the loaders (delete orphans that nothing references) · 2026-09-12 · today orphans are reported and left in place (DECISIONS 2026-09-12); only needed if a renamed chapter must go
+- cost lines in the run reports from the AI ledger · 2026-09-12 · the D13 reports carry counts only; `ncert extract` (D14) is the first command that spends
+- ~~a Collective Intelligence Layer (CIL) carrying season notes — the 2026 cancellation and Re-NEET is the first candidate — built by a "from-inputs" step~~ · 2026-09-12 · parked at the D13 close as an idea in neither SPEC nor TECH_PLAN · **retired the same day**: the founder issued change spec CS-1 (`docs/changes/CS-1-collective-intelligence.md`), integrated as SPEC §9.6/§6.1/§10.9, TECH_PLAN §2.3/§4.5/§6.3 and the D22/D24/D47/D49/D55/D56/D73 scopes; "from-inputs" is `collective from-inputs` over the F11 excerpt files; the 2026 Re-NEET season note is the first `season_notes` candidate for `collective from-inputs` (also carried by the D58 DECISIONS row)
 - private-use-area decoding in the ingest text extractor · 2026-09-09 · `ncert/2022-ed/en/phy11-part1/keph107.pdf` (Gravitation, 7 of 17 pages) and its prelims extract as U+F020–U+F0FF (cp1252 byte + 0xF000); subtract 0xF000 or Chapter 7 loses those pages — the only English file affected (every page of every file was scanned)
 
 ---

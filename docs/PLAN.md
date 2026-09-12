@@ -111,12 +111,21 @@ tools; your reviews focus on output quality.)*
   ✅ *50-question audit sample: you personally check; note error rate.*
 - **D21 —** Solutions for remaining subjects (batch overnight); distractor-map
   generation. ✅ *Second 50-question audit; error rate < agreed threshold.*
-- **D22 —** Weightage & difficulty statistics computed → syllabus nodes updated.
+- **D22 —** Weightage & difficulty statistics computed → syllabus nodes updated; the
+  `collective_records` migration and `collective from-pyq` momentum per node (CS-1 §2, §4;
+  TECH_PLAN §2.3, §6.3 — added 2026-09-12).
   ✅ *Top-10 weightage chapters match known NEET wisdom (sanity check).*
 - **D23 —** Anchor-linking questions↔NCERT; seed the eval suite v1 (~60 questions
   across subjects). ✅ *Eval harness runs and reports.*
 - **D24 —** Buffer + **Week-4 gate:** solved, tagged, anchored PYQ bank + eval suite
-  running in CI.
+  running in CI. In the buffer (CS-1 §4, §7, §9.3; added 2026-09-12): `collective from-pyq`
+  misconception drafts from the distractor maps; `collective from-inputs` over the F11
+  excerpt files if they exist; `collective review` (the founder-review sheet) and
+  `collective load` of the founder-edited sheet — the last three with explicit permission
+  to slip to any later buffer (CS-1 §8, §9.3), so the Week-4 gate never waits on a founder
+  review. ✅ *travels with `collective load`, here or in the buffer it slips to: approved
+  collective records exist for the top-50 weightage nodes at or above the confidence
+  threshold; the review sheet is founder-signed; every record carries `season_version`.*
 
 ### PHASE 3 — Onboarding & first plan (Week 5, Days 25–30) — Modules M2 + M4(v0)
 
@@ -133,7 +142,14 @@ tools; your reviews focus on output quality.)*
   extract correctly; storage verifiably empty after.*
 - **D29 —** 12th-marksheet variant (shared pattern) + deterministic first-plan
   generator (archetype track + interview inputs) + first-plan reveal screen with target
-  line. ✅ *New user reaches a personalized plan end-to-end.*
+  line; the first plan reads the approved collective records — pacing multipliers, priority
+  from `struggle_score`, templated collectively-attributed reasons — and degrades gracefully
+  when records are absent or below the confidence threshold (from-pyq-only records or none:
+  a sound plan with default learn minutes and plain weightage-based reasons); the reveal's
+  copy is honest about the ramp — the plan sharpens as the app learns the student (SPEC
+  §6.1, CS-1 §1 principle 3; founder ruling 2026-09-12 — the evidence-weighted blend arrives
+  at D55–D56). ✅ *New user reaches a personalized plan end-to-end, with the records table
+  populated and with it empty.*
 - **D30 —** Notification permission moment + morning notification skeleton.
   **Week-5 gate:** install → interview → (optional scorecard) → first plan < 5 minutes,
   demoed cold on a fresh device.
@@ -150,7 +166,9 @@ tools; your reviews focus on output quality.)*
 - **D34 —** Offline mode: today's blocks + questions cached; outbox sync for results.
   ✅ *Airplane-mode test: complete a session, land, sync.*
 - **D35 —** Diagnostic test (30-question adaptive flavor) reusing the session engine;
-  ability estimates update chapter status. ✅ *Diagnostic shifts a seeded user's plan.*
+  ability estimates update chapter status; the intro names the diagnostic as the fastest
+  way to shift the weight from “students like you” to “you” (SPEC §6.1, CS-1 §5.6 — added
+  2026-09-12). ✅ *Diagnostic shifts a seeded user's plan.*
 - **D36 —** Buffer + **Week-6 gate:** practice loop end-to-end incl. offline + diagnostic.
 
 ### PHASE 5 — Doubt solver (Weeks 7–8, Days 37–48) — Module M6 (the hero)
@@ -178,15 +196,20 @@ tools; your reviews focus on output quality.)*
   tomorrow's plan with the reason line.*
 - **D46 —** Doubt history screen + follow-up threading. ✅ *Follow-ups keep context.*
 - **D47 —** Eval suite expansion to ~150 questions; wire the eval gate into pre-commit
-  for AI-touching changes. ✅ *Gate demonstrably blocks a prompt change that fails.*
+  for AI-touching changes; the harness gains the `claim` fixture kind — a collective-attributed
+  line and the record it must trace to — first populated from the D29 first plan's templated
+  reasons, the AI reason lines joining at D56 (CS-1 §7; TECH_PLAN §4.10 — added 2026-09-12).
+  ✅ *Gate demonstrably blocks a prompt change that fails.*
 - **D48 —** Buffer + **Week-8 gate:** hero feature demo-ready; eval ≥ target; founder
   audit error list empty or ticketed.
 
 ### PHASE 6 — Notebook, SRS & the nightly brain (Weeks 9–10, Days 49–60) — M7 + M8
 
 - **D49 —** Error capture from practice events + cause classification (async) with
-  confidence + one-tap student correction. ✅ *Wrong answers appear diagnosed within
-  minutes; correction overrides stick.*
+  confidence + one-tap student correction; the classifier is seeded with the node's approved
+  `misconceptions[]` and may cite one with collective attribution from event one, the
+  student's correction and history overriding (CS-1 §6; TECH_PLAN §4.6 — added 2026-09-12).
+  ✅ *Wrong answers appear diagnosed within minutes; correction overrides stick.*
 - **D50 —** Notebook UI: summary (subject/cause + patterns line), entries, cause chips.
   ✅ *Matches spec wireframe; free-tier 30-cap notice.*
 - **D51 —** SRS scheduling (3/10/25) + variant selection (prefer real question on same
@@ -198,11 +221,22 @@ tools; your reviews focus on output quality.)*
 - **D54 —** Buffer + **Week-9 gate:** mistake lifecycle capture→diagnose→resurface→heal
   demonstrated end-to-end.
 - **D55 —** Nightly re-planner: state snapshot assembly + deterministic candidate blocks
-  (SRS dues, weak-node practice, backbone next, hours budget). ✅ *Dry-run outputs
-  sensible plans for 5 synthetic students.*
+  (SRS dues, weak-node practice, backbone next, hours budget); the snapshot reads two
+  sources — the approved collective record and the student state — blended per node by
+  the evidence-level weighting, pacing = default × multiplier until the measured pace
+  (CS-1 §5.1–§5.3; TECH_PLAN §4.5 — added 2026-09-12). ✅ *Dry-run outputs sensible
+  plans for 5 synthetic students; two day-1 students with different onboarding answers get
+  visibly different, collective-informed plans with every block reason backed and
+  attributed; the same student with two weeks of synthetic history has individual data
+  outweigh the prior on practiced nodes; emptying the records table degrades the day-1
+  plans (CS-1 §7 a–c).*
 - **D56 —** AI selection/ordering + reason lines + mentor note; JSON-validated output;
-  deterministic fallback (a plan must ALWAYS exist). ✅ *Kill the AI mid-run → fallback
-  plan appears; no planless morning possible.*
+  deterministic fallback (a plan must ALWAYS exist); reasons carry an attribution —
+  collective lines cite the record, individual lines the student's data, never blended —
+  and the season prior softens volume and tone before individual slump signals fire
+  (CS-1 §5.4–§5.5; TECH_PLAN §4.5, SPEC §10.9 — added 2026-09-12); the AI reason
+  lines join the eval's `claim` fixtures (CS-1 §7). ✅ *Kill the AI
+  mid-run → fallback plan appears; no planless morning possible.*
 - **D57 —** Batch execution for all active users + morning notification with plan
   deep-link. ✅ *Two devices, different profiles, different 7 AM plans.*
 - **D58 —** Streaks, weekly trajectory card (humble-early copy), plan negotiation chat
@@ -244,7 +278,9 @@ tools; your reviews focus on output quality.)*
   dependency audit). ✅ *Checklist committed with findings fixed.*
 - **D72 —** Buffer + **Week-12 gate:** app is boringly reliable.
 - **D73 —** Analytics funnels (install→plan→doubt→D7; paywall funnel; cache rate) +
-  crash reporting triage flow. ✅ *Dashboards live with real test traffic.*
+  crash reporting triage flow; the CS-1 §7 metrics — day-1→day-7 plan-block completion
+  trend, reason lines by attribution, collective-record coverage of served blocks
+  (TECH_PLAN §10.2–§10.3 — added 2026-09-12). ✅ *Dashboards live with real test traffic.*
 - **D74 —** Play Store: listing assets, data-safety form, internal testing track upload.
   ✅ *Installable from the testing track.*
 - **D75 —** Beta tooling: invite codes, founder admin peek (read-only), audit-queue

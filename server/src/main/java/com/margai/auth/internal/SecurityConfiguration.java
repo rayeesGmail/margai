@@ -5,6 +5,7 @@ import com.margai.common.api.IstClock;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.PathContainer;
@@ -77,7 +78,12 @@ class SecurityConfiguration {
         return PUBLIC_PATTERNS.stream().anyMatch(pattern -> pattern.matches(path));
     }
 
+    /**
+     * Servlet contexts only: the {@code pipeline} profile starts no web server (TECH_PLAN §6.1, D13),
+     * and there is no {@link HttpSecurity} to build a chain from where nothing listens.
+     */
     @Bean
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     SecurityFilterChain apiSecurity(HttpSecurity http, JwtDecoder decoder, JwtService jwts, ErrorResponses responses,
             RateLimitProperties limits, IstClock clock) throws Exception {
         ApiAuthenticationEntryPoint failures = new ApiAuthenticationEntryPoint(responses);

@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -59,6 +60,19 @@ public class ArchetypeTrackStep {
         this.sequence = sequence;
         this.phase = phase;
         this.targetWeek = targetWeek;
+    }
+
+    /** The D13 loader's upsert (TECH_PLAN §6.3), matched on (track, sequence); returns whether anything changed. */
+    public boolean apply(UUID nodeId, TrackPhase phase, Short targetWeek) {
+        boolean changed = !this.nodeId.equals(nodeId)
+                || this.phase != phase
+                || !Objects.equals(this.targetWeek, targetWeek);
+        if (changed) {
+            this.nodeId = nodeId;
+            this.phase = phase;
+            this.targetWeek = targetWeek;
+        }
+        return changed;
     }
 
     public UUID getId() {

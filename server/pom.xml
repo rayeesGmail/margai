@@ -148,9 +148,9 @@
       <version>3.0.7</version>
     </dependency>
     <!-- Bedrock Converse + InvokeModel behind BedrockAiClient, active only in the bedrock profile
-         (TECH_PLAN §1.2, §4.11). Credentials come from the default chain (an aws login session or
-         a named profile locally — TECH_PLAN §7.4 intends an Identity Center profile — and the task
-         role in AWS), never from configuration. -->
+         (TECH_PLAN §1.2, §4.11). Credentials come from the default chain (locally the Identity
+         Center profile of TECH_PLAN §7.4, created at F8 on 2026-09-12; the task role in AWS),
+         never from configuration. -->
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>bedrockruntime</artifactId>
@@ -161,6 +161,22 @@
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>signin</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- The same chain, for the IAM Identity Center profile F8 created (an sso_session written by
+         `aws configure sso`) — the identity TECH_PLAN §7.4 and §7.6 intend for the laptop. `sso`
+         exchanges the cached token for role credentials, `ssooidc` refreshes that token; both are
+         loaded reflectively like signin above, hence runtime scope. Without them the SDK refuses
+         the profile with "the 'sso' service module must be on the class path" while the CLI, which
+         has its own resolver, resolves it fine. -->
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>sso</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>ssooidc</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- D7 (founder ruling 2026-09-08): the OTP email channel over SES v2 while the DLT SMS

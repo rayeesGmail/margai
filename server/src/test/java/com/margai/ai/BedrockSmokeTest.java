@@ -26,13 +26,14 @@ import org.springframework.test.context.ActiveProfiles;
 /**
  * The D5 live smoke (PLAN D5 ✅ "one live call logged with token counts"; TECH_PLAN §4.1 last
  * paragraph, §13.2 item 1). Founder-run only: {@code BEDROCK_LIVE=1} plus AWS credentials in the
- * SDK's default chain (an {@code aws login} session, or {@code AWS_PROFILE=<profile>}); otherwise
+ * SDK's default chain — the IAM Identity Center profile F8 created (TECH_PLAN §7.4), after
+ * {@code aws sso login --profile margai}; otherwise
  * the test is skipped and the build never touches AWS. Two calls on the {@code cheap} tier prove
  * that the forced tool returns the record, that the ledger gets real token counts, and that the
  * second call reads the prompt cache the first one wrote.
  *
  * <pre>
- * cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
+ * cd server && AWS_PROFILE=margai BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
  * </pre>
  */
 @SpringBootTest

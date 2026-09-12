@@ -13,8 +13,9 @@ import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 
 /**
  * The {@code bedrock} profile (TECH_PLAN §1.2): {@code BEDROCK_LIVE=1} locally, the task
- * definition in AWS. Credentials come from the SDK's default chain (an {@code aws login} session,
- * a named profile, or the task role in AWS);
+ * definition in AWS. Credentials come from the SDK's default chain — locally the
+ * IAM Identity Center profile F8 created, {@code AWS_PROFILE=margai} (TECH_PLAN §7.4); in AWS
+ * the task role;
  * the region and the call timeout are configuration. The SDK does not retry — the retry
  * decorator owns that policy (DECISIONS D5) — so a failure is never retried twice over.
  */

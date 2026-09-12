@@ -1424,9 +1424,14 @@ unchanged; the batch lane, the request shape and the region paragraph do not.*
   becomes a latency choice: below it, `completeBatch` runs the requests on-demand with concurrency 4
   through the same decorators, so the ledger is identical either way. Until the beta grows past the
   threshold, nightly work is therefore on-demand — conflict §0.4 #2, unchanged in effect. **Still
-  D55 work**: submitting a real batch needs `completeBatch` overridden down the decorator chain and
-  the `batch = true` / batch-price columns threaded into `LedgerAiClient`; what exists today is the
-  on-demand loop and a one-record probe in the live smoke that proves the lane.
+  D55 work**, and D55 owns three things, not one (founder ruling 2026-09-12): `completeBatch`
+  overridden down the decorator chain rather than on the inner client alone, the `batch = true` and
+  batch-price columns threaded into `LedgerAiClient`, and **the one-record live probe re-added to
+  `AiLiveSmokeTest`** — it was removed on 2026-09-12 because a batch call outside the seam writes no
+  `ai_calls` row and "every model call logs an `ai_calls` row" admits no test exception (§4.13); once
+  the lane is ledgered the probe is an ordinary seam call and belongs back in the smoke. Until then
+  the lane's support rests on the provider's own reference (§13.2 item 2), and what runs is the
+  on-demand loop.
 - **Timeouts and retries**: 20 s per real-time call, 2 retries with jitter on throttling and 5xx;
   batch jobs 10 min. A final failure is a typed error the UI renders honestly (`AI_UNAVAILABLE`).
   *A rate limit now carries the provider's own `retry-after`, which the retry decorator prefers over

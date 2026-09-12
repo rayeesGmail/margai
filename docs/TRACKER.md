@@ -226,8 +226,11 @@ Then the spec-auditor ran on those commits and returned FAIL with five MAJOR fin
   (2) **a long retry-after was discarded rather than capped**, so a provider asking for two minutes
   got a retry in under a second — the opposite of the hint's purpose, and not what the javadoc said;
   (3) **the batch probe was a billable call with no ai_calls row**, a hard rule with no test
-  exception — removed rather than carved out (see the deviation note above; it was in the approved
-  acceptance list, so the founder may want it back once D55 makes it ledgerable);
+  exception — removed rather than carved out (see the deviation note above). **Founder ruling, same
+  day: keep it out now and re-add it once D55 makes it ledgerable** — so D55 owns three things, not
+  one (completeBatch down the chain, the batch columns in the ledger, the probe back in the smoke),
+  written into TECH_PLAN §4.11, PLAN D55, the DECISIONS batch row and the test's own javadoc so the
+  obligation cannot be lost or re-argued;
   (4) three TECH_PLAN run commands still activated the deleted `bedrock` profile
   (`nightly,bedrock`, `pipeline,bedrock`) — the nightly re-planner and the content pipeline would
   have run on the fake and fabricated plans and extracted content silently;

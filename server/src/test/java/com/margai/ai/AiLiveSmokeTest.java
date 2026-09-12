@@ -47,12 +47,14 @@ import org.springframework.test.context.ActiveProfiles;
  * cost. Only the id check reaches the provider outside the seam, and it bills nothing: it reads
  * model metadata, it does not run inference.
  *
- * <p>The batch lane is <b>not</b> probed here. Submitting one would be a billable model call with no
- * {@code ai_calls} row, and "every model call logs an {@code ai_calls} row" is a hard rule with no
- * exception written for a test (CLAUDE.md; TECH_PLAN §4.13). The lane's support is recorded from the
- * provider's own reference (§13.2 item 2); confirming it live belongs with D55, which builds the
+ * <p>The batch lane is <b>not</b> probed here <i>yet</i>. Submitting one today would be a billable
+ * model call with no {@code ai_calls} row, and "every model call logs an {@code ai_calls} row" is a
+ * hard rule with no exception written for a test (CLAUDE.md; TECH_PLAN §4.13), so the probe was
+ * removed on 2026-09-12. The founder's ruling that day: it comes back at D55, which builds the
  * ledgered batch path — {@code completeBatch} overridden down the decorator chain and the
- * {@code batch} column and batch price threaded into the ledger.
+ * {@code batch} column and batch price threaded into the ledger — at which point the probe is an
+ * ordinary seam call and this class is where it belongs. Do not re-add it before then; until then
+ * the lane's support rests on the provider's own reference (§13.2 item 2).
  */
 @SpringBootTest
 @ActiveProfiles("live")

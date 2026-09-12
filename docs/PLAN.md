@@ -224,7 +224,10 @@ tools; your reviews focus on output quality.)*
   (SRS dues, weak-node practice, backbone next, hours budget); the snapshot reads two
   sources — the approved collective record and the student state — blended per node by
   the evidence-level weighting, pacing = default × multiplier until the measured pace
-  (CS-1 §5.1–§5.3; TECH_PLAN §4.5 — added 2026-09-12). ✅ *Dry-run outputs sensible
+  (CS-1 §5.1–§5.3; TECH_PLAN §4.5 — added 2026-09-12). Also the batch lane the nightly run
+  is the first caller of: `completeBatch` down the decorator chain, the `batch` and
+  batch-price columns in the ledger, and the one-record live probe restored to
+  `AiLiveSmokeTest` (TECH_PLAN §4.11; founder ruling 2026-09-12). ✅ *Dry-run outputs sensible
   plans for 5 synthetic students; two day-1 students with different onboarding answers get
   visibly different, collective-informed plans with every block reason backed and
   attributed; the same student with two weeks of synthetic history has individual data

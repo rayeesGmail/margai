@@ -25,7 +25,7 @@ report says why), 2 usage or a missing input. The database comes from the same v
 (`DB_URL`, `DB_USER`, `DB_PASSWORD`, compose defaults otherwise). The `pipeline` profile starts no web
 server and uses the production Flyway locations only, so the `db/seed` test taxonomy never meets a
 real load — against a developer database that carries the seed, the reports list its stale shapes as
-orphans and leave them in place. Live model commands (D14 onwards) add the `bedrock` profile through
-`BEDROCK_LIVE=1` (DEV_SPEC §13.7).
+orphans and leave them in place. Live model commands (D14 onwards) add the `live` profile through
+`AI_LIVE=1` (DEV_SPEC §13.7), with `margai.ai.provider` choosing the provider inside it.
 
 Rules that apply here: `.claude/rules/pipeline.md`.

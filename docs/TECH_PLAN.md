@@ -1365,8 +1365,8 @@ Two layers, one fixture set.
   record it must trace to (`node_code`, `season_version`, field) — first populated from the D29
   first plan's templated reasons (attributed lines exist from D29, founder ruling 2026-09-12), the
   AI reason lines joining at D56 (§4.5); a claim that traces to no approved record fails the suite.
-- **Live layer** (the real gate): `BEDROCK_LIVE=1 ./mvnw -Peval verify` runs `EvalSuiteIT`, which
-  drives `DoubtSolveService` end to end with `BedrockAiClient` against a Testcontainers database
+- **Live layer** (the real gate): `AI_LIVE=1 ./mvnw -Peval verify` runs `EvalSuiteIT`, which
+  drives `DoubtSolveService` end to end with the live provider client against a Testcontainers database
   loaded with the NCERT and question tables from a snapshot in the content bucket. Per fixture it
   records correct/incorrect, anchor match, verified flag, tier, latency and cost. PASS = ≥ 97%
   correct final answers **and** zero fixtures where an unverified numerical would have rendered.
@@ -1718,8 +1718,8 @@ founder runs every apply by hand.
 
 | Name | Where | Data | AI | Purpose |
 |---|---|---|---|---|
-| `local` | developer laptop, docker compose | compose Postgres, seed migrations | `FakeAiClient`; `BEDROCK_LIVE=1` opt-in with the breaker on | every PLAN day's build loop |
-| `beta` | AWS ap-south-1, one account | RDS | Bedrock via global inference profiles | the 50-student closed beta and everything from D57 on |
+| `local` | developer laptop, docker compose | compose Postgres, seed migrations | `FakeAiClient`; `AI_LIVE=1` opt-in with the breaker on | every PLAN day's build loop |
+| `beta` | AWS ap-south-1, one account | RDS | the providers' own APIs, keys from SSM *(2026-09-12; was Bedrock via global inference profiles)* | the 50-student closed beta and everything from D57 on |
 
 No staging until public launch (PARKED). Local is the pre-production environment; the beta stack is
 rebuilt from Terraform if it drifts.

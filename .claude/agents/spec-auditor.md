@@ -18,10 +18,12 @@ Check, in this order, and cite the governing section for every finding:
 2. **Working agreements** — docs/DEV_SPEC.md §13 and CLAUDE.md hard rules: `correct_key` never sent before
    that student's answer to the question is recorded server-side (only the carriers TECH_PLAN §3.1
    names); no AI answer without retrieval grounding + numerical verification; every
-   Bedrock call through `AiClient` with an `ai_calls` row; REASON tier only via the router; cache
-   writes only when verified; money endpoints idempotent + webhook signature verified; uploaded
+   model call through `AiClient` with an `ai_calls` row (any provider — model access has been direct
+   since 2026-09-12, DECISIONS; Bedrock is dormant, not the rule); REASON tier only via the router;
+   cache writes only when verified; money endpoints idempotent + webhook signature verified; uploaded
    images only in the S3 uploads/ bucket and deleted after confirmation; schema changes only via
-   Flyway migration + entity; no secrets or model IDs in code; no todo-markers; copy externalised.
+   Flyway migration + entity; no secrets, provider API keys or model IDs in code; no todo-markers;
+   copy externalised.
 3. **Reference design drift** — docs/DEV_SPEC.md §2–12 or the D3-approved plan in docs/. Drift is
    allowed but must be recorded in docs/; unrecorded drift is a finding.
 4. **Evidence rule** — any user-facing statement about a student must be backed by that student's

@@ -20,7 +20,8 @@ class TaxonomyPrerequisitesCommand extends InputFileCommand {
 
     private final CurriculumImport imports;
 
-    TaxonomyPrerequisitesCommand(CurriculumImport imports) {
+    TaxonomyPrerequisitesCommand(CurriculumImport imports, Reports reports) {
+        super(reports);
         this.imports = imports;
     }
 
@@ -30,13 +31,14 @@ class TaxonomyPrerequisitesCommand extends InputFileCommand {
     }
 
     @Override
-    int run(Path inputFile) {
+    void run(Path inputFile, Report report) {
         List<PrerequisiteRow> rows = PrerequisitesCsvReader.read(inputFile);
-        print(FILE + ": " + rows.size() + " edges read");
-        PrerequisiteLoadReport report = imports.loadPrerequisites(rows);
-        print("syllabus_prerequisites: " + report.inserted() + " inserted, " + report.unchanged() + " already present; "
-                + report.edgesInDatabase() + " edges over " + report.nodesWithEdges() + " nodes, no cycle");
-        print("orphan edges (in the database, not in the file): " + listOrNone(report.orphanEdges()));
-        return EXIT_OK;
+        report.read(rows.size() + " edges");
+        PrerequisiteLoadReport result = imports.loadPrerequisites(rows);
+        report.section("syllabus_prerequisites")
+                .table(List.of("inserted", "already present", "edges in the database", "nodes with edges", "cycle"),
+                        List.of(List.of(String.valueOf(result.inserted()), String.valueOf(result.unchanged()),
+                                String.valueOf(result.edgesInDatabase()), String.valueOf(result.nodesWithEdges()), "none")));
+        report.section("orphan edges (in the database, not in the file)").list(result.orphanEdges());
     }
 }

@@ -20,6 +20,9 @@ import picocli.CommandLine;
 @Profile("pipeline")
 class PipelineRunner implements ApplicationRunner, ExitCodeGenerator {
 
+    /** The root command's name, as typed and as printed in usage and report titles. */
+    static final String COMMAND_NAME = "margai-pipeline";
+
     /** Spring's own arguments ({@code --spring.profiles.active=…}) are not picocli's business. */
     private static final String SPRING_ARGUMENT_PREFIX = "--spring.";
 

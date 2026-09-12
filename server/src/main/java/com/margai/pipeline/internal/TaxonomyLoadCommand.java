@@ -1,11 +1,13 @@
 package com.margai.pipeline.internal;
 
 import com.margai.curriculum.api.CurriculumImport;
+import com.margai.curriculum.api.NodeKind;
 import com.margai.curriculum.api.SyllabusNodeRow;
 import com.margai.curriculum.api.TaxonomyLoadReport;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
@@ -21,7 +23,8 @@ class TaxonomyLoadCommand extends InputFileCommand {
 
     private final CurriculumImport imports;
 
-    TaxonomyLoadCommand(CurriculumImport imports) {
+    TaxonomyLoadCommand(CurriculumImport imports, Reports reports) {
+        super(reports);
         this.imports = imports;
     }
 
@@ -31,16 +34,24 @@ class TaxonomyLoadCommand extends InputFileCommand {
     }
 
     @Override
-    int run(Path inputFile) {
+    void run(Path inputFile, Report report) {
         List<SyllabusNodeRow> rows = TaxonomyCsvReader.read(inputFile);
-        print(FILE + ": " + rows.size() + " nodes read");
-        TaxonomyLoadReport report = imports.loadTaxonomy(rows);
-        print("syllabus_nodes: " + report.inserted() + " inserted, " + report.updated() + " updated, "
-                + report.unchanged() + " unchanged");
-        report.counts().forEach((subject, kinds) -> print("  " + subject + ": " + kinds.entrySet().stream()
-                .map(entry -> entry.getValue() + " " + entry.getKey())
-                .collect(Collectors.joining(", "))));
-        print("orphans (in the database, not in the file): " + listOrNone(report.orphans()));
-        return EXIT_OK;
+        report.read(rows.size() + " nodes");
+        TaxonomyLoadReport result = imports.loadTaxonomy(rows);
+        report.section("syllabus_nodes")
+                .table(List.of("inserted", "updated", "unchanged"), List.of(List.of(
+                        String.valueOf(result.inserted()), String.valueOf(result.updated()), String.valueOf(result.unchanged()))));
+        List<String> header = new ArrayList<>(List.of("subject"));
+        Arrays.stream(NodeKind.values()).map(NodeKind::name).forEach(header::add);
+        List<List<String>> perSubject = new ArrayList<>();
+        result.counts().forEach((subject, kinds) -> {
+            List<String> cells = new ArrayList<>(List.of(subject.name()));
+            for (NodeKind kind : NodeKind.values()) {
+                cells.add(String.valueOf(kinds.getOrDefault(kind, 0)));
+            }
+            perSubject.add(cells);
+        });
+        report.section("nodes per subject and kind").table(header, perSubject);
+        report.section("orphans (in the database, not in the file)").list(result.orphans());
     }
 }

@@ -10,7 +10,7 @@ import picocli.CommandLine.Spec;
  * prerequisites}, {@code backbone load}, {@code cutoffs load}. The group commands only route;
  * calling a group without a subcommand is a usage error.
  */
-@Command(name = "margai-pipeline", mixinStandardHelpOptions = true,
+@Command(name = PipelineRunner.COMMAND_NAME, mixinStandardHelpOptions = true,
         description = "MARG AI content pipeline (TECH_PLAN §6). Every command is idempotent and writes a report.",
         subcommands = {PipelineCommand.Taxonomy.class, PipelineCommand.Backbone.class, PipelineCommand.Cutoffs.class})
 final class PipelineCommand implements Runnable {

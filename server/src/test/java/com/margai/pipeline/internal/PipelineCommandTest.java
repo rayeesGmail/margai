@@ -25,15 +25,20 @@ import picocli.CommandLine;
 
 /**
  * The command tree without Spring: a factory that hands the leaf commands a recording
- * {@link CurriculumImport} and everything else to picocli's default factory. Every D13 command
- * reads its input under {@code --inputs} and passes the rows on, a missing file is a usage error
- * with the path, a malformed file fails the run, groups without a subcommand and unknown commands
- * are usage errors, and Spring's own arguments never reach picocli.
+ * {@link CurriculumImport} and a {@link Reports} on a fixed clock, and everything else to
+ * picocli's default factory. Every D13 command reads its input under {@code --inputs}, passes the
+ * rows on and writes its dated report under {@code --reports}; a missing file is a usage error
+ * with the path and no report; a malformed file fails the run and still leaves a report; groups
+ * without a subcommand and unknown commands are usage errors; Spring's own arguments never reach
+ * picocli.
  */
 class PipelineCommandTest {
 
     @TempDir
     Path inputs;
+
+    @TempDir
+    Path reports;
 
     private final StringWriter out = new StringWriter();
     private final StringWriter err = new StringWriter();
@@ -42,20 +47,21 @@ class PipelineCommandTest {
 
     @BeforeEach
     void commandLine() {
+        Reports writer = new Reports(ReportTest.CLOCK);
         CommandLine.IFactory factory = new CommandLine.IFactory() {
             @Override
             public <K> K create(Class<K> cls) throws Exception {
                 if (cls == TaxonomyLoadCommand.class) {
-                    return cls.cast(new TaxonomyLoadCommand(imports));
+                    return cls.cast(new TaxonomyLoadCommand(imports, writer));
                 }
                 if (cls == TaxonomyPrerequisitesCommand.class) {
-                    return cls.cast(new TaxonomyPrerequisitesCommand(imports));
+                    return cls.cast(new TaxonomyPrerequisitesCommand(imports, writer));
                 }
                 if (cls == BackboneLoadCommand.class) {
-                    return cls.cast(new BackboneLoadCommand(imports));
+                    return cls.cast(new BackboneLoadCommand(imports, writer));
                 }
                 if (cls == CutoffsLoadCommand.class) {
-                    return cls.cast(new CutoffsLoadCommand(imports));
+                    return cls.cast(new CutoffsLoadCommand(imports, writer));
                 }
                 return CommandLine.defaultFactory().create(cls);
             }
@@ -66,55 +72,63 @@ class PipelineCommandTest {
     }
 
     @Test
-    void eachCommandReadsItsInputFileAndHandsTheRowsOn() {
+    void eachCommandReadsItsInputHandsTheRowsOnAndWritesItsReport() throws IOException {
         String committed = InputReadersTest.INPUTS.toString();
 
-        assertThat(commandLine.execute("taxonomy", "load", "--inputs", committed)).isZero();
-        assertThat(commandLine.execute("taxonomy", "prerequisites", "--inputs", committed)).isZero();
-        assertThat(commandLine.execute("backbone", "load", "--inputs", committed)).isZero();
-        assertThat(commandLine.execute("cutoffs", "load", "--inputs", committed)).isZero();
+        assertThat(commandLine.execute("taxonomy", "load", "--inputs", committed, "--reports", reports.toString())).isZero();
+        assertThat(commandLine.execute("taxonomy", "prerequisites", "--inputs", committed, "--reports", reports.toString())).isZero();
+        assertThat(commandLine.execute("backbone", "load", "--inputs", committed, "--reports", reports.toString())).isZero();
+        assertThat(commandLine.execute("cutoffs", "load", "--inputs", committed, "--reports", reports.toString())).isZero();
 
         assertThat(imports.nodes).hasSize(516);
         assertThat(imports.edges).hasSize(104);
         assertThat(imports.tracks).hasSize(4);
         assertThat(imports.cutoffs).hasSize(40);
         assertThat(out.toString())
-                .contains("taxonomy.csv: 516 nodes read")
-                .contains("syllabus_nodes: 516 inserted, 0 updated, 0 unchanged")
-                .contains("orphans (in the database, not in the file): none")
-                .contains("prerequisites.csv: 104 edges read")
-                .contains("syllabus_prerequisites: 104 inserted, 0 already present; 104 edges over 83 nodes, no cycle")
-                .contains("archetypes.yaml: 4 tracks, 744 steps read")
-                .contains("archetype_tracks: 4 inserted, 0 updated, 0 unchanged")
-                .contains("archetype_track_steps: 744 inserted, 0 updated, 0 unchanged, 0 removed")
-                .contains("chapters in no track: none")
-                .contains("cutoffs.csv: 40 rows read")
-                .contains("cutoffs: 40 inserted, 0 updated, 0 unchanged");
+                .contains("# margai-pipeline taxonomy load\n")
+                .contains("- read: 516 nodes\n- result: ok\n")
+                .contains("| inserted | updated | unchanged |\n|---|---|---|\n| 516 | 0 | 0 |\n")
+                .contains("## orphans (in the database, not in the file)\n\nnone\n")
+                .contains("- read: 104 edges\n")
+                .contains("| 104 | 0 | 104 | 83 | none |\n")
+                .contains("- read: 4 tracks, 744 steps\n")
+                .contains("| 744 | 0 | 0 | 0 |\n")
+                .contains("- read: 40 rows\n")
+                .contains("| 40 | 0 | 0 |\n")
+                .contains("report: " + reports.resolve("2026-09-12-taxonomy-load.md"));
         assertThat(err.toString()).isEmpty();
+        assertThat(Files.list(reports).map(path -> path.getFileName().toString()))
+                .containsExactlyInAnyOrder("2026-09-12-taxonomy-load.md", "2026-09-12-taxonomy-prerequisites.md",
+                        "2026-09-12-backbone-load.md", "2026-09-12-cutoffs-load.md");
+        assertThat(Files.readString(reports.resolve("2026-09-12-backbone-load.md")))
+                .contains("| track | steps |\n|---|---|\n| fresher_2yr | 210 |\n| fresher_1yr | 166 |\n| dropper | 178 |\n| repeater | 190 |\n");
     }
 
     @Test
-    void aMissingInputFileIsAUsageErrorNamingThePath() {
+    void aMissingInputFileIsAUsageErrorNamingThePathAndWritesNoReport() throws IOException {
         assertThat(run("taxonomy", "load")).isEqualTo(InputFileCommand.EXIT_USAGE);
 
         assertThat(err.toString()).contains("input file not found: " + inputs.resolve(TaxonomyLoadCommand.FILE));
         assertThat(out.toString()).isEmpty();
         assertThat(imports.nodes).isNull();
+        assertThat(Files.list(reports)).isEmpty();
     }
 
     @Test
-    void aMalformedInputFailsTheRunBeforeAnythingElse() throws IOException {
+    void aMalformedInputFailsTheRunAndTheReportSaysWhy() throws IOException {
         Files.writeString(inputs.resolve(TaxonomyLoadCommand.FILE), "code,subject\nPHY,physics\n");
 
         assertThat(run("taxonomy", "load")).isEqualTo(InputFileCommand.EXIT_FAILED);
 
-        assertThat(err.toString()).contains("taxonomy.csv:1: header must be");
-        assertThat(out.toString()).isEmpty();
+        assertThat(err.toString()).contains("FAILED: taxonomy.csv:1: header must be");
+        assertThat(out.toString()).contains("- result: FAILED: taxonomy.csv:1: header must be");
         assertThat(imports.nodes).isNull();
+        assertThat(Files.readString(reports.resolve("2026-09-12-taxonomy-load.md")))
+                .contains("- read: nothing yet\n- result: FAILED: taxonomy.csv:1: header must be");
     }
 
     @Test
-    void theInputsDirectoryDefaultsToThePipelineDirectoryBesideServer() {
+    void theDirectoriesDefaultToThePipelineDirectoryBesideServer() {
         CommandLine.ParseResult parsed = commandLine.parseArgs("taxonomy", "load");
         InputFileCommand load = (InputFileCommand) parsed.subcommand().subcommand().commandSpec().userObject();
 
@@ -153,7 +167,7 @@ class PipelineCommandTest {
     }
 
     private int run(String group, String command) {
-        return commandLine.execute(group, command, "--inputs", inputs.toString());
+        return commandLine.execute(group, command, "--inputs", inputs.toString(), "--reports", reports.toString());
     }
 
     /** Records what the commands hand over and answers with a report shaped like a first clean load. */
@@ -180,7 +194,9 @@ class PipelineCommandTest {
         public BackboneLoadReport loadBackbone(List<ArchetypeTrackRow> rows) {
             tracks = rows;
             int steps = rows.stream().mapToInt(track -> track.steps().size()).sum();
-            return new BackboneLoadReport(rows.size(), 0, 0, steps, 0, 0, 0, Map.of(), List.of());
+            Map<com.margai.common.api.AttemptType, Integer> perTrack = new java.util.LinkedHashMap<>();
+            rows.forEach(track -> perTrack.put(track.code(), track.steps().size()));
+            return new BackboneLoadReport(rows.size(), 0, 0, steps, 0, 0, 0, perTrack, List.of());
         }
 
         @Override

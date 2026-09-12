@@ -5,7 +5,6 @@ import com.margai.curriculum.api.CutoffLoadReport;
 import com.margai.curriculum.api.CutoffRow;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
@@ -21,7 +20,8 @@ class CutoffsLoadCommand extends InputFileCommand {
 
     private final CurriculumImport imports;
 
-    CutoffsLoadCommand(CurriculumImport imports) {
+    CutoffsLoadCommand(CurriculumImport imports, Reports reports) {
+        super(reports);
         this.imports = imports;
     }
 
@@ -31,15 +31,17 @@ class CutoffsLoadCommand extends InputFileCommand {
     }
 
     @Override
-    int run(Path inputFile) {
+    void run(Path inputFile, Report report) {
         List<CutoffRow> rows = CutoffsCsvReader.read(inputFile);
-        print(FILE + ": " + rows.size() + " rows read");
-        CutoffLoadReport report = imports.loadCutoffs(rows);
-        print("cutoffs: " + report.inserted() + " inserted, " + report.updated() + " updated, " + report.unchanged() + " unchanged");
-        print("  rows per year: " + report.rowsPerYear().entrySet().stream()
-                .map(entry -> entry.getKey() + " " + entry.getValue())
-                .collect(Collectors.joining(", ")));
-        print("orphans (in the database, not in the file): " + listOrNone(report.orphans()));
-        return EXIT_OK;
+        report.read(rows.size() + " rows");
+        CutoffLoadReport result = imports.loadCutoffs(rows);
+        report.section("cutoffs")
+                .table(List.of("inserted", "updated", "unchanged"), List.of(List.of(
+                        String.valueOf(result.inserted()), String.valueOf(result.updated()), String.valueOf(result.unchanged()))));
+        report.section("rows per year")
+                .table(List.of("year", "rows"), result.rowsPerYear().entrySet().stream()
+                        .map(entry -> List.of(String.valueOf(entry.getKey()), String.valueOf(entry.getValue())))
+                        .toList());
+        report.section("orphans (in the database, not in the file)").list(result.orphans());
     }
 }

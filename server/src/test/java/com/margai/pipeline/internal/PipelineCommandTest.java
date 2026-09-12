@@ -11,6 +11,8 @@ import com.margai.curriculum.api.CurriculumImportException;
 import com.margai.curriculum.api.CutoffLoadReport;
 import com.margai.curriculum.api.CutoffRow;
 import com.margai.curriculum.api.NcertBookRow;
+import com.margai.curriculum.api.NcertLoadReport;
+import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.NcertRegisterReport;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
@@ -243,6 +245,10 @@ class PipelineCommandTest {
                             new NcertExtractCommandTest.RecordingExtract(), new NcertExtractCommandTest.StubSpend(),
                             new PipelineProperties(72, 10), writer));
                 }
+                if (cls == NcertLoadCommand.class) {
+                    return cls.cast(new NcertLoadCommand(new NcertRenderCommandTest.RecordingStore(),
+                            imports, writer));
+                }
                 return CommandLine.defaultFactory().create(cls);
             }
         };
@@ -252,7 +258,7 @@ class PipelineCommandTest {
      * Records what the commands hand over and answers with a report shaped like a first clean load;
      * {@code failure}, when set, is thrown by the taxonomy load instead.
      */
-    static final class RecordingImport implements CurriculumImport {
+    static class RecordingImport implements CurriculumImport {
 
         List<SyllabusNodeRow> nodes;
         List<PrerequisiteRow> edges;
@@ -301,6 +307,11 @@ class PipelineCommandTest {
         @Override
         public void recordRenderedPages(String bookCode, BookLanguage language, int pages) {
             renderedPages.add(bookCode + " " + language + " " + pages);
+        }
+
+        @Override
+        public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
+            return new NcertLoadReport(rows.size(), 0, 0, Map.of(), List.of());
         }
     }
 }

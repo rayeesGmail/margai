@@ -7,6 +7,8 @@ import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.CutoffLoadReport;
 import com.margai.curriculum.api.CutoffRow;
 import com.margai.curriculum.api.NcertBookRow;
+import com.margai.curriculum.api.NcertLoadReport;
+import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.NcertRegisterReport;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
@@ -32,14 +34,16 @@ class CurriculumImportService implements CurriculumImport {
     private final BackboneImporter backbone;
     private final CutoffImporter cutoffs;
     private final NcertBookImporter ncertBooks;
+    private final NcertParagraphImporter ncertParagraphs;
 
     CurriculumImportService(TaxonomyImporter taxonomy, PrerequisiteImporter prerequisites, BackboneImporter backbone,
-            CutoffImporter cutoffs, NcertBookImporter ncertBooks) {
+            CutoffImporter cutoffs, NcertBookImporter ncertBooks, NcertParagraphImporter ncertParagraphs) {
         this.taxonomy = taxonomy;
         this.prerequisites = prerequisites;
         this.backbone = backbone;
         this.cutoffs = cutoffs;
         this.ncertBooks = ncertBooks;
+        this.ncertParagraphs = ncertParagraphs;
     }
 
     @Override
@@ -70,5 +74,10 @@ class CurriculumImportService implements CurriculumImport {
     @Override
     public void recordRenderedPages(String bookCode, BookLanguage language, int pages) {
         ncertBooks.recordRenderedPages(bookCode, language, pages);
+    }
+
+    @Override
+    public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
+        return ncertParagraphs.load(bookCode, language, rows);
     }
 }

@@ -51,4 +51,12 @@ public interface CurriculumImport {
      * {@code ncert load} divides by. Refused when the book is not registered.
      */
     void recordRenderedPages(String bookCode, BookLanguage language, int pages);
+
+    /**
+     * {@code ncert load} (D14): upsert on the paragraph address, the text landing in the column of
+     * the edition being loaded — so D16's Hindi pass fills {@code text_hi} beside the English
+     * paragraph at that address instead of making a second row. Refused: an unregistered book, and
+     * one address twice in the same extraction.
+     */
+    NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows);
 }

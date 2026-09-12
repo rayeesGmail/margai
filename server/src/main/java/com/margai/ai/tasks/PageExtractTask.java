@@ -40,17 +40,20 @@ public class PageExtractTask implements NcertPageExtractor {
     }
 
     @Override
-    public AiResponse<NcertPage> read(String bookTitle, short chapter, int page, ImagePart image,
+    public AiResponse<NcertPage> read(String bookTitle, short chapter, int page, List<ImagePart> images,
             PreviousPage previous, AiCallContext ctx) {
         Map<String, Object> variables = new LinkedHashMap<>();
         variables.put("book_title", bookTitle);
         variables.put("chapter", chapter);
         variables.put("page", page);
+        // Told to the model only when the page arrives in bands, so the single-image prompt is
+        // unchanged and the two configurations stay comparable.
+        variables.put("tiles", images.size() > 1 ? images.size() : null);
         variables.put("previous_section", previous == null ? null : previous.section());
         variables.put("previous_para_no", previous == null ? null : previous.paraNo());
         variables.put("previous_tail", previous == null ? null : previous.tail());
         return ai.complete(AiRequest.of(AiFeature.pipeline_extract, Tier.vision, prompt, variables,
                         NcertPage.class, ctx)
-                .withImages(List.of(image)));
+                .withImages(images));
     }
 }

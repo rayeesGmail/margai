@@ -238,12 +238,12 @@ class PipelineCommandTest {
                 }
                 if (cls == NcertRenderCommand.class) {
                     return cls.cast(new NcertRenderCommand(new NcertRenderCommandTest.RecordingStore(), imports,
-                            new PipelineProperties(72, 10), writer));
+                            new PipelineProperties(72, 10, 1), writer));
                 }
                 if (cls == NcertExtractCommand.class) {
                     return cls.cast(new NcertExtractCommand(new NcertRenderCommandTest.RecordingStore(),
                             new NcertExtractCommandTest.RecordingExtract(), new NcertExtractCommandTest.StubSpend(),
-                            new PipelineProperties(72, 10), writer));
+                            new PipelineProperties(72, 10, 1), writer));
                 }
                 if (cls == NcertLoadCommand.class) {
                     return cls.cast(new NcertLoadCommand(new NcertRenderCommandTest.RecordingStore(),

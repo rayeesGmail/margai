@@ -77,7 +77,7 @@ class NcertExtractCommandTest {
         page(9, 1);
 
         Reports writer = new Reports(ReportTest.CLOCK);
-        PipelineProperties properties = new PipelineProperties(72, 2);
+        PipelineProperties properties = new PipelineProperties(72, 2, 1);
         CommandLine.IFactory siblings =
                 PipelineCommandTest.siblingFactory(new PipelineCommandTest.RecordingImport(), writer);
         CommandLine.IFactory factory = new CommandLine.IFactory() {
@@ -338,14 +338,16 @@ class NcertExtractCommandTest {
         final List<String> calls = new ArrayList<>();
         final List<String> tails = new ArrayList<>();
         final List<String> addresses = new ArrayList<>();
+        final List<Integer> imageCounts = new ArrayList<>();
         final List<String> empty = new ArrayList<>();
         final List<String> lowConfidence = new ArrayList<>();
 
         @Override
-        public AiResponse<NcertPage> read(String bookTitle, short chapter, int page, ImagePart image,
+        public AiResponse<NcertPage> read(String bookTitle, short chapter, int page, List<ImagePart> images,
                 PreviousPage previous, AiCallContext ctx) {
             String address = chapter + "/" + page;
             calls.add(address);
+            imageCounts.add(images.size());
             tails.add(previous == null ? null : previous.tail());
             addresses.add(previous == null ? null : previous.section() + " ¶" + previous.paraNo());
             List<NcertPage.Paragraph> paragraphs = empty.contains(address) ? List.of()

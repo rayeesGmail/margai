@@ -44,7 +44,7 @@ class PageExtractTaskTest {
         UUID requestId = UUID.randomUUID();
 
         AiResponse<NcertPage> response = task.read("Physics Part-I, Textbook for Class XI",
-                (short) 7, 12, image(), PreviousPage.none(), new AiCallContext(null, requestId.toString(), false));
+                (short) 7, 12, List.of(image()), PreviousPage.none(), new AiCallContext(null, requestId.toString(), false));
 
         NcertPage page = response.output();
         assertThat(page.confidence()).isEqualByComparingTo(new BigDecimal("0.96"));
@@ -70,7 +70,7 @@ class PageExtractTaskTest {
      */
     @Test
     void theStateHandedForwardCarriesTheAddressNotOnlyTheText() {
-        NcertPage page = task.read("Physics Part-I, Textbook for Class XI", (short) 7, 12, image(),
+        NcertPage page = task.read("Physics Part-I, Textbook for Class XI", (short) 7, 12, List.of(image()),
                 PreviousPage.none(), new AiCallContext(null, UUID.randomUUID().toString(), false)).output();
 
         PreviousPage previous = PreviousPage.of(page, PreviousPage.none());

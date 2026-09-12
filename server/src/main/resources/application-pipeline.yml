@@ -18,6 +18,12 @@ margai:
     # limit, above which it downscales before the model sees the image (§6.1).
     render-dpi: 150
     extract-batch-size: 10
+    # Each page is sent as 2 overlapping bands rather than one whole image. The provider shrinks
+    # anything over ~1,568 pixels on the long edge and a 150-DPI page is ~1,754, so a whole page
+    # arrives already reduced — which is where the D14 audit found every transcription error: a
+    # subscript, an exponent, a prime, a minus sign, while the prose around them was perfect.
+    # Set to 1 to send whole pages again (the two are directly comparable on the same chapter).
+    page-tiles: 2
   ai:
     # A page transcription is not an answer. The 1,024 default sizes a reasoning answer inside the
     # 20 s budget (§4.11); a full NCERT body page is 400–900 words plus JSON field names, escapes

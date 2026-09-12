@@ -13,12 +13,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @param extractBatchSize how many pages one {@code ncert extract} transaction writes to the
  *                         JSONL before flushing, so an interrupted run resumes near where it
  *                         stopped rather than from the start of the book.
+ * @param pageTiles        how many overlapping horizontal bands each page is sent as. 1 sends the
+ *                         whole page, which the provider then shrinks below the size at which
+ *                         subscripts survive; 2 sends each half unscaled. The D14 audit found
+ *                         every transcription error in a small glyph and none in the prose, which
+ *                         is what this exists to fix ({@link PageTiles}).
  */
 @ConfigurationProperties(prefix = "margai.pipeline")
-public record PipelineProperties(int renderDpi, int extractBatchSize) {
+public record PipelineProperties(int renderDpi, int extractBatchSize, int pageTiles) {
 
     public PipelineProperties {
         renderDpi = renderDpi <= 0 ? 150 : renderDpi;
         extractBatchSize = extractBatchSize <= 0 ? 10 : extractBatchSize;
+        pageTiles = pageTiles <= 0 ? 1 : pageTiles;
     }
 }

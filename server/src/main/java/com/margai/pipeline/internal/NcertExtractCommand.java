@@ -68,6 +68,8 @@ class NcertExtractCommand extends NcertBookCommand {
     @Override
     void run(BookDefinition definition, List<BookDefinition.Chapter> selected, Report report) {
         report.line("content store: " + content.describe());
+        report.line("page tiles: " + properties.pageTiles()
+                + (properties.pageTiles() > 1 ? " (each page sent as overlapping bands, unscaled)" : " (whole page)"));
         String runId = "pipeline-ncert-extract-" + UUID.randomUUID();
         report.line("request id: " + runId);
         AiCallContext ctx = AiCallContext.system(runId);
@@ -131,8 +133,11 @@ class NcertExtractCommand extends NcertBookCommand {
                     previous = previousOf(existing, previous);
                     continue;
                 }
+                List<ImagePart> images = PageTiles.split(content.get(pageKey), properties.pageTiles()).stream()
+                        .map(band -> new ImagePart(band, PdfPageRenderer.MEDIA_TYPE))
+                        .toList();
                 AiResponse<NcertPage> response = extract.read(definition.row().titleEn(), chapter.no(), page,
-                        new ImagePart(content.get(pageKey), PdfPageRenderer.MEDIA_TYPE), previous, ctx);
+                        images, previous, ctx);
                 ExtractedPage read = ExtractedPage.of(chapter.no(), page, response.output(), response.aiCallId());
                 done.put(read.address(), read);
                 called++;

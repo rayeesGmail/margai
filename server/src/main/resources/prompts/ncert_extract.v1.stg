@@ -330,6 +330,13 @@ Call the tool exactly once, with the paragraphs in reading order.
 
 user(v) ::= <<
 This is page <v.page> of Chapter <v.chapter> of <v.book_title>.
+<if(v.tiles)>
+The page is given to you as <v.tiles> images: horizontal bands of the one page, in order from the
+top. They **overlap** — the last lines of one band are repeated as the first lines of the next —
+so that no line is cut in half. Read them as one page: transcribe each paragraph once, in reading
+order, and do not repeat a paragraph because it appears in two bands. Paragraph numbering runs
+across the whole page, not within a band.
+<endif>
 <if(v.previous_tail)>
 The previous page ended inside section <v.previous_section>, at paragraph <v.previous_para_no> of
 that section, with the text below.

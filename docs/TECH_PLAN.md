@@ -1935,7 +1935,10 @@ minors is a separate `purpose` with the same machinery.
 
 ### 9.2 Secrets and rotation
 
-All secrets in SSM SecureStrings, injected as environment variables by ECS (§7.3); locally in a
+All secrets in SSM SecureStrings, injected as environment variables by ECS (§7.3) — not AWS Secrets
+Manager, whose rotation, multi-account and size features all miss us at beta, and which ECS resolves
+through the same task-definition field, so the choice is reversible without touching code
+(DECISIONS 2026-09-12; the triggers that would reverse it are in that row); locally in a
 human-edited `.env` that Claude can neither read nor write (`.claude/settings.json`,
 `scripts/block-paths.sh`); `scripts/detect-secrets.sh` scans every write and CI scans the tree.
 JWT key rotation: `jwt/secret_previous` is accepted for 15 minutes after a rotation. Razorpay and

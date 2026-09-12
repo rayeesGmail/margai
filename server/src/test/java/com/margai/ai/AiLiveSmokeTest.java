@@ -83,7 +83,7 @@ class AiLiveSmokeTest {
     @Test
     void theConfiguredModelIdsExistAtTheProvider() {
         assertThat(info.isLive()).as("inner client under the live profile").isTrue();
-        assertThat(info.inner()).isEqualTo(properties.provider());
+        assertThat(info.inner()).isEqualTo(properties.provider().name());
 
         for (Tier tier : List.of(Tier.cheap, Tier.reason, Tier.vision)) {
             String configured = properties.modelFor(tier);
@@ -191,10 +191,15 @@ class AiLiveSmokeTest {
     }
 
     private static String describe(AiCall row) {
-        return String.format("ai_calls %s | %s | %s | %s v%s | status=%s | in=%d out=%d cache_read=%d cache_write=%d"
+        return String.format("ai_calls %s | %s | %s | %s | status=%s | in=%d out=%d cache_read=%d cache_write=%d"
                 + " | %d ms | %d paise | request_id=%s",
-                row.getId(), row.getFeature(), row.getModelId(), row.getPromptName(), row.getPromptVersion(),
+                row.getId(), row.getFeature(), row.getModelId(), prompt(row),
                 row.getStatus(), row.getInputTokens(), row.getOutputTokens(), row.getCacheReadTokens(),
                 row.getCacheWriteTokens(), row.getLatencyMs(), row.getCostPaise(), row.getRequestId());
+    }
+
+    /** An embedding call has no prompt; the transcript is D5's evidence, so it should not say "null vnull". */
+    private static String prompt(AiCall row) {
+        return row.getPromptName() == null ? "—" : row.getPromptName() + " v" + row.getPromptVersion();
     }
 }

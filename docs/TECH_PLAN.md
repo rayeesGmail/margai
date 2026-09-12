@@ -1324,6 +1324,13 @@ a re-learn block candidate.
 - Price table: config JSON keyed by model id with per-million-token prices for input, output, cache
   read and cache write, plus `usd_inr`. `cost_paise` is computed at insert; a price change never
   rewrites history.
+- **Measured 2026-09-12** (the D5 live re-run, TRACKER day log — first real numbers for this cost
+  model): a reasoning call against a **cold** cache cost **232 paise**, of which 96% was the 9,860-token
+  cache write; the same call **warm** is ≈ 28 paise. On the cheap model the write was 81 paise and each
+  subsequent read 13 paise. So the ₹25 per-user daily cap is roughly **10 cold reasoning calls or 89
+  warm ones** — the spread SPEC §6.3's free-tier limits and the breaker's thresholds should be
+  reasoned about with, and the concrete case for SPEC §11's 55% cache-hit target being a cost lever
+  rather than a nicety. Re-estimate at D65 against real ledger data (§10.5).
 - Breaker: `margai.ai.budget.user_daily_paise` (default 2,500 = ₹25) and `global_daily_paise`
   checked before each call against today's IST sum. Over budget: doubts return `AI_BUDGET_EXCEEDED`
   with the honest copy and the solve is queued for after midnight; the planner uses the deterministic
@@ -1406,7 +1413,13 @@ unchanged; the batch lane, the request shape and the region paragraph do not.*
   **minimum cacheable length** is silently not cached — 4,096 tokens on the cheap model, 1,024 on the
   reasoning one — so `margai.ai.tier.<t>.cache-min-tokens` records each model's floor and the app
   warns at startup for every prompt that falls short of one (founder ruling, 2026-09-12). The single
-  `cache_write` price remains the 5-minute rate (§4.8).*
+  `cache_write` price remains the 5-minute rate (§4.8).
+  **Measured 2026-09-12:** the two models tokenize the same rendered prefix differently — 6,595
+  tokens on the cheap model against 9,860 on the reasoning one, +50% — which is why the floor is per
+  model and not one number. It also bounds the tripwire: the startup check estimates ~4 characters
+  per token, which came out 4% **high** for the cheap model, so a prompt designed to sit just above
+  its 4,096 floor can still fail to cache while the check passes. **Design prompts with margin, not
+  to the line**; the check catches an accident, it does not certify a near-miss.*
 - **Per-model request shape**: *added 2026-09-12.* The models differ in what they accept, and a
   rejected field is a 400, not a default: the reasoning model refuses `temperature` and
   `budget_tokens`, the cheap model refuses `effort`. Each tier therefore configures
@@ -2296,6 +2309,13 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    retry decorator's two jittered retries plus the provider's `retry-after` (§4.11) therefore cover
    a 429 we should essentially never see. One caveat: these are per-minute allowances for the whole
    organisation, so they are shared if this account ever runs another workload.
+   **Live proof 2026-09-12 17:42 IST** (`AiLiveSmokeTest`, founder-run; rows in the TRACKER day
+   log): six calls across the three configured ids, all `ok`. Forced tool use, prompt caching
+   (written by one call and read by the next two, 81 → 13 paise on the cheap model), an image on the
+   vision tier, the reasoning tier answering on its own request shape in 2.07 s, and 1,024-wide
+   embeddings in English and Hindi from `embed-v4.0`. **Item 1 closed on direct-API terms** — the
+   only thing it leaves open is the embedding *price*, which is the founder's to confirm and is
+   tracked in the F8 row, not here.
 2. Bedrock batch inference minimum record count and whether the chosen models support it.
    **Partial 2026-09-06:** the Mumbai pricing page lists batch prices for both chosen models
    (Haiku 4.5 0.50 / 2.50, Sonnet 4.6 1.50 / 7.50 — half of on-demand), so both support batch

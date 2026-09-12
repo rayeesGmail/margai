@@ -1334,9 +1334,10 @@ a re-learn block candidate.
 - Price table: config JSON keyed by model id with per-million-token prices for input, output, cache
   read and cache write, plus `usd_inr`. `cost_paise` is computed at insert; a price change never
   rewrites history. *A corrected price therefore gets an append-only note here naming the date and
-  the rows priced on the old figure, never a backfill — the first such correction is due when the
-  embedding provider's direct-API price is confirmed, since every embedding row written from
-  2026-09-12 is priced off a placeholder carried over from the Bedrock page (F8).*
+  the rows priced on the old figure, never a backfill. The convention stands; the correction it was
+  written for turned out not to be needed — the embedding rate was confirmed on the provider's own
+  pricing page on 2026-09-12 as the same 0.12 the Bedrock page had given, so no row was ever
+  mispriced and nothing is outstanding.*
 - **Measured 2026-09-12** (the D5 live re-run, TRACKER day log — first real numbers for this cost
   model): a reasoning call against a **cold** cache cost **232 paise**, of which 96% was the 9,860-token
   cache write; the same call **warm** is ≈ 28 paise. On the cheap model the write was 81 paise and each
@@ -1381,6 +1382,14 @@ a re-learn block candidate.
   the `vector(n)` columns equal, and D17's retrieval harness must cover Hindi and Hinglish queries —
   if the v4 line underperforms the v3 one there, the swap happens **before** the D16 corpus
   embedding, while it is still free (founder rider, 2026-09-12).
+  **Price confirmed 2026-09-12** on the provider's own pricing page: **0.12 USD per 1M text
+  tokens**, identical to the Bedrock figure the table already carried, so nothing was ever
+  mispriced. The same model charges **0.47 for image tokens** — irrelevant today, since
+  `EmbedRequest` carries text only and the client sends `texts` — but §4.8's table holds **one
+  `input` price per model**, so the day anything embeds an image the ledger under-bills it about
+  fourfold. Embed 4 is multimodal with a 128K window, so that day is plausible (diagram retrieval
+  for figure-heavy NCERT chapters); it would be a change to the price table's shape, not a config
+  edit, and this note is the warning that it is not free.
 - Indexes: HNSW cosine on `ncert_paragraphs.embedding`, `questions.embedding`,
   `doubt_cache.embedding` (`m = 16, ef_construction = 64`); GIN on `ncert_paragraphs.tsv`.
 - `HybridRetriever` is the one retrieval component (§4.3 stage 6) and is also used by the pipeline
@@ -2394,9 +2403,13 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    1536 and the v3 line rejects. Default is the v4 line pinned to **1,024**, so §2.3's `vector(1024)`
    columns are untouched and **no migration is needed** (none of them exists yet either: V1 creates
    the extension only). Titan stops being the fallback — the fallback is now the v3 line, two config
-   keys away (§4.9). Open for the founder: the exact model id string and the direct-API price, both
-   confirmed when the provider account is funded; the price row carries the Bedrock figure as a
-   placeholder until then.
+   keys away (§4.9).
+   **Item 4 closed on direct-API terms, 2026-09-12:** the id `embed-v4.0` was proved by the live
+   smoke (accepted, 1,024-wide vectors in English and Hindi) and the price confirmed on the
+   provider's pricing page at **0.12 USD per 1M text tokens** — the same figure the table already
+   carried from the Bedrock page, so no row was mispriced and §4.8 needs no correction note. Noted
+   there and in §4.9: image tokens on the same model cost 0.47, which the one-price-per-model table
+   cannot express.
 
 ### 13.3 Single-instance assumptions and their upgrade path
 

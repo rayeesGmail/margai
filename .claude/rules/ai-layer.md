@@ -7,13 +7,32 @@ paths:
 
 # AI layer rules (DEV_SPEC §4, §13.4)
 
-- All model access goes through the single `AiClient` interface. No feature code calls Bedrock
-  directly. Implementations: `BedrockAiClient` (the `bedrock` profile: `BEDROCK_LIVE=1` locally,
-  the ECS task definition in AWS; TECH_PLAN §1.2) and `FakeAiClient` (the default everywhere
-  else; fixtures under `ai-fixtures/`). Both run behind the same decorator chain — ledger,
-  breaker, tier policy, schema validation, retry (TECH_PLAN §4.1). Only the `ai` module's
-  internal packages and its task classes in `ai.tasks` touch `AiClient`; feature modules call
-  task classes (ArchUnit).
+- All model access goes through the single `AiClient` interface. No feature code calls a provider
+  directly. Implementations: in the `live` profile (`AI_LIVE=1` locally, the ECS task definition in
+  AWS; TECH_PLAN §1.2) the provider `margai.ai.provider` names — `AnthropicAiClient` for completions
+  joined to `CohereEmbeddingClient` for embeddings (`CompositeAiClient`), or the dormant
+  `BedrockAiClient`; `FakeAiClient` everywhere else (fixtures under `ai-fixtures/`). All of them run
+  behind the same decorator chain — ledger, breaker, tier policy, schema validation, retry
+  (TECH_PLAN §4.1). Only the `ai` module's internal packages and its task classes in `ai.tasks`
+  touch `AiClient`; feature modules call task classes (ArchUnit).
+- Each provider's SDK or HTTP client stays inside its own package under `ai.internal.<provider>`
+  (ArchUnit). Provider API keys are the auth model: SSM SecureString deployed, untracked local
+  environment on a laptop, never in code, config, logs or a repo file
+  (docs/runbooks/ai-provider-keys.md).
+- Per-tier request shape is config, not a code branch: the models differ in what they *accept*
+  (the reasoning model rejects `temperature`, the cheap one rejects `effort`), so
+  `margai.ai.tier.<t>.{temperature,thinking,effort,cache-min-tokens}` carries it and an absent key
+  means the field is not sent. A cached prefix shorter than the model's `cache-min-tokens` is not
+  cached at all — the startup warning says so, do not ignore it.
+- **Prompt economy** (measured 2026-09-12, D5 live re-run): the two tiers tokenize the same prefix
+  about 50% apart — 6,595 tokens on the cheap model against 9,860 on the reasoning one. So (a) write
+  a prefix with comfortable margin over its tier's cache floor, never to the line: the startup
+  tripwire estimates ~4 characters per token and ran 4% *high* for the cheap model, so it catches an
+  accident but cannot certify a near-miss; and (b) prompt length is a per-model cost variable while
+  you are writing, not a shared constant — the same words cost half again as much on the reasoning
+  tier, and a cold cache write is ~96% of that call's cost (TECH_PLAN §4.8, §4.11).
+- The embedding pin is provider + model + dimension together. Changing any of the three means
+  re-embedding the corpus and re-indexing, never a config flip alone (TECH_PLAN §4.9).
 - Prompt templates live in `server/src/main/resources/prompts/<name>.v<N>.stg` (StringTemplate 4
   group files with a `system` template, the cached prefix, and a `user` template; the active
   version is `margai.ai.prompts.<name>.version`, TECH_PLAN §4.12). Shared model-facing fragments

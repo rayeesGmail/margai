@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Architecture rules beyond Modulith's module boundaries (TECH_PLAN §1.4, §4.2, §4.13, §8.1):
- * the AWS SDK confined to the two integration packages (Bedrock in {@code ai}, SES in
- * {@code auth} since the D7 ruling) and each service SDK to its own, the single entry point to
- * the AI seam, the router as the only producer of routed decisions, and controllers in
- * {@code web} packages. Main classes only.
+ * every provider SDK confined to the one package that talks to that provider — the model SDK and
+ * the embedding provider's HTTP calls in {@code ai}, the AWS SDK in the dormant Bedrock package
+ * and in {@code auth} for SES since the D7 ruling — the single entry point to the AI seam, the
+ * router as the only producer of routed decisions, and controllers in {@code web} packages. Main
+ * classes only.
  */
 class ArchitectureTest {
 
@@ -38,6 +39,23 @@ class ArchitectureTest {
         noClasses().that().resideOutsideOfPackage("com.margai.ai.internal.bedrock..")
                 .should().dependOnClassesThat().resideInAPackage("software.amazon.awssdk.services.bedrock..")
                 .because("only ai imports software.amazon.awssdk.services.bedrock* (TECH_PLAN §1.4), and inside ai only its bedrock package")
+                .check(CLASSES);
+    }
+
+    @Test
+    void onlyTheAnthropicPackageImportsTheModelSdk() {
+        noClasses().that().resideOutsideOfPackage("com.margai.ai.internal.anthropic..")
+                .should().dependOnClassesThat().resideInAPackage("com.anthropic..")
+                .because("the model provider's SDK lives behind one package, as every provider does (TECH_PLAN §1.4)")
+                .check(CLASSES);
+    }
+
+    @Test
+    void onlyTheCoherePackageMakesTheEmbeddingProvidersHttpCalls() {
+        noClasses().that().resideInAPackage("com.margai.ai..")
+                .and().resideOutsideOfPackage("com.margai.ai.internal.cohere..")
+                .should().dependOnClassesThat().resideInAPackage("org.springframework.web.client..")
+                .because("the embedding provider is called over HTTP from its own package only (TECH_PLAN §4.9)")
                 .check(CLASSES);
     }
 

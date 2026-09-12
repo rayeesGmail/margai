@@ -24,5 +24,5 @@ paths:
   associations (TECH_PLAN §1.3).
 - Configuration (model IDs, tiers, limits, prices, feature flags) comes from config / SSM,
   never from code constants. No credentials anywhere in the tree; `FakeAiClient` is the default.
-- Structured JSON logs with request IDs end-to-end; every Bedrock call writes an `ai_calls` row.
+- Structured JSON logs with request IDs end-to-end; every model call writes an `ai_calls` row.
 - Copy shown to students is externalised (ARB on the app side; server returns codes + both languages).

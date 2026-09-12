@@ -49,7 +49,6 @@ public final class BedrockAiClient implements AiClient {
 
     /** The response header Bedrock sets on InvokeModel with the input token count. */
     static final String INPUT_COUNT_HEADER = "X-Amzn-Bedrock-Input-Token-Count";
-    static final int EMBEDDING_DIMENSIONS = 1024;
 
     private static final Logger log = LoggerFactory.getLogger(BedrockAiClient.class);
 
@@ -131,7 +130,7 @@ public final class BedrockAiClient implements AiClient {
     /** The embedding request body per model family; the family prefix selects the wire shape, the id is config. */
     String embedBody(String modelId, EmbedRequest request) {
         if (modelId.startsWith("amazon.titan")) {
-            return codec.toJson(Map.of("inputText", request.text(), "dimensions", EMBEDDING_DIMENSIONS,
+            return codec.toJson(Map.of("inputText", request.text(), "dimensions", properties.embed().dimensions(),
                     "normalize", true));
         }
         return codec.toJson(Map.of("texts", List.of(request.text()), "input_type", request.inputType().name(),
@@ -153,11 +152,12 @@ public final class BedrockAiClient implements AiClient {
             JsonNode embeddings = root.path("embeddings");
             vector = embeddings.isObject() ? embeddings.path("float").path(0) : embeddings.path(0);
         }
-        if (!vector.isArray() || vector.size() != EMBEDDING_DIMENSIONS) {
+        int dimensions = properties.embed().dimensions();
+        if (!vector.isArray() || vector.size() != dimensions) {
             throw new InvalidOutputException(List.of("embedding has " + (vector.isArray() ? vector.size() : 0)
-                    + " dimensions, expected " + EMBEDDING_DIMENSIONS), body, usage, modelId);
+                    + " dimensions, expected " + dimensions + " (margai.ai.embed)"), body, usage, modelId);
         }
-        float[] values = new float[EMBEDDING_DIMENSIONS];
+        float[] values = new float[dimensions];
         for (int i = 0; i < values.length; i++) {
             values[i] = (float) vector.get(i).asDouble();
         }

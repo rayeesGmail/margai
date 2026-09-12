@@ -180,7 +180,7 @@ flowchart LR
     SCHED[EventBridge Scheduler<br/>00:30 IST] --> NIGHT[Same image<br/>profile nightly]
     API --> RDS[(RDS PostgreSQL 18<br/>pgvector · pg_trgm)]
     NIGHT --> RDS
-    API --> BR[Amazon Bedrock<br/>CHEAP · REASON · VISION · EMBED]
+    API --> BR[Provider APIs<br/>models: CHEAP · REASON · VISION<br/>embeddings: EMBED]
     NIGHT --> BR
     API --> S3U[(S3 uploads<br/>1-day lifecycle)]
     API --> EXT[SES OTP email · MSG91 OTP SMS after F1 · Razorpay · FCM · PostHog]
@@ -196,13 +196,16 @@ service at beta; the places where a second instance would need one are listed in
 
 ### 1.2 Run modes (Spring profiles)
 
+*Amended 2026-09-12: the `bedrock` profile is now `live`, switched on by `AI_LIVE=1`, and which
+provider it wires is `margai.ai.provider` — the switch outlives a provider change (DECISIONS; §4.11).*
+
 | Profile | Started by | Does | AI client |
 |---|---|---|---|
-| `api` (default) | ECS service, `./mvnw spring-boot:run` locally | HTTP API, in-process notification dispatcher (every 60 s), sweepers (expired images hourly, unclassified errors every 5 minutes) *— and, since D11 (2026-09-09), the OTP delivery-rate log line every `margai.auth.otp.report-every`; scheduling is switched on in `common` for every profile, so the `nightly` and `pipeline` tasks carry a scheduler thread too, and each schedule stays with the module whose work it is (DECISIONS D11)* | `fake` unless `bedrock` is also active |
+| `api` (default) | ECS service, `./mvnw spring-boot:run` locally | HTTP API, in-process notification dispatcher (every 60 s), sweepers (expired images hourly, unclassified errors every 5 minutes) *— and, since D11 (2026-09-09), the OTP delivery-rate log line every `margai.auth.otp.report-every`; scheduling is switched on in `common` for every profile, so the `nightly` and `pipeline` tasks carry a scheduler thread too, and each schedule stays with the module whose work it is (DECISIONS D11)* | `fake` unless `live` is also active |
 | `nightly` | EventBridge → ECS RunTask at 00:30 IST; locally by hand | the `jobs` module's `NightlyRunner` (§1.3): §4.5 re-plan for every user active in 14 days, weekly trajectory + patterns on Sundays, purge job, ai spend rollup; exits when done | as above |
-| `pipeline` | Founder's laptop with AWS SSO, `java -jar server.jar --spring.profiles.active=pipeline <command>` | §6 content commands (picocli) | `bedrock` (human-launched) |
-| `eval` | Founder's laptop, `BEDROCK_LIVE=1 ./mvnw -Peval verify` | §4.10 live eval suite | `bedrock` |
-| `bedrock` | Added by the environment (`BEDROCK_LIVE=1` locally; task definition in AWS) | Swaps `FakeAiClient` for `BedrockAiClient`; cost breaker stays on | — |
+| `pipeline` | Founder's laptop with AWS SSO, `java -jar server.jar --spring.profiles.active=pipeline <command>` | §6 content commands (picocli) | `live` (human-launched) |
+| `eval` | Founder's laptop, `AI_LIVE=1 ./mvnw -Peval verify` | §4.10 live eval suite | `live` |
+| `live` | Added by the environment (`AI_LIVE=1` locally; task definition in AWS) | Swaps `FakeAiClient` for the provider `margai.ai.provider` names; cost breaker stays on | — |
 | `local` | Developer default | Compose db, seed migrations (§2.9), fake OTP (`margai.auth.otp.sender = log`, the sandbox inbox for email and, after F1, SMS) / FCM / Razorpay adapters that log | `fake` |
 
 ### 1.3 Modules and package layout
@@ -232,7 +235,7 @@ Both names match the eval gate's `retriev*` path rule.
 | `trajectory` | weekly predicted band, peer line, deep report (§6.5, §8 screen 11) | `trajectory_snapshots` | common, account, curriculum, practice.api, notebook.api, billing.api |
 | `billing` | subscriptions, Razorpay, webhooks, paywall triggers, cancel/refund, auto-pause (§6.9, §8 screen 12) | `subscriptions`, `payments`, `billing_events`, `paywall_impressions` | common, account |
 | `notifications` | FCM devices, scheduling from plan events, 2/day cap, quiet periods, dispatcher (§6.10) | `notification_log` | common, account, planner.api (events) |
-| `ai` | `AiClient`, Bedrock/Fake, ledger, breaker, router, retrieval, prompts, verification, embeddings (§4) | `ai_calls`, `ai_spend_daily`, `audit_queue` | common, curriculum |
+| `ai` | `AiClient`, one package per provider plus the fake, ledger, breaker, router, retrieval, prompts, verification, embeddings (§4) | `ai_calls`, `ai_spend_daily`, `audit_queue` | common, curriculum |
 | `storage` | S3 port (uploads, content), signed URLs, deletion | — | common |
 | `pipeline` | §6 CLI commands | — | common, curriculum (D13); ai, storage (D14) — *`common` added 2026-09-12 (DECISIONS): the run report's IST clock* |
 | `jobs` | `NightlyRunner` (§4.5 orchestration), the purge and rollup jobs, the export executor (gathers every module's data for `data_export_jobs`, D64), the daily document-deletion verification job (§9.6, D64), the sweepers' schedules, the weekly dump | — | every `api` package |
@@ -274,10 +277,13 @@ Rules, enforced by the Modulith test from D4:
 - `jobs` and `ops` sit on top: they may use every module's `api` and nothing uses them. `jobs`
   orchestrates (the nightly run calls `planner.api`, `trajectory.api`, `notebook.api`, `account.api`
   and `ai.api` in turn); `ops` only reads.
-- Only `ai` imports `software.amazon.awssdk.services.bedrock*`. Only `storage` imports S3. Only
+- Only `ai` talks to a model or embedding provider, and inside `ai` each provider is confined to one
+  package (*extended 2026-09-12*): the model SDK to `ai.internal.anthropic`, the embedding provider's
+  HTTP calls to `ai.internal.cohere`, `software.amazon.awssdk.services.bedrock*` to the dormant
+  `ai.internal.bedrock`. Only `storage` imports S3. Only
   `billing` imports the Razorpay SDK; only `notifications` the FCM client; only `auth` the SMS client
   and, since the D7 ruling (2026-09-08, DECISIONS), the SES client for the email OTP channel — inside
-  `auth` only its `internal.email` package, as Bedrock is confined to `ai.internal.bedrock` (ArchUnit).
+  `auth` only its `internal.email` package, on the same principle (ArchUnit enforces all of these).
 - Feature modules never read another module's tables directly; they call `<module>.api` or listen to
   events. `ops` is the one exception: read-only queries across `api` packages.
 - Controllers live in `<module>.web`, are thin, and map to one service call.
@@ -316,7 +322,8 @@ Rules, enforced by the Modulith test from D4:
 ### 1.6 Nightly execution model
 
 - EventBridge Scheduler fires at 19:00 UTC (00:30 IST) and runs the image as an ECS task with
-  `--spring.profiles.active=nightly,bedrock`. The task processes users in a fixed order, commits per
+  `--spring.profiles.active=nightly,live` *(2026-09-12: the profile was renamed from `bedrock`;
+  a run left on the old name would start on `FakeAiClient` and fabricate plans)*. The task processes users in a fixed order, commits per
   user, and exits. Re-running it is safe: `daily_plans` is unique on `(user_id, plan_date)` and a
   rerun overwrites only plans it generated itself (`generated_by = nightly`), never a renegotiated one.
 - If no plan exists for a user at `GET /plan/today`, the API builds the deterministic fallback on the
@@ -825,7 +832,7 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
 | 409 | `STATE_CONFLICT` (e.g. answering a finished session, onboarding step out of order) |
 | 422 | `DOUBT_LIMIT_REACHED` (details: resets_at), `DOUBT_UNVERIFIED` (the honest fallback, with the audit reference), `NOT_A_QUESTION` (photo has no question) |
 | 429 | `RATE_LIMITED` (header `Retry-After`), `OTP_RATE_LIMITED` |
-| 502/503 | `AI_UNAVAILABLE` (Bedrock failure after retries, DEV_SPEC §4.1 "couldn't solve this right now"), `AI_BUDGET_EXCEEDED` (breaker; details: degraded mode) |
+| 502/503 | `AI_UNAVAILABLE` (provider failure after retries, DEV_SPEC §4.1 "couldn't solve this right now"), `AI_BUDGET_EXCEEDED` (breaker; details: degraded mode) |
 | 500 | `INTERNAL` (request id in details; never a stack trace) |
 
 Messages come from `messages_{en,hi,hinglish}.properties` in `common` (server-side copy); the
@@ -1037,10 +1044,11 @@ package com.margai.ai.api;
 public interface AiClient {
     <T> AiResponse<T> complete(AiRequest<T> request);        // text + optional images → typed JSON
     <T> List<AiResponse<T>> completeBatch(List<AiRequest<T>> requests);
-                                                             // same contract for many requests: a Bedrock
-                                                             // batch job when the flag and minimum allow,
-                                                             // otherwise a bounded on-demand loop; one
-                                                             // AiResponse and one ledger row per request
+                                                             // same contract for many requests: a provider
+                                                             // batch submission when the flag and threshold
+                                                             // allow (D55; §4.11), otherwise a bounded
+                                                             // on-demand loop; one AiResponse and one
+                                                             // ledger row per request either way
     AiResponse<float[]> embed(EmbedRequest request);         // text → vector(1024)
 }
 
@@ -1062,7 +1070,8 @@ Implementations and decorators (innermost first):
 
 | Class | Role |
 |---|---|
-| `BedrockAiClient` (`@Profile("bedrock")`) | Converse API with forced tool-use for JSON output; prompt-cache checkpoint after the system prefix; model id per tier from config |
+| `AnthropicAiClient` + `CohereEmbeddingClient` (`@Profile("live")`, chosen by `margai.ai.provider`) | *Added 2026-09-12:* Messages API with forced tool use for JSON output, a cached system prefix, model id and request shape per tier from config; embeddings from their own provider, so the innermost client is the two halves joined (`CompositeAiClient`) |
+| `BedrockAiClient` (`@Profile("live")`, `margai.ai.provider = bedrock`) | Converse API with forced tool-use for JSON output; prompt-cache checkpoint after the system prefix; model id per tier from config. *Dormant since 2026-09-12 — kept whole so the way back needs no code; its price rows come from the environment* |
 | `FakeAiClient` (default) | returns fixtures from `src/main/resources/ai-fixtures/<prompt>.<case>.json` (main resources: the fake is the runtime default in `local`/`api` profiles and ships in the image; tests add cases under `src/test/resources/ai-fixtures/`) chosen by a variable (`fixture_case`) or a deterministic hash; realistic token counts so the ledger and breaker are exercised |
 | `RetryingAiClient` | 2 retries with jitter on throttling/5xx; timeouts 20 s real-time, 10 min batch; maps failures to `AiUnavailableException` |
 | `SchemaValidatingAiClient` | validates the JSON against the record's schema; one repair retry with the validation error in context; then `InvalidOutputException` |
@@ -1071,7 +1080,7 @@ Implementations and decorators (innermost first):
 | `LedgerAiClient` (outermost) | writes the `ai_calls` row for every outcome, including breaker and failure; computes `cost_paise` from the price table |
 
 The bean wiring is the decorator chain over whichever implementation the profile selects, so
-`FakeAiClient` runs under the same breaker and ledger as Bedrock. The only callers of `AiClient`
+`FakeAiClient` runs under the same breaker and ledger as a live provider. The only callers of `AiClient`
 are the task classes in `ai.tasks`, each owning one prompt and one output record, plus
 `EmbeddingService`, the only caller of `embed`:
 
@@ -1093,8 +1102,12 @@ are the task classes in `ai.tasks`, each owning one prompt and one output record
 | `CollectiveMineTask` | CHEAP (batch) | pipeline `collective from-inputs` (feature `pipeline_collective`; CS-1 §3–§4): thematic mining of founder-collected excerpt files into draft struggle, pacing, season and strategy signals with source counts — derived signals only, never quotes. `collective from-pyq` is deterministic over `questions` and `distractor_map` and makes no model call |
 | `EmbeddingService` | EMBED | cache lookup, `HybridRetriever`, pipeline `ncert embed`, `anchors link` |
 
-The D5 smoke test is a `smoke` feature call under `BEDROCK_LIVE=1` that asserts one `ai_calls` row
-with non-zero token counts, then the profile is switched off (PLAN D5 ✅).
+The D5 smoke test is a `smoke` feature call under `AI_LIVE=1` that asserts one `ai_calls` row
+with non-zero token counts, then the profile is switched off (PLAN D5 ✅). *Re-run under the direct
+providers on 2026-09-12 as `AiLiveSmokeTest`, which also covers what the switch left open: the
+configured ids exist at the provider, the reasoning tier's own request shape, an image on the vision
+tier, embeddings in both languages at the pinned width, and a one-record batch on the reasoning
+model.*
 
 ### 4.2 Tiers and routing
 
@@ -1145,6 +1158,16 @@ solve 1.0, a cache hit 0.5, a follow-up 0.5 (spec-silent; decision D3.26 — a f
 parent's context and is usually CHEAP). Over the Pro fair-use cap, the solve is accepted, marked
 `queued`, and processed by a low-priority single-thread executor with on-demand calls; the client
 sees "in a few minutes" and polls. Nothing is refused for a Pro user (SPEC §6.3).
+
+*Amended 2026-09-12 (founder ruling, DECISIONS).* "Nothing is refused for a Pro user" governs the
+**money breaker too**, not just this cap: the first measured costs put a warm verified numerical at
+≈ ₹2.50, so §4.8's ₹25 stops a Pro user at ~10 of them while this section promises 30 — and the two
+limits were failing differently, one queueing politely and the other returning
+`AI_BUDGET_EXCEEDED`. Both now accept the solve and queue it for Pro; only the free tier keeps a
+hard stop, where the limit is the product's boundary. The **waits differ and so must the copy**: over
+this fair-use cap the on-demand executor above still makes "in a few minutes" true, while a
+breaker-queued solve waits for the IST budget reset and its copy says tonight (§4.8). D44 owns the
+copy and routing; D65 owns the wiring.
 
 **Priority speed** (SPEC §6.9): Pro solves run on a dedicated executor (concurrency 4) while free
 solves share a smaller one (concurrency 2); when the global breaker or Bedrock throttling bites,
@@ -1310,14 +1333,37 @@ a re-learn block candidate.
   transaction so a rolled-back feature transaction still leaves the cost on record.
 - Price table: config JSON keyed by model id with per-million-token prices for input, output, cache
   read and cache write, plus `usd_inr`. `cost_paise` is computed at insert; a price change never
-  rewrites history.
+  rewrites history. *A corrected price therefore gets an append-only note here naming the date and
+  the rows priced on the old figure, never a backfill. The convention stands; the correction it was
+  written for turned out not to be needed — the embedding rate was confirmed on the provider's own
+  pricing page on 2026-09-12 as the same 0.12 the Bedrock page had given, so no row was ever
+  mispriced and nothing is outstanding.*
+- **Measured 2026-09-12** (the D5 live re-run, TRACKER day log — first real numbers for this cost
+  model): a reasoning call against a **cold** cache cost **232 paise**, of which 96% was the 9,860-token
+  cache write; the same call **warm** is ≈ 28 paise. On the cheap model the write was 81 paise and each
+  subsequent read 13 paise. So the ₹25 per-user daily cap is roughly **10 cold reasoning calls or 89
+  warm ones** — the spread SPEC §6.3's free-tier limits and the breaker's thresholds should be
+  reasoned about with, and the concrete case for SPEC §11's 55% cache-hit target being a cost lever
+  rather than a nicety. Re-estimate at D65 against real ledger data (§10.5).
 - Breaker: `margai.ai.budget.user_daily_paise` (default 2,500 = ₹25) and `global_daily_paise`
   checked before each call against today's IST sum. Over budget: doubts return `AI_BUDGET_EXCEEDED`
   with the honest copy and the solve is queued for after midnight; the planner uses the deterministic
   path; classification waits for the sweeper. Active in every profile, including `local` with the
   fake client (DEV_SPEC §13.7). The D65 acceptance simulates a runaway loop and expects the trip.
+  **Amended 2026-09-12 (founder ruling, DECISIONS): `AI_BUDGET_EXCEEDED` is a free-tier outcome
+  only.** For a Pro user the breaker takes the same shape as the §4.4 fair-use cap — accept the
+  solve, queue it, honest copy, never a refusal — because SPEC §6.3's promise is a trust
+  commitment and the amount stays at ₹25 (a breaker, not a budget: 4–7× expected usage). The wait is
+  the honest difference: a breaker-queued solve cannot run until the IST reset, so its copy says
+  tonight rather than minutes, and the nightly batch lane (00:30 IST, half price, §4.11) is its
+  natural home because the wait already crosses midnight. The ₹25 is unchanged and the free tier's
+  hard stop is unchanged. D44 owns the copy and routing; **D65's simulation must cover the Pro queue
+  path, not only the trip**.
 - Daily alarm: the nightly run rebuilds `ai_spend_daily`; CloudWatch metric `ai.cost.paise` per
-  feature; AWS Budgets on the Bedrock service cost as the independent backstop (§10.4).
+  feature; *amended 2026-09-12 — the independent backstop is no longer AWS Budgets on a Bedrock
+  line item but a spend limit and alert on the provider's own console workspace, set by the founder
+  (F8 checklist). Ours stays ours: the daily alarm is computed from the `ai_calls` ledger and is
+  provider-agnostic (§10.4). AWS Budgets still covers the AWS half of the bill.*
 
 ### 4.9 Embeddings and retrieval
 
@@ -1326,6 +1372,25 @@ a re-learn block candidate.
   the console (§13.2) — confirmed 2026-09-06 (§13.2 item 4): Cohere Embed Multilingual v3 is
   on-demand in ap-south-1 itself, Titan v2 the fallback by config; the dimension is fixed at 1,024
   so the schema does not move.
+  **Amended 2026-09-12 (DECISIONS):** embeddings come from Cohere's own API, and provider, model and
+  dimension are pinned together in config (`margai.ai.embed.provider|model|dimensions`) because a
+  stored vector is comparable only to vectors from the same three. Default: the v4 line at
+  `output_dimension` 1,024 — 1,024 stays the schema's width, so no migration moves, and the width is
+  sent explicitly only where the model accepts it (`send-output-dimension`; the v3 line errors on
+  it), which is what makes the swap below config alone. **Changing any of the three is a corpus
+  re-embedding and a re-index, never a config flip**: `EmbeddingDimensionTest` holds the config and
+  the `vector(n)` columns equal, and D17's retrieval harness must cover Hindi and Hinglish queries —
+  if the v4 line underperforms the v3 one there, the swap happens **before** the D16 corpus
+  embedding, while it is still free (founder rider, 2026-09-12).
+  **Price confirmed 2026-09-12** on the provider's own pricing page: **0.12 USD per 1M text
+  tokens**, identical to the Bedrock figure the table already carried, so nothing was ever
+  mispriced. The same model charges **0.47 for image tokens** — irrelevant today, since
+  `EmbedRequest` carries text only and the client sends `texts` — but §4.8's table holds **one
+  `input` price per model**, so the day anything embeds an image the ledger under-bills it about
+  fourfold. Using that capability is PARKED as **diagram retrieval with multimodal embeddings**
+  (TRACKER, 2026-09-12), and the price key is its precondition: adding image embedding means giving
+  the price table a second key per model first, which is a change to its shape rather than a config
+  edit.
 - Indexes: HNSW cosine on `ncert_paragraphs.embedding`, `questions.embedding`,
   `doubt_cache.embedding` (`m = 16, ef_construction = 64`); GIN on `ncert_paragraphs.tsv`.
 - `HybridRetriever` is the one retrieval component (§4.3 stage 6) and is also used by the pipeline
@@ -1344,8 +1409,8 @@ Two layers, one fixture set.
   record it must trace to (`node_code`, `season_version`, field) — first populated from the D29
   first plan's templated reasons (attributed lines exist from D29, founder ruling 2026-09-12), the
   AI reason lines joining at D56 (§4.5); a claim that traces to no approved record fails the suite.
-- **Live layer** (the real gate): `BEDROCK_LIVE=1 ./mvnw -Peval verify` runs `EvalSuiteIT`, which
-  drives `DoubtSolveService` end to end with `BedrockAiClient` against a Testcontainers database
+- **Live layer** (the real gate): `AI_LIVE=1 ./mvnw -Peval verify` runs `EvalSuiteIT`, which
+  drives `DoubtSolveService` end to end with the live provider client against a Testcontainers database
   loaded with the NCERT and question tables from a snapshot in the content bucket. Per fixture it
   records correct/incorrect, anchor match, verified flag, tier, latency and cost. PASS = ≥ 97%
   correct final answers **and** zero fixtures where an unverified numerical would have rendered.
@@ -1364,24 +1429,66 @@ Two layers, one fixture set.
   Every prompt or parameter change therefore needs a founder-launched live run, whose cost
   (~200 fixtures, mostly CHEAP) is a few hundred rupees.
 
-### 4.11 Bedrock specifics
+### 4.11 Provider specifics
 
-- **Structured output**: Converse API with a single tool whose input schema is the output record's
-  JSON schema and `tool_choice` forced; the tool input is the answer. No free-text JSON parsing.
+*Retitled and amended 2026-09-12 (DECISIONS): model access is direct, so what used to be Bedrock
+mechanics are now the providers' own. The structured-output and caching designs survive the switch
+unchanged; the batch lane, the request shape and the region paragraph do not.*
+
+- **Structured output**: a single tool whose input schema is the output record's JSON schema and
+  `tool_choice` forced; the tool input is the answer. No free-text JSON parsing. *Forced tool use is
+  supported on both configured models; where a future model removes it (one model line already has),
+  the escape hatch is the API's structured-output format, which the SDK derives from the same
+  record.*
 - **Prompt caching**: the system prompt and format instructions form the cached prefix; the question
-  and retrieved passages follow. `cache_read_tokens` land in the ledger.
-- **Batch inference**: `completeBatch` submits a Bedrock batch job only when it holds at least
-  `margai.ai.batch_min_records` requests (default 100, the documented minimum; 0 disables batch).
-  Records are written to the content bucket keyed by request id, the job is polled, and the output is
-  merged back by record id; `LedgerAiClient` then writes **one `ai_calls` row per record** from the
-  per-record usage in the output file, with `batch = true` and the batch price. Below the minimum,
-  `completeBatch` runs the requests on-demand with concurrency 4 through the same decorators, so the
-  ledger is identical either way. Until the beta grows past the minimum, nightly work is therefore
-  on-demand. This is conflict §0.4 #2 made concrete.
+  and retrieved passages follow. `cache_read_tokens` land in the ledger. *A prefix below the model's
+  **minimum cacheable length** is silently not cached — 4,096 tokens on the cheap model, 1,024 on the
+  reasoning one — so `margai.ai.tier.<t>.cache-min-tokens` records each model's floor and the app
+  warns at startup for every prompt that falls short of one (founder ruling, 2026-09-12). The single
+  `cache_write` price remains the 5-minute rate (§4.8).
+  **Measured 2026-09-12:** the two models tokenize the same rendered prefix differently — 6,595
+  tokens on the cheap model against 9,860 on the reasoning one, +50% — which is why the floor is per
+  model and not one number. It also bounds the tripwire: the startup check estimates ~4 characters
+  per token, which came out 4% **high** for the cheap model, so a prompt designed to sit just above
+  its 4,096 floor can still fail to cache while the check passes. **Design prompts with margin, not
+  to the line**; the check catches an accident, it does not certify a near-miss.*
+- **Per-model request shape**: *added 2026-09-12.* The models differ in what they accept, and a
+  rejected field is a 400, not a default: the reasoning model refuses `temperature` and
+  `budget_tokens`, the cheap model refuses `effort`. Each tier therefore configures
+  `temperature`, `thinking` and `effort`, and an absent key means the field is not sent. The
+  reasoning tier ships `thinking: disabled` with `effort: medium` so that a call fits the 20 s budget
+  and the 1,024-token output cap; **D23/D39 compare thinking-on against thinking-off on the
+  hard-numericals subset before beta, and if thinking-on materially improves accuracy,
+  `max-output-tokens` and `call-timeout` are raised then, on that evidence** (founder rider,
+  2026-09-12).
+- **Batch inference**: *amended 2026-09-12.* The direct Batches API accepts the reasoning model, so
+  the offline-reasoning lane is the same model as the real-time one — cheaper than the model the
+  Bedrock allowlist had forced on it — at 50% off every token, cache reads and writes included,
+  with results inside 24 h (an expiry, not an SLA). **It has no minimum record count**, so
+  `margai.ai.batch_min_records` (default 100; 0 disables batch) stops being a platform floor and
+  becomes a latency choice: below it, `completeBatch` runs the requests on-demand with concurrency 4
+  through the same decorators, so the ledger is identical either way. Until the beta grows past the
+  threshold, nightly work is therefore on-demand — conflict §0.4 #2, unchanged in effect. **Still
+  D55 work**, and D55 owns three things, not one (founder ruling 2026-09-12): `completeBatch`
+  overridden down the decorator chain rather than on the inner client alone, the `batch = true` and
+  batch-price columns threaded into `LedgerAiClient`, and **the one-record live probe re-added to
+  `AiLiveSmokeTest`** — it was removed on 2026-09-12 because a batch call outside the seam writes no
+  `ai_calls` row and "every model call logs an `ai_calls` row" admits no test exception (§4.13); once
+  the lane is ledgered the probe is an ordinary seam call and belongs back in the smoke. Until then
+  the lane's support rests on the provider's own reference (§13.2 item 2), and what runs is the
+  on-demand loop.
 - **Timeouts and retries**: 20 s per real-time call, 2 retries with jitter on throttling and 5xx;
   batch jobs 10 min. A final failure is a typed error the UI renders honestly (`AI_UNAVAILABLE`).
+  *A rate limit now carries the provider's own `retry-after`, which the retry decorator prefers over
+  its computed backoff, capped at 30 s. The provider SDK runs with retries disabled, as the AWS one
+  did: one retry policy in the stack (D5). This is the whole of the throttling design, deliberately:
+  the account's rate limits are ~1,000× the daily spend the breaker allows (§13.2 item 1, read
+  2026-09-12), so a 429 means something has gone wrong, not that we are running near capacity.*
 - **Region**: calls from ap-south-1 to global inference profiles; the privacy copy discloses
-  processing outside India.
+  processing outside India. *Amended 2026-09-12: the calls now leave for the providers' own
+  endpoints, so the disclosure still holds and the region is no longer ours to choose — except that
+  the direct API exposes an `inference_geo` control Bedrock did not, which is PARKED against SPEC
+  §6.11's residency copy rather than used today.*
 
 ### 4.12 Prompts
 
@@ -1399,10 +1506,12 @@ concept sentence, anchor line, optional trap note, ≤ 350 words, no meta-talk, 
 | No AI answer without retrieval grounding | `HybridRetriever` floor + `AnswerAssembler` anchor ∈ retrieved set | fake-layer eval fixture with empty retrieval expects the grounding fallback |
 | Numerical answers independently verified; never rendered unverified | `NumericalVerifier` + `AnswerAssembler` fallback branch; `doubt_cache.verified` CHECK | seeded-mismatch fixture (PLAN D39 ✅) expects `unverified_fallback` and no cache row |
 | REASON only via the router | `RouteDecision` constructors + `TierPolicyAiClient` | unit test: REASON request without a decision is rejected |
-| Every Bedrock call logs an `ai_calls` row | `LedgerAiClient` outermost decorator | ledger count equals call count for success, failure and breaker cases |
+| Every model call logs an `ai_calls` row *(reworded 2026-09-12 with the provider switch)* | `LedgerAiClient` outermost decorator | ledger count equals call count for success, failure and breaker cases |
 | Cache writes only when verified | `DoubtCacheWriter` guard + DB CHECK | repository test: inserting `verified = false` fails |
 | Per-user AI cost breaker | `BudgetBreakerAiClient` | fixed-clock test crossing the cap; D65 runaway simulation |
 | Model IDs, prices, limits from config | `@ConfigurationProperties` only; ArchUnit rule: no string literal matching a model-id pattern in `ai` | architecture test |
+| *Added 2026-09-12:* each provider SDK confined to its own package | `ai.internal.anthropic` for the model SDK, `ai.internal.cohere` for the embedding provider's HTTP calls, `ai.internal.bedrock` for the dormant one | architecture test |
+| *Added 2026-09-12:* the embedding width matches the schema | `margai.ai.embed.dimensions` is the one source; the client rejects a vector of any other length | `EmbeddingDimensionTest` over the migrations |
 | NTA-trap only when PYQ-backed | `AnswerAssembler` drops unbacked notes; `topic_traps` need evidence rows | unit + repository tests |
 
 ## 5. Flutter app
@@ -1573,7 +1682,8 @@ human-held and never in the tree (`key.properties` is gitignored).
 ### 6.1 Where it runs and why
 
 AI-touching pipeline steps are Java, inside the server image, under the `pipeline` Spring profile
-with picocli commands (`java -jar server.jar --spring.profiles.active=pipeline,bedrock <command>`).
+with picocli commands (`java -jar server.jar --spring.profiles.active=pipeline,live <command>`;
+*the profile was renamed from `bedrock` on 2026-09-12 — the old name silently extracts on the fake*).
 Reason: `.claude/rules/pipeline.md` requires every pipeline AI call to go through `AiClient` with the
 cost ledger, and the entities, Flyway schema and `HybridRetriever` already exist there. PDF page
 rendering uses PDFBox; paragraph extraction uses the VISION tier on page images rather than text
@@ -1666,8 +1776,8 @@ founder runs every apply by hand.
 
 | Name | Where | Data | AI | Purpose |
 |---|---|---|---|---|
-| `local` | developer laptop, docker compose | compose Postgres, seed migrations | `FakeAiClient`; `BEDROCK_LIVE=1` opt-in with the breaker on | every PLAN day's build loop |
-| `beta` | AWS ap-south-1, one account | RDS | Bedrock via global inference profiles | the 50-student closed beta and everything from D57 on |
+| `local` | developer laptop, docker compose | compose Postgres, seed migrations | `FakeAiClient`; `AI_LIVE=1` opt-in with the breaker on | every PLAN day's build loop |
+| `beta` | AWS ap-south-1, one account | RDS | the providers' own APIs, keys from SSM *(2026-09-12; was Bedrock via global inference profiles)* | the 50-student closed beta and everything from D57 on |
 
 No staging until public launch (PARKED). Local is the pre-production environment; the beta stack is
 rebuilt from Terraform if it drifts.
@@ -1679,14 +1789,14 @@ rebuilt from Terraform if it drifts.
 | Network | One VPC, two AZs; public subnets for the ALB and the Fargate tasks; private subnets for RDS | Tasks in public subnets with a security group that only accepts the ALB avoid a NAT gateway (the classic ~₹3k/month surprise). S3 gateway endpoint is free and added. |
 | Ingress | ALB, ACM certificate, Route 53 record on the final domain (TRACKER F7) | HTTP → HTTPS redirect; health check `/actuator/health` |
 | Compute | ECS Fargate service, 1 task, 1 vCPU / 2 GB, ARM64 (Graviton) | Java 25 with `-XX:MaxRAMPercentage=70`. Rolling deploy with min 100% / max 200% |
-| Nightly | ECS RunTask from EventBridge Scheduler, same task definition with the `nightly,bedrock` profiles, 2 vCPU / 4 GB | 60-minute timeout; failure alarm (§10.4) |
+| Nightly | ECS RunTask from EventBridge Scheduler, same task definition with the `nightly,live` profiles *(renamed 2026-09-12)*, 2 vCPU / 4 GB | 60-minute timeout; failure alarm (§10.4) |
 | Registry | ECR, one repository, images tagged with the git SHA | lifecycle: keep last 20 |
 | Database | RDS PostgreSQL 18, `db.t4g.small`, single-AZ, 20 GB gp3, automated backups 7 days, deletion protection | `pgvector` and `pg_trgm` created by migration V1. PG18 availability on RDS and its pgvector version are a console check (§13.2) |
 | Object storage | `margai-beta-uploads`: SSE-S3, block public access, lifecycle expires objects after 1 day, prefixes `uploads/doubts/`, `uploads/documents/`, `exports/`. `margai-beta-content`: source PDFs, page images, JSONL artefacts, weekly logical dumps; versioning on | The hard rule "uploaded images: uploads bucket only" (CLAUDE.md) maps to the first bucket |
-| AI | Bedrock model access enabled for the CHEAP, REASON, VISION and EMBED models named in config; global cross-region inference profiles called from ap-south-1 | Data may be processed outside India: disclosed in the privacy copy (SPEC §6.11) |
+| AI | *Amended 2026-09-12 (DECISIONS):* the providers' own APIs, reached with the two keys in SSM (§7.3) — no AWS-side model access, no inference profiles, no IAM statement for models. The dormant Bedrock path (§4.11) would need its model access re-enabled | Data may be processed outside India: disclosed in the privacy copy (SPEC §6.11) |
 | Config and secrets | SSM Parameter Store under `/margai/beta/…`; SecureString for secrets | injected into the task as environment variables through the task definition's `secrets` (`valueFrom` SSM ARN). No library, no runtime fetch; a config change is a task restart (~2 min) |
 | Scheduling | EventBridge Scheduler: nightly 19:00 UTC; weekly dump Sunday 21:00 UTC | both target ECS RunTask |
-| Logs and metrics | CloudWatch Logs (JSON), 30-day retention; CloudWatch metrics from Micrometer; AWS Budgets for the Bedrock daily spend alarm | §10 |
+| Logs and metrics | CloudWatch Logs (JSON), 30-day retention; CloudWatch metrics from Micrometer; the daily AI spend alarm from the `ai_calls` ledger, with the provider's console workspace limit as the independent backstop and AWS Budgets for the AWS bill *(amended 2026-09-12, §10.4)* | §10 |
 | Push, OTP, payments, analytics | FCM (Firebase project), SES (verified sender identity + production access via TRACKER F10; the OTP email channel since the D7 ruling), MSG91 (DLT template via TRACKER F1; SMS once it lands), Razorpay (KYC via F1), PostHog Cloud | credentials in SSM only; SES needs none (task role) |
 
 ### 7.3 Configuration and secrets layout
@@ -1708,10 +1818,14 @@ rebuilt from Terraform if it drifts.
 /margai/beta/razorpay/webhook_secret   SecureString
 /margai/beta/fcm/service_account_json  SecureString
 /margai/beta/posthog/api_key           SecureString
-/margai/beta/ai/tier/cheap             String       model id, pinned version
-/margai/beta/ai/tier/reason            String
-/margai/beta/ai/tier/vision            String
-/margai/beta/ai/embed/model            String
+/margai/beta/ai/provider               String       anthropic | bedrock (2026-09-12)
+/margai/beta/ai/anthropic/api_key      SecureString the model provider's key — the AI auth model (2026-09-12)
+/margai/beta/ai/cohere/api_key         SecureString the embedding provider's key (2026-09-12)
+/margai/beta/ai/tier/cheap/id          String       model id, pinned version
+/margai/beta/ai/tier/cheap/…           String       temperature, thinking, effort, cache_min_tokens (§4.11, 2026-09-12)
+/margai/beta/ai/tier/reason/id         String
+/margai/beta/ai/tier/vision/id         String
+/margai/beta/ai/embed/model            String       with embed/provider, embed/dimensions — pinned together (§4.9)
 /margai/beta/ai/prices_json            String       {model_id: {input, output, cache_read, cache_write} per Mtok, USD}
 /margai/beta/ai/usd_inr                String
 /margai/beta/ai/budget/user_daily_paise String
@@ -1733,9 +1847,15 @@ IDs, prices, limits, flags and prompt versions never appear as code constants (`
   on the two buckets; `logs:*` on its log group; `cloudwatch:PutMetricData`; `ses:SendEmail` on the
   verified sender identity (D7 ruling; F10); and `iam:PassRole` on the batch service role below.
   Nothing else.
+  **Amended 2026-09-12 (DECISIONS):** the `bedrock:*` and `iam:PassRole` statements drop out — model
+  access is an API key now, not an IAM identity, and the key reaches the task through SSM like every
+  other secret. The task role keeps S3, logs, CloudWatch and SES; the execution role's
+  `GetParameters` + KMS decrypt (below) is what makes the two provider keys reachable. Re-add the
+  Bedrock statements only if `margai.ai.provider` ever goes back.
 - Bedrock batch service role (used only when batch mode is on, §4.11): trusted by `bedrock.amazonaws.com`,
   read on `content/batch/in/`, write on `content/batch/out/`; its ARN is the `roleArn` of every batch
-  job.
+  job. *Not needed since 2026-09-12: the direct Batches API holds the records itself, so the batch
+  lane needs no bucket and no service role.*
 - Execution role: ECR pull, SSM `GetParameters` on `/margai/beta/*`, KMS decrypt for SecureStrings.
 - GitHub Actions deploy role via OIDC (no long-lived keys): ECR push and `ecs:UpdateService` only.
   Deploy is a `workflow_dispatch` job the founder triggers after merging; automatic deploy on `main`
@@ -1756,13 +1876,13 @@ IDs, prices, limits, flags and prompt versions never appear as code constants (`
 
 | By PLAN day | Needed for | Build |
 |---|---|---|
-| D5 | one live Bedrock smoke call | AWS account, Bedrock model access, SSO profile on the laptop |
+| D5 | one live model smoke call | *amended 2026-09-12: two funded provider accounts, their keys in SSM, and a console spend limit per workspace — the AWS account and SSO profile stay for RDS, S3 and SES* |
 | D14 | NCERT PDFs in S3 | content bucket |
 | D28 | scorecard upload with 24-hour deletion | uploads bucket with the 1-day lifecycle, IAM for local dev |
 | D55 | nightly loop, D57 two-device morning plans, D60 three unattended days | the full beta stack: VPC, RDS, ECR, ECS service + scheduled task, ALB + certificate, SSM parameters, log group |
 | D64 | export and deletion promises | exports prefix, purge job scheduled |
 | D70 | failure drills | backups, alarms, restore runbook |
-| D73 | dashboards | CloudWatch dashboard, PostHog project, AWS Budgets alarm |
+| D73 | dashboards | CloudWatch dashboard, PostHog project, AWS Budgets alarm *(for the AWS bill; the AI spend alarm is the ledger's, §10.4)* |
 | D74 | Play Store internal track | release signing key (human-held), `--dart-define` production API URL |
 
 ### 7.7 Beta cost estimate (monthly, order of magnitude)
@@ -1789,8 +1909,8 @@ list prices at the time of writing and are re-estimated at D65 with real ledger 
 | Repository slice | `@DataJpaTest` + Testcontainers `pgvector/pgvector:pg18` | migrations apply, constraints (CHECKs, partial uniques), vector and tsv queries, `HybridRetriever` SQL | every `mvnw verify` |
 | Controller slice | `@WebMvcTest` + `MockMvcTester` | envelope for every error code, auth failures, validation, idempotency replay, **no `correct_key` before judging** | every `mvnw verify` |
 | Module flow | `@SpringBootTest` + Testcontainers + `FakeAiClient` | end-to-end paths per PLAN day (onboarding → first plan; session → notebook entry; doubt → cache), events between modules, breaker and ledger behaviour | every `mvnw verify` |
-| Architecture | Spring Modulith `ApplicationModules.verify()`, ArchUnit | §1.4 dependency rules, SDK import restrictions, no model-id literals, controllers only in `web` | every `mvnw verify` |
-| Live | `-Peval` profile, `BEDROCK_LIVE=1` | §4.10 live eval; D5 smoke | founder-launched |
+| Architecture | Spring Modulith `ApplicationModules.verify()`, ArchUnit | §1.4 dependency rules, the per-provider SDK import restrictions, no model-id literals (models *and* embeddings), the embedding width against the migrations, controllers only in `web` | every `mvnw verify` |
+| Live | `-Peval` profile, `AI_LIVE=1` *(renamed 2026-09-12; it is the one switch that unlocks billable calls)* | §4.10 live eval; D5 smoke | founder-launched |
 
 Every service-layer change ships with tests in the same commit (CLAUDE.md). `./mvnw verify` stays
 under ~3 minutes by keeping one shared Testcontainers instance per JVM (singleton container pattern)
@@ -1862,11 +1982,22 @@ minors is a separate `purpose` with the same machinery.
 
 ### 9.2 Secrets and rotation
 
-All secrets in SSM SecureStrings, injected as environment variables by ECS (§7.3); locally in a
+All secrets in SSM SecureStrings, injected as environment variables by ECS (§7.3) — not AWS Secrets
+Manager, whose rotation, multi-account and size features all miss us at beta, and which ECS resolves
+through the same task-definition field, so the choice is reversible without touching code
+(DECISIONS 2026-09-12; the triggers that would reverse it are in that row); locally in a
 human-edited `.env` that Claude can neither read nor write (`.claude/settings.json`,
 `scripts/block-paths.sh`); `scripts/detect-secrets.sh` scans every write and CI scans the tree.
 JWT key rotation: `jwt/secret_previous` is accepted for 15 minutes after a rotation. Razorpay and
 MSG91 keys rotate by SSM update plus task restart.
+
+*Added 2026-09-12 (DECISIONS):* the two **AI provider keys** (`ai/anthropic/api_key`,
+`ai/cohere/api_key`) are the auth model for every model and embedding call — there is no cloud role
+behind those calls and no session to expire — so they rotate by SSM update plus a forced deployment,
+and there is **no dual-accept window** like the JWT secret's: the overlap has to come from two valid
+keys at the provider, because we do not decide what a key is worth. A live client refuses to start on
+a blank key. The full procedure, including what a leaked key can and cannot reach, is
+`docs/runbooks/ai-provider-keys.md`.
 
 ### 9.3 Authorisation and IDOR
 
@@ -1984,7 +2115,7 @@ SPEC §11): `plan.blocks.completion{day_since_start}` (the day-1 → day-7 compl
 |---|---|---|
 | API errors | 5xx > 2% over 5 min | reliability is a feature (R5) |
 | Nightly missing | no `nightly.duration` datapoint by 06:00 IST | no planless morning; the API fallback covers users meanwhile |
-| Bedrock spend | `ai.cost.paise` daily sum > `global_daily_paise`, and AWS Budgets on the Bedrock service | cost surprise bounded (PLAN risk register) |
+| AI spend *(reworded 2026-09-12)* | `ai.cost.paise` daily sum > `global_daily_paise`, and a spend limit + alert on the provider's console workspace, set by the founder (F8) | cost surprise bounded (PLAN risk register). Ours is computed from the `ai_calls` ledger and is provider-agnostic; the provider's own limit is the independent backstop that AWS Budgets used to be, and AWS Budgets still covers the AWS bill |
 | Verification mismatches | `doubt.verify.mismatch` > 5% over 1 h | prompt or model regression |
 | OTP failure | `otp.failed / otp.sent` > 5% over 1 h | OTP ≥ 98% first attempt (SPEC §11) — *`otp.failed` counts wrong-code attempts, not deliveries: SPEC §11's number is `otp.verified{first_attempt=true} / otp.sent` (the report's `first_attempt_rate`), and a code that never arrives shows as `expired_unverified`; the D73 alarm text says which of the three it watches (D11, 2026-09-09)* |
 | RDS | free storage < 20%, CPU > 80% for 15 min | |
@@ -2041,8 +2172,9 @@ error code; everything else is a bug and maps to `INTERNAL`.
 ### 11.5 Configuration
 
 `@ConfigurationProperties(prefix = "margai")` records, validated at startup (`@Validated`, fail-fast
-on a missing secret in the `bedrock` profile). Tree: `margai.ai.*` (tiers, embed, prices, budget,
-batch, prompts), `margai.limits.*`, `margai.srs.*` (stages), `margai.exam.*` (date, mode thresholds),
+on a missing secret in the `live` profile — *renamed from `bedrock` on 2026-09-12; a blank provider
+key refuses to start*). Tree: `margai.ai.*` (*provider, per-tier model + request shape, the embed
+pin, provider keys*, prices, budget, batch, prompts), `margai.limits.*`, `margai.srs.*` (stages), `margai.exam.*` (date, mode thresholds),
 `margai.notifications.*` (caps, quiet hours), `margai.billing.*` (prices, refund window),
 `margai.flags.*`, and — CS-1 — `margai.planner.collective.*` (the §4.5 weighting, attribution,
 season and momentum constants) and `margai.pipeline.collective.*` (`momentum_dead_band`,
@@ -2076,7 +2208,7 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 | PLAN days | Sections that define the work |
 |---|---|
 | D4 core schema | §2.1–§2.4 (D4 tables column by column), §2.9 V1–V4 and the seed location, §8.2 reversibility test, §1.3 first module packages, Modulith verification |
-| D5 AiClient seam | §4.1, §4.8 ledger and breaker, §2.8 `ai_calls`, §1.2 `bedrock` profile, §4.1 smoke |
+| D5 AiClient seam | §4.1, §4.8 ledger and breaker, §2.8 `ai_calls`, §1.2 `live` profile *(renamed 2026-09-12)*, §4.1 smoke |
 | D6 buffer / Week-1 gate | §0.3 dispositions closed, §14 in DECISIONS.md |
 | D7–D12 auth | §3.2, §3.4, §3.7 auth and account, §2.2 auth tables, §9.1, §5.4 refresh interceptor, §5.8 login |
 | D13 taxonomy | §6.2, §6.3 `taxonomy`, `backbone`, `cutoffs` commands; §2.3 |
@@ -2119,7 +2251,7 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 | Hindi legacy fonts in older NCERT scans | vision extraction reads glyphs as images; alignment report catches the misses |
 | NCERT licensing (TRACKER F2) | the app shows one anchored paragraph at a time and never a chapter (§2.10); text is retrieval-only |
 | Solo-founder operations | alarms to email, admin peek, runbooks from D70, no on-call rotation pretended |
-| Bedrock batch minimum | on-demand path is the default; batch is a flag (§4.11) |
+| ~~Bedrock batch minimum~~ *(void 2026-09-12: the direct batch endpoint has no minimum; the threshold is a latency choice)*; ~~provider rate-limit tier~~ *(read 2026-09-12, §13.2 item 1: the breaker binds ~1,000× sooner than the limiter, so neither a tier upgrade nor a throttling layer is needed)* | on-demand path is the default; batch is a flag (§4.11) |
 
 ### 13.2 Facts to confirm in the AWS console (extends DEV_SPEC §12 item 4)
 
@@ -2183,6 +2315,39 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    formula's assumption holds); the forced tool returned the record. The same proof on the
    Anthropic profiles, and the tier defaults above, stand as recorded; rerun the smoke when the
    ticket clears.
+   **Item 1 reopened and closed differently, 2026-09-12 (founder decision, DECISIONS):** the
+   Marketplace subscription needs invoicing / a registered entity and approval is uncertain, so this
+   item stops being a Bedrock question. Model access is direct: the cheap and vision tiers take the
+   4.5 cheap model, REASON the current Sonnet — **not gated on the direct API**, since the
+   `AccessDenied` of 2026-09-06 was an AWS account allowlist and not a model matter. Ids are bare
+   (`claude-…`, no `global.` prefix and **no date suffix**), and per-token rates are the same
+   numbers this table records, with cache reads a tenth of input, a 5-minute cache write 1.25×, and
+   batch half. The gap this item can no longer close from a console: **rate limits** — the account
+   tier's RPM/ITPM/OTPM per model, which the founder reads from the provider console (F8) and which
+   the batch runner's throttling is sized from. Bedrock access facts above are kept as the record of
+   why the switch happened; `margai.ai.provider = bedrock` is the way back.
+   **Rate limits read 2026-09-12** (founder, provider console; screenshots in the day log), and they
+   close the last gap: per model, both the cheap model and the reasoning model allow **10,000
+   requests/min, 10M input tokens/min excluding cache reads, and 2M output tokens/min**; across all
+   models, **4,000 batch submissions/min with a 500,000-request queue**, web search 30 uses/s and
+   1,000 GB of Files API storage (we use neither). **No tier upgrade is needed and no throttling
+   layer is worth building**, because the cost breaker binds thousands of times sooner than the rate
+   limiter: the global daily cap of ₹500 (§4.8) is about **$5.60**, which on the cheap model is
+   ≈ 5.6M input tokens — roughly **34 seconds** of one minute's input allowance, for a whole day.
+   Even 50 students each spending their full ₹25 is ≈ 84 seconds of it. The heaviest planned run,
+   D19–D21's PYQ solutions (≈ 2,700 questions), is under a minute of input allowance in total and
+   executes at concurrency 4 against a 20 s timeout — about 12 calls/min, ≈ 0.6% of the output
+   allowance — and its largest conceivable batch is ≈ 2,700 records against a 500,000 queue. The
+   retry decorator's two jittered retries plus the provider's `retry-after` (§4.11) therefore cover
+   a 429 we should essentially never see. One caveat: these are per-minute allowances for the whole
+   organisation, so they are shared if this account ever runs another workload.
+   **Live proof 2026-09-12 17:42 IST** (`AiLiveSmokeTest`, founder-run; rows in the TRACKER day
+   log): six calls across the three configured ids, all `ok`. Forced tool use, prompt caching
+   (written by one call and read by the next two, 81 → 13 paise on the cheap model), an image on the
+   vision tier, the reasoning tier answering on its own request shape in 2.07 s, and 1,024-wide
+   embeddings in English and Hindi from `embed-v4.0`. **Item 1 closed on direct-API terms** — the
+   only thing it leaves open is the embedding *price*, which is the founder's to confirm and is
+   tracked in the F8 row, not here.
 2. Bedrock batch inference minimum record count and whether the chosen models support it.
    **Partial 2026-09-06:** the Mumbai pricing page lists batch prices for both chosen models
    (Haiku 4.5 0.50 / 2.50, Sonnet 4.6 1.50 / 7.50 — half of on-demand), so both support batch
@@ -2195,6 +2360,15 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    via cross-region inference profiles and the list includes ap-south-1 (Haiku 4.5 has no
    single-region batch support anywhere; Sonnet 4.6 only in eu-west-2), so `completeBatch`
    submits with the same `global.` profile IDs as real-time calls. **Item 2 closed.**
+   **Superseded 2026-09-12 (DECISIONS):** on the direct API this is a different endpoint with
+   different limits, and a strictly better answer. The reasoning model is supported — the "no batch
+   price" reading of the Bedrock pricing page was a fact about Bedrock, not about the model — so the
+   offline lane and the real-time lane are one model. There is **no minimum record count** (the
+   ceiling is 100,000 requests or 256 MB per batch, results within 24 h), which turns
+   `batch_min_records` from a platform floor into a latency choice, and the 50% discount covers cache
+   reads and writes too. Taken from the provider's own reference; the live confirmation is the
+   one-record probe in `AiLiveSmokeTest`. Batch on Bedrock was also the only lane that needed the
+   content bucket and a service role (§7.4); the direct API needs neither.
 3. RDS for PostgreSQL 18 availability in ap-south-1 and its pgvector version (HNSW needs ≥ 0.5).
    If PostgreSQL 18 is not offered, the founder decided (§0.5 item 7) to drop to 17 as a versions
    change. Every place that touches: SPEC §3 (fixes "PostgreSQL 18" — a founder amendment to the
@@ -2224,6 +2398,19 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    as designed. EMBED = `cohere.embed-multilingual-v3` (`margai.ai.embed.model`), Titan v2 the
    fallback by config. Price (Mumbai on-demand, 2026-09-06): 0.10 USD per 1M input tokens
    (Embed 4 would be 0.12); recorded in the item 1 table. **Item 4 closed.**
+   **Reopened and closed differently, 2026-09-12 (DECISIONS):** embeddings come from the provider's
+   own API. The wire contract is the same one this item verified — `input_type` document vs query,
+   `truncate: END`, floats back — plus `output_dimension`, which the v4 line accepts at 256/512/1024/
+   1536 and the v3 line rejects. Default is the v4 line pinned to **1,024**, so §2.3's `vector(1024)`
+   columns are untouched and **no migration is needed** (none of them exists yet either: V1 creates
+   the extension only). Titan stops being the fallback — the fallback is now the v3 line, two config
+   keys away (§4.9).
+   **Item 4 closed on direct-API terms, 2026-09-12:** the id `embed-v4.0` was proved by the live
+   smoke (accepted, 1,024-wide vectors in English and Hindi) and the price confirmed on the
+   provider's pricing page at **0.12 USD per 1M text tokens** — the same figure the table already
+   carried from the Bedrock page, so no row was mispriced and §4.8 needs no correction note. Noted
+   there and in §4.9: image tokens on the same model cost 0.47, which the one-price-per-model table
+   cannot express.
 
 ### 13.3 Single-instance assumptions and their upgrade path
 
@@ -2233,7 +2420,7 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 | In-process notification dispatcher and sweepers | one API task | ShedLock on the Postgres table, or move them into the nightly/ops task family |
 | Async classification via Spring events + `@Async` | one JVM, restarts tolerated by the sweeper | SQS queue with the same listener code |
 | Idempotency keys in Postgres | always fine | — |
-| Batch inference disabled | < 100 users active | flip `margai.ai.batch_min_records` |
+| Batch inference disabled | < 100 users active *(a latency choice since 2026-09-12, not a provider minimum)* | flip `margai.ai.batch_min_records`, and build the ledgered batch path (§4.11, D55) |
 
 ### 13.4 Decisions only the founder can take
 

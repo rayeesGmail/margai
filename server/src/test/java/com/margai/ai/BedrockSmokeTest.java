@@ -18,27 +18,44 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * The D5 live smoke (PLAN D5 ✅ "one live call logged with token counts"; TECH_PLAN §4.1 last
- * paragraph, §13.2 item 1). Founder-run only: {@code BEDROCK_LIVE=1} plus AWS credentials in the
- * SDK's default chain (an {@code aws login} session, or {@code AWS_PROFILE=<profile>}); otherwise
- * the test is skipped and the build never touches AWS. Two calls on the {@code cheap} tier prove
- * that the forced tool returns the record, that the ledger gets real token counts, and that the
- * second call reads the prompt cache the first one wrote.
+ * The same smoke against the dormant provider (TECH_PLAN §4.11), kept so the way back is proven
+ * rather than assumed: since the 2026-09-12 switch the live client is chosen by
+ * {@code margai.ai.provider}, and this test is the only place that asks for {@code bedrock}. It
+ * needs that provider's model ids and price rows supplied by environment, since the defaults
+ * price the direct-API models; {@link AiLiveSmokeTest} is the D5 acceptance now.
+ *
+ * <p>Founder-run only, and behind the same single switch as every live run: {@code AI_LIVE=1} is
+ * what unlocks billable calls anywhere (DECISIONS 2026-09-12 — it replaced {@code BEDROCK_LIVE=1}
+ * with no alias, so this test selects the dormant path with a system property rather than a second
+ * environment variable that could unlock spend on its own). It also needs AWS credentials in the
+ * SDK's default chain — the IAM Identity Center profile F8 created (TECH_PLAN §7.4), after
+ * {@code aws sso login --profile margai}. Two calls on the {@code cheap} tier prove that the forced
+ * tool returns the record, that the ledger gets real token counts, and that the second call reads
+ * the prompt cache the first one wrote.
  *
  * <pre>
- * cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
+ * cd server && AWS_PROFILE=margai AI_LIVE=1 -Dbedrock.smoke=true \
+ *   MARGAI_AI_TIER_CHEAP_ID=… MARGAI_AI_PRICES_JSON=… \
+ *   MARGAI_AI_EMBED_PROVIDER=bedrock MARGAI_AI_EMBED_MODEL=… \
+ *   ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
  * </pre>
+ *
+ * <p>The embedding provider has to move with the completion provider: this client embeds for
+ * itself, and leaving {@code margai.ai.embed.provider} on the direct one would build that client
+ * too and refuse to start without a key it would never use.
  */
-@SpringBootTest
-@ActiveProfiles("bedrock")
+@SpringBootTest(properties = "margai.ai.provider=bedrock")
+@ActiveProfiles("live")
 @Import(TestcontainersConfiguration.class)
-@EnabledIfEnvironmentVariable(named = "BEDROCK_LIVE", matches = "1")
+@EnabledIfEnvironmentVariable(named = "AI_LIVE", matches = "1")
+@EnabledIfSystemProperty(named = "bedrock.smoke", matches = "true")
 class BedrockSmokeTest {
 
     @Autowired
@@ -64,7 +81,7 @@ class BedrockSmokeTest {
         assertThat(first.output().number()).isEqualTo(7);
         assertThat(second.output().number()).isEqualTo(8);
         assertThat(first.output().greeting()).isNotBlank();
-        assertThat(first.modelId()).isEqualTo(properties.tier().cheap());
+        assertThat(first.modelId()).isEqualTo(properties.modelFor(Tier.cheap));
 
         List<AiCall> rows = calls.findByRequestIdOrderByCreatedAt(requestId);
         System.out.println("=== D5 live smoke: ai_calls rows ===");
@@ -75,7 +92,7 @@ class BedrockSmokeTest {
             assertThat(row.getStatus()).isEqualTo(AiCallStatus.ok);
             assertThat(row.getFeature()).isEqualTo(AiFeature.smoke);
             assertThat(row.getTier()).isEqualTo(Tier.cheap);
-            assertThat(row.getModelId()).isEqualTo(properties.tier().cheap());
+            assertThat(row.getModelId()).isEqualTo(properties.modelFor(Tier.cheap));
             assertThat(row.getPromptName()).isEqualTo("smoke");
             assertThat(row.getPromptVersion()).isEqualTo((short) 1);
             assertThat(row.getInputTokens()).as("input tokens").isPositive();

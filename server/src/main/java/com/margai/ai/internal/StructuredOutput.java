@@ -26,7 +26,7 @@ import tools.jackson.databind.json.JsonMapper;
  * The structured-output contract (TECH_PLAN §4.11, DECISIONS D3.21 and D5): one JSON schema is
  * derived from the output record — snake_case property names, every component required except
  * {@link Optional} ones (optional and nullable), no additional properties, enums as their
- * constant names — and serves both as the forced Bedrock tool's input schema and as the schema
+ * constant names — and serves both as the forced tool's input schema and as the schema
  * the model's answer is validated against before it is decoded into the record. Required-ness
  * and types are the validator's job; Jackson only rejects unknown properties and null
  * primitives. A mismatch is an {@link InvalidOutputException} that carries the validation
@@ -94,6 +94,20 @@ public final class StructuredOutput {
 
     public String toJson(Object value) {
         return mapper.writeValueAsString(value);
+    }
+
+    /**
+     * A tree as plain Java values ({@link Map}, {@link List}, String, Number, Boolean, null).
+     * Provider SDKs carry JSON in their own tree types; handing them plain values keeps their
+     * JSON library — Jackson 2 in the Anthropic SDK — out of this module's imports entirely.
+     */
+    public Object toPlain(JsonNode node) {
+        return mapper.convertValue(node, Object.class);
+    }
+
+    /** The inverse: plain Java values, as an SDK hands them back, as a tree. */
+    public JsonNode fromPlain(Object value) {
+        return mapper.convertValue(value, JsonNode.class);
     }
 
     /** Validates against the record's schema, then decodes; {@code usage} and {@code modelId} attribute a failure. */

@@ -12,9 +12,8 @@ import com.margai.ai.api.Usage;
 import com.margai.ai.internal.AiProperties;
 import com.margai.ai.internal.PromptRegistry;
 import com.margai.ai.internal.StructuredOutput;
+import com.margai.ai.internal.TestAiProperties;
 import com.margai.ai.tasks.SmokeAnswer;
-import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -154,8 +153,7 @@ class BedrockAiClientTest {
     }
 
     private static AiProperties properties(String embedModel) {
-        return new AiProperties("ap-south-1", new AiProperties.Tiers("c", "r", "v"), new AiProperties.Embed(embedModel),
-                "{}", BigDecimal.ONE, new AiProperties.Budget(1, 1), 100, 1024, Duration.ofSeconds(20), Map.of());
+        return TestAiProperties.withEmbed(embedModel, 1024);
     }
 
     private static PromptRegistry prompts() {

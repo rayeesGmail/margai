@@ -75,7 +75,7 @@ class AiSeamFlowTest {
         AiResponse<SmokeAnswer> response = smoke.run(7, AiCallContext.system(requestId));
 
         assertThat(response.output().greeting()).isNotBlank();
-        assertThat(response.modelId()).isEqualTo(properties.tier().cheap());
+        assertThat(response.modelId()).isEqualTo(properties.modelFor(Tier.cheap));
         assertThat(response.aiCallId()).isNotNull();
         List<AiCall> rows = calls.findByRequestIdOrderByCreatedAt(requestId);
         assertThat(rows).hasSize(1);
@@ -110,7 +110,7 @@ class AiSeamFlowTest {
     void aUserAtTheDailyCapGetsABreakerRowAndNoModelCall() {
         UUID userId = jdbc.queryForObject("INSERT INTO users (phone) VALUES ('+919876543250') RETURNING id", UUID.class);
         jdbc.update("INSERT INTO ai_calls (user_id, feature, model_id, tier, status, cost_paise)"
-                + " VALUES (?, 'doubt', ?, 'cheap', 'ok', ?)", userId, properties.tier().cheap(),
+                + " VALUES (?, 'doubt', ?, 'cheap', 'ok', ?)", userId, properties.modelFor(Tier.cheap),
                 properties.budget().userDailyPaise());
         String requestId = "breaker-" + UUID.randomUUID();
 
@@ -137,6 +137,6 @@ class AiSeamFlowTest {
         assertThat(rows).hasSize(1);
         assertThat(rows.get(0).getStatus()).isEqualTo(AiCallStatus.error);
         assertThat(rows.get(0).getErrorCode()).isEqualTo("TierPolicyException");
-        assertThat(rows.get(0).getModelId()).isEqualTo(properties.tier().reason());
+        assertThat(rows.get(0).getModelId()).isEqualTo(properties.modelFor(Tier.reason));
     }
 }

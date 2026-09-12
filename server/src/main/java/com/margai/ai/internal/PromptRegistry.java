@@ -118,6 +118,17 @@ public final class PromptRegistry {
         return PromptRef.named(name);
     }
 
+    /**
+     * The cached prefix of a prompt with no variables bound: what the provider is asked to cache,
+     * near enough to size it (TECH_PLAN §4.11). Fragment groups have no system template.
+     */
+    public String systemPrefix(String name) {
+        if (name.startsWith(FRAGMENT_PREFIX)) {
+            throw new IllegalArgumentException("fragment groups have no system template: " + name);
+        }
+        return render(PromptRef.named(name), Map.of()).system();
+    }
+
     public RenderedPrompt render(PromptRef ref, Map<String, Object> variables) {
         int version = activeVersion(ref.name());
         STGroup group = groups.get(ref.name()).get(version);

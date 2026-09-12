@@ -52,9 +52,11 @@ List ₹499/month; founding price ₹299/month; annual ₹2,999. Payments via UP
 - Mobile app: **Flutter** (latest stable), Android first; iOS/web later from same codebase.
 - Backend: **Java (latest LTS) + Spring Boot 4.x**.
 - Database: **PostgreSQL 18** (with vector search capability for retrieval).
-- Cloud: **AWS, ap-south-1 (Mumbai)**; AI models via **Amazon Bedrock**
-  (cost-efficient model for routine work, stronger reasoning model for hard problems,
-  batch processing for nightly jobs, aggressive caching everywhere).
+- Cloud: **AWS, ap-south-1 (Mumbai)** for infrastructure (RDS, S3, ECS, SSM, SES);
+  AI models via direct provider APIs — **Anthropic API** (cost-efficient model for
+  routine work, stronger reasoning model for hard problems, batch processing for
+  nightly jobs, aggressive caching everywhere) and a dedicated embeddings
+  provider. (Amazon Bedrock optional-later, post-incorporation.)
 - Payments: **Razorpay** (UPI autopay). OTP SMS: Indian DLT-compliant provider (e.g. MSG91).
   Push: **FCM**. Analytics: PostHog.
 - Non-negotiable product-level technical behaviors: answers are judged server-side;

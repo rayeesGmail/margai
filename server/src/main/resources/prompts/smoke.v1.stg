@@ -1,8 +1,8 @@
 // smoke v1 — the D5 connectivity smoke (TECH_PLAN §4.1 last paragraph, §13.2 item 1).
 // Proves three things on a live call: the forced tool returns the SmokeAnswer record, the
 // ledger gets real token counts, and the second call reads the prompt cache. The system
-// template is therefore deliberately longer than the largest published cache minimum
-// (4,096 tokens for the current Anthropic models on Bedrock): a NEET syllabus outline the
+// template is therefore deliberately longer than the largest configured cache minimum
+// (margai.ai.tier.*.cache-min-tokens, 4,096 on the cheap model): a NEET syllabus outline the
 // mentor persona can genuinely carry. Nothing here answers a student.
 // Templates take one argument, v, the variables map (<v.number>).
 

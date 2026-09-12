@@ -11,14 +11,14 @@
 
 | Field | Value |
 |---|---|
-| Current phase | **PHASE 2 — Content pipeline v1 (Weeks 3–4, D13–D24, M3)**, D13 done 2026-09-12, D14 next (the NCERT extraction pilot, the first live VISION day — the Anthropic 403 and the F8 bucket in the Blockers row); PHASE 1 — Auth & identity (Week 2, D7–D12) closed at the Week-2 gate 2026-09-09, running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
-| Current day | D13 done · 2026-09-12 (built 2026-09-10 → 12 on `d13-taxonomy`: the four founder inputs drafted from the NEET (UG) 2026 syllabus and reviewed by the founder in full — all seven checklist items closed 2026-09-11 — 516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-off rows; then the `pipeline` module in six task commits: picocli commands under the `pipeline` profile, `CurriculumImport` in `curriculum.api`, strict readers, run reports with the input's SHA-256; **acceptance PASS** run literally against a fresh database `margai_d13` in the compose container: `taxonomy load`, `taxonomy prerequisites`, `backbone load`, `cutoffs load` all exit 0 with 516 / 104 / 744 / 40 rows, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path over psql, an idempotent re-run changes nothing; reports committed under `pipeline/reports/`; server tests 356 (was 319), app untouched; spec-auditor on the build: see the day log) · next: D14 — NCERT extraction pilot, 2 books EN (✅ 20-paragraph spot check): TECH_PLAN §6.1 VISION extraction over page images, §6.3 `ncert register|render|extract|load`, `books.yaml` (§6.2), the S3 `content/` home (F8) or the ignored `pipeline/data/`, the Bedrock 403 (Blockers) and the D3 text-extraction escape hatch, the PUA decoding for `keph107.pdf` (PARKED), the D4 seed decision (PARKED) · 2026-09-12 after the D13 close: change spec **CS-1 (Collective Intelligence Layer)** integrated into SPEC, TECH_PLAN, PLAN and this tracker (day log "CS-1"); it adds scope to D22, D24, D29, D35, D47, D49, D55, D56, D73 and founder workstream F11, and changes nothing before D22; the founder's three rulings of 2026-09-12 (SPEC §6.1 sentence, the D29 read with graceful degradation, the momentum/strategy consumers) are applied |
+| Current phase | **PHASE 2 — Content pipeline v1 (Weeks 3–4, D13–D24, M3)**, D13 done 2026-09-12, D14 next (the NCERT extraction pilot, the first live VISION day — F8's two D14 prerequisites landed 2026-09-12, the non-root identity and the content bucket; the third, model access, was resolved on 2026-09-12 by leaving Bedrock for the providers' own APIs, and now needs two funded provider accounts and their keys in SSM rather than an AWS ticket); PHASE 1 — Auth & identity (Week 2, D7–D12) closed at the Week-2 gate 2026-09-09, running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
+| Current day | D13 done · 2026-09-12 (built 2026-09-10 → 12 on `d13-taxonomy`: the four founder inputs drafted from the NEET (UG) 2026 syllabus and reviewed by the founder in full — all seven checklist items closed 2026-09-11 — 516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-off rows; then the `pipeline` module in six task commits: picocli commands under the `pipeline` profile, `CurriculumImport` in `curriculum.api`, strict readers, run reports with the input's SHA-256; **acceptance PASS** run literally against a fresh database `margai_d13` in the compose container: `taxonomy load`, `taxonomy prerequisites`, `backbone load`, `cutoffs load` all exit 0 with 516 / 104 / 744 / 40 rows, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path over psql, an idempotent re-run changes nothing; reports committed under `pipeline/reports/`; server tests 356 (was 319), app untouched; spec-auditor on the build: see the day log) · next: D14 — NCERT extraction pilot, 2 books EN (✅ 20-paragraph spot check): TECH_PLAN §6.1 VISION extraction over page images, §6.3 `ncert register|render|extract|load`, `books.yaml` (§6.2), the S3 content home — **settled 2026-09-12**: `margai-beta-content`, prefixes at the root, sources under `source/` (DECISIONS F8) — the Bedrock 403 (Blockers) and the D3 text-extraction escape hatch, the PUA decoding for `keph107.pdf` (PARKED), the D4 seed decision (PARKED) · 2026-09-12 after the D13 close: change spec **CS-1 (Collective Intelligence Layer)** integrated into SPEC, TECH_PLAN, PLAN and this tracker (day log "CS-1"); it adds scope to D22, D24, D29, D35, D47, D49, D55, D56, D73 and founder workstream F11, and changes nothing before D22; the founder's three rulings of 2026-09-12 (SPEC §6.1 sentence, the D29 read with graceful degradation, the momentum/strategy consumers) are applied |
 | Days completed / total | 13 / 84 |
 | Schedule delta | on track (the build); one founder item slipped — F10's SES production access was due "before D12" and is still open (slippage log) |
 | Last week's gate | **Week-2 🚩 PASS** 2026-09-09 — a stranger's email signs in first try on the AVD (fresh install of the `db98a49` build, one code typed once, Today, reopen still signed in, `first_attempt_rate=1.000`) and the D9 runbook's ten rows re-run clean on the same build (transcript in the D12 day log, table in the runbook); carried, not failed: the phone channel (F1), mobile data (F8), an unverified stranger's inbox (F10 production access). Week-1 🚩 PASS 2026-09-08 stands (D6 day log) |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
 | Cache hit rate | — |
-| Blockers | none for the build (the phone-over-mobile-data half of D8's ✅ waits for a public endpoint, F8 — named as carried in the Week-2 gate verdict; F10's SES live proof passed 2026-09-09 — real email delivery works to verified recipients; production access is the remaining F10 step before an unverified stranger's inbox, also carried in the verdict). Two open items on the AWS account (founder; not build blockers before D14, the first live VISION day): (1) the **Anthropic models are refused with 403 `INVALID_PAYMENT_INSTRUMENT`** (AWS Marketplace subscription needs a valid payment method; AWS support ticket open since 2026-09-07) — the tier defaults stay Anthropic, the D5 smoke was proven on Amazon Nova Lite instead; when the ticket clears, rerun `cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false`, then close TECH_PLAN §13.2 item 1's live proof and confirm or drop the Nova price row (DECISIONS 2026-09-08 D5 row). (2) The local CLI session is the account **root** user via `aws login` — F8 creates a non-root IAM Identity Center or IAM identity with Bedrock permissions (TECH_PLAN §7.4; DECISIONS 2026-09-08 D6 row names the interim path). All four §13.2 console checks are closed (D4/D5 day logs): CHEAP/VISION Haiku 4.5, REASON Sonnet 4.6 via `global.` profiles, EMBED `cohere.embed-multilingual-v3` in-region, batch minimum 100; Sonnet 5 / Opus 5 / Opus 4.8 gated → F8 allowlist request. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
+| Blockers | none for the build (the phone-over-mobile-data half of D8's ✅ waits for a public endpoint, F8 — named as carried in the Week-2 gate verdict; F10's SES live proof passed 2026-09-09 — real email delivery works to verified recipients; production access is the remaining F10 step before an unverified stranger's inbox, also carried in the verdict). ~~(1) The **Anthropic models are refused with 403 `INVALID_PAYMENT_INSTRUMENT`**~~ — **resolved by decision, not by AWS, 2026-09-12**: the Marketplace subscription needs invoicing against a registered entity and approval was uncertain, so model access moved to the providers' own APIs (DECISIONS 2026-09-12 D13+; the AWS ticket is moot and Bedrock is PARKED until F9). What replaced it was four provider-account steps, none of them AWS; **two closed the same evening** (both keys into SSM and the local env file; the rate-limit tier read — no upgrade or throttling needed, §13.2 item 1), leaving two: **the workspace spend limit + alert**, and **the exact embed model id and direct-API price** (the price row is still the Bedrock placeholder that every `cost_paise` is computed from). The live D5 acceptance is now runnable by the founder (F8 row). ~~(2) The local CLI session is the account **root** user via `aws login`~~ — **closed 2026-09-12**: F8 enabled IAM Identity Center and created the profile `margai`, and the D5 smoke passed on it — the daily identity is no longer root (TECH_PLAN §7.4; the DECISIONS 2026-09-08 D6 row closed with it). The four §13.2 console checks were all closed on Bedrock terms (D4/D5 day logs); items 1, 2 and 4 are re-closed on direct-API terms in §13.2 itself, and the tier defaults are now the 4.5 cheap model with the current Sonnet for REASON in both lanes — the model AWS had gated is not gated on the direct API. Toolchain on this machine: JDK 25, Flutter 3.47.2, Android SDK 36 + emulator |
 
 ---
 
@@ -155,7 +155,7 @@
 | F7 | Domain + social handles for final name | anytime | ☐ | MARGAI = working name |
 | F9 | DPDP legal review of the minors' consent flow (TECH_PLAN §0.5 item 8, §9.6): consent OTP at the DOB step, gated photo doubts and uploads until consent | before D27 ideally; before beta at the latest | ☐ | not a build blocker; may tighten the gating |
 | F11 | **Collect public-discourse excerpt files + a source list** for the collective intelligence layer (CS-1 §3, `docs/changes/CS-1-collective-intelligence.md`): excerpts from open forums, public comments and published topper/teacher material as `pipeline/inputs/collective/excerpts/*.md` (per file: source, date collected, node codes; the directory is git-ignored — list each file with its SHA-256 in `pipeline/inputs/collective/manifest.md`, DECISIONS 2026-09-12) with `sources.csv`; within CS-1's hard boundaries — nothing paywalled or login-gated, no competitor content or question banks, robots/ToS respected, no identifiable students. The pipeline reads the files and never crawls | any time from now; ideally before the D24 buffer | ☐ added 2026-09-12 | needed only before `collective from-inputs`; blocks nothing else — `from-pyq`, `review` and `load` run without it, and `from-inputs` may slip to any later buffer (CS-1 §8; TECH_PLAN §12.2) |
-| F8 | AWS beta stack (Terraform) per TECH_PLAN §7.6 — accepted at D3 (decision 5). Claude drafts Terraform in a separate infra session profile (plan allowed, apply denied), created when the first milestone is due; founder runs every apply | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ accepted 2026-09-04 | PLAN has no infra day (TECH_PLAN §0.4 #1); console checks §13.2 before D5. Bedrock access confirmed 2026-09-06 for Haiku 4.5 + Sonnet 4.6; optional AWS Sales allowlist request for the Claude 5 family / Opus 4.x (REASON upgrade path, not a blocker). 2026-09-07: the account's payment instrument blocks the Marketplace subscription for the Anthropic models (D5 blocker) — fix in Billing; and the local CLI session is the root user — create a non-root identity (IAM Identity Center or an IAM user) with Bedrock permissions for daily use before more live work (§7.4, §9.2). 2026-09-08 (D7): the ALB must keep `xff_header_processing.mode = append` — the app keys rate limits and `request_ip` on the *last* `X-Forwarded-For` hop (§1.5 step 1); the task role needs `ses:SendEmail` on the F10 identity (§7.4); SSM gains `otp/sender`, `otp/email_from`, `otp/channels` (§7.3). 2026-09-09 (D12): the Terraform variable behind `otp/sender` needs a validation that refuses `log` — the sandbox sender must never reach a deployed task, and a startup refusal in the server was rejected at D12 because most test contexts boot without a profile (PARKED) |
+| F8 | AWS beta stack (Terraform) per TECH_PLAN §7.6 — accepted at D3 (decision 5). Claude drafts Terraform in a separate infra session profile (plan allowed, apply denied), created when the first milestone is due; founder runs every apply | by D5 (Bedrock access), D14, D28, D55, D70 | ☐ accepted 2026-09-04 | PLAN has no infra day (TECH_PLAN §0.4 #1); console checks §13.2 before D5. Bedrock access confirmed 2026-09-06 for Haiku 4.5 + Sonnet 4.6; optional AWS Sales allowlist request for the Claude 5 family / Opus 4.x (REASON upgrade path, not a blocker). 2026-09-07: the account's payment instrument blocks the Marketplace subscription for the Anthropic models (D5 blocker) — fix in Billing; and the local CLI session is the root user — create a non-root identity (IAM Identity Center or an IAM user) with Bedrock permissions for daily use before more live work (§7.4, §9.2). 2026-09-08 (D7): the ALB must keep `xff_header_processing.mode = append` — the app keys rate limits and `request_ip` on the *last* `X-Forwarded-For` hop (§1.5 step 1); the task role needs `ses:SendEmail` on the F10 identity (§7.4); SSM gains `otp/sender`, `otp/email_from`, `otp/channels` (§7.3). 2026-09-09 (D12): the Terraform variable behind `otp/sender` needs a validation that refuses `log` — the sandbox sender must never reach a deployed task, and a startup refusal in the server was rejected at D12 because most test contexts boot without a profile (PARKED). **2026-09-12: the D5 milestone's last piece landed and half of D14's** — IAM Identity Center enabled (which made this account an AWS Organization management account), a user plus a custom permission set (Bedrock invoke on `*` because the `global.` inference profiles route across regions, the content bucket, `ses:SendEmail`), the laptop profile `margai`, and the D5 smoke re-run on it green; the server needed the SDK `sso` + `ssooidc` modules to resolve the profile (DECISIONS 2026-09-12 F8). Done by hand in the console, not Terraform — the full stack is D55, and the D55 session imports or recreates these two. **2026-09-12: the D14 milestone is complete** — `margai-beta-content` created in ap-south-1 (versioning Enabled, all four public-access blocks true) and the founder's PDFs uploaded under `source/`: 216 objects / 816,580,701 bytes, byte-for-byte the local tree (ncert 199 = en 100 + hi 99, syllabus 2, pyq 15), prefix layout in DECISIONS 2026-09-12 F8. **2026-09-12, later the same day: Bedrock leaves F8's scope** — the Marketplace payment block is not fixable without a registered entity, so model access is direct (DECISIONS 2026-09-12 D13+) and F8 loses the Bedrock work: no `bedrock:*` or `iam:PassRole` on the task role, no batch service role, no batch prefixes in the content bucket (§7.4 amended). What F8 gains instead — ✅ **Anthropic account funded, workspace spend limit set and alert configured** 2026-09-12 — the independent backstop AWS Budgets used to be (§10.4); our ledger-computed daily alarm is the other half and neither replaces the other; ✅ **Cohere funded; the id and the price are both confirmed** 2026-09-12 — `embed-v4.0` proved by the live smoke (accepted, 1,024-wide vectors in English and Hindi) and **0.12 USD / 1M text tokens** read off the provider's pricing page, the same figure the Bedrock page had given, so the "placeholder" was right all along and no `cost_paise` row was ever mispriced. Recorded alongside it: image tokens on that model are **0.47**, ~4× text, which the one-price-per-model table cannot express (§4.9) — harmless while we embed text only, and the capability itself is now PARKED as *diagram retrieval with multimodal embeddings*; ✅ **both keys into SSM** at `/margai/beta/ai/{anthropic,cohere}/api_key` as SecureStrings and into the laptop's untracked local env file — done 2026-09-12, ahead of the ECS task that will read them (D55), rotation per docs/runbooks/ai-provider-keys.md; ✅ **rate-limit tier read** 2026-09-12 (console screenshots in the day log): 10K req/min, 10M input tokens/min and 2M output tokens/min on **each** of the two models, plus 4K batch submissions/min against a 500K queue — **no tier upgrade and no throttling layer needed**, the breaker binds ~1,000× sooner (§13.2 item 1, DECISIONS). Next F8 milestone otherwise unchanged: D28 (uploads bucket with the 1-day lifecycle) |
 
 ---
 
@@ -175,6 +175,231 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+Side task · 2026-09-12 · off Bedrock: model access moves to direct provider APIs (no PLAN day)
+Founder decision, taken after the F8 entry below and after the Anthropic 403 it left open: the AWS
+  Marketplace subscription for the models needs invoicing against a registered entity and approval
+  is uncertain, so the AI layer was blocked behind a company-formation dependency with no date. We
+  switch to the providers' own APIs now — Anthropic for every Claude tier, Cohere for embeddings —
+  and Bedrock becomes optional-later, reconsidered after F9. DECISIONS rows are labelled D13+: a
+  founder decision after D13 with no PLAN day of its own.
+The change plan was shown before any edit and approved as written, with a ruling on each of its
+  eight questions and riders on two: (1) SPEC §3's cloud line amended on an explicit per-edit
+  instruction, the D3 ruling's condition; (2) the embedding pin is the v4 line at 1,024, **with the
+  rider that D17's retrieval harness must cover Hindi and Hinglish and a swap to the v3 line happens
+  before the D16 corpus embedding if v4 underperforms**; (3) Sonnet 5 for REASON in both lanes, the
+  Sonnet 4.6 and Nova Lite price rows deleted; (4) REASON runs thinking-off at effort medium, **with
+  the rider that D23/D39 compare thinking-on on the hard-numericals subset and raise
+  max-output-tokens and call-timeout then, on evidence**; (5) AI_LIVE=1 and a `live` profile, no
+  alias; (6) the cache floor accepted as a prompt-design constraint **plus a startup tripwire**;
+  (7) Cohere over the framework's HTTP client, no SDK; (8) DEV_SPEC §13 stays historical and the
+  deviation is carried in CLAUDE.md's except-note.
+Verified before relying on any of it (reported in the session, no live call — there is no key yet):
+  model ids are bare and date-suffix-free; the reasoning model is **not** gated on the direct API,
+  so the 2026-09-06 AccessDenied was an AWS account allowlist and not a model fact; the Batches API
+  is first-party only (Bedrock has none), supports that model, discounts every token by half
+  including cache reads and writes, and **has no minimum record count** — so batch_min_records stops
+  being a platform floor; forced tool use survives on both models; cache minimums are 4,096 tokens
+  on the cheap model and 1,024 on the reasoning one; and two findings that changed the draft — the
+  reasoning model answers a `temperature` with a 400, and thinking is on by default there, which
+  with a 1,024-token output cap and a 20 s timeout would have truncated every REASON call.
+Built, in the approved order, each commit green: 6925a41 the adapters (AnthropicAiClient + request
+  mapper, CohereEmbeddingClient, the two-halves CompositeAiClient, per-tier request shape in config,
+  the embedding pin replacing two hard-coded 1024s, retry-after honoured, AI_LIVE, ArchUnit per
+  provider, AiLiveSmokeTest); 7f2cff4 the startup guards (the cache tripwire warns per prompt and
+  tier, cache-min-tokens required, EmbeddingDimensionTest holds config and the migrations' vector(n)
+  equal); 411095a the key patterns in detect-secrets.sh, the rotation runbook and CLAUDE.md;
+  292374f SPEC §3, the TECH_PLAN AI sections with dated notes, six DECISIONS rows; 3530bce this
+  tracker, the rules and the READMEs; e7dc0e5 a gap found re-reading the wiring (the dormant path
+  needs the embedding provider moved with it too). `./mvnw verify` 392 tests green, 0 failures,
+  7 skipped; eval stamp re-run before each AI-path commit; no migration was needed —
+  ai_calls.model_id is VARCHAR(120), batch already exists, and no vector column exists yet.
+Then the spec-auditor ran on those commits and returned FAIL with five MAJOR findings, three of them
+  real defects rather than documentation drift. All fixed in the follow-up commit:
+  (1) **provider selection failed open** — both provider configurations are conditional on
+  margai.ai.provider, so one mistyped character in the deployed parameter matched neither and the
+  chain fell back to FakeAiClient *inside the live profile*: the app would have started normally and
+  served students fixtures, with no retrieval grounding, no verification, no honest fallback and one
+  log line as the only sign. Now a typed enum (the typo fails binding) plus a refusal when the live
+  profile has no provider client, both tested;
+  (2) **a long retry-after was discarded rather than capped**, so a provider asking for two minutes
+  got a retry in under a second — the opposite of the hint's purpose, and not what the javadoc said;
+  (3) **the batch probe was a billable call with no ai_calls row**, a hard rule with no test
+  exception — removed rather than carved out (see the deviation note above). **Founder ruling, same
+  day: keep it out now and re-add it once D55 makes it ledgerable** — so D55 owns three things, not
+  one (completeBatch down the chain, the batch columns in the ledger, the probe back in the smoke),
+  written into TECH_PLAN §4.11, PLAN D55, the DECISIONS batch row and the test's own javadoc so the
+  obligation cannot be lost or re-argued;
+  (4) three TECH_PLAN run commands still activated the deleted `bedrock` profile
+  (`nightly,bedrock`, `pipeline,bedrock`) — the nightly re-planner and the content pipeline would
+  have run on the fake and fabricated plans and extracted content silently;
+  (5) §7.2's component table still asserted Bedrock as the current provider and AWS Budgets as the
+  spend backstop, contradicting sections amended the same day.
+  From the MINOR list: BEDROCK_LIVE had survived as a second switch able to unlock billable calls on
+  its own, contradicting this session's own "no alias" row (the dormant smoke now needs AI_LIVE=1
+  plus a `-Dbedrock.smoke=true` selector); ModelIdLiteralTest was blind to the bare embedding ids the
+  switch introduced; the prompt-changelog entry was missing although the rule covers tier routing and
+  both the REASON model and the embedding model changed; stale "Bedrock" wording in §1.1's diagram,
+  §1.3, §1.4, §3.3, §4.1, §7.6, §8.1, §13.1, §13.3, PLAN D70 and seven javadoc / prompt-header spots;
+  §9.2 gained the provider keys it was already cited for; the DECISIONS dormant-path row now names
+  both config keys; CLAUDE.md's except-note counts the infra line as a fourth altered line.
+  Recorded, not fixed: this change also edited the auditor's own instructions, so the file that
+  defines the check is downstream of what it checks — worth a founder eye.
+  `./mvnw verify` after the fixes: 396 tests, 0 failures, 6 skipped.
+Deviation to flag, not hidden: the acceptance line asked for the batch probe to write an ai_calls row
+  with the batch columns. It does not, and building that today would have been a bigger change than
+  the approved plan — `completeBatch` fans out to `complete` at the **outermost** decorator, so a
+  real batch submission needs the override threaded down the whole chain (breaker over N requests,
+  per-record schema validation and retries) plus the batch flag and price in the ledger. That is the
+  D55 work TECH_PLAN §4.11 already defers. What landed is the on-demand loop unchanged and a
+  one-record probe in the live smoke that proves the lane accepts the reasoning model and prints its
+  usage. Recorded in §4.11 and the DECISIONS batch row.
+Pending founder (tonight, per the ruling): fund the Anthropic account and set the workspace spend
+  limit + alert; fund Cohere and confirm the exact embed model id and the direct-API price (the price
+  row carries the Bedrock figure as a placeholder); put both keys into SSM at the §7.3 paths and into
+  .env.local; read the account's rate-limit tier from the console and report it next session so the
+  batch runner's throttling can be sized. Then the re-run D5 acceptance under AI_LIVE=1:
+  AiLiveSmokeTest covers ids via the models endpoint, two cheap calls with the cache proof, a REASON
+  call, a vision call, embeddings in both languages, and the one-record batch.
+Same evening, two of the four founder items closed. **Keys created and installed** — both in SSM at
+  the §7.3 paths and in the laptop's untracked env file — which unblocks the live acceptance; the
+  SSM parameters exist ahead of the task that will read them (D55), which is the right order.
+  **Rate-limit tier read** from the console: 10K requests/min, 10M input tokens/min (excluding cache
+  reads) and 2M output tokens/min on *each* of the cheap and reasoning models; across all models 4K
+  batch submissions/min against a 500K-request queue, web search 30/s and 1,000 GB of Files API
+  storage, neither of which we use. The finding matters more than the numbers: **no tier upgrade,
+  and no throttling layer worth building.** The ₹500 global daily cap is ≈ $5.60, which on the cheap
+  model is ≈ 5.6M input tokens — about **34 seconds** of one minute's input allowance, for a whole
+  day; 50 students each at their full ₹25 is ≈ 84 seconds of it. D19–D21's ≈ 2,700 PYQ solutions are
+  under a minute of input allowance in total and run at concurrency 4 against a 20 s timeout, ≈ 0.6%
+  of the output allowance, with the largest conceivable batch ≈ 2,700 records against a 500K queue.
+  The breaker binds roughly a thousand times sooner than the limiter, so the existing two jittered
+  retries plus the provider's `retry-after` are the whole throttling design and a 429 now means a
+  bug rather than saturation (DECISIONS, TECH_PLAN §4.11 and §13.2 item 1; the §13.1 risk row is
+  closed). Caveat recorded: the allowances are organisation-wide, so a second workload on this
+  account would share them.
+**D5 live acceptance re-run PASS, 2026-09-12 17:42 IST** (founder-run under `AI_LIVE=1`; transcript
+  pasted in session). Every substantive check passed on the first attempt; the one red was my own
+  test bug — `info.inner()` is a String and `properties.provider()` became an enum in the audit-fix
+  commit, so AssertJ compared `anthropic` with `"anthropic"`. Fixed, and the print helper no longer
+  prints "null vnull" for an embedding row, which has no prompt by design. The rows:
+```
+  smoke | claude-sonnet-5   | in=239 out=56 cache_read=0    cache_write=9860 | 2070 ms | 232 paise
+  embed | embed-v4.0        | in=7   out=0  cache_read=0    cache_write=0    |  595 ms |   1 paisa
+  embed | embed-v4.0        | in=27  out=0  cache_read=0    cache_write=0    |  380 ms |   1 paisa
+  smoke | claude-haiku-4-5  | in=449 out=50 cache_read=0    cache_write=6595 | 1196 ms |  81 paise  (vision, image accepted)
+  smoke | claude-haiku-4-5  | in=445 out=50 cache_read=6595 cache_write=0    | 1202 ms |  13 paise
+  smoke | claude-haiku-4-5  | in=445 out=50 cache_read=6595 cache_write=0    | 1017 ms |  13 paise
+```
+  What it settles, beyond "it works": **the reasoning tier's request shape is right** — thinking-off
+  at effort medium returned a valid forced-tool answer in 2.07 s, so decision 4's default holds and
+  only its quality rider (D23/D39) is still open. **The embedding model id `embed-v4.0` is
+  confirmed** — the provider accepted it and returned vectors of the pinned 1,024 width in English
+  and Hindi, closing half of that founder to-do; the **price is not** confirmed, since the 1-paisa
+  rows are computed from our placeholder. Note the explicit id check never ran (it sat after the
+  failing assertion), but six successful calls across three ids are stronger evidence than a
+  metadata lookup. Latencies — 2.07 s reason, 1.2 s vision, 1.0–1.2 s cheap, 0.4–0.6 s embed — sit
+  far inside the 20 s timeout and inside D29's 6-second first-plan budget.
+Two findings worth carrying into the cost model, both new information: **the cache pays for itself
+  in one read.** The vision call wrote the cheap model's cache at 81 paise and each of the two cheap
+  calls then read it at 13 paise — 6× cheaper — and the write is shared across every prompt-identical
+  call until the TTL expires. On the reasoning tier the gap is starker: that 232-paise row is a
+  *cold* cache (9,860 write tokens at 2.50/Mtok is 96% of its cost); the same call warm is ≈ 28
+  paise. So the ₹25 per-user daily cap is ~10 cold reasoning calls but ~89 warm ones, which is the
+  number SPEC §6.3's free-tier limits and §4.8's breaker should be reasoned about with — and it is
+  the strongest argument yet for SPEC §11's 55% cache-hit target being a cost lever rather than a
+  nicety. **And the two models tokenize the same prefix differently**: 6,595 tokens on the cheap
+  model against 9,860 on the reasoning one, +50%. That vindicates per-model `cache-min-tokens`, and
+  it bounds the tripwire's precision — our ~4-chars-per-token estimate came to 6,879, which is 4%
+  *high* for the cheap model, so a prompt designed to sit just above its 4,096 floor could still
+  fail to cache. Design prompts with margin, not to the line (§4.11).
+**Founder rulings on the smoke report, 2026-09-12** (this thread closes with them):
+  (1) **₹25/user/day stands** — a circuit breaker at 4–7× expected honest usage, not a budget;
+  D65's runaway simulation remains its acceptance test. Deliberately not sized to the ₹299/mo
+  subscription (₹9.97/day), because the breaker's job is the loop, not the margin.
+  (2) **A Pro user is never refused.** The money breaker takes the same shape as the §4.4 fair-use
+  cap — accept, queue, honest copy — and `AI_BUDGET_EXCEEDED` becomes a free-tier outcome only,
+  where the limit is the product's boundary. SPEC §6.3 is a trust promise, not a limit.
+  *Refinement I surfaced and the ruling absorbed:* one policy, two waits, so two copies. The ruling
+  said "queue it (batch lane), 'answer in a few minutes'" — but a breaker-queued solve cannot run
+  until the IST budget reset, so "a few minutes" would be false, and §4.4's fair-use queue is
+  explicitly an on-demand low-priority executor, not batch. Adopted instead: over the *cap*, the
+  on-demand executor and "in a few minutes" (unchanged); over the *money breaker*, a wait to the day
+  boundary with copy that says tonight — and the nightly batch lane is its natural home precisely
+  because that wait already crosses 00:30 IST, at half price (D55). Recorded in §4.4, §4.8,
+  DECISIONS, and PLAN D44 (copy + routing) and D65 (wiring; the simulation must cover the queue
+  path, not only the trip).
+  (3) **D23's eval produces the first honest per-doubt cost**, and that number triggers a founder
+  re-run of the milestone economics — founder-pending at D23 below. Today's figures stay directional
+  (±40%: a smoke prompt with 50-token outputs against a solver prompt that does not exist until
+  D37); they are recorded in §4.8 as what was measured and are **not** propagated into §7.7.
+  (4) **Prompt economy for D37** written where it survives eight weeks: the substance in
+  `.claude/rules/ai-layer.md` (auto-loaded whenever prompts are touched) with a pointer on PLAN
+  D37's scope line — margin over the cache floor, and prompt length as a per-model cost variable.
+  (5) **Embed price stays open**; on receipt, `prices-json` is updated and the ledger docs get an
+  **append-only correction note** — every embedding `cost_paise` written to date was priced off the
+  0.12 placeholder and is never retroactively rewritten (§4.8's existing rule: a price change never
+  rewrites history).
+Founder-pending: ~~the Anthropic workspace spend limit + alert~~ and ~~the embed price~~ — **both
+  done 2026-09-12**, and the price is the tidier outcome: 0.12 USD / 1M text tokens off the
+  provider's own pricing page, identical to the Bedrock figure the table already carried, so the
+  "placeholder" was correct, no `cost_paise` row was ever wrong, and §4.8's append-only correction
+  convention stands unused rather than owed. The same page carries a second number worth keeping:
+  **image tokens cost 0.47 on that model, ~4× text**, which our one-price-per-model table cannot
+  express — harmless while `EmbedRequest` carries text only, a silent ~4× under-bill the day
+  anything embeds an image (§4.9). The capability behind it is PARKED as **diagram retrieval with
+  multimodal embeddings**, with the second price key as its stated precondition, so the number is
+  filed against the idea it belongs to rather than left as a loose warning. **At D23** — re-run the milestone economics against
+  the eval's first honest per-doubt cost (ruling 3), the one item still outstanding.
+Open after this: **nothing in the provider switch.** Every founder item closed the same evening,
+  every ⏳ verification item proved live, `./mvnw verify` green. What remains is scheduled, not
+  pending: the D23 economics re-run (ruling 3), D37's prompt-economy discipline, D44's Pro
+  degradation copy and D55's ledgered batch lane with the probe it owes back. Bedrock's revival and
+  the residency question stay PARKED.
+```
+
+```
+Side task · 2026-09-12 · F8's non-root identity, a D14 prerequisite (no PLAN day)
+The D14 prerequisites were read out of this tracker at the founder's ask and three needed a founder
+  decision: the VISION model (the Anthropic 403), the source-PDF home (the F8 content bucket), and
+  the non-root identity. The founder took the last two; this entry covers the identity, done by
+  hand in the console rather than Terraform — §7.6 puts the full stack at D55, and the D5 milestone
+  was built the same way, so the D55 Terraform session imports or recreates it.
+Built (founder-run): IAM Identity Center enabled in ap-south-1 — which turns this standalone account
+  into an AWS Organization management account, flagged before the click — a user, and a custom
+  permission set carrying Bedrock invoke/batch on `*`, create-and-read-write on `margai-beta-content`,
+  and `ses:SendEmail` for the F10 proof. Bedrock is scoped to `*` deliberately: the tier defaults are
+  `global.` cross-region inference profiles, which authorise against the profile ARN *and* the
+  foundation-model ARN in whichever region the call routes to, so §7.4's scoped ARN list is written
+  for the ECS task role (D55) and not for the laptop. Laptop profile `margai` via `aws configure sso`.
+Server change: `sso` + `ssooidc` joined `signin` as runtime dependencies in server/pom.xml. The first
+  smoke under the new profile failed with "To use Sso related properties in the 'margai' profile, the
+  'sso' service module must be on the class path" — `signin` (D5) serves an `aws login` session, not
+  an `sso_session`, and the AWS CLI resolves the same profile with its own resolver, which is why
+  `aws sts get-caller-identity --profile margai` had already succeeded. `./mvnw verify` green
+  (360 tests, BedrockSmokeTest skipped as designed), then the live re-run green: two `ok` ai_calls
+  rows on `apac.amazon.nova-lite-v1:0`, 29 in / 20 out, 5,976 cache written then read, 1 paisa each.
+Docs: server/README.md, the BedrockSmokeTest and BedrockConfiguration javadocs and the pom comment
+  name the `margai` profile; the DECISIONS 2026-09-08 D6 row closed on its own terms; one new
+  DECISIONS row for the two SDK modules; F8 and the Blockers cell updated.
+Then the other half of F8's D14 milestone, same sitting: `margai-beta-content` created in ap-south-1
+  (versioning Enabled, the four public-access blocks true) and the founder's PDFs synced under
+  `source/` — 216 objects, 816,580,701 bytes, reconciled against the local tree file-for-file and
+  byte-for-byte (ncert 199 = en 100 + hi 99, syllabus 2, pyq 15; no case-variant `.PDF` the sync's
+  `--include "*.pdf"` could have skipped). The prefix layout needed a reading: §6.2/§6.3 give the
+  page-image and JSONL keys with no prefix while §7.4 and the D12 row say "content/", which nested
+  would read `margai-beta-content/content/…` — taken as the bucket, DECISIONS row.
+Two inventory facts this surfaced, both for later days, neither acted on: `pyq/` now holds **15**
+  papers (NEET 2018–2026 including the Re-NEET and an `extras/` folder), where the D11 note recorded
+  one 2020 paper — D19's ✅ compares counts against the official papers, so the real inventory
+  matters there; and `pyq/` has no `manifest.md`, though `ncert/2022-ed/{en,hi}/` and `syllabus/`
+  each have one and the ignored-PDF-plus-tracked-manifest pattern is the established convention.
+Open after this: the Anthropic 403 — the one remaining D14 prerequisite, and the thing that decides
+  how the VISION extraction runs. Noted in passing: a `.aws.dev.credentials` path matches no
+  .gitignore pattern (the file does not exist; static keys are forbidden by §7.4 anyway), and
+  `./mvnw verify` counts 360 tests where the D13 line records 356 — reconcile at D14.
+```
 
 ```
 CS-1 · 2026-09-12 · DOCS (not a PLAN day) · change spec CS-1 — Collective Intelligence Layer — integrated
@@ -1419,6 +1644,10 @@ Tomorrow's first task:
 ## 🅿️ PARKED (Sunday review only)
 
 - _idea · date · one line_
+- **diagram retrieval with multimodal embeddings** · 2026-09-12 · Embed 4 takes images natively (128K window, no pre-processing), so figure-heavy chapters could be retrieved by diagram and not only by the text around it — worth considering when NCERT extraction shows how much meaning lives in figures (D14–D18). Cost is the catch: image tokens are **0.47/1M against text's 0.12, ~4×**, and §4.8's price table holds one `input` price per model, so this needs a second price key before it can bill honestly — a change to the table's shape, not a config edit (§4.9). Nothing embeds an image today; `EmbedRequest` carries text only
+- **revisit Amazon Bedrock after incorporation (F9)** · 2026-09-12 · the switch to direct provider APIs was forced by the Marketplace payment block, not by a preference; `BedrockAiClient` stays whole and `margai.ai.provider=bedrock` is the whole way back, so this is a comparison (price, latency from ap-south-1, data residency) to re-run once a registered entity can be invoiced — not a rebuild
+- `inference_geo` for the residency copy · 2026-09-12 · the direct API exposes an inference-geography control Bedrock did not; SPEC §6.11 currently promises only "AI processing may occur outside India", so pinning a geo could tighten that promise — a product decision (and a DPDP one, F9), not a config change
+- provider usage/cost reports as a second source beside the ledger · 2026-09-12 · the provider's admin API can report spend per workspace and key; our `ai_calls` ledger is the source of truth (§10.5) and the console workspace limit is the backstop, so this is only worth wiring if the two ever disagree
 - git-native pre-commit hook (`core.hooksPath` → scripts/precommit-gate.sh) · 2026-09-02 · today only Claude's commits are gated; the human's own commits bypass the gate
 - protect scripts/ and .claude/settings.json from agent edits after D1 · 2026-09-02 · the policed agent can currently edit its own policy; commit review by the human is the only control
 - `.claude/skills/release-checklist/` (DEV_SPEC §13.1: migration check, eval gate, changelog) · 2026-09-02 · not in D1 scope; needed before Week 11 (money) at the latest

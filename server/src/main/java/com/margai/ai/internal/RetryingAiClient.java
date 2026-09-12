@@ -16,6 +16,10 @@ import org.slf4j.LoggerFactory;
  * on the failures the inner client marks retryable (throttling, 5xx); timeouts, access denied
  * and invalid output are not retried. The only retry policy in the stack: the SDK client runs
  * with a single attempt (DECISIONS D5).
+ *
+ * <p>When the provider sends its own wait hint with a rate limit ({@code retry-after}), that
+ * hint wins over the computed backoff, clamped to {@link #MAX_RETRY_AFTER} so a pathological
+ * header cannot park a request thread for minutes.
  */
 public final class RetryingAiClient implements AiClient {
 
@@ -27,6 +31,9 @@ public final class RetryingAiClient implements AiClient {
 
     public static final int DEFAULT_RETRIES = 2;
     public static final Duration DEFAULT_BASE_DELAY = Duration.ofMillis(500);
+
+    /** Ceiling on a provider-supplied {@code retry-after}; past it the computed backoff is used. */
+    public static final Duration MAX_RETRY_AFTER = Duration.ofSeconds(30);
 
     private static final Logger log = LoggerFactory.getLogger(RetryingAiClient.class);
 
@@ -67,7 +74,7 @@ public final class RetryingAiClient implements AiClient {
                 if (!e.isRetryable() || retry == maxRetries) {
                     throw e;
                 }
-                Duration delay = backoff(retry + 1);
+                Duration delay = delayFor(e, retry + 1);
                 log.warn("{} failed with {} ({}); retry {}/{} after {} ms", what, e.code(), e.getMessage(),
                         retry + 1, maxRetries, delay.toMillis());
                 try {
@@ -78,6 +85,18 @@ public final class RetryingAiClient implements AiClient {
                 }
             }
         }
+    }
+
+    /**
+     * The provider's own hint when it sent one, clamped to {@link #MAX_RETRY_AFTER}, otherwise the
+     * computed backoff. Clamped rather than discarded: dropping a long hint would fall back to a
+     * sub-second backoff and retry far sooner than the provider asked, which is the opposite of
+     * what the hint is for.
+     */
+    Duration delayFor(AiUnavailableException failure, int retry) {
+        return failure.retryAfter()
+                .map(hint -> hint.compareTo(MAX_RETRY_AFTER) > 0 ? MAX_RETRY_AFTER : hint)
+                .orElseGet(() -> backoff(retry));
     }
 
     /** {@code base × 2^(n-1)} scaled by a jitter factor in [0.5, 1.5). */

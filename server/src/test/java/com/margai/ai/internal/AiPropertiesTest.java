@@ -3,6 +3,9 @@ package com.margai.ai.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.ai.api.Tier;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.annotation.UserConfigurations;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
@@ -23,10 +26,17 @@ class AiPropertiesTest {
     void localDefaultsBindFromApplicationYml() {
         runner.run(context -> {
             AiProperties properties = context.getBean(AiProperties.class);
-            assertThat(properties.region()).isEqualTo("ap-south-1");
-            assertThat(properties.tier().cheap()).isNotBlank().isEqualTo(properties.tier().vision());
-            assertThat(properties.tier().reason()).isNotBlank().isNotEqualTo(properties.tier().cheap());
+            assertThat(properties.provider()).isEqualTo(AiProperties.Provider.anthropic);
+            assertThat(AiProperties.Provider.valueOf(AiProperties.ANTHROPIC))
+                    .as("the conditional's constant and the enum cannot drift apart")
+                    .isEqualTo(AiProperties.Provider.anthropic);
+            assertThat(AiProperties.Provider.valueOf(AiProperties.BEDROCK)).isEqualTo(AiProperties.Provider.bedrock);
+            assertThat(properties.bedrock().region()).isEqualTo("ap-south-1");
+            assertThat(properties.modelFor(Tier.cheap)).isNotBlank().isEqualTo(properties.modelFor(Tier.vision));
+            assertThat(properties.modelFor(Tier.reason)).isNotBlank().isNotEqualTo(properties.modelFor(Tier.cheap));
             assertThat(properties.embed().model()).isNotBlank();
+            assertThat(properties.embed().provider()).isNotBlank();
+            assertThat(properties.embed().dimensions()).isEqualTo(1024);
             assertThat(properties.modelFor(Tier.embed)).isEqualTo(properties.embed().model());
             assertThat(properties.usdInr()).isPositive();
             assertThat(properties.budget().userDailyPaise()).isEqualTo(2_500L);
@@ -35,20 +45,76 @@ class AiPropertiesTest {
             assertThat(properties.maxOutputTokens()).isEqualTo(1024);
             assertThat(properties.callTimeout()).isEqualTo(java.time.Duration.ofSeconds(20));
             assertThat(properties.promptVersions()).containsEntry("smoke", 1);
+            assertThat(properties.anthropic().apiKey()).isEmpty();
+            assertThat(properties.cohere().apiKey()).isEmpty();
+            assertThat(properties.cohere().baseUrl()).startsWith("https://");
 
             PriceTable prices = context.getBean(PriceTable.class);
-            assertThat(prices.modelIds()).contains(properties.tier().cheap(), properties.tier().reason(),
-                    properties.tier().vision(), properties.embed().model());
-            assertThat(prices.priceOf(properties.tier().reason()).output())
-                    .isGreaterThan(prices.priceOf(properties.tier().cheap()).output());
+            assertThat(prices.modelIds()).contains(properties.modelFor(Tier.cheap), properties.modelFor(Tier.reason),
+                    properties.modelFor(Tier.vision), properties.embed().model());
+            assertThat(prices.priceOf(properties.modelFor(Tier.reason)).output())
+                    .isGreaterThan(prices.priceOf(properties.modelFor(Tier.cheap)).output());
             assertThat(context.getBean(CostCalculator.class)).isNotNull();
             assertThat(context.getBean(PromptRegistry.class).names()).contains("smoke");
         });
     }
 
+    /**
+     * §4.11: the request shape is per model, and "send nothing" has to be expressible — the
+     * reasoning model rejects a temperature outright and the cheap one rejects an effort.
+     */
+    @Test
+    void eachTierCarriesTheRequestShapeItsModelAccepts() {
+        runner.run(context -> {
+            AiProperties properties = context.getBean(AiProperties.class);
+            AiProperties.Model cheap = properties.modelOf(Tier.cheap);
+            AiProperties.Model reason = properties.modelOf(Tier.reason);
+
+            assertThat(cheap.temperature()).isZero();
+            assertThat(cheap.effort()).isNull();
+            assertThat(reason.temperature()).isNull();
+            assertThat(reason.effort()).isEqualTo(AiProperties.Effort.medium);
+            assertThat(reason.thinking()).isEqualTo(AiProperties.Thinking.disabled);
+            assertThat(cheap.cacheMinTokens()).isGreaterThan(reason.cacheMinTokens());
+        });
+    }
+
+    /**
+     * The cache tripwire's own subject (founder ruling 2026-09-12): the prompts that ship must
+     * actually be cacheable on the tier they run on, or the cost model's cache rate is fiction.
+     * Test-only prompts are excluded — "shipped" means present in main resources.
+     */
+    @Test
+    void everyShippedPromptsCachedPrefixClearsTheCheapModelsMinimum() {
+        runner.run(context -> {
+            AiProperties properties = context.getBean(AiProperties.class);
+            PromptRegistry prompts = context.getBean(PromptRegistry.class);
+            int floor = properties.modelOf(Tier.cheap).cacheMinTokens();
+
+            List<String> shipped = prompts.names().stream()
+                    .filter(name -> !name.startsWith(PromptRegistry.FRAGMENT_PREFIX))
+                    .filter(name -> Files.exists(Path.of("src/main/resources/prompts",
+                            name + ".v" + prompts.activeVersion(name) + ".stg")))
+                    .toList();
+
+            assertThat(shipped).isNotEmpty();
+            for (String name : shipped) {
+                assertThat(FakeAiClient.tokens(prompts.systemPrefix(name)))
+                        .as("cached prefix of prompt %s against the cheap tier's %d-token minimum", name, floor)
+                        .isGreaterThanOrEqualTo(floor);
+            }
+        });
+    }
+
+    @Test
+    void aTierWithoutItsModelsCacheMinimumDoesNotBoot() {
+        runner.withPropertyValues("margai.ai.tier.cheap.cache-min-tokens=0")
+                .run(context -> assertThat(context).hasFailed());
+    }
+
     @Test
     void aTierPointingAtAnUnpricedModelDoesNotBoot() {
-        runner.withPropertyValues("margai.ai.tier.reason=unpriced-model").run(context -> {
+        runner.withPropertyValues("margai.ai.tier.reason.id=unpriced-model").run(context -> {
             assertThat(context).hasFailed();
             assertThat(context.getStartupFailure()).rootCause().hasMessageContaining("unpriced-model");
         });
@@ -62,11 +128,26 @@ class AiPropertiesTest {
         });
     }
 
+    /**
+     * The fail-open hole the spec-auditor found on 2026-09-12: both provider configurations are
+     * conditional on this value, so a value matching neither would have left the chain on the fake
+     * and started the application anyway. A typed provider refuses to bind instead.
+     */
     @Test
-    void validationRejectsABlankRegionAndAZeroBudget() {
-        runner.withPropertyValues("margai.ai.region=").run(context -> assertThat(context).hasFailed());
+    void anUnknownProviderDoesNotBoot() {
+        runner.withPropertyValues("margai.ai.provider=anthropik").run(context -> {
+            assertThat(context).hasFailed();
+            assertThat(context.getStartupFailure()).hasStackTraceContaining("margai.ai.provider");
+        });
+    }
+
+    @Test
+    void validationRejectsABlankProviderABlankRegionAndAZeroBudget() {
+        runner.withPropertyValues("margai.ai.provider=").run(context -> assertThat(context).hasFailed());
+        runner.withPropertyValues("margai.ai.bedrock.region=").run(context -> assertThat(context).hasFailed());
         runner.withPropertyValues("margai.ai.budget.user-daily-paise=0")
                 .run(context -> assertThat(context).hasFailed());
+        runner.withPropertyValues("margai.ai.embed.dimensions=0").run(context -> assertThat(context).hasFailed());
     }
 
     @Test

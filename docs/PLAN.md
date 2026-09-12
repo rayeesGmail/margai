@@ -174,7 +174,10 @@ tools; your reviews focus on output quality.)*
 ### PHASE 5 — Doubt solver (Weeks 7–8, Days 37–48) — Module M6 (the hero)
 
 - **D37 —** Text-doubt path v1: normalize → cache lookup → cheap-tier answer with
-  retrieval grounding. ✅ *10 typed doubts answered with correct anchors.*
+  retrieval grounding. Write the `doubt_answer` prefix with comfortable margin over the
+  cheap tier's 4,096-token cache floor, and treat prompt length as a per-model cost
+  variable — the two tiers tokenize the same prefix ~50% apart (`.claude/rules/ai-layer.md`;
+  measured 2026-09-12). ✅ *10 typed doubts answered with correct anchors.*
 - **D38 —** Photo path: capture UI + vision extraction → same pipeline. ✅ *10 photographed
   printed questions extracted faithfully.*
 - **D39 —** Difficulty router + reasoning tier + numerical verification (independent
@@ -190,7 +193,11 @@ tools; your reviews focus on output quality.)*
 - **D43 —** Language behavior: EN/HI/Hinglish answer generation honoring user setting;
   copy pass on solver strings. ✅ *Same doubt in 3 languages reads naturally.*
 - **D44 —** Free-tier limits (5/day, cached=half) + limit meter UI + graceful limit
-  screen (paywall teaser, not a wall). ✅ *Limit math correct across day boundary (IST).*
+  screen (paywall teaser, not a wall). Also the copy and routing for the unified Pro
+  degradation path: a Pro user is never refused, so both the fair-use cap and the money
+  breaker accept and queue, with honest copy per wait — "a few minutes" over the cap,
+  tonight over the breaker (founder ruling 2026-09-12; TECH_PLAN §4.4, §4.8). The hard
+  stop stays free-tier only. ✅ *Limit math correct across day boundary (IST).*
 - **D45 —** Doubt → student-state write-back (concept weak-signals) with visible effect
   in next plan (“because you asked 3 Optics doubts…”). ✅ *Seeded doubts change
   tomorrow's plan with the reason line.*
@@ -224,7 +231,10 @@ tools; your reviews focus on output quality.)*
   (SRS dues, weak-node practice, backbone next, hours budget); the snapshot reads two
   sources — the approved collective record and the student state — blended per node by
   the evidence-level weighting, pacing = default × multiplier until the measured pace
-  (CS-1 §5.1–§5.3; TECH_PLAN §4.5 — added 2026-09-12). ✅ *Dry-run outputs sensible
+  (CS-1 §5.1–§5.3; TECH_PLAN §4.5 — added 2026-09-12). Also the batch lane the nightly run
+  is the first caller of: `completeBatch` down the decorator chain, the `batch` and
+  batch-price columns in the ledger, and the one-record live probe restored to
+  `AiLiveSmokeTest` (TECH_PLAN §4.11; founder ruling 2026-09-12). ✅ *Dry-run outputs sensible
   plans for 5 synthetic students; two day-1 students with different onboarding answers get
   visibly different, collective-informed plans with every block reason backed and
   attributed; the same student with two weeks of synthetic history has individual data
@@ -260,7 +270,10 @@ tools; your reviews focus on output quality.)*
   document-deletion verification job, consent texts, legal pages. ✅ *Export a real
   account; delete an account; verify purge schedule.*
 - **D65 —** Per-user AI budget circuit breaker + daily spend alarms + cost dashboard
-  (cache rate, cost/feature, cost/user). ✅ *Simulated runaway loop trips the breaker.*
+  (cache rate, cost/feature, cost/user); the breaker wiring includes the Pro queue path
+  (accept + queue, never a refusal — TECH_PLAN §4.8, founder ruling 2026-09-12) and the
+  re-estimate of §7.7's economics on real ledger data. ✅ *Simulated runaway loop trips the
+  breaker — for a free user a hard stop, for a Pro user a queued solve and honest copy.*
 - **D66 —** **Week-11 gate:** money loop + trust promises all demonstrably true.
   (F5: marketing site drafted this week, evenings.)
 
@@ -272,7 +285,7 @@ tools; your reviews focus on output quality.)*
   ✅ *A day of simulated triggers never exceeds caps.*
 - **D69 —** Performance pass: cold start, Today load, solver latency streaming, low-end
   device test. ✅ *Spec p95 targets met on the cheap test phone.*
-- **D70 —** Failure drills: DB restore from backup, Bedrock outage behavior (honest
+- **D70 —** Failure drills: DB restore from backup, AI provider outage behavior (honest
   errors + queue), payment webhook replay. ✅ *Each drill scripted and passing.*
 - **D71 —** Security review checklist (auth, IDOR probes, rate limits, secrets scan,
   dependency audit). ✅ *Checklist committed with findings fixed.*

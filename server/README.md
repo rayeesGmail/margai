@@ -3,7 +3,7 @@
 Java 25 (latest LTS) · Spring Boot 4.1 · Maven (wrapper) · Flyway · PostgreSQL 18 with pgvector + pg_trgm ·
 Spring Modulith (module boundaries as a test). One deployable, no microservices (DEV_SPEC §2,
 TECH_PLAN §1). All model access goes through the single `AiClient` interface (see "AI seam"
-below); `FakeAiClient` is the default outside a human-launched `BEDROCK_LIVE=1` run.
+below); `FakeAiClient` is the default outside a human-launched `AI_LIVE=1` run.
 
 ## Run locally
 
@@ -29,10 +29,13 @@ Tests share one `pgvector/pgvector:pg18` container per JVM (`TestcontainersConfi
 must be running; the compose db is not used by tests. What runs (TECH_PLAN §8):
 
 - `ModularityTest` — Spring Modulith verifies the §1.3–§1.4 module boundaries.
-- `ArchitectureTest` (ArchUnit) — the AWS SDK only in `ai.internal.bedrock` (Bedrock) and
-  `auth.internal.email` (SES), each service SDK in its own package, only the `ai` module touches
-  `AiClient`, only the difficulty router produces a routed `RouteDecision`, controllers live in `web`
-  packages. `ModelIdLiteralTest` — no model id literal in `ai` sources.
+- `ArchitectureTest` (ArchUnit) — every provider SDK in its own package: the model SDK only in
+  `ai.internal.anthropic`, the embedding provider's HTTP calls only in `ai.internal.cohere`, the AWS
+  SDK only in `ai.internal.bedrock` (the dormant Bedrock client) and `auth.internal.email` (SES);
+  only the `ai` module touches `AiClient`, only the difficulty router produces a routed
+  `RouteDecision`, controllers live in `web` packages. `ModelIdLiteralTest` — no model id literal in
+  `ai` sources. `EmbeddingDimensionTest` — the migrations' `vector(n)` matches
+  `margai.ai.embed.dimensions`.
 - `AuthFlowTest`, `SecurityChainTest`, `AuthControllerTest` and the `auth` unit tests — OTP request
   and verify end to end, the chain's 401 envelopes, token rotation and reuse detection, rate limits,
   and a log-appender proof that the module never logs a code (see "Auth" below).
@@ -43,15 +46,20 @@ must be running; the compose db is not used by tests. What runs (TECH_PLAN §8):
 - `MigrationReversibilityTest` — empty database → latest → every `-- ROLLBACK:` block newest first
   → only `flyway_schema_history` remains.
 - `AiSeamFlowTest` and the `ai` unit tests — the AI seam on the fake: ledger row per outcome,
-  breaker, tier policy, schema repair, retries, the Bedrock request mapping without a network.
-- `BedrockSmokeTest` — skipped unless `BEDROCK_LIVE=1` (see below).
+  breaker, tier policy, schema repair, retries, and each provider's request mapping and failure
+  translation without a network.
+- `AiLiveSmokeTest` — skipped unless `AI_LIVE=1` (see below). `BedrockSmokeTest` — skipped unless
+  `BEDROCK_LIVE=1`, and it needs `margai.ai.provider=bedrock` plus that provider's ids and prices
+  from the environment; it exists so the dormant path stays proven.
 
 ## AI seam (TECH_PLAN §4.1, §4.8, §4.11)
 
 `com.margai.ai` owns the one `AiClient` bean: a decorator chain, outermost first,
 `ledger > breaker > tier-policy > schema > retry` around an inner client — `FakeAiClient` by
-default, `BedrockAiClient` when the `bedrock` profile is active. The chain is logged at startup
-(`AiClient chain: …`) and the same breaker and ledger run in every profile.
+default, and in the `live` profile whichever provider `margai.ai.provider` names: the model
+provider's client joined to the embedding provider's (`CompositeAiClient`), or the dormant
+`BedrockAiClient`. The chain is logged at startup (`AiClient chain: …`) and the same breaker and
+ledger run in every profile, against every provider.
 
 - **Ledger** — every call, every outcome, one `ai_calls` row (`ok`, `invalid_output`, `timeout`,
   `error`, `breaker`) with tokens and `cost_paise` computed at insert from `margai.ai.prices-json`
@@ -61,10 +69,11 @@ default, `BedrockAiClient` when the `bedrock` profile is active. The chain is lo
 - **Tier policy** — `reason` needs a `RouteDecision` (router, `verification()`, `generation()`);
   `vision` needs images.
 - **Schema** — the output record's JSON schema (snake_case, all fields required, no extras) is the
-  forced Bedrock tool's input schema and the validator's schema; one repair retry, then
+  forced tool's input schema and the validator's schema; one repair retry, then
   `InvalidOutputException`.
-- **Retry** — two jittered retries on throttling and 5xx; timeouts (20 s, `margai.ai.call-timeout`)
-  are not retried.
+- **Retry** — two jittered retries on throttling and 5xx, and a rate limit's own `retry-after` wins
+  over the computed backoff (capped at 30 s); timeouts (20 s, `margai.ai.call-timeout`) are not
+  retried. The provider SDKs run with their own retries off: one retry policy in the stack.
 - **Prompts** — `src/main/resources/prompts/<name>.v<N>.stg`, StringTemplate 4 group files with a
   `system` template (the cached prefix) and a `user` template; active version per prompt from
   `margai.ai.prompts.<name>.version`, else the highest present. `_`-prefixed groups
@@ -75,30 +84,47 @@ default, `BedrockAiClient` when the `bedrock` profile is active. The chain is lo
   deterministic hash of the rendered user prompt does; `_`-prefixed cases are failure cases reachable
   only by name; `<case>.repaired.json` answers the repair retry. Usage is realistic (≈ 4 chars per
   token, simulated prompt cache) and rows carry the configured model id.
-- **Config** — `margai.ai.*` in `application.yml` holds the local defaults (tier model ids, embed
-  model, prices, budgets, batch minimum, timeout, prompt versions); SSM overrides them per
-  environment through environment variables (`MARGAI_AI_TIER_CHEAP`, …). No model id, price or
-  limit lives in Java.
+- **Config** — `margai.ai.*` in `application.yml` holds the local defaults (the provider, each
+  tier's model id **and the request shape that model accepts**, the embed pin, prices, budgets,
+  batch minimum, timeout, prompt versions); SSM overrides them per environment through environment
+  variables (`MARGAI_AI_TIER_CHEAP_ID`, …). No model id, price or limit lives in Java. The two
+  provider keys are SecureStrings and blank by default — a live run without one refuses to start
+  (docs/runbooks/ai-provider-keys.md).
+- **Cache floors** — a cached prefix shorter than the model's minimum cacheable length is silently
+  not cached, so each tier records its model's floor in `cache-min-tokens` and startup warns per
+  prompt that falls short. Treat the warning as a cost bug, not noise.
 
 ### Live smoke (D5 acceptance, founder-run)
 
-The only way to reach Bedrock from a developer machine is a human-launched run with AWS credentials
-in the SDK's default chain — an `aws login` session in the default profile (the SDK `signin` module
-is on the runtime classpath for it), or a named profile via `AWS_PROFILE=<profile>`; Claude sessions
-cannot (CLAUDE.md). The intended developer identity is an IAM Identity Center (SSO) profile with
-Bedrock permissions (TECH_PLAN §7.4; created under founder workstream F8) — until it exists the
-login session is the interim path, recorded in DECISIONS.md (D6). With Docker running:
+The only way to reach a provider from a developer machine is a human-launched run with both provider
+keys in the environment; Claude sessions cannot (CLAUDE.md). Put them in the untracked `.env.local`
+(`.env.*` is git-ignored and `scripts/block-paths.sh` refuses to write it) and source it. With Docker
+running:
 
 ```bash
-cd server && BEDROCK_LIVE=1 ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
+cd server && AI_LIVE=1 ./mvnw test -Dtest=AiLiveSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
 ```
 
-`BedrockSmokeTest` makes two `smoke` calls on the `cheap` tier and asserts: both `ai_calls` rows
-`ok` with non-zero input and output tokens, the forced tool echoed the number, the first row wrote
-the prompt cache and the second read it. The rows are printed. `BEDROCK_LIVE` is unset again
-afterwards; without it the test is skipped and `./mvnw verify` never touches AWS. To run the API
-itself against Bedrock: `BEDROCK_LIVE=1 ./mvnw spring-boot:run` (prefix `AWS_PROFILE=<profile>` when
-the credentials are not in the default profile).
+`AiLiveSmokeTest` proves, and prints the `ai_calls` rows for, everything the 2026-09-12 provider
+switch left open: the configured model ids exist at the provider, two `cheap` calls where the forced
+tool echoed the number and the second read the prompt cache the first wrote, one `reason` call on
+that model's own request shape, one `vision` call with an image, embeddings in English and Hindi at
+the pinned width, and a one-record batch on the reasoning model. `AI_LIVE` is unset again
+afterwards; without it the test is skipped and `./mvnw verify` reaches no provider.
+
+The dormant Bedrock path has its own founder-run smoke, `BedrockSmokeTest` under `BEDROCK_LIVE=1`,
+which additionally needs that provider's model ids and price rows from the environment — and
+`margai.ai.embed.provider` moved off the direct provider, because the Bedrock client embeds for
+itself and the direct embedding client would otherwise be built and refuse to start without a key it
+would never use. It uses the **IAM Identity Center (SSO) profile `margai`** created under
+founder workstream F8 on 2026-09-12 (TECH_PLAN §7.4, §7.6) — not the account root user — and the SDK
+resolves that profile only because the `sso` and `ssooidc` modules are on the runtime classpath
+beside `signin`; without them the chain refuses the profile with *"the `sso` service module must be
+on the class path"* while the AWS CLI, which has its own resolver, works fine
+(`aws sso login --profile margai` when the cached token has expired).
+
+To run the API itself against a live provider: `AI_LIVE=1 ./mvnw spring-boot:run` (add
+`MARGAI_AI_PROVIDER=bedrock` and `AWS_PROFILE=margai` for the dormant path).
 
 ## Auth (D7): OTP by email, tokens, rate limits
 

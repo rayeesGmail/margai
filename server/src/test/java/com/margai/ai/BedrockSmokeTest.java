@@ -38,10 +38,15 @@ import org.springframework.test.context.ActiveProfiles;
  * first one wrote.
  *
  * <pre>
- * cd server && AWS_PROFILE=margai BEDROCK_LIVE=1 MARGAI_AI_PROVIDER=bedrock \
+ * cd server && AWS_PROFILE=margai BEDROCK_LIVE=1 \
  *   MARGAI_AI_TIER_CHEAP_ID=… MARGAI_AI_PRICES_JSON=… \
+ *   MARGAI_AI_EMBED_PROVIDER=bedrock MARGAI_AI_EMBED_MODEL=… \
  *   ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
  * </pre>
+ *
+ * <p>The embedding provider has to move with the completion provider: this client embeds for
+ * itself, and leaving {@code margai.ai.embed.provider} on the direct one would build that client
+ * too and refuse to start without a key it would never use.
  */
 @SpringBootTest(properties = "margai.ai.provider=bedrock")
 @ActiveProfiles("live")

@@ -113,8 +113,10 @@ the pinned width, and a one-record batch on the reasoning model. `AI_LIVE` is un
 afterwards; without it the test is skipped and `./mvnw verify` reaches no provider.
 
 The dormant Bedrock path has its own founder-run smoke, `BedrockSmokeTest` under `BEDROCK_LIVE=1`,
-which additionally needs `margai.ai.provider=bedrock` and that provider's model ids and price rows
-from the environment. It uses the **IAM Identity Center (SSO) profile `margai`** created under
+which additionally needs that provider's model ids and price rows from the environment — and
+`margai.ai.embed.provider` moved off the direct provider, because the Bedrock client embeds for
+itself and the direct embedding client would otherwise be built and refuse to start without a key it
+would never use. It uses the **IAM Identity Center (SSO) profile `margai`** created under
 founder workstream F8 on 2026-09-12 (TECH_PLAN §7.4, §7.6) — not the account root user — and the SDK
 resolves that profile only because the `sso` and `ssooidc` modules are on the runtime classpath
 beside `signin`; without them the chain refuses the profile with *"the `sso` service module must be

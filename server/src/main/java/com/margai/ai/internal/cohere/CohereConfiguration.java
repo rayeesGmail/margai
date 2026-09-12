@@ -18,6 +18,12 @@ import org.springframework.web.client.RestClient;
  * locally, the task definition in AWS. The key is configuration from SSM and the call inherits
  * {@code margai.ai.call-timeout} on both connect and read; nothing here retries — the retry
  * decorator owns that policy (DECISIONS D5).
+ *
+ * <p>Wired on {@code margai.ai.embed.provider}, independently of the completion provider, because
+ * the two halves of the seam are separate providers now. The dormant Bedrock client embeds for
+ * itself, so running it (§4.11) means setting {@code margai.ai.embed.provider} away from
+ * {@code cohere} as well — otherwise this bean is built, and refuses to start without a key it
+ * would never use.
  */
 @Configuration(proxyBeanMethods = false)
 @Profile("live")

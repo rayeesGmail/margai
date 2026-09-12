@@ -1,5 +1,7 @@
 package com.margai.pipeline.internal;
 
+import com.margai.curriculum.api.CurriculumImport;
+import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import java.nio.file.Path;
 import java.util.List;
@@ -16,6 +18,12 @@ class TaxonomyPrerequisitesCommand extends InputFileCommand {
 
     static final String FILE = "prerequisites.csv";
 
+    private final CurriculumImport imports;
+
+    TaxonomyPrerequisitesCommand(CurriculumImport imports) {
+        this.imports = imports;
+    }
+
     @Override
     String inputFileName() {
         return FILE;
@@ -25,6 +33,10 @@ class TaxonomyPrerequisitesCommand extends InputFileCommand {
     int run(Path inputFile) {
         List<PrerequisiteRow> rows = PrerequisitesCsvReader.read(inputFile);
         print(FILE + ": " + rows.size() + " edges read");
+        PrerequisiteLoadReport report = imports.loadPrerequisites(rows);
+        print("syllabus_prerequisites: " + report.inserted() + " inserted, " + report.unchanged() + " already present; "
+                + report.edgesInDatabase() + " edges over " + report.nodesWithEdges() + " nodes, no cycle");
+        print("orphan edges (in the database, not in the file): " + listOrNone(report.orphanEdges()));
         return EXIT_OK;
     }
 }

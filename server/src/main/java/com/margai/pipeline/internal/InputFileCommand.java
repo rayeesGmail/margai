@@ -1,5 +1,6 @@
 package com.margai.pipeline.internal;
 
+import com.margai.curriculum.api.CurriculumImportException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
@@ -9,9 +10,10 @@ import picocli.CommandLine.Spec;
 
 /**
  * A leaf command over one founder-owned input file (TECH_PLAN §6.2). The file must exist before
- * anything runs: a missing input is a usage error (exit 2) with the resolved path, and a file
- * that breaks its contract fails the run (exit 1) with the file and line — in both cases before
- * anything is written. Subclasses name their file and do the work in {@link #run(Path)}.
+ * anything runs: a missing input is a usage error (exit 2) with the resolved path. A file that
+ * breaks its own contract, or contradicts the taxonomy it loads into, fails the run (exit 1) with
+ * the reason — the load's transaction has already rolled back by then, so nothing is half-written.
+ * Subclasses name their file and do the work in {@link #run(Path)}.
  */
 abstract class InputFileCommand implements Callable<Integer> {
 
@@ -40,7 +42,7 @@ abstract class InputFileCommand implements Callable<Integer> {
         }
         try {
             return run(file);
-        } catch (InputFormatException e) {
+        } catch (InputFormatException | CurriculumImportException e) {
             spec.commandLine().getErr().println(e.getMessage());
             return EXIT_FAILED;
         }
@@ -48,5 +50,9 @@ abstract class InputFileCommand implements Callable<Integer> {
 
     void print(String line) {
         spec.commandLine().getOut().println(line);
+    }
+
+    static String listOrNone(java.util.List<String> items) {
+        return items.isEmpty() ? "none" : String.join(", ", items);
     }
 }

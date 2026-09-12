@@ -2,6 +2,7 @@ package com.margai.curriculum.internal;
 
 import com.margai.curriculum.api.NodeKind;
 import com.margai.curriculum.api.Subject;
+import com.margai.curriculum.api.SyllabusNodeRow;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -85,6 +87,35 @@ public class SyllabusNode {
         this.sortOrder = sortOrder;
         this.weightageMarksAvg = BigDecimal.ZERO;
         this.neetRelevant = true;
+    }
+
+    /**
+     * The D13 loader's upsert (TECH_PLAN §6.3): every column the founder's file carries, matched
+     * on {@code code}; {@code weightageMarksAvg} is D22's and stays. Returns whether anything
+     * changed, so the report can tell an update from a no-op re-run.
+     */
+    public boolean apply(SyllabusNodeRow row, UUID parentId) {
+        boolean changed = subject != row.subject()
+                || !Objects.equals(classLevel, row.classLevel())
+                || !Objects.equals(this.parentId, parentId)
+                || kind != row.kind()
+                || !nameEn.equals(row.nameEn())
+                || !Objects.equals(nameHi, row.nameHi())
+                || sortOrder != row.sortOrder()
+                || !Objects.equals(defaultLearnMinutes, row.defaultLearnMinutes())
+                || neetRelevant != row.neetRelevant();
+        if (changed) {
+            this.subject = row.subject();
+            this.classLevel = row.classLevel();
+            this.parentId = parentId;
+            this.kind = row.kind();
+            this.nameEn = row.nameEn();
+            this.nameHi = row.nameHi();
+            this.sortOrder = row.sortOrder();
+            this.defaultLearnMinutes = row.defaultLearnMinutes();
+            this.neetRelevant = row.neetRelevant();
+        }
+        return changed;
     }
 
     public UUID getId() {

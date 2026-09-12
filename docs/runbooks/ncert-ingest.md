@@ -76,6 +76,16 @@ Start with one chapter (`--chapters 1`) and read its report before letting the b
 line and the low-confidence list are both in it, and a prompt that is reading the pages wrongly is
 cheapest to catch after twenty pages rather than after two hundred.
 
+**The end-of-chapter apparatus is never sent.** Before calling for any page, the command reads the
+chapter's own text layer and finds where Summary / Points to Ponder / Exercises / Answers begins;
+that page and everything after it is recorded as skipped and costs nothing. This is not a
+politeness — NCERT numbers its exercises with the chapter number (Chapter 7's questions are 7.1,
+7.2, 7.3), so a page of them is indistinguishable from a page of sections, and asking the model to
+ignore them did not work. The report's first table says, per chapter, where the boundary fell and
+which heading found it. **Read it.** A boundary that looks too early means real teaching is being
+skipped; `—  not found: every page is sent` means the text layer was unreadable and nothing was
+skipped, which is safe but means the model will see the exercises for that chapter.
+
 Estimated cost at `claude-haiku-4-5` rates: about ₹0.55–1.10 per page, so roughly ₹250 for `bio11`
 and ₹170 for `phy11-part1`. The report's cost line is the truth — it comes from the `ai_calls`
 ledger, not from an estimate.

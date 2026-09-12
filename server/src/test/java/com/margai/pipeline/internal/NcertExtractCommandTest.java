@@ -63,6 +63,15 @@ class NcertExtractCommandTest {
                       - {no: 8, en: keph201.pdf}
                       - {no: 9, en: keph202.pdf}
                 """);
+        // The source PDFs: extract reads their text layer to find where the apparatus starts. These
+        // carry prose and no Summary, so no boundary is found and every page is sent — which is what
+        // the tests below assume unless they replace the source themselves.
+        store.put("source/ncert/2022-ed/en/phy11-part2/keph201.pdf",
+                pdfWithText("7.1 the first section of the chapter", "7.2 the second section of it",
+                        "7.3 the third section of the chapter"), "application/pdf");
+        store.put("source/ncert/2022-ed/en/phy11-part2/keph202.pdf",
+                pdfWithText("8.1 the first section of the chapter", "8.2 the second section of it"),
+                "application/pdf");
         page(8, 1);
         page(8, 2);
         page(9, 1);
@@ -153,7 +162,7 @@ class NcertExtractCommandTest {
         assertThat(run()).isZero();
 
         assertThat(extract.calls).isEmpty();
-        assertThat(out.toString()).contains("| 3 | 0 | 3 | 3 |");
+        assertThat(out.toString()).contains("| 3 | 0 | 3 | 0 | 3 |");
     }
 
     /**
@@ -235,6 +244,45 @@ class NcertExtractCommandTest {
         assertThat(extract.calls).containsExactly("8/2", "8/5", "9/1");
     }
 
+    /**
+     * The apparatus is never sent. Two prompt revisions failed to stop the model reading NCERT's
+     * chapter-numbered exercises as sections; not showing it the page is the version that cannot
+     * fail (D14).
+     */
+    @Test
+    void theEndOfChapterApparatusIsNeverSentAndIsRecordedAsSkipped() throws IOException {
+        store.put("source/ncert/2022-ed/en/phy11-part2/keph201.pdf",
+                pdfWithText("7.1 the first section of the chapter as we have written it here",
+                        "7.2 the second section of the chapter as it is printed on the page",
+                        "SUMMARY",
+                        "7.1 Answer the following questions that are set for the student to do"),
+                "application/pdf");
+        page(8, 3);
+        page(8, 4);
+
+        assertThat(run()).isZero();
+
+        assertThat(extract.calls).containsExactly("8/1", "8/2", "9/1");
+        assertThat(out.toString())
+                .contains("## end-of-chapter apparatus (never sent to the model)")
+                .contains("| 8 | page 3 | SUMMARY | 2 |");
+
+        List<ExtractedPage> written = ExtractJsonl.read(
+                store.get(ContentKeys.extract("phy11-part2", BookLanguage.en)));
+        assertThat(written).extracting(ExtractedPage::address).contains("8/3", "8/4");
+        assertThat(written.stream().filter(ExtractedPage::wasSkipped)).hasSize(2)
+                .allSatisfy(page -> assertThat(page.skipped()).isEqualTo("apparatus from SUMMARY"));
+    }
+
+    /** A chapter whose text layer cannot be read sends every page: skipping blind would drop teaching. */
+    @Test
+    void aChapterWithNoDetectableApparatusSendsEveryPage() {
+        assertThat(run()).isZero();
+
+        assertThat(extract.calls).containsExactly("8/1", "8/2", "9/1");
+        assertThat(out.toString()).contains("not found: every page is sent");
+    }
+
     @Test
     void anUnrenderedChapterFailsTheRunAndSaysWhatToDo() {
         store.objects.keySet().removeIf(key -> key.startsWith("pages/phy11-part2/en/9/"));
@@ -248,6 +296,35 @@ class NcertExtractCommandTest {
     private int run() {
         return commandLine.execute("ncert", "extract", "--book", "phy11-part2",
                 "--inputs", inputs.toString(), "--reports", reports.toString());
+    }
+
+    /**
+     * A PDF whose text layer says something, so {@link ChapterApparatus} has a page to read. Each
+     * argument is one page; the filler makes the page legible English by the measured standard.
+     */
+    private static byte[] pdfWithText(String... pageTexts) throws IOException {
+        try (org.apache.pdfbox.pdmodel.PDDocument document = new org.apache.pdfbox.pdmodel.PDDocument()) {
+            for (String text : pageTexts) {
+                org.apache.pdfbox.pdmodel.PDPage pdPage = new org.apache.pdfbox.pdmodel.PDPage();
+                document.addPage(pdPage);
+                try (var content = new org.apache.pdfbox.pdmodel.PDPageContentStream(document, pdPage)) {
+                    content.beginText();
+                    content.setFont(new org.apache.pdfbox.pdmodel.font.PDType1Font(
+                            org.apache.pdfbox.pdmodel.font.Standard14Fonts.FontName.HELVETICA), 11);
+                    content.setLeading(14);
+                    content.newLineAtOffset(50, 740);
+                    content.showText(text);
+                    content.newLine();
+                    content.showText("This is the text of the page and it is written in the words that we use,");
+                    content.newLine();
+                    content.showText("with the same of and to in a that as it for on by an which be are this.");
+                    content.endText();
+                }
+            }
+            var bytes = new java.io.ByteArrayOutputStream();
+            document.save(bytes);
+            return bytes.toByteArray();
+        }
     }
 
     private void page(int chapter, int page) {

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,9 +80,11 @@ class NcertExtractCommand extends NcertBookCommand {
         int alreadyDone = done.size();
 
         List<List<String>> perChapter = new ArrayList<>();
+        List<List<String>> apparatusRows = new ArrayList<>();
         List<String> lowConfidence = new ArrayList<>();
         int called = 0;
         int skipped = 0;
+        int apparatusSkipped = 0;
         for (BookDefinition.Chapter chapter : selected) {
             List<String> pageKeys = content.list(ContentKeys.pagePrefix(definition.code(), language, chapter.no()));
             if (pageKeys.isEmpty()) {
@@ -89,11 +92,29 @@ class NcertExtractCommand extends NcertBookCommand {
                         "chapter " + chapter.no() + " of '" + definition.code() + "' has no rendered pages — "
                                 + "run `ncert render` first");
             }
+            // Where this chapter stops teaching. Pages past it are never sent: the model cannot
+            // reliably tell NCERT's chapter-numbered exercises from its sections, and it does not
+            // have to if it never sees them (D14, ChapterApparatus).
+            Optional<ChapterApparatus.Boundary> apparatus =
+                    ChapterApparatus.find(PdfTextLayer.pages(content.get(definition.sourceKey(language, chapter))));
+            apparatusRows.add(List.of(String.valueOf(chapter.no()),
+                    apparatus.map(boundary -> "page " + boundary.firstPage()).orElse("—"),
+                    apparatus.map(ChapterApparatus.Boundary::heading).orElse("not found: every page is sent"),
+                    String.valueOf(apparatus.map(boundary -> pageKeys.stream()
+                            .filter(key -> boundary.covers(ContentKeys.pageNumber(key))).count()).orElse(0L))));
+
             int chapterCalled = 0;
             int chapterParagraphs = 0;
             PreviousPage previous = PreviousPage.none();
             for (String pageKey : pageKeys) {
                 int page = ContentKeys.pageNumber(pageKey);
+                if (apparatus.map(boundary -> boundary.covers(page)).orElse(false)) {
+                    ExtractedPage record = ExtractedPage.skipped(chapter.no(), page,
+                            "apparatus from " + apparatus.orElseThrow().heading());
+                    done.put(record.address(), record);
+                    apparatusSkipped++;
+                    continue;
+                }
                 ExtractedPage existing = done.get(chapter.no() + "/" + page);
                 // A page this run is not calling for still advances the address, when we know it:
                 // otherwise `--pages 3` would call page 3 with no previous address, the model would
@@ -133,12 +154,14 @@ class NcertExtractCommand extends NcertBookCommand {
         flush(jsonlKey, done);
 
         int paragraphs = done.values().stream().mapToInt(page -> page.paragraphs().size()).sum();
+        report.section("end-of-chapter apparatus (never sent to the model)")
+                .table(List.of("chapter", "starts at", "heading", "pages not sent"), apparatusRows);
         report.section("pages per chapter")
                 .table(List.of("chapter", "pages", "called", "paragraphs"), perChapter);
         report.section("total").table(
-                List.of("pages in jsonl", "called this run", "already done", "paragraphs"),
+                List.of("pages in jsonl", "called this run", "already done", "apparatus", "paragraphs"),
                 List.of(List.of(String.valueOf(done.size()), String.valueOf(called),
-                        String.valueOf(skipped), String.valueOf(paragraphs))));
+                        String.valueOf(skipped), String.valueOf(apparatusSkipped), String.valueOf(paragraphs))));
         report.section("low-confidence pages (below " + LOW_CONFIDENCE + ")").list(lowConfidence);
 
         AiSpend.RunSpend bill = spend.of(runId);

@@ -20,14 +20,28 @@ record ExtractedPage(
         int page,
         BigDecimal confidence,
         UUID aiCallId,
-        List<NcertPage.Paragraph> paragraphs) {
+        List<NcertPage.Paragraph> paragraphs,
+        String skipped) {
 
     ExtractedPage {
         paragraphs = paragraphs == null ? List.of() : List.copyOf(paragraphs);
     }
 
     static ExtractedPage of(short chapterNo, int page, NcertPage read, UUID aiCallId) {
-        return new ExtractedPage(chapterNo, page, read.confidence(), aiCallId, read.paragraphs());
+        return new ExtractedPage(chapterNo, page, read.confidence(), aiCallId, read.paragraphs(), null);
+    }
+
+    /**
+     * A page deliberately not sent to the model, recorded so the JSONL stays a complete account of
+     * the chapter: a re-run does not reconsider it, and {@code ncert load}'s coverage — extracted
+     * pages against rendered pages — is not dragged down by pages we chose to leave out.
+     */
+    static ExtractedPage skipped(short chapterNo, int page, String reason) {
+        return new ExtractedPage(chapterNo, page, null, null, List.of(), reason);
+    }
+
+    boolean wasSkipped() {
+        return skipped != null;
     }
 
     /** The address of this page, as a report and a resume check use it. */

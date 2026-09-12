@@ -330,7 +330,7 @@ class NcertLoadCommandTest {
 
     private static ExtractedPage page(int chapter, int page, String confidence, NcertPage.Paragraph... paragraphs) {
         return new ExtractedPage((short) chapter, page, new BigDecimal(confidence), UUID.randomUUID(),
-                List.of(paragraphs));
+                List.of(paragraphs), null);
     }
 
     private static NcertPage.Paragraph paragraph(String section, int paraNo, String text) {

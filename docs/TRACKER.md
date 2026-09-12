@@ -44,7 +44,7 @@
 
 ## PHASE 2 — Content pipeline v1 (Weeks 3–4) · M3
 
-- [x] **D13** Taxonomy CSV loaded + prerequisite graph + archetype drafts · ✅ no cycles — done 2026-09-12 (drafted 2026-09-10 from the syllabus PDFs, founder review complete 2026-09-11 with all seven checklist items closed, built 2026-09-12): `pipeline/inputs/` (516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-offs), the `pipeline` module with `taxonomy load|prerequisites`, `backbone load`, `cutoffs load` under the `pipeline` profile and `CurriculumImport` in `curriculum.api`; **acceptance PASS** on a fresh database — all four commands exit 0, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path, idempotent re-run; reports in `pipeline/reports/2026-09-12-*.md`; server tests 356 (day log); branch `d13-taxonomy`, PR pending the founder's review and push
+- [x] **D13** Taxonomy CSV loaded + prerequisite graph + archetype drafts · ✅ no cycles — done 2026-09-12, merged as PR #13 (9e0e930) (drafted 2026-09-10 from the syllabus PDFs, founder review complete 2026-09-11 with all seven checklist items closed, built 2026-09-12): `pipeline/inputs/` (516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-offs), the `pipeline` module with `taxonomy load|prerequisites`, `backbone load`, `cutoffs load` under the `pipeline` profile and `CurriculumImport` in `curriculum.api`; **acceptance PASS** on a fresh database — all four commands exit 0, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path, idempotent re-run; reports in `pipeline/reports/2026-09-12-*.md`; server tests 356 (day log); branch `d13-taxonomy`, PR pending the founder's review and push
 - [ ] **D14** NCERT extraction pilot (2 books, EN) · ✅ 20-paragraph spot check
 - [ ] **D15** All EN books extracted · ✅ coverage report/book
 - [ ] **D16** Hindi ingest + EN↔HI alignment · ✅ 20 aligned pairs checked
@@ -244,6 +244,8 @@ Rulings 2026-09-12 (the founder, same day; three DECISIONS rows; the closing com
   templated reasons are attributed lines — with the AI lines joining at D56 (§4.10, PLAN/TRACKER
   D47 and D56); §12.1's D25–D30 row; the dashboard's CS-1 note names D29 and D35. Nothing before
   D22 moves; the D14 prerequisites are unchanged. Open for the founder (CS-1): nothing.
+Merged to main with PR #13 (d13-taxonomy) by the founder 2026-09-12, merge commit 9e0e930; SPEC v2.0
+  on main now carries the CS-1 amendments (§1, §6.1, §9.6, §10.9).
 ```
 
 ```
@@ -363,7 +365,9 @@ spec-auditor on the build, before this commit: FAIL → 1 MAJOR and 11 MINOR, al
   here. Four tests added for the new refusals and failure paths: 356 → 360.
 Open for the founder: ~~what the Collective Intelligence Layer's "from-inputs" step is (CIL itself
   expanded and PARKED at the close)~~ — answered the same day by change spec CS-1 (the CS-1 block
-  above); the F3 booking (in progress); the PR from d13-taxonomy.
+  above); the F3 booking (in progress); ~~the PR from d13-taxonomy~~.
+PR #13 from d13-taxonomy merged to main by the founder 2026-09-12 (merge commit 9e0e930, 20 commits:
+  the D13 inputs and loaders plus the CS-1 integration and its rulings); D13 closed on main.
 ```
 
 ```

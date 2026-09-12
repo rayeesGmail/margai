@@ -221,6 +221,30 @@ Notable while building:
     python script instead of Write/Edit, so the path/secret guard did not inspect those two writes.
     The first was redone through the tool; the second was left because rewriting from a truncated
     view risked corrupting a correct file. No further shell edits after that.
+Spec-auditor: FAIL, FAIL, FAIL over three rounds — 919b7b2, 3266418, 4b47df2 — and the day is much
+  better for it. Round 1 found a BLOCKER in the deliverable itself: the prompt demanded paragraph
+  numbering that continues within a section across a page break while the call carried only the
+  previous page's *text*, so the model had nothing to continue from and would have restarted at 1 on
+  every page; the loader then merged anything sharing an address, concatenating unrelated paragraphs
+  and dropping the remainder, silently. The auditor's sharpest point: the D14 ✅ itself would not have
+  caught it, because a merged row reads as one long paragraph. Also round 1: max-output-tokens 1024
+  sized a reasoning answer, not a page (most body pages would have truncated, and a truncated tool
+  input still parses); coverage divided by the extraction's own size, so a run that stopped at page
+  40 of 240 reported ~100%; the model's section and para_no reached the schema unvalidated; and D16's
+  Hindi pass would have erased the English text's provenance.
+  Round 2 found that three of those six fixes had each opened a hole, two of them the false refusal
+  the fixes were meant to prevent: a text-free page (a plate, a full-page figure — common mid-chapter
+  in Biology) reset the address and reintroduced the blocker, while strict page adjacency *refused a
+  correct book* whose paragraph ran across a figure; `--pages` skipped the branch that advances the
+  address, so the `--redo` remedy the refusal prints could never work and the founder would have
+  looped, paying each time; and unioning figure_refs across loads made `ncert load` non-idempotent —
+  a re-extraction correcting a hallucinated figure could never clear it, and the report said
+  "unchanged" while discarding the correction. Round 3 found the last one: the gap rule could not
+  tell "page carried no text" from "page absent from the JSONL", and a JSONL with holes is a state
+  this pipeline reaches by design (partial render, targeted --redo, resumed extract), so a hole read
+  as a figure page and joined two unrelated paragraphs. An absent page is now refused by name.
+  Everything above was found and fixed BEFORE any paid call — which is the point of running the
+  audit before the acceptance rather than after it. Tests 456 → 477.
 Acceptance ✅ "Spot-check 20 random paragraphs against the PDFs" — NOT YET RUN. `ncert register` was
   run for real against a fresh database margai_d14 in the compose container: 10 books inserted, exit
   0, re-run 0/0/10 unchanged, rows verified over psql, report committed
@@ -229,6 +253,13 @@ Acceptance ✅ "Spot-check 20 random paragraphs against the PDFs" — NOT YET RU
   which DEV_SPEC §13.7 requires a human to launch — so render, extract and load are the founder's,
   per docs/runbooks/ncert-ingest.md (commands, the ~₹250 + ~₹170 estimate, the sampling SQL and what
   to check in each of the twenty rows). D14 is committed but NOT ticked until that run passes.
+  Before the twenty-row sample, two checks the auditor asked for by name, because the sample cannot
+  see them: (1) two consecutive pages of one running section in the JSONL — the paragraph numbers
+  must continue, not restart; (2) the page immediately after a full-page figure — same check across
+  the gap. The first chapter to extract is phy11-part1 ch 7 (Gravitation): it is the one English
+  file whose text layer is broken PUA glyphs, so a clean read there is the direct evidence for the
+  D3 escape-hatch judgement that VISION over page images beats text extraction, and it costs ~₹20
+  to learn rather than ~₹420.
 ```
 
 ```

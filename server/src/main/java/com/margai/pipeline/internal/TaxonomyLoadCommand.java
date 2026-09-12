@@ -1,5 +1,8 @@
 package com.margai.pipeline.internal;
 
+import com.margai.curriculum.api.SyllabusNodeRow;
+import java.nio.file.Path;
+import java.util.List;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
@@ -16,5 +19,12 @@ class TaxonomyLoadCommand extends InputFileCommand {
     @Override
     String inputFileName() {
         return FILE;
+    }
+
+    @Override
+    int run(Path inputFile) {
+        List<SyllabusNodeRow> rows = TaxonomyCsvReader.read(inputFile);
+        print(FILE + ": " + rows.size() + " nodes read");
+        return EXIT_OK;
     }
 }

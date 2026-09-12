@@ -1,5 +1,8 @@
 package com.margai.pipeline.internal;
 
+import com.margai.curriculum.api.ArchetypeTrackRow;
+import java.nio.file.Path;
+import java.util.List;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
@@ -16,5 +19,13 @@ class BackboneLoadCommand extends InputFileCommand {
     @Override
     String inputFileName() {
         return FILE;
+    }
+
+    @Override
+    int run(Path inputFile) {
+        List<ArchetypeTrackRow> tracks = ArchetypesYamlReader.read(inputFile);
+        int steps = tracks.stream().mapToInt(track -> track.steps().size()).sum();
+        print(FILE + ": " + tracks.size() + " tracks, " + steps + " steps read");
+        return EXIT_OK;
     }
 }

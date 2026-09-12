@@ -34,22 +34,19 @@ class PipelineCommandTest {
     }
 
     @Test
-    void eachCommandResolvesItsInputFile() throws IOException {
-        for (String file : new String[] {TaxonomyLoadCommand.FILE, TaxonomyPrerequisitesCommand.FILE,
-                BackboneLoadCommand.FILE, CutoffsLoadCommand.FILE}) {
-            Files.writeString(inputs.resolve(file), "header\n");
-        }
+    void eachCommandReadsItsInputFile() {
+        String committed = InputReadersTest.INPUTS.toString();
 
-        assertThat(run("taxonomy", "load")).isZero();
-        assertThat(run("taxonomy", "prerequisites")).isZero();
-        assertThat(run("backbone", "load")).isZero();
-        assertThat(run("cutoffs", "load")).isZero();
+        assertThat(commandLine.execute("taxonomy", "load", "--inputs", committed)).isZero();
+        assertThat(commandLine.execute("taxonomy", "prerequisites", "--inputs", committed)).isZero();
+        assertThat(commandLine.execute("backbone", "load", "--inputs", committed)).isZero();
+        assertThat(commandLine.execute("cutoffs", "load", "--inputs", committed)).isZero();
 
         assertThat(out.toString())
-                .contains("margai-pipeline taxonomy load: " + inputs.resolve(TaxonomyLoadCommand.FILE))
-                .contains("margai-pipeline taxonomy prerequisites: " + inputs.resolve(TaxonomyPrerequisitesCommand.FILE))
-                .contains("margai-pipeline backbone load: " + inputs.resolve(BackboneLoadCommand.FILE))
-                .contains("margai-pipeline cutoffs load: " + inputs.resolve(CutoffsLoadCommand.FILE));
+                .contains("taxonomy.csv: 516 nodes read")
+                .contains("prerequisites.csv: 104 edges read")
+                .contains("archetypes.yaml: 4 tracks, 744 steps read")
+                .contains("cutoffs.csv: 40 rows read");
         assertThat(err.toString()).isEmpty();
     }
 
@@ -58,6 +55,16 @@ class PipelineCommandTest {
         assertThat(run("taxonomy", "load")).isEqualTo(InputFileCommand.EXIT_USAGE);
 
         assertThat(err.toString()).contains("input file not found: " + inputs.resolve(TaxonomyLoadCommand.FILE));
+        assertThat(out.toString()).isEmpty();
+    }
+
+    @Test
+    void aMalformedInputFailsTheRunBeforeAnythingElse() throws IOException {
+        Files.writeString(inputs.resolve(TaxonomyLoadCommand.FILE), "code,subject\nPHY,physics\n");
+
+        assertThat(run("taxonomy", "load")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(err.toString()).contains("taxonomy.csv:1: header must be");
         assertThat(out.toString()).isEmpty();
     }
 

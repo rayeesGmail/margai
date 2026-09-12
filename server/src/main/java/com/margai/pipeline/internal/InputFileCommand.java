@@ -9,14 +9,14 @@ import picocli.CommandLine.Spec;
 
 /**
  * A leaf command over one founder-owned input file (TECH_PLAN §6.2). The file must exist before
- * anything runs: a missing input is a usage error (exit 2) with the resolved path, never a
- * half-run. Subclasses name their file and do the work in {@link #run(Path)}; the base behaviour
- * resolves the file and prints where it was found, which is also what a dry check of the input
- * directory needs.
+ * anything runs: a missing input is a usage error (exit 2) with the resolved path, and a file
+ * that breaks its contract fails the run (exit 1) with the file and line — in both cases before
+ * anything is written. Subclasses name their file and do the work in {@link #run(Path)}.
  */
 abstract class InputFileCommand implements Callable<Integer> {
 
     static final int EXIT_OK = 0;
+    static final int EXIT_FAILED = 1;
     static final int EXIT_USAGE = 2;
 
     @Mixin
@@ -28,6 +28,9 @@ abstract class InputFileCommand implements Callable<Integer> {
     /** The file under {@code --inputs} this command reads. */
     abstract String inputFileName();
 
+    /** The command's work over an existing input file; returns the exit code. */
+    abstract int run(Path inputFile);
+
     @Override
     public final Integer call() {
         Path file = io.input(inputFileName());
@@ -35,11 +38,15 @@ abstract class InputFileCommand implements Callable<Integer> {
             spec.commandLine().getErr().println("input file not found: " + file.toAbsolutePath().normalize());
             return EXIT_USAGE;
         }
-        return run(file);
+        try {
+            return run(file);
+        } catch (InputFormatException e) {
+            spec.commandLine().getErr().println(e.getMessage());
+            return EXIT_FAILED;
+        }
     }
 
-    int run(Path inputFile) {
-        spec.commandLine().getOut().println(spec.qualifiedName() + ": " + inputFile.toAbsolutePath().normalize());
-        return EXIT_OK;
+    void print(String line) {
+        spec.commandLine().getOut().println(line);
     }
 }

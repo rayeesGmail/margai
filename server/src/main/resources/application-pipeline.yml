@@ -6,3 +6,17 @@ spring:
   main:
     web-application-type: none
     banner-mode: off
+margai:
+  # The content bucket F8 created on 2026-09-12, with the pipeline's prefixes at its root:
+  # source/{ncert,syllabus,pyq}/…, pages/{book}/{lang}/{chapter}/{page}.png,
+  # extract/{book}/{lang}.jsonl (DECISIONS 2026-09-12 F8, D14). Credentials come from the SDK's
+  # default chain — AWS_PROFILE=margai on the laptop (TECH_PLAN §7.4).
+  storage:
+    content-bucket: margai-beta-content
+  ai:
+    budget:
+      # A pipeline day is not a student day: extracting two pilot books is ~450 VISION calls in
+      # one run, against a global-daily-paise placeholder sized for student traffic (₹500). The
+      # console workspace spend limit F8 set on 2026-09-12 is the independent backstop; this is
+      # the ledger-side one, and it still stops a runaway loop dead (founder ruling, D14).
+      global-daily-paise: 200000   # ₹2,000 per IST day for a pipeline run

@@ -196,6 +196,13 @@
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>sesv2</artifactId>
     </dependency>
+    <!-- D14: the content bucket behind the storage module's ObjectStore — source PDFs, page
+         images and JSONL artefacts (TECH_PLAN §1.3, §7.6). Only storage.internal.s3 imports it
+         (ArchitectureTest), on the same one-package-per-service principle as the two above. -->
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>s3</artifactId>
+    </dependency>
 
     <!-- test -->
     <dependency>

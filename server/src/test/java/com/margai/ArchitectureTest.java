@@ -27,10 +27,20 @@ class ArchitectureTest {
             .importPackages("com.margai");
 
     @Test
-    void onlyTheTwoIntegrationPackagesImportTheAwsSdk() {
-        noClasses().that().resideOutsideOfPackages("com.margai.ai.internal.bedrock..", "com.margai.auth.internal.email..")
+    void onlyTheIntegrationPackagesImportTheAwsSdk() {
+        noClasses().that().resideOutsideOfPackages("com.margai.ai.internal.bedrock..",
+                        "com.margai.auth.internal.email..", "com.margai.storage.internal.s3..")
                 .should().dependOnClassesThat().resideInAPackage("software.amazon.awssdk..")
-                .because("the AWS SDK is confined to the packages that talk to a service (TECH_PLAN §1.4; D7 ruling: SES in auth)")
+                .because("the AWS SDK is confined to the packages that talk to a service "
+                        + "(TECH_PLAN §1.4; D7 ruling: SES in auth; D14: S3 in storage)")
+                .check(CLASSES);
+    }
+
+    @Test
+    void onlyTheStoragePackageImportsTheS3Sdk() {
+        noClasses().that().resideOutsideOfPackage("com.margai.storage.internal.s3..")
+                .should().dependOnClassesThat().resideInAPackage("software.amazon.awssdk.services.s3..")
+                .because("only storage imports S3 (TECH_PLAN §1.4), and inside storage only its s3 package")
                 .check(CLASSES);
     }
 

@@ -1436,7 +1436,9 @@ unchanged; the batch lane, the request shape and the region paragraph do not.*
   batch jobs 10 min. A final failure is a typed error the UI renders honestly (`AI_UNAVAILABLE`).
   *A rate limit now carries the provider's own `retry-after`, which the retry decorator prefers over
   its computed backoff, capped at 30 s. The provider SDK runs with retries disabled, as the AWS one
-  did: one retry policy in the stack (D5).*
+  did: one retry policy in the stack (D5). This is the whole of the throttling design, deliberately:
+  the account's rate limits are ~1,000× the daily spend the breaker allows (§13.2 item 1, read
+  2026-09-12), so a 429 means something has gone wrong, not that we are running near capacity.*
 - **Region**: calls from ap-south-1 to global inference profiles; the privacy copy discloses
   processing outside India. *Amended 2026-09-12: the calls now leave for the providers' own
   endpoints, so the disclosure still holds and the region is no longer ours to choose — except that
@@ -2204,7 +2206,7 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 | Hindi legacy fonts in older NCERT scans | vision extraction reads glyphs as images; alignment report catches the misses |
 | NCERT licensing (TRACKER F2) | the app shows one anchored paragraph at a time and never a chapter (§2.10); text is retrieval-only |
 | Solo-founder operations | alarms to email, admin peek, runbooks from D70, no on-call rotation pretended |
-| ~~Bedrock batch minimum~~ *(void 2026-09-12: the direct batch endpoint has no minimum; the threshold is a latency choice)* — the live risk is now the **provider rate-limit tier**, unread until the founder reports it (F8) | on-demand path is the default; batch is a flag (§4.11) |
+| ~~Bedrock batch minimum~~ *(void 2026-09-12: the direct batch endpoint has no minimum; the threshold is a latency choice)*; ~~provider rate-limit tier~~ *(read 2026-09-12, §13.2 item 1: the breaker binds ~1,000× sooner than the limiter, so neither a tier upgrade nor a throttling layer is needed)* | on-demand path is the default; batch is a flag (§4.11) |
 
 ### 13.2 Facts to confirm in the AWS console (extends DEV_SPEC §12 item 4)
 
@@ -2279,6 +2281,21 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
    tier's RPM/ITPM/OTPM per model, which the founder reads from the provider console (F8) and which
    the batch runner's throttling is sized from. Bedrock access facts above are kept as the record of
    why the switch happened; `margai.ai.provider = bedrock` is the way back.
+   **Rate limits read 2026-09-12** (founder, provider console; screenshots in the day log), and they
+   close the last gap: per model, both the cheap model and the reasoning model allow **10,000
+   requests/min, 10M input tokens/min excluding cache reads, and 2M output tokens/min**; across all
+   models, **4,000 batch submissions/min with a 500,000-request queue**, web search 30 uses/s and
+   1,000 GB of Files API storage (we use neither). **No tier upgrade is needed and no throttling
+   layer is worth building**, because the cost breaker binds thousands of times sooner than the rate
+   limiter: the global daily cap of ₹500 (§4.8) is about **$5.60**, which on the cheap model is
+   ≈ 5.6M input tokens — roughly **34 seconds** of one minute's input allowance, for a whole day.
+   Even 50 students each spending their full ₹25 is ≈ 84 seconds of it. The heaviest planned run,
+   D19–D21's PYQ solutions (≈ 2,700 questions), is under a minute of input allowance in total and
+   executes at concurrency 4 against a 20 s timeout — about 12 calls/min, ≈ 0.6% of the output
+   allowance — and its largest conceivable batch is ≈ 2,700 records against a 500,000 queue. The
+   retry decorator's two jittered retries plus the provider's `retry-after` (§4.11) therefore cover
+   a 429 we should essentially never see. One caveat: these are per-minute allowances for the whole
+   organisation, so they are shared if this account ever runs another workload.
 2. Bedrock batch inference minimum record count and whether the chosen models support it.
    **Partial 2026-09-06:** the Mumbai pricing page lists batch prices for both chosen models
    (Haiku 4.5 0.50 / 2.50, Sonnet 4.6 1.50 / 7.50 — half of on-demand), so both support batch

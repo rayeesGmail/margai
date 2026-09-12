@@ -57,6 +57,6 @@ public final class InvalidOutputException extends RuntimeException {
     }
 
     public InvalidOutputException withUsage(Usage total) {
-        return new InvalidOutputException(errors, outputJson, total, modelId);
+        return new InvalidOutputException(errors, outputJson, total, modelId, repairable);
     }
 }

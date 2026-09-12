@@ -140,12 +140,14 @@ class NcertLoadCommand extends NcertBookCommand {
                     byAddress.put(address, new Joined(page.chapterNo(), section, paragraph, page));
                     continue;
                 }
-                if (index != 0 || textBetween(pages, page.chapterNo(), joined.lastPage(), page.page())) {
+                String why = index != 0 ? "it is not that page's first paragraph"
+                        : gap(pages, page.chapterNo(), joined.lastPage(), page.page());
+                if (why != null) {
                     throw new InputFormatException(Path.of(ContentKeys.EXTRACT), 0,
                             "ch " + page.chapterNo() + " §" + section + " ¶" + paragraph.paraNo()
                                     + " is claimed by page " + joined.lastPage() + " and page " + page.page()
-                                    + ", which cannot be one paragraph continuing across a page break — "
-                                    + "re-extract those pages (`ncert extract --redo --chapters "
+                                    + ", which cannot be one paragraph continuing across a page break: " + why
+                                    + " — re-extract those pages (`ncert extract --redo --chapters "
                                     + page.chapterNo() + " --pages " + joined.lastPage() + "," + page.page() + "`)");
                 }
                 joined.add(page, paragraph);
@@ -155,14 +157,31 @@ class NcertLoadCommand extends NcertBookCommand {
     }
 
     /**
-     * Whether any page strictly between these two carried text. A figure page between two halves of
-     * a paragraph is not a break in the paragraph; a page of prose between them means the two are
-     * different paragraphs that were given the same number.
+     * Why these two halves cannot be one paragraph, or null when they can. A figure page between
+     * them is not a break in the paragraph; a page of prose between them means two different
+     * paragraphs were given one number.
+     *
+     * <p>Every page in between must be <em>present and empty</em>. An absent page is refused rather
+     * than assumed blank: the JSONL legitimately has holes — after an interrupted render, after a
+     * targeted {@code --redo --pages}, after an extract resumed over a different {@code --chapters}
+     * selection — and treating a hole as a figure page would silently concatenate two unrelated
+     * paragraphs, which is the original blocker wearing a different hat (spec-auditor, D14).
      */
-    private static boolean textBetween(List<ExtractedPage> pages, short chapter, int from, int to) {
-        return pages.stream().anyMatch(page -> page.chapterNo() == chapter
-                && page.page() > from && page.page() < to
-                && !page.paragraphs().isEmpty());
+    private static String gap(List<ExtractedPage> pages, short chapter, int from, int to) {
+        for (int number = from + 1; number < to; number++) {
+            int between = number;
+            ExtractedPage page = pages.stream()
+                    .filter(candidate -> candidate.chapterNo() == chapter && candidate.page() == between)
+                    .findFirst().orElse(null);
+            if (page == null) {
+                return "page " + between + " is not in the extraction, so whether it broke the paragraph "
+                        + "is unknown";
+            }
+            if (!page.paragraphs().isEmpty()) {
+                return "page " + between + " between them carries text";
+            }
+        }
+        return null;
     }
 
     /**

@@ -177,6 +177,26 @@ class NcertLoadCommandTest {
         assertThat(imports.rows.getFirst().extraction().pages()).containsExactly(1, 3);
     }
 
+    /**
+     * A page missing from the JSONL is not a figure page. The pipeline reaches that state by
+     * design — an interrupted render, a targeted `--redo --pages`, a resumed extract over a
+     * different `--chapters` — and assuming a hole was blank would concatenate two unrelated
+     * paragraphs silently, which is the original blocker in another guise (spec-auditor, D14).
+     */
+    @Test
+    void anAbsentPageBetweenTwoHalvesIsRefusedNotAssumedBlank() {
+        imports.renderedPagesAnswer = 3;
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first.")),
+                page(7, 3, "0.95", paragraph("7.1", 1, "Restarted at one.")));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString())
+                .contains("is claimed by page 1 and page 3")
+                .contains("page 2 is not in the extraction, so whether it broke the paragraph is unknown");
+        assertThat(imports.rows).isNull();
+    }
+
     /** But a page of prose in between means they are two different paragraphs, not one. */
     @Test
     void aParagraphSeparatedByAPageOfTextIsACollision() {
@@ -187,7 +207,8 @@ class NcertLoadCommandTest {
 
         assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
 
-        assertThat(out.toString()).contains("is claimed by page 1 and page 3");
+        assertThat(out.toString()).contains("is claimed by page 1 and page 3")
+                .contains("page 2 between them carries text");
     }
 
     /** Validating a stripped section while keying on the raw one split a section in two. */

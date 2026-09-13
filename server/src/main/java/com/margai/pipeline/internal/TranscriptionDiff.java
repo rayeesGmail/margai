@@ -61,11 +61,27 @@ import java.util.regex.Pattern;
  */
 final class TranscriptionDiff {
 
-    /** Words our conventions introduce that the printed page never spells out. */
+    /**
+     * Words our conventions introduce that the printed page never spells out.
+     *
+     * <p>This list and the prompt's transcription rules are one thing in two places, and they drift
+     * the moment a convention is added to one and not the other: the run of 2026-09-13 added
+     * {@code _bar}, {@code sum}, {@code integral}, {@code perp} and {@code partial} to the prompt
+     * and produced 45 flags in this class for the pages that obeyed. A word here is not evidence of
+     * anything — it only stops a convention being read as an invention.
+     */
     private static final Set<String> NOTATION = Set.of(
             "sqrt", "approx", "hat", "x", "illegible",
+            "bar", "vec", "perp", "par", "sum", "integral", "partial", "d",
             "alpha", "beta", "gamma", "delta", "theta", "lambda", "mu", "pi", "rho", "sigma",
             "omega", "phi", "psi", "epsilon", "eta", "nu", "tau", "chi", "kappa");
+
+    /**
+     * A Greek letter the model wrote joined to its operator — {@code dtheta} for dθ, {@code dmu}.
+     * The page prints the glyph, so the joined word is ours, not the book's.
+     */
+    private static final Pattern JOINED_NOTATION = Pattern.compile(
+            "^d(alpha|beta|gamma|delta|theta|lambda|mu|pi|rho|sigma|omega|phi|psi|epsilon|eta|nu|tau|chi|kappa)$");
 
     private static final Pattern WORD = Pattern.compile("[A-Za-z]+");
 
@@ -132,7 +148,8 @@ final class TranscriptionDiff {
         int at = 0;
         Matcher matcher = WORD.matcher(text);
         while (matcher.find()) {
-            if (NOTATION.contains(matcher.group().toLowerCase(Locale.ROOT))) {
+            String word = matcher.group().toLowerCase(Locale.ROOT);
+            if (NOTATION.contains(word) || JOINED_NOTATION.matcher(word).matches()) {
                 kept.append(text, at, matcher.start()).append(' ');
                 at = matcher.end();
             }

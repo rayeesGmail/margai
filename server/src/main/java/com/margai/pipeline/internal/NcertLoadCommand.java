@@ -143,6 +143,12 @@ class NcertLoadCommand extends NcertBookCommand {
      */
     static List<NcertParagraphRow> join(List<ExtractedPage> pages, String jsonlKey) {
         Map<String, Joined> byAddress = new LinkedHashMap<>();
+        // Every collision, not the first one. A whole-book load that stopped at the earliest
+        // offender made the founder re-extract two pages, re-load, and discover the next one — at
+        // a model call and three minutes each. Nothing is written either way, so there is no reason
+        // to withhold the rest of the list (D14, the first full-book load).
+        List<String> collisions = new ArrayList<>();
+        Map<Short, TreeSet<Integer>> redo = new LinkedHashMap<>();
         for (ExtractedPage page : pages) {
             List<NcertPage.Paragraph> paragraphs = page.paragraphs();
             for (int index = 0; index < paragraphs.size(); index++) {
@@ -158,15 +164,25 @@ class NcertLoadCommand extends NcertBookCommand {
                         : joined.endsFinished() ? "the first half is a finished sentence"
                         : gap(pages, page.chapterNo(), joined.lastPage(), page.page());
                 if (why != null) {
-                    throw new InputFormatException(Path.of(jsonlKey), 0,
-                            "ch " + page.chapterNo() + " §" + section + " ¶" + paragraph.paraNo()
-                                    + " is claimed by page " + joined.lastPage() + " and page " + page.page()
-                                    + ", which cannot be one paragraph continuing across a page break: " + why
-                                    + " — re-extract those pages (`ncert extract --redo --chapters "
-                                    + page.chapterNo() + " --pages " + joined.lastPage() + "," + page.page() + "`)");
+                    collisions.add("ch " + page.chapterNo() + " §" + section + " ¶" + paragraph.paraNo()
+                            + " is claimed by page " + joined.lastPage() + " and page " + page.page()
+                            + ": " + why);
+                    redo.computeIfAbsent(page.chapterNo(), chapter -> new TreeSet<>())
+                            .addAll(List.of(joined.lastPage(), page.page()));
+                    continue;
                 }
                 joined.add(page, paragraph);
             }
+        }
+        if (!collisions.isEmpty()) {
+            throw new InputFormatException(Path.of(jsonlKey), 0, collisions.size()
+                    + " address(es) cannot be one paragraph continuing across a page break:\n  "
+                    + String.join("\n  ", collisions) + "\nRe-extract every affected page:\n  "
+                    + redo.entrySet().stream()
+                            .map(entry -> "ncert extract --redo --chapters " + entry.getKey() + " --pages "
+                                    + entry.getValue().stream().map(String::valueOf)
+                                            .collect(java.util.stream.Collectors.joining(",")))
+                            .collect(java.util.stream.Collectors.joining("\n  ")));
         }
         return byAddress.values().stream().map(Joined::row).toList();
     }

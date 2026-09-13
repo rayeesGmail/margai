@@ -66,6 +66,23 @@ class TranscriptionDiffTest {
         assertThat(TranscriptionDiff.check(PAGE_129, said)).isEmpty();
     }
 
+    /**
+     * The conventions added on the first full book's evidence — an overbar, a summation, an
+     * integral, a perpendicular subscript, and a Greek letter joined to its operator. The prompt
+     * gained them and this list did not, and the next run produced 45 flags for the pages that
+     * obeyed (D14). Every convention in the prompt belongs here the same day.
+     */
+    @Test
+    void theConventionsAddedAfterTheFirstFullBookAreNotDivergences() {
+        String page = "The average acceleration ā over the interval and the moment of inertia "
+                + "Σ m_i r_i², with the work ∫ F dx along the path and the component L⊥ dθ.";
+        String said = "The average acceleration a_bar over the interval and the moment of inertia "
+                + "sum m_i r_i^2, with the work integral F dx along the path and the component "
+                + "L_perp dtheta.";
+
+        assertThat(TranscriptionDiff.check(page, said)).isEmpty();
+    }
+
     /** The whole point: our own notation must not read as divergence. */
     @Test
     void ourNotationIsNotADivergence() {

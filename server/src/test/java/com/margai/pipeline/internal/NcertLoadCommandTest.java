@@ -223,6 +223,30 @@ class NcertLoadCommandTest {
         assertThat(imports.rows).isNull();
     }
 
+    /**
+     * Every collision, not the first. The first full-book load stopped at the earliest offender,
+     * which would have had the founder re-extract two pages, re-load, and meet the next one — a
+     * model call and three minutes each time. Nothing is written either way (D14).
+     */
+    @Test
+    void everyCollisionIsNamedAtOnceWithOneRedoPerChapter() {
+        imports.renderedPagesAnswer = 4;
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first is finished.")),
+                page(7, 2, "0.95", paragraph("7.1", 1, "A different paragraph numbered one.")),
+                page(7, 3, "0.95", paragraph("7.2", 1, "Another section, also finished.")),
+                page(7, 4, "0.95", paragraph("7.2", 1, "And its collision.")));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString())
+                .contains("2 address(es) cannot be one paragraph")
+                .contains("ch 7 §7.1 ¶1 is claimed by page 1 and page 2")
+                .contains("ch 7 §7.2 ¶1 is claimed by page 3 and page 4")
+                // One command per chapter, naming every page that needs re-extracting.
+                .contains("ncert extract --redo --chapters 7 --pages 1,2,3,4");
+        assertThat(imports.rows).isNull();
+    }
+
     /** But a page of prose in between means they are two different paragraphs, not one. */
     @Test
     void aParagraphSeparatedByAPageOfTextIsACollision() {

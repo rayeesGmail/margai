@@ -407,7 +407,38 @@ THE D14 ✅, RUN BY CLAUDE AT 23:05 ON THE CANONICAL ROWS (setseed 0.14, twenty 
   now understood. The founder spot-verifies rows 3, 6, 11, 15 and 19 and rules PASS or PARTIAL.
   **Ruled PARTIAL by the founder at 23:30**: the truer sentence about the corpus as loaded — 142 of
   143 pages extracted before the radical rule, bio11 not yet run. D14 stays unticked; the tick
-  comes with D15's re-extraction on the final prompt. Then bio11 (~₹200) on the same configuration. Code-assigned
+  comes with D15's re-extraction on the final prompt.
+HOW TO RESUME (written 2026-09-13 23:40 for the session of 2026-09-14). Branch
+  `d14-ncert-extraction`, 19 commits ahead of main, tree clean; founder reviews and pushes (Claude
+  never pushes). Local state: database `margai_d14` in the compose container (DB_URL
+  jdbc:postgresql://localhost:5432/margai_d14, user/password margai), the founder's PDFs under
+  `ncert/2022-ed/en/`, phy11-part1 rendered + extracted + loaded (canonical, PARTIAL), bio11
+  rendered only. Every pipeline command is run by the founder from `server/` after
+  `./mvnw -q -DskipTests package`, on ONE line — a trailing space after a `\` continuation broke a
+  run tonight — with `AI_LIVE=1 AWS_PROFILE=margai MARGAI_AI_ANTHROPIC_API_KEY=… DB_URL=…` in
+  front of `java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live`
+  (drop `AI_LIVE`/the key/`,live` for `load` and `render`). The order, each step gated by the one
+  before, nothing touching a full book until chapter 7 has proved it:
+  1. `ncert extract --book phy11-part1 --lang en --chapters 7 --redo` (₹13) then
+     `ncert load … --chapters 7`; check: primes present (`F'_G` rows in §7.3), `§7.3 ¶10–12` in
+     Example → Answer → F_GA order, no refusal, splits ≤ 3. Then the ten-item glyph query in the
+     day log above.
+  2. `aws s3 rm s3://margai-beta-content/extract/phy11-part1/en.jsonl --profile margai`, then
+     `ncert extract --book phy11-part1 --lang en` (~₹120), `ncert load …`; check: coverage 100%,
+     zero refused collisions, `page-break repairs` naming any Answer that needed it. Re-run the
+     ✅ (setseed 0.14, twenty rows, rendered pages) — 20/20 text is the D14 tick.
+  3. bio11: `--chapters 1` dry run first (₹13) — Biology's risk is scientific names, genus
+     capitalisation and `Figure 10.2 b` labels, untested — then the book (~₹220), load, its own
+     twenty-row ✅ (the D15 gate wants coverage ≥ 95% per book).
+  4. Code-assigned numbering as prompt v3 (the model returns section, text and one
+     continues-previous-page boolean; `ncert load` assigns ¶n; collisions become impossible):
+     build, `./mvnw verify`, eval gate, chapter 7, and only then the eight remaining books.
+  5. The eight books (D15 proper). PARKED, in order of value: the page-image second read
+     (`ncert verify --read-pages`), the four low-coverage phy pages, the run-report overwrite.
+  Standing rules from today: the text layer is authoritative for characters it has and never for
+  ones it lacks; bands only, no whole-page image; a printed label is transcribed; chapter 7 first,
+  every time. Founder to-do outside the pipeline: rotate the Anthropic key that was pasted into the
+  session at ~14:00 (docs/runbooks/ai-provider-keys.md). Then bio11 (~₹200) on the same configuration. Code-assigned
   numbering (prompt v3) is D15 work, applied to the eight remaining books first and back to phy
   only if chapter 7 proves it materially better, as a corpus event.
 ```

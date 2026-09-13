@@ -188,7 +188,8 @@ class TranscriptionDiffTest {
      */
     @Test
     void aFaithfulTranscriptionOfARealNcertPageIsSilent() throws IOException {
-        assumeTrue(Files.isDirectory(NCERT), "founder's NCERT PDFs not on this machine");
+        // The directory exists everywhere — its manifest is committed — so the guard is the PDF.
+        assumeTrue(Files.exists(NCERT.resolve("phy11-part1/keph107.pdf")), "founder's NCERT PDFs not on this machine");
         List<String> pages = PdfTextLayer.pages(Files.readAllBytes(NCERT.resolve("phy11-part1/keph107.pdf")));
         String page = pages.get(2);
 
@@ -223,7 +224,8 @@ class TranscriptionDiffTest {
      */
     @Test
     void textFromAnotherPageIsStillFoundOnTheRealPage() throws IOException {
-        assumeTrue(Files.isDirectory(NCERT), "founder's NCERT PDFs not on this machine");
+        // The directory exists everywhere — its manifest is committed — so the guard is the PDF.
+        assumeTrue(Files.exists(NCERT.resolve("phy11-part1/keph107.pdf")), "founder's NCERT PDFs not on this machine");
         List<String> pages = PdfTextLayer.pages(Files.readAllBytes(NCERT.resolve("phy11-part1/keph107.pdf")));
 
         String foreign = "This is the static friction that provides the centripetal acceleration. "

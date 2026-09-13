@@ -102,7 +102,8 @@ class ChapterApparatusTest {
      */
     @Test
     void everyEnglishChapterOfEverySubjectHasABoundaryInItsBackHalf() throws IOException {
-        assumeTrue(Files.isDirectory(NCERT), "founder's NCERT PDFs not on this machine");
+        // The directory exists everywhere — its manifest is committed — so the guard is a PDF.
+        assumeTrue(Files.exists(NCERT.resolve("phy11-part1/keph107.pdf")), "founder's NCERT PDFs not on this machine");
 
         int files = 0;
         int withBoundary = 0;

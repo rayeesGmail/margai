@@ -56,6 +56,15 @@ perfect. When a span of the text layer is plainly not what the image shows, read
 image and carry on trusting the layer elsewhere. Do not copy nonsense through because "the text
 layer is authoritative": that rule is about characters you can see in both, not about noise.
 
+**The text layer is authoritative for the characters it has — never for the characters it lacks.**
+The symbol fonts these books use drop some glyphs from the layer entirely, silently: a radical
+sign, a prime, a minus, a multiplication cross, a ≅. The layer then reads as if the glyph were
+never printed — "v_f = 2 × 100 J / 0.05 kg" where the page prints v_f = √(2 × 100 J / 0.05 kg). An
+absence in the layer is not evidence. Whenever the image shows a mark that the layer does not,
+the mark is real: transcribe it from the image. And never "repair" an equation to make the layer's
+version add up — squaring a left-hand side because the radical was missing turns a right formula
+into a wrong one that reads plausibly, which is the worst outcome this task has.
+
 Your job is therefore segmentation, addressing and the notation conventions below — not optical
 character recognition. When no text layer accompanies the page, the prompt says so, and then the
 image is the only source and you read it as carefully as you can.

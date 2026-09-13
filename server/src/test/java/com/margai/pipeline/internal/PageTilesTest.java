@@ -30,11 +30,19 @@ class PageTilesTest {
         assertThat(PageTiles.split(page, 0)).containsExactly(page);
     }
 
+    /**
+     * The whole page first, for layout, then the bands, for glyphs: chapter 7 extracted each way
+     * on its own was wrong in one place — bands cut sentences and misordered a two-column page,
+     * the whole page alone lost every prime (D14).
+     */
     @Test
-    void twoTilesCoverThePageWithAnOverlapAndComeInReadingOrder() throws IOException {
-        List<byte[]> bands = PageTiles.split(png(WIDTH, HEIGHT), 2);
+    void theWholePageComesFirstThenTwoTilesCoverItWithAnOverlapInReadingOrder() throws IOException {
+        byte[] page = png(WIDTH, HEIGHT);
+        List<byte[]> images = PageTiles.split(page, 2);
 
-        assertThat(bands).hasSize(2);
+        assertThat(images).hasSize(3);
+        assertThat(images.getFirst()).as("the page itself, untouched").isEqualTo(page);
+        List<byte[]> bands = images.subList(1, 3);
         int overlap = (int) Math.round(HEIGHT * PageTiles.OVERLAP);
         assertThat(height(bands.get(0))).isEqualTo(HEIGHT / 2 + overlap);
         assertThat(height(bands.get(1))).isEqualTo(HEIGHT - HEIGHT / 2 + overlap);
@@ -44,14 +52,17 @@ class PageTilesTest {
         assertThat(width(bands.get(0))).isEqualTo(WIDTH);
     }
 
-    /** The reason the feature exists: every band is under the size the provider would shrink. */
+    /** The reason the bands exist: each is under the size the provider would shrink; the page is not. */
     @Test
     void eachBandOfARealPageIsBelowTheProvidersResizeThreshold() throws IOException {
         int providerLimit = 1568;
         assertThat(HEIGHT).as("a whole page is over the limit, which is the problem")
                 .isGreaterThan(providerLimit);
 
-        for (byte[] band : PageTiles.split(png(WIDTH, HEIGHT), 2)) {
+        List<byte[]> images = PageTiles.split(png(WIDTH, HEIGHT), 2);
+        assertThat(height(images.getFirst())).as("the whole page travels as it is, and is shrunk")
+                .isGreaterThan(providerLimit);
+        for (byte[] band : images.subList(1, images.size())) {
             assertThat(Math.max(width(band), height(band)))
                     .as("a band must arrive unscaled")
                     .isLessThanOrEqualTo(providerLimit);

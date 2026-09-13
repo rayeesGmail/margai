@@ -34,8 +34,16 @@ final class PageTiles {
     }
 
     /**
-     * Splits a page into {@code tiles} overlapping bands, top to bottom. One tile means the page
-     * unchanged, which is the configuration this pipeline shipped with and the one to fall back to.
+     * The whole page first, then {@code tiles} overlapping bands of it, top to bottom. One tile
+     * means the page alone, which is the configuration this pipeline shipped with.
+     *
+     * <p>Both, not either, because chapter 7 was extracted both ways on 2026-09-13 and each was
+     * wrong in one place. Bands alone kept every prime and cut sentences at the seam, and on a
+     * two-column page with a worked example put a mid-page paragraph first. The whole page alone
+     * read the layout correctly and lost the primes — {@code F'_GB} came back {@code F_GB} — which
+     * the text layer cannot restore, because NCERT's Symbol font has no Unicode mapping for them.
+     * So the page supplies layout and reading order and the bands supply the glyphs, and the prompt
+     * says which is which (D14, DECISIONS).
      */
     static List<byte[]> split(byte[] png, int tiles) {
         if (tiles <= 1) {
@@ -46,7 +54,8 @@ final class PageTiles {
         int band = height / tiles;
         int overlap = (int) Math.round(height * OVERLAP);
 
-        List<byte[]> bands = new ArrayList<>(tiles);
+        List<byte[]> bands = new ArrayList<>(tiles + 1);
+        bands.add(png);
         for (int index = 0; index < tiles; index++) {
             int top = Math.max(0, index * band - (index == 0 ? 0 : overlap));
             int bottom = index == tiles - 1 ? height : Math.min(height, (index + 1) * band + overlap);

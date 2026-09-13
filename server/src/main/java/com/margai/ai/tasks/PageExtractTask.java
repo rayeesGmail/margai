@@ -50,8 +50,10 @@ public class PageExtractTask implements NcertPageExtractor {
         // there is — so the model is never left guessing which source it was given.
         variables.put("page_text", pageText == null || pageText.isBlank() ? null : pageText);
         // Told to the model only when the page arrives in bands, so the single-image prompt is
-        // unchanged and the two configurations stay comparable.
-        variables.put("tiles", images.size() > 1 ? images.size() : null);
+        // unchanged and the two configurations stay comparable. When there is more than one image
+        // the first is the whole page and the rest are its bands (PageTiles), so the count the
+        // prompt names is the bands alone.
+        variables.put("tiles", images.size() > 1 ? images.size() - 1 : null);
         variables.put("previous_section", previous == null ? null : previous.section());
         variables.put("previous_para_no", previous == null ? null : previous.paraNo());
         variables.put("previous_tail", previous == null ? null : previous.tail());

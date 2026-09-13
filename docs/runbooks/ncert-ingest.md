@@ -76,6 +76,54 @@ Start with one chapter (`--chapters 1`) and read its report before letting the b
 line and the low-confidence list are both in it, and a prompt that is reading the pages wrongly is
 cheapest to catch after twenty pages rather than after two hundred.
 
+### The chapter-7 dry run, after any change to extraction
+
+`phy11-part1` chapter 7 (Gravitation, `keph107.pdf`, 17 pages of which 12 are billed) is the
+standing test chapter, and it costs about ₹15. Every defect in the D14 table came from it, so it is
+the one chapter where a new run can be compared against a known result instead of being read cold.
+Seven of its seventeen pages also carry the private-use encoding that broke text extraction at D9,
+which makes it the hardest case for FIX 1 as well as the cheapest.
+
+```
+# 0. an artefact from an earlier prompt version must go first: the run will refuse it by name
+aws s3 rm s3://margai-beta-content/extract/phy11-part1/en.jsonl --profile margai
+
+# 1. extract one chapter
+AI_LIVE=1 AWS_PROFILE=margai MARGAI_AI_ANTHROPIC_API_KEY=… DB_URL=… \
+  java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live \
+  ncert extract --book phy11-part1 --lang en --chapters 7
+
+# 2. load the same chapter (no model, no cost; coverage prints — for a subset, which is correct)
+AWS_PROFILE=margai DB_URL=… \
+  java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline \
+  ncert load --book phy11-part1 --lang en --chapters 7
+```
+
+Read these six things in the extract report, in this order, before spending anything more:
+
+1. **`| 7 | fed as the character authority |`** in the text layer table. If it says `withheld`, FIX 1
+   did not happen on this chapter and every number below is about something else.
+2. **`cache write` on the cost line** — the cached prefix's real token count on the model's own
+   tokenizer. It must be at or above 4,600. `cache read` on the calls after the first proves the
+   prefix is being cached rather than re-sent at full price.
+3. **The apparatus boundary** — chapter 7's exercises begin at the page the table names, and the
+   pages not sent should be 5 of 17.
+4. **`characters that differ …`** — this is the section the whole day was about. A handful of lines
+   is the expected shape. A wall of them means the check is mis-tuned against this file and is worth
+   stopping for; `none` with a `checked:` count of zero means nothing was examined.
+5. **The cost per billed page** — ₹1.06 before the text layer, so ₹1.15–1.35 is the expected range.
+   Meaningfully above that changes the estimate for the other nine books, not just this one.
+6. **That the load succeeds at all.** Two paragraphs at one address is the failure that three
+   separate D14 runs hit; the loader refuses it by name and prints the `--redo` that fixes it.
+
+Then compare the paragraphs against the D14 defect table in the TRACKER day log for 2026-09-13 —
+the same sample pages, item by item. Four of its nine items (the dropped prime, the lost minus, the
+dropped `×`, `1` read as `l`) cannot appear in the report by construction and have to be looked for
+by eye on the rendered page.
+
+Nothing here is wasted: the chapter stays in the JSONL, and the full-book run resumes over it
+without paying for those pages again.
+
 **The end-of-chapter apparatus is never sent.** Before calling for any page, the command reads the
 chapter's own text layer and finds where Summary / Points to Ponder / Exercises / Answers begins;
 that page and everything after it is recorded as skipped and costs nothing. This is not a

@@ -19,6 +19,9 @@ class EquationsTest {
             "| F | = G m_1 m_2 / r^2 [7.5]",
             "g(h) approx= g (1 - 2h / R_E) [7.15]",
             "R_m was already known then to be about 3.84 x 10^8 m.",
+            // Whichever sign the page prints: the prompt no longer fixes the glyph (D14).
+            "R_m was already known then to be about 3.84 × 10^8 m.",
+            "The mass follows from 1.33 × 10^-14 and the orbital radius.",
             "W(r) = - 4 G m^2 / l - 2 G m^2 / (sqrt(2) l)",
             "2H_2 + O_2 -> 2H_2O (heat)",
             "The reaction N_2 + 3H_2 <-> 2NH_3 reaches equilibrium.",

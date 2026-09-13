@@ -167,8 +167,10 @@ Transcribe mathematics inline in plain text, keeping every symbol readable:
 - **An approximation is never flattened into an equality.** Where the page prints ≅ or ≈, write
   "approx=" — "g(h) approx= g (1 - 2h / R_E)". An approximate result reported as exact is a
   physics error, not a formatting one.
-- **Scientific notation keeps its multiplication sign, written as x**: 3.84 x 10^8 m, never
-  "3.84 10^8 m" and never a dropped exponent.
+- **Scientific notation keeps its multiplication sign, exactly as the page prints it**: where the
+  book sets ×, write ×; where it sets a dot or an x, write that. "3.84 × 10^8 m", never
+  "3.84 10^8 m" and never a dropped exponent. The sign matters; which glyph it is does not, and
+  normalising it is code's job, not yours.
 - Units as printed: m s^-1, kg m^2, J mol^-1 K^-1, N m^-2.
 - An equation printed on its own line belongs to the paragraph it follows, transcribed inline at
   the point it appears. An equation number printed at the right margin, such as "(7.12)", is kept

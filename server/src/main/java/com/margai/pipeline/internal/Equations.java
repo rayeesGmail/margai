@@ -45,8 +45,13 @@ final class Equations {
      */
     private static final String STATE = "[A-Za-z0-9\\])]\\((?:s|l|g|aq)\\)(?=[^A-Za-z]|$)";
 
-    /** Scientific notation, in the fixed spelling the prompt requires: 3.84 x 10^8. */
-    private static final String SCIENTIFIC = "\\bx\\s*10\\s*\\^";
+    /**
+     * Scientific notation, whichever multiplication sign the page prints — 3.84 × 10^8, 3.84 x
+     * 10^8, 3.84 · 10^8. The prompt used to fix the glyph as ASCII {@code x} and the model wrote
+     * both; the rule was dropped in favour of "as printed", which leaves recognising the variants
+     * to code, where it belongs (D14, 2026-09-13).
+     */
+    private static final String SCIENTIFIC = "(?:\\bx|[×·⋅*])\\s*10\\s*\\^";
 
     private static final Pattern EXPRESSION = Pattern.compile(String.join("|",
             Pattern.quote(APPROXIMATION), ARROW, ASSIGNMENT, EXPONENT, SUBSCRIPT, ROOT, STATE, SCIENTIFIC));

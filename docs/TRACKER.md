@@ -12,7 +12,7 @@
 | Field | Value |
 |---|---|
 | Current phase | **PHASE 2 — Content pipeline v1 (Weeks 3–4, D13–D24, M3)**, D13 done 2026-09-12, D14 next (the NCERT extraction pilot, the first live VISION day — F8's two D14 prerequisites landed 2026-09-12, the non-root identity and the content bucket; the third, model access, was resolved on 2026-09-12 by leaving Bedrock for the providers' own APIs, and now needs two funded provider accounts and their keys in SSM rather than an AWS ticket); PHASE 1 — Auth & identity (Week 2, D7–D12) closed at the Week-2 gate 2026-09-09, running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
-| Current day | **D14 built 2026-09-12 on `d14-ncert-extraction`, ✅ acceptance pending the founder's live run** — 7 task commits + docs: V7 `ncert`, the `storage` module, `books.yaml`, and `ncert register|render|extract|load`; 456 server tests, verify green, eval PASS (placeholder); `ncert register` proved for real on a fresh `margai_d14`, while `render`, `extract` and `load` need `AWS_PROFILE=margai` and the human-launched `AI_LIVE=1` (DEV_SPEC §13.7) and are the founder's to run per `docs/runbooks/ncert-ingest.md` (~₹420 estimated for both pilot books, the ledger's own line is in the report). Seven DECISIONS rows dated today · previously: D13 done · 2026-09-12 (built 2026-09-10 → 12 on `d13-taxonomy`: the four founder inputs drafted from the NEET (UG) 2026 syllabus and reviewed by the founder in full — all seven checklist items closed 2026-09-11 — 516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-off rows; then the `pipeline` module in six task commits: picocli commands under the `pipeline` profile, `CurriculumImport` in `curriculum.api`, strict readers, run reports with the input's SHA-256; **acceptance PASS** run literally against a fresh database `margai_d13` in the compose container: `taxonomy load`, `taxonomy prerequisites`, `backbone load`, `cutoffs load` all exit 0 with 516 / 104 / 744 / 40 rows, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path over psql, an idempotent re-run changes nothing; reports committed under `pipeline/reports/`; server tests 356 (was 319), app untouched; spec-auditor on the build: see the day log) · next: D14 — NCERT extraction pilot, 2 books EN (✅ 20-paragraph spot check): TECH_PLAN §6.1 VISION extraction over page images, §6.3 `ncert register|render|extract|load`, `books.yaml` (§6.2), the S3 content home — **settled 2026-09-12**: `margai-beta-content`, prefixes at the root, sources under `source/` (DECISIONS F8) — the Bedrock 403 (Blockers) and the D3 text-extraction escape hatch, the PUA decoding for `keph107.pdf` (PARKED), the D4 seed decision (PARKED) · 2026-09-12 after the D13 close: change spec **CS-1 (Collective Intelligence Layer)** integrated into SPEC, TECH_PLAN, PLAN and this tracker (day log "CS-1"); it adds scope to D22, D24, D29, D35, D47, D49, D55, D56, D73 and founder workstream F11, and changes nothing before D22; the founder's three rulings of 2026-09-12 (SPEC §6.1 sentence, the D29 read with graceful degradation, the momentum/strategy consumers) are applied |
+| Current day | **D14 built 2026-09-12 on `d14-ncert-extraction`, fixed against its own defect table 2026-09-13, ✅ acceptance pending the founder's re-run** — the founder's five live runs on ch 7 (~₹95) produced a full defect audit, one ruling and six fixes, all now implemented: the page's text layer travels with the image and is authoritative for characters (the §6.1 reversal), the notation gaps are closed in prompt **v2**, `has_equations` moves from the model's schema into Java, every paragraph is diffed against the page's own text layer with an independent paragraph-count flag beside it, confidence is demoted to a routing signal, and **one verified run per book is canonical and frozen** — reproducibility was the wrong target. The reasoning-model track is closed (2.2× the cost, neither run loadable, its own confidence silent about both). A spec-auditor pass on the finished work returned FAIL with two blockers, both fixed — the prompt still asked for the field FIX 3 had removed from the schema, and the retired field made the JSONL already in the bucket unreadable — and its sharpest finding rebuilt the character check against a *real* NCERT text layer rather than an imagined one. 540 server tests, verify green, eval PASS (placeholder); eleven DECISIONS rows dated 2026-09-13. Next is the founder's: re-run both pilot books (~₹430 authorised), the same-sample defect table, then the twenty-paragraph ✅ · earlier: 7 task commits + docs — V7 `ncert`, the `storage` module, `books.yaml`, `ncert register|render|extract|load`; `ncert register` proved for real on a fresh `margai_d14`, while `render`, `extract` and `load` need `AWS_PROFILE=margai` and the human-launched `AI_LIVE=1` (DEV_SPEC §13.7) per `docs/runbooks/ncert-ingest.md` · previously: D13 done · 2026-09-12 (built 2026-09-10 → 12 on `d13-taxonomy`: the four founder inputs drafted from the NEET (UG) 2026 syllabus and reviewed by the founder in full — all seven checklist items closed 2026-09-11 — 516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-off rows; then the `pipeline` module in six task commits: picocli commands under the `pipeline` profile, `CurriculumImport` in `curriculum.api`, strict readers, run reports with the input's SHA-256; **acceptance PASS** run literally against a fresh database `margai_d13` in the compose container: `taxonomy load`, `taxonomy prerequisites`, `backbone load`, `cutoffs load` all exit 0 with 516 / 104 / 744 / 40 rows, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path over psql, an idempotent re-run changes nothing; reports committed under `pipeline/reports/`; server tests 356 (was 319), app untouched; spec-auditor on the build: see the day log) · next: D14 — NCERT extraction pilot, 2 books EN (✅ 20-paragraph spot check): TECH_PLAN §6.1 VISION extraction over page images, §6.3 `ncert register|render|extract|load`, `books.yaml` (§6.2), the S3 content home — **settled 2026-09-12**: `margai-beta-content`, prefixes at the root, sources under `source/` (DECISIONS F8) — the Bedrock 403 (Blockers) and the D3 text-extraction escape hatch, the PUA decoding for `keph107.pdf` (PARKED), the D4 seed decision (PARKED) · 2026-09-12 after the D13 close: change spec **CS-1 (Collective Intelligence Layer)** integrated into SPEC, TECH_PLAN, PLAN and this tracker (day log "CS-1"); it adds scope to D22, D24, D29, D35, D47, D49, D55, D56, D73 and founder workstream F11, and changes nothing before D22; the founder's three rulings of 2026-09-12 (SPEC §6.1 sentence, the D29 read with graceful degradation, the momentum/strategy consumers) are applied |
 | Days completed / total | 13 / 84 |
 | Schedule delta | on track (the build); one founder item slipped — F10's SES production access was due "before D12" and is still open (slippage log) |
 | Last week's gate | **Week-2 🚩 PASS** 2026-09-09 — a stranger's email signs in first try on the AVD (fresh install of the `db98a49` build, one code typed once, Today, reopen still signed in, `first_attempt_rate=1.000`) and the D9 runbook's ten rows re-run clean on the same build (transcript in the D12 day log, table in the runbook); carried, not failed: the phone channel (F1), mobile data (F8), an unverified stranger's inbox (F10 production access). Week-1 🚩 PASS 2026-09-08 stands (D6 day log) |
@@ -175,6 +175,135 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+D14 (continued) · 2026-09-13 · the extraction is fixed against its own defect table, and the
+  corpus policy changes: freeze, don't reproduce
+The founder ran the pipeline live on phy11-part1 ch 7 (Gravitation) five times over 2026-09-12/13 —
+  ~₹95 in total — and every run taught something the build could not have guessed. What the day
+  produced is one ruling and six fixes, all founder-issued after a full defect audit.
+
+THE HISTORICAL DEFECT TABLE (kept as written on 2026-09-13, annotated in place; the re-run measures
+  itself against THIS list, on the same sample pages — a fresh random twenty proves nothing).
+  Every item was verified by reading a rendered page against the stored row.
+
+  Still present on Haiku + tiling, before today's work:
+  | # | Page says | Model produced | Why it matters | Closed by |
+  |---|---|---|---|---|
+  | 1 | `Gm(2m) / 1` (the problem sets AG = BG = CG = **1** m) | `Gm(2m) / l` | digit read as letter — changes the denominator. 3 paragraphs | FIX 1 only (the layer has the digit). **FIX 4 cannot see it** — a lone letter beside an operator is neither a word nor a symbol; pinned as not caught in `TranscriptionDiffTest` |
+  | 2 | `F'_GB = F_GB and F'_GC = F_GC` | `F_GB = F_GB …` | primes dropped — the line asserts nothing | FIX 2 only. **FIX 4 cannot see it, and never could**: NCERT's prime is a Symbol-font glyph with no Unicode mapping, so the layer renders `Kepler's` as `Keplers` — the prime is not in our source either |
+  | 3 | `= − (2Gm²/l)(2 + 1/√2)` | `= (2 G m^2 / l)(…)` | sign lost from an intermediate step | FIX 2 only. **FIX 4 cannot see it** — punctuation is squashed away before comparison |
+  | 4 | `ĵ`, `î` (vector hats) | `j`, `i` | vector/scalar distinction lost | FIX 2 (the hat rule was discretionary; now fixed as `i_hat`) |
+  | 5 | `g(h) ≅ g(1 − 2h/R_E)` | `g(h) = g (…)` | an approximation rendered as an equality | FIX 2 (`approx=`, never flattened) |
+  | 6 | `M_E`, `r_A` | `M_e`, `r_a` in places | subscript case drifts within a chapter | FIX 1 + FIX 2 (case copied exactly), and **FIX 4 catches it**: `Me` is looked for on the page and is not there |
+  | 7 | `3.84 × 10⁸ m` | `3.84 10^8 m` | multiplication sign dropped | FIX 2 (`x` kept in scientific notation). FIX 4 cannot see it — punctuation again |
+  | 8 | — | `… = 3600 [7.4] i` | stray character at paragraph end | neither: a single stray letter is below every signal here. Left open, and named as open |
+  | 9 | "3. Law of periods : The square of the time period…" (pure prose) | `has_equations = true` | over-flagged; a later equation-verification pass filters on this | FIX 3: computed in Java, gone from the schema |
+
+  Fixed by tiling earlier the same day (kept: these are the class that *more pixels* fixes):
+  | # | Was | Now |
+  |---|---|---|
+  | 10 | `L_p = m_r r_p v_p` (×3 in one paragraph) | `m_p` ✓ — and this is the one defect class **FIX 4 provably catches**: `mr` is looked for in the page's own layer and is not there. Proven against the real `keph107.pdf` text, not a hand-written imitation of it |
+  | 11 | `3.84 × 10^m` — exponent gone | `10^8` ✓ |
+  | 12 | `g/a_m = R_e²/R_m²` inverted, `g α R_e^2` sign lost | `R_m²/R_E²`, `g α R_E^-2` ✓ |
+  | 13 | `F_i`, `r_2i`, `r̂_2i` — subscript `1` read as `i` | `F_1`, `r_21` ✓ |
+  | 14 | `For the moon, R_M = (1.52)^(1/3) × 365` | `∴ T_M = (1.52)^(3/2) × 365` ✓ — wrong symbol, wrong exponent *and* an invented noun, all three corrected |
+
+  Addressing defects (structural, not glyph):
+  | # | Defect | Status |
+  |---|---|---|
+  | 15 | exercise numbers `7.1, 7.2 …` transcribed as sections | fixed 2026-09-12 — those pages are never sent now |
+  | 16 | `Example 7.1` used as a section name (reasoning model) | moot: that track is closed (RULING 1); the loader refuses it either way |
+  | 17 | numbering restarted inside a tile band (reasoning model) | moot as above; the cheap model obeys the instruction |
+  | 18 | paragraph splits differ every run: 135 / 149 / 124 / 120 / 110 | **not a defect** — reframed by FIX 5 as a corpus-policy question, see below |
+
+  The pattern that drove the fixes: items 1–7 are all *small detached marks* — a digit beside
+  letters, a prime, a leading sign, a hat, a multiplication cross — and every one of them is
+  already correct in the PDF's text layer. That is the whole argument for FIX 1.
+
+RULING 1 (founder): the VISION tier stays on the cheap model with tiling; the reasoning-model track
+  for extraction is CLOSED, no further runs. Evidence: ₹27.96 against ₹12.71 on the same chapter
+  (2.2×), and neither reasoning-model run produced a loadable chapter — one restarted numbering
+  inside a tile band, the other named `Example 7.1` as a printed section — while its own confidence
+  warned about neither. `application-visionsonnet.yml` is deleted and its test with it.
+FIX 1–6, all implemented today: the page's text layer travels with the image and is authoritative
+  for characters (the §6.1 reversal); the notation gaps the audit exposed are closed in the prompt;
+  `has_equations` leaves the model's schema for `pipeline.internal.Equations`; every paragraph is
+  diffed character-by-character against the page's layer through a notation whitelist
+  (`TranscriptionDiff`); two split rules plus the freeze policy; confidence demoted to a routing
+  signal with a soft paragraph-count flag beside it (`PageStructure`). Claude's addition, surfaced
+  rather than decided silently: the prompt becomes **v2**, because a frozen corpus has to name a
+  version and v1 changed under eight exploratory runs.
+FIX 5's policy is the day's real change of mind. Reproducibility was the wrong target: five runs
+  gave five paragraph counts and each differed for a *good* reason. One verified run per book is
+  now canonical and frozen; a later re-extraction is a corpus event that re-embeds and re-anchors
+  what it moved; D17's guard checks integrity against the frozen run, not stability across runs.
+  The morning's DECISIONS row saying the opposite is struck through in place, kept for its
+  measurements.
+Shared failure mode, named by the founder and worth repeating: the model is now *given* the text
+  layer and the diff *checks* against the text layer, so where that layer is wrong they agree and
+  neither notices. Two independent things guard it — `PageStructure`, which knows nothing about
+  characters, and the audit procedure's new rule that at least five of the twenty sampled
+  paragraphs are read against the **rendered page image** (runbook §"The D14 ✅", step 4).
+Hindi rider (founder): Hindi has no usable text layer at all, so it loses the character check
+  entirely — its acceptance sample doubles to 30–40 paragraphs weighted toward matra- and
+  conjunct-dense pages, and the parked Chanakya→Unicode converter is now a higher priority, since
+  its output is what would give Hindi the same mechanical verification English gets.
+Cached prefix: the v2 system template is 21,302 characters, ~5,325 tokens by the 4-chars-per-token
+  proxy the startup tripwire uses, against the founder's ≥4,600 floor on the cheap model's own
+  tokenizer. The last real measurement was **5,199** (v1, read off the ledger's `cache write`
+  column); v2 is longer, so the floor holds — the authoritative number is the `cache write` figure
+  in the first report of the re-run.
+Spec-auditor on the whole change set: **FAIL, and it earned its keep twice over** — two BLOCKERs,
+  both of which would have hit the founder's ₹430 run before a single page was extracted.
+  (1) FIX 3 was half done: `has_equations` left the tool schema and stayed in the prompt in four
+  places, so the model would have been told four times to emit a property the forced tool's
+  `additionalProperties: false` forbids — a validation failure and a repair retry on every page,
+  billed twice. A green build did not catch it because nothing compared the prompt against the
+  schema; `PageExtractTaskTest` now does, deriving the allowed field names from the record itself.
+  (2) Removing the field made every JSONL line already in the bucket unreadable — the reader is
+  deliberately strict about unknown properties — so `ncert extract` would have died on a raw Jackson
+  message while reading the file it resumes from. It now refuses by name, names the object and the
+  line, and prints the remedy; and that is the *right* answer rather than a kinder one, since an
+  extraction is canonical per prompt version.
+  Then four MAJORs, of which one changed the design. The character check had been written against
+  hand-written page text with the subscripts spaced out — `"L p = m p r p v p"` — which is not what
+  a PDF text layer contains. Reading `keph107.pdf` through `PdfTextLayer` settled it in one run:
+  NCERT's layer glues inline subscripts (`Lp = mp rp vp`), glues superscripts (`3.84 × 108m`,
+  `1010 m`), splits displayed equations across lines out of reading order, breaks the odd word with
+  kerning (`the p lanet`), renders Greek through an unmapped Symbol font (`ΔA` arrives as `DA`) and
+  **drops the apostrophe entirely — `Kepler's` extracts as `Keplers`**. Against that shape the check
+  as written flagged every paragraph carrying a symbol, and would have buried the re-run's report in
+  false positives. Rewritten to compare squashed text by two threshold-free questions — is this word
+  on the page, is this symbol on the page — and **tested against the real file**: a faithful
+  transcription of four real paragraphs of page 129 is silent, and `m_p` read as `m_r` is still
+  caught. The last finding is the one worth remembering: that lost apostrophe means the dropped
+  prime the audit complained about is **not detectable in principle** from this source, and the same
+  goes for the lost minus and the dropped `×` (punctuation) and for `1` read as `l`. All four are now
+  written down as not-caught — in the class, in the runbook, in the defect table above, and as a
+  passing test that pins the limit — because a check that reports "none" about something it never
+  examined is worse than no check. The other MAJORs: the report's two new sections printed `none`
+  whether they had checked everything or nothing (they now print what they checked), and a dead
+  `MINUS` constant sat beside a comment claiming signs were compared (both gone). MINORs fixed:
+  `Equations` read NCERT's own list markers `(g)`, `(l)` as chemical states; two report tables were
+  both called "the report's first table"; a DECISIONS row claimed the structural flag covered the
+  shared-source residual, which it cannot — only the human step does.
+Gates: `./mvnw verify` green, **540 tests** (519 → 530 with the fixes, 529 after deleting the closed
+  experiment's test, 540 after the audit's), eval gate PASS (placeholder). Commits: one for
+  FIX 1–6 (they touch the same command and the same template; no split of them both compiles and
+  means anything), one for the documents and one for the audit's fixes. Eleven DECISIONS rows dated
+  2026-09-13 — ten new, plus the morning's freeze row struck through in place and kept for its
+  measurements — TECH_PLAN §6.1 and §6.3 dated notes, the runbook's audit procedure rewritten,
+  prompt-changelog rows for v2 and for the deleted profile.
+Honest gap in the evidence, found by the auditor and not fixable retrospectively: `Reports` writes
+  `<date>-<command>.md` and overwrites it, so the five live runs of 2026-09-12/13 left two files
+  between them, and the ₹27.96-against-₹12.71 comparison behind RULING 1 survives only in this log
+  and in the session transcript. The `ai_calls` ledger holds every row, which is the source of truth
+  (§10.5); the *report* is simply not the evidence it is meant to be when a day holds more than one
+  run of the same command. PARKED.
+NEXT, and it is the founder's: re-run both pilot books (~₹430 authorised), produce the defect table
+  again on the same sample pages, then the D14 ✅ twenty-paragraph check. D14 stays unticked.
+```
 
 ```
 D14 · 2026-09-12 · NCERT extraction pilot — built, acceptance pending the founder's live run
@@ -1730,7 +1859,8 @@ Tomorrow's first task:
 ## 🅿️ PARKED (Sunday review only)
 
 - _idea · date · one line_
-- **the freeze-and-migrate guard on `ncert load` (D17)** · 2026-09-13 (D14, founder) · paragraph segmentation is not reproducible — 135 / 149 / 124 paragraphs over three runs of one chapter — while sections are stable and the student-facing anchor is section-level (SPEC §6.3), so today re-cutting is harmless. From **D17** it is not: embeddings are per paragraph row, and from **D23** `question_anchors` bind a question to a paragraph id, so a silent re-extraction re-points a question at different text under the same heading. `ncert load` must refuse to change a chapter's paragraph set once embeddings or anchors exist for it, unless told to re-migrate — and the migration then has to re-embed and re-anchor what it moved. Build it with D17, before the first dependency exists rather than after (DECISIONS 2026-09-13)
+- **a run report that a second run of the same command cannot overwrite** · 2026-09-13 (D14, spec-auditor) · `Reports` writes `pipeline/reports/<date>-<command>.md` and overwrites it, which was right when a command ran once a day. `ncert extract` ran five times on 2026-09-12/13 and left two files, so the cost comparison that decided RULING 1 is not in the repo — and a resumed run's report, which checks fewer pages than the first, silently replaces the first one's flags. `.claude/rules/pipeline.md` makes the report the day's committed evidence, so this is the evidence rule leaking. Cheapest fix: keep the name, append a run block instead of replacing the file, or suffix a run ordinal when the file exists. Do it before D16, when whole books start being re-run
+- **the freeze-and-migrate guard on `ncert load` (D17)** · 2026-09-13 (D14, founder) · paragraph segmentation is not reproducible — 135 / 149 / 124 / 120 / 110 paragraphs over five runs of one chapter — while sections are stable and the student-facing anchor is section-level (SPEC §6.3), so today re-cutting is harmless. From **D17** it is not: embeddings are per paragraph row, and from **D23** `question_anchors` bind a question to a paragraph id, so a silent re-extraction re-points a question at different text under the same heading. `ncert load` must refuse to change a chapter's paragraph set once embeddings or anchors exist for it, unless told to re-migrate — and the migration then has to re-embed and re-anchor what it moved. Build it with D17, before the first dependency exists rather than after (DECISIONS 2026-09-13) · **restated the same day by the founder's freeze policy**: the freeze happens at the first *verified* run, not at the first *dependent* one, so the guard's question is **"is this chapter still the frozen corpus?"** (prompt version, run id, paragraph set) rather than "do two runs agree?", which they never will and need not. Same day, same home — D17 — different check
 - **the Hindi apparatus boundary (D16)** · 2026-09-12 (D14) · `ChapterApparatus` finds where a chapter stops teaching by reading the PDF's text layer, which works for all 79 English files and for **none** of the Hindi ones: all ten Hindi books are Chanakya glyph text with no Unicode map, so there is no heading to match and every Hindi page would be sent — including its exercises, whose chapter-numbered items are exactly what the detector exists to keep out. D16 needs another route: the English edition's boundary expressed as a fraction of the chapter, the Hindi chapter's own page count against it, or a one-off founder-reviewed boundary per chapter in `books.yaml`. Decide before the first Hindi extract, not after
 - **edition versioning for NCERT paragraphs** · 2026-09-12 (D14, spec-auditor MINOR) · SPEC §9 item 2 requires "Editions tracked; the app must always reflect the current edition", but an edition today is a single `edition_year` on a `code`-unique book row: re-registering a new edition overwrites it in place, `ncert load` rewrites the paragraph text at the same addresses, and nothing on a paragraph records which edition it came from. A reprint that renumbers a section would silently move anchors under students who already have them. Needs a real decision (an edition column on the book key, or an edition dimension on the paragraph address) before the first NCERT reprint we ingest — not before the beta corpus, which is one edition throughout
 - **`ObjectStore` is one unqualified bean bound to the content bucket, and has no `delete`** · 2026-09-12 (D14, spec-auditor MINOR) · at D28 the uploads bucket arrives with a 24-hour lifecycle and deletion (DEV_SPEC R6, SPEC §6.8), and an injection point wanting uploads would silently receive content — CLAUDE.md's "uploaded images: S3 uploads/ bucket only" would be a naming convention rather than a type guarantee. Qualify the beans (or give the port a bucket dimension) and add `delete` as part of D28, not before
@@ -1781,7 +1911,7 @@ Tomorrow's first task:
 - `otp.time_to_verify{channel}` (a timer from `created_at` to `verified_at`) and `otp.resent{channel}` (a request whose previous code for that destination is still unverified) · 2026-09-09 · two cheap delivery-latency signals not asked for by PLAN D11; add when the D73 dashboard wants a latency panel
 - the D11 report's window is the process lifetime · 2026-09-09 · right while one API task runs and CloudWatch is absent; when the counters flow to CloudWatch (F8/D73) decide whether `GET /admin/metrics/otp` grows a `?hours=` database window (then `send_failed` would need a row per failed delivery — the D7 row deletes it) or simply points at the dashboard
 - an admin bootstrap (a seed or a CLI that flags the founder's row) · 2026-09-09 · today `users.role = 'admin'` is set by hand over psql (TECH_PLAN §3.7 "flagged by hand"), as the D11 ✅ did; D75's admin routes decide whether a `pipeline` command or an SSM-listed email does it
-- a Chanakya→Unicode step (or OCR) before any Hindi NCERT chunk is embedded · 2026-09-09 · found while writing `ncert/2022-ed/hi/manifest.md`: all ten Hindi books are selectable text set in the legacy 8-bit Walkman-Chanakya fonts with no ToUnicode map, so extraction yields glyph codes and zero Devanagari across 1,976 pages; the Phase-2 content pipeline (D13+) grounds on `en/` until this exists, and the manifest's "text OK" column stays ✗ until a converted sample passes a native-reader check
+- a Chanakya→Unicode step (or OCR) before any Hindi NCERT chunk is embedded · 2026-09-09 · found while writing `ncert/2022-ed/hi/manifest.md`: all ten Hindi books are selectable text set in the legacy 8-bit Walkman-Chanakya fonts with no ToUnicode map, so extraction yields glyph codes and zero Devanagari across 1,976 pages; the Phase-2 content pipeline (D13+) grounds on `en/` until this exists, and the manifest's "text OK" column stays ✗ until a converted sample passes a native-reader check · **2026-09-13 (D14, founder): priority raised, and the reason changed.** It was an ingest convenience; it is now the only route to *verification*. English paragraphs are checked character-by-character against the page's own text layer (FIX 4) — Hindi has no such layer, so every Hindi paragraph is verified by a native reader or not at all, which is why the D16 Hindi sample doubles to 30–40. A working converter gives Hindi the same mechanical check English gets. Decide before D16, and it is worth its own buffer half-day if D18 is where it lands
 - topic-level `name_hi` for the 374 taxonomy topics (batch translation through the CHEAP tier + a native-reader check), and a final native-reader skim of the full unit and chapter `name_hi` column · 2026-09-10 · the D13 draft fills Hindi for subjects, units and chapters only; needed before the D26 syllabus grid shows topics in Hindi · 2026-09-11 (D13 review): the sampled unit and chapter Hindi reviewed and approved for D13; the full-column skim stays parked for before D26
 - cut-off seat-type rows the founder must source: every `govt_mbbs` / `private_mbbs` / `bds` closing-marks row by year, category and quota scope (MCC and state counselling) · 2026-09-10 · the D13 draft carries only the NTA qualifying cut-offs · 2026-09-11: the 2026 qualifying rows landed at the review (Re-NEET, 16 July 2026 notice; an outlier season, DECISIONS D13 row for D58); seat-type rows are not needed before the trajectory work around D58
 - replace or reconcile the D4 `db/seed` test taxonomy (`PHY.11.MECH`, `CHE.11.PHYS`, `PHY.11.KIN`, `CHE.11.MOLE`, four edges, one track, three cut-offs) now that the real inputs exist · 2026-09-12 · a local database that carries the seed shows them as loader orphans (`CurriculumImportSeedTest` pins the shape); `SeedTaxonomyTest` and the constraint tests rely on the seed's fixed UUIDs — decide at D14 whether the seed becomes a subset of the real taxonomy or those tests fixture their own rows · **decided 2026-09-12 (D14, founder ruling, DECISIONS)**: the four invented codes become four real codes from `taxonomy.csv` with the fixed UUIDs kept, so no test fixtures are rewritten; **the edit itself is scheduled for the D18 buffer** — it is taxonomy work and D14 was NCERT work

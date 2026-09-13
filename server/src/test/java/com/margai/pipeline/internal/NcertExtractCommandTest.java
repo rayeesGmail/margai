@@ -98,7 +98,7 @@ class NcertExtractCommandTest {
         assertThat(run()).isZero();
 
         assertThat(extract.calls).containsExactly("8/1", "8/2", "9/1");
-        List<ExtractedPage> written = ExtractJsonl.read(
+        List<ExtractedPage> written = ExtractJsonl.read(ContentKeys.extract("phy11-part2", BookLanguage.en),
                 store.get(ContentKeys.extract("phy11-part2", BookLanguage.en)));
         assertThat(written).extracting(ExtractedPage::address).containsExactly("8/1", "8/2", "9/1");
         assertThat(written.getFirst().paragraphs()).hasSize(1);
@@ -205,7 +205,7 @@ class NcertExtractCommandTest {
         run();
 
         assertThat(extract.calls).isEmpty();
-        List<ExtractedPage> written = ExtractJsonl.read(
+        List<ExtractedPage> written = ExtractJsonl.read(ContentKeys.extract("phy11-part2", BookLanguage.en),
                 store.get(ContentKeys.extract("phy11-part2", BookLanguage.en)));
         assertThat(written).extracting(ExtractedPage::address).containsExactly("8/1", "8/2", "9/1");
         assertThat(written.get(1).paragraphs()).isEmpty();
@@ -267,7 +267,7 @@ class NcertExtractCommandTest {
                 .contains("## end-of-chapter apparatus (never sent to the model)")
                 .contains("| 8 | page 3 | SUMMARY | 2 |");
 
-        List<ExtractedPage> written = ExtractJsonl.read(
+        List<ExtractedPage> written = ExtractJsonl.read(ContentKeys.extract("phy11-part2", BookLanguage.en),
                 store.get(ContentKeys.extract("phy11-part2", BookLanguage.en)));
         assertThat(written).extracting(ExtractedPage::address).contains("8/3", "8/4");
         assertThat(written.stream().filter(ExtractedPage::wasSkipped)).hasSize(2)
@@ -283,6 +283,7 @@ class NcertExtractCommandTest {
     void aLegibleTextLayerIsSentWithEveryPage() {
         assertThat(run()).isZero();
 
+        assertThat(out.toString()).contains("checked: 3 of the 3 page(s) called this run");
         assertThat(extract.pageTexts).hasSize(3).doesNotContainNull();
         assertThat(extract.pageTexts.get(0)).contains("7.1 the first section of the chapter");
         assertThat(extract.pageTexts.get(1)).contains("7.2 the second section of it");
@@ -300,7 +301,11 @@ class NcertExtractCommandTest {
         assertThat(run()).isZero();
 
         assertThat(extract.pageTexts.subList(0, 2)).containsOnlyNulls();
-        assertThat(out.toString()).contains("| 8 | withheld: illegible |");
+        assertThat(out.toString()).contains("| 8 | withheld: illegible |")
+                // The count is the point: chapter 9's layer is legible and chapter 8's is not, so
+                // one page of the three was checked. Without it the section reads "none" and a
+                // founder takes that for a clean bill of health (spec-auditor, D14).
+                .contains("checked: 1 of the 3 page(s) called this run (the rest had no usable text layer)");
     }
 
     /** A chapter whose text layer cannot be read sends every page: skipping blind would drop teaching. */

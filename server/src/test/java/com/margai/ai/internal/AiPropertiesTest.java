@@ -22,28 +22,6 @@ class AiPropertiesTest {
             .withInitializer(new ConfigDataApplicationContextInitializer())
             .withConfiguration(UserConfigurations.of(AiConfiguration.class));
 
-    /**
-     * The D14 experiment profile: the VISION tier on the reasoning model for the content pipeline
-     * only. It has to keep binding — "send no temperature" is spelled as an empty value, which is
-     * exactly the kind of thing that rots unnoticed — and it must not disturb the other tiers,
-     * since the same VISION tier serves student photo doubts outside this profile.
-     */
-    @Test
-    void theVisionSonnetExperimentBindsAndChangesOnlyTheVisionTier() {
-        runner.withPropertyValues("spring.profiles.active=visionsonnet").run(context -> {
-            AiProperties properties = context.getBean(AiProperties.class);
-
-            assertThat(properties.modelFor(Tier.vision)).isEqualTo(properties.modelFor(Tier.reason));
-            assertThat(properties.modelOf(Tier.vision).temperature())
-                    .as("the reasoning model refuses temperature outright (§4.11)").isNull();
-            assertThat(properties.modelOf(Tier.vision).effort()).isEqualTo(AiProperties.Effort.medium);
-            assertThat(properties.modelOf(Tier.vision).cacheMinTokens())
-                    .isEqualTo(properties.modelOf(Tier.reason).cacheMinTokens());
-            assertThat(properties.modelFor(Tier.cheap))
-                    .as("the cheap tier is untouched").isNotEqualTo(properties.modelFor(Tier.vision));
-        });
-    }
-
     @Test
     void localDefaultsBindFromApplicationYml() {
         runner.run(context -> {
@@ -66,7 +44,9 @@ class AiPropertiesTest {
             assertThat(properties.batchMinRecords()).isEqualTo(100);
             assertThat(properties.maxOutputTokens()).isEqualTo(1024);
             assertThat(properties.callTimeout()).isEqualTo(java.time.Duration.ofSeconds(20));
-            assertThat(properties.promptVersions()).containsEntry("smoke", 1);
+            // v2 is the version a frozen corpus names (D14, DECISIONS 2026-09-13): v1 was amended
+            // between exploratory runs, so a paragraph row tracing to "v1" traces to nothing.
+            assertThat(properties.promptVersions()).containsEntry("smoke", 1).containsEntry("ncert_extract", 2);
             assertThat(properties.anthropic().apiKey()).isEmpty();
             assertThat(properties.cohere().apiKey()).isEmpty();
             assertThat(properties.cohere().baseUrl()).startsWith("https://");

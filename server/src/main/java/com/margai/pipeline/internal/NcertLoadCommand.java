@@ -63,7 +63,7 @@ class NcertLoadCommand extends NcertBookCommand {
         }
         Set<Short> chapters = new TreeSet<>();
         selected.forEach(chapter -> chapters.add(chapter.no()));
-        List<ExtractedPage> pages = ExtractJsonl.read(content.get(jsonlKey)).stream()
+        List<ExtractedPage> pages = ExtractJsonl.read(jsonlKey, content.get(jsonlKey)).stream()
                 .filter(page -> chapters.contains(page.chapterNo()))
                 .sorted((left, right) -> left.chapterNo() != right.chapterNo()
                         ? Short.compare(left.chapterNo(), right.chapterNo())

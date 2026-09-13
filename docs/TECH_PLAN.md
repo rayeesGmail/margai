@@ -1688,7 +1688,22 @@ Reason: `.claude/rules/pipeline.md` requires every pipeline AI call to go throug
 cost ledger, and the entities, Flyway schema and `HybridRetriever` already exist there. PDF page
 rendering uses PDFBox; paragraph extraction uses the VISION tier on page images rather than text
 extraction, because NCERT layout (two columns, equations, boxed examples, Hindi legacy fonts in older
-scans) defeats text extractors and the buffer day D18 exists for exactly that mess. The top-level
+scans) defeats text extractors and the buffer day D18 exists for exactly that mess.
+
+*Amended 2026-09-13 (D14, founder FIX 1; DECISIONS): **both sources travel with the call, and each is
+authoritative for what it is good at**. The image decides layout, reading order, what is a box and
+what is body text, and where a paragraph begins — which is what this paragraph's "defeats text
+extractors" is really about. The page's own text layer decides **characters**, and is sent alongside
+the image whenever `PdfTextLayer` scores the chapter legible (a per-chapter judgement, not per-page).
+The D14 audit is the evidence: prose came back 98.96% correct with zero invention, while every
+surviving defect was a glyph — `1` read as `l`, a dropped prime, a lost leading minus, an exponent
+read as its reciprocal — and every one of those characters was already correct in the PDF. Where a
+span of the layer is garbage (math fonts, private-use encodings) the image remains the fallback and
+the prompt says so; where a whole chapter's layer is meaningless — every Hindi book, and
+`chem11-part2/kech202.pdf` — it is withheld and the run says so in its report. The D3 escape hatch
+(Python text extraction instead of VISION) is **not** what this is: the model still reads the page.*
+
+The top-level
 `pipeline/` directory holds founder-owned inputs (`pipeline/inputs/*.csv`, `*.yaml`, committed),
 per-run reports (`pipeline/reports/`, committed) and its README; `pipeline/data/` stays the
 gitignored scratch directory for downloaded PDFs and intermediate files, as `.gitignore` and
@@ -1718,7 +1733,7 @@ Source PDFs, page images, JSONL artefacts and eval snapshots live in the content
 | `backbone load` · `cutoffs load` | D13 | `archetype_tracks.code` + sequence; cutoff natural key | steps per track, nodes not in any track |
 | `ncert register` | D14 | `ncert_books.code` | — |
 | `ncert render --book --lang` | D14 | page image key `pages/{book}/{lang}/{chapter}/{page}.png` — *the chapter segment added at D14 (DECISIONS): NCERT's sources are chapter-wise PDFs, so page numbers run per chapter* | pages rendered, and `ncert_books.pages_*` written |
-| `ncert extract --book --lang [--chapters] [--pages] [--redo]` | D14–D15 | JSONL `extract/{book}/{lang}.jsonl`, **one line per page** (*D14, DECISIONS: the confidence, the `ai_calls` row and the page number belong to the page, and a page yielding no paragraphs must still be recorded as read*): `{chapter_no, page, confidence, ai_call_id, paragraphs: [{section, para_no, text, has_equations, figure_refs}]}`; one VISION call per page carrying where the previous page ended — its section, its last paragraph number and that paragraph's tail — so numbering continues within a section instead of restarting per page | pages processed, paragraphs, low-confidence pages, cost from the ledger |
+| `ncert extract --book --lang [--chapters] [--pages] [--redo]` | D14–D15 | JSONL `extract/{book}/{lang}.jsonl`, **one line per page** (*D14, DECISIONS: the confidence, the `ai_calls` row and the page number belong to the page, and a page yielding no paragraphs must still be recorded as read*): `{chapter_no, page, confidence, ai_call_id, skipped, paragraphs: [{section, para_no, text, figure_refs}]}`; one VISION call per page carrying where the previous page ended — its section, its last paragraph number and that paragraph's tail — so numbering continues within a section instead of restarting per page. *Amended 2026-09-13 (D14, DECISIONS): the call also carries **the page's own text layer** where the chapter's is legible, authoritative for characters (§6.1 note); `has_equations` has left the model's schema and is computed in Java at load time from the transcription — never ask a model to judge what code can compute; `skipped` records a page deliberately not sent (the end-of-chapter apparatus); the template is `ncert_extract.v2`, the version a frozen corpus names* | pages processed, paragraphs, **characters differing from the page's text layer**, **pages whose paragraph count does not match the page's shape**, low-confidence pages, cost from the ledger |
 | `ncert load --book --lang` | D14–D15 | `(book_id, chapter_no, section, para_no)`; halves of a paragraph straddling a page break are joined, any other collision fails the run | paragraphs upserted; **coverage % per book** against the *rendered* page count (PLAN D15 ✅), plus text yield per chapter |
 | `ncert align --book` | D16 | same key | EN↔HI pairs by section and order, embedding-similarity outliers listed for the 20-pair check |
 | `ncert embed --book` | D17 | paragraph id | embedded count; the 15 concept queries from `eval/retrieval-queries.json` run and print top-3 |
@@ -1740,6 +1755,20 @@ Source PDFs, page images, JSONL artefacts and eval snapshots live in the content
 Every command is idempotent and re-runnable, fails loudly and never half-writes (one transaction
 per natural-key batch). Each writes `pipeline/reports/<date>-<command>.md`, which is committed as
 the evidence for that day's ✅ check.
+
+*Added 2026-09-13 (D14, founder FIX 5 and FIX 6; DECISIONS). **What is trusted, in order.** (1) The
+loader's invariants are the safety net and the only thing that refuses: a section that does not
+belong to its chapter, a section that is not a printed section number, a paragraph number out of
+range, two paragraphs at one address, a page absent from the JSONL. (2) The mechanical checks —
+the character diff against the page's text layer, and the paragraph-count shape flag — find what the
+invariants cannot see; they route a human's attention and never block a run. (3) The model's own
+`confidence` sits **below both**: it is a review-routing signal, not a guarantee, and the D14
+evidence is that it warned about neither of the two pages that failed the loader while flagging
+none of the three real character defects on a run it called uniformly confident. **And a corpus is
+frozen, not reproduced**: paragraph segmentation legitimately differs between extractions, so one
+verified run per book is canonical, a later re-extraction is a corpus event that re-embeds and
+re-anchors what it moved, and D17's guard checks integrity against the frozen run rather than
+stability across runs.*
 
 ### 6.4 Embedding language choice
 

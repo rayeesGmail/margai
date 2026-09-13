@@ -14,45 +14,68 @@ import java.util.regex.Pattern;
  *
  * <p>The D14 audit found the transcription errors by reading pages against the database by eye, at
  * roughly an hour a chapter, and the errors it found were never in the prose: a {@code 1} read as
- * {@code l}, {@code m_p} read as {@code m_r}, a lost exponent, a dropped prime, a missing minus.
+ * {@code l}, {@code m_p} read as {@code m_r}, a lost exponent, an exponent read as its reciprocal.
  * Each of those is a difference between two strings, which is a thing code can see. This turns the
- * founder's audit from free-reading for dropped primes into adjudicating flagged lines.
+ * founder's audit from free-reading for misread glyphs into adjudicating flagged lines.
  *
- * <p>The comparison is deliberately one-sided in its hard signal. A token the model produced that
- * is <em>not on the page</em> is a misread or an invention, and that is what flags. A token on the
- * page that the model did not produce is usually correct behaviour — captions, running heads,
- * table interiors and the apparatus are all deliberately skipped — so it is counted, never flagged.
+ * <p><b>Everything here compares squashed text</b> — letters and digits only, every space, line
+ * break and punctuation mark removed — because that is the only shape in which the two sides are
+ * comparable. A real NCERT text layer (measured on {@code keph107.pdf}, D14) glues an inline
+ * subscript to its base, {@code L_p} arriving as {@code Lp} and {@code 3.84 × 10⁸} as
+ * {@code 3.84 × 108}; splits a displayed equation's subscripts onto lines of their own in an order
+ * unrelated to reading order; and breaks the occasional word with kerning, {@code the p lanet}. A
+ * token-level comparison against that produces a false flag on every paragraph that carries a
+ * symbol, which is precisely the set of paragraphs this exists to check.
  *
- * <p>The whitelist is our own notation: the prompt asks for {@code sqrt(...)}, {@code approx=},
- * Greek letters by name, {@code i_hat} and {@code x 10^8}, none of which appear on the page in
- * those words. Anything outside it is a real divergence.
+ * <p>It asks two questions, both one-sided and both threshold-free. <b>Does the page contain this
+ * word?</b> — a word the paragraph uses more often than the whole page holds it is invented or
+ * misread, which is how {@code Kepler's third law} became {@code For the moon} at D14. And <b>is
+ * this symbol on the page?</b> — every {@code m_p}, {@code R_E}, {@code 10^8} the transcription
+ * writes is glued back into the form the layer holds ({@code mp}, {@code RE}, {@code 108}) and
+ * looked for, which is how {@code m_p} read as {@code m_r} is caught: {@code mr} is nowhere on that
+ * page. Neither question has a budget or a tolerance to tune, and neither depends on locating the
+ * paragraph within the page — the two things that made a first, count-based cut of this class flag
+ * correct work.
  *
- * <p>This shares a failure mode with the text layer being fed to the model as the character
- * authority: where the layer is subtly wrong but legible, the model copies it and this agrees.
- * That residual is covered by the independent structural flag and by the founder reading a few
- * paragraphs against the rendered image rather than the layer (DECISIONS 2026-09-13).
+ * <p>Nothing the page has and the model did not produce is ever flagged: captions, running heads,
+ * table interiors and the apparatus are all skipped deliberately.
+ *
+ * <p><b>What it cannot see, stated plainly, because a check that cries "none" when it looked at
+ * nothing is worse than no check.</b> Punctuation is squashed away, so a dropped multiplication
+ * sign, a lost leading minus and a dropped prime are invisible to it — and on this corpus they are
+ * invisible in principle rather than by omission: NCERT sets those glyphs in a Symbol font with no
+ * Unicode mapping, so {@code Kepler's} reaches the text layer as {@code Keplers}, and the prime the
+ * model stands accused of dropping is not in the layer either. A superscript with an operator in it
+ * ({@code (1.52)^(3/2)}) has no single glued form and is skipped. Those defects are addressed by
+ * instruction (FIX 2) and caught, if at all, by the founder's eye on the rendered image.
+ *
+ * <p>This also shares a failure mode with the text layer being fed to the model as the character
+ * authority: where the layer is subtly wrong but legible, the model copies it and this agrees. That
+ * residual is not covered by the structural flag — which cannot see characters at all — but by the
+ * founder reading a few paragraphs against the rendered image (DECISIONS 2026-09-13).
  */
 final class TranscriptionDiff {
 
     /** Words our conventions introduce that the printed page never spells out. */
     private static final Set<String> NOTATION = Set.of(
-            "sqrt", "approx", "hat", "i_hat", "j_hat", "k_hat", "x",
+            "sqrt", "approx", "hat", "x", "illegible",
             "alpha", "beta", "gamma", "delta", "theta", "lambda", "mu", "pi", "rho", "sigma",
-            "omega", "phi", "psi", "epsilon", "eta", "nu", "tau", "chi", "kappa", "illegible");
+            "omega", "phi", "psi", "epsilon", "eta", "nu", "tau", "chi", "kappa");
 
     private static final Pattern WORD = Pattern.compile("[A-Za-z]+");
 
-    /**
-     * Digits are compared one character at a time, not as runs: a superscript arrives from the
-     * text layer glued to its base — 10^8 is "108" there, R_E^2 is "RE2" — so whole-number
-     * comparison would flag every exponent on the page. Character counts still catch the errors
-     * that matter, a dropped 8 or an exponent read as 1/3 instead of 3/2.
-     */
-    private static final Pattern DIGIT = Pattern.compile("[0-9]");
+    /** Everything squashing keeps. */
+    private static final Pattern NOT_ALPHANUMERIC = Pattern.compile("[^A-Za-z0-9]+");
 
-    /** A minus may be a hyphen, a true minus or an en dash; a prime may be an apostrophe or ′. */
-    private static final Pattern MINUS = Pattern.compile("[-−–]");
-    private static final Pattern PRIME = Pattern.compile("['′]");
+    /**
+     * One subscripted or superscripted symbol as the prompt asks for it — {@code m_p}, {@code R_E},
+     * {@code T_M}, {@code 10^8}, {@code R_E^2} — and deliberately nothing with a bracket or an
+     * operator in the script ({@code (1.52)^(3/2)}), which has no single glued form to look for.
+     */
+    private static final Pattern SCRIPT = Pattern.compile("[A-Za-z0-9]+(?:[_^][A-Za-z0-9]+)+");
+
+    /** Shorter than this and a "word" is a symbol fragment, not a word (see the class note). */
+    private static final int MIN_WORD = 3;
 
     private TranscriptionDiff() {
     }
@@ -67,81 +90,80 @@ final class TranscriptionDiff {
         if (pageText == null || pageText.isBlank() || paragraph == null || paragraph.isBlank()) {
             return List.of();
         }
+        String said = squash(withoutNotation(paragraph));
+        String page = squash(pageText);
+        if (said.isEmpty() || page.isEmpty()) {
+            return List.of();
+        }
         List<String> findings = new ArrayList<>();
 
-        Map<String, Integer> pageWords = counts(WORD, pageText);
-        for (Map.Entry<String, Integer> word : counts(WORD, paragraph).entrySet()) {
-            String token = word.getKey();
-            if (NOTATION.contains(token.toLowerCase(Locale.ROOT))) {
-                continue;
-            }
-            int onPage = pageWords.getOrDefault(token, 0);
-            // A single letter is almost always a symbol — M_E against M_e, m_p against m_r — so
-            // its case is checked. A word is matched case-insensitively, because a sentence's
-            // first letter is capitalised on the page and inside a joined paragraph alike.
-            if (token.length() > 1) {
-                onPage = pageWords.entrySet().stream()
-                        .filter(entry -> entry.getKey().equalsIgnoreCase(token))
-                        .mapToInt(Map.Entry::getValue).sum();
-            }
-            if (onPage < word.getValue()) {
-                findings.add("'" + token + "' " + word.getValue() + "x here, " + onPage + "x on the page");
+        // A word the paragraph uses more often than the whole page holds it is invented or
+        // misread, wherever on the page it sits. Whole-page and case-insensitive, so this cannot
+        // fire on a paragraph that was merely placed wrongly.
+        String lowerPage = page.toLowerCase(Locale.ROOT);
+        String lowerSaid = said.toLowerCase(Locale.ROOT);
+        for (String word : words(paragraph)) {
+            // Both sides counted the same way — as substrings of squashed text — so a word the
+            // layer happens to have glued to its neighbour still counts as present.
+            int here = occurrences(lowerSaid, word);
+            int onPage = occurrences(lowerPage, word);
+            if (onPage < here) {
+                findings.add("'" + word + "' " + here + "x here, " + onPage + "x on the page");
             }
         }
 
-        Map<String, Integer> pageDigits = counts(DIGIT, pageText);
-        for (Map.Entry<String, Integer> digit : counts(DIGIT, paragraph).entrySet()) {
-            int onPage = pageDigits.getOrDefault(digit.getKey(), 0);
-            if (onPage < digit.getValue()) {
-                findings.add("digit '" + digit.getKey() + "' " + digit.getValue()
-                        + "x here, " + onPage + "x on the page");
+        // Every subscript and superscript the transcription writes, glued back into the shape the
+        // text layer holds it in, must be somewhere on the page. This is the check that catches the
+        // defect class the audit was full of — m_p read as m_r — and it is exact: no budget, no
+        // threshold, no located span. Case matters, because M_E against M_e is one of the defects.
+        Matcher script = SCRIPT.matcher(withoutNotation(paragraph));
+        while (script.find()) {
+            String glued = squash(script.group());
+            if (glued.length() > 1 && !page.contains(glued)) {
+                findings.add("'" + script.group() + "' is not on the page (as '" + glued + "')");
             }
         }
-
-        // Signs and primes are not tokens, and losing one is the quietest error of all: the
-        // sentence still reads correctly and the physics is wrong.
-        int primesLost = count(PRIME, pageTextWithin(pageText, paragraph)) - count(PRIME, paragraph);
-        if (primesLost > 0) {
-            findings.add(primesLost + " prime" + (primesLost > 1 ? "s" : "") + " on the page, none here");
-        }
-        return List.copyOf(findings);
+        // One line per distinct divergence: a symbol misread three times in a paragraph is one
+        // thing to adjudicate, not three.
+        return List.copyOf(new java.util.LinkedHashSet<>(findings));
     }
 
-    /**
-     * The span of the page this paragraph most plausibly came from, for the counts that only make
-     * sense locally: from the position of the paragraph's first long word to that of its last.
-     * A whole-page count would compare a paragraph against every minus sign on the page.
-     */
-    private static String pageTextWithin(String pageText, String paragraph) {
-        List<String> words = new ArrayList<>();
-        Matcher matcher = WORD.matcher(paragraph);
+    /** The paragraph's own distinct words, our notation removed, symbol fragments excluded. */
+    private static Set<String> words(String paragraph) {
+        Set<String> words = new java.util.LinkedHashSet<>();
+        Matcher matcher = WORD.matcher(withoutNotation(paragraph));
         while (matcher.find()) {
-            if (matcher.group().length() >= 6) {
-                words.add(matcher.group());
+            if (matcher.group().length() >= MIN_WORD) {
+                words.add(matcher.group().toLowerCase(Locale.ROOT));
             }
         }
-        if (words.size() < 2) {
-            return "";
-        }
-        int from = pageText.indexOf(words.getFirst());
-        int to = pageText.lastIndexOf(words.getLast());
-        return from < 0 || to < 0 || to <= from ? "" : pageText.substring(from, Math.min(to + 40, pageText.length()));
+        return words;
     }
 
-    private static Map<String, Integer> counts(Pattern pattern, String text) {
-        Map<String, Integer> counts = new HashMap<>();
-        Matcher matcher = pattern.matcher(text);
+    private static String withoutNotation(String text) {
+        StringBuilder kept = new StringBuilder(text.length());
+        int at = 0;
+        Matcher matcher = WORD.matcher(text);
         while (matcher.find()) {
-            counts.merge(matcher.group(), 1, Integer::sum);
+            if (NOTATION.contains(matcher.group().toLowerCase(Locale.ROOT))) {
+                kept.append(text, at, matcher.start()).append(' ');
+                at = matcher.end();
+            }
         }
-        return counts;
+        return kept.append(text.substring(at)).toString();
     }
 
-    private static int count(Pattern pattern, String text) {
+    private static String squash(String text) {
+        return NOT_ALPHANUMERIC.matcher(text).replaceAll("");
+    }
+
+    /** Non-overlapping occurrences of one string in another. */
+    private static int occurrences(String haystack, String needle) {
         int found = 0;
-        Matcher matcher = pattern.matcher(text);
-        while (matcher.find()) {
+        int at = haystack.indexOf(needle);
+        while (at >= 0) {
             found++;
+            at = haystack.indexOf(needle, at + needle.length());
         }
         return found;
     }

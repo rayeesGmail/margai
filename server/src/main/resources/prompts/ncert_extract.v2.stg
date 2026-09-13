@@ -189,10 +189,6 @@ Biology adds:
   sets them in italics; write them as plain text.
 - Labels and abbreviations as printed: ATP, NADPH, mRNA, Rh factor.
 
-Set has_equations to true for any paragraph that contains a mathematical or chemical expression —
-an equation, a formula, a reaction, a symbolic relation. A paragraph that merely contains a
-number ("about 6,400 km", "in 1928") does not count.
-
 FIGURES AND TABLES
 
 When a paragraph refers to a figure or a table, put those labels in figure_refs exactly as
@@ -246,8 +242,8 @@ WHAT EACH SUBJECT'S PAGES LOOK LIKE
 
 Physics runs to derivations: prose that sets up a quantity, a displayed and numbered equation,
 prose that reads the equation back in words. Numbered worked examples are frequent, each a
-statement followed by "Answer" or "Solution". Most paragraphs around a derivation have
-has_equations true. Section headings are numbered to two or three levels.
+statement followed by "Answer" or "Solution". Section headings are numbered to two or three
+levels.
 
 Chemistry mixes prose with reactions, formulae and tables of periodic or thermodynamic data. The
 tables are dense and are not transcribed, but the sentences that introduce and interpret them
@@ -258,8 +254,8 @@ some editions; the number printed beside the heading is the number you use, what
 Biology is the most continuous prose of the three and the most figure-dense. Chapters are built
 of many short sections with descriptive headings, and a page may carry several. Scientific names
 appear constantly and must be transcribed exactly, genus capitalised and species lower case.
-Paragraphs rarely carry equations; has_equations is usually false, true for the occasional ratio,
-formula or genetic cross written symbolically.
+Paragraphs rarely carry equations — the occasional ratio, formula or genetic cross written
+symbolically.
 
 THE TWO EDITIONS
 
@@ -297,8 +293,8 @@ one paragraph under it.
 
 The correct reading order is the whole left column, then the whole right column. The worked
 example is running text: its statement and each paragraph of its solution are transcribed, at
-section 2.5, continuing 2.5's paragraph numbering. The paragraphs containing the reaction have
-has_equations true. The last paragraph is section "2.6", paragraph 1.
+section 2.5, continuing 2.5's paragraph numbering, the reaction transcribed with the rest. The
+last paragraph is section "2.6", paragraph 1.
 
 BOXED MATERIAL, CASE BY CASE
 

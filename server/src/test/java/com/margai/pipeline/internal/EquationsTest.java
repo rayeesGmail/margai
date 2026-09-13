@@ -40,6 +40,11 @@ class EquationsTest {
             "The value of the gravitational constant G was first determined by Henry Cavendish in 1798.",
             "Most planets have nearly circular orbits about the Sun, within about 1 per cent.",
             "Photosynthesis converts light energy into chemical energy in the chloroplast.",
+            // A list running past (f): the state-symbol rule must not read NCERT's own numbering
+            // as chemistry (spec-auditor, D14).
+            "The factors are (a) temperature, (b) pressure, (c) surface area, (d) concentration, "
+                    + "(e) the catalyst, (f) the solvent and (g) the vessel in which it is carried out.",
+            "Distinguish between (s) the solid state and (l) the liquid state as they are defined here.",
     })
     void proseIsNotAnExpression(String text) {
         assertThat(Equations.present(text)).as(text).isFalse();

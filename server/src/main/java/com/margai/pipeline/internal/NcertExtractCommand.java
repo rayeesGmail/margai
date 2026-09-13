@@ -77,7 +77,7 @@ class NcertExtractCommand extends NcertBookCommand {
         String jsonlKey = ContentKeys.extract(definition.code(), language);
         Map<String, ExtractedPage> done = new LinkedHashMap<>();
         if (content.exists(jsonlKey)) {
-            ExtractJsonl.read(content.get(jsonlKey)).forEach(page -> done.put(page.address(), page));
+            ExtractJsonl.read(jsonlKey, content.get(jsonlKey)).forEach(page -> done.put(page.address(), page));
         }
         int alreadyDone = done.size();
 
@@ -90,6 +90,7 @@ class NcertExtractCommand extends NcertBookCommand {
         int called = 0;
         int skipped = 0;
         int apparatusSkipped = 0;
+        int pagesChecked = 0;
         for (BookDefinition.Chapter chapter : selected) {
             List<String> pageKeys = content.list(ContentKeys.pagePrefix(definition.code(), language, chapter.no()));
             if (pageKeys.isEmpty()) {
@@ -162,6 +163,7 @@ class NcertExtractCommand extends NcertBookCommand {
                 // layer and both free (FIX 4, FIX 6): they turn the founder's audit from reading
                 // every paragraph into adjudicating the flagged ones.
                 if (pageText != null) {
+                    pagesChecked++;
                     for (NcertPage.Paragraph paragraph : response.output().paragraphs()) {
                         TranscriptionDiff.check(pageText, paragraph.text()).forEach(finding ->
                                 diffFlags.add("ch " + chapter.no() + " p" + page + " §" + paragraph.section()
@@ -196,9 +198,18 @@ class NcertExtractCommand extends NcertBookCommand {
                 List.of("pages in jsonl", "called this run", "already done", "apparatus", "paragraphs"),
                 List.of(List.of(String.valueOf(done.size()), String.valueOf(called),
                         String.valueOf(skipped), String.valueOf(apparatusSkipped), String.valueOf(paragraphs))));
+        // These two sections say how many pages they looked at, because they do not look at all of
+        // them: a page this run did not call for is not re-checked, and a chapter whose text layer
+        // was withheld cannot be checked at all. Without the count, "none" on a resumed run reads
+        // as a clean bill of health for pages nothing examined (spec-auditor, D14).
+        String checked = pagesChecked + " of the " + called + " page(s) called this run"
+                + (pagesChecked < called ? " (the rest had no usable text layer)" : "");
         report.section("characters that differ from the page's text layer — adjudicate these")
-                .list(diffFlags);
-        report.section("pages whose paragraph count does not match the page's shape").list(structureFlags);
+                .line("checked: " + checked)
+                .list(diffFlags, pagesChecked == 0 ? "nothing was checked" : "none on the pages checked");
+        report.section("pages whose paragraph count does not match the page's shape")
+                .line("checked: " + checked)
+                .list(structureFlags, pagesChecked == 0 ? "nothing was checked" : "none on the pages checked");
         report.section("low-confidence pages (below " + LOW_CONFIDENCE
                 + ") — a routing signal, not a guarantee").list(lowConfidence);
 

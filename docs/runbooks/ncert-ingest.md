@@ -81,18 +81,62 @@ chapter's own text layer and finds where Summary / Points to Ponder / Exercises 
 that page and everything after it is recorded as skipped and costs nothing. This is not a
 politeness — NCERT numbers its exercises with the chapter number (Chapter 7's questions are 7.1,
 7.2, 7.3), so a page of them is indistinguishable from a page of sections, and asking the model to
-ignore them did not work. The report's first table says, per chapter, where the boundary fell and
+ignore them did not work. The report's **apparatus table** says, per chapter, where the boundary fell and
 which heading found it. **Read it.** A boundary that looks too early means real teaching is being
 skipped; `—  not found: every page is sent` means the text layer was unreadable and nothing was
 skipped, which is safe but means the model will see the exercises for that chapter.
 
-Estimated cost at `claude-haiku-4-5` rates: about ₹0.55–1.10 per page, so roughly ₹250 for `bio11`
-and ₹170 for `phy11-part1`. The report's cost line is the truth — it comes from the `ai_calls`
-ledger, not from an estimate.
+**The page's own text layer is sent with the image** (D14, DECISIONS 2026-09-13). The image decides
+layout and reading order; the text layer decides characters, because these books are digitally
+typeset and every glyph the model misread at D14 was already correct in the PDF. The report's **text
+layer table** — the first one it prints — says, per chapter, whether the layer was fed or withheld
+and the legibility score behind that call. `withheld: illegible` is expected for **every Hindi book** and for `chem11-part2/kech202.pdf`,
+whose text is a custom-encoded font; it is not expected for any other English chapter, and one that
+appears is worth stopping for.
+
+Estimated cost at `claude-haiku-4-5` rates, built from the one real measurement rather than from a
+rate card: ch 7 of `phy11-part1` cost **₹12.71 for 12 billed pages — ₹1.06 each** (17 rendered, 5
+apparatus pages never sent) with tiling and no text layer. The text layer adds ~30–40% of *input*
+tokens, which is a smaller share of the bill than it sounds — output tokens price 5× input and
+cache reads a tenth — so call it **₹1.15–1.35 per billed page**. Against ~20–25% of pages being
+apparatus: `bio11` ≈ 211 billed of 264 → **₹250–285**, `phy11-part1` ≈ 138 billed of 184 →
+**₹160–185**. Both books together, **about ₹430**.
+
+The report's cost line is the truth — it comes from the `ai_calls` ledger, not from an estimate —
+and the first chapter's report is where to check this estimate before letting a book run. Two
+numbers in it are worth reading directly: `cache write` on the first call is the cached prefix's
+real token count (it must clear 4,600, the founder's floor on the cheap model's own tokenizer; the
+v2 template estimates ~5,325 by the startup tripwire's cruder proxy), and `cache read` on every
+call after it is the proof the prefix is actually being cached rather than re-sent at full price.
+
+**Read the two new report sections before the load.** Each begins with a `checked:` line saying how
+many of the pages called this run it actually looked at — a page the run resumed over and a chapter
+whose text layer was withheld are not checked, and the sections say so rather than printing `none`.
+
+`characters that differ from the page's text layer` asks two questions of every paragraph, both
+against that page's own layer: **is this word on the page at all** (a word used more often than the
+whole page holds it is invented or misread) and **is this symbol on the page** (`m_p`, `R_E`,
+`10^8` are glued back to the `mp`, `RE`, `108` the layer actually contains, and looked for). What it
+cannot see, so that `none` is read correctly: punctuation is ignored, so **a dropped `×`, a lost
+leading minus and a dropped prime will not appear here** — on these files they cannot, because NCERT
+sets those glyphs in a Symbol font with no Unicode mapping and `Kepler's` reaches the text layer as
+`Keplers`. Nor will a digit `1` read as a letter `l`. Those four are what step 4 of the ✅ below is
+for.
+
+`pages whose paragraph count does not match the page's shape` is a deliberately independent check —
+it knows nothing about characters, so it still has something to say where the layer itself is wrong.
+Both route attention; neither refuses. The low-confidence list is the weakest of the three signals
+(D14: the model was uniformly confident on a run that carried three real defects), so read it last.
 
 Resumable: pages already in `extract/{book}/{lang}.jsonl` are not called for again, so an
 interrupted run costs nothing to finish and a re-run costs nothing at all. `--redo` deliberately
 pays again for pages already done.
+
+**One verified run per book is the corpus.** Extract, audit, load, and from then on treat a
+re-extraction as a corpus event rather than a re-run: segmentation legitimately differs between
+extractions, and from D17 a chapter's paragraphs carry embeddings and question anchors that a silent
+re-cut would re-point. If a book must be re-extracted after that, it is re-embedded and re-anchored
+with it (DECISIONS 2026-09-13; the guard lands with D17).
 
 ## 4. load — JSONL into ncert_paragraphs
 
@@ -142,15 +186,31 @@ one `books.yaml` maps to that `chapter_no` — and check three things:
    paragraph that reads better than NCERT is a paragraph to reject.
 2. **The address is right.** The section printed above it matches `section`, and the paragraph is
    where `para_no` says within that section.
-3. **The flags are right.** `has_equations` true exactly when there is a mathematical or chemical
-   expression; `figure_refs` matches the figures the paragraph actually names.
+3. **The flags are right.** `figure_refs` matches the figures the paragraph actually names.
+   (`has_equations` is no longer the model's to get wrong — it is computed in Java from the
+   transcribed text, so a wrong value there is a regex to fix, not a paragraph to reject.)
+4. **Read at least five of the twenty against the rendered page image**, not against the PDF's text
+   layer or a text search of it — open `pages/{book}/en/{chapter}/{page}.png`, or the PDF page as it
+   renders on screen. This is not fussiness: the model is now *given* the text layer, and the
+   character diff *checks* against the text layer, so the two share a source and agree wherever that
+   source is wrong. The page as printed is the only thing outside that loop, and a human eye is the
+   only thing that reads it. At D14 this caught what the mechanical check structurally could not
+   (DECISIONS 2026-09-13, FIX 4).
 
 Record the twenty rows and the verdict in the TRACKER day log. A failure in (1) is serious and
 means the prompt or the render DPI needs work before D15; a failure in (2) is the anchor being
 wrong, which is what the whole addressing scheme exists to prevent.
 
+**Re-running the audit after an extraction change.** Sample the *same pages* as the previous audit,
+not a fresh random twenty: a defect table is only evidence if the two runs are comparable. The D14
+table — the defect list, what tiling fixed and what the v2 prompt is meant to fix — is in the TRACKER
+day log for 2026-09-13; work down it item by item and record which are gone, which survive and
+which are new. A new defect class matters more than a surviving one: surviving defects were already
+priced in, a new one means a change made something worse.
+
 Also read the extract report's low-confidence list: those pages are the model telling you where to
-look, and they should be checked whether or not the random sample lands on them.
+look, and they should be checked whether or not the random sample lands on them — while remembering
+that at D14 it was silent about every defect that mattered.
 
 ## If something goes wrong
 

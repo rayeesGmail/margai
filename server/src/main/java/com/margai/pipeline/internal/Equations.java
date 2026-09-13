@@ -36,8 +36,14 @@ final class Equations {
     /** A root, in the fixed spelling the prompt requires. */
     private static final String ROOT = "\\bsqrt\\s*\\(";
 
-    /** A chemical state attached to a formula: (s), (l), (g), (aq). */
-    private static final String STATE = "\\((?:s|l|g|aq)\\)(?=[^A-Za-z]|$)";
+    /**
+     * A chemical state, and it must be <em>attached</em> to the formula it belongs to — Zn(s), not
+     * a bare "(s)". NCERT numbers list items (a), (b), … and a list running to (g) or (l) would
+     * otherwise flag prose as chemistry (spec-auditor, D14). The cost is a formula written with a
+     * space, "H2O (l)", which this misses; every real reaction also carries an arrow, and that is
+     * matched above.
+     */
+    private static final String STATE = "[A-Za-z0-9\\])]\\((?:s|l|g|aq)\\)(?=[^A-Za-z]|$)";
 
     /** Scientific notation, in the fixed spelling the prompt requires: 3.84 x 10^8. */
     private static final String SCIENTIFIC = "\\bx\\s*10\\s*\\^";

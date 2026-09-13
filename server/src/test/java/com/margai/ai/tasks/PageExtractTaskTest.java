@@ -9,9 +9,13 @@ import com.margai.ai.api.ImagePart;
 import com.margai.ai.internal.PromptRegistry;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -125,6 +129,28 @@ class PageExtractTaskTest {
 
         assertThat(system).contains("Numbering runs across pages, not within them");
     }
+
+    /**
+     * The prompt may not ask for a field the tool schema forbids. `has_equations` was removed from
+     * the output record at D14 and left in four places in the prefix, where the tool's
+     * additionalProperties:false would have turned every page into a validation failure and a
+     * repair retry — billed twice, on a ₹430 run (spec-auditor, D14). A green build did not catch
+     * it because nothing compared the two; this does.
+     */
+    @Test
+    void theSystemPrefixAsksForNoFieldTheSchemaForbids() {
+        String system = prompts.systemPrefix("ncert_extract");
+        Set<String> allowed = Arrays.stream(NcertPage.Paragraph.class.getRecordComponents())
+                .map(component -> SNAKE.matcher(component.getName()).replaceAll("_$0").toLowerCase(Locale.ROOT))
+                .collect(java.util.stream.Collectors.toSet());
+
+        assertThat(allowed).contains("section", "para_no", "figure_refs").doesNotContain("has_equations");
+        assertThat(system).as("a field named in the prompt but absent from the schema")
+                .doesNotContain("has_equations");
+    }
+
+    /** camelCase to snake_case, the naming the tool schema is generated with. */
+    private static final Pattern SNAKE = Pattern.compile("(?<=[a-z0-9])[A-Z]");
 
     private static ImagePart image() {
         return new ImagePart("not a real png, the fake never looks".getBytes(StandardCharsets.UTF_8), "image/png");

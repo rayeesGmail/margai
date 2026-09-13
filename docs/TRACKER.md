@@ -365,8 +365,42 @@ THE CANONICAL RUN — phy11-part1, 22:15–22:42, ₹117.88 for 108 billed pages
   run (`ch 1 p2` 21%, `ch 4 p3`, `ch 6 p16`, `ch 6 p25`), consistent enough across four extractions
   to be page content rather than loss, still unexamined (PARKED). Spend on phy11-part1 today ≈
   ₹435 across ten live runs; bio11 not yet extracted.
-NEXT: the founder's D14 ✅ — twenty random paragraphs against the PDFs, per the runbook — on this
-  corpus; D14 ticks when it passes. Then bio11 (~₹200) on the same configuration. Code-assigned
+THE D14 ✅, RUN BY CLAUDE AT 23:05 ON THE CANONICAL ROWS (setseed 0.14, twenty rows of
+  phy11-part1, every one read against its rendered page image, not the text layer). Verdict per
+  row — text exact / address right / figure refs right:
+  | # | address | pages | verdict |
+  |---|---|---|---|
+  | 1 | §5.1.1 ¶8 | 2 | ✓ ✓ — · the unit-vector identities' second line sits in the next paragraph (segmentation, not text) |
+  | 2 | §5.11.2 ¶5 | 14 | ✓ ✓ — · Eqs. (5.26), (5.27) exact, subscripts 1f/2f/1i right |
+  | 3 | §5.4 ¶5 | 5 | **✗** ✓ — · page: v_f = √(2×100 J / 0.05 kg) = 63.2 m s⁻¹; stored: "v_f^2 = 2 × 100 J / 0.05 kg = 63.2 m s^-1" — **the radical dropped and the left side squared: a wrong formula** |
+  | 4 | §5.11 ¶3 | 13 | ✓ ✓ — |
+  | 5 | §7.2 ¶1 | 2 | ✓ ✓ — |
+  | 6 | §6.8.2 ¶6 | 22 | ✓ ✓ — · begins "free space." — the known gravity-/free split |
+  | 7 | §1.3 ¶3 | 3 | ✓ ✓ — · "(1) For example…" and the indented "All these numbers…" merged into one |
+  | 8 | §6.10 ¶14 | 27 | ✓ ✓ — |
+  | 9 | §6.4 ¶8 | 9 | ✓ ✓ — · ends "…may have"; page 10's continuation numbered ¶9 instead of joined (known class) |
+  | 10 | §6.7.3 ¶7 | 17 | ✓ ✓ — |
+  | 11 | §4.7 ¶4 | 10 | ✓ ✓ — · p'_A, p'_B primes present |
+  | 12 | §5.1.1 ¶13 | 2 | ✓ ✓ — · Example 5.1 with its label |
+  | 13 | §3.10 ¶15 | 16 | ✓ ✓ — · ν and π by name, (3.47) kept |
+  | 14 | §2.4 ¶18 | 6 | ✓ ✓ — · Example 2.3 with its label |
+  | 15 | §6.9 ¶9 | 24 | ✓ ✓ ✓ · Fig. 6.28; NCERT's own "of length of length l" reproduced faithfully |
+  | 16 | §1.6.2 ¶10 | 9 | ✓ ✓ — |
+  | 17 | §5.6 ¶7 | 7 | ✓ ✓ — · Example 5.6, −k/x and the range kept |
+  | 18 | §7.2 ¶5 | 3 | ✓ ✓ — · the audit's item-9 paragraph, has_equations now false |
+  | 19 | §6.12 ¶12 | 30 | ✓ ✓ — · L_perp, ω k_hat, (6.42c)/(6.42d) |
+  | 20 | §1.2 ¶10 | 3 | ✓ ✓ — |
+  **Text exact 19/20, address right 20/20, figure refs 1/1. One defect, and it is the instructive
+  kind**: row 3 dropped a radical. The text layer cannot carry √ (Symbol font, unmapped), so it
+  reads "2 100 J / 0.05 kg"; told the layer is authoritative for characters, the model followed the
+  layer's *absence* of a glyph the band image plainly shows, and then repaired the arithmetic by
+  squaring the left side — a wrong formula that reads plausibly. The rule needs one sentence:
+  **the layer is authoritative for characters it has, never for characters it lacks — a radical,
+  a prime, an operator missing from the layer and visible in the image is taken from the image.**
+  First prompt item tomorrow, tested on chapter 7 before anything. Two rows (6, 9) are the known
+  split class; row 7 a benign merge. Claude's recommendation on the ✅: **PARTIAL** — the addressing
+  scheme, which is D14's deliverable, is 20/20; the text is 19/20 with a formula error of a class
+  now understood. The founder spot-verifies rows 3, 6, 11, 15 and 19 and rules PASS or PARTIAL. Then bio11 (~₹200) on the same configuration. Code-assigned
   numbering (prompt v3) is D15 work, applied to the eight remaining books first and back to phy
   only if chapter 7 proves it materially better, as a corpus event.
 ```

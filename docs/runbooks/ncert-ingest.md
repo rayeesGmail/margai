@@ -111,7 +111,8 @@ Read these six things in the extract report, in this order, before spending anyt
 4. **`characters that differ …`** — this is the section the whole day was about. A handful of lines
    is the expected shape. A wall of them means the check is mis-tuned against this file and is worth
    stopping for; `none` with a `checked:` count of zero means nothing was examined.
-5. **The cost per billed page** — ₹1.06 before the text layer, so ₹1.15–1.35 is the expected range.
+5. **The cost per billed page** — measured at ₹1.07–1.09 across the whole of `phy11-part1` with the
+   text layer and bands (₹117.88 for 108 billed pages, 2026-09-13).
    Meaningfully above that changes the estimate for the other nine books, not just this one.
 6. **That the load succeeds at all.** Two paragraphs at one address is the failure that three
    separate D14 runs hit; the loader refuses it by name and prints the `--redo` that fixes it.
@@ -142,13 +143,13 @@ and the legibility score behind that call. `withheld: illegible` is expected for
 whose text is a custom-encoded font; it is not expected for any other English chapter, and one that
 appears is worth stopping for.
 
-Estimated cost at `claude-haiku-4-5` rates, built from the one real measurement rather than from a
-rate card: ch 7 of `phy11-part1` cost **₹12.71 for 12 billed pages — ₹1.06 each** (17 rendered, 5
-apparatus pages never sent) with tiling and no text layer. The text layer adds ~30–40% of *input*
-tokens, which is a smaller share of the bill than it sounds — output tokens price 5× input and
-cache reads a tenth — so call it **₹1.15–1.35 per billed page**. Against ~20–25% of pages being
-apparatus: `bio11` ≈ 211 billed of 264 → **₹250–285**, `phy11-part1` ≈ 138 billed of 184 →
-**₹160–185**. Both books together, **about ₹430**.
+Cost at `claude-haiku-4-5` rates, measured on a whole book rather than estimated: the canonical
+extraction of `phy11-part1` on 2026-09-13 cost **₹117.88 for 108 billed pages — ₹1.09 each** (143
+rendered, 35 apparatus pages never sent), with the text layer and two bands per page. The text
+layer's extra input tokens turned out to cost less than feared, because output tokens price 5×
+input and cache reads a tenth. So plan on **₹1.05–1.15 per billed page and ~75% of pages billed**:
+`bio11` ≈ 200 billed of 264 → **about ₹220**; a book the size of `phy11-part1` → **about ₹120**.
+A chapter-7 dry run is ₹13.
 
 The report's cost line is the truth — it comes from the `ai_calls` ledger, not from an estimate —
 and the first chapter's report is where to check this estimate before letting a book run. Two

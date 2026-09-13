@@ -397,8 +397,12 @@ THE D14 ✅, RUN BY CLAUDE AT 23:05 ON THE CANONICAL ROWS (setseed 0.14, twenty 
   squaring the left side — a wrong formula that reads plausibly. The rule needs one sentence:
   **the layer is authoritative for characters it has, never for characters it lacks — a radical,
   a prime, an operator missing from the layer and visible in the image is taken from the image.**
-  First prompt item tomorrow, tested on chapter 7 before anything. Two rows (6, 9) are the known
-  split class; row 7 a benign merge. Claude's recommendation on the ✅: **PARTIAL** — the addressing
+  Added to the prompt at 23:10 and **proved on the failing page at 23:20** (`--redo --chapters 5
+  --pages 5`, ₹1): `§5.4 ¶5` now reads `v_f = sqrt(2 × 100 J / 0.05 kg) = 63.2 m s^-1`, and the
+  closing line "The speed is reduced by approximately 68% (not 90%)." — which the first run had
+  swallowed — is its own paragraph. The rule postdates the canonical run, so the book carries one
+  page on it and 142 without; the full re-extraction on the final prompt is the D15 corpus event.
+  Two rows (6, 9) are the known split class; row 7 a benign merge. Claude's recommendation on the ✅: **PARTIAL** — the addressing
   scheme, which is D14's deliverable, is 20/20; the text is 19/20 with a formula error of a class
   now understood. The founder spot-verifies rows 3, 6, 11, 15 and 19 and rules PASS or PARTIAL. Then bio11 (~₹200) on the same configuration. Code-assigned
   numbering (prompt v3) is D15 work, applied to the eight remaining books first and back to phy

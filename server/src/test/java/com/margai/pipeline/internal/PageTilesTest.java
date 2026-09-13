@@ -31,23 +31,16 @@ class PageTilesTest {
     }
 
     /**
-     * The whole page first, for layout, then the bands, for glyphs: chapter 7 extracted each way
-     * on its own was wrong in one place — bands cut sentences and misordered a two-column page,
-     * the whole page alone lost every prime (D14).
+     * Bands only, no whole-page image beside them: chapter 7 was extracted with the page alongside
+     * three times on 2026-09-13 — full size first, full size last, and as a thumbnail — and lost
+     * every prime each time, while bands alone kept them. Any whole-page view makes the model
+     * transcribe from it (D14, DECISIONS). This pins that there are exactly {@code tiles} images.
      */
     @Test
-    void theWholePageComesFirstThenTwoTilesCoverItWithAnOverlapInReadingOrder() throws IOException {
-        byte[] page = png(WIDTH, HEIGHT);
-        List<byte[]> images = PageTiles.split(page, 2);
+    void twoTilesCoverThePageWithAnOverlapAndComeInReadingOrderWithNoWholePageBesideThem() throws IOException {
+        List<byte[]> bands = PageTiles.split(png(WIDTH, HEIGHT), 2);
 
-        assertThat(images).hasSize(3);
-        // Last, and a thumbnail: sent full size, first or last, the model read its characters off
-        // the page and lost the primes both times (D14, chapter 7, 21:32 and 21:46). Small enough
-        // that no glyph is legible, large enough that the layout is.
-        assertThat(height(images.getLast())).as("the whole page, shrunk to a layout sketch")
-                .isEqualTo(PageTiles.THUMBNAIL_HEIGHT);
-        assertThat(width(images.getLast())).isEqualTo((int) Math.round((double) WIDTH * PageTiles.THUMBNAIL_HEIGHT / HEIGHT));
-        List<byte[]> bands = images.subList(0, 2);
+        assertThat(bands).hasSize(2);
         int overlap = (int) Math.round(HEIGHT * PageTiles.OVERLAP);
         assertThat(height(bands.get(0))).isEqualTo(HEIGHT / 2 + overlap);
         assertThat(height(bands.get(1))).isEqualTo(HEIGHT - HEIGHT / 2 + overlap);
@@ -64,10 +57,7 @@ class PageTilesTest {
         assertThat(HEIGHT).as("a whole page is over the limit, which is the problem")
                 .isGreaterThan(providerLimit);
 
-        List<byte[]> images = PageTiles.split(png(WIDTH, HEIGHT), 2);
-        assertThat(height(images.getLast())).as("the thumbnail is far below the limit, and below legibility")
-                .isLessThan(providerLimit / 2);
-        for (byte[] band : images.subList(0, images.size() - 1)) {
+        for (byte[] band : PageTiles.split(png(WIDTH, HEIGHT), 2)) {
             assertThat(Math.max(width(band), height(band)))
                     .as("a band must arrive unscaled")
                     .isLessThanOrEqualTo(providerLimit);

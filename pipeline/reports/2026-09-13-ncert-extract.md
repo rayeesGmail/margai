@@ -1,13 +1,13 @@
 # margai-pipeline ncert extract
 
-- run: 2026-09-13 21:46 IST
+- run: 2026-09-13 21:59 IST
 - input: ../pipeline/inputs/books.yaml
 - sha256: 43094de04766d480a31d739fac3a7135d697568a2cc78ef7ebe587685e3b6b5c
 - read: 1 chapters of phy11-part1 (en)
 - result: ok
 content store: s3://margai-beta-content
-page tiles: 2 (each page sent as overlapping bands, unscaled)
-request id: pipeline-ncert-extract-1b5a0c28-0a0c-4ab8-b163-07fd5dbac59b
+page tiles: 2 (each page sent as overlapping bands, unscaled, plus a thumbnail of the whole page for layout)
+request id: pipeline-ncert-extract-719b0680-4298-4f73-a0a6-04a1a034769b
 
 ## text layer (authoritative for characters where it is legible)
 
@@ -25,18 +25,18 @@ request id: pipeline-ncert-extract-1b5a0c28-0a0c-4ab8-b163-07fd5dbac59b
 
 | chapter | pages | called | paragraphs |
 |---|---|---|---|
-| 7 | 17 | 12 | 106 |
+| 7 | 17 | 12 | 114 |
 
 ## total
 
 | pages in jsonl | called this run | already done | apparatus | paragraphs |
 |---|---|---|---|---|
-| 143 | 12 | 0 | 5 | 988 |
+| 143 | 12 | 0 | 5 | 996 |
 
 ## characters that differ from the page's text layer — adjudicate these
 
 checked: 12 of the 12 page(s) called this run
-none on the pages checked
+- ch 7 p6 §7.4 ¶2: 'neighbouring' 3x here, 2x on the page
 
 ## pages whose text is not all there — or is there twice
 
@@ -51,5 +51,5 @@ none
 
 | calls | input | output | cache read | cache write | cost |
 |---|---|---|---|---|---|
-| 12 | 83424 | 14733 | 68607 | 6237 | ₹15.51 |
+| 12 | 70968 | 14990 | 68607 | 6237 | ₹14.52 |
 jsonl: extract/phy11-part1/en.jsonl (143 pages, 143 of them from earlier runs)

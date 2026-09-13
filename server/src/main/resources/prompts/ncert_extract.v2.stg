@@ -386,17 +386,14 @@ Call the tool exactly once, with the paragraphs in reading order.
 user(v) ::= <<
 This is page <v.page> of Chapter <v.chapter> of <v.book_title>.
 <if(v.tiles)>
-The page is given to you twice over. **The first <v.tiles> images are horizontal bands of the
-page**, in order from the top, each at full resolution: **read every character from these** — a
-subscript, a prime, a minus sign, an exponent — because they are the only images in which such
-marks are large enough to see. The bands **overlap** — the last lines of one band are repeated as
-the first lines of the next — so that no line is cut in half. **The last image is a small
-thumbnail of the whole page** — deliberately too small to read a single letter from. It is there
-for one thing: the layout — the columns, the boxes, where each paragraph begins and ends, and
-the order in which the page is read. Every character comes from the bands. Transcribe each
-paragraph once, in the reading
-order the whole page shows, and do not repeat a paragraph because it appears in two bands.
-Paragraph numbering runs across the whole page, not within a band.
+The page is given to you as <v.tiles> images: horizontal bands of the one page, in order from the
+top, each at full resolution so that a subscript, a prime, a minus sign or an exponent is large
+enough to see. They **overlap** — the last lines of one band are repeated as the first lines of
+the next — so that no line is cut in half. Read them as one page: work out the columns and the
+boxes from the bands together, transcribe each paragraph once, in reading order, and do not
+repeat a paragraph because it appears in two bands. Where the page has two columns, the whole of
+the left column is read before the right, across every band. Paragraph numbering runs across the
+whole page, not within a band.
 
 **A band boundary is never a paragraph boundary.** The bands are an artefact of how the image was
 cut for you; the page does not know about them. If the text at the bottom of one band ends in the

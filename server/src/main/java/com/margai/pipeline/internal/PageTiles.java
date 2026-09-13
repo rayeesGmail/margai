@@ -28,35 +28,26 @@ final class PageTiles {
     /** Share of the page height repeated at each seam. Enough for two or three lines of body text. */
     static final double OVERLAP = 0.06;
 
-    /**
-     * Height of the whole-page thumbnail. Body text at 150 DPI is ~23 px tall on the page; at this
-     * height it is ~9 px — shapes of lines and paragraphs, not letters.
-     */
-    static final int THUMBNAIL_HEIGHT = 700;
-
     private static final String FORMAT = "png";
 
     private PageTiles() {
     }
 
     /**
-     * The whole page first, then {@code tiles} overlapping bands of it, top to bottom. One tile
-     * means the page alone, which is the configuration this pipeline shipped with.
+     * Splits a page into {@code tiles} overlapping bands, top to bottom. One tile means the page
+     * unchanged, which is the configuration this pipeline shipped with and the one to fall back to.
      *
-     * <p>Both, not either, because chapter 7 was extracted both ways on 2026-09-13 and each was
-     * wrong in one place. Bands alone kept every prime and cut sentences at the seam, and on a
-     * two-column page with a worked example put a mid-page paragraph first. The whole page alone
-     * read the layout correctly and lost the primes — {@code F'_GB} came back {@code F_GB} — which
-     * the text layer cannot restore, because NCERT's Symbol font has no Unicode mapping for them.
-     * So the page supplies layout and reading order and the bands supply the glyphs, and the prompt
-     * says which is which (D14, DECISIONS).
-     *
-     * <p>The bands come first and the page last, and the page is a <b>thumbnail</b>. With the page
-     * sent full size, first or last, the primes vanished exactly as they had with the page alone
-     * (two ₹15 runs, 21:32 and 21:46) — told to read characters from the bands, the model read
-     * them off the page anyway. So the page is shrunk to {@link #THUMBNAIL_HEIGHT}, at which the
-     * columns, boxes and paragraph breaks are plain and no glyph is legible: the layout it is
-     * there for survives, and there is nothing on it to transcribe from.
+     * <p>Bands only — no whole-page image alongside them — and that was measured, not assumed.
+     * On the evening of 2026-09-13 chapter 7 was extracted four ways. Bands alone: every prime
+     * kept, one two-column page with a worked example read out of order. The whole page alone:
+     * the layout right and every prime gone, {@code F'_GB} arriving as {@code F_GB}. Then the page
+     * <em>with</em> the bands, three times — full size first, full size last, and as a 700-pixel
+     * thumbnail too small to read a letter from — and the primes vanished all three times, with
+     * the layout right and every label kept. Any whole-page view at all, even an illegible one,
+     * makes the model transcribe from it rather than from the bands it is told to read. A prime
+     * that the Symbol font never mapped cannot be restored from the text layer, so the primes
+     * decide it: bands only, and the reading-order case goes to the page-image second read
+     * (D14, DECISIONS).
      */
     static List<byte[]> split(byte[] png, int tiles) {
         if (tiles <= 1) {
@@ -67,31 +58,13 @@ final class PageTiles {
         int band = height / tiles;
         int overlap = (int) Math.round(height * OVERLAP);
 
-        List<byte[]> bands = new ArrayList<>(tiles + 1);
+        List<byte[]> bands = new ArrayList<>(tiles);
         for (int index = 0; index < tiles; index++) {
             int top = Math.max(0, index * band - (index == 0 ? 0 : overlap));
             int bottom = index == tiles - 1 ? height : Math.min(height, (index + 1) * band + overlap);
             bands.add(write(page.getSubimage(0, top, page.getWidth(), bottom - top)));
         }
-        bands.add(write(thumbnail(page)));
         return List.copyOf(bands);
-    }
-
-    /** The page at {@link #THUMBNAIL_HEIGHT}, aspect kept, smoothly downsampled. */
-    static BufferedImage thumbnail(BufferedImage page) {
-        int width = Math.max(1, (int) Math.round((double) page.getWidth() * THUMBNAIL_HEIGHT / page.getHeight()));
-        BufferedImage small = new BufferedImage(width, THUMBNAIL_HEIGHT, BufferedImage.TYPE_INT_RGB);
-        java.awt.Graphics2D graphics = small.createGraphics();
-        try {
-            graphics.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
-                    java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            graphics.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING,
-                    java.awt.RenderingHints.VALUE_RENDER_QUALITY);
-            graphics.drawImage(page, 0, 0, width, THUMBNAIL_HEIGHT, null);
-        } finally {
-            graphics.dispose();
-        }
-        return small;
     }
 
     private static BufferedImage read(byte[] png) {

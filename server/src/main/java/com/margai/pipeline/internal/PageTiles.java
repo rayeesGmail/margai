@@ -28,6 +28,12 @@ final class PageTiles {
     /** Share of the page height repeated at each seam. Enough for two or three lines of body text. */
     static final double OVERLAP = 0.06;
 
+    /**
+     * Height of the whole-page thumbnail. Body text at 150 DPI is ~23 px tall on the page; at this
+     * height it is ~9 px — shapes of lines and paragraphs, not letters.
+     */
+    static final int THUMBNAIL_HEIGHT = 700;
+
     private static final String FORMAT = "png";
 
     private PageTiles() {
@@ -45,9 +51,12 @@ final class PageTiles {
      * So the page supplies layout and reading order and the bands supply the glyphs, and the prompt
      * says which is which (D14, DECISIONS).
      *
-     * <p>The bands come first and the page last, not the other way round: with the page first the
-     * primes vanished exactly as they had with the page alone — the model reads its characters
-     * off the first image it is given, whatever it is told about the rest.
+     * <p>The bands come first and the page last, and the page is a <b>thumbnail</b>. With the page
+     * sent full size, first or last, the primes vanished exactly as they had with the page alone
+     * (two ₹15 runs, 21:32 and 21:46) — told to read characters from the bands, the model read
+     * them off the page anyway. So the page is shrunk to {@link #THUMBNAIL_HEIGHT}, at which the
+     * columns, boxes and paragraph breaks are plain and no glyph is legible: the layout it is
+     * there for survives, and there is nothing on it to transcribe from.
      */
     static List<byte[]> split(byte[] png, int tiles) {
         if (tiles <= 1) {
@@ -64,8 +73,25 @@ final class PageTiles {
             int bottom = index == tiles - 1 ? height : Math.min(height, (index + 1) * band + overlap);
             bands.add(write(page.getSubimage(0, top, page.getWidth(), bottom - top)));
         }
-        bands.add(png);
+        bands.add(write(thumbnail(page)));
         return List.copyOf(bands);
+    }
+
+    /** The page at {@link #THUMBNAIL_HEIGHT}, aspect kept, smoothly downsampled. */
+    static BufferedImage thumbnail(BufferedImage page) {
+        int width = Math.max(1, (int) Math.round((double) page.getWidth() * THUMBNAIL_HEIGHT / page.getHeight()));
+        BufferedImage small = new BufferedImage(width, THUMBNAIL_HEIGHT, BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D graphics = small.createGraphics();
+        try {
+            graphics.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
+                    java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            graphics.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING,
+                    java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+            graphics.drawImage(page, 0, 0, width, THUMBNAIL_HEIGHT, null);
+        } finally {
+            graphics.dispose();
+        }
+        return small;
     }
 
     private static BufferedImage read(byte[] png) {

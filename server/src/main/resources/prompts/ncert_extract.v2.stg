@@ -390,10 +390,11 @@ The page is given to you twice over. **The first <v.tiles> images are horizontal
 page**, in order from the top, each at full resolution: **read every character from these** — a
 subscript, a prime, a minus sign, an exponent — because they are the only images in which such
 marks are large enough to see. The bands **overlap** — the last lines of one band are repeated as
-the first lines of the next — so that no line is cut in half. **The last image is the whole
-page, shrunk**: use it only to decide the layout — the columns, the boxes, where each paragraph
-begins and ends, and the order in which the page is read — and never to read a character from,
-because at that size a prime or a dot is gone. Transcribe each paragraph once, in the reading
+the first lines of the next — so that no line is cut in half. **The last image is a small
+thumbnail of the whole page** — deliberately too small to read a single letter from. It is there
+for one thing: the layout — the columns, the boxes, where each paragraph begins and ends, and
+the order in which the page is read. Every character comes from the bands. Transcribe each
+paragraph once, in the reading
 order the whole page shows, and do not repeat a paragraph because it appears in two bands.
 Paragraph numbering runs across the whole page, not within a band.
 

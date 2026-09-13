@@ -69,7 +69,9 @@ class NcertExtractCommand extends NcertBookCommand {
     void run(BookDefinition definition, List<BookDefinition.Chapter> selected, Report report) {
         report.line("content store: " + content.describe());
         report.line("page tiles: " + properties.pageTiles()
-                + (properties.pageTiles() > 1 ? " (each page sent as overlapping bands, unscaled)" : " (whole page)"));
+                + (properties.pageTiles() > 1
+                        ? " (each page sent as overlapping bands, unscaled, plus a thumbnail of the whole page for layout)"
+                        : " (whole page)"));
         String runId = "pipeline-ncert-extract-" + UUID.randomUUID();
         report.line("request id: " + runId);
         AiCallContext ctx = AiCallContext.system(runId);

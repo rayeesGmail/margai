@@ -1,6 +1,6 @@
 # margai-pipeline ncert load
 
-- run: 2026-09-13 21:34 IST
+- run: 2026-09-13 21:47 IST
 - input: ../pipeline/inputs/books.yaml
 - sha256: 43094de04766d480a31d739fac3a7135d697568a2cc78ef7ebe587685e3b6b5c
 - read: 1 chapters of phy11-part1 (en)
@@ -15,32 +15,36 @@ none
 
 | inserted | updated | unchanged |
 |---|---|---|
-| 0 | 109 | 0 |
+| 0 | 106 | 0 |
 
 ## pages per chapter
 
 | chapter | pages extracted | pages with text | paragraphs | text yield |
 |---|---|---|---|---|
-| 7 | 17 | 12 | 109 | 70.6% |
+| 7 | 17 | 12 | 106 | 70.6% |
 
 ## paragraphs that begin in the middle of the previous one's sentence
 
 a band boundary is not a paragraph boundary; these are where it was read as one
-- ch 7 §7.3 ¶23 continues the sentence ¶22 stopped in the middle of: "…s easily done using calculus. For two special" + "cases, a simple law results when you do that …"
-- ch 7 §7.5 ¶5 continues the sentence ¶4 stopped in the middle of: "… sphere M_r of radius r is (4π / 3) ρ r^3 and" + "hence F = G m ((4π / 3) r) r^3 / r^2 = G m (M…"
-- ch 7 §7.7 ¶9 continues the sentence ¶8 stopped in the middle of: "…ential energy W(r) at a distance r, such that" + "valid for r > R, so that once again W_12 = W(…"
-- ch 7 §7.9 ¶6 continues the sentence ¶5 stopped in the middle of: "…s to our aid, T_M^2 / T_E^2 = R_MS^3 / R_ES^3" + "where R_MS is the Mars-Sun distance and R_ES …"
+- ch 7 §7.5 ¶5 continues the sentence ¶4 stopped in the middle of: "…e sphere M_r of radius r is (4/3) π ρ r^3 and" + "hence F = G m ((4/3) ρ r) (r^3 / r^2) = G m (…"
+- ch 7 §7.9 ¶5 continues the sentence ¶4 stopped in the middle of: "…s to our aid, T_M^2 / T_E^2 = R_MS^3 / R_ES^3" + "where R_MS is the Mars-Sun distance and R_ES …"
 
 ## coverage for the book
 
 | pages rendered | pages extracted | pages with text | paragraphs | coverage |
 |---|---|---|---|---|
-| 143 | 17 | 12 | 109 | — |
+| 143 | 17 | 12 | 106 | — |
 
 ## addresses in the database this extraction no longer carries
 
-- ch 7 §7.2 ¶10
-- ch 7 §7.4 ¶6
+- ch 7 §7.3 ¶17
+- ch 7 §7.3 ¶18
+- ch 7 §7.3 ¶19
+- ch 7 §7.3 ¶20
+- ch 7 §7.3 ¶21
+- ch 7 §7.3 ¶22
+- ch 7 §7.3 ¶23
+- ch 7 §7.3 ¶24
 - ch 7 §7.4 ¶7
 - ch 7 §7.5 ¶10
 - ch 7 §7.5 ¶9
@@ -50,10 +54,7 @@ a band boundary is not a paragraph boundary; these are where it was read as one
 - ch 7 §7.6 ¶15
 - ch 7 §7.6 ¶16
 - ch 7 §7.6 ¶17
-- ch 7 §7.8 ¶18
 - ch 7 §7.8 ¶19
-- ch 7 §7.9 ¶13
-- ch 7 §7.9 ¶14
 - ch 7 §7.9 ¶15
 - ch 7 §7.9 ¶16
 - ch 7 §7.9 ¶17

@@ -176,8 +176,9 @@ Transcribe mathematics inline in plain text, keeping every symbol readable:
   - a partial derivative ∂ is "d" only when the page means an ordinary derivative; where the page
     prints ∂, write "partial": "partial V / partial x".
 - **An approximation is never flattened into an equality.** Where the page prints ≅ or ≈, write
-  "approx=" — "g(h) approx= g (1 - 2h / R_E)". An approximate result reported as exact is a
-  physics error, not a formatting one.
+  that sign, exactly as printed — "g(h) ≅ g (1 - 2h / R_E)" — or "approx=" if you cannot
+  produce the glyph. Never "=". An approximate result reported as exact is a physics error, not a
+  formatting one.
 - **Scientific notation keeps its multiplication sign, exactly as the page prints it**: where the
   book sets ×, write ×; where it sets a dot or an x, write that. "3.84 × 10^8 m", never
   "3.84 10^8 m" and never a dropped exponent. The sign matters; which glyph it is does not, and
@@ -385,15 +386,16 @@ Call the tool exactly once, with the paragraphs in reading order.
 user(v) ::= <<
 This is page <v.page> of Chapter <v.chapter> of <v.book_title>.
 <if(v.tiles)>
-The page is given to you twice over. **The first image is the whole page**: use it for the
-layout — the columns, the boxes, where each paragraph begins and ends, and the order in which the
-page is read. **The <v.tiles> images after it are horizontal bands of that same page**, in order
-from the top, each at full resolution: use them for the characters — a subscript, a prime, a
-minus sign, an exponent — because at whole-page size those marks are too small to read reliably.
-The bands **overlap** — the last lines of one band are repeated as the first lines of the next —
-so that no line is cut in half. Transcribe each paragraph once, in the reading order the whole
-page shows, and do not repeat a paragraph because it appears in two bands. Paragraph numbering
-runs across the whole page, not within a band.
+The page is given to you twice over. **The first <v.tiles> images are horizontal bands of the
+page**, in order from the top, each at full resolution: **read every character from these** — a
+subscript, a prime, a minus sign, an exponent — because they are the only images in which such
+marks are large enough to see. The bands **overlap** — the last lines of one band are repeated as
+the first lines of the next — so that no line is cut in half. **The last image is the whole
+page, shrunk**: use it only to decide the layout — the columns, the boxes, where each paragraph
+begins and ends, and the order in which the page is read — and never to read a character from,
+because at that size a prime or a dot is gone. Transcribe each paragraph once, in the reading
+order the whole page shows, and do not repeat a paragraph because it appears in two bands.
+Paragraph numbering runs across the whole page, not within a band.
 
 **A band boundary is never a paragraph boundary.** The bands are an artefact of how the image was
 cut for you; the page does not know about them. If the text at the bottom of one band ends in the

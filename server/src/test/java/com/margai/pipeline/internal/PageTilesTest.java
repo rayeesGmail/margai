@@ -41,8 +41,10 @@ class PageTilesTest {
         List<byte[]> images = PageTiles.split(page, 2);
 
         assertThat(images).hasSize(3);
-        assertThat(images.getFirst()).as("the page itself, untouched").isEqualTo(page);
-        List<byte[]> bands = images.subList(1, 3);
+        // Last, not first: with the page first the model read its characters off it and lost the
+        // primes, exactly as with the page alone (D14, chapter 7, 21:32).
+        assertThat(images.getLast()).as("the page itself, untouched, after the bands").isEqualTo(page);
+        List<byte[]> bands = images.subList(0, 2);
         int overlap = (int) Math.round(HEIGHT * PageTiles.OVERLAP);
         assertThat(height(bands.get(0))).isEqualTo(HEIGHT / 2 + overlap);
         assertThat(height(bands.get(1))).isEqualTo(HEIGHT - HEIGHT / 2 + overlap);
@@ -60,9 +62,9 @@ class PageTilesTest {
                 .isGreaterThan(providerLimit);
 
         List<byte[]> images = PageTiles.split(png(WIDTH, HEIGHT), 2);
-        assertThat(height(images.getFirst())).as("the whole page travels as it is, and is shrunk")
+        assertThat(height(images.getLast())).as("the whole page travels as it is, and is shrunk")
                 .isGreaterThan(providerLimit);
-        for (byte[] band : images.subList(1, images.size())) {
+        for (byte[] band : images.subList(0, images.size() - 1)) {
             assertThat(Math.max(width(band), height(band)))
                     .as("a band must arrive unscaled")
                     .isLessThanOrEqualTo(providerLimit);

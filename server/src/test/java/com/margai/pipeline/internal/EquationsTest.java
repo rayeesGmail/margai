@@ -18,6 +18,8 @@ class EquationsTest {
             "a_m = V^2 / R_m = 4 pi^2 R_m / T^2 [7.3]",
             "| F | = G m_1 m_2 / r^2 [7.5]",
             "g(h) approx= g (1 - 2h / R_E) [7.15]",
+            // As printed, since the evening of D14: the glyph the page sets, not our spelling of it.
+            "g(h) ≅ g (1 - 2h / R_E). [7.15]",
             "R_m was already known then to be about 3.84 x 10^8 m.",
             // Whichever sign the page prints: the prompt no longer fixes the glyph (D14).
             "R_m was already known then to be about 3.84 × 10^8 m.",

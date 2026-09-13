@@ -44,6 +44,10 @@ final class PageTiles {
      * the text layer cannot restore, because NCERT's Symbol font has no Unicode mapping for them.
      * So the page supplies layout and reading order and the bands supply the glyphs, and the prompt
      * says which is which (D14, DECISIONS).
+     *
+     * <p>The bands come first and the page last, not the other way round: with the page first the
+     * primes vanished exactly as they had with the page alone — the model reads its characters
+     * off the first image it is given, whatever it is told about the rest.
      */
     static List<byte[]> split(byte[] png, int tiles) {
         if (tiles <= 1) {
@@ -55,12 +59,12 @@ final class PageTiles {
         int overlap = (int) Math.round(height * OVERLAP);
 
         List<byte[]> bands = new ArrayList<>(tiles + 1);
-        bands.add(png);
         for (int index = 0; index < tiles; index++) {
             int top = Math.max(0, index * band - (index == 0 ? 0 : overlap));
             int bottom = index == tiles - 1 ? height : Math.min(height, (index + 1) * band + overlap);
             bands.add(write(page.getSubimage(0, top, page.getWidth(), bottom - top)));
         }
+        bands.add(png);
         return List.copyOf(bands);
     }
 

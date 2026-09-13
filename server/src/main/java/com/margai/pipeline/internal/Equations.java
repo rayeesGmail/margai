@@ -19,7 +19,8 @@ import java.util.regex.Pattern;
 final class Equations {
 
     /** An approximation, in the fixed spelling the prompt requires. */
-    private static final String APPROXIMATION = "approx=";
+    /** An approximation, as the page prints it or in the spelling the prompt falls back to. */
+    private static final String APPROXIMATION = "(?:approx=|[≅≈≃])";
 
     /** A reaction or relation arrow: 2H_2 + O_2 -> 2H_2O, N_2 + 3H_2 <-> 2NH_3. */
     private static final String ARROW = "<->|->|<=|>=|!=";
@@ -54,7 +55,7 @@ final class Equations {
     private static final String SCIENTIFIC = "(?:\\bx|[×·⋅*])\\s*10\\s*\\^";
 
     private static final Pattern EXPRESSION = Pattern.compile(String.join("|",
-            Pattern.quote(APPROXIMATION), ARROW, ASSIGNMENT, EXPONENT, SUBSCRIPT, ROOT, STATE, SCIENTIFIC));
+            APPROXIMATION, ARROW, ASSIGNMENT, EXPONENT, SUBSCRIPT, ROOT, STATE, SCIENTIFIC));
 
     private Equations() {
     }

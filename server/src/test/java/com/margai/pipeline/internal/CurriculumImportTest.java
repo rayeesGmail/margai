@@ -155,6 +155,24 @@ class CurriculumImportTest {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(2);
     }
 
+    /**
+     * A load of one chapter says nothing about the others. The first `--chapters 7` load into a
+     * book that already held chapters 1–6 reported every one of their addresses as "no longer
+     * carried" — 600 lines, all wrong (D14). Orphans are judged only within the chapters loaded.
+     */
+    @Test
+    void aChapterSubsetLoadReportsOrphansOnlyWithinItsOwnChapters() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        NcertLoadReport report = imports.loadParagraphs("phy11-part1", BookLanguage.en, List.of(
+                new NcertParagraphRow((short) 8, "8.1", (short) 1, "Another chapter entirely.", false, List.of(),
+                        new ParagraphExtraction(List.of(1), new BigDecimal("0.95"), null))));
+
+        assertThat(report.orphans()).as("chapter 7's rows are not this load's business").isEmpty();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(3);
+    }
+
     @Test
     void loadingIntoAnUnregisteredBookIsRefused() {
         assertThatThrownBy(() -> imports.loadParagraphs("bio11", BookLanguage.en, paragraphs()))

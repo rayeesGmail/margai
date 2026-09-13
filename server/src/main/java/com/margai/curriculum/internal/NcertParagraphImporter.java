@@ -63,7 +63,13 @@ class NcertParagraphImporter {
         }
         paragraphs.flush();
 
-        List<String> orphans = existing.keySet().stream().filter(address -> !inFile.contains(address))
+        // Only within the chapters this load carried. A `--chapters 7` load says nothing about
+        // chapter 3's rows, and reporting them as "no longer carried" listed the whole book —
+        // 600 lines, every one wrong — the first time a subset was loaded into a full one (D14).
+        List<String> orphans = existing.values().stream()
+                .filter(paragraph -> perChapter.containsKey(paragraph.getChapterNo()))
+                .map(NcertParagraph::address)
+                .filter(address -> !inFile.contains(address))
                 .sorted().toList();
         return new NcertLoadReport(inserted, updated, unchanged, perChapter, orphans);
     }

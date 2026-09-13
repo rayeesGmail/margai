@@ -341,9 +341,31 @@ THE STRUCTURAL DIAGNOSIS, given to the founder at 20:50: every remaining defect 
 Spend today ≈ ₹262 on phy11-part1 (₹13 + ₹13 + ₹100 + ₹115 + ₹9 + ₹12); bio11 (~₹200) not yet
   extracted; ~₹590 projected against ₹430 authorised, named to the founder at 20:50. Founder's
   ruling 21:00: fix phy first, then bio with the fixes.
-NEXT (2026-09-14, founder-approved order): whole-page+bands on ch 7 (₹15) → code-assigned
-  numbering as prompt v3, validated on ch 7 (₹13) → phy11-part1 clean (~₹115) → D14 ✅ on it →
-  bio11 (~₹200). D14 stays unticked until the ✅ runs.
+LATE EVENING, 21:00–22:45 — the founder chose to finish phy tonight, and the imaging question was
+  settled by measurement rather than argument. Four more chapter-7 runs (₹55): page + bands with the
+  page first (₹15.50) — reading order right, every label kept, **every prime gone**; bands first and
+  page last (₹15.51) — the same; the page as a 700-px thumbnail (₹15.50) — the same again. Any
+  whole-page view, even one too small to read a letter from, makes the model transcribe from it.
+  The bands-only run had kept every prime. So **bands only** is the configuration, recorded with all
+  four measurements (DECISIONS), and the two-column reading-order case — one page in seventeen — is
+  the page-image second read's to catch. Also from those runs: `≅` is written as printed (the sign
+  was intact, only the spelling drifted), the label rule works (61 of 62 Answers, 62 of 62 Examples
+  carried their label), and the orphan report of a chapter-subset load was scoped to its own
+  chapters after listing all of chapters 1–6 as "no longer carried".
+THE CANONICAL RUN — phy11-part1, 22:15–22:42, ₹117.88 for 108 billed pages, the JSONL deleted
+  first so the whole book is one prompt and one configuration: **coverage 100%, 1,017 paragraphs,
+  zero refused collisions, primes present across the book (35 rows), no case drift, no ASCII `x`**,
+  character-diff flags 78 → 10. Known defects, named: ~21 genuine mid-sentence splits (38 listed,
+  17 of them "where…/and…/or…" after a displayed equation, which NCERT sets flush-left); **one**
+  question-and-answer merge, `ch 6 §6.7.4 ¶5`, where page 18's Answer came through without its
+  label — the founder re-rolls that page for ~₹1; the same four pages under 60% coverage as every
+  run (`ch 1 p2` 21%, `ch 4 p3`, `ch 6 p16`, `ch 6 p25`), consistent enough across four extractions
+  to be page content rather than loss, still unexamined (PARKED). Spend on phy11-part1 today ≈
+  ₹435 across ten live runs; bio11 not yet extracted.
+NEXT: the founder's D14 ✅ — twenty random paragraphs against the PDFs, per the runbook — on this
+  corpus; D14 ticks when it passes. Then bio11 (~₹200) on the same configuration. Code-assigned
+  numbering (prompt v3) is D15 work, applied to the eight remaining books first and back to phy
+  only if chapter 7 proves it materially better, as a corpus event.
 ```
 
 ```

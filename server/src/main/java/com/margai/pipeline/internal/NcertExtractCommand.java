@@ -169,7 +169,9 @@ class NcertExtractCommand extends NcertBookCommand {
                                 diffFlags.add("ch " + chapter.no() + " p" + page + " §" + paragraph.section()
                                         + " ¶" + paragraph.paraNo() + ": " + finding));
                     }
-                    PageStructure.check(pageText, response.output().paragraphs().size())
+                    String transcribed = response.output().paragraphs().stream()
+                            .map(NcertPage.Paragraph::text).collect(java.util.stream.Collectors.joining(" "));
+                    PageCoverage.check(pageText, transcribed)
                             .ifPresent(reason -> structureFlags.add("ch " + chapter.no() + " p" + page + ": " + reason));
                 }
                 previous = PreviousPage.of(response.output(), previous);
@@ -207,7 +209,7 @@ class NcertExtractCommand extends NcertBookCommand {
         report.section("characters that differ from the page's text layer — adjudicate these")
                 .line("checked: " + checked)
                 .list(diffFlags, pagesChecked == 0 ? "nothing was checked" : "none on the pages checked");
-        report.section("pages whose paragraph count does not match the page's shape")
+        report.section("pages whose text is not all there — or is there twice")
                 .line("checked: " + checked)
                 .list(structureFlags, pagesChecked == 0 ? "nothing was checked" : "none on the pages checked");
         report.section("low-confidence pages (below " + LOW_CONFIDENCE

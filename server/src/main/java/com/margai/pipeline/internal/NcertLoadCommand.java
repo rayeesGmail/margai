@@ -44,6 +44,12 @@ class NcertLoadCommand extends NcertBookCommand {
 
     private static final Pattern SECTION = Pattern.compile("\\d{1,2}(\\.\\d{1,3})*");
 
+    /**
+     * A finished thought, at the end of a page's half-paragraph. A closing bracket counts: NCERT
+     * ends a displayed equation with its number, "(7.15)", and the sentence about it has finished.
+     */
+    private static final Pattern FINISHED = Pattern.compile("[.?!:)\\]]\\s*$");
+
     private final ObjectStore content;
     private final CurriculumImport imports;
 
@@ -90,6 +96,14 @@ class NcertLoadCommand extends NcertBookCommand {
         report.section("pages per chapter")
                 .table(List.of("chapter", "pages extracted", "pages with text", "paragraphs", "text yield"),
                         perChapter);
+
+        // Free, and it found a real defect class on the first full book: 32 paragraphs of
+        // Physics Part-I were one sentence cut at a tile boundary (D14). It lives here rather than
+        // in `extract` because this is where the paragraphs exist in printed order, joined.
+        List<String> split = SplitSentences.find(rows);
+        report.section("paragraphs that begin in the middle of the previous one's sentence")
+                .line("a band boundary is not a paragraph boundary; these are where it was read as one")
+                .list(split);
 
         // Coverage divides by the pages `ncert render` produced, not by the pages this JSONL happens
         // to carry: an extraction that stopped at page 40 of 240 must not report itself complete.
@@ -141,6 +155,7 @@ class NcertLoadCommand extends NcertBookCommand {
                     continue;
                 }
                 String why = index != 0 ? "it is not that page's first paragraph"
+                        : joined.endsFinished() ? "the first half is a finished sentence"
                         : gap(pages, page.chapterNo(), joined.lastPage(), page.page());
                 if (why != null) {
                     throw new InputFormatException(Path.of(jsonlKey), 0,
@@ -262,6 +277,24 @@ class NcertLoadCommand extends NcertBookCommand {
 
         private int lastPage() {
             return pages.getLast();
+        }
+
+        /**
+         * Whether what we have so far is a finished thought — and therefore cannot be the first
+         * half of a paragraph that runs on.
+         *
+         * <p>This is the third condition on a page-break join, and the one the D14 corpus needed.
+         * A paragraph genuinely continuing onto the next page stops mid-sentence at the page's
+         * last line; it does not stop at a full stop. Where it does, the two halves are two
+         * different paragraphs that were numbered the same — which is what happened at
+         * {@code ch 4 §4.9.1 ¶18}, where a page about rolling friction was concatenated with a
+         * page about circular motion because both called their paragraph 18 and the address
+         * matched. The other two conditions could not see it: it was that page's first paragraph
+         * and the pages were adjacent.
+         */
+        private boolean endsFinished() {
+            String sofar = text.toString().stripTrailing();
+            return !sofar.isEmpty() && FINISHED.matcher(sofar).find();
         }
 
         private void add(ExtractedPage page, NcertPage.Paragraph paragraph) {

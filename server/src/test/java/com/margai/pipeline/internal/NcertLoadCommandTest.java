@@ -186,7 +186,9 @@ class NcertLoadCommandTest {
     @Test
     void anAbsentPageBetweenTwoHalvesIsRefusedNotAssumedBlank() {
         imports.renderedPagesAnswer = 3;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first.")),
+        // The first half is deliberately unfinished, so the gap is what decides this one and not
+        // the finished-sentence guard that would otherwise refuse it first.
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first half runs on")),
                 page(7, 3, "0.95", paragraph("7.1", 1, "Restarted at one.")));
 
         assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
@@ -197,11 +199,35 @@ class NcertLoadCommandTest {
         assertThat(imports.rows).isNull();
     }
 
+    /**
+     * The defect the first full book produced, and the reason for the third condition on a join.
+     * Page 15 of chapter 4 numbered a paragraph about circular motion ¶18, the same as page 14's
+     * paragraph about rolling friction, and both other conditions were satisfied — it was that
+     * page's first paragraph and the pages were adjacent — so the two were concatenated into one
+     * row that changes subject halfway through. A paragraph that genuinely continues onto the next
+     * page stops mid-sentence; it does not stop at a full stop.
+     */
+    @Test
+    void twoFinishedParagraphsAtOneAddressAreNotJoinedAcrossThePageBreak() {
+        imports.renderedPagesAnswer = 2;
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1,
+                        "For the same weight, rolling friction is much smaller than sliding friction.")),
+                page(7, 2, "0.95", paragraph("7.1", 1,
+                        "This is the static friction that provides the centripetal acceleration.")));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString())
+                .contains("is claimed by page 1 and page 2")
+                .contains("the first half is a finished sentence");
+        assertThat(imports.rows).isNull();
+    }
+
     /** But a page of prose in between means they are two different paragraphs, not one. */
     @Test
     void aParagraphSeparatedByAPageOfTextIsACollision() {
         imports.renderedPagesAnswer = 3;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first.")),
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first half runs on")),
                 page(7, 2, "0.95", paragraph("7.1", 2, "The second.")),
                 page(7, 3, "0.95", paragraph("7.1", 1, "Restarted at one.")));
 

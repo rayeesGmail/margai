@@ -83,9 +83,12 @@ class TranscriptionDiffTest {
                 + "inspection tells us that r_p and v_p are mutually perpendicular. Similarly, "
                 + "L_A = m_r r_A v_A. From angular momentum conservation m_r r_p v_p = m_r r_A v_A";
 
-        assertThat(TranscriptionDiff.check(PAGE_129, said))
-                .singleElement(org.assertj.core.api.InstanceOfAssertFactories.STRING)
-                .contains("m_r").contains("not on the page");
+        // NOT caught, and pinned as not caught. The symbol check that found this was retired after
+        // the chapter-7 dry run produced 51 flags and no true positives: PDFBox emits a displayed
+        // equation by typographic row, so `mp` is not on the page in any order either, and the
+        // check could not tell a real misread from the layout. A formula is verified against the
+        // page image or not at all (D14).
+        assertThat(TranscriptionDiff.check(PAGE_129, said)).isEmpty();
     }
 
     /**
@@ -106,16 +109,19 @@ class TranscriptionDiffTest {
         assertThat(TranscriptionDiff.check(page, said)).isEmpty();
     }
 
-    /** Audit item 14: a symbol read as another symbol entirely, where the page prints T_M. */
+    /**
+     * Audit item 14, a symbol read as another symbol entirely: also NOT caught here, for the same
+     * reason. What this class still catches on that paragraph is the other half of the same defect
+     * — the invented noun — which is the test below.
+     */
     @Test
-    void aMisreadSymbolInAWorkedExampleIsFlagged() {
+    void aMisreadSymbolInAWorkedExampleIsNotCaught() {
         String page = "where RMS is the Mars-Sun distance and RES is the Earth-Sun distance. "
                 + "Therefore TM = (1.52)3/2 × 365 = 684 days for the martian year.";
         String said = "where R_MS is the Mars-Sun distance and R_ES is the Earth-Sun distance. "
                 + "Therefore Q_M = (1.52)^(3/2) x 365 = 684 days for the martian year.";
 
-        assertThat(TranscriptionDiff.check(page, said))
-                .anySatisfy(finding -> assertThat(finding).contains("Q_M"));
+        assertThat(TranscriptionDiff.check(page, said)).isEmpty();
     }
 
     /** Audit item 14's other half: a noun the page does not contain anywhere. */
@@ -192,16 +198,20 @@ class TranscriptionDiffTest {
         }
     }
 
-    /** And on the same real page, the real defect is still found. */
+    /**
+     * And on the same real page, the class of defect this still catches: text belonging to another
+     * page. This is the real one it found on the first full book — page 15 of chapter 4 carried a
+     * paragraph about circular motion under a chapter-4 friction address, and the words gave it
+     * away because they were nowhere on the page it claimed.
+     */
     @Test
-    void theRealDefectIsStillFoundOnTheRealPage() throws IOException {
+    void textFromAnotherPageIsStillFoundOnTheRealPage() throws IOException {
         assumeTrue(Files.isDirectory(NCERT), "founder's NCERT PDFs not on this machine");
         List<String> pages = PdfTextLayer.pages(Files.readAllBytes(NCERT.resolve("phy11-part1/keph107.pdf")));
 
-        String misread = "The magnitude of the angular momentum at P is L_p = m_r r_p v_p, since "
-                + "inspection tells us that r_p and v_p are mutually perpendicular. Similarly, "
-                + "L_A = m_r r_A v_A.";
+        String foreign = "This is the static friction that provides the centripetal acceleration. "
+                + "Static friction opposes the impending motion of the car moving away from the circle.";
 
-        assertThat(TranscriptionDiff.check(pages.get(2), misread)).isNotEmpty();
+        assertThat(TranscriptionDiff.check(pages.get(2), foreign)).isNotEmpty();
     }
 }

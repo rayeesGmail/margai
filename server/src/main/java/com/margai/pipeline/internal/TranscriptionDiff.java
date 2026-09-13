@@ -27,15 +27,20 @@ import java.util.regex.Pattern;
  * token-level comparison against that produces a false flag on every paragraph that carries a
  * symbol, which is precisely the set of paragraphs this exists to check.
  *
- * <p>It asks two questions, both one-sided and both threshold-free. <b>Does the page contain this
- * word?</b> — a word the paragraph uses more often than the whole page holds it is invented or
- * misread, which is how {@code Kepler's third law} became {@code For the moon} at D14. And <b>is
- * this symbol on the page?</b> — every {@code m_p}, {@code R_E}, {@code 10^8} the transcription
- * writes is glued back into the form the layer holds ({@code mp}, {@code RE}, {@code 108}) and
- * looked for, which is how {@code m_p} read as {@code m_r} is caught: {@code mr} is nowhere on that
- * page. Neither question has a budget or a tolerance to tune, and neither depends on locating the
- * paragraph within the page — the two things that made a first, count-based cut of this class flag
- * correct work.
+ * <p>It asks one question, one-sided and threshold-free: <b>does the page contain this word?</b> A
+ * word the paragraph uses more often than the whole page holds it is invented or misread, which is
+ * how {@code Kepler's third law} became {@code For the moon} at D14. There is no budget, no
+ * tolerance, and no need to locate the paragraph within the page.
+ *
+ * <p>It asked a second question once — is this symbol on the page, with {@code m_p} glued back to
+ * the {@code mp} the layer holds — and the chapter-7 dry run retired it: 51 flags, every one a
+ * false positive. The reason is worth keeping, because it bounds what any layer-based check can
+ * ever do here. PDFBox emits a <em>displayed</em> equation by typographic row rather than in
+ * reading order, so {@code R_m²} arrives as {@code 2 / m / R} and a page of them arrives as
+ * {@code 22 / fi E / mVmV GmM} — base and script are not merely reordered, their association is
+ * gone. Inline symbols in running prose do glue ({@code Lp = mp rp vp}), but nothing in a
+ * transcription says which kind a given symbol was. Verifying a formula therefore needs the page
+ * <em>image</em>, which is what {@code ncert verify --read-pages} is for.
  *
  * <p>Nothing the page has and the model did not produce is ever flagged: captions, running heads,
  * table interiors and the apparatus are all skipped deliberately.
@@ -45,9 +50,9 @@ import java.util.regex.Pattern;
  * sign, a lost leading minus and a dropped prime are invisible to it — and on this corpus they are
  * invisible in principle rather than by omission: NCERT sets those glyphs in a Symbol font with no
  * Unicode mapping, so {@code Kepler's} reaches the text layer as {@code Keplers}, and the prime the
- * model stands accused of dropping is not in the layer either. A superscript with an operator in it
- * ({@code (1.52)^(3/2)}) has no single glued form and is skipped. Those defects are addressed by
- * instruction (FIX 2) and caught, if at all, by the founder's eye on the rendered image.
+ * model stands accused of dropping is not in the layer either. Nor can it see a wrong symbol, per
+ * the paragraph above. Those defects are addressed by instruction (FIX 2) and caught, if at all, by
+ * a second read of the page image or by the founder's eye on it.
  *
  * <p>This also shares a failure mode with the text layer being fed to the model as the character
  * authority: where the layer is subtly wrong but legible, the model copies it and this agrees. That
@@ -66,13 +71,6 @@ final class TranscriptionDiff {
 
     /** Everything squashing keeps. */
     private static final Pattern NOT_ALPHANUMERIC = Pattern.compile("[^A-Za-z0-9]+");
-
-    /**
-     * One subscripted or superscripted symbol as the prompt asks for it — {@code m_p}, {@code R_E},
-     * {@code T_M}, {@code 10^8}, {@code R_E^2} — and deliberately nothing with a bracket or an
-     * operator in the script ({@code (1.52)^(3/2)}), which has no single glued form to look for.
-     */
-    private static final Pattern SCRIPT = Pattern.compile("[A-Za-z0-9]+(?:[_^][A-Za-z0-9]+)+");
 
     /** Shorter than this and a "word" is a symbol fragment, not a word (see the class note). */
     private static final int MIN_WORD = 3;
@@ -112,19 +110,8 @@ final class TranscriptionDiff {
             }
         }
 
-        // Every subscript and superscript the transcription writes, glued back into the shape the
-        // text layer holds it in, must be somewhere on the page. This is the check that catches the
-        // defect class the audit was full of — m_p read as m_r — and it is exact: no budget, no
-        // threshold, no located span. Case matters, because M_E against M_e is one of the defects.
-        Matcher script = SCRIPT.matcher(withoutNotation(paragraph));
-        while (script.find()) {
-            String glued = squash(script.group());
-            if (glued.length() > 1 && !page.contains(glued)) {
-                findings.add("'" + script.group() + "' is not on the page (as '" + glued + "')");
-            }
-        }
-        // One line per distinct divergence: a symbol misread three times in a paragraph is one
-        // thing to adjudicate, not three.
+        // One line per distinct divergence: a word misread three times in a paragraph is one thing
+        // to adjudicate, not three.
         return List.copyOf(new java.util.LinkedHashSet<>(findings));
     }
 

@@ -164,6 +164,17 @@ Transcribe mathematics inline in plain text, keeping every symbol readable:
   rho, sigma, omega, Delta, Omega. Write "Delta H" for an enthalpy change, "theta" for an angle.
 - **Unit vectors take a fixed spelling: i_hat, j_hat, k_hat**, and a vector marked by an arrow or
   by bold keeps its plain symbol. Write "F_GA = Gm(2m) / 1 j_hat", never "j".
+- **The other marks above and beside a symbol have fixed spellings too**, so that one quantity is
+  spelled one way everywhere in the corpus:
+  - an overbar, for a mean or an average, is `_bar`: ā is "a_bar", v̄ is "v_bar".
+  - a vector arrow, where the page draws one over the symbol, is `_vec`: v⃗ is "v_vec". Do not
+    write "v_arrow".
+  - a perpendicular or parallel subscript is `_perp` and `_par`: L⊥ is "L_perp".
+  - a summation sign Σ is "sum", with its range in brackets where the page prints one:
+    "sum(i = 1 to n) m_i r_i".
+  - an integral sign ∫ is "integral", with its limits the same way: "integral(x_i to x_f) F dx".
+  - a partial derivative ∂ is "d" only when the page means an ordinary derivative; where the page
+    prints ∂, write "partial": "partial V / partial x".
 - **An approximation is never flattened into an equality.** Where the page prints ≅ or ≈, write
   "approx=" — "g(h) approx= g (1 - 2h / R_E)". An approximate result reported as exact is a
   physics error, not a formatting one.
@@ -375,6 +386,15 @@ top. They **overlap** — the last lines of one band are repeated as the first l
 so that no line is cut in half. Read them as one page: transcribe each paragraph once, in reading
 order, and do not repeat a paragraph because it appears in two bands. Paragraph numbering runs
 across the whole page, not within a band.
+
+**A band boundary is never a paragraph boundary.** The bands are an artefact of how the image was
+cut for you; the page does not know about them. If the text at the bottom of one band ends in the
+middle of a sentence, that sentence continues at the top of the next band and the whole of it is
+ONE paragraph — do not close a paragraph at the edge of a band and do not begin a new one there.
+A paragraph ends where the page ends it: a full stop followed by an indent, a new line of white
+space, a heading, or the end of the page. This is the most common way a page is read wrongly:
+"The scheme is now for international usage" and "in scientific, technical and commercial work."
+are one sentence, not two paragraphs, however they happen to fall across the two images.
 <endif>
 <if(v.previous_tail)>
 The previous page ended inside section <v.previous_section>, at paragraph <v.previous_para_no> of

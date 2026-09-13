@@ -6,3 +6,37 @@ spring:
   main:
     web-application-type: none
     banner-mode: off
+margai:
+  # The content bucket F8 created on 2026-09-12, with the pipeline's prefixes at its root:
+  # source/{ncert,syllabus,pyq}/…, pages/{book}/{lang}/{chapter}/{page}.png,
+  # extract/{book}/{lang}.jsonl (DECISIONS 2026-09-12 F8, D14). Credentials come from the SDK's
+  # default chain — AWS_PROFILE=margai on the laptop (TECH_PLAN §7.4).
+  storage:
+    content-bucket: margai-beta-content
+  pipeline:
+    # 150 DPI puts an A4 page at about 1240×1754 — just under the provider's 1568-pixel long-edge
+    # limit, above which it downscales before the model sees the image (§6.1).
+    render-dpi: 150
+    extract-batch-size: 10
+    # Each page is sent as 2 overlapping bands rather than one whole image. The provider shrinks
+    # anything over ~1,568 pixels on the long edge and a 150-DPI page is ~1,754, so a whole page
+    # arrives already reduced — which is where the D14 audit found every transcription error: a
+    # subscript, an exponent, a prime, a minus sign, while the prose around them was perfect.
+    # Set to 1 to send whole pages again (the two are directly comparable on the same chapter).
+    page-tiles: 2
+  ai:
+    # A page transcription is not an answer. The 1,024 default sizes a reasoning answer inside the
+    # 20 s budget (§4.11); a full NCERT body page is 400–900 words plus JSON field names, escapes
+    # and figure_refs, which lands at or over that on most pages and over it reliably in Biology —
+    # and a truncated tool input still parses, so the failure would have been silently short pages
+    # (spec-auditor, D14). The provider client now refuses a max_tokens stop outright.
+    max-output-tokens: 8192
+    # A page image is ~2,800 input tokens and the answer can be long, so give the call room; the
+    # default 20 s is sized for a short reasoning answer, not a page.
+    call-timeout: 120s
+    budget:
+      # A pipeline day is not a student day: extracting two pilot books is ~450 VISION calls in
+      # one run, against a global-daily-paise placeholder sized for student traffic (₹500). The
+      # console workspace spend limit F8 set on 2026-09-12 is the independent backstop; this is
+      # the ledger-side one, and it still stops a runaway loop dead (founder ruling, D14).
+      global-daily-paise: 200000   # ₹2,000 per IST day for a pipeline run

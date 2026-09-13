@@ -26,6 +26,7 @@ import java.io.InterruptedIOException;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import tools.jackson.databind.JsonNode;
@@ -86,15 +87,26 @@ public final class AnthropicAiClient implements CompletionClient {
                 tokens(usage.cacheCreationInputTokens().orElse(0L)));
     }
 
-    /** The forced tool's input is the answer; a response without a tool call is invalid output. */
+    /**
+     * The forced tool's input is the answer; a response without a tool call is invalid output, and
+     * so is one the model was cut off in the middle of. A truncated tool input can still parse as
+     * a Map — the SDK completes what it has — so a short answer would otherwise look like a valid
+     * one: a page transcription missing its last paragraphs, silently (spec-auditor, D14). The
+     * caller's fix is `margai.ai.max-output-tokens`, so the message says which knob.
+     */
     static JsonNode toolInput(Message response, Usage usage, String modelId, StructuredOutput codec) {
+        String stopReason = response.stopReason().map(Object::toString).orElse("none");
+        if (stopReason.toLowerCase(Locale.ROOT).contains("max_tokens")) {
+            throw new InvalidOutputException(List.of("the answer was cut off at the output-token limit ("
+                    + usage.outputTokens() + " tokens) — raise margai.ai.max-output-tokens for this workload"),
+                    null, usage, modelId, false);
+        }
         for (ContentBlock block : response.content()) {
             Optional<ToolUseBlock> toolUse = block.toolUse();
             if (toolUse.isPresent()) {
                 return codec.fromPlain(toolUse.get()._input().convert(Map.class));
             }
         }
-        String stopReason = response.stopReason().map(Object::toString).orElse("none");
         throw new InvalidOutputException(List.of("no tool call in the response (stop reason " + stopReason + ")"),
                 null, usage, modelId);
     }

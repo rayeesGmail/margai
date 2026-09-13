@@ -5,10 +5,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.margai.common.api.AttemptType;
 import com.margai.curriculum.api.ArchetypeTrackRow;
 import com.margai.curriculum.api.BackboneLoadReport;
+import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.CurriculumImportException;
 import com.margai.curriculum.api.CutoffLoadReport;
 import com.margai.curriculum.api.CutoffRow;
+import com.margai.curriculum.api.NcertBookRow;
+import com.margai.curriculum.api.NcertLoadReport;
+import com.margai.curriculum.api.NcertParagraphRow;
+import com.margai.curriculum.api.NcertRegisterReport;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import com.margai.curriculum.api.SyllabusNodeRow;
@@ -18,6 +23,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,25 +57,7 @@ class PipelineCommandTest {
     @BeforeEach
     void commandLine() {
         Reports writer = new Reports(ReportTest.CLOCK);
-        CommandLine.IFactory factory = new CommandLine.IFactory() {
-            @Override
-            public <K> K create(Class<K> cls) throws Exception {
-                if (cls == TaxonomyLoadCommand.class) {
-                    return cls.cast(new TaxonomyLoadCommand(imports, writer));
-                }
-                if (cls == TaxonomyPrerequisitesCommand.class) {
-                    return cls.cast(new TaxonomyPrerequisitesCommand(imports, writer));
-                }
-                if (cls == BackboneLoadCommand.class) {
-                    return cls.cast(new BackboneLoadCommand(imports, writer));
-                }
-                if (cls == CutoffsLoadCommand.class) {
-                    return cls.cast(new CutoffsLoadCommand(imports, writer));
-                }
-                return CommandLine.defaultFactory().create(cls);
-            }
-        };
-        commandLine = PipelineRunner.commandLine(factory)
+        commandLine = PipelineRunner.commandLine(siblingFactory(imports, writer))
                 .setOut(new PrintWriter(out, true))
                 .setErr(new PrintWriter(err, true));
     }
@@ -107,6 +95,26 @@ class PipelineCommandTest {
                         "2026-09-12-backbone-load.md", "2026-09-12-cutoffs-load.md");
         assertThat(Files.readString(reports.resolve("2026-09-12-backbone-load.md")))
                 .contains("| track | steps |\n|---|---|\n| fresher_2yr | 210 |\n| fresher_1yr | 166 |\n| dropper | 178 |\n| repeater | 190 |\n");
+    }
+
+    @Test
+    void ncertRegisterReadsBooksYamlHandsTheRowsOnAndWritesItsReport() throws IOException {
+        String committed = InputReadersTest.INPUTS.toString();
+
+        assertThat(commandLine.execute("ncert", "register", "--inputs", committed, "--reports", reports.toString()))
+                .isZero();
+
+        assertThat(imports.books).hasSize(10);
+        assertThat(imports.books).extracting(NcertBookRow::code).contains("bio11", "phy11-part1");
+        assertThat(out.toString())
+                .contains("# margai-pipeline ncert register\n")
+                .contains("- read: 10 books\n- result: ok\n")
+                .contains("| inserted | updated | unchanged |\n|---|---|---|\n| 10 | 0 | 0 |\n")
+                .contains("| bio11 | biology | 11 | — | 1–19 | 19 | en + hi |\n")
+                .contains("| phy11-part2 | physics | 11 | 2 | 8–14 | 7 | en + hi |\n")
+                .contains("## books in the database that books.yaml no longer names\n\nnone\n")
+                .contains("report: " + reports.resolve("2026-09-12-ncert-register.md"));
+        assertThat(err.toString()).isEmpty();
     }
 
     @Test
@@ -205,15 +213,60 @@ class PipelineCommandTest {
     }
 
     /**
+     * The leaf commands every test in this package needs picocli to be able to build, whatever it
+     * is actually exercising: the tree is constructed whole, so a sibling without a constructor
+     * fails the run before the command under test is reached.
+     */
+    static CommandLine.IFactory siblingFactory(CurriculumImport imports, Reports writer) {
+        return new CommandLine.IFactory() {
+            @Override
+            public <K> K create(Class<K> cls) throws Exception {
+                if (cls == TaxonomyLoadCommand.class) {
+                    return cls.cast(new TaxonomyLoadCommand(imports, writer));
+                }
+                if (cls == TaxonomyPrerequisitesCommand.class) {
+                    return cls.cast(new TaxonomyPrerequisitesCommand(imports, writer));
+                }
+                if (cls == BackboneLoadCommand.class) {
+                    return cls.cast(new BackboneLoadCommand(imports, writer));
+                }
+                if (cls == CutoffsLoadCommand.class) {
+                    return cls.cast(new CutoffsLoadCommand(imports, writer));
+                }
+                if (cls == NcertRegisterCommand.class) {
+                    return cls.cast(new NcertRegisterCommand(imports, writer));
+                }
+                if (cls == NcertRenderCommand.class) {
+                    return cls.cast(new NcertRenderCommand(new NcertRenderCommandTest.RecordingStore(), imports,
+                            new PipelineProperties(72, 10, 1), writer));
+                }
+                if (cls == NcertExtractCommand.class) {
+                    return cls.cast(new NcertExtractCommand(new NcertRenderCommandTest.RecordingStore(),
+                            new NcertExtractCommandTest.RecordingExtract(), new NcertExtractCommandTest.StubSpend(),
+                            new PipelineProperties(72, 10, 1), writer));
+                }
+                if (cls == NcertLoadCommand.class) {
+                    return cls.cast(new NcertLoadCommand(new NcertRenderCommandTest.RecordingStore(),
+                            imports, writer));
+                }
+                return CommandLine.defaultFactory().create(cls);
+            }
+        };
+    }
+
+    /**
      * Records what the commands hand over and answers with a report shaped like a first clean load;
      * {@code failure}, when set, is thrown by the taxonomy load instead.
      */
-    static final class RecordingImport implements CurriculumImport {
+    static class RecordingImport implements CurriculumImport {
 
         List<SyllabusNodeRow> nodes;
         List<PrerequisiteRow> edges;
         List<ArchetypeTrackRow> tracks;
         List<CutoffRow> cutoffs;
+        List<NcertBookRow> books;
+        final List<String> renderedPages = new ArrayList<>();
+        Integer renderedPagesAnswer;
         RuntimeException failure;
 
         @Override
@@ -244,6 +297,27 @@ class PipelineCommandTest {
         public CutoffLoadReport loadCutoffs(List<CutoffRow> rows) {
             cutoffs = rows;
             return new CutoffLoadReport(rows.size(), 0, 0, Map.of(), List.of());
+        }
+
+        @Override
+        public NcertRegisterReport registerBooks(List<NcertBookRow> rows) {
+            books = rows;
+            return new NcertRegisterReport(rows.size(), 0, 0, List.of());
+        }
+
+        @Override
+        public void recordRenderedPages(String bookCode, BookLanguage language, int pages) {
+            renderedPages.add(bookCode + " " + language + " " + pages);
+        }
+
+        @Override
+        public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
+            return new NcertLoadReport(rows.size(), 0, 0, Map.of(), List.of());
+        }
+
+        @Override
+        public Integer renderedPages(String bookCode, BookLanguage language) {
+            return renderedPagesAnswer;
         }
     }
 }

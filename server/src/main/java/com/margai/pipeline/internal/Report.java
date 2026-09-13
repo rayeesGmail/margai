@@ -90,8 +90,17 @@ final class Report {
 
     /** A sorted list of names, or {@code none}. */
     Report list(List<String> items) {
+        return list(items, "none");
+    }
+
+    /**
+     * The same, with the empty case spelled out by the caller. A check that ran and found nothing
+     * and a check that never ran both produce an empty list, and "none" reads as the first — which
+     * is how a resumed run could report a clean page it never looked at (spec-auditor, D14).
+     */
+    Report list(List<String> items, String whenEmpty) {
         if (items.isEmpty()) {
-            body.add("none");
+            body.add(whenEmpty);
         } else {
             items.forEach(item -> body.add("- " + item));
         }

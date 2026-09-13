@@ -9,11 +9,18 @@ import com.margai.common.api.Category;
 import com.margai.curriculum.api.ArchetypeStepRow;
 import com.margai.curriculum.api.ArchetypeTrackRow;
 import com.margai.curriculum.api.BackboneLoadReport;
+import com.margai.curriculum.api.BookLanguage;
+import com.margai.curriculum.api.BookSubject;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.CurriculumImportException;
 import com.margai.curriculum.api.CutoffLoadReport;
 import com.margai.curriculum.api.CutoffRow;
+import com.margai.curriculum.api.NcertBookRow;
+import com.margai.curriculum.api.NcertLoadReport;
+import com.margai.curriculum.api.NcertParagraphRow;
+import com.margai.curriculum.api.NcertRegisterReport;
 import com.margai.curriculum.api.NodeKind;
+import com.margai.curriculum.api.ParagraphExtraction;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import com.margai.curriculum.api.SeatType;
@@ -21,8 +28,10 @@ import com.margai.curriculum.api.Subject;
 import com.margai.curriculum.api.SyllabusNodeRow;
 import com.margai.curriculum.api.TaxonomyLoadReport;
 import com.margai.curriculum.api.TrackPhase;
+import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +56,7 @@ class CurriculumImportTest {
     private static final Path PREREQUISITES = InputReadersTest.INPUTS.resolve(TaxonomyPrerequisitesCommand.FILE);
     private static final Path ARCHETYPES = InputReadersTest.INPUTS.resolve(BackboneLoadCommand.FILE);
     private static final Path CUTOFFS = InputReadersTest.INPUTS.resolve(CutoffsLoadCommand.FILE);
+    private static final Path BOOKS = InputReadersTest.INPUTS.resolve(NcertRegisterCommand.FILE);
 
     @Autowired
     private CurriculumImport imports;
@@ -60,8 +70,148 @@ class CurriculumImportTest {
         jdbc.update("DELETE FROM archetype_track_steps");
         jdbc.update("DELETE FROM archetype_tracks");
         jdbc.update("DELETE FROM chapter_status");
+        jdbc.update("DELETE FROM ncert_paragraphs");
+        jdbc.update("DELETE FROM ncert_books");
         jdbc.update("DELETE FROM syllabus_nodes");
         jdbc.update("DELETE FROM cutoffs");
+    }
+
+    @Test
+    void registersTheCommittedBooksAndIsIdempotent() {
+        List<NcertBookRow> rows = BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList();
+
+        NcertRegisterReport first = imports.registerBooks(rows);
+        assertThat(first.inserted()).isEqualTo(10);
+        assertThat(first.updated()).isZero();
+        assertThat(first.orphans()).isEmpty();
+
+        NcertRegisterReport again = imports.registerBooks(rows);
+        assertThat(again.inserted()).isZero();
+        assertThat(again.unchanged()).isEqualTo(10);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_books", Long.class)).isEqualTo(10);
+        assertThat(jdbc.queryForObject(
+                "SELECT s3_key_en FROM ncert_books WHERE code = 'phy11-part2'", String.class))
+                .isEqualTo("source/ncert/2022-ed/en/phy11-part2/");
+        assertThat(jdbc.queryForObject("SELECT pages_en FROM ncert_books WHERE code = 'bio11'", Integer.class))
+                .isNull();
+    }
+
+    @Test
+    void aBookTheFileNoLongerNamesIsAnOrphanAndIsKept() {
+        List<NcertBookRow> rows = BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList();
+        imports.registerBooks(rows);
+
+        NcertRegisterReport report = imports.registerBooks(rows.stream()
+                .filter(row -> !row.code().equals("bio12")).toList());
+
+        assertThat(report.orphans()).containsExactly("bio12");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_books", Long.class)).isEqualTo(10);
+    }
+
+    @Test
+    void loadsParagraphsAtTheirAddressAndIsIdempotent() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+
+        NcertLoadReport first = imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        assertThat(first.inserted()).isEqualTo(2);
+        assertThat(first.perChapter()).containsEntry((short) 7, 2);
+
+        NcertLoadReport again = imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        assertThat(again.inserted()).isZero();
+        assertThat(again.unchanged()).isEqualTo(2);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(2);
+        assertThat(jdbc.queryForObject(
+                "SELECT text_en FROM ncert_paragraphs WHERE chapter_no = 7 AND section = '7.9' AND para_no = 1",
+                String.class))
+                .isEqualTo("The gravitational potential energy of a body.");
+    }
+
+    /** D16's Hindi pass fills the same row rather than making a second one. */
+    @Test
+    void theHindiEditionLandsOnTheSameParagraphRow() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(new NcertParagraphRow((short) 7, "7.9",
+                (short) 1, "गुरुत्वीय स्थितिज ऊर्जा।", false, List.of(),
+                new ParagraphExtraction(List.of(12), new BigDecimal("0.90"), null))));
+
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(2);
+        Map<String, Object> row = jdbc.queryForMap(
+                "SELECT text_en, text_hi FROM ncert_paragraphs WHERE chapter_no = 7 AND section = '7.9' AND para_no = 1");
+        assertThat(row.get("text_en")).isEqualTo("The gravitational potential energy of a body.");
+        assertThat(row.get("text_hi")).isEqualTo("गुरुत्वीय स्थितिज ऊर्जा।");
+    }
+
+    @Test
+    void paragraphsTheExtractionNoLongerCarriesAreOrphansAndAreKept() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        NcertLoadReport report = imports.loadParagraphs("phy11-part1", BookLanguage.en,
+                List.of(paragraphs().getFirst()));
+
+        assertThat(report.orphans()).containsExactly("ch 7 §7.9 ¶2");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(2);
+    }
+
+    /**
+     * A load of one chapter says nothing about the others. The first `--chapters 7` load into a
+     * book that already held chapters 1–6 reported every one of their addresses as "no longer
+     * carried" — 600 lines, all wrong (D14). Orphans are judged only within the chapters loaded.
+     */
+    @Test
+    void aChapterSubsetLoadReportsOrphansOnlyWithinItsOwnChapters() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        NcertLoadReport report = imports.loadParagraphs("phy11-part1", BookLanguage.en, List.of(
+                new NcertParagraphRow((short) 8, "8.1", (short) 1, "Another chapter entirely.", false, List.of(),
+                        new ParagraphExtraction(List.of(1), new BigDecimal("0.95"), null))));
+
+        assertThat(report.orphans()).as("chapter 7's rows are not this load's business").isEmpty();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(3);
+    }
+
+    @Test
+    void loadingIntoAnUnregisteredBookIsRefused() {
+        assertThatThrownBy(() -> imports.loadParagraphs("bio11", BookLanguage.en, paragraphs()))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessageContaining("run `ncert register` first");
+    }
+
+    @Test
+    void oneAddressTwiceInAnExtractionIsRefused() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        NcertParagraphRow row = paragraphs().getFirst();
+
+        assertThatThrownBy(() -> imports.loadParagraphs("phy11-part1", BookLanguage.en, List.of(row, row)))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessageContaining("the address ch 7 §7.9 ¶1 appears twice");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isZero();
+    }
+
+    private static List<NcertParagraphRow> paragraphs() {
+        return List.of(
+                new NcertParagraphRow((short) 7, "7.9", (short) 1,
+                        "The gravitational potential energy of a body.", false, List.of(),
+                        new ParagraphExtraction(List.of(12), new BigDecimal("0.96"), null)),
+                new NcertParagraphRow((short) 7, "7.9", (short) 2,
+                        "W = -G M m / r (Fig. 7.9).", true, List.of("Fig. 7.9"),
+                        new ParagraphExtraction(List.of(12, 13), new BigDecimal("0.91"), null)));
+    }
+
+    @Test
+    void twoBooksMayNotClaimTheSameEdition() {
+        NcertBookRow bio11 = new NcertBookRow("bio11", BookSubject.biology, (short) 11, null,
+                "Biology, Textbook for Class XI", null, (short) 2022, "source/a/", null);
+        NcertBookRow duplicate = new NcertBookRow("bio11-reprint", BookSubject.biology, (short) 11, null,
+                "Biology, Textbook for Class XI", null, (short) 2022, "source/b/", null);
+
+        assertThatThrownBy(() -> imports.registerBooks(List.of(bio11, duplicate)))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessageContaining("two books claim to be biology class 11 part null");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_books", Long.class)).isZero();
     }
 
     @Test

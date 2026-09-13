@@ -50,5 +50,10 @@ paths:
   within the same subject.
 - Every call writes an `ai_calls` row (tokens from the response, cost from the config price table).
   The per-user daily budget breaker applies in every profile, including dev.
+- **Never ask a model to judge what code can compute.** A field the model fills in is a field that
+  can be wrong for no reason: `has_equations` was asked of the extraction model and came back true
+  for Kepler's third law stated entirely in words, so it is now decided in Java from the
+  transcribed text (`pipeline.internal.Equations`, D14). Ask the model for what only reading can
+  produce — the words, the structure, the address — and compute every derivable property.
 - Model IDs, prompts versions, limits and prices come from config (SSM), never code constants.
 - "NTA trap" notes only when a linked PYQ backs them (Evidence rule).

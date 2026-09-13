@@ -38,6 +38,11 @@ public final class SchemaValidatingAiClient implements AiClient {
         try {
             return inner.complete(request);
         } catch (InvalidOutputException e) {
+            if (!e.repairable()) {
+                log.warn("invalid model output for {}/{} ({}); not repairable, no retry", request.feature(),
+                        request.prompt().name(), e.errors());
+                throw e;
+            }
             first = e;
         }
         log.warn("invalid model output for {}/{} ({}); one repair attempt", request.feature(),

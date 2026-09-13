@@ -25,6 +25,10 @@
          It verifies the module boundaries of TECH_PLAN §1.3–§1.4 in a test (D4, DECISIONS D3.14). -->
     <spring-modulith.version>2.1.1</spring-modulith.version>
     <awssdk.version>2.54.13</awssdk.version>
+    <!-- D14: page rendering for the NCERT ingest (TECH_PLAN §6.1). Not managed by the Boot BOM. -->
+    <pdfbox.version>3.0.5</pdfbox.version>
+    <jai-imageio-jpeg2000.version>1.4.0</jai-imageio-jpeg2000.version>
+    <jbig2-imageio.version>3.0.4</jbig2-imageio.version>
   </properties>
 
   <dependencyManagement>
@@ -195,6 +199,36 @@
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>sesv2</artifactId>
+    </dependency>
+    <!-- D14: the content bucket behind the storage module's ObjectStore — source PDFs, page
+         images and JSONL artefacts (TECH_PLAN §1.3, §7.6). Only storage.internal.s3 imports it
+         (ArchitectureTest), on the same one-package-per-service principle as the two above. -->
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>s3</artifactId>
+    </dependency>
+    <!-- D14: `ncert render` turns each source PDF page into the image the VISION tier reads
+         (TECH_PLAN §6.1: NCERT's two-column layout, equations and legacy Hindi fonts defeat text
+         extractors). Only the pipeline module imports it (ArchitectureTest). -->
+    <dependency>
+      <groupId>org.apache.pdfbox</groupId>
+      <artifactId>pdfbox</artifactId>
+      <version>${pdfbox.version}</version>
+    </dependency>
+    <!-- D14: NCERT embeds image formats Java cannot decode out of the box — JPEG2000 across most
+         chapter files, JBIG2 in at least some. PDFBox answers a missing decoder by logging
+         "Cannot read … image" and rendering the page WITHOUT that image, so the failure is a
+         silently degraded page rather than an error; both were found that way on real books.
+         PdfPageRenderer now also makes any missing decoder throw, whatever the format. -->
+    <dependency>
+      <groupId>com.github.jai-imageio</groupId>
+      <artifactId>jai-imageio-jpeg2000</artifactId>
+      <version>${jai-imageio-jpeg2000.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.pdfbox</groupId>
+      <artifactId>jbig2-imageio</artifactId>
+      <version>${jbig2-imageio.version}</version>
     </dependency>
 
     <!-- test -->

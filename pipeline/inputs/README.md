@@ -1,8 +1,8 @@
 # pipeline/inputs — founder-owned data files
 
-The four files here are the inputs of the D13 pipeline commands (TECH_PLAN §6.2, §6.3): the pipeline
-reads them and never edits them. They were **drafted by Claude on 2026-09-10 from the official NEET (UG)
-2026 syllabus and the NCERT 2022-edition contents pages, for the founder's review** (PLAN D13:
+The files here are the inputs of the pipeline commands (TECH_PLAN §6.2, §6.3): the pipeline
+reads them and never edits them. The first four were **drafted by Claude on 2026-09-10 from the official
+NEET (UG) 2026 syllabus and the NCERT 2022-edition contents pages, for the founder's review** (PLAN D13:
 "founder-reviewed"). Every judgement call is listed under *Review checklist* below; DECISIONS.md rows
 dated 2026-09-10 record the spec-silent choices.
 
@@ -12,6 +12,24 @@ dated 2026-09-10 record the spec-silent choices.
 | `prerequisites.csv` | `syllabus_prerequisites` | `taxonomy prerequisites` | 104 chapter-to-chapter edges, acyclic |
 | `archetypes.yaml` | `archetype_tracks`, `archetype_track_steps` | `backbone load` | 4 tracks, 744 steps |
 | `cutoffs.csv` | `cutoffs` | `cutoffs load` | 40 qualifying rows, 2019–2026 |
+| `books.yaml` | `ncert_books` | `ncert register` (D14) | 10 books, 79 chapters, both editions |
+
+## books.yaml
+
+One entry per NCERT book with both editions on it, drafted 2026-09-12 from
+`ncert/2022-ed/{en,hi}/manifest.md`. Two things in it are worth the founder's eye:
+
+- **`chapters` maps each PDF to the chapter number printed in the book**, which the file names do not
+  carry: a Part-II folder numbers its files from 01 while its chapters start at 8 (`keph201.pdf` is
+  Chapter 8). Every anchor a student sees means the printed number (SPEC §6.3), so this mapping is
+  explicit rather than derived. It was checked against each book's contents-page range on 2026-09-12.
+- **`subject` is the book's**, so Biology is one book — the taxonomy's botany/zoology split is reached
+  per paragraph through `node_id` at D23, not per book (DECISIONS D14).
+
+Absent on purpose: prelims (`*ps`), answers (`*an`) and appendices (`*a1`), which carry no paragraph a
+student anchors to; and `title_hi` everywhere, until a native reader supplies it — the ten Hindi books
+are legacy Chanakya glyph text with no Unicode map (TRACKER PARKED 2026-09-09), which is also why
+nothing renders or extracts `hi` before D16.
 
 Sources: `syllabus/manifest.md` (the 2025 and 2026 syllabus PDFs: identical content, 50 NTA units),
 `ncert/2022-ed/en/manifest.md` (the 79 NCERT chapters; titles verified from each book's contents page

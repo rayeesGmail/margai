@@ -44,7 +44,9 @@ class AiPropertiesTest {
             assertThat(properties.batchMinRecords()).isEqualTo(100);
             assertThat(properties.maxOutputTokens()).isEqualTo(1024);
             assertThat(properties.callTimeout()).isEqualTo(java.time.Duration.ofSeconds(20));
-            assertThat(properties.promptVersions()).containsEntry("smoke", 1);
+            // v2 is the version a frozen corpus names (D14, DECISIONS 2026-09-13): v1 was amended
+            // between exploratory runs, so a paragraph row tracing to "v1" traces to nothing.
+            assertThat(properties.promptVersions()).containsEntry("smoke", 1).containsEntry("ncert_extract", 2);
             assertThat(properties.anthropic().apiKey()).isEmpty();
             assertThat(properties.cohere().apiKey()).isEmpty();
             assertThat(properties.cohere().baseUrl()).startsWith("https://");

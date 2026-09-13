@@ -38,4 +38,33 @@ public interface CurriculumImport {
 
     /** {@code cutoffs load}: upsert on (year, category, quota_scope, seat_type). */
     CutoffLoadReport loadCutoffs(List<CutoffRow> rows);
+
+    /**
+     * {@code ncert register} (D14): upsert on {@code ncert_books.code}. Refused: one code claimed
+     * twice, and two books claiming the same (subject, class level, part) — the pair a student's
+     * "Class 11 Physics Part-I" means, which two books would make ambiguous.
+     */
+    NcertRegisterReport registerBooks(List<NcertBookRow> rows);
+
+    /**
+     * {@code ncert render} (D14): the page count of one edition, which the coverage percentage at
+     * {@code ncert load} divides by. Refused when the book is not registered.
+     */
+    void recordRenderedPages(String bookCode, BookLanguage language, int pages);
+
+    /**
+     * How many pages {@code ncert render} produced for one edition, or null if it has not run.
+     * This is the denominator of {@code ncert load}'s coverage: dividing by the pages that were
+     * *extracted* instead would report an extraction that stopped a third of the way through a
+     * book as complete (spec-auditor, D14).
+     */
+    Integer renderedPages(String bookCode, BookLanguage language);
+
+    /**
+     * {@code ncert load} (D14): upsert on the paragraph address, the text landing in the column of
+     * the edition being loaded — so D16's Hindi pass fills {@code text_hi} beside the English
+     * paragraph at that address instead of making a second row. Refused: an unregistered book, and
+     * one address twice in the same extraction.
+     */
+    NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows);
 }

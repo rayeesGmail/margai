@@ -358,7 +358,10 @@ THE CANONICAL RUN — phy11-part1, 22:15–22:42, ₹117.88 for 108 billed pages
   character-diff flags 78 → 10. Known defects, named: ~21 genuine mid-sentence splits (38 listed,
   17 of them "where…/and…/or…" after a displayed equation, which NCERT sets flush-left); **one**
   question-and-answer merge, `ch 6 §6.7.4 ¶5`, where page 18's Answer came through without its
-  label — the founder re-rolls that page for ~₹1; the same four pages under 60% coverage as every
+  label — re-rolled once for ₹1 at 22:52 and came back identical, so it is deterministic for that
+  page and stays on this list by name rather than being chased further tonight (the label repair
+  cannot fire on a label that was never transcribed; the page-image second read is what catches
+  it); the same four pages under 60% coverage as every
   run (`ch 1 p2` 21%, `ch 4 p3`, `ch 6 p16`, `ch 6 p25`), consistent enough across four extractions
   to be page content rather than loss, still unexamined (PARKED). Spend on phy11-part1 today ≈
   ₹435 across ten live runs; bio11 not yet extracted.

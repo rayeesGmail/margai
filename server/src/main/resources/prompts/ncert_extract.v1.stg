@@ -66,6 +66,12 @@ paragraph — so a page with no heading on it continues that section rather than
 the first page of a chapter there is no such state; use the heading printed on the page, or the
 chapter's own number for text above the first one.
 
+A section is always a printed section number of this chapter — "7.9", "7.9.2" — or, for text above
+the first numbered heading, the chapter's own number. **Never invent a section label.** A worked
+example, an activity box, a "Points to Ponder" item or any other titled block is not a section: its
+paragraphs take the section its box sits in. "Example 7.1" is the name of a box, not an address,
+and a paragraph filed under it can never be found again.
+
 Paragraph numbers start at 1 within each section and count upward in reading order. Reading order
 is top to bottom; on a two-column page it is the whole of the left column, then the whole of the
 right column. When a new section begins mid-page, its paragraph numbering starts again at 1.
@@ -300,7 +306,7 @@ PITFALLS TO AVOID
 - Do not renumber paragraphs from 1 at the top of every page. Numbering restarts with a section,
   not with a page — and when you are told where the previous page ended, continue from that number.
 - Do not invent a section number you cannot see and cannot infer; use the chapter number and
-  lower the confidence instead.
+  lower the confidence instead. A box's title — "Example 7.1" — is never a section.
 - Do not merge two printed paragraphs because they are about the same thing, and do not split one
   because it is long.
 - Do not transcribe a figure caption, a table, an exercise question, or the summary — and remember

@@ -44,12 +44,6 @@ class NcertLoadCommand extends NcertBookCommand {
 
     private static final Pattern SECTION = Pattern.compile("\\d{1,2}(\\.\\d{1,3})*");
 
-    /**
-     * A finished thought, at the end of a page's half-paragraph. A closing bracket counts: NCERT
-     * ends a displayed equation with its number, "(7.15)", and the sentence about it has finished.
-     */
-    private static final Pattern FINISHED = Pattern.compile("[.?!:)\\]]\\s*$");
-
     private final ObjectStore content;
     private final CurriculumImport imports;
 
@@ -76,7 +70,14 @@ class NcertLoadCommand extends NcertBookCommand {
                         : Integer.compare(left.page(), right.page()))
                 .toList();
 
+        // Deterministic corrections first, each reported: an Answer opening a page is the next
+        // paragraph, and a re-transcribed tail is dropped. Then the join, which refuses what is
+        // left over (D14, the first full-book load).
+        PageBreakRepairs.Repaired repaired = PageBreakRepairs.apply(pages);
+        pages = repaired.pages();
         List<NcertParagraphRow> rows = join(pages, jsonlKey);
+        report.section("page-break repairs to the model's numbering (deterministic, each one named)")
+                .list(repaired.notes());
         NcertLoadReport result = imports.loadParagraphs(definition.code(), language, rows);
 
         report.section("ncert_paragraphs")
@@ -160,8 +161,12 @@ class NcertLoadCommand extends NcertBookCommand {
                     byAddress.put(address, new Joined(page.chapterNo(), section, paragraph, page));
                     continue;
                 }
+                // Whether the first half had finished its sentence is deliberately not a condition:
+                // a paragraph can run on across a page break after a full stop, and one did
+                // (Chapter 1, pages 3–4, checked on the rendered image). The two cases code can
+                // decide — a label opening the page, a repeated tail — are repaired before this
+                // (PageBreakRepairs); what remains is the model's typographic call.
                 String why = index != 0 ? "it is not that page's first paragraph"
-                        : joined.endsFinished() ? "the first half is a finished sentence"
                         : gap(pages, page.chapterNo(), joined.lastPage(), page.page());
                 if (why != null) {
                     collisions.add("ch " + page.chapterNo() + " §" + section + " ¶" + paragraph.paraNo()
@@ -293,24 +298,6 @@ class NcertLoadCommand extends NcertBookCommand {
 
         private int lastPage() {
             return pages.getLast();
-        }
-
-        /**
-         * Whether what we have so far is a finished thought — and therefore cannot be the first
-         * half of a paragraph that runs on.
-         *
-         * <p>This is the third condition on a page-break join, and the one the D14 corpus needed.
-         * A paragraph genuinely continuing onto the next page stops mid-sentence at the page's
-         * last line; it does not stop at a full stop. Where it does, the two halves are two
-         * different paragraphs that were numbered the same — which is what happened at
-         * {@code ch 4 §4.9.1 ¶18}, where a page about rolling friction was concatenated with a
-         * page about circular motion because both called their paragraph 18 and the address
-         * matched. The other two conditions could not see it: it was that page's first paragraph
-         * and the pages were adjacent.
-         */
-        private boolean endsFinished() {
-            String sofar = text.toString().stripTrailing();
-            return !sofar.isEmpty() && FINISHED.matcher(sofar).find();
         }
 
         private void add(ExtractedPage page, NcertPage.Paragraph paragraph) {

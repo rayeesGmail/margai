@@ -409,6 +409,11 @@ Number this page's paragraphs from there, not from 1:
   number <v.previous_para_no> plus one, and the numbering continues upward from there.
 - If this page opens a new numbered section, numbering restarts at 1 under that new section, as
   always.
+- **A paragraph that begins with a printed label — "Answer", "Solution", "Example 4.9" — is
+  always a new paragraph**, number <v.previous_para_no> plus one, even when it is the very first
+  thing on this page and the previous page ended with the question it answers. An Answer never
+  continues its question. The book sets these labels in bold precisely because they start
+  something.
 
 --- end of the previous page ---
 <v.previous_tail>

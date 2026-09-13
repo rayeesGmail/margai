@@ -200,27 +200,45 @@ class NcertLoadCommandTest {
     }
 
     /**
-     * The defect the first full book produced, and the reason for the third condition on a join.
-     * Page 15 of chapter 4 numbered a paragraph about circular motion ¶18, the same as page 14's
-     * paragraph about rolling friction, and both other conditions were satisfied — it was that
-     * page's first paragraph and the pages were adjacent — so the two were concatenated into one
-     * row that changes subject halfway through. A paragraph that genuinely continues onto the next
-     * page stops mid-sentence; it does not stop at a full stop.
+     * Pages 61–62 of Chapter 4, and 108–109 of Chapter 6: an Example's question ends the page and
+     * its Answer opens the next, and the model numbered the Answer as a continuation. A label is a
+     * fact the book prints, not a typographic judgement, so the loader renumbers instead of
+     * refusing — and says so in the report, because a silent repair of model output is not one.
      */
     @Test
-    void twoFinishedParagraphsAtOneAddressAreNotJoinedAcrossThePageBreak() {
+    void anAnswerOpeningThePageIsRenumberedAsTheNextParagraphAndReported() {
         imports.renderedPagesAnswer = 2;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1,
-                        "For the same weight, rolling friction is much smaller than sliding friction.")),
-                page(7, 2, "0.95", paragraph("7.1", 1,
-                        "This is the static friction that provides the centripetal acceleration.")));
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "What is the tension in the string?")),
+                page(7, 2, "0.95", paragraph("7.1", 1, "Answer As the string is inextensible, both move together."),
+                        paragraph("7.1", 2, "Thus the equation for the motion of the trolley follows.")));
 
-        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+        assertThat(run()).isZero();
 
+        assertThat(imports.rows).extracting(NcertParagraphRow::paraNo).containsExactly((short) 1, (short) 2, (short) 3);
+        assertThat(imports.rows.get(1).text()).startsWith("Answer");
         assertThat(out.toString())
-                .contains("is claimed by page 1 and page 2")
-                .contains("the first half is a finished sentence");
-        assertThat(imports.rows).isNull();
+                .contains("## page-break repairs to the model's numbering")
+                .contains("page 2 opens with \"Answer\" at ¶1")
+                .contains("move up by one");
+    }
+
+    /**
+     * Pages 3–4 of Chapter 1: "…namely four." ends the page and the paragraph runs on, flush left,
+     * after the full stop. A test that refused this as "the first half is a finished sentence"
+     * was wrong on the first real book, and the join must go through.
+     */
+    @Test
+    void aParagraphRunningOnAfterAFullStopIsJoined() {
+        imports.renderedPagesAnswer = 2;
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 3, "All these numbers have four significant figures, namely four.")),
+                page(7, 2, "0.95", paragraph("7.1", 3, "This shows that the location of decimal point is of no consequence.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).hasSize(1);
+        assertThat(imports.rows.getFirst().text())
+                .isEqualTo("All these numbers have four significant figures, namely four. "
+                        + "This shows that the location of decimal point is of no consequence.");
     }
 
     /**
@@ -231,19 +249,22 @@ class NcertLoadCommandTest {
     @Test
     void everyCollisionIsNamedAtOnceWithOneRedoPerChapter() {
         imports.renderedPagesAnswer = 4;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first is finished.")),
-                page(7, 2, "0.95", paragraph("7.1", 1, "A different paragraph numbered one.")),
-                page(7, 3, "0.95", paragraph("7.2", 1, "Another section, also finished.")),
-                page(7, 4, "0.95", paragraph("7.2", 1, "And its collision.")));
+        // Two collisions the join still refuses: a claim that is not the page's first paragraph,
+        // and a claim across a page that carries text.
+        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first paragraph of the section")),
+                page(7, 2, "0.95", paragraph("7.1", 2, "The second."), paragraph("7.1", 1, "Not first on its page.")),
+                page(7, 3, "0.95", paragraph("7.2", 1, "A new section")),
+                page(7, 4, "0.95", paragraph("7.2", 2, "with a page of text")),
+                page(7, 5, "0.95", paragraph("7.2", 1, "before a restart at one.")));
 
         assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
 
         assertThat(out.toString())
                 .contains("2 address(es) cannot be one paragraph")
                 .contains("ch 7 §7.1 ¶1 is claimed by page 1 and page 2")
-                .contains("ch 7 §7.2 ¶1 is claimed by page 3 and page 4")
+                .contains("ch 7 §7.2 ¶1 is claimed by page 3 and page 5")
                 // One command per chapter, naming every page that needs re-extracting.
-                .contains("ncert extract --redo --chapters 7 --pages 1,2,3,4");
+                .contains("ncert extract --redo --chapters 7 --pages 1,2,3,5");
         assertThat(imports.rows).isNull();
     }
 

@@ -131,6 +131,28 @@ class PageExtractTaskTest {
     }
 
     /**
+     * FIX 1 is paid for in input tokens on every page of every book, so the thing it buys has to be
+     * demonstrably in the turn. Both branches are rendered here: given a layer the turn carries it
+     * under its delimiters and says it is authoritative for characters; given none, the turn says
+     * the image is the only source instead of silently dropping the section (spec-auditor, D14).
+     */
+    @Test
+    void theUserTurnCarriesThePageTextLayerWhenThereIsOneAndSaysSoWhenThereIsNot() {
+        Map<String, Object> common = Map.of("book_title", "Physics Part-I", "chapter", 7, "page", 12);
+        Map<String, Object> withLayer = new java.util.LinkedHashMap<>(common);
+        withLayer.put("page_text", "Lp = mp rp vp, since inspection tells us");
+
+        String fed = prompts.render(com.margai.ai.api.PromptRef.named("ncert_extract"), withLayer).user();
+        String withheld = prompts.render(com.margai.ai.api.PromptRef.named("ncert_extract"), common).user();
+
+        assertThat(fed).contains("Lp = mp rp vp, since inspection tells us")
+                .contains("--- text layer of this page ---")
+                .contains("authoritative for characters");
+        assertThat(withheld).contains("no usable text layer")
+                .doesNotContain("--- text layer of this page ---");
+    }
+
+    /**
      * The prompt may not ask for a field the tool schema forbids. `has_equations` was removed from
      * the output record at D14 and left in four places in the prefix, where the tool's
      * additionalProperties:false would have turned every page into a validation failure and a

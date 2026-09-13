@@ -274,6 +274,35 @@ class NcertExtractCommandTest {
                 .allSatisfy(page -> assertThat(page.skipped()).isEqualTo("apparatus from SUMMARY"));
     }
 
+    /**
+     * The page's own text layer travels with the image as the character authority (D14 §6.1
+     * reversal): the characters vision fumbles — 1 against l, a prime, a leading minus, an
+     * exponent — are already in it, because these books are digitally typeset.
+     */
+    @Test
+    void aLegibleTextLayerIsSentWithEveryPage() {
+        assertThat(run()).isZero();
+
+        assertThat(extract.pageTexts).hasSize(3).doesNotContainNull();
+        assertThat(extract.pageTexts.get(0)).contains("7.1 the first section of the chapter");
+        assertThat(extract.pageTexts.get(1)).contains("7.2 the second section of it");
+        assertThat(extract.pageTexts.get(2)).contains("8.1 the first section of the chapter");
+        assertThat(out.toString())
+                .contains("## text layer (authoritative for characters where it is legible)")
+                .contains("| 8 | fed as the character authority |");
+    }
+
+    /** Hindi, and one Chemistry file, have no usable layer — the image is then the only source. */
+    @Test
+    void anIllegibleTextLayerIsWithheldAndSaidSoInTheReport() throws IOException {
+        store.put("source/ncert/2022-ed/en/phy11-part2/keph201.pdf", garbledPdf(3), "application/pdf");
+
+        assertThat(run()).isZero();
+
+        assertThat(extract.pageTexts.subList(0, 2)).containsOnlyNulls();
+        assertThat(out.toString()).contains("| 8 | withheld: illegible |");
+    }
+
     /** A chapter whose text layer cannot be read sends every page: skipping blind would drop teaching. */
     @Test
     void aChapterWithNoDetectableApparatusSendsEveryPage() {
@@ -303,8 +332,28 @@ class NcertExtractCommandTest {
      * argument is one page; the filler makes the page legible English by the measured standard.
      */
     private static byte[] pdfWithText(String... pageTexts) throws IOException {
+        return pdf(java.util.Arrays.stream(pageTexts)
+                .map(text -> List.of(text,
+                        "This is the text of the page and it is written in the words that we use,",
+                        "with the same of and to in a that as it for on by an which be are this."))
+                .toList());
+    }
+
+    /**
+     * The {@code chem11-part2/kech202.pdf} case: a custom-encoded font whose text extracts as a
+     * Caesar-shifted alphabet. No filler — a page of this has enough words to be judged and none of
+     * them are English, which is exactly why {@link PdfTextLayer} scores it near zero.
+     */
+    private static byte[] garbledPdf(int pages) throws IOException {
+        List<String> page = List.of(
+                "LVRPHULVP DQG WKH VWUXFWXUH RI PDWWHU LQ WKH ILUVW FKDSWHU RI WKLV ERRN",
+                "DQG WKH ZRUGV WKDW DUH SULQWHG KHUH DUH QRW WKH ZRUGV WKH IRQW FODLPV");
+        return pdf(java.util.stream.IntStream.range(0, pages).mapToObj(index -> page).toList());
+    }
+
+    private static byte[] pdf(List<List<String>> pages) throws IOException {
         try (org.apache.pdfbox.pdmodel.PDDocument document = new org.apache.pdfbox.pdmodel.PDDocument()) {
-            for (String text : pageTexts) {
+            for (List<String> lines : pages) {
                 org.apache.pdfbox.pdmodel.PDPage pdPage = new org.apache.pdfbox.pdmodel.PDPage();
                 document.addPage(pdPage);
                 try (var content = new org.apache.pdfbox.pdmodel.PDPageContentStream(document, pdPage)) {
@@ -313,11 +362,12 @@ class NcertExtractCommandTest {
                             org.apache.pdfbox.pdmodel.font.Standard14Fonts.FontName.HELVETICA), 11);
                     content.setLeading(14);
                     content.newLineAtOffset(50, 740);
-                    content.showText(text);
-                    content.newLine();
-                    content.showText("This is the text of the page and it is written in the words that we use,");
-                    content.newLine();
-                    content.showText("with the same of and to in a that as it for on by an which be are this.");
+                    for (int line = 0; line < lines.size(); line++) {
+                        if (line > 0) {
+                            content.newLine();
+                        }
+                        content.showText(lines.get(line));
+                    }
                     content.endText();
                 }
             }
@@ -339,19 +389,21 @@ class NcertExtractCommandTest {
         final List<String> tails = new ArrayList<>();
         final List<String> addresses = new ArrayList<>();
         final List<Integer> imageCounts = new ArrayList<>();
+        final List<String> pageTexts = new ArrayList<>();
         final List<String> empty = new ArrayList<>();
         final List<String> lowConfidence = new ArrayList<>();
 
         @Override
         public AiResponse<NcertPage> read(String bookTitle, short chapter, int page, List<ImagePart> images,
-                PreviousPage previous, AiCallContext ctx) {
+                String pageText, PreviousPage previous, AiCallContext ctx) {
             String address = chapter + "/" + page;
             calls.add(address);
             imageCounts.add(images.size());
+            pageTexts.add(pageText);
             tails.add(previous == null ? null : previous.tail());
             addresses.add(previous == null ? null : previous.section() + " ¶" + previous.paraNo());
             List<NcertPage.Paragraph> paragraphs = empty.contains(address) ? List.of()
-                    : List.of(new NcertPage.Paragraph("7.9", 1, "text of " + address, false, List.of()));
+                    : List.of(new NcertPage.Paragraph("7.9", 1, "text of " + address, List.of()));
             BigDecimal confidence = lowConfidence.contains(address) ? new BigDecimal("0.40") : new BigDecimal("0.95");
             return new AiResponse<>(new NcertPage(paragraphs, confidence), Usage.none(), "fake",
                     Duration.ZERO, UUID.randomUUID());

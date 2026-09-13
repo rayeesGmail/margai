@@ -83,6 +83,9 @@ class NcertExtractCommand extends NcertBookCommand {
 
         List<List<String>> perChapter = new ArrayList<>();
         List<List<String>> apparatusRows = new ArrayList<>();
+        List<List<String>> textLayerRows = new ArrayList<>();
+        List<String> diffFlags = new ArrayList<>();
+        List<String> structureFlags = new ArrayList<>();
         List<String> lowConfidence = new ArrayList<>();
         int called = 0;
         int skipped = 0;
@@ -94,11 +97,22 @@ class NcertExtractCommand extends NcertBookCommand {
                         "chapter " + chapter.no() + " of '" + definition.code() + "' has no rendered pages — "
                                 + "run `ncert render` first");
             }
-            // Where this chapter stops teaching. Pages past it are never sent: the model cannot
-            // reliably tell NCERT's chapter-numbered exercises from its sections, and it does not
-            // have to if it never sees them (D14, ChapterApparatus).
-            Optional<ChapterApparatus.Boundary> apparatus =
-                    ChapterApparatus.find(PdfTextLayer.pages(content.get(definition.sourceKey(language, chapter))));
+            // The chapter's own text layer, read once and used twice: to find where the chapter
+            // stops teaching, and — when it can be trusted — as the character-level authority sent
+            // alongside each page image (DECISIONS 2026-09-13, the §6.1 reversal).
+            List<String> pageTexts = PdfTextLayer.pages(content.get(definition.sourceKey(language, chapter)));
+            // Trust is judged per chapter, not per page: a page dense with equations scores low on
+            // English words by construction, and gating per page would withhold the text layer from
+            // exactly the pages it exists to fix.
+            boolean textLayerTrusted = PdfTextLayer.isLegible(pageTexts);
+            textLayerRows.add(List.of(String.valueOf(chapter.no()),
+                    textLayerTrusted ? "fed as the character authority" : "withheld: illegible",
+                    "%.3f".formatted(PdfTextLayer.meanLegibility(pageTexts))));
+
+            // Pages past the boundary are never sent: the model cannot reliably tell NCERT's
+            // chapter-numbered exercises from its sections, and it does not have to if it never
+            // sees them (D14, ChapterApparatus).
+            Optional<ChapterApparatus.Boundary> apparatus = ChapterApparatus.find(pageTexts);
             apparatusRows.add(List.of(String.valueOf(chapter.no()),
                     apparatus.map(boundary -> "page " + boundary.firstPage()).orElse("—"),
                     apparatus.map(ChapterApparatus.Boundary::heading).orElse("not found: every page is sent"),
@@ -136,13 +150,26 @@ class NcertExtractCommand extends NcertBookCommand {
                 List<ImagePart> images = PageTiles.split(content.get(pageKey), properties.pageTiles()).stream()
                         .map(band -> new ImagePart(band, PdfPageRenderer.MEDIA_TYPE))
                         .toList();
+                String pageText = textLayerTrusted && page <= pageTexts.size() ? pageTexts.get(page - 1) : null;
                 AiResponse<NcertPage> response = extract.read(definition.row().titleEn(), chapter.no(), page,
-                        images, previous, ctx);
+                        images, pageText, previous, ctx);
                 ExtractedPage read = ExtractedPage.of(chapter.no(), page, response.output(), response.aiCallId());
                 done.put(read.address(), read);
                 called++;
                 chapterCalled++;
                 chapterParagraphs += read.paragraphs().size();
+                // The character check and the structural flag, both against the page's own text
+                // layer and both free (FIX 4, FIX 6): they turn the founder's audit from reading
+                // every paragraph into adjudicating the flagged ones.
+                if (pageText != null) {
+                    for (NcertPage.Paragraph paragraph : response.output().paragraphs()) {
+                        TranscriptionDiff.check(pageText, paragraph.text()).forEach(finding ->
+                                diffFlags.add("ch " + chapter.no() + " p" + page + " §" + paragraph.section()
+                                        + " ¶" + paragraph.paraNo() + ": " + finding));
+                    }
+                    PageStructure.check(pageText, response.output().paragraphs().size())
+                            .ifPresent(reason -> structureFlags.add("ch " + chapter.no() + " p" + page + ": " + reason));
+                }
                 previous = PreviousPage.of(response.output(), previous);
                 if (read.confidence() != null && read.confidence().compareTo(LOW_CONFIDENCE) < 0) {
                     lowConfidence.add("ch " + chapter.no() + " page " + page + " — confidence "
@@ -159,6 +186,8 @@ class NcertExtractCommand extends NcertBookCommand {
         flush(jsonlKey, done);
 
         int paragraphs = done.values().stream().mapToInt(page -> page.paragraphs().size()).sum();
+        report.section("text layer (authoritative for characters where it is legible)")
+                .table(List.of("chapter", "disposition", "legibility"), textLayerRows);
         report.section("end-of-chapter apparatus (never sent to the model)")
                 .table(List.of("chapter", "starts at", "heading", "pages not sent"), apparatusRows);
         report.section("pages per chapter")
@@ -167,7 +196,11 @@ class NcertExtractCommand extends NcertBookCommand {
                 List.of("pages in jsonl", "called this run", "already done", "apparatus", "paragraphs"),
                 List.of(List.of(String.valueOf(done.size()), String.valueOf(called),
                         String.valueOf(skipped), String.valueOf(apparatusSkipped), String.valueOf(paragraphs))));
-        report.section("low-confidence pages (below " + LOW_CONFIDENCE + ")").list(lowConfidence);
+        report.section("characters that differ from the page's text layer — adjudicate these")
+                .list(diffFlags);
+        report.section("pages whose paragraph count does not match the page's shape").list(structureFlags);
+        report.section("low-confidence pages (below " + LOW_CONFIDENCE
+                + ") — a routing signal, not a guarantee").list(lowConfidence);
 
         AiSpend.RunSpend bill = spend.of(runId);
         report.section("cost (from the ai_calls ledger)").table(

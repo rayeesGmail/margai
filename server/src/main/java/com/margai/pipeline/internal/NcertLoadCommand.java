@@ -252,7 +252,6 @@ class NcertLoadCommand extends NcertBookCommand {
         private final List<String> figureRefs = new ArrayList<>();
         private BigDecimal confidence;
         private UUID aiCallId;
-        private boolean hasEquations;
 
         private Joined(short chapterNo, String section, NcertPage.Paragraph first, ExtractedPage page) {
             this.chapterNo = chapterNo;
@@ -272,7 +271,6 @@ class NcertLoadCommand extends NcertBookCommand {
             text.append(paragraph.text().strip());
             pages.add(page.page());
             paragraph.figureRefs().stream().filter(ref -> !figureRefs.contains(ref)).forEach(figureRefs::add);
-            hasEquations |= paragraph.hasEquations();
             if (confidence == null || (page.confidence() != null && page.confidence().compareTo(confidence) < 0)) {
                 confidence = page.confidence();
             }
@@ -283,7 +281,10 @@ class NcertLoadCommand extends NcertBookCommand {
 
         private NcertParagraphRow row() {
             return new NcertParagraphRow(chapterNo, section, (short) first.paraNo(), text.toString(),
-                    hasEquations, figureRefs, new ParagraphExtraction(pages, confidence, aiCallId));
+                    // Decided from the joined text, once the halves are together: a paragraph
+                    // whose equation sits on the second page is still a paragraph with an equation.
+                    Equations.present(text.toString()),
+                    figureRefs, new ParagraphExtraction(pages, confidence, aiCallId));
         }
     }
 }

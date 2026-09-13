@@ -41,11 +41,14 @@ public class PageExtractTask implements NcertPageExtractor {
 
     @Override
     public AiResponse<NcertPage> read(String bookTitle, short chapter, int page, List<ImagePart> images,
-            PreviousPage previous, AiCallContext ctx) {
+            String pageText, PreviousPage previous, AiCallContext ctx) {
         Map<String, Object> variables = new LinkedHashMap<>();
         variables.put("book_title", bookTitle);
         variables.put("chapter", chapter);
         variables.put("page", page);
+        // Absent for a chapter whose layer is noise, and the prompt then says the image is all
+        // there is — so the model is never left guessing which source it was given.
+        variables.put("page_text", pageText == null || pageText.isBlank() ? null : pageText);
         // Told to the model only when the page arrives in bands, so the single-image prompt is
         // unchanged and the two configurations stay comparable.
         variables.put("tiles", images.size() > 1 ? images.size() : null);

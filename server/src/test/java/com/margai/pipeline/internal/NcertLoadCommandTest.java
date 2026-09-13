@@ -286,15 +286,18 @@ class NcertLoadCommandTest {
 
     @Test
     void figureRefsAndEquationsSurviveTheJoin() {
+        imports.renderedPagesAnswer = 2;
         jsonl(page(7, 1, "0.95",
-                new NcertPage.Paragraph("7.9", 1, "First half with", false, List.of("Fig. 7.9"))),
+                new NcertPage.Paragraph("7.9", 1, "First half with", List.of("Fig. 7.9"))),
                 page(7, 2, "0.95",
-                        new NcertPage.Paragraph("7.9", 1, "an equation E = mc^2.", true, List.of("Table 7.1"))));
+                        new NcertPage.Paragraph("7.9", 1, "an equation E = mc^2.", List.of("Table 7.1"))));
 
         run();
 
         NcertParagraphRow row = imports.rows.getFirst();
         assertThat(row.text()).isEqualTo("First half with an equation E = mc^2.");
+        // Computed in Java from the joined text: the equation arrived on the second page, and a
+        // paragraph is still a paragraph with an equation wherever its halves fell (D14).
         assertThat(row.hasEquations()).isTrue();
         assertThat(row.figureRefs()).containsExactly("Fig. 7.9", "Table 7.1");
     }
@@ -334,7 +337,7 @@ class NcertLoadCommandTest {
     }
 
     private static NcertPage.Paragraph paragraph(String section, int paraNo, String text) {
-        return new NcertPage.Paragraph(section, paraNo, text, false, List.of());
+        return new NcertPage.Paragraph(section, paraNo, text, List.of());
     }
 
     /** Records what the command hands over and answers as a first clean load would. */

@@ -1,4 +1,10 @@
-// ncert_extract v1 — D14 page extraction (TECH_PLAN §6.1, §6.3; SPEC §9 item 2).
+// ncert_extract v2 — D14 page extraction (TECH_PLAN §6.1, §6.3; SPEC §9 item 2).
+//
+// v2 is the version the canonical corpus is extracted with. v1 was the exploratory one: it ran
+// eight times on one chapter, was amended between runs, and none of its output survives. The
+// bump exists so the freeze has something to name — every ncert_paragraphs row traces to an
+// ai_calls row that records the prompt version that produced it, and a corpus frozen against a
+// version that kept changing under it could not be re-derived (FIX 5 policy, D14).
 // One call per page image on the VISION tier. The output is the page's paragraphs at their
 // printed addresses, which become ncert_paragraphs rows and, through them, every anchor a
 // student sees ("Class 11 Physics, Ch 7, §7.9", SPEC §6.3).
@@ -22,9 +28,37 @@ their own book. Accuracy of the text and of its address matters more than anythi
 paragraph attributed to the wrong section sends a student to the wrong page of a book they are
 holding, and a sentence you improved is a sentence their book does not contain.
 
-You are reading one page image at a time, in order, from a chapter of an NCERT textbook for
-Classes XI and XII in Physics, Chemistry or Biology. These are the books the NEET syllabus is
-drawn from. Your output is a list of paragraphs, each with the address at which it is printed.
+You are reading one page at a time, in order, from a chapter of an NCERT textbook for Classes XI
+and XII in Physics, Chemistry or Biology. These are the books the NEET syllabus is drawn from.
+Your output is a list of paragraphs, each with the address at which it is printed.
+
+YOUR TWO SOURCES, AND WHICH ONE WINS
+
+Most pages come to you twice: as an image, and as the text layer embedded in the PDF the image was
+rendered from. They are the same page seen two ways, and each is authoritative for different
+things.
+
+**The text layer is authoritative for characters.** Every letter, digit, subscript, superscript,
+prime, sign and symbol is taken from it. These books are digitally typeset, so the layer already
+holds what an eye can mistake: the difference between `1` and `l`, the prime on F', the minus in
+front of a fraction, the 8 in 10^8, the capital in M_E. Where the text layer shows a character,
+that character is right and the image is not a second opinion.
+
+**The image is authoritative for everything else**: layout, columns and reading order, where a
+paragraph begins and ends, which heading a paragraph sits under, what is a caption, what is a box,
+what is running text. The text layer arrives in an order that often has nothing to do with reading
+order, and it cannot tell a caption from a sentence. Never take structure from it.
+
+**Where the text layer is garbage, the image is the fallback — for that span only.** Mathematics is
+frequently set in symbol fonts that extract as private-use codepoints, mojibake or nothing at all,
+so an equation can come through as a run of meaningless characters while the prose around it is
+perfect. When a span of the text layer is plainly not what the image shows, read that span from the
+image and carry on trusting the layer elsewhere. Do not copy nonsense through because "the text
+layer is authoritative": that rule is about characters you can see in both, not about noise.
+
+Your job is therefore segmentation, addressing and the notation conventions below — not optical
+character recognition. When no text layer accompanies the page, the prompt says so, and then the
+image is the only source and you read it as carefully as you can.
 
 THE SHAPE OF AN NCERT PAGE
 
@@ -97,9 +131,17 @@ Join a word broken by a hyphen at the end of a line back into one word, unless t
 to the word itself. Join lines within a paragraph into continuous text with single spaces. End a
 paragraph where the printed paragraph ends: an indent, a blank line, or a new heading.
 
-Bulleted and numbered lists inside the running text are part of the paragraph that introduces
-them when they are short; when a list is long or each item is itself a paragraph, give each item
-its own paragraph, in order. Keep the item markers as printed ("(a)", "(i)", "1.").
+Two rules settle where a paragraph begins, because the same page must split the same way every
+time it is read:
+
+**A displayed equation never begins a new paragraph.** An equation set on its own line, centred,
+with or without a number at the right margin, belongs to the paragraph whose sentence runs into
+it — and the prose that resumes after it is still that same paragraph, unless the page indents it
+as a new one. A derivation of four displayed equations inside one flowing argument is one
+paragraph, not five.
+
+**A list item of two or more sentences is its own paragraph.** A one-sentence item stays inside
+the paragraph that introduces the list. Keep the item markers as printed ("(a)", "(i)", "1.").
 
 Footnotes at the bottom of a page are transcribed as their own paragraph, at the section the page
 is in, after the body paragraphs of that page.
@@ -109,12 +151,24 @@ EQUATIONS AND FORMULAE
 Transcribe mathematics inline in plain text, keeping every symbol readable:
 
 - Subscripts with an underscore and superscripts with a caret: v_0, a_max, E = mc^2, x^2 + y^2.
+- **Copy the case of a subscript or superscript exactly.** M_E is not M_e, r_A is not r_a. The book
+  distinguishes them and so do you.
+- **A prime is part of the symbol and is always kept.** F'_GB is not F_GB: the book primes a symbol
+  precisely to tell two quantities apart, and dropping it turns "F'_GB = F_GB" into a statement
+  about nothing.
+- **A leading minus belongs to the expression it is in front of.** If the page shows
+  "= − (2Gm^2/l)(2 + 1/sqrt(2))", the minus is transcribed. A sign is not decoration.
 - Fractions as a division, with brackets where they are needed: F = G M m / r^2,
   T = 2 pi sqrt(l / g), v = (u + at) / 2.
 - Greek letters by name when they are symbols: alpha, beta, gamma, delta, theta, lambda, mu, pi,
   rho, sigma, omega, Delta, Omega. Write "Delta H" for an enthalpy change, "theta" for an angle.
-- Vectors as the book marks them, with an arrow or bold noted in words only if the distinction
-  carries meaning in that sentence; otherwise the plain symbol is enough.
+- **Unit vectors take a fixed spelling: i_hat, j_hat, k_hat**, and a vector marked by an arrow or
+  by bold keeps its plain symbol. Write "F_GA = Gm(2m) / 1 j_hat", never "j".
+- **An approximation is never flattened into an equality.** Where the page prints ≅ or ≈, write
+  "approx=" — "g(h) approx= g (1 - 2h / R_E)". An approximate result reported as exact is a
+  physics error, not a formatting one.
+- **Scientific notation keeps its multiplication sign, written as x**: 3.84 x 10^8 m, never
+  "3.84 10^8 m" and never a dropped exponent.
 - Units as printed: m s^-1, kg m^2, J mol^-1 K^-1, N m^-2.
 - An equation printed on its own line belongs to the paragraph it follows, transcribed inline at
   the point it appears. An equation number printed at the right margin, such as "(7.12)", is kept
@@ -159,29 +213,10 @@ question, "Additional Exercises", "Answers", and appendices. Skip a margin quota
 biography box that is not part of a sentence in the body. Skip the chapter's contents list where
 one is printed.
 
-THE APPARATUS RUNS TO THE END OF THE CHAPTER
-
-Once a chapter's apparatus begins it does not stop: Summary, then Points to Ponder, then Exercises,
-then Answers, to the last page. **Every page from there to the end of the chapter is apparatus and
-returns no paragraphs**, whether or not its own heading is printed on it. A heading appears once,
-on the page where that part starts; the pages after it carry only the content, and they are just as
-much apparatus as the page with the heading.
-
-Two signatures tell you that you are past the body even with no heading in sight.
-
-**Numbered questions look exactly like sections.** NCERT numbers its exercises with the chapter
-number, so Chapter 7's exercises run 7.1, 7.2, 7.3 … precisely the shape of its section numbers. A
-page of numbered items where each item *asks something* — "Choose the correct alternative", "Show
-that…", "What would be…", a list of options (a) (b) (c) (d) — is the Exercises. Those numbers are
-question numbers, not sections, and the whole page returns no paragraphs.
-
-**Numbers that go backwards are the giveaway.** Section numbers only ever increase through a
-chapter. When you are told the previous page ended in section 7.13 and this page opens with items
-numbered 7.2, 7.3, 7.4, you are not back in section 7.2 — you are in the exercise list, which
-restarts the numbering. Body text never returns to a section it has already passed.
-
-If a page is apparatus, say so by returning an empty paragraph list with a high confidence. You
-have read it correctly; it simply holds nothing a student should be sent to.
+The pages of a chapter's end matter never reach you — the pipeline finds where the Summary begins
+and stops sending there — so you will not meet a page of exercises. If one ever does arrive,
+recognise it by its numbered questions, which NCERT labels with the chapter number and which
+therefore look exactly like section numbers, and return no paragraphs for it.
 
 Worked examples are the exception among boxed material: they are running text, and both the
 statement of the example and its solution are transcribed, at the section the example sits in.
@@ -360,6 +395,19 @@ Number this page's paragraphs from there, not from 1:
 --- end of the previous page ---
 <v.previous_tail>
 --- end of quoted text ---
+<endif>
+<if(v.page_text)>
+Below is this page's embedded text layer. It is authoritative for characters — letters, digits,
+subscripts, superscripts, primes, signs, symbols — and says nothing about layout or reading order,
+which you take from the image. Where a span of it is plainly noise rather than what the image
+shows, read that span from the image instead.
+
+--- text layer of this page ---
+<v.page_text>
+--- end of text layer ---
+<else>
+This page comes with no usable text layer, so the image is your only source. Read the characters
+from it as carefully as you can, and lower your confidence where a glyph is genuinely ambiguous.
 <endif>
 Extract this page's paragraphs. Call the tool exactly once.
 >>

@@ -38,18 +38,21 @@ public record NcertPage(List<Paragraph> paragraphs, BigDecimal confidence) {
     /**
      * One paragraph as printed.
      *
-     * @param section      the numbered heading it falls under ("7.9"), or the chapter's own
-     *                     number for text before the first numbered section
-     * @param paraNo       its position within that section, from 1
-     * @param text         the paragraph, transcribed, never summarised
-     * @param hasEquations whether it contains a mathematical or chemical expression
-     * @param figureRefs   figure and table labels the paragraph refers to, as printed
+     * <p>There is deliberately no {@code has_equations} field. Whether a paragraph holds an
+     * equation is decided from its transcribed text in Java: asked to judge it, the model flagged
+     * prose that merely stated a law in words, and a model is never asked for what code can
+     * compute (.claude/rules/ai-layer.md, D14).
+     *
+     * @param section    the numbered heading it falls under ("7.9"), or the chapter's own
+     *                   number for text before the first numbered section
+     * @param paraNo     its position within that section, from 1
+     * @param text       the paragraph, transcribed, never summarised
+     * @param figureRefs figure and table labels the paragraph refers to, as printed
      */
     public record Paragraph(
             String section,
             int paraNo,
             String text,
-            boolean hasEquations,
             List<String> figureRefs) {
 
         public Paragraph {

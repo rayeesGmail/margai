@@ -86,10 +86,12 @@ final class PdfTextLayer {
 
     /** Whether a chapter's text layer can be trusted, judged over its pages that carry enough text. */
     static boolean isLegible(List<String> pages) {
+        return meanLegibility(pages) >= MIN_LEGIBILITY;
+    }
+
+    /** The chapter's mean legibility, or 0 when no page carries enough text to judge. */
+    static double meanLegibility(List<String> pages) {
         double[] scores = pages.stream().mapToDouble(PdfTextLayer::legibility).filter(score -> score >= 0).toArray();
-        if (scores.length == 0) {
-            return false;
-        }
-        return Arrays.stream(scores).average().orElse(0) >= MIN_LEGIBILITY;
+        return scores.length == 0 ? 0 : Arrays.stream(scores).average().orElse(0);
     }
 }

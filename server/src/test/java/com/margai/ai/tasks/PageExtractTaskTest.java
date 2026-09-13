@@ -44,15 +44,13 @@ class PageExtractTaskTest {
         UUID requestId = UUID.randomUUID();
 
         AiResponse<NcertPage> response = task.read("Physics Part-I, Textbook for Class XI",
-                (short) 7, 12, List.of(image()), PreviousPage.none(), new AiCallContext(null, requestId.toString(), false));
+                (short) 7, 12, List.of(image()), "the page's own text layer", PreviousPage.none(), new AiCallContext(null, requestId.toString(), false));
 
         NcertPage page = response.output();
         assertThat(page.confidence()).isEqualByComparingTo(new BigDecimal("0.96"));
         assertThat(page.paragraphs()).hasSize(2);
         assertThat(page.paragraphs().getFirst().section()).isEqualTo("7.9");
         assertThat(page.paragraphs().getFirst().paraNo()).isEqualTo(1);
-        assertThat(page.paragraphs().getFirst().hasEquations()).isFalse();
-        assertThat(page.paragraphs().getLast().hasEquations()).isTrue();
         assertThat(page.paragraphs().getLast().figureRefs()).containsExactly("Fig. 7.9");
 
         Map<String, Object> row = jdbc.queryForMap(
@@ -71,7 +69,8 @@ class PageExtractTaskTest {
     @Test
     void theStateHandedForwardCarriesTheAddressNotOnlyTheText() {
         NcertPage page = task.read("Physics Part-I, Textbook for Class XI", (short) 7, 12, List.of(image()),
-                PreviousPage.none(), new AiCallContext(null, UUID.randomUUID().toString(), false)).output();
+                "the page's own text layer", PreviousPage.none(),
+                new AiCallContext(null, UUID.randomUUID().toString(), false)).output();
 
         PreviousPage previous = PreviousPage.of(page, PreviousPage.none());
 
@@ -106,7 +105,7 @@ class PageExtractTaskTest {
     void aLongTailIsCutToItsEnd() {
         String paragraph = "x".repeat(NcertPage.TAIL_LENGTH + 200) + "the end.";
         NcertPage page = new NcertPage(
-                List.of(new NcertPage.Paragraph("7.9", 1, paragraph, false, List.of())), BigDecimal.ONE);
+                List.of(new NcertPage.Paragraph("7.9", 1, paragraph, List.of())), BigDecimal.ONE);
 
         assertThat(page.tail()).hasSize(NcertPage.TAIL_LENGTH).endsWith("the end.");
     }

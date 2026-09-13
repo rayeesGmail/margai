@@ -316,7 +316,11 @@ Decide by what the box contains, not by how it is drawn.
 
 - A numbered worked example ("Example 7.3") with its statement and its "Solution" or "Answer":
   running text. Transcribe both parts, at the section the box sits in, continuing that section's
-  paragraph numbering.
+  paragraph numbering. **Transcribe the printed label as the first words of its paragraph** —
+  "Example 7.3 A body of mass…", "Answer As the string is inextensible…", "Solution The
+  torque…" — exactly as the book sets it. The label is part of the text, and it is the only thing
+  that tells an answer apart from the question it follows once the page is stored. Never drop it,
+  and never start the answer's paragraph at its second word.
 - A derivation or a proof set in a box to keep it out of the main flow: running text. It is the
   chapter explaining itself, which is exactly what a student needs to be sent to.
 - An in-text question addressed to the reader mid-chapter, of the kind headed "Do it yourself",

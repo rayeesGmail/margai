@@ -5,6 +5,7 @@ import com.margai.curriculum.api.ParagraphExtraction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * A loaded paragraph divided back into what each of its pages printed (D15). {@code ncert load} joins
@@ -18,6 +19,12 @@ final class ParagraphParts {
     private static final int OPENING_LETTERS = 12;
     /** Below this many letters on either side an opening is compared whole. */
     private static final int MIN_OPENING_LETTERS = 6;
+
+    /**
+     * A subscript or superscript in the transcription's notation. The text layer sets these on a
+     * baseline of their own, so the layer's line carries "M" where the transcription writes M_E.
+     */
+    private static final Pattern SCRIPT = Pattern.compile("[_^](\\([^)]*\\)|-?[A-Za-z0-9]+)");
 
     private ParagraphParts() {
     }
@@ -57,12 +64,12 @@ final class ParagraphParts {
 
     /**
      * A paragraph's opening in a form the transcription and the text layer share: letters only, lower
-     * case, a box ornament glued before a capital dropped ("tExample 7.1"). Subscripts, primes and
-     * apostrophes are where the two sides differ, and none of them is a letter.
+     * case, a box ornament glued before a capital dropped ("tExample 7.1"), the transcription's
+     * subscripts and exponents dropped. Those, primes and apostrophes are where the two sides differ.
      */
     static String opening(String text) {
-        String letters = (text == null ? "" : text.strip()).replaceFirst("^[a-z](?=[A-Z])", "")
-                .replaceAll("[^A-Za-z]", "").toLowerCase(Locale.ROOT);
+        String letters = SCRIPT.matcher((text == null ? "" : text.strip()).replaceFirst("^[a-z](?=[A-Z])", ""))
+                .replaceAll("").replaceAll("[^A-Za-z]", "").toLowerCase(Locale.ROOT);
         return letters.length() > OPENING_LETTERS ? letters.substring(0, OPENING_LETTERS) : letters;
     }
 

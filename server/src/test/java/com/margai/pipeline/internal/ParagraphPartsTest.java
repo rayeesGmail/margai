@@ -49,6 +49,10 @@ class ParagraphPartsTest {
                 .isEqualTo(ParagraphParts.opening("Stated Mathematically, Newtons gravitation"));
         assertThat(ParagraphParts.opening("The quotation is essentially"))
                 .isNotEqualTo(ParagraphParts.opening("The gravitational force is"));
+        // The layer sets a subscript or an exponent on a baseline of its own, so its line reads "M"
+        // where the transcription writes M_E (chapter 7 page 8).
+        assertThat(ParagraphParts.sameOpening("where M_E = mass of earth, m = mass", "where M = mass of earth,")).isTrue();
+        assertThat(ParagraphParts.sameOpening("Given k = 10^-13 s^2 m^(-3) and the", "Given k = 10 s m and the")).isTrue();
     }
 
     static NcertParagraphRow row(String text, List<Integer> pages, List<Integer> starts) {

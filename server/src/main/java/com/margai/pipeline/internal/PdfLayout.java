@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -57,6 +57,10 @@ final class PdfLayout {
     private static final double SEGMENT_GAP = 12;
     /** Wider than any justified word space: a display's spacing, which splits a line anywhere. */
     private static final double DISPLAY_GAP = 40;
+    /** How many body lines below the right column's first line the left column's first may begin before something unseen is above it. */
+    private static final double FAR_BELOW_LINES = 3;
+    /** How many prose lines must share a start for it to be a column's margin. */
+    private static final int MARGIN_LINES = 3;
     /** A line body text sits within this many points of the body size. */
     private static final double BODY_SIZE_TOLERANCE = 0.9;
     /** How many words of a starting line a report quotes. */
@@ -147,12 +151,22 @@ final class PdfLayout {
         Top top = Top.unknown;
         String topLine = null;
         boolean topJudged = false;
+        // Where the right column's text begins, for the one check below on the left column's first line.
+        double rightTop = columns.getOrDefault(true, List.of()).stream()
+                .filter(line -> Math.abs(line.size - body) <= BODY_SIZE_TOLERANCE)
+                .mapToDouble(line -> line.y).min().orElse(Double.MAX_VALUE);
         for (boolean right : new boolean[] {false, true}) {
             List<Line> column = new ArrayList<>(columns.getOrDefault(right, List.of()));
             column.sort(Comparator.comparingDouble((Line line) -> line.y).thenComparingDouble(line -> line.x));
             Double margin = commonest(column.stream().filter(prose::contains).map(line -> line.x).toList());
             boolean afterHeading = false;
             for (Line line : column) {
+                // A left column whose first line in the layer sits far below where the right column's
+                // text begins has something above it the layer cannot see — on chapter 7 page 11, the
+                // displayed equations that finish page 10's paragraph — so it cannot say what it continues.
+                if (!topJudged && !right && line.y - rightTop > FAR_BELOW_LINES * body) {
+                    topJudged = true;
+                }
                 // A heading may run to a second line of capitals, which is still the heading.
                 boolean heading = line.bold && (HEADING.matcher(line.text).find() || (afterHeading && line.isCapitals()));
                 boolean isProse = prose.contains(line);
@@ -231,17 +245,22 @@ final class PdfLayout {
     }
 
     /**
-     * Where the right column begins: the left column's margin is the commonest start of a prose line
-     * in the left half, and a line starting most of the way from it to the middle is the right
-     * column's. With no prose in the left half the page is one column.
+     * Where the right column begins: the left column's margin is the leftmost start that several prose
+     * lines in the left half share — not the commonest, because a verso page's right column can start
+     * left of the middle and outnumber the left column's flush lines (chapter 7 page 7) — and a line
+     * starting most of the way from it to the middle is the right column's. With no such margin the
+     * page is one column.
      */
     private static double columnBoundary(List<Line> lines, double pageWidth) {
         if (lines.isEmpty()) {
             return Double.MAX_VALUE;
         }
         double body = bodySize(lines);
-        Double leftMargin = commonest(prose(lines, body).stream()
-                .filter(line -> line.x < pageWidth / 2).map(line -> line.x).toList());
+        Map<Long, List<Double>> byPoint = new TreeMap<>();
+        prose(lines, body).stream().filter(line -> line.x < pageWidth / 2)
+                .forEach(line -> byPoint.computeIfAbsent(Math.round(line.x), point -> new ArrayList<>()).add(line.x));
+        Double leftMargin = byPoint.values().stream().filter(group -> group.size() >= MARGIN_LINES)
+                .map(List::getFirst).findFirst().orElse(null);
         return leftMargin == null ? Double.MAX_VALUE : leftMargin + 0.8 * (pageWidth / 2 - leftMargin);
     }
 

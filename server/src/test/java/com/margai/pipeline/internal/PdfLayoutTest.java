@@ -152,6 +152,50 @@ class PdfLayoutTest {
         assertThat(shape.top()).isEqualTo(PdfLayout.Top.unknown);
     }
 
+    /**
+     * Chapter 7 page 7: the right column's margin (319.7 pt) sits left of the page's middle and carries
+     * more flush lines than the left column's, so "the commonest start in the left half" took the right
+     * column for the left and read the page as one column. The left margin is the leftmost start that
+     * several prose lines share.
+     */
+    @Test
+    void aRightColumnThatStartsLeftOfTheMiddleAndOutnumbersTheLeftIsStillTheRightColumn() {
+        PdfLayout.PageShape shape = shape(
+                line(91.7, 100, "Bookman", "If the mass m is situated on the surface of"),
+                line(73.7, 112, "Bookman", "earth, then r = R and the gravitational force on"),
+                line(73.7, 124, "Bookman", "it is, from the equation above it on the page"),
+                line(73.7, 136, "Bookman", "known quantity. The measurement of G by the"),
+                line(319.7, 100, "Bookman", "its distance from the centre of the earth is"),
+                line(319.7, 112, "Bookman", "the force on the point mass m , we get from"),
+                line(337.7, 124, "Bookman", "The acceleration experienced by the point"),
+                line(319.7, 136, "Bookman", "mass is F(h)/m and we get the relation here"),
+                line(319.7, 148, "Bookman", "surface of earth : For h and R we can see"),
+                line(319.7, 160, "Bookman", "expand the right hand side of the equation"));
+
+        assertThat(shape.starts()).containsExactly("If the mass m is situated", "The acceleration experienced by the point");
+    }
+
+    /**
+     * Chapter 7 page 11: the left column opens with the displayed equations that finish page 10's
+     * paragraph, and they carry no text layer at all — so its first line in the layer is the indented
+     * "A point to note…", 67 pt below where the right column starts. Something the layer cannot see is
+     * above it, and the page cannot say whether it continues.
+     */
+    @Test
+    void aLeftColumnWhoseFirstLineSitsFarBelowTheRightColumnsCannotSayWhetherItContinues() {
+        PdfLayout.PageShape shape = shape(
+                line(91.7, 184, "Bookman", "A point to note is that the speed of the projectile"),
+                line(73.7, 196, "Bookman", "is zero at N, but is nonzero when it strikes the"),
+                line(73.7, 208, "Bookman", "heavier sphere 4 M. The calculation of this speed"),
+                line(73.7, 220, "Bookman", "is left as an exercise to the students of the book"),
+                line(319.7, 117, "Bookman", "traverses a distance with speed V. Its time and"),
+                line(319.7, 129, "Bookman", "period T therefore is the one given below here"),
+                line(319.7, 141, "Bookman", "on substitution of value of V from the equation"));
+
+        assertThat(shape.top()).isEqualTo(PdfLayout.Top.unknown);
+        assertThat(shape.starts()).contains("A point to note is that");
+    }
+
     /** The running head is smaller than the body; it is never the page's first line. */
     @Test
     void theRunningHeadIsNotTheFirstLine() {

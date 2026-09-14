@@ -1,0 +1,25 @@
+# A measurement, not a default: the VISION tier on Claude Opus 5.
+#
+#   java -jar server.jar --spring.profiles.active=pipeline,live,visionopus ncert extract …
+#
+# Added 2026-09-14 (D15, DECISIONS) when the founder asked whether a one-time corpus should be
+# cut with the strongest model available. Chapter 7 is run on it once, about ₹85 at $5 in / $25
+# out per million tokens (2.5× Sonnet 5, 5× Haiku 4.5), and read against the same defect list
+# as the Haiku and Sonnet runs. The design decision it informs is the pair — which model
+# transcribes and which verifies in the page-image second read — not a single winner.
+#
+# Request shape (the current API guidance for this model): thinking is adaptive by default and
+# stays on; `disabled` is accepted only at effort `high` or below and can make the model write
+# its tool call as text instead of calling the tool, which on this task is the whole output —
+# so adaptive at `low` effort, which still cuts cost. `temperature` is rejected outright, and an
+# empty value binds to null, which is how "send nothing" is spelled. The cacheable prefix
+# minimum is 1,024 tokens as on the reasoning tier.
+margai:
+  ai:
+    tier:
+      vision:
+        id: claude-opus-5
+        temperature:
+        effort: low
+        thinking: adaptive
+        cache-min-tokens: 1024

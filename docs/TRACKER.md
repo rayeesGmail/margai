@@ -545,6 +545,20 @@ v3 DRY RUN 5 — chapter 7 on Sonnet 5, the amended prompt (no tail, the open-se
   chapter-7 runs on v3: Haiku ×3, each with a structural failure the nets could not see (an
   echoed tail, a lost column, the wrong column joined); Sonnet ×2, the first with a skipped
   heading the headings check then closed, the second clean. Spend on v3 dry runs ₹104.27.
+v3 DRY RUN 6 — bio11 chapter 1 on Sonnet 5, 16:49 (₹15.82; 8 pages billed; cache write
+  10,413). 34 paragraphs → 30 rows, zero splits, zero repairs, no diff flag, no low-confidence
+  page; the one coverage flag is page 2 at 0% — **the Ernst Mayr biography returned no
+  paragraphs, as the new rule asks**, and the ratio check cannot know a page was left on
+  purpose. Read against the nine pages rendered this morning: **text exact 30/30, address
+  30/30** — the unit opener as §1 ¶1; "Linnaeus" back at the page-5 break and joined, "…systema'
+  which means systematic arrangement of organisms. Linnaeus used Systema Naturae as the title
+  of his publication"; "…species like nigrum and melongena. Human beings…" joined; the list
+  markers "1." "2." "3." "4." as printed where v2 had "(1)" and a dropped "4."; every binomial
+  with the genus capitalised — Mangifera indica ×4, Solanum tuberosum, Panthera leo ×2, P.
+  pardus, P. tigris, Homo sapiens; `Figure 1.1` ×2 and `Table 1.1` in figure_refs; even "think
+  of a dog ?" with the book's space before the mark. Confidence 0.90–0.97. Every defect the
+  morning's v2 audit listed for this chapter is gone. Spend on v3 dry runs ₹120.09; Sonnet has
+  now read both dry-run chapters clean on the amended prompt.
 ```
 
 ```

@@ -41,7 +41,7 @@ or symbols differ.
 You are the second, independent read. The first reader was careful and is usually right; the errors that
 remain are small and they matter: a hat on a symbol the book prints without one, a prime dropped, a
 subscript in the wrong case, a minus lost in front of a fraction, a bracket missing where it changes what
-is divided by what, a word the book does not contain. A student taught from a paragraph with one of those
+a sum or an exponent covers, a word the book does not contain. A student taught from a paragraph with one of those
 errors learns the wrong physics from a source that claims to be their own textbook. Nothing downstream
 of you can see these errors: a human adjudicates what you flag, and what you do not flag is published.
 
@@ -117,12 +117,10 @@ page does not print:
 - An exponent or a subscript attached to the wrong thing, or an exponent written as its reciprocal.
 - An approximation flattened into an equality: the page prints ≅ or ≈ and the item writes "=".
 - An equation number that is missing, different, or not in its printed parentheses.
-- A bracket that is missing or misplaced **where it changes what the expression means**: which terms a
-  fraction divides, what an exponent applies to, what a factor multiplies. In this notation a factor
-  written after a fraction with no bracket reads as part of the denominator, so a factor the page sets
-  outside a fraction is bracketed apart from it. The page prints mv² over 2r: "(m v^2) / (2 r)" is right
-  and "m v^2 / 2 r", which reads as (mv²/2)·r, differs. The page prints the fraction k/m multiplied by
-  x: "(k / m) x" is right and "k / m x", which reads as k over mx, differs.
+- A bracket that is missing or misplaced **where it changes what a sum or a difference, an exponent or a
+  function covers**. The page prints (u + at)/2: "(u + at) / 2" is right and "u + at / 2", which divides
+  only at, differs. The page prints √(2g)·h: "sqrt(2 g) h" is right and "sqrt(2 g h)" differs. The page
+  prints an exponent of −kt: "e^(-k t)" is right and "e^-k t" differs.
 - A misprint the item has "corrected". The page prints "teh velocity"; an item reading "the velocity"
   differs from the print, because the corpus carries the book's own words and a misprint is adjudicated
   by a person, not repaired by a reader.
@@ -136,9 +134,10 @@ WHAT IS NOT A DIFFERENCE
 - Spacing of any kind: "k x^2" and "kx^2", "f(t)" and "f (t)", a space before a comma or a colon. The
   book's own irregular spacing is not kept and not flagged.
 - A line break or a hyphen that only breaks a word at the end of a printed line.
-- Brackets that change nothing, because nothing follows or precedes that could group differently:
-  "(m v^2) / r" and "m v^2 / r" are one reading, and so are "x(t)" and "x (t)". A bracket around a
-  fraction that a factor follows is never one of these: see above.
+- How products and quotients are grouped, when no sum, difference, exponent or function is split by it.
+  The conventions write products and quotients one after another — "G M m / r^2", "Gm(2m) / 1 j_hat" —
+  and leave their grouping to the reader, so "m v^2 / 2 r" against "(m v^2) / (2 r)", "k / m x" against
+  "(k / m) x", and "x(t)" against "x (t)" are not differences for you to flag.
 - The approximation signs ≅, ≃ and ≈, which are one sign here, and the dashes −, - and –, which are one
   minus.
 - The multiplication sign in scientific notation written as ×, x or a dot: the sign matters, the glyph

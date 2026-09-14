@@ -114,7 +114,7 @@ class PageVerifyTaskTest {
         String system = prompts.systemPrefix("ncert_verify");
 
         assertThat(system).contains("r_hat").contains("unit vector")
-                .contains("(m v^2) / (2 r)").contains("(k / m) x")
+                .contains("u + at / 2").contains("How products and quotients are grouped")
                 .contains("resistence")
                 .contains("not_on_page").contains("omitted")
                 .contains("≅, ≃ and ≈")

@@ -177,6 +177,49 @@
 ## 📝 Day log (append newest on top)
 
 ```
+D15 · 2026-09-14 · step 1 of the HOW TO RESUME order — the chapter-7 dry run on the final v2 prompt: PASS
+Run by the founder at 08:05 from `d15-ncert-books`, fast-forwarded to the merged main (451adb3); the jar
+  built 2026-09-13 23:58 carries the committed prompt byte for byte, so nothing was rebuilt.
+  `ncert extract --book phy11-part1 --lang en --chapters 7 --redo`: 12 pages called, ₹14.08 from the
+  ledger — ₹1.17 per billed page, 7% above the canonical run's ₹1.09, which moves the bio11 estimate
+  from ₹220 to about ₹235 — text layer fed at legibility 0.389, cache write 6,448 / cache read 70,928,
+  apparatus from page 13 (SUMMARY, 5 of 17 not sent), character diff none over 12 pages checked,
+  paragraph-count flag none, 120 paragraphs. `ncert load … --chapters 7`: exit 0, no refusal, 0
+  page-break repairs, 120 updated; 20 addresses of earlier runs reported as no longer carried.
+  The block's gates, each read on the rows of today's calls only (joined through
+  `extraction->'en'->>'aiCallId'` to `ai_calls`, because of the finding below):
+  - primes present: `F'_GB = F_GB and F'_GC = F_GC` at §7.3 ¶18, `F'_R = F'_GA + F'_GB + F'_GC` at
+    ¶19; 20 rows in the chapter carry a prime;
+  - §7.3 ¶10 `Example 7.2` → ¶11 `Answer` → ¶12 `F_GA = Gm(2m) / 1 j_hat`, the order the block asks
+    for at the numbers it names;
+  - splits 3, at the threshold: §7.3 ¶21 "cases, a simple law…" is a genuine band split inside page 5;
+    §7.5 ¶5 "hence F = …" and §7.9 ¶11 "where R_MS…" are page-break continuations the model did not
+    flag, the second the defensible flush-left class after a displayed equation;
+  - the glyph table of the 2026-09-13 day log (items 1–8 and 10–14; the log named ten defects but
+    recorded no query, so it was rebuilt as a fourteen-row SQL over wrong/right patterns): every wrong
+    pattern 0 hits — `Gm(2m) / 1` ×3, both primed lines, `= − (2 G m^2 / l)(2 + 1 / √2)` with its minus
+    and its radical (the glyph, as printed), `i_hat`/`j_hat` ×6, `g(h) ≅`, `M_E` ×26 and no `M_e`,
+    `× 10^` ×11 and no ASCII `x`, `10^8`, `R_m^2 / R_E^2` beside `g ∝ R_E^-2`, `r_21`,
+    `T_M = (1.52)^(3/2) × 365`, `L_P = m_P r_P v_P` in the case the page prints. The one flag was the
+    check's own: the length `l` closing `− 5.41 G m^2 / l` at §7.7 ¶13 matched the stray-letter
+    pattern. Confidence 0.92 on every page, as uniform as ever.
+  Both chapter-7 reports are committed with this entry, before step 2's whole-book run overwrites
+  the day's files (the PARKED report-overwrite item, worked around by commit order today).
+FINDING, before the corpus event: `ncert load` reports orphans and never deletes them, so
+  `ncert_paragraphs` held 1,102 phy11-part1 rows against the canonical run's 1,017 — 85 rows left by
+  the ten earlier runs, 26 of them in chapter 7 (20 after today's load). A random twenty over the
+  table can land on a row no run carries, and D17's embed would embed them. Proposed for step 2:
+  delete the book's rows between the full extraction and its load, by hand and on the founder's
+  say, so the table equals the run — a DECISIONS row if agreed; a `--prune` on `ncert load` for
+  corpus events is PARKED. Also PARKED: under `--redo` the extract report's closing `jsonl:` line
+  counts the redone pages as "from earlier runs".
+Next: step 2 — archive the canonical JSONL rather than delete it, extract phy11-part1 in full on
+  this prompt (~₹125), delete the book's rows, load, then the ✅ on the same twenty pages as
+  2026-09-13 (a seed cannot reproduce a sample across a reload; the pages are the constant) —
+  20/20 text is the D14 tick.
+```
+
+```
 D14 (continued) · 2026-09-13 · the extraction is fixed against its own defect table, and the
   corpus policy changes: freeze, don't reproduce
 The founder ran the pipeline live on phy11-part1 ch 7 (Gravitation) five times over 2026-09-12/13 —
@@ -1998,6 +2041,8 @@ Tomorrow's first task:
 ## 🅿️ PARKED (Sunday review only)
 
 - _idea · date · one line_
+- **`ncert load --prune` for a corpus event** · 2026-09-14 (D15) · the load reports the addresses a chapter no longer carries and leaves the rows in place, which was right for a subset load into a full book and is wrong for a re-extraction that replaces the book: 85 stale rows sat beside the canonical 1,017 until today, sampleable by the ✅ and embeddable by D17. A flag that deletes the orphans of the chapters this load carries, refused once embeddings or anchors exist unless the D17 migrate path is taken. Until it exists the corpus event deletes by hand before the load (day log 2026-09-14)
+- **the extract report's "from earlier runs" count under `--redo`** · 2026-09-14 (D15) · the closing `jsonl:` line counted all 143 pages as from earlier runs on a run that had just redone 12 of them; the total table above it is right (`called this run 12`, `already done 0`). Cosmetic, one line in `NcertExtractCommand`
 - **`ncert verify --read-pages`: the page-image second read** · 2026-09-13 (D14) · the only instrument that can verify a formula, since the text layer holds no base–script association for a displayed equation (measured: `22 / fi E / mVmV GmM`) and cannot carry a prime at all (Symbol font, no Unicode map). A comparison task, not a second transcription; on the VISION tier; ~₹1/page over formula pages. A half-built `PageVerifyTask` was removed on 2026-09-13 because a `@Component` requiring an unwritten prompt broke every Spring context — it returns with its prompt. Free checks (word diff, coverage ratio, split sentences, page-break repairs) already landed in `extract` and `load`
 - **the four phy11-part1 pages under 60% character coverage** · 2026-09-13 (D14) · `ch 1 p2` 21%, `ch 6 p25` 45%, `ch 6 p16` 55%, `ch 4 p3` 58% — flagged by `PageCoverage` on the first full book and not yet looked at; a chapter-opener with a contents sidebar would explain p2, the others need the rendered image. Look before the next phy re-extraction so a real loss is not re-extracted identically
 - **a run report that a second run of the same command cannot overwrite** · 2026-09-13 (D14, spec-auditor) · `Reports` writes `pipeline/reports/<date>-<command>.md` and overwrites it, which was right when a command ran once a day. `ncert extract` ran five times on 2026-09-12/13 and left two files, so the cost comparison that decided RULING 1 is not in the repo — and a resumed run's report, which checks fewer pages than the first, silently replaces the first one's flags. `.claude/rules/pipeline.md` makes the report the day's committed evidence, so this is the evidence rule leaking. Cheapest fix: keep the name, append a run block instead of replacing the file, or suffix a run ordinal when the file exists. Do it before D16, when whole books start being re-run

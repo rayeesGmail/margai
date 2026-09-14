@@ -251,6 +251,11 @@ class PipelineCommandTest {
                     return cls.cast(new NcertLoadCommand(new NcertRenderCommandTest.RecordingStore(),
                             imports, writer));
                 }
+                if (cls == NcertVerifyCommand.class) {
+                    return cls.cast(new NcertVerifyCommand(new NcertRenderCommandTest.RecordingStore(), imports,
+                            new NcertVerifyCommandTest.StubVerifier(), ids -> Map.of(),
+                            new NcertExtractCommandTest.StubSpend(), new PipelineProperties(72, 10, 1), writer));
+                }
                 return CommandLine.defaultFactory().create(cls);
             }
         };

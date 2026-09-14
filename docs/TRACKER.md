@@ -499,6 +499,31 @@ v3 DRY RUN 3 — chapter 7 on Haiku, amended prompt, 15:35 (₹13.64; cache writ
   this page's left column, never the previous page. Tests first, verify green, eval gate PASS
   (placeholder). Spend on v3 dry runs so far ₹58.67 (three chapter-7 runs: Haiku ₹13.81 and
   ₹13.64, Sonnet ₹31.22).
+v3 DRY RUN 4 — chapter 7 on Haiku, with the open-sentence fact and the left-column rule, 15:52
+  (₹13.97; cache write 7,577). 105 paragraphs → 95 rows, zero splits, zero repairs, no echo.
+  Page 5's content is back — F_GA / F_GB / F_GC, F_R, "Alternatively…", part (b) with five of
+  its seven primes (`F'_GB = F_GB and F'_GC = F_GC`, `F'_GA + F'_GB + F'_GC`; the first `F'_GA`
+  and `F'_R` unprimed, as v2 had it) — **but in the wrong order, and the same error on a second
+  page.** Page 5: the right column's top "cases, a simple law results…" was again flagged as
+  the Answer's continuation and joined to it ("…in vector notation are cases, a simple law
+  results"), then (1) and (2), then the left column's equations. Page 11 (confidence 0.75):
+  page 10 ends "…= − GM/2R − GM/R or" and the completion is two displayed equations at the top
+  of page 11's left column; the model joined "or" onto the right column's "traverses a distance
+  2π(R_E + h) with speed V", never transcribed the two equations, and filed "A point to note is
+  that the speed of the projectile is zero at N…" under §7.9 although it sits above the 7.9
+  heading. One new side effect of the headings check: "7.4 THE GRAVITATIONAL CONSTANT" was
+  transcribed as the first words of §7.4 ¶1. The (7.10) join on page 7 and page 8's opening
+  are clean.
+  THE PATTERN, four Haiku runs and one Sonnet run on: when the previous page's open sentence
+  runs into displayed equations at the top of the left column, Haiku without the previous
+  page's words takes the right column's prose top for the continuation, drops the equations,
+  and mis-files what follows — on two of twelve pages this run, invisible to every net. With
+  the words (v2 ×3, v3 run 1) it read those pages right and echoed elsewhere. Sonnet read them
+  right without the words. Neither prompt rule moved Haiku on this: the rule says "left column
+  first" and the model still went right. This is a layout failure a prompt cannot fix, only a
+  structure can — column-aware tiling (the left column's bands before the right column's, so
+  reading order is the images' order), or a net that compares the first paragraph's opening
+  words with the layer's top-left line and flags the page. Spend on v3 dry runs ₹72.64.
 ```
 
 ```

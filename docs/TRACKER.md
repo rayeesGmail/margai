@@ -678,6 +678,13 @@ v3 DRY RUN 9 — chapter 7 on Sonnet again, on the same amended prompt, 18:27 (�
   twice structurally clean and closer to the print; Sonnet structurally wrong in two runs of
   three (run 2 the heading, run 9 the column), but the one read to see the vector r. Opus
   transcribes, Sonnet verifies — to the founder.
+FOUNDER, ~18:50: "why is every run creating a new issue?" Because no two runs shared a prompt
+  (nine runs, nine prompts), both current models sample at the API default with no temperature
+  setting, the full read only began at run 7, and twelve pages is a small sample. RULING: prompt
+  v3 frozen at debb920 (DECISIONS, prompt-changelog). The next spend is a repeat, not a change —
+  Opus on chapter 7 pages 4, 6 and 8 with `--redo` (~₹20), read against run 8's rows, to tell
+  the rule from the dice on the vector r, the page-6 join and the page-8 split. Then the second
+  read is built against a prompt that does not move under it.
 ```
 
 ```

@@ -114,20 +114,22 @@ class NcertExtractCommandTest {
     }
 
     /**
-     * The D14 blocker: the tail alone cannot tell a model what paragraph number to continue from,
-     * so the address travels with it and a new chapter starts from nothing.
+     * The section travels with the tail so a page with no heading keeps its section, and a new
+     * chapter starts from nothing. Through v2 the paragraph number travelled too; since v3 the
+     * loader counts, so there is no number to carry (D15).
      */
     @Test
-    void eachPageAlsoCarriesTheAddressThePreviousPageEndedAt() {
+    void eachPageAlsoCarriesTheSectionThePreviousPageEndedIn() {
         run();
 
-        assertThat(extract.addresses).containsExactly(null, "7.9 ¶1", null);
+        assertThat(extract.addresses).containsExactly(null, "7.9", null);
     }
 
     /**
-     * A figure page must not reset the address: it has no text of its own, so it carries the
-     * running section and paragraph number across and drops only the tail. Without this the next
-     * page restarts at 1 — the original blocker, reintroduced by its own first fix.
+     * A figure page must not reset the state: it has no text of its own, so it carries the
+     * running section across and drops only the tail. Without this the next page would have to
+     * guess its section — through v2 it also restarted the numbering, the original blocker,
+     * reintroduced by its own first fix.
      */
     @Test
     void aTextFreePageCarriesTheAddressAcrossAndDropsOnlyTheTail() {
@@ -137,11 +139,11 @@ class NcertExtractCommandTest {
         assertThat(run()).isZero();
 
         assertThat(extract.calls).containsExactly("8/1", "8/2", "8/3", "9/1");
-        assertThat(extract.addresses).containsExactly(null, "7.9 ¶1", "7.9 ¶1", null);
+        assertThat(extract.addresses).containsExactly(null, "7.9", "7.9", null);
         assertThat(extract.tails).containsExactly(null, "text of 8/1", null, null);
     }
 
-    /** A resumed run must continue the numbering too, not restart it at the first uncalled page. */
+    /** A resumed run must carry the section and tail forward too, not start the first uncalled page cold. */
     @Test
     void aResumedRunCarriesTheAddressFromThePageAlreadyInTheJsonl() {
         commandLine.execute("ncert", "extract", "--book", "phy11-part2", "--chapters", "8", "--pages", "1",
@@ -151,7 +153,7 @@ class NcertExtractCommandTest {
         run();
 
         assertThat(extract.calls).contains("8/2");
-        assertThat(extract.addresses).containsExactly("7.9 ¶1", null);
+        assertThat(extract.addresses).containsExactly("7.9", null);
     }
 
     @Test
@@ -167,8 +169,8 @@ class NcertExtractCommandTest {
 
     /**
      * The remedy a load refusal prints is `--redo --chapters C --pages N`. If a `--pages`-filtered
-     * page did not advance the address, that command would call page N with nothing to continue
-     * from, the model would restart at 1, and the founder would pay to reproduce the same collision
+     * page did not advance the state, that command would call page N with no section and no tail,
+     * the model would guess, and the founder would pay to reproduce the same refusal
      * (spec-auditor, D14).
      */
     @Test
@@ -182,7 +184,7 @@ class NcertExtractCommandTest {
                 "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
 
         assertThat(extract.calls).containsExactly("8/2");
-        assertThat(extract.addresses).containsExactly("7.9 ¶1");
+        assertThat(extract.addresses).containsExactly("7.9");
     }
 
     @Test
@@ -406,9 +408,9 @@ class NcertExtractCommandTest {
             imageCounts.add(images.size());
             pageTexts.add(pageText);
             tails.add(previous == null ? null : previous.tail());
-            addresses.add(previous == null ? null : previous.section() + " ¶" + previous.paraNo());
+            addresses.add(previous == null ? null : previous.section());
             List<NcertPage.Paragraph> paragraphs = empty.contains(address) ? List.of()
-                    : List.of(new NcertPage.Paragraph("7.9", 1, "text of " + address, List.of()));
+                    : List.of(new NcertPage.Paragraph("7.9", "text of " + address, false, List.of()));
             BigDecimal confidence = lowConfidence.contains(address) ? new BigDecimal("0.40") : new BigDecimal("0.95");
             return new AiResponse<>(new NcertPage(paragraphs, confidence), Usage.none(), "fake",
                     Duration.ZERO, UUID.randomUUID());

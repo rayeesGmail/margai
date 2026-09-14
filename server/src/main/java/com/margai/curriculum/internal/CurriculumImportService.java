@@ -22,8 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
  * {@link CurriculumImport} over the D4 tables (TECH_PLAN §2.3, §6.3): one importer per load, one
  * transaction per call — the importer checks the file against itself and against the database,
  * upserts by natural key, and any {@code CurriculumImportException} rolls the whole call back.
- * Nothing is deleted except a track's stale step sequences; rows the file no longer names are
- * reported as orphans (DECISIONS 2026-09-12 D13).
+ * Rows the file no longer names are reported as orphans and kept (DECISIONS 2026-09-12 D13), with
+ * two exceptions: a track's stale step sequences, and — since 2026-09-14 (D15) — the NCERT
+ * paragraphs of a loaded chapter that its re-extraction no longer produces, which
+ * {@link NcertParagraphImporter} deletes and names, refusing if any of them is anchored.
  */
 @Service
 @Transactional

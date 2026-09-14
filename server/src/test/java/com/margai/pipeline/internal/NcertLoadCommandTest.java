@@ -22,9 +22,10 @@ import org.junit.jupiter.api.io.TempDir;
 import picocli.CommandLine;
 
 /**
- * {@code ncert load} over a JSONL written by hand: a paragraph that straddles a page break is
- * loaded as one paragraph with both pages recorded, a page of pure figure counts against coverage
- * without becoming a row, and the report carries the per-chapter and per-book coverage that
+ * {@code ncert load} over a JSONL written by hand: paragraph numbers are assigned here, per
+ * section in reading order across pages (v3, D15); a paragraph that straddles a page break is
+ * loaded as one paragraph with both pages recorded; a page of pure figure counts against coverage
+ * without becoming a row; and the report carries the per-chapter and per-book coverage that
  * PLAN D15's ✅ asks for.
  */
 class NcertLoadCommandTest {
@@ -71,14 +72,24 @@ class NcertLoadCommandTest {
         commandLine = PipelineRunner.commandLine(factory).setOut(printer).setErr(printer);
     }
 
-    /** The prompt gives a continuation the number it already had, so both halves share an address. */
+    /** The model labels sections and the loader counts: ¶1, ¶2, ¶3 per section, across pages. */
+    @Test
+    void paragraphsAreNumberedPerSectionInReadingOrderAcrossPages() {
+        jsonl(page(7, 1, "0.95", p("7", "Text above the first heading."), p("7.1", "First."), p("7.1", "Second.")),
+                page(7, 2, "0.95", p("7.1", "Third, on the next page."), p("7.2", "A new section."), p("7.2", "Its second.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address).containsExactly(
+                "ch 7 §7 ¶1", "ch 7 §7.1 ¶1", "ch 7 §7.1 ¶2", "ch 7 §7.1 ¶3", "ch 7 §7.2 ¶1", "ch 7 §7.2 ¶2");
+    }
+
+    /** The second page's first paragraph is flagged, so both halves become one row at one address. */
     @Test
     void aParagraphStraddlingAPageBreakIsLoadedAsOneParagraph() {
         jsonl(
-                page(7, 1, "0.95", paragraph("7.1", 1, "The first paragraph."),
-                        paragraph("7.1", 2, "A sentence that runs on")),
-                page(7, 2, "0.80", paragraph("7.1", 2, "and finishes on the next page."),
-                        paragraph("7.2", 1, "A new section.")));
+                page(7, 1, "0.95", p("7.1", "The first paragraph."), p("7.1", "A sentence that runs on")),
+                page(7, 2, "0.80", continuing("7.1", "and finishes on the next page."), p("7.2", "A new section.")));
 
         assertThat(run()).isZero();
 
@@ -88,6 +99,22 @@ class NcertLoadCommandTest {
         assertThat(straddling.text()).isEqualTo("A sentence that runs on and finishes on the next page.");
         assertThat(straddling.extraction().pages()).containsExactly(1, 2);
         assertThat(straddling.extraction().confidence()).isEqualByComparingTo("0.80");
+        assertThat(imports.rows.get(2).address()).isEqualTo("ch 7 §7.2 ¶1");
+    }
+
+    /**
+     * The model once mislabelled one paragraph mid-section and then returned to the section; a
+     * counter that restarted at 1 would have given two paragraphs one address. A section keeps
+     * counting wherever it resumes, so an address can never be claimed twice.
+     */
+    @Test
+    void aSectionResumingAfterAnotherKeepsCounting() {
+        jsonl(page(7, 1, "0.95", p("7.1", "One."), p("7.2", "Aside."), p("7.1", "Two.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address)
+                .containsExactly("ch 7 §7.1 ¶1", "ch 7 §7.2 ¶1", "ch 7 §7.1 ¶2");
     }
 
     /** A figure page is read correctly and yields nothing; that is text yield, not lost coverage. */
@@ -95,9 +122,9 @@ class NcertLoadCommandTest {
     void aFigureOnlyPageLowersTextYieldNotCoverage() {
         imports.renderedPagesAnswer = 4;
         jsonl(
-                page(7, 1, "0.95", paragraph("7.1", 1, "Text.")),
+                page(7, 1, "0.95", p("7.1", "Text.")),
                 page(7, 2, "0.99"),
-                page(7, 3, "0.95", paragraph("7.2", 1, "More text.")),
+                page(7, 3, "0.95", p("7.2", "More text.")),
                 page(7, 4, "0.99"));
 
         run();
@@ -117,9 +144,9 @@ class NcertLoadCommandTest {
     @Test
     void coverageDividesByTheRenderedPagesAndSaysSoWhenPagesAreMissing() {
         imports.renderedPagesAnswer = 12;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "Text.")),
-                page(7, 2, "0.95", paragraph("7.1", 2, "More.")),
-                page(7, 3, "0.95", paragraph("7.1", 3, "Still more.")));
+        jsonl(page(7, 1, "0.95", p("7.1", "Text.")),
+                page(7, 2, "0.95", p("7.1", "More.")),
+                page(7, 3, "0.95", p("7.1", "Still more.")));
 
         run();
 
@@ -131,7 +158,7 @@ class NcertLoadCommandTest {
     @Test
     void coverageIsUnavailableUntilRenderHasRecordedThePageCount() {
         imports.renderedPagesAnswer = null;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "Text.")));
+        jsonl(page(7, 1, "0.95", p("7.1", "Text.")));
 
         run();
 
@@ -140,34 +167,13 @@ class NcertLoadCommandTest {
                 .contains("coverage unavailable: ncert_books.pages_en is not set");
     }
 
-    /**
-     * The failure mode the blocker created: a model that restarts numbering at 1 on every page
-     * collides two different paragraphs at one address. Merging them silently is what the
-     * 20-paragraph spot check would not catch, so the run stops and names both pages.
-     */
-    @Test
-    void twoDifferentParagraphsAtOneAddressFailTheRun() {
-        imports.renderedPagesAnswer = 3;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first paragraph.")),
-                page(7, 2, "0.95", paragraph("7.1", 2, "Second page, second paragraph.")),
-                page(7, 3, "0.95", paragraph("7.1", 1, "Third page restarting at one.")));
-
-        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
-
-        assertThat(out.toString())
-                .contains("ch 7 §7.1 ¶1 is claimed by page 1 and page 3")
-                .contains("cannot be one paragraph continuing across a page break")
-                .contains("ncert extract --redo --chapters 7 --pages 1,3");
-        assertThat(imports.rows).isNull();
-    }
-
     /** A paragraph may legitimately run from page 10 to page 12 across a full-page figure. */
     @Test
     void aParagraphContinuesAcrossAnInterveningFigurePage() {
         imports.renderedPagesAnswer = 3;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "A sentence that runs on")),
+        jsonl(page(7, 1, "0.95", p("7.1", "A sentence that runs on")),
                 page(7, 2, "0.99"),
-                page(7, 3, "0.95", paragraph("7.1", 1, "and finishes after the figure.")));
+                page(7, 3, "0.95", continuing("7.1", "and finishes after the figure.")));
 
         assertThat(run()).isZero();
 
@@ -186,40 +192,103 @@ class NcertLoadCommandTest {
     @Test
     void anAbsentPageBetweenTwoHalvesIsRefusedNotAssumedBlank() {
         imports.renderedPagesAnswer = 3;
-        // The first half is deliberately unfinished, so the gap is what decides this one and not
-        // the finished-sentence guard that would otherwise refuse it first.
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first half runs on")),
-                page(7, 3, "0.95", paragraph("7.1", 1, "Restarted at one.")));
+        jsonl(page(7, 1, "0.95", p("7.1", "The first half runs on")),
+                page(7, 3, "0.95", continuing("7.1", "and claims to finish it.")));
 
         assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
 
         assertThat(out.toString())
-                .contains("is claimed by page 1 and page 3")
-                .contains("page 2 is not in the extraction, so whether it broke the paragraph is unknown");
+                .contains("page 3 says its first paragraph (§7.1) continues the previous page")
+                .contains("page 2 is not in the extraction, so whether it broke the paragraph is unknown")
+                .contains("ncert extract --redo --chapters 7 --pages 1,3");
+        assertThat(imports.rows).isNull();
+    }
+
+    /** A continuation attaches to the nearest page that carried text, whatever the model meant. */
+    @Test
+    void aContinuationJoinsTheNearestTextBearingPage() {
+        imports.renderedPagesAnswer = 3;
+        jsonl(page(7, 1, "0.95", p("7.1", "The first paragraph.")),
+                page(7, 2, "0.95", p("7.1", "The second runs on")),
+                page(7, 3, "0.95", continuing("7.1", "and finishes here.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::text)
+                .containsExactly("The first paragraph.", "The second runs on and finishes here.");
+    }
+
+    /** The flag says "the rest of the previous paragraph"; a new heading says it is not. The loader refuses rather than guesses. */
+    @Test
+    void aContinuationIntoADifferentSectionIsRefused() {
+        imports.renderedPagesAnswer = 2;
+        jsonl(page(7, 1, "0.95", p("7.1", "The end of section 7.1.")),
+                page(7, 2, "0.95", continuing("7.2", "flagged as continuing but under a new heading.")));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString())
+                .contains("the previous page ended in §7.1, not §7.2")
+                .contains("ncert extract --redo --chapters 7 --pages 1,2");
+        assertThat(imports.rows).isNull();
+    }
+
+    @Test
+    void aContinuationOnTheFirstPageOfAChapterIsRefused() {
+        imports.renderedPagesAnswer = 1;
+        jsonl(page(7, 1, "0.95", continuing("7.1", "nothing precedes this in the chapter.")));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("no paragraph precedes it in chapter 7")
+                .contains("ncert extract --redo --chapters 7 --pages 1");
+    }
+
+    /**
+     * Every refusal, not the first. The first full-book load stopped at the earliest offender,
+     * which would have had the founder re-extract two pages, re-load, and meet the next one — a
+     * model call and three minutes each time. Nothing is written either way (D14).
+     */
+    @Test
+    void everyRefusalIsNamedAtOnceWithOneRedoPerChapter() {
+        imports.renderedPagesAnswer = 5;
+        jsonl(page(7, 1, "0.95", p("7.1", "The first paragraph of the section")),
+                page(7, 3, "0.95", continuing("7.1", "across a page that is absent")),
+                page(7, 4, "0.95", p("7.2", "A new section")),
+                page(7, 5, "0.95", continuing("7.3", "flagged into yet another section.")));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString())
+                .contains("2 page(s) claim a continuation that cannot be one")
+                .contains("page 3 says its first paragraph (§7.1) continues the previous page")
+                .contains("page 5 says its first paragraph (§7.3) continues the previous page")
+                // One command per chapter, naming every page that needs re-extracting.
+                .contains("ncert extract --redo --chapters 7 --pages 1,3,4,5");
         assertThat(imports.rows).isNull();
     }
 
     /**
      * Pages 61–62 of Chapter 4, and 108–109 of Chapter 6: an Example's question ends the page and
-     * its Answer opens the next, and the model numbered the Answer as a continuation. A label is a
-     * fact the book prints, not a typographic judgement, so the loader renumbers instead of
+     * its Answer opens the next, and the model flagged the Answer as a continuation. A label is a
+     * fact the book prints, not a typographic judgement, so the loader clears the flag instead of
      * refusing — and says so in the report, because a silent repair of model output is not one.
      */
     @Test
-    void anAnswerOpeningThePageIsRenumberedAsTheNextParagraphAndReported() {
+    void anAnswerOpeningThePageIsANewParagraphAndReported() {
         imports.renderedPagesAnswer = 2;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "What is the tension in the string?")),
-                page(7, 2, "0.95", paragraph("7.1", 1, "Answer As the string is inextensible, both move together."),
-                        paragraph("7.1", 2, "Thus the equation for the motion of the trolley follows.")));
+        jsonl(page(7, 1, "0.95", p("7.1", "What is the tension in the string?")),
+                page(7, 2, "0.95", continuing("7.1", "Answer As the string is inextensible, both move together."),
+                        p("7.1", "Thus the equation for the motion of the trolley follows.")));
 
         assertThat(run()).isZero();
 
         assertThat(imports.rows).extracting(NcertParagraphRow::paraNo).containsExactly((short) 1, (short) 2, (short) 3);
         assertThat(imports.rows.get(1).text()).startsWith("Answer");
         assertThat(out.toString())
-                .contains("## page-break repairs to the model's numbering")
-                .contains("page 2 opens with \"Answer\" at ¶1")
-                .contains("move up by one");
+                .contains("## page-break repairs to the model's continuation flags")
+                .contains("page 2 opens with \"Answer\"")
+                .contains("flag is cleared");
     }
 
     /**
@@ -230,8 +299,8 @@ class NcertLoadCommandTest {
     @Test
     void aParagraphRunningOnAfterAFullStopIsJoined() {
         imports.renderedPagesAnswer = 2;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 3, "All these numbers have four significant figures, namely four.")),
-                page(7, 2, "0.95", paragraph("7.1", 3, "This shows that the location of decimal point is of no consequence.")));
+        jsonl(page(7, 1, "0.95", p("7.1", "All these numbers have four significant figures, namely four.")),
+                page(7, 2, "0.95", continuing("7.1", "This shows that the location of decimal point is of no consequence.")));
 
         assertThat(run()).isZero();
 
@@ -241,53 +310,12 @@ class NcertLoadCommandTest {
                         + "This shows that the location of decimal point is of no consequence.");
     }
 
-    /**
-     * Every collision, not the first. The first full-book load stopped at the earliest offender,
-     * which would have had the founder re-extract two pages, re-load, and meet the next one — a
-     * model call and three minutes each time. Nothing is written either way (D14).
-     */
-    @Test
-    void everyCollisionIsNamedAtOnceWithOneRedoPerChapter() {
-        imports.renderedPagesAnswer = 4;
-        // Two collisions the join still refuses: a claim that is not the page's first paragraph,
-        // and a claim across a page that carries text.
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first paragraph of the section")),
-                page(7, 2, "0.95", paragraph("7.1", 2, "The second."), paragraph("7.1", 1, "Not first on its page.")),
-                page(7, 3, "0.95", paragraph("7.2", 1, "A new section")),
-                page(7, 4, "0.95", paragraph("7.2", 2, "with a page of text")),
-                page(7, 5, "0.95", paragraph("7.2", 1, "before a restart at one.")));
-
-        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
-
-        assertThat(out.toString())
-                .contains("2 address(es) cannot be one paragraph")
-                .contains("ch 7 §7.1 ¶1 is claimed by page 1 and page 2")
-                .contains("ch 7 §7.2 ¶1 is claimed by page 3 and page 5")
-                // One command per chapter, naming every page that needs re-extracting.
-                .contains("ncert extract --redo --chapters 7 --pages 1,2,3,5");
-        assertThat(imports.rows).isNull();
-    }
-
-    /** But a page of prose in between means they are two different paragraphs, not one. */
-    @Test
-    void aParagraphSeparatedByAPageOfTextIsACollision() {
-        imports.renderedPagesAnswer = 3;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "The first half runs on")),
-                page(7, 2, "0.95", paragraph("7.1", 2, "The second.")),
-                page(7, 3, "0.95", paragraph("7.1", 1, "Restarted at one.")));
-
-        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
-
-        assertThat(out.toString()).contains("is claimed by page 1 and page 3")
-                .contains("page 2 between them carries text");
-    }
-
     /** Validating a stripped section while keying on the raw one split a section in two. */
     @Test
     void aSectionIsNormalisedOnceSoWhitespaceCannotSplitIt() {
         imports.renderedPagesAnswer = 2;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "First half")),
-                page(7, 2, "0.95", paragraph(" 7.1 ", 1, "and second half.")));
+        jsonl(page(7, 1, "0.95", p("7.1", "First half")),
+                page(7, 2, "0.95", continuing(" 7.1 ", "and second half.")));
 
         assertThat(run()).isZero();
 
@@ -299,7 +327,7 @@ class NcertLoadCommandTest {
     @Test
     void aRefusalNamesTheChapterThePageAndTheRealJsonlKey() {
         imports.renderedPagesAnswer = 1;
-        jsonl(page(7, 4, "0.95", paragraph("12.4", 1, "Wrong chapter.")));
+        jsonl(page(7, 4, "0.95", p("12.4", "Wrong chapter.")));
 
         run();
 
@@ -313,9 +341,9 @@ class NcertLoadCommandTest {
     @Test
     void anExtractionHoldingMorePagesThanWereRenderedIsFlaggedNotReportedOverAHundred() {
         imports.renderedPagesAnswer = 2;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "One.")),
-                page(7, 2, "0.95", paragraph("7.2", 1, "Two.")),
-                page(7, 3, "0.95", paragraph("7.3", 1, "Three.")));
+        jsonl(page(7, 1, "0.95", p("7.1", "One.")),
+                page(7, 2, "0.95", p("7.2", "Two.")),
+                page(7, 3, "0.95", p("7.3", "Three.")));
 
         run();
 
@@ -325,7 +353,7 @@ class NcertLoadCommandTest {
     @Test
     void aSectionFromAnotherChapterFailsTheRun() {
         imports.renderedPagesAnswer = 1;
-        jsonl(page(7, 1, "0.95", paragraph("12.4", 1, "A section from the wrong chapter.")));
+        jsonl(page(7, 1, "0.95", p("12.4", "A section from the wrong chapter.")));
 
         assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
 
@@ -338,7 +366,7 @@ class NcertLoadCommandTest {
     @Test
     void aSectionThatIsNotASectionNumberFailsTheRun() {
         imports.renderedPagesAnswer = 1;
-        jsonl(page(7, 1, "0.95", paragraph("Gravitation", 1, "A heading, not a number.")));
+        jsonl(page(7, 1, "0.95", p("Gravitation", "A heading, not a number.")));
 
         assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
 
@@ -346,22 +374,12 @@ class NcertLoadCommandTest {
     }
 
     @Test
-    void aParagraphNumberBelowOneFailsTheRun() {
-        imports.renderedPagesAnswer = 1;
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 0, "Numbered from zero.")));
-
-        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
-
-        assertThat(out.toString()).contains("§7.1 has paragraph number 0");
-    }
-
-    @Test
     void figureRefsAndEquationsSurviveTheJoin() {
         imports.renderedPagesAnswer = 2;
         jsonl(page(7, 1, "0.95",
-                new NcertPage.Paragraph("7.9", 1, "First half with", List.of("Fig. 7.9"))),
+                new NcertPage.Paragraph("7.9", "First half with", false, List.of("Fig. 7.9"))),
                 page(7, 2, "0.95",
-                        new NcertPage.Paragraph("7.9", 1, "an equation E = mc^2.", List.of("Table 7.1"))));
+                        new NcertPage.Paragraph("7.9", "an equation E = mc^2.", true, List.of("Table 7.1"))));
 
         run();
 
@@ -373,9 +391,22 @@ class NcertLoadCommandTest {
         assertThat(row.figureRefs()).containsExactly("Fig. 7.9", "Table 7.1");
     }
 
+    /** The rows the load deleted are named under their own heading, so a corpus event's losses are on the record. */
+    @Test
+    void theAddressesTheLoadDeletedAreReported() {
+        imports.orphansAnswer = List.of("ch 7 §7.3 ¶23", "ch 7 §7.3 ¶24");
+        jsonl(page(7, 1, "0.95", p("7.1", "Text.")));
+
+        run();
+
+        assertThat(out.toString())
+                .contains("## addresses in the database this extraction no longer carried — deleted")
+                .contains("- ch 7 §7.3 ¶23\n- ch 7 §7.3 ¶24");
+    }
+
     @Test
     void theEditionBeingLoadedIsPassedThrough() {
-        jsonl(page(7, 1, "0.95", paragraph("7.1", 1, "Text.")));
+        jsonl(page(7, 1, "0.95", p("7.1", "Text.")));
 
         run();
 
@@ -407,8 +438,12 @@ class NcertLoadCommandTest {
                 List.of(paragraphs), null);
     }
 
-    private static NcertPage.Paragraph paragraph(String section, int paraNo, String text) {
-        return new NcertPage.Paragraph(section, paraNo, text, List.of());
+    private static NcertPage.Paragraph p(String section, String text) {
+        return new NcertPage.Paragraph(section, text, false, List.of());
+    }
+
+    private static NcertPage.Paragraph continuing(String section, String text) {
+        return new NcertPage.Paragraph(section, text, true, List.of());
     }
 
     /** Records what the command hands over and answers as a first clean load would. */
@@ -417,6 +452,7 @@ class NcertLoadCommandTest {
         List<NcertParagraphRow> rows;
         String book;
         BookLanguage language;
+        List<String> orphansAnswer = List.of();
 
         @Override
         public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
@@ -425,7 +461,7 @@ class NcertLoadCommandTest {
             this.rows = new ArrayList<>(rows);
             Map<Short, Integer> perChapter = new java.util.TreeMap<>();
             rows.forEach(row -> perChapter.merge(row.chapterNo(), 1, Integer::sum));
-            return new NcertLoadReport(rows.size(), 0, 0, perChapter, List.of());
+            return new NcertLoadReport(rows.size(), 0, 0, perChapter, orphansAnswer);
         }
     }
 }

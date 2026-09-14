@@ -16,7 +16,8 @@ paths:
 - Founder-owned inputs live in `pipeline/inputs/` (taxonomy CSV, prerequisites CSV, archetypes YAML,
   cutoffs CSV, books YAML, PYQ papers JSON — TECH_PLAN §6.2) as data files in the repo; the pipeline
   never edits them. Every command writes `pipeline/reports/<date>-<command>.md`, committed as the
-  day's evidence (§6.3).
+  day's evidence (§6.3); a second run of the same command on the same day writes `-2.md`, a third
+  `-3.md`, and no run ever overwrites an earlier one's report (D15).
 - The commands are Java under the `pipeline` Spring profile (picocli, TECH_PLAN §6.1) in the
   `pipeline` module (`server/**/pipeline/**`), which reaches other modules only through their `api`
   packages. AI calls (solutions, distractor maps, embeddings) go through `AiClient` with the cost

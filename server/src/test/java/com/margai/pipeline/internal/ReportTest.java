@@ -15,7 +15,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 /**
  * The run report (TECH_PLAN §6.3): its markdown shape, the SHA-256 that pins the input, the
- * {@code <date>-<command>.md} file name on the IST day, and the overwrite on a same-day re-run.
+ * {@code <date>-<command>.md} file name on the IST day, and the numbered file a same-day re-run gets.
  */
 class ReportTest {
 

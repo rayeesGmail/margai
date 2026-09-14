@@ -9,6 +9,7 @@ import com.margai.storage.api.ObjectStore;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +25,14 @@ import picocli.CommandLine.Command;
  * {@code ncert load}: the book's JSONL into {@code ncert_paragraphs} (TECH_PLAN §6.3), upserted
  * on the paragraph address, with the coverage percentage PLAN D15's ✅ asks for.
  *
- * <p>One thing here is not a simple mapping. A paragraph that runs across a page break appears in
- * the JSONL twice — the extraction prompt deliberately gives the continuation the number it
- * already had, so that the two halves share one address — and the loader joins them in page
- * order into the one paragraph they are. Taking the last page's half instead would silently drop
- * the first, which is exactly the kind of loss a spot-check of 20 paragraphs might miss.
+ * <p>Since v3 the loader assigns the paragraph numbers (DECISIONS 2026-09-14). The model returns
+ * each paragraph's section and text and, for a page's first paragraph, whether it continues the
+ * previous page; the loader counts ¶1, ¶2, ¶3 per section in reading order across pages. Two
+ * different paragraphs at one address — the failure three separate D14 runs hit, and that the
+ * loader then refused by name — cannot occur any more, so that refusal is gone. A paragraph that
+ * runs across a page break appears in the JSONL twice, flagged on the second page, and is joined
+ * in page order into the one paragraph it is; taking the last page's half instead would silently
+ * drop the first, which is exactly the kind of loss a spot-check of 20 paragraphs might miss.
  */
 @Component
 @Profile("pipeline")
@@ -38,9 +42,6 @@ class NcertLoadCommand extends NcertBookCommand {
 
     /** {@code ncert_paragraphs.section} is VARCHAR(16); a printed section is "7" or "7.9.2". */
     static final int SECTION_MAX_LENGTH = 16;
-
-    /** A page holds a handful of paragraphs; a number beyond this is a misread, not a long page. */
-    static final int PARA_NO_MAX = 200;
 
     private static final Pattern SECTION = Pattern.compile("\\d{1,2}(\\.\\d{1,3})*");
 
@@ -70,13 +71,13 @@ class NcertLoadCommand extends NcertBookCommand {
                         : Integer.compare(left.page(), right.page()))
                 .toList();
 
-        // Deterministic corrections first, each reported: an Answer opening a page is the next
-        // paragraph, and a re-transcribed tail is dropped. Then the join, which refuses what is
-        // left over (D14, the first full-book load).
+        // Deterministic corrections first, each reported: a re-transcribed tail is cut and a
+        // labelled paragraph is never a continuation. Then the numbering and the join, which
+        // refuse a continuation that cannot be one (D14, the first full-book load; D15).
         PageBreakRepairs.Repaired repaired = PageBreakRepairs.apply(pages);
         pages = repaired.pages();
-        List<NcertParagraphRow> rows = join(pages, jsonlKey);
-        report.section("page-break repairs to the model's numbering (deterministic, each one named)")
+        List<NcertParagraphRow> rows = number(pages, jsonlKey);
+        report.section("page-break repairs to the model's continuation flags (deterministic, each one named)")
                 .list(repaired.notes());
         NcertLoadReport result = imports.loadParagraphs(definition.code(), language, rows);
 
@@ -125,96 +126,100 @@ class NcertLoadCommand extends NcertBookCommand {
             report.line("INCOMPLETE: " + (rendered - pages.size()) + " rendered pages are not in the "
                     + "extraction — run `ncert extract` again before trusting this load");
         }
-        report.section("addresses in the database this extraction no longer carries").list(result.orphans());
+        report.section("addresses in the database this extraction no longer carried — deleted")
+                .list(result.orphans());
     }
 
     /**
-     * JSONL pages into paragraph rows, joining the halves of a paragraph that straddles a page
-     * break: same address, page order, one space between. The row's extraction then names every
-     * page it came from, and carries the lowest confidence of them — a paragraph is only as
-     * trustworthy as the least certain page it was read from.
+     * JSONL pages into numbered paragraph rows. Numbers are assigned here, per chapter and
+     * section, in reading order across pages: a section's first paragraph is ¶1 wherever on the
+     * page it begins, and a section that resumes after another keeps counting rather than
+     * restarting, so no two paragraphs can ever share an address.
      *
-     * <p>Only a genuine continuation is joined: the same address, as that page's first paragraph,
-     * with nothing but text-free pages in between. The gap matters — a paragraph can run from page
-     * 10 to page 12 across a full-page figure, and requiring strict adjacency refused that
-     * legitimate book (spec-auditor, D14). Any other collision means the extraction numbered two
-     * different paragraphs the same — the failure mode of a model that restarts at 1 on every page
-     * — and it fails the run by name instead of quietly concatenating unrelated text, which is
-     * what a 20-paragraph spot check would not catch.
+     * <p>A page's first paragraph flagged as continuing the previous page is joined onto that
+     * page's last paragraph — same address, page order, one space between — and the row then
+     * names every page it came from and carries the lowest confidence of them. Only a genuine
+     * continuation is joined: something must precede it in the chapter, it must be in the section
+     * the previous page ended in, and every page in between must be present and text-free. The
+     * gap matters — a paragraph can run from page 10 to page 12 across a full-page figure, and
+     * requiring strict adjacency refused that legitimate book (spec-auditor, D14). A flag that
+     * fails any of these is refused by name, every one at once, with the pages to re-extract:
+     * nothing is written either way, so there is no reason to withhold the rest of the list.
      */
-    static List<NcertParagraphRow> join(List<ExtractedPage> pages, String jsonlKey) {
-        Map<String, Joined> byAddress = new LinkedHashMap<>();
-        // Every collision, not the first one. A whole-book load that stopped at the earliest
-        // offender made the founder re-extract two pages, re-load, and discover the next one — at
-        // a model call and three minutes each. Nothing is written either way, so there is no reason
-        // to withhold the rest of the list (D14, the first full-book load).
-        List<String> collisions = new ArrayList<>();
+    static List<NcertParagraphRow> number(List<ExtractedPage> pages, String jsonlKey) {
+        List<Joined> rows = new ArrayList<>();
+        List<String> refusals = new ArrayList<>();
         Map<Short, TreeSet<Integer>> redo = new LinkedHashMap<>();
+        // (chapter, section) → the last number given out; a resumed section continues its count.
+        Map<String, Integer> counters = new HashMap<>();
+        short chapter = -1;
+        Joined last = null;
         for (ExtractedPage page : pages) {
+            if (page.chapterNo() != chapter) {
+                chapter = page.chapterNo();
+                last = null;
+            }
             List<NcertPage.Paragraph> paragraphs = page.paragraphs();
             for (int index = 0; index < paragraphs.size(); index++) {
                 NcertPage.Paragraph paragraph = paragraphs.get(index);
                 String section = check(page, paragraph, jsonlKey);
-                String address = page.chapterNo() + " " + section + " " + paragraph.paraNo();
-                Joined joined = byAddress.get(address);
-                if (joined == null) {
-                    byAddress.put(address, new Joined(page.chapterNo(), section, paragraph, page));
+                if (index == 0 && paragraph.continuesPreviousPage()) {
+                    String why = last == null ? "no paragraph precedes it in chapter " + chapter
+                            : !last.section.equals(section) ? "the previous page ended in §" + last.section
+                                    + ", not §" + section
+                            : gap(pages, chapter, last.lastPage(), page.page());
+                    if (why != null) {
+                        refusals.add("ch " + chapter + " page " + page.page() + " says its first paragraph (§"
+                                + section + ") continues the previous page, but " + why);
+                        TreeSet<Integer> affected = redo.computeIfAbsent(chapter, c -> new TreeSet<>());
+                        affected.add(page.page());
+                        if (last != null) {
+                            affected.add(last.lastPage());
+                        }
+                        continue;
+                    }
+                    last.add(page, paragraph);
                     continue;
                 }
-                // Whether the first half had finished its sentence is deliberately not a condition:
-                // a paragraph can run on across a page break after a full stop, and one did
-                // (Chapter 1, pages 3–4, checked on the rendered image). The two cases code can
-                // decide — a label opening the page, a repeated tail — are repaired before this
-                // (PageBreakRepairs); what remains is the model's typographic call.
-                String why = index != 0 ? "it is not that page's first paragraph"
-                        : gap(pages, page.chapterNo(), joined.lastPage(), page.page());
-                if (why != null) {
-                    collisions.add("ch " + page.chapterNo() + " §" + section + " ¶" + paragraph.paraNo()
-                            + " is claimed by page " + joined.lastPage() + " and page " + page.page()
-                            + ": " + why);
-                    redo.computeIfAbsent(page.chapterNo(), chapter -> new TreeSet<>())
-                            .addAll(List.of(joined.lastPage(), page.page()));
-                    continue;
-                }
-                joined.add(page, paragraph);
+                int paraNo = counters.merge(chapter + " " + section, 1, Integer::sum);
+                Joined joined = new Joined(chapter, section, paraNo, page, paragraph);
+                rows.add(joined);
+                last = joined;
             }
         }
-        if (!collisions.isEmpty()) {
-            throw new InputFormatException(Path.of(jsonlKey), 0, collisions.size()
-                    + " address(es) cannot be one paragraph continuing across a page break:\n  "
-                    + String.join("\n  ", collisions) + "\nRe-extract every affected page:\n  "
+        if (!refusals.isEmpty()) {
+            throw new InputFormatException(Path.of(jsonlKey), 0, refusals.size()
+                    + " page(s) claim a continuation that cannot be one:\n  "
+                    + String.join("\n  ", refusals) + "\nRe-extract every affected page:\n  "
                     + redo.entrySet().stream()
                             .map(entry -> "ncert extract --redo --chapters " + entry.getKey() + " --pages "
                                     + entry.getValue().stream().map(String::valueOf)
                                             .collect(java.util.stream.Collectors.joining(",")))
                             .collect(java.util.stream.Collectors.joining("\n  ")));
         }
-        return byAddress.values().stream().map(Joined::row).toList();
+        return rows.stream().map(Joined::row).toList();
     }
 
     /**
-     * Why these two halves cannot be one paragraph, or null when they can. A figure page between
-     * them is not a break in the paragraph; a page of prose between them means two different
-     * paragraphs were given one number.
+     * Why these two halves cannot be one paragraph, or null when they can. A continuation attaches
+     * to the nearest page that carried text, so every page between them is text-free by
+     * construction — a figure page between them is not a break in the paragraph — and the one
+     * thing left to check is that each of them is <em>present</em>.
      *
-     * <p>Every page in between must be <em>present and empty</em>. An absent page is refused rather
-     * than assumed blank: the JSONL legitimately has holes — after an interrupted render, after a
-     * targeted {@code --redo --pages}, after an extract resumed over a different {@code --chapters}
-     * selection — and treating a hole as a figure page would silently concatenate two unrelated
-     * paragraphs, which is the original blocker wearing a different hat (spec-auditor, D14).
+     * <p>An absent page is refused rather than assumed blank: the JSONL legitimately has holes —
+     * after an interrupted render, after a targeted {@code --redo --pages}, after an extract
+     * resumed over a different {@code --chapters} selection — and treating a hole as a figure page
+     * would silently concatenate two unrelated paragraphs, which is the original blocker wearing a
+     * different hat (spec-auditor, D14).
      */
     private static String gap(List<ExtractedPage> pages, short chapter, int from, int to) {
         for (int number = from + 1; number < to; number++) {
             int between = number;
-            ExtractedPage page = pages.stream()
-                    .filter(candidate -> candidate.chapterNo() == chapter && candidate.page() == between)
-                    .findFirst().orElse(null);
-            if (page == null) {
+            boolean present = pages.stream()
+                    .anyMatch(candidate -> candidate.chapterNo() == chapter && candidate.page() == between);
+            if (!present) {
                 return "page " + between + " is not in the extraction, so whether it broke the paragraph "
                         + "is unknown";
-            }
-            if (!page.paragraphs().isEmpty()) {
-                return "page " + between + " between them carries text";
             }
         }
         return null;
@@ -226,6 +231,9 @@ class NcertLoadCommand extends NcertBookCommand {
      * section is what the app shows as the anchor a student taps (SPEC §6.3), so a section that
      * does not belong to this chapter is a student sent to the wrong page of a book they are
      * holding. Refusing by name beats a raw constraint violation at the end of a 260-page load.
+     *
+     * <p>A blank text is refused where the model's output is decoded, since v3, and re-called; the
+     * check here is the net under that, for an artefact written by hand or by an older build.
      */
     private static String check(ExtractedPage page, NcertPage.Paragraph paragraph, String jsonlKey) {
         String where = "ch " + page.chapterNo() + " page " + page.page() + ": ";
@@ -248,11 +256,8 @@ class NcertLoadCommand extends NcertBookCommand {
             throw refuse(page, jsonlKey, where + "section '" + section + "' belongs to chapter " + chapterOfSection
                     + ", not to chapter " + page.chapterNo() + " — the page was read as the wrong chapter");
         }
-        if (paragraph.paraNo() < 1 || paragraph.paraNo() > PARA_NO_MAX) {
-            throw refuse(page, jsonlKey, where + "§" + section + " has paragraph number " + paragraph.paraNo());
-        }
         if (paragraph.text() == null || paragraph.text().isBlank()) {
-            throw refuse(page, jsonlKey, where + "§" + section + " ¶" + paragraph.paraNo() + " has no text");
+            throw refuse(page, jsonlKey, where + "a paragraph of §" + section + " has no text");
         }
         return section;
     }
@@ -282,17 +287,17 @@ class NcertLoadCommand extends NcertBookCommand {
 
         private final short chapterNo;
         private final String section;
-        private final NcertPage.Paragraph first;
+        private final int paraNo;
         private final StringBuilder text = new StringBuilder();
         private final List<Integer> pages = new ArrayList<>();
         private final List<String> figureRefs = new ArrayList<>();
         private BigDecimal confidence;
         private UUID aiCallId;
 
-        private Joined(short chapterNo, String section, NcertPage.Paragraph first, ExtractedPage page) {
+        private Joined(short chapterNo, String section, int paraNo, ExtractedPage page, NcertPage.Paragraph first) {
             this.chapterNo = chapterNo;
             this.section = section;
-            this.first = first;
+            this.paraNo = paraNo;
             add(page, first);
         }
 
@@ -316,7 +321,7 @@ class NcertLoadCommand extends NcertBookCommand {
         }
 
         private NcertParagraphRow row() {
-            return new NcertParagraphRow(chapterNo, section, (short) first.paraNo(), text.toString(),
+            return new NcertParagraphRow(chapterNo, section, (short) paraNo, text.toString(),
                     // Decided from the joined text, once the halves are together: a paragraph
                     // whose equation sits on the second page is still a paragraph with an equation.
                     Equations.present(text.toString()),

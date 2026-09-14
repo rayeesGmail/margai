@@ -25,6 +25,9 @@ record ExtractedPage(
 
     ExtractedPage {
         paragraphs = paragraphs == null ? List.of() : List.copyOf(paragraphs);
+        // The model's output is held to this rule where it is decoded; the artefact is held to it
+        // here, so an older or hand-edited line cannot carry what a call cannot (D15).
+        NcertPage.requireFlagOnFirstOnly(paragraphs);
     }
 
     static ExtractedPage of(short chapterNo, int page, NcertPage read, UUID aiCallId) {

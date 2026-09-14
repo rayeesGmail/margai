@@ -76,6 +76,15 @@ Start with one chapter (`--chapters 1`) and read its report before letting the b
 line and the low-confidence list are both in it, and a prompt that is reading the pages wrongly is
 cheapest to catch after twenty pages rather than after two hundred.
 
+**Since prompt v3 (D15, 2026-09-14) the model does not number paragraphs.** It returns each
+paragraph's section and text and, on the page's first paragraph, one flag — whether it is the
+rest of the paragraph the previous page ended in — and `ncert load` counts ¶1, ¶2, ¶3 per section
+across pages. So the extract report names a paragraph by its position on the page, `ch 6 p8 §6.2
+#1`, because ¶n does not exist until the load. A blank paragraph or a flag on any paragraph but
+the first is refused where the model's output is decoded and the page is re-called at once, with
+both attempts on the ledger. The previous page's tail travels as 200 characters of context for
+that one flag, and the prompt says it is never part of the page's output.
+
 ### The chapter-7 dry run, after any change to extraction
 
 `phy11-part1` chapter 7 (Gravitation, `keph107.pdf`, 17 pages of which 12 are billed) is the
@@ -85,8 +94,9 @@ Seven of its seventeen pages also carry the private-use encoding that broke text
 which makes it the hardest case for FIX 1 as well as the cheapest.
 
 ```
-# 0. an artefact from an earlier prompt version must go first: the run will refuse it by name
-aws s3 rm s3://margai-beta-content/extract/phy11-part1/en.jsonl --profile margai
+# 0. an artefact from an earlier prompt version must be moved aside first: the run refuses it by
+#    name, and the old version's corpus stays re-derivable from its own artefact (FIX 5)
+aws s3 mv s3://margai-beta-content/extract/phy11-part1/en.jsonl s3://margai-beta-content/extract/phy11-part1/en.v2.jsonl --profile margai
 
 # 1. extract one chapter
 AI_LIVE=1 AWS_PROFILE=margai MARGAI_AI_ANTHROPIC_API_KEY=… DB_URL=… \
@@ -114,8 +124,13 @@ Read these six things in the extract report, in this order, before spending anyt
 5. **The cost per billed page** — measured at ₹1.07–1.09 across the whole of `phy11-part1` with the
    text layer and bands (₹117.88 for 108 billed pages, 2026-09-13).
    Meaningfully above that changes the estimate for the other nine books, not just this one.
-6. **That the load succeeds at all.** Two paragraphs at one address is the failure that three
-   separate D14 runs hit; the loader refuses it by name and prints the `--redo` that fixes it.
+6. **That the load succeeds at all.** Two paragraphs at one address was the failure three
+   separate D14 runs hit; since v3 the loader numbers, so it cannot happen. What the loader still
+   refuses by name, with the `--redo` that fixes it, is a continuation flag that cannot be one:
+   nothing before it in the chapter, a different section, an absent page between.
+
+Biology has its own dry run: `bio11` chapter 1 (`kebo101.pdf`, 9 pages, 8 billed, about ₹8),
+with a unit-opener biography, binomials, "Figure 1.1" refs and Table 1.1 on its pages (D15).
 
 Then compare the paragraphs against the D14 defect table in the TRACKER day log for 2026-09-13 —
 the same sample pages, item by item. Four of its nine items (the dropped prime, the lost minus, the
@@ -155,7 +170,8 @@ The report's cost line is the truth — it comes from the `ai_calls` ledger, not
 and the first chapter's report is where to check this estimate before letting a book run. Two
 numbers in it are worth reading directly: `cache write` on the first call is the cached prefix's
 real token count (it must clear 4,600, the founder's floor on the cheap model's own tokenizer; the
-v2 template estimates ~5,325 by the startup tripwire's cruder proxy), and `cache read` on every
+v2 template measured 6,448 on the real tokenizer on 2026-09-13, and v3 is longer — its own figure is
+read from the first v3 run's `cache write`), and `cache read` on every
 call after it is the proof the prefix is actually being cached rather than re-sent at full price.
 
 **Read the two new report sections before the load.** Each begins with a `checked:` line saying how
@@ -195,8 +211,15 @@ AWS_PROFILE=margai DB_URL=… \
   ncert load --book bio11 --lang en
 ```
 
-No model, no cost. Upserts on the paragraph address. A paragraph that straddles a page break — with
-or without a figure page in between — is joined into one row carrying every page it came from.
+No model, no cost. Numbers the paragraphs — ¶1, ¶2, ¶3 per section in reading order across pages
+(v3, D15) — and upserts on the address. A paragraph that straddles a page break — with or without
+a figure page in between — is joined on the extraction's flag into one row carrying every page it
+came from. **Rows of the loaded chapters that this extraction no longer produces are deleted and
+listed** under their own heading (DECISIONS 2026-09-14): with the loader numbering, a one-page
+redo shifts every address after it, so a re-extraction always leaves some. Two exceptions: a row
+still holding the other edition's text is kept (the Hindi cut is not the English one), and a row
+that is anchored refuses the whole load — re-extracting an anchored chapter is a corpus event
+that re-anchors what it moved (D17), not a load.
 
 The report gives two different numbers, and they answer different questions:
 
@@ -210,8 +233,13 @@ The report gives two different numbers, and they answer different questions:
 
 The load refuses rather than guesses. It stops, names the page and prints the `--redo` that fixes
 it, when a section does not belong to its chapter, when a section is not a printed section number,
-when a paragraph number is out of range, or when two different paragraphs claim one address — the
-signature of a page whose numbering restarted. Nothing is written when it refuses.
+when a paragraph is blank, or when a page's first paragraph claims to continue the previous page
+and cannot — nothing precedes it in the chapter, the previous page ended in a different section,
+or a page between them is missing from the JSONL. Every refusal is named at once, with one
+`--redo` per chapter. Nothing is written when it refuses.
+
+Every run's report is its own file: a second run of the same command on the same day writes
+`<date>-<command>-2.md`, a third `-3.md`, and nothing overwrites an earlier run's (D15).
 
 ## The D14 ✅ — 20 random paragraphs against the PDFs
 

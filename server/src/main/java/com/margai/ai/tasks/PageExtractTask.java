@@ -19,10 +19,10 @@ import org.springframework.stereotype.Component;
  * on the VISION tier: NCERT's two-column layout, its equations and the legacy Hindi fonts defeat
  * text extractors, so the model reads the rendered page.
  *
- * <p>Where the previous page ended travels with the call — its section, its last paragraph number
- * and the tail of that paragraph's text — so a paragraph broken across a page boundary is
- * completed rather than duplicated, and paragraph numbering continues within a section instead of
- * restarting at every page (§6.3; {@link PreviousPage}).
+ * <p>Where the previous page ended travels with the call — its section and the tail of its last
+ * paragraph — so a page with no heading keeps its section and a paragraph broken across the page
+ * boundary is recognised as a continuation rather than duplicated (§6.3; {@link PreviousPage}).
+ * The paragraph number is not asked of the model either: since v3 the loader counts (D15).
  *
  * <p>The chapter number is passed in, never asked of the model: it comes from the
  * founder-reviewed {@code books.yaml}, because a Part-II file's printed chapter differs from its
@@ -54,7 +54,6 @@ public class PageExtractTask implements NcertPageExtractor {
         // beside them, at any size, cost every prime on chapter 7 (PageTiles, D14).
         variables.put("tiles", images.size() > 1 ? images.size() : null);
         variables.put("previous_section", previous == null ? null : previous.section());
-        variables.put("previous_para_no", previous == null ? null : previous.paraNo());
         variables.put("previous_tail", previous == null ? null : previous.tail());
         return ai.complete(AiRequest.of(AiFeature.pipeline_extract, Tier.vision, prompt, variables,
                         NcertPage.class, ctx)

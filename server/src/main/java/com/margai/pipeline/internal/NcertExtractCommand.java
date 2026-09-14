@@ -133,11 +133,11 @@ class NcertExtractCommand extends NcertBookCommand {
                     continue;
                 }
                 ExtractedPage existing = done.get(chapter.no() + "/" + page);
-                // A page this run is not calling for still advances the address, when we know it:
-                // otherwise `--pages 3` would call page 3 with no previous address, the model would
-                // restart numbering, and the collision the founder was re-extracting to fix would
-                // come straight back — the remedy printed by the load's refusal could never work
-                // (spec-auditor, D14).
+                // A page this run is not calling for still advances the state, when we know it:
+                // otherwise `--pages 3` would call page 3 with no previous section and no tail, the
+                // model would guess the section and could not judge a continuation, and the remedy
+                // printed by the load's refusal could never work (spec-auditor, D14; the state was
+                // the address through v2 and is the section and tail since v3).
                 if (pages != null && !pages.isEmpty() && !pages.contains(page)) {
                     previous = existing == null ? null : previousOf(existing, previous);
                     continue;
@@ -164,10 +164,14 @@ class NcertExtractCommand extends NcertBookCommand {
                 // every paragraph into adjudicating the flagged ones.
                 if (pageText != null) {
                     pagesChecked++;
-                    for (NcertPage.Paragraph paragraph : response.output().paragraphs()) {
+                    // Named by position on the page — "#3" — because the paragraph number does
+                    // not exist yet: since v3 `ncert load` assigns it (D15).
+                    List<NcertPage.Paragraph> readParagraphs = response.output().paragraphs();
+                    for (int index = 0; index < readParagraphs.size(); index++) {
+                        NcertPage.Paragraph paragraph = readParagraphs.get(index);
+                        String at = "ch " + chapter.no() + " p" + page + " §" + paragraph.section() + " #" + (index + 1);
                         TranscriptionDiff.check(pageText, paragraph.text()).forEach(finding ->
-                                diffFlags.add("ch " + chapter.no() + " p" + page + " §" + paragraph.section()
-                                        + " ¶" + paragraph.paraNo() + ": " + finding));
+                                diffFlags.add(at + ": " + finding));
                     }
                     String transcribed = response.output().paragraphs().stream()
                             .map(NcertPage.Paragraph::text).collect(java.util.stream.Collectors.joining(" "));
@@ -234,7 +238,7 @@ class NcertExtractCommand extends NcertBookCommand {
         content.put(key, ExtractJsonl.write(ordered), "application/jsonl");
     }
 
-    /** Where a page already in the JSONL left off, so a resumed run continues the numbering too. */
+    /** Where a page already in the JSONL left off, so a resumed run carries its section and tail forward too. */
     private static PreviousPage previousOf(ExtractedPage page, PreviousPage before) {
         return PreviousPage.of(new NcertPage(page.paragraphs(), page.confidence()), before);
     }

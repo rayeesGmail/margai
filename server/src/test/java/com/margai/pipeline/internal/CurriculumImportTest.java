@@ -143,8 +143,15 @@ class CurriculumImportTest {
         assertThat(row.get("text_hi")).isEqualTo("गुरुत्वीय स्थितिज ऊर्जा।");
     }
 
+    /**
+     * A re-extraction cuts paragraphs differently, and since v3 the loader numbers them, so a
+     * one-page redo shifts every number after it. Rows at addresses the extraction no longer
+     * carries were kept and reported through D14; by 2026-09-14 the table held 85 rows no run
+     * produced beside the canonical 1,017, sampleable by the ✅ and embeddable by D17. They are
+     * now deleted, and named (DECISIONS 2026-09-14).
+     */
     @Test
-    void paragraphsTheExtractionNoLongerCarriesAreOrphansAndAreKept() {
+    void paragraphsTheExtractionNoLongerCarriesAreDeletedAndNamed() {
         imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
         imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
 
@@ -152,16 +159,17 @@ class CurriculumImportTest {
                 List.of(paragraphs().getFirst()));
 
         assertThat(report.orphans()).containsExactly("ch 7 §7.9 ¶2");
-        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(2);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(1);
     }
 
     /**
      * A load of one chapter says nothing about the others. The first `--chapters 7` load into a
      * book that already held chapters 1–6 reported every one of their addresses as "no longer
-     * carried" — 600 lines, all wrong (D14). Orphans are judged only within the chapters loaded.
+     * carried" — 600 lines, all wrong (D14). Orphans are judged, and now deleted, only within the
+     * chapters loaded.
      */
     @Test
-    void aChapterSubsetLoadReportsOrphansOnlyWithinItsOwnChapters() {
+    void aChapterSubsetLoadPrunesOrphansOnlyWithinItsOwnChapters() {
         imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
         imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
 
@@ -171,6 +179,37 @@ class CurriculumImportTest {
 
         assertThat(report.orphans()).as("chapter 7's rows are not this load's business").isEmpty();
         assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(3);
+    }
+
+    /**
+     * From D23 a question anchors to a paragraph id, and from D17 a row carries an embedding; a
+     * load that deleted such a row would re-point a question at nothing. Until the D17 migrate
+     * path exists, a load that would prune an anchored row refuses the whole book by name, and
+     * writes nothing (TRACKER PARKED "freeze-and-migrate guard", DECISIONS 2026-09-14).
+     */
+    @Test
+    void anOrphanThatIsAnchoredRefusesTheLoadAndWritesNothing() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        loadTaxonomy();
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        jdbc.update("UPDATE ncert_paragraphs SET node_id = (SELECT id FROM syllabus_nodes LIMIT 1) "
+                + "WHERE chapter_no = 7 AND section = '7.9' AND para_no = 2");
+
+        // The row this load does carry is changed, so the refusal has an update to roll back as
+        // well as a deletion to withhold — "nothing was written" means both.
+        NcertParagraphRow changed = new NcertParagraphRow((short) 7, "7.9", (short) 1,
+                "A changed first paragraph.", false, List.of(),
+                new ParagraphExtraction(List.of(12), new BigDecimal("0.96"), null));
+
+        assertThatThrownBy(() -> imports.loadParagraphs("phy11-part1", BookLanguage.en, List.of(changed)))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessageContaining("ch 7 §7.9 ¶2")
+                .hasMessageContaining("anchored");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(2);
+        assertThat(jdbc.queryForObject(
+                "SELECT text_en FROM ncert_paragraphs WHERE chapter_no = 7 AND section = '7.9' AND para_no = 1",
+                String.class))
+                .isEqualTo("The gravitational potential energy of a body.");
     }
 
     @Test
@@ -189,6 +228,10 @@ class CurriculumImportTest {
                 .isInstanceOf(CurriculumImportException.class)
                 .hasMessageContaining("the address ch 7 §7.9 ¶1 appears twice");
         assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isZero();
+    }
+
+    private void loadTaxonomy() {
+        imports.loadTaxonomy(TaxonomyCsvReader.read(TAXONOMY));
     }
 
     private static List<NcertParagraphRow> paragraphs() {

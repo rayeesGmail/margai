@@ -79,9 +79,7 @@ class PageExtractTaskTest {
 
         PreviousPage previous = PreviousPage.of(page, PreviousPage.none());
 
-        assertThat(previous.section()).isEqualTo("7.9");
-        assertThat(previous.tail()).isNotBlank();
-        assertThat(previous.tail()).isEqualTo(page.paragraphs().getLast().text());
+        assertThat(previous).isEqualTo(new PreviousPage("7.9"));
     }
 
     /**
@@ -91,14 +89,14 @@ class PageExtractTaskTest {
     @Test
     void aPageWithNoParagraphsCarriesTheSectionAcrossWithoutATail() {
         NcertPage empty = new NcertPage(List.of(), BigDecimal.ONE);
-        PreviousPage before = new PreviousPage("7.9", "the text of the page before");
+        PreviousPage before = new PreviousPage("7.9");
 
         PreviousPage after = PreviousPage.of(empty, before);
 
         assertThat(after.section()).isEqualTo("7.9");
         assertThat(after).isNotNull();
-        assertThat(after.tail()).isNull();
-        assertThat(empty.tail()).isNull();
+        assertThat(after).isEqualTo(before);
+        assertThat(empty.paragraphs()).isEmpty();
     }
 
     @Test
@@ -107,12 +105,12 @@ class PageExtractTaskTest {
     }
 
     @Test
-    void aLongTailIsCutToItsEnd() {
-        String paragraph = "x".repeat(NcertPage.TAIL_LENGTH + 200) + "the end.";
+    void aPageHandsForwardOnlyItsLastSection() {
+        String paragraph = "the end of the page, in section 7.9.";
         NcertPage page = new NcertPage(
                 List.of(new NcertPage.Paragraph("7.9", paragraph, false, List.of())), BigDecimal.ONE);
 
-        assertThat(page.tail()).hasSize(NcertPage.TAIL_LENGTH).endsWith("the end.");
+        assertThat(PreviousPage.of(page, PreviousPage.none())).isEqualTo(new PreviousPage("7.9"));
     }
 
     /** {@code <} opens a StringTemplate expression, so the reversible-reaction arrow is escaped. */
@@ -137,20 +135,33 @@ class PageExtractTaskTest {
                 .doesNotContain("Numbering runs across pages");
     }
 
-    /** The quoted tail is context for one decision and never output; the turn has to say so where the tail is. */
+    /**
+     * No tail travels any more (D15, the first v3 measurement): the cheap model echoed the quoted
+     * ending on two of twelve pages, once verbatim and once as a paraphrase the repair cannot see.
+     * The turn names the section and asks for the flag from this page's own typography.
+     */
     @Test
-    void theUserTurnQuotesTheTailAsContextOnly() {
+    void theUserTurnNamesTheSectionAndQuotesNoTail() {
         Map<String, Object> variables = new java.util.LinkedHashMap<>();
         variables.put("book_title", "Physics Part-I");
         variables.put("chapter", 6);
         variables.put("page", 8);
         variables.put("previous_section", "6.2");
-        variables.put("previous_tail", "Suppose, the three squares that make up the L shaped lamina");
         String user = prompts.render(com.margai.ai.api.PromptRef.named("ncert_extract"), variables).user();
         assertThat(user).contains("section 6.2")
-                .contains("Suppose, the three squares that make up the L shaped lamina")
-                .contains("never part of this page's output")
-                .doesNotContain("previous_para_no").doesNotContain("plus one");
+                .contains("continues_previous_page")
+                .contains("first word printed here")
+                .doesNotContain("last words of the previous page")
+                .doesNotContain("previous_tail").doesNotContain("previous_para_no").doesNotContain("plus one");
+    }
+
+    /** The two rules the first measurement asked for, both in the cached prefix. */
+    @Test
+    void theSystemPrefixChecksTheHeadingsAndKeepsEachNumberedLawItsOwnParagraph() {
+        String system = prompts.systemPrefix("ncert_extract");
+        assertThat(system).contains("check the headings")
+                .contains("Law of periods")
+                .doesNotContain("last words of the previous page");
     }
 
     /**

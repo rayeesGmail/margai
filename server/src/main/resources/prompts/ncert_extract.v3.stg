@@ -6,9 +6,16 @@
 // into a sentence the book does not contain, continuations left unflagged. The model now returns
 // each paragraph's section and text and, on a page's first paragraph, one flag — whether it is
 // the rest of the paragraph the previous page ended in — and `ncert load` counts (DECISIONS
-// 2026-09-14). The quoted tail shrinks to context for that one decision. New rules from the D14
-// and D15 audits: a printed item marker is part of its paragraph, an equation number keeps its
-// printed parentheses, a unit-opener biography page returns no paragraphs.
+// 2026-09-14). New rules from the D14 and D15 audits: a printed item marker is part of its
+// paragraph, an equation number keeps its printed parentheses, a unit-opener biography page
+// returns no paragraphs.
+//
+// Amended the same afternoon after the first measurement (two models, chapter 7): no ending of
+// the previous page is quoted any more — the cheap model echoed it on two of twelve pages, once
+// verbatim and once as a paraphrase — so the continuation flag is judged from this page's own
+// typography; every printed heading must appear in the output, checked before finishing — the
+// reasoning model skipped a heading and its paragraph at a column top and filed the next two
+// pages under the section before; and a numbered law or rule set as its own paragraph stays one.
 //
 // v2 stays on disk: phy11-part1's frozen v2 corpus names it through ai_calls.prompt_version, and
 // a corpus must be re-derivable from the version that produced it (FIX 5 policy, D14).
@@ -127,13 +134,15 @@ paragraphs take the section its box sits in. "Example 7.1" is the name of a box,
 and a paragraph filed under it can never be found again.
 
 **Whether the page's first paragraph continues the previous page** is the one other thing you
-decide about addresses, and it is a judgement about this page's typography. Set
-continues_previous_page to true on the page's first paragraph only when it is the rest of the
-paragraph the previous page ended in the middle of: the sentence runs on, or the paragraph runs on
-flush left after a full stop. Set it to false when this page starts a new paragraph — an indent,
-a heading above it, a printed label. On every other paragraph of the page it is false. A first
-paragraph that continues the previous page is in the section you were told the previous page
-ended in, and its text begins with the first word printed on THIS page.
+decide about addresses, and it is a judgement about this page's typography alone — nothing of
+the previous page's text is shown to you. Set continues_previous_page to true on the page's
+first paragraph only when it is the rest of the paragraph the previous page ended in the middle
+of: its first line begins mid-sentence, in lower case or after a comma, or it begins flush left
+with no indent where the page's own paragraphs are indented. Set it to false when this page
+starts a new paragraph — an indent, a heading above it, a printed label, a numbered item. On
+every other paragraph of the page it is false. A first paragraph that continues the previous
+page is in the section you were told the previous page ended in, and its text begins with the
+first word printed on THIS page — never with words you suppose ended the page before.
 
 **A paragraph that begins with a printed label — "Answer", "Solution", "Example 4.9" — never
 continues the previous page**, even when it is the very first thing on the page and the previous
@@ -143,6 +152,16 @@ these labels in bold precisely because they start something.
 **Paragraph numbering is done for you.** Do not count, do not number, do not restart anything at
 a heading, do not add a number to the text. Put each paragraph under its section, in reading
 order, and the count follows from that.
+
+**Before you finish, check the headings.** Every numbered section heading printed on the page —
+"7.3 UNIVERSAL LAW OF GRAVITATION", "1.2.1 Species" — must appear in your output as the section
+of the paragraphs beneath it, and the first paragraph under each heading must be transcribed. A
+page that prints a heading your output never names has been misread: a column top was skipped,
+or a heading set beside a table or a figure was taken for part of it. On the first measurement
+of this version a whole heading and its opening paragraph, at the top of a column beside a
+table, were skipped, and every paragraph of that section on the next two pages was then filed
+under the section before it — an address no check downstream can see. Count the headings on
+the page, and count the section changes in your output; they must match.
 
 Reading order is top to bottom; on a two-column page it is the whole of the left column, then the
 whole of the right column.
@@ -168,7 +187,10 @@ as a new one. A derivation of four displayed equations inside one flowing argume
 paragraph, not five.
 
 **A list item of two or more sentences is its own paragraph.** A one-sentence item stays inside
-the paragraph that introduces the list.
+the paragraph that introduces the list — except a numbered statement the book sets as its own
+paragraph: a law, a rule or a definition printed "1. Law of orbits : All planets move…", "2. Law
+of areas : The line that joins…", "3. Law of periods : The square…" is one paragraph each,
+however many sentences it has, and never joins the item before it.
 
 **A printed item marker at the head of a paragraph is part of its text.** "(a)", "(b)", "(i)",
 "(ii)", "1.", "4." — exactly as the page prints it, as the first characters of the paragraph,
@@ -328,14 +350,15 @@ the language of the prose differs.
 A PAGE THAT CONTINUES ONE
 
 A left-hand page of Chapter 12 opens with no heading. Its first eight lines finish a sentence
-that the previous page began; the text quoted to you ends "...the internal energy of the system
-therefore". Halfway down, the heading "12.4 FIRST LAW OF THERMODYNAMICS" begins a new section
-with three paragraphs under it.
+that the previous page began — the first line starts flush left, in lower case, "depends only
+on the state of the system". Halfway down, the heading "12.4 FIRST LAW OF THERMODYNAMICS" begins
+a new section with three paragraphs under it.
 
 The correct output has four paragraphs. The first is the rest of the running paragraph: its
 section is the one you were told the previous page ended in — 12.3 — its continues_previous_page
 is true, and its text begins with the words printed at the top of this page ("depends only on...")
-and not with any of the quoted words. The other three have section "12.4" and the flag false.
+and not with any words you suppose ended the page before. The other three have section "12.4"
+and the flag false.
 Nothing is numbered.
 
 A TWO-COLUMN PAGE WITH A WORKED EXAMPLE
@@ -350,7 +373,8 @@ The correct reading order is the whole left column, then the whole right column.
 example is running text: its statement and each paragraph of its solution are transcribed, at
 section 2.5, the reaction transcribed with the rest, the labels "Example 2.4" and "Solution" as
 the first words of their paragraphs. The last paragraph is section "2.6". The flag is true on
-the page's first paragraph only if the quoted tail shows that 2.5's prose was cut mid-paragraph.
+the page's first paragraph only if its own first line shows that 2.5's prose was cut
+mid-paragraph — it begins mid-sentence, or flush left with no indent.
 
 BOXED MATERIAL, CASE BY CASE
 
@@ -386,7 +410,8 @@ Punnett square", one further paragraph that refers to that figure and to Table 5
 heading "5.2.3 Back-cross" with a first paragraph at the foot of the page.
 
 The correct output has five paragraphs. Two at section "5.2.1" — the first of them with
-continues_previous_page true if the quoted tail shows the previous page's paragraph was cut
+continues_previous_page true if its first line begins mid-sentence or flush left where the
+page's paragraphs are indented, that is, if the previous page's paragraph was cut
 short, false if it starts a new one. Two at section "5.2.2", the second with figure_refs
 ["Fig. 5.4", "Table 5.1"]. One at section "5.2.3", even though it is cut off by the end of the
 page: transcribe what is printed here, and the next page will flag its continuation. The caption
@@ -403,9 +428,11 @@ PITFALLS TO AVOID
   because it is long.
 - Do not transcribe a figure caption, a table, an exercise question, or the summary — and remember
   that the exercises carry chapter-numbered labels that look exactly like section numbers.
-- Do not repeat text you were given from the previous page, and do not complete it: the quoted
-  tail is on the previous page, and anything written to make it a sentence is a sentence the
-  book does not contain.
+- Do not write the end of the previous page's paragraph from memory or from the subject: this
+  page's first paragraph starts with the first word printed on this page, and anything written
+  in front of it is a sentence the book does not contain.
+- Do not finish without the heading check above: a heading printed on the page and absent from
+  your output means a column or a paragraph was skipped.
 - Do not reorder anything: reading order only.
 - Do not describe the page, apologise, or add commentary. The output is paragraphs and a
   confidence, nothing else.
@@ -450,25 +477,17 @@ are one sentence, not two paragraphs, however they happen to fall across the two
 <endif>
 <if(v.previous_section)>
 The previous page ended inside section <v.previous_section>. A page with no heading on it is
-still in that section.
-<endif>
-<if(v.previous_tail)>
-The last words of the previous page are quoted below, as context for ONE decision: whether this
-page's first paragraph is the rest of the paragraph they belong to. The quoted text is on the
-previous page and is never part of this page's output — do not repeat it, do not complete it, do
-not write anything that would make it a sentence.
+still in that section. Decide from THIS page alone whether its first paragraph is the rest of
+the paragraph the previous page ended in the middle of:
 
-- If this page's first paragraph CONTINUES it — the sentence runs on, or the paragraph runs on
-  flush left — set continues_previous_page to true on that paragraph, keep it in section
-  <v.previous_section>, and transcribe only the words printed on THIS page, starting with the
-  first word printed here.
+- If it is — its first line begins mid-sentence, or it begins flush left with no indent where
+  the page's paragraphs are indented — set continues_previous_page to true on that paragraph,
+  keep it in section <v.previous_section>, and transcribe only the words printed on THIS page,
+  starting with the first word printed here. Never write the words that ended the previous page.
 - If this page starts a new paragraph — an indent, a heading, a printed label such as "Answer",
-  "Solution" or "Example" — set it to false. An Answer never continues its question.
+  "Solution" or "Example", a numbered item — set it to false. An Answer never continues its
+  question.
 - Every other paragraph on this page has the flag false.
-
---- last words of the previous page ---
-<v.previous_tail>
---- end of quoted text ---
 <endif>
 <if(v.page_text)>
 Below is this page's embedded text layer. It is authoritative for characters — letters, digits,

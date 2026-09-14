@@ -13,20 +13,14 @@ import java.util.List;
  * (D15): the model returned one through v2, counting on from where the previous page ended, and
  * every defect that cost money on 2026-09-14 was that count — a phantom empty continuation, a
  * quoted tail "completed" into a sentence the book does not contain, continuations left
- * unflagged. The model now says only whether its first paragraph continues the previous page;
- * {@code ncert load} counts (DECISIONS 2026-09-14).
+ * unflagged. The model now says only whether its first paragraph continues the previous page,
+ * judged from this page's own typography — no ending of the previous page travels with the call
+ * any more, because the model echoed it — and {@code ncert load} counts (DECISIONS 2026-09-14).
  *
  * @param paragraphs in reading order, possibly empty for a page that is all figure or cover
  * @param confidence 0–1, how sure the model is of this page's text and addresses
  */
 public record NcertPage(List<Paragraph> paragraphs, BigDecimal confidence) {
-
-    /**
-     * How much of a page travels with the next page's call: enough to recognise a sentence that
-     * runs on, and no more — the tail is context for one decision, never text to output, and the
-     * 600 characters v2 sent were what the model set about "completing" (ch 6 p8, D15).
-     */
-    public static final int TAIL_LENGTH = 200;
 
     public NcertPage {
         paragraphs = paragraphs == null ? List.of() : List.copyOf(paragraphs);
@@ -46,19 +40,6 @@ public record NcertPage(List<Paragraph> paragraphs, BigDecimal confidence) {
                         + "can continue the previous page");
             }
         }
-    }
-
-    /**
-     * The ending of this page's text, as the next page's call receives it (TECH_PLAN §6.3, "the
-     * previous page's tail for paragraph continuity"): null when the page carried no paragraphs,
-     * so a plate or a figure page does not hand the next page a stale tail.
-     */
-    public String tail() {
-        if (paragraphs.isEmpty()) {
-            return null;
-        }
-        String text = paragraphs.getLast().text();
-        return text.length() <= TAIL_LENGTH ? text : text.substring(text.length() - TAIL_LENGTH);
     }
 
     /**

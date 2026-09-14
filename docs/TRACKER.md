@@ -390,6 +390,78 @@ THE v3 BUILD, 11:15–12:45 — plan approved with the recommended option on eac
   rather than scanning the prefix for every snake_case identifier, because the prefix
   legitimately carries dozens of them — `i_hat`, `v_bar`, `L_perp`, `H_2SO_4` — and a scan
   would need an allowlist longer than the check. Tests 576 → 578.
+v3 DRY RUN 1 — phy11-part1 chapter 7 on Haiku 4.5, 14:50, into a fresh `margai_d15` (₹13.81,
+  12 pages, cache write 6,940 so the v3 prefix clears the floor; the report landed as
+  `-2.md`). 100 paragraphs → 90 rows: ten continuations flagged and joined, against v2's three
+  splits this morning; one split left (§7.3 ¶15, the band split inside page 5, same as v2);
+  the repair fired once (page 7 repeated 59 characters of page 6, dropped, joined). §7.3 order
+  right; the glyph table clean but for two items; no ASCII `x`; `≅` kept; equation numbers now
+  in parentheses where v2 wrote `[7.10]`. Read against pages 4–8 rendered:
+  - **REGRESSION, primes**: page 5's `F'_GA … F'_GB = F_GB and F'_GC = F_GC, F'_R = F'_GA +
+    F'_GB + F'_GC` came back with every prime gone — `F_GB = F_GB and F_GC = F_GC` — the D14
+    item-2 defect, which v2 kept on three bands-only runs today (v2 dropped only the first
+    F'_GA). One run; variance or cause is unknown until a second run;
+  - **the tail echo persists in a form the repair cannot see**: page 8's first paragraph opens
+    "M_s is proportional to the cube of its radius." — a paraphrase of page 7's last sentence
+    ("Since mass of a sphere is proportional to be cube of its radius."), not on page 8 at all,
+    caught only by the character diff ('proportional', 'cube' 0x on the page). Page 7 had
+    echoed page 6 verbatim (repaired). Two of twelve pages echoed the quoted tail; v2's same
+    twelve pages echoed nothing today;
+  - both v2 and v3 correct NCERT's own "neigbouring" typo on page 6, and both paraphrase the
+    book's misprinted (7.10) — neither is a v3 change;
+  - segmentation is coarser and, where checked, right: the (b) part of Example 7.2 is one
+    paragraph with its displayed equations, as the rule says, where v2 cut it into three rows;
+    §7.7's two printed paragraphs on page 8 stay two.
+  Verdict on this run: structurally the better pipeline (joins, parentheses, no collisions
+  possible), with one regression to explain (the primes) and one problem the tail creates
+  rather than solves. Recommendation put to the founder: drop the tail from the call
+  altogether — the flag is a judgement about this page's typography and the previous section
+  still travels — and re-run; the Sonnet chapter 7 on the same prompt first, as the other
+  data point on both questions.
+v3 DRY RUN 2 — phy11-part1 chapter 7 on Sonnet 5 (`visionsonnet`), 15:09, same prompt, same
+  bands, same layer (₹31.22, 2.26× Haiku; cache write 9,399 on its tokenizer). 92 paragraphs →
+  81 rows, zero splits, zero repairs, zero character-diff flags — and one coverage flag, **page
+  3 at 59%**, which on reading is the whole finding. Sonnet skipped the top of page 3's right
+  column: the heading "7.3 UNIVERSAL LAW OF GRAVITATION", the "Legend has it that observing an
+  apple…" paragraph, Eq. (7.3) and "where V is the speed of the moon…" — none of it in any
+  row, where v2 and Haiku-v3 both have it as §7.3 ¶1. Having never seen the heading, it carried
+  §7.2 forward across pages 4 and 5: **fourteen paragraphs of §7.3 filed as §7.2 ¶9–22**, which
+  no loader invariant can see (7.2 is a printed section of chapter 7) and which the load
+  reported only as the deletion of Haiku's sixteen §7.3 rows. Two continuation flags were also
+  wrong: page 3's "3. Law of periods" joined onto page 2's "2. Law of areas", and page 4's
+  first §7.3 paragraph ("This clearly shows that the force due to earth's gravity decreases…")
+  joined onto the Example 7.1 Answer it does not belong to. On the other side of the ledger:
+  every prime on page 5 kept — `F'_GA = G2m.2m/1 j_hat … F'_GB = F_GB and F'_GC = F_GC, F'_R =
+  F'_GA + F'_GB + F'_GC` — which is better than v2 and far better than Haiku-v3; no tail echo
+  on pages 7 or 8 (page 8 opens "Thus the force on the point mass is", exactly as printed, and
+  the (7.10) join reads clean); the (b) part of Example 7.2 one paragraph as the rule says;
+  and its confidence *dipped* to 0.88 on precisely the mis-addressed pages, where Haiku's sits
+  at 0.92 everywhere — the first time the model's confidence has pointed at a real defect.
+  Two Sonnet runs now, on two prompt versions, each unloadable or wrongly addressed on
+  chapter 7 for a different structural reason (D14: numbering restarted in a band, "Example
+  7.1" as a section; D15: a heading and a paragraph skipped, a section carried too far). Its
+  strengths are glyphs and restraint, which is the shape of a verifier, not a transcriber.
+  Recommendation to the founder: RULING 1 stands — Haiku transcribes — and the page-image
+  second read, when it is built, is where Sonnet earns its price. On the tail: Haiku echoed it
+  on two of twelve pages and Sonnet on none; the recommendation to drop it stands. Haiku's
+  lost primes remain unexplained until a second Haiku run, which the no-tail re-run gives for
+  the same ₹14.
+RULING, ~15:40 (founder): improve the prompt and measure both models again rather than choose
+  on one run each. Three changes, one commit, all in v3 (no corpus has been cut on it): **no
+  text of the previous page travels with the call** — `PreviousPage(section)` only, `tail()` and
+  `TAIL_LENGTH` gone from the page record, the user turn asks for the flag from this page's own
+  typography (a first line mid-sentence, or flush left where the page's paragraphs are
+  indented) and says never to write the words that ended the page before; **a headings
+  self-check** in the prefix and the pitfalls — every numbered heading printed on the page must
+  appear as a section change, its first paragraph transcribed, headings counted against section
+  changes — because Sonnet's whole failure was one skipped heading; **a numbered law or rule set
+  as its own paragraph stays one**, because "3. Law of periods" onto "2. Law of areas" was
+  arguably what the one-sentence-item rule said. The three worked examples that mentioned a
+  quoted tail rewritten. The repeated-tail repair stays: it reads the JSONL, not the call.
+  Tests updated first (the task test names the section and quotes no tail; the prefix test asks
+  for the headings check and the law rule), verify green, eval gate PASS (placeholder). Next:
+  both models on chapter 7 and bio11 chapter 1 — two runs each on v3 is the minimum to tell
+  variance from cause for Haiku's primes and Sonnet's skip.
 ```
 
 ```

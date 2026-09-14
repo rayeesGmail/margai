@@ -66,15 +66,13 @@ class NcertPageTest {
                 .hasMessageContaining("first paragraph");
     }
 
+    /** A plate or a full-page figure: no paragraphs is a valid page, not a refusal. */
     @Test
-    void theTailIsTheLastTwoHundredCharactersOfThePagesLastParagraph() {
-        String paragraph = "x".repeat(NcertPage.TAIL_LENGTH + 200) + "the end.";
-        NcertPage page = new NcertPage(
-                List.of(new NcertPage.Paragraph("7.9", paragraph, false, List.of())), BigDecimal.ONE);
+    void aPageWithNoParagraphsIsValid() {
+        NcertPage empty = new NcertPage(List.of(), BigDecimal.ONE);
 
-        assertThat(NcertPage.TAIL_LENGTH).isEqualTo(200);
-        assertThat(page.tail()).hasSize(200).endsWith("the end.");
-        assertThat(new NcertPage(List.of(), BigDecimal.ONE).tail()).isNull();
+        assertThat(empty.paragraphs()).isEmpty();
+        assertThat(new NcertPage(null, BigDecimal.ONE).paragraphs()).isEmpty();
     }
 
     private NcertPage decode(String json) {

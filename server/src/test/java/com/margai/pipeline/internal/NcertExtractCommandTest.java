@@ -110,7 +110,7 @@ class NcertExtractCommandTest {
     void eachPageCarriesThePreviousPagesTailAndEachChapterStartsFresh() {
         run();
 
-        assertThat(extract.tails).containsExactly(null, "text of 8/1", null);
+        assertThat(extract.addresses).containsExactly(null, "7.9", null);
     }
 
     /**
@@ -140,7 +140,6 @@ class NcertExtractCommandTest {
 
         assertThat(extract.calls).containsExactly("8/1", "8/2", "8/3", "9/1");
         assertThat(extract.addresses).containsExactly(null, "7.9", "7.9", null);
-        assertThat(extract.tails).containsExactly(null, "text of 8/1", null, null);
     }
 
     /** A resumed run must carry the section and tail forward too, not start the first uncalled page cold. */
@@ -393,7 +392,6 @@ class NcertExtractCommandTest {
     static final class RecordingExtract implements NcertPageExtractor {
 
         final List<String> calls = new ArrayList<>();
-        final List<String> tails = new ArrayList<>();
         final List<String> addresses = new ArrayList<>();
         final List<Integer> imageCounts = new ArrayList<>();
         final List<String> pageTexts = new ArrayList<>();
@@ -407,7 +405,6 @@ class NcertExtractCommandTest {
             calls.add(address);
             imageCounts.add(images.size());
             pageTexts.add(pageText);
-            tails.add(previous == null ? null : previous.tail());
             addresses.add(previous == null ? null : previous.section());
             List<NcertPage.Paragraph> paragraphs = empty.contains(address) ? List.of()
                     : List.of(new NcertPage.Paragraph("7.9", "text of " + address, false, List.of()));

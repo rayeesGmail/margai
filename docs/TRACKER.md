@@ -585,6 +585,29 @@ v3 DRY RUN 7 — chapter 7 on Claude Opus 5 (`visionopus`: adaptive thinking, lo
   invisible failures, on the layout NCERT Physics uses on one page in six. Sonnet and Opus both
   read the chapter clean on the final prompt; Opus reads it closer to the print. The pair
   decision — who transcribes, who verifies — goes to the founder with this table.
+THE FULL READ OF THE OPUS RUN, 17:20 — every one of the 95 rows against all 12 pages rendered,
+  because the founder asked whether it was issue-free and the checks plus three pages could
+  not say so. Structure clean on every page: joins across pages 1–2, 4–5, 6–7, 8–9, 10–11 and
+  11–12 all right, every heading a section change, no column read out of order. **Three text
+  defects, one of them Opus's alone**: (1) page 6, §7.4 ¶2 — "Where ° is the restoring couple
+  per unit angle of twist. ° can be measured independently": the text layer renders τ as a
+  degree sign and Opus copied the layer's garbage through, twice, where Sonnet and Haiku both
+  wrote τ (the D14 class; the rule "where a span of the layer is garbage, read the image" was
+  not applied); (2) page 4, §7.3 ¶5 — the last term of the vector form of Eq. (7.5) written
+  `− G m_1 m_2 / |r|^3 r_hat` where the book prints the vector r, not r_hat — **all three
+  models made this one**; (3) page 4, §7.3 ¶2 — `a_m alpha R_m^(-2)` for ∝, which Sonnet also
+  wrote and Haiku got right as `∝`. Lesser: `"Eq. (7.5)"` placed in figure_refs (Opus only);
+  three merges of printed paragraphs — "Stated Mathematically…" with "Equation (7.5) can be
+  expressed…" on page 4, the three (7.20)–(7.22) paragraphs on page 8, the three escape-speed
+  paragraphs on page 10 — benign for an anchor, against the rule; `30^o` beside `30°` in one
+  row. And the fidelity that no other run showed: the book's own "neighouring", its misprinted
+  `4p/3` in (7.10), its ". ." after W_o, its "central force ." — all kept as printed where the
+  others corrected or paraphrased. By the ✅ standard: text exact 92 of 95, address 95 of 95,
+  figure refs right but for the equation in the list. Sonnet's second run, on the same pages
+  read the same way at the time: `^3/2` unbracketed (since ruled), the same r_hat and alpha,
+  more merges, τ right. So Opus is the best first read of the three and not a clean one; the
+  τ error is exactly what a second model reading the page would catch, and the vector r is
+  what neither would.
 ```
 
 ```

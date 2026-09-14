@@ -217,6 +217,72 @@ Next: step 2 — archive the canonical JSONL rather than delete it, extract phy1
   this prompt (~₹125), delete the book's rows, load, then the ✅ on the same twenty pages as
   2026-09-13 (a seed cannot reproduce a sample across a reload; the pages are the constant) —
   20/20 text is the D14 tick.
+STEP 2, 08:31–09:17 — the corpus event on the final v2 prompt. The canonical JSONL was archived
+  beside the live key (`extract/phy11-part1/en.2026-09-13-canonical.jsonl`; the command reads its
+  key exactly, so a sibling is invisible to it). Whole-book extract 08:31–09:04: 108 billed pages,
+  ₹118.36 (₹1.10 each), every chapter fed (legibility 0.379–0.470), every apparatus boundary at
+  SUMMARY, 1,044 paragraphs; character diff 23 flags, 21 of them on one row, ch 6 p8 §6.2 ¶47
+  (below); the same four low-coverage pages as every run — rendered and read: Table 1.1 (ch 1
+  p2), the Ancient Indian Science box (ch 4 p3), the bicycle-rim experiment box (ch 6 p16),
+  Table 6.1 (ch 6 p25) — all skipped by the prompt's own rules (tables, activity boxes,
+  historical asides): content the run was told to leave, not text lost; the PARKED item closes.
+  Whether Table 6.1's moments of inertia should ever be anchorable content is a founder policy
+  question, not a defect.
+  The first load REFUSED, writing nothing: `ch 4 page 2: §4.1 ¶5 has no text`. Page 2 opens at
+  the 4.2 heading with no §4.1 text above it — a phantom continuation object with empty text,
+  emitted for a paragraph that does not continue; all 108 calls `ok`, nothing retried, because
+  the paragraph schema does not forbid a blank text. Redone for ₹1.77 (`--redo --chapters 4
+  --pages 2`: 8 paragraphs, was 9; that one-page run's report overwrote the whole-book extract
+  report on disk — the numbers above are from the founder's pasted transcript). Then the book's
+  1,102 rows deleted by hand (founder-run, the ruling on the morning's finding — DECISIONS) and
+  the load run clean: **coverage 100%, 1,023 rows inserted, zero refused, no orphans**, one
+  page-break repair (ch 6 §6.7.4 p18's Answer — last night's known merge — transcribed with its
+  label this time and renumbered), 32 splits listed, about half the "where…/and…" class.
+THE D14 ✅, RE-RUN BY CLAUDE 09:20–09:45 ON THE SAME TWENTY PAGES AS 2026-09-13 (a seed cannot
+  reproduce a sample across a reload; the page and the section are the constants, the row is the
+  one at last night's address where it still exists and the named paragraph where the numbering
+  moved). Every row read against the page rendered from the PDF at 130 dpi, never the text layer.
+  Text exact / address right / figure refs right:
+  | # | 2026-09-13 row | today's row | pages | verdict |
+  |---|---|---|---|---|
+  | 1 | §5.1.1 ¶8 | §5.1.1 ¶8 | 2 | ✓ ✓ — · the unit-vector identities are one paragraph now (¶7); ¶8 joins "Given two vectors" across the column break |
+  | 2 | §5.11.2 ¶5 | §5.11.2 ¶5 | 14 | ✓ ✓ — · (5.26), (5.27) exact |
+  | 3 | §5.4 ¶5 | §5.4 ¶5 | 5 | ✓ ✓ — · **`v_f = sqrt(2 × 100 J / 0.05 kg) = 63.2 m s^-1` — last night's ✗ is fixed in the corpus**; "The speed is reduced by approximately 68% (not 90%)." is ¶6 |
+  | 4 | §5.11 ¶3 | §5.11 ¶3 | 13 | ✓ ✓ — |
+  | 5 | §7.2 ¶1 | §7.2 ¶1 | 2 | ✓ ✓ — |
+  | 6 | §6.8.2 ¶6 | §6.8.2 ¶6 | 22 | ✓ ✓ — · still begins "free space." (the gravity-/free page-break split, same address) |
+  | 7 | §1.3 ¶3 | §1.3 ¶3 | 3–4 | ✓ ✓ — · "(1) For example…", "All these numbers…" and the five bullet rules of page 4 in one row, joined across the page, every word on the pages |
+  | 8 | §6.10 ¶14 | §6.10 ¶14 | 27 | ✓ ✓ — · `α = (ω − ω_0) / t = 4π rad/s^2` |
+  | 9 | §6.4 ¶8 | §6.4 ¶8 | 9–10 | ✓ ✓ — · **last night's split is joined**: "…may have complicated trajectories…" is one row across the page |
+  | 10 | §6.7.3 ¶7 | §6.7.3 ¶6 | 17 | ✓ ✓ — · equation numbers written `[6.28 b]`, `[6.17]` where the page prints parentheses; τ as `tau` |
+  | 11 | §4.7 ¶4 | §4.7 ¶4 | 10 | ✓ ✓ — · p'_A, p'_B primes present |
+  | 12 | §5.1.1 ¶13 | §5.1.1 ¶11 | 2 | ✓ ✓ — · Example 5.1 with its label; `(3 i_hat + 4 j_hat - 5 k_hat)` |
+  | 13 | §3.10 ¶15 | §3.10 ¶15 | 16 | ✓ ✓ — · ν and π by name, (3.47) and (3.48) kept |
+  | 14 | §2.4 ¶18 | §2.4 ¶18 | 6 | ✓ ✓ — · Example 2.3 with its label |
+  | 15 | §6.9 ¶9 | §6.9 ¶8 | 24 | ✓ ✓ ✓ · Fig. 6.28; "of length of length l" reproduced; **the hanging item labels "(a)" (¶7) and "(b)" (¶8) are not transcribed** — the only omission in the twenty; "(1)", "(i)", "(ii)" are kept elsewhere in the book, so a drift, not a policy |
+  | 16 | §1.6.2 ¶10 | §1.6.2 ¶10 | 9 | ✓ ✓ — |
+  | 17 | §5.6 ¶7 | §5.6 ¶8 | 7 | ✓ ✓ — · Example 5.6, `F_r = -k/x`, the range |
+  | 18 | §7.2 ¶5 | §7.2 ¶5 | 3 | ✓ ✓ — · has_equations false |
+  | 19 | §6.12 ¶12 | §6.12 ¶12 | 30 | ✓ ✓ — · `L = L_z + L_perp (6.42c)`; ¶13 carries (6.42d) with ω k_hat |
+  | 20 | §1.2 ¶10 | §1.2 ¶10 | 3 | ✓ ✓ — |
+  **Text exact 20/20, address right 20/20, figure refs 1/1.** Fifteen of the twenty sit at last
+  night's address unchanged. Two notes for prompt v3, neither a wrong word: a hanging item label
+  is part of its paragraph's text (row 15), and an equation number keeps the page's parentheses
+  (row 10). The founder rules whether row 15's dropped "(b)" counts against "text exact".
+BUT ONE FABRICATION OUTSIDE THE SAMPLE, caught by the character diff and read on both pages:
+  `ch 6 §6.2 ¶47` (p8). Page 7 ends mid-sentence "…Suppose, the three squares that make up the L
+  shaped lamina" and page 8 opens "of Fig. 6.11 had different masses. How will you then determine
+  the centre of mass of the lamina?". The stored ¶47 reads "are made of the same material and have
+  the same thickness, then the centre of mass of the L-shape lies on the line OD. We could have
+  guessed this without calculations. Can you tell why? Suppose, the three squares that make up the
+  L shaped lamina of Fig. 6.11 had different masses. How will you…" — an invented clause to make
+  the quoted tail grammatical, then the whole tail repeated, then the page's real fragment. The
+  prompt says never to repeat the quoted tail; the model repaired it instead. `PageBreakRepairs`'
+  repeated-tail rule did not fire because the invented clause precedes the repeat. FIX 4 did its
+  job — 21 words "0x on the page" is exactly this shape. **The tick waits on a ₹2 redo of that
+  page**; if it recurs, the page joins the known-defect list by name, and v3's
+  continues-previous-page boolean is the structural answer (a paragraph that merely continues
+  carries no tail to "complete").
 ```
 
 ```

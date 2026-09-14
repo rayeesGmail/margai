@@ -583,7 +583,8 @@ v3 DRY RUN 7 — chapter 7 on Claude Opus 5 (`visionopus`: adaptive thinking, lo
   | 7 | Opus | + exponent rule | none | clean | ₹79.74 |
   | 8 | Opus | + five notation rules | none | clean but the vector r | ₹80.62 |
   | 9 | Sonnet | + five notation rules | page 5 right column first: three equations lost, page 6's §7.4 filed under §7.3 | 13 subscripts dropped | ₹31.98 |
-  Spend on v3 dry runs ₹199.83 (rows 8 and 9, 18:05 and 18:27, are read below). Haiku is out for transcription: three runs, three different
+  | 10 | Opus | frozen; pages 4, 6, 8 redone | none | 0 characters changed, 5 boundaries moved | ₹24.80 |
+  Spend on v3 dry runs ₹199.83 (rows 8–10, 18:05, 18:27 and 18:56, are read below). Haiku is out for transcription: three runs, three different
   invisible failures, on the layout NCERT Physics uses on one page in six. Sonnet and Opus both
   read the chapter clean on the final prompt; Opus reads it closer to the print. The pair
   decision — who transcribes, who verifies — goes to the founder with this table.
@@ -685,6 +686,26 @@ FOUNDER, ~18:50: "why is every run creating a new issue?" Because no two runs sh
   Opus on chapter 7 pages 4, 6 and 8 with `--redo` (~₹20), read against run 8's rows, to tell
   the rule from the dice on the vector r, the page-6 join and the page-8 split. Then the second
   read is built against a prompt that does not move under it.
+v3 DRY RUN 10 — the first repeat: Opus on chapter 7 pages 4, 6 and 8 again, frozen prompt,
+  `--redo`, 18:56 (₹24.80 — the cached prefix had lapsed, so a fresh cache write). 29
+  paragraphs where run 8 had 27 on those pages; no flag. THE DIFF against run 8's rows, 19:00:
+  **not one character differs** across the three pages — only spacing and bracket placement
+  ("F (d)" for "F(d)", "(GM_E / R_E^3)" bracketed, "G m_1 m_2" spaced) — and five paragraph
+  boundaries moved. Rule or dice, per question: the vector r is `r_hat` a third time — habit,
+  not dice, and the verifier's job (Sonnet saw it once in four reads). Page 6's "The bar AB…"
+  is its own paragraph this time, from the same stored page 5 and the same "mid-sentence" fact
+  — dice, one in two; the fact is not the cause by itself. Page 8's "and hence…" is cut off
+  again — habit, two in two — while (7.17) and (7.18) are now one paragraph where run 8 had two
+  (the page indents "Substituting…", so run 8 was right there) — dice. Two boundaries moved
+  that nobody asked about: Newton's law statement is its own paragraph again (run 7's reading;
+  the page sets it flush-left, either is defensible), and Example 7.2 is now three rows — the
+  stem, (a), (b) — where runs 7 and 8 gave one. So the repeat says: on a frozen prompt the
+  character layer is stable under the sampling and the segmentation layer is not; the chapter
+  went 99 → 102 rows with the same text. Consequences for the build: the second read compares
+  text and must ignore spacing and bracket placement; paragraph boundaries are checked by code
+  against the layer's indented line starts, not by another prompt line; an inline fraction
+  followed by a factor — "G Mm / d^2 L" for G (Mm/d²) L this time, bracketed in run 8 — is a
+  notation the frozen prompt leaves to the dice (PARKED). Spend on v3 dry runs ₹337.23.
 ```
 
 ```
@@ -2509,6 +2530,8 @@ Tomorrow's first task:
 ## 🅿️ PARKED (Sunday review only)
 
 - _idea · date · one line_
+- **an inline fraction followed by a factor needs a bracket** · 2026-09-14 (D15) · G (Mm/d²) L = τθ came out `G (Mm / d^2) L` on one Opus run and `G Mm / d^2 L` on the repeat of the same page, and the second reads as d²L in the denominator; the prompt is frozen (DECISIONS 2026-09-14), so this is the first candidate for its next amendment, only if the second read cannot flag it
+- **paragraph boundaries checked by code against the text layer's indented line starts** · 2026-09-14 (D15) · the repeat on the frozen prompt moved five boundaries on three pages with zero character changes, so segmentation is the layer the sampling moves; the layer knows which lines start indented, so `ncert load` or the second read can count printed paragraphs per page and name a page whose row count differs — the check the Sonnet column failure (run 9, three equations lost) would also trip
 - ~~**`ncert load --prune` for a corpus event** · 2026-09-14 (D15) · the load reports the addresses a chapter no longer carries and leaves the rows in place, which was right for a subset load into a full book and is wrong for a re-extraction that replaces the book: 85 stale rows sat beside the canonical 1,017 until today, sampleable by the ✅ and embeddable by D17. A flag that deletes the orphans of the chapters this load carries, refused once embeddings or anchors exist unless the D17 migrate path is taken. Until it exists the corpus event deletes by hand before the load (day log 2026-09-14)~~ · **done the same day, without a flag**: the load deletes them, names them, refuses if any is anchored, spares a row holding the other edition's text (DECISIONS 2026-09-14)
 - **the extract report's "from earlier runs" count under `--redo`** · 2026-09-14 (D15) · the closing `jsonl:` line counted all 143 pages as from earlier runs on a run that had just redone 12 of them; the total table above it is right (`called this run 12`, `already done 0`). Cosmetic, one line in `NcertExtractCommand`
 - **`ncert verify --read-pages`: the page-image second read** · 2026-09-13 (D14) · the only instrument that can verify a formula, since the text layer holds no base–script association for a displayed equation (measured: `22 / fi E / mVmV GmM`) and cannot carry a prime at all (Symbol font, no Unicode map). A comparison task, not a second transcription; on the VISION tier; ~₹1/page over formula pages. A half-built `PageVerifyTask` was removed on 2026-09-13 because a `@Component` requiring an unwritten prompt broke every Spring context — it returns with its prompt. Free checks (word diff, coverage ratio, split sentences, page-break repairs) already landed in `extract` and `load`

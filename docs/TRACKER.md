@@ -581,7 +581,8 @@ v3 DRY RUN 7 — chapter 7 on Claude Opus 5 (`visionopus`: adaptive thinking, lo
   | 5 | Sonnet | fact + rule + headings check | none | `^3/2` unbracketed | ₹31.63 |
   | 6 | Sonnet | bio11 ch 1 | none; 30/30 exact | — | ₹15.82 |
   | 7 | Opus | + exponent rule | none | clean | ₹79.74 |
-  Spend on v3 dry runs ₹199.83. Haiku is out for transcription: three runs, three different
+  | 8 | Opus | + five notation rules | none | clean but the vector r | ₹80.62 |
+  Spend on v3 dry runs ₹199.83 (row 8, 18:05, is read below). Haiku is out for transcription: three runs, three different
   invisible failures, on the layout NCERT Physics uses on one page in six. Sonnet and Opus both
   read the chapter clean on the final prompt; Opus reads it closer to the print. The pair
   decision — who transcribes, who verifies — goes to the founder with this table.
@@ -617,6 +618,32 @@ FOUNDER, ~17:35: fix what a prompt can reach before choosing. Done, one commit: 
   after a number (`NotationFlags`), run on every paragraph whether or not a layer was fed. The
   `r_hat`-by-analogy case is the one no rule guarantees; the second read is for it. Next: Opus
   and Sonnet on chapter 7 again on this prompt, ₹80 + ₹32, both read in full.
+v3 DRY RUN 8 — chapter 7 on Opus again, on the amended prompt, 18:05 (₹80.62; one transient
+  AnthropicIoException retried by the client). 106 paragraphs → 99 rows, zero repairs, no flag,
+  the new notation section empty. The load pruned the two addresses run 7 held that this run
+  does not (§7.3 ¶15, §7.4 ¶5) and dropped `"Eq. (7.5)"` from §7.6 ¶1's figure_refs — the code
+  guard did its job; the prompt line against it did not reach the model. THE FULL READ, 18:20 —
+  all 99 rows against the 12 pages. Run 7's three text defects: τ is now "tau" in every place
+  (page 6, where the PDF itself prints the degree-sign glyph and the rule resolves it), ∝ is `∝`
+  twice (page 4), `30°` once after each number where run 7 had `30^o` — the five rules took. The
+  vector r in the third form of Eq. (7.5) is still `r_hat` — the by-analogy case, as predicted.
+  Run 7's three merges are gone: (7.17)/(7.18), (7.21)–(7.22) and (7.31)–(7.32) each split as
+  the page indents. Two segmentation defects new to this run, neither touching a character:
+  page 6's first line "The bar AB has two small lead spheres…" is indented on the page but was
+  flagged as continuing §7.4 ¶1 from page 5 — page 5 ends "shown in Fig.7.6" with no full stop,
+  so the fact said "mid-sentence" and the model believed the fact over the indent; and page 8's
+  "and hence the acceleration due to gravity…" is flush-left after (7.18) but was cut into its
+  own paragraph. Two nits shared with every run: "where v is the velocity…" (page 3) and "where
+  we have used the relation…" (page 11) are indented on the page and kept in the paragraph
+  before. Newton's law statement on page 4 is flush-left and read as continuing "…Universal Law
+  of Gravitation :" — right by the typography rule, where run 7 gave it its own paragraph.
+  "E ( ) = W_1 + …" on page 9: the print has nothing between the parentheses (the ∞ dropped by
+  the symbol font in the PDF as well as the layer), and the model wrote "E (infinity)" from the
+  sentence before it; page 9's own "Setting r = infinity" is the book's word. Everything else
+  exact: "neighouring", "4p/3", "to be cube", ". .", "central force ." all kept again. By the ✅
+  standard: text exact 98 of 99 (the vector r), address 99 of 99, figure refs right after the
+  guard. Stray-letter hits at §7.7 ¶11, §7.9 ¶5, §7.9 ¶17 are `l`, `s`, `d` — false positives.
+  Spend on v3 dry runs ₹280.45. Sonnet on the same prompt is next (~₹32), then the pair.
 ```
 
 ```

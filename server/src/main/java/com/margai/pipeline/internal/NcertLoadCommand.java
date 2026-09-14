@@ -7,6 +7,7 @@ import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.ParagraphExtraction;
 import com.margai.storage.api.ObjectStore;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,10 +77,17 @@ class NcertLoadCommand extends NcertBookCommand {
         // refuse a continuation that cannot be one (D14, the first full-book load; D15).
         PageBreakRepairs.Repaired repaired = PageBreakRepairs.apply(pages);
         pages = repaired.pages();
+        // Then the founder's rulings on what `ncert verify` flagged (D15): the canonical run is
+        // frozen, so a defect in it is corrected here, on the record, rather than re-drawn.
+        NcertCorrections.Applied corrected = NcertCorrections.apply(pages, corrections(definition, chapters, report));
+        pages = corrected.pages();
         Numbered numbered = number(pages, jsonlKey);
         List<NcertParagraphRow> rows = numbered.rows();
         report.section("page-break repairs to the model's continuation flags (deterministic, each one named)")
                 .list(repaired.notes());
+        report.section("corrections from " + NcertCorrectionsYamlReader.FILE + " (founder-adjudicated, each one named)")
+                .list(corrected.notes())
+                .line("rulings on verifier flags that change no text: " + corrected.rulings());
         report.section("figure_refs that are not figure or table labels — dropped")
                 .list(numbered.droppedRefs());
         NcertLoadReport result = imports.loadParagraphs(definition.code(), language, rows);
@@ -131,6 +139,21 @@ class NcertLoadCommand extends NcertBookCommand {
         }
         report.section("addresses in the database this extraction no longer carried — deleted")
                 .list(result.orphans());
+    }
+
+    /**
+     * This load's entries of the corrections file, which is optional: until the first adjudication
+     * there is nothing to apply. A file that is present is read in full, so a broken entry for another
+     * book still fails this load — the file is one founder-owned input, not one per book.
+     */
+    private List<NcertCorrection> corrections(BookDefinition definition, Set<Short> chapters, Report report) {
+        Path file = io.input(NcertCorrectionsYamlReader.FILE);
+        if (!Files.isRegularFile(file)) {
+            report.line("no " + NcertCorrectionsYamlReader.FILE + " under the inputs: nothing to apply");
+            return List.of();
+        }
+        report.line("corrections: " + file.normalize() + " sha256 " + Report.sha256(file));
+        return NcertCorrections.forLoad(NcertCorrectionsYamlReader.read(file), definition.code(), language, chapters);
     }
 
     /**
@@ -316,6 +339,7 @@ class NcertLoadCommand extends NcertBookCommand {
         private final int paraNo;
         private final StringBuilder text = new StringBuilder();
         private final List<Integer> pages = new ArrayList<>();
+        private final List<Integer> pageStarts = new ArrayList<>();
         private final List<String> figureRefs = new ArrayList<>();
         private BigDecimal confidence;
         private UUID aiCallId;
@@ -335,6 +359,8 @@ class NcertLoadCommand extends NcertBookCommand {
             if (!text.isEmpty()) {
                 text.append(' ');
             }
+            // Where this page's part begins, so `ncert verify` can hold each page to its own words (D15).
+            pageStarts.add(text.length());
             // Single spaces within a paragraph, as the prompt asks: one model set its displayed
             // equations on their own lines (D15, run 5), and a line break is not a difference.
             text.append(paragraph.text().strip().replaceAll("\\s+", " "));
@@ -353,7 +379,7 @@ class NcertLoadCommand extends NcertBookCommand {
                     // Decided from the joined text, once the halves are together: a paragraph
                     // whose equation sits on the second page is still a paragraph with an equation.
                     Equations.present(text.toString()),
-                    figureRefs, new ParagraphExtraction(pages, confidence, aiCallId));
+                    figureRefs, new ParagraphExtraction(pages, pageStarts, confidence, aiCallId, null));
         }
     }
 }

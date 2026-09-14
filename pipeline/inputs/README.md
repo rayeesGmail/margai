@@ -13,6 +13,27 @@ dated 2026-09-10 record the spec-silent choices.
 | `archetypes.yaml` | `archetype_tracks`, `archetype_track_steps` | `backbone load` | 4 tracks, 744 steps |
 | `cutoffs.csv` | `cutoffs` | `cutoffs load` | 40 qualifying rows, 2019–2026 |
 | `books.yaml` | `ncert_books` | `ncert register` (D14) | 10 books, 79 chapters, both editions |
+| `ncert-corrections.yaml` | `ncert_paragraphs`, through the extraction | `ncert load` (D15) | the founder's rulings on `ncert verify` flags; empty until the first adjudication |
+
+## ncert-corrections.yaml
+
+The outcome of adjudicating an `ncert verify` report (D15, DECISIONS 2026-09-14 "the pair"). One book's
+extraction is frozen as its canonical run, so a defect found in it is corrected here — deterministically,
+on the record, re-appliable — instead of re-extracting the page and drawing again. Claude drafts the
+entries from the flags it read against the rendered pages; the founder approves them before they are
+committed.
+
+- **Keyed on the page and a span, never on the address.** `ncert load` assigns paragraph numbers and a
+  join or split moves every number after it, so an address would point at a different paragraph the
+  moment another correction lands. The page and its words do not move. `address` may be written for a
+  reader and is never used to apply the entry.
+- **A span must occur exactly once on its page**, or the load refuses by name: not at all means the
+  page is not what the entry was written against, twice means the entry does not say which.
+- **`text`, `join` and `split` change the extraction; `misprint` and `false_positive` do not** — they
+  rule on a flag (the book's own error kept; the verifier wrong), and `ncert verify` reads them so a
+  ruled flag is not raised again.
+- Quote every value holding a comma or a colon: in YAML's `{…}` form an unquoted comma starts a new key,
+  and the reader refuses the key it does not know.
 
 ## books.yaml
 

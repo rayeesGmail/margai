@@ -102,6 +102,55 @@ class NcertLoadCommandTest {
         assertThat(imports.rows.get(2).address()).isEqualTo("ch 7 §7.2 ¶1");
     }
 
+    /** `ncert verify` judges each page for its own part of a straddling paragraph, so the row says where each part starts. */
+    @Test
+    void eachRowSaysWhereEachOfItsPagesPartBegins() {
+        jsonl(
+                page(7, 1, "0.95", p("7.1", "The first paragraph."), p("7.1", "A sentence that runs on ")),
+                page(7, 2, "0.80", continuing("7.1", "\nand finishes on the next page."), p("7.2", "A new section.")));
+
+        run();
+
+        assertThat(imports.rows.get(0).extraction().pageStarts()).containsExactly(0);
+        NcertParagraphRow straddling = imports.rows.get(1);
+        assertThat(straddling.extraction().pageStarts()).containsExactly(0, 24);
+        assertThat(straddling.text().substring(24)).isEqualTo("and finishes on the next page.");
+    }
+
+    /** The founder's adjudication lands in the load: a correction is applied before numbering, and named. */
+    @Test
+    void theCorrectionsFileIsAppliedAndEveryCorrectionIsReported() throws IOException {
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 4, kind: text, transcribed: "r_hat",
+                     printed: "r", reason: the page prints the vector}
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 4, kind: split, at: "The quotation",
+                     reason: indented on the page}
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 4, kind: false_positive, printed: "m_2",
+                     transcribed: "m_2", reason: the verifier misread}
+                """);
+        jsonl(page(7, 4, "0.95", p("7.3", "F = - G m_1m_2 / |r|^3 r_hat. The quotation is from Principia.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::text)
+                .containsExactly("F = - G m_1m_2 / |r|^3 r.", "The quotation is from Principia.");
+        assertThat(out.toString())
+                .contains("## corrections from ncert-corrections.yaml (founder-adjudicated, each one named)")
+                .contains("- ch 7 page 4 §7.3: \"r_hat\" → \"r\" (the page prints the vector)")
+                .contains("- ch 7 page 4 §7.3: a new paragraph starts at \"The quotation\" (indented on the page)")
+                .contains("rulings on verifier flags that change no text: 1");
+    }
+
+    @Test
+    void withoutACorrectionsFileTheLoadSaysSo() {
+        jsonl(page(7, 1, "0.95", p("7.1", "Text.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(out.toString()).contains("no ncert-corrections.yaml under the inputs: nothing to apply");
+    }
+
     /**
      * The model once mislabelled one paragraph mid-section and then returned to the section; a
      * counter that restarted at 1 would have given two paragraphs one address. A section keeps

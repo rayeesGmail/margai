@@ -1,0 +1,20 @@
+# ncert-corrections.yaml — the founder's rulings on what `ncert verify` flagged (D15).
+#
+# `ncert load` applies every entry for the book, edition and chapters it loads, after its own
+# page-break repairs and before it numbers paragraphs, and names each one in its report. An entry
+# that cannot be applied fails the load by name and nothing is written. See the README beside this
+# file and docs/runbooks/ncert-ingest.md, "5. verify".
+#
+# Every entry: book, lang, chapter, page (within the chapter's PDF), kind, reason; address optional,
+# for the reader only. Quote any value that contains a comma, a colon or a leading symbol.
+#
+#   kind: text            transcribed + printed — the span must occur exactly once on the page
+#   kind: join            at — the words a paragraph starts with; it is the rest of the one before
+#   kind: split           at — a span occurring once on the page; a new paragraph starts there
+#   kind: misprint        transcribed + printed as the verifier quoted them — the book's own error, kept
+#   kind: false_positive  transcribed + printed as the verifier quoted them — the verifier was wrong
+#
+# Example:
+#   - {book: phy11-part1, lang: en, chapter: 7, page: 4, kind: text, address: "ch 7 §7.3 ¶5",
+#      transcribed: "|r|^3 r_hat", printed: "|r|^3 r", reason: "the third form prints the vector r"}
+corrections: []

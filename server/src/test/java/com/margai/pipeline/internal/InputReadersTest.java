@@ -106,6 +106,16 @@ class InputReadersTest {
         assertThat(reNeet.source()).endsWith("(Re-NEET)");
     }
 
+    /** The committed corrections file reads, and every entry in it names a book books.yaml carries. */
+    @Test
+    void theCommittedCorrectionsFileReadsAndNamesOnlyRegisteredBooks() {
+        List<NcertCorrection> corrections = NcertCorrectionsYamlReader.read(INPUTS.resolve(NcertCorrectionsYamlReader.FILE));
+        List<String> books = BooksYamlReader.read(INPUTS.resolve(NcertRegisterCommand.FILE)).stream()
+                .map(BookDefinition::code).toList();
+
+        assertThat(corrections).allSatisfy(entry -> assertThat(books).contains(entry.book()));
+    }
+
     @Test
     void aWrongHeaderIsRefusedOnLineOne() throws IOException {
         Path file = write("taxonomy.csv", "code,subject,kind\nPHY,physics,subject\n");

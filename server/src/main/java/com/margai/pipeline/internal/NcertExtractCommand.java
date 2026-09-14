@@ -85,6 +85,7 @@ class NcertExtractCommand extends NcertBookCommand {
         List<List<String>> apparatusRows = new ArrayList<>();
         List<List<String>> textLayerRows = new ArrayList<>();
         List<String> diffFlags = new ArrayList<>();
+        List<String> notationFlags = new ArrayList<>();
         List<String> structureFlags = new ArrayList<>();
         List<String> lowConfidence = new ArrayList<>();
         int called = 0;
@@ -159,6 +160,14 @@ class NcertExtractCommand extends NcertBookCommand {
                 called++;
                 chapterCalled++;
                 chapterParagraphs += read.paragraphs().size();
+                // The notation check needs no layer: a degree sign not after a number is the
+                // layer's Greek letter copied through, whichever source the page came with (D15).
+                List<NcertPage.Paragraph> transcribedParagraphs = response.output().paragraphs();
+                for (int index = 0; index < transcribedParagraphs.size(); index++) {
+                    NcertPage.Paragraph paragraph = transcribedParagraphs.get(index);
+                    String at = "ch " + chapter.no() + " p" + page + " §" + paragraph.section() + " #" + (index + 1);
+                    NotationFlags.check(paragraph.text()).forEach(finding -> notationFlags.add(at + ": " + finding));
+                }
                 // The character check and the structural flag, both against the page's own text
                 // layer and both free (FIX 4, FIX 6): they turn the founder's audit from reading
                 // every paragraph into adjudicating the flagged ones.
@@ -216,6 +225,9 @@ class NcertExtractCommand extends NcertBookCommand {
         report.section("pages whose text is not all there — or is there twice")
                 .line("checked: " + checked)
                 .list(structureFlags, pagesChecked == 0 ? "nothing was checked" : "none on the pages checked");
+        report.section("notation to adjudicate — a glyph the layer garbled and the model copied")
+                .line("checked: every paragraph of the " + called + " page(s) called this run")
+                .list(notationFlags, called == 0 ? "nothing was checked" : "none");
         report.section("low-confidence pages (below " + LOW_CONFIDENCE
                 + ") — a routing signal, not a guarantee").list(lowConfidence);
 

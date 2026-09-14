@@ -406,6 +406,24 @@ class NcertLoadCommandTest {
                 .isEqualTo("(b) Now if the mass at vertex A is doubled then F'_GA = 4Gm^2 j_hat F'_GB = F_GB and F'_GC = F_GC");
     }
 
+    /**
+     * figure_refs holds figure and table labels; a model put "Eq. (7.5)" in it (D15, the Opus
+     * run). A rule can ask; the loader guarantees, and names what it dropped.
+     */
+    @Test
+    void aFigureRefThatIsNotAFigureOrTableLabelIsDroppedAndReported() {
+        jsonl(page(7, 7, "0.95",
+                new NcertPage.Paragraph("7.6", "Consider a point mass m at a height h (Fig. 7.8(a)); from Eq. (7.5)",
+                        false, List.of("Fig. 7.8(a)", "Eq. (7.5)", "Table 7.1", "Figure 10.2 b"))));
+
+        run();
+
+        assertThat(imports.rows.getFirst().figureRefs()).containsExactly("Fig. 7.8(a)", "Table 7.1", "Figure 10.2 b");
+        assertThat(out.toString())
+                .contains("## figure_refs that are not figure or table labels — dropped")
+                .contains("ch 7 §7.6 ¶1: \"Eq. (7.5)\"");
+    }
+
     /** The rows the load deleted are named under their own heading, so a corpus event's losses are on the record. */
     @Test
     void theAddressesTheLoadDeletedAreReported() {

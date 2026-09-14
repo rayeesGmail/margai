@@ -608,6 +608,15 @@ THE FULL READ OF THE OPUS RUN, 17:20 — every one of the 95 rows against all 12
   more merges, τ right. So Opus is the best first read of the three and not a clean one; the
   τ error is exactly what a second model reading the page would catch, and the vector r is
   what neither would.
+FOUNDER, ~17:35: fix what a prompt can reach before choosing. Done, one commit: five prompt
+  lines (the Greek-letter-as-degree-sign case named; never add a mark the layer lacks and the
+  image does not show; ∝ never "alpha"; one degree sign after its number; the indent decides
+  after a displayed equation; an equation number is never a figure_ref) and two guards in code,
+  tests first: `ncert load` keeps only Fig/Figure/Table labels in figure_refs and names what it
+  dropped; the extract report's new "notation to adjudicate" section flags a degree sign not
+  after a number (`NotationFlags`), run on every paragraph whether or not a layer was fed. The
+  `r_hat`-by-analogy case is the one no rule guarantees; the second read is for it. Next: Opus
+  and Sonnet on chapter 7 again on this prompt, ₹80 + ₹32, both read in full.
 ```
 
 ```

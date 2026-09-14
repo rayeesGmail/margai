@@ -74,6 +74,14 @@ so an equation can come through as a run of meaningless characters while the pro
 perfect. When a span of the text layer is plainly not what the image shows, read that span from the
 image and carry on trusting the layer elsewhere. Do not copy nonsense through because "the text
 layer is authoritative": that rule is about characters you can see in both, not about noise.
+The commonest noise is a Greek letter: the symbol fonts render τ, θ, ρ and their kin as a
+degree sign, a lone letter or a box, so "Where ° is the restoring couple" in the layer is τ on
+the page and is written "tau". A degree sign only ever follows a number.
+
+**Never add a mark the layer lacks and the image does not show.** The mirror of the rule
+above: where the layer prints a plain r and the image prints a bold r, the symbol is the vector
+r and stays a plain letter — it does not become r_hat because the term before it had a hat. A
+hat, a prime, a bar, a subscript is written only where the page prints it.
 
 **The text layer is authoritative for the characters it has — never for the characters it lacks.**
 The symbol fonts these books use drop some glyphs from the layer entirely, silently: a radical
@@ -196,7 +204,10 @@ time it is read:
 with or without a number at the right margin, belongs to the paragraph whose sentence runs into
 it — and the prose that resumes after it is still that same paragraph, unless the page indents it
 as a new one. A derivation of four displayed equations inside one flowing argument is one
-paragraph, not five.
+paragraph, not five. The indent is the thing to look for: after a displayed equation, a line
+that begins flush left continues the paragraph, a line that begins indented starts the next
+one — "Using the relation g = GM_E/R_E^2, we get" indented after (7.31) is a new paragraph,
+however closely it follows the argument.
 
 **A list item of two or more sentences is its own paragraph.** A one-sentence item stays inside
 the paragraph that introduces the list — except a numbered statement the book sets as its own
@@ -233,6 +244,10 @@ Transcribe mathematics inline in plain text, keeping every symbol readable:
   T = 2 pi sqrt(l / g), v = (u + at) / 2.
 - Greek letters by name when they are symbols: alpha, beta, gamma, delta, theta, lambda, mu, pi,
   rho, sigma, omega, Delta, Omega. Write "Delta H" for an enthalpy change, "theta" for an angle.
+  The proportionality sign ∝ is not a Greek letter: write "∝" or "proportional to", never
+  "alpha" — "a_m ∝ R_m^(-2)".
+- An angle in degrees keeps the degree sign, written once and only after its number: "30°",
+  never "30^o".
 - **Unit vectors take a fixed spelling: i_hat, j_hat, k_hat**, and a vector marked by an arrow or
   by bold keeps its plain symbol. Write "F_GA = Gm(2m) / 1 j_hat", never "j".
 - **The other marks above and beside a symbol have fixed spellings too**, so that one quantity is
@@ -281,7 +296,9 @@ FIGURES AND TABLES
 When a paragraph refers to a figure or a table, put those labels in figure_refs exactly as
 printed. The printed form varies by book and you copy what is on the page rather than normalising
 it: Physics prints "Fig. 7.9" and "Fig. 2.3 (a)", Biology prints "Figure 10.2 b" and "Figure 10.2
-a and b", tables print "Table 5.1". A paragraph that refers to none has an empty list.
+a and b", tables print "Table 5.1". A paragraph that refers to none has an empty list. Only
+figures and tables go there: an equation number a paragraph cites — "from Eq. (7.5)" — stays in
+the text and is never a figure_ref.
 
 A caption is not a paragraph. Do not transcribe "Fig. 7.9 Variation of g with depth" as text.
 Do not describe what a figure shows. Do not transcribe the labels inside a diagram. The contents

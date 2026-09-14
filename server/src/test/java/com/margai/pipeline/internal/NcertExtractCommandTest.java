@@ -197,6 +197,18 @@ class NcertExtractCommandTest {
         assertThat(extract.calls).containsExactly("8/1", "8/2", "9/1");
     }
 
+    /** A degree sign not after a number is the text layer's τ copied through; the report names it whether or not a layer was fed. */
+    @Test
+    void aStrayDegreeSignIsFlaggedInTheReport() {
+        extract.degree.add("8/2");
+
+        run();
+
+        assertThat(out.toString())
+                .contains("## notation to adjudicate")
+                .contains("ch 8 p2 §7.9 #1: a degree sign not after a number");
+    }
+
     @Test
     void aPageWithNoParagraphsIsStillRecordedAsRead() {
         extract.empty.add("8/2");
@@ -396,6 +408,7 @@ class NcertExtractCommandTest {
         final List<Integer> imageCounts = new ArrayList<>();
         final List<String> pageTexts = new ArrayList<>();
         final List<String> empty = new ArrayList<>();
+        final List<String> degree = new ArrayList<>();
         final List<String> lowConfidence = new ArrayList<>();
 
         @Override
@@ -406,8 +419,9 @@ class NcertExtractCommandTest {
             imageCounts.add(images.size());
             pageTexts.add(pageText);
             addresses.add(previous == null ? null : previous.section());
+            String text = degree.contains(address) ? "Where ° is the restoring couple of " + address : "text of " + address;
             List<NcertPage.Paragraph> paragraphs = empty.contains(address) ? List.of()
-                    : List.of(new NcertPage.Paragraph("7.9", "text of " + address, false, List.of()));
+                    : List.of(new NcertPage.Paragraph("7.9", text, false, List.of()));
             BigDecimal confidence = lowConfidence.contains(address) ? new BigDecimal("0.40") : new BigDecimal("0.95");
             return new AiResponse<>(new NcertPage(paragraphs, confidence), Usage.none(), "fake",
                     Duration.ZERO, UUID.randomUUID());

@@ -76,9 +76,12 @@ class NcertLoadCommand extends NcertBookCommand {
         // refuse a continuation that cannot be one (D14, the first full-book load; D15).
         PageBreakRepairs.Repaired repaired = PageBreakRepairs.apply(pages);
         pages = repaired.pages();
-        List<NcertParagraphRow> rows = number(pages, jsonlKey);
+        Numbered numbered = number(pages, jsonlKey);
+        List<NcertParagraphRow> rows = numbered.rows();
         report.section("page-break repairs to the model's continuation flags (deterministic, each one named)")
                 .list(repaired.notes());
+        report.section("figure_refs that are not figure or table labels — dropped")
+                .list(numbered.droppedRefs());
         NcertLoadReport result = imports.loadParagraphs(definition.code(), language, rows);
 
         report.section("ncert_paragraphs")
@@ -146,7 +149,14 @@ class NcertLoadCommand extends NcertBookCommand {
      * fails any of these is refused by name, every one at once, with the pages to re-extract:
      * nothing is written either way, so there is no reason to withhold the rest of the list.
      */
-    static List<NcertParagraphRow> number(List<ExtractedPage> pages, String jsonlKey) {
+    /** The numbered rows, and the figure_refs entries that were not figure or table labels. */
+    record Numbered(List<NcertParagraphRow> rows, List<String> droppedRefs) {
+    }
+
+    /** What figure_refs may hold: a figure or a table label as the books print them. */
+    private static final Pattern FIGURE_REF = Pattern.compile("^(Fig\\.?|Figure|Table)\\b.*", Pattern.CASE_INSENSITIVE);
+
+    static Numbered number(List<ExtractedPage> pages, String jsonlKey) {
         List<Joined> rows = new ArrayList<>();
         List<String> refusals = new ArrayList<>();
         Map<Short, TreeSet<Integer>> redo = new LinkedHashMap<>();
@@ -197,7 +207,23 @@ class NcertLoadCommand extends NcertBookCommand {
                                             .collect(java.util.stream.Collectors.joining(",")))
                             .collect(java.util.stream.Collectors.joining("\n  ")));
         }
-        return rows.stream().map(Joined::row).toList();
+        // A model put "Eq. (7.5)" in figure_refs (D15, the Opus run). A rule can ask; this
+        // guarantees, and names what it dropped so a wrong label is never silently discarded.
+        List<String> dropped = new ArrayList<>();
+        List<NcertParagraphRow> result = new ArrayList<>(rows.size());
+        for (Joined joined : rows) {
+            NcertParagraphRow row = joined.row();
+            List<String> kept = row.figureRefs().stream().filter(ref -> FIGURE_REF.matcher(ref.strip()).matches()).toList();
+            if (kept.size() == row.figureRefs().size()) {
+                result.add(row);
+                continue;
+            }
+            row.figureRefs().stream().filter(ref -> !FIGURE_REF.matcher(ref.strip()).matches())
+                    .forEach(ref -> dropped.add(row.address() + ": \"" + ref + "\""));
+            result.add(new NcertParagraphRow(row.chapterNo(), row.section(), row.paraNo(), row.text(),
+                    row.hasEquations(), kept, row.extraction()));
+        }
+        return new Numbered(List.copyOf(result), List.copyOf(dropped));
     }
 
     /**

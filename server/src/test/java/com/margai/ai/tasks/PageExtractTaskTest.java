@@ -180,6 +180,11 @@ class PageExtractTaskTest {
         assertThat(system).contains("check the headings")
                 .contains("Law of periods")
                 .contains("top of the left")
+                // The Opus full read (D15): a degree sign copied through for τ, a hat added by
+                // analogy, "alpha" for ∝, paragraphs merged across an indent after an equation.
+                .contains("degree sign")
+                .contains("Never add a mark")
+                .contains("proportional to")
                 .doesNotContain("last words of the previous page");
     }
 

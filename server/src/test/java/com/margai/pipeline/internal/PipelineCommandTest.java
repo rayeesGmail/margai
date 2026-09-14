@@ -14,6 +14,7 @@ import com.margai.curriculum.api.NcertBookRow;
 import com.margai.curriculum.api.NcertLoadReport;
 import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.NcertRegisterReport;
+import com.margai.curriculum.api.NcertVerificationRow;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import com.margai.curriculum.api.SyllabusNodeRow;
@@ -24,6 +25,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -318,6 +320,21 @@ class PipelineCommandTest {
         @Override
         public Integer renderedPages(String bookCode, BookLanguage language) {
             return renderedPagesAnswer;
+        }
+
+        /** What {@link #paragraphs} answers: the rows `ncert verify` reads. */
+        List<NcertParagraphRow> paragraphsAnswer = List.of();
+        final List<NcertVerificationRow> verifications = new ArrayList<>();
+
+        @Override
+        public List<NcertParagraphRow> paragraphs(String bookCode, BookLanguage language, Collection<Short> chapters) {
+            return paragraphsAnswer.stream().filter(row -> chapters.contains(row.chapterNo())).toList();
+        }
+
+        @Override
+        public int recordVerifications(String bookCode, BookLanguage language, List<NcertVerificationRow> verdicts) {
+            verifications.addAll(verdicts);
+            return verdicts.size();
         }
     }
 }

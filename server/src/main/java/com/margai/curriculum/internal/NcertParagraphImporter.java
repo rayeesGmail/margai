@@ -4,6 +4,10 @@ import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.CurriculumImportException;
 import com.margai.curriculum.api.NcertLoadReport;
 import com.margai.curriculum.api.NcertParagraphRow;
+import com.margai.curriculum.api.NcertVerificationRow;
+import com.margai.curriculum.api.ParagraphVerification;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,6 +28,12 @@ import org.springframework.stereotype.Component;
 @Component
 class NcertParagraphImporter {
 
+    /** Chapter, then the printed section compared number by number (7.2 before 7.10), then ¶. */
+    private static final Comparator<NcertParagraph> READING_ORDER = Comparator
+            .comparing(NcertParagraph::getChapterNo)
+            .thenComparing(NcertParagraph::getSection, NcertParagraphImporter::compareSections)
+            .thenComparing(NcertParagraph::getParaNo);
+
     private final NcertBookRepository books;
     private final NcertParagraphRepository paragraphs;
 
@@ -33,9 +43,7 @@ class NcertParagraphImporter {
     }
 
     NcertLoadReport load(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
-        NcertBook book = books.findByCode(bookCode)
-                .orElseThrow(() -> new CurriculumImportException(
-                        "book '" + bookCode + "' is not registered — run `ncert register` first"));
+        NcertBook book = book(bookCode);
 
         Map<String, NcertParagraph> existing = new HashMap<>();
         paragraphs.findByBookId(book.getId()).forEach(paragraph -> existing.put(paragraph.address(), paragraph));
@@ -95,5 +103,62 @@ class NcertParagraphImporter {
         paragraphs.deleteAll(orphans);
         return new NcertLoadReport(inserted, updated, unchanged, perChapter,
                 orphans.stream().map(NcertParagraph::address).toList());
+    }
+
+    List<NcertParagraphRow> paragraphs(String bookCode, BookLanguage language, Collection<Short> chapters) {
+        NcertBook book = book(bookCode);
+        return paragraphs.findByBookId(book.getId()).stream()
+                .filter(paragraph -> chapters.contains(paragraph.getChapterNo()))
+                .filter(paragraph -> paragraph.text(language) != null)
+                .sorted(READING_ORDER)
+                .map(paragraph -> paragraph.row(language))
+                .toList();
+    }
+
+    /**
+     * Every verdict is checked before any is written, so a refusal names all of them at once and the
+     * transaction has nothing to roll back but the reading.
+     */
+    int recordVerifications(String bookCode, BookLanguage language, List<NcertVerificationRow> verdicts) {
+        NcertBook book = book(bookCode);
+        Map<String, NcertParagraph> existing = new HashMap<>();
+        paragraphs.findByBookId(book.getId()).forEach(paragraph -> existing.put(paragraph.address(), paragraph));
+
+        List<String> refusals = new ArrayList<>();
+        for (NcertVerificationRow verdict : verdicts) {
+            NcertParagraph paragraph = existing.get(verdict.address());
+            String text = paragraph == null ? null : paragraph.text(language);
+            if (text == null) {
+                refusals.add(verdict.address() + " is not in " + bookCode + " (" + language + ")");
+            } else if (!ParagraphVerification.sha256(text).equals(verdict.verification().textSha256())) {
+                refusals.add(verdict.address() + ": the text has changed since it was verified — "
+                        + "run `ncert verify --read-pages` again for its page");
+            }
+        }
+        if (!refusals.isEmpty()) {
+            throw new CurriculumImportException(refusals.size() + " verdict(s) cannot be recorded, nothing was written:\n  "
+                    + String.join("\n  ", refusals));
+        }
+        verdicts.forEach(verdict -> existing.get(verdict.address()).recordVerification(language, verdict.verification()));
+        paragraphs.flush();
+        return verdicts.size();
+    }
+
+    private NcertBook book(String bookCode) {
+        return books.findByCode(bookCode)
+                .orElseThrow(() -> new CurriculumImportException(
+                        "book '" + bookCode + "' is not registered — run `ncert register` first"));
+    }
+
+    private static int compareSections(String left, String right) {
+        String[] a = left.split("\\.");
+        String[] b = right.split("\\.");
+        for (int index = 0; index < Math.min(a.length, b.length); index++) {
+            int compared = Integer.compare(Integer.parseInt(a[index]), Integer.parseInt(b[index]));
+            if (compared != 0) {
+                return compared;
+            }
+        }
+        return Integer.compare(a.length, b.length);
     }
 }

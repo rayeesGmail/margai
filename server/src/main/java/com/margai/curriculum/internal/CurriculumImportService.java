@@ -10,10 +10,12 @@ import com.margai.curriculum.api.NcertBookRow;
 import com.margai.curriculum.api.NcertLoadReport;
 import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.NcertRegisterReport;
+import com.margai.curriculum.api.NcertVerificationRow;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import com.margai.curriculum.api.SyllabusNodeRow;
 import com.margai.curriculum.api.TaxonomyLoadReport;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,5 +88,16 @@ class CurriculumImportService implements CurriculumImport {
     @Override
     public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
         return ncertParagraphs.load(bookCode, language, rows);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<NcertParagraphRow> paragraphs(String bookCode, BookLanguage language, Collection<Short> chapters) {
+        return ncertParagraphs.paragraphs(bookCode, language, chapters);
+    }
+
+    @Override
+    public int recordVerifications(String bookCode, BookLanguage language, List<NcertVerificationRow> verdicts) {
+        return ncertParagraphs.recordVerifications(bookCode, language, verdicts);
     }
 }

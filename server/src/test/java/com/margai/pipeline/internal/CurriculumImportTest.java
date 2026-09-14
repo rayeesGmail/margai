@@ -19,8 +19,10 @@ import com.margai.curriculum.api.NcertBookRow;
 import com.margai.curriculum.api.NcertLoadReport;
 import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.NcertRegisterReport;
+import com.margai.curriculum.api.NcertVerificationRow;
 import com.margai.curriculum.api.NodeKind;
 import com.margai.curriculum.api.ParagraphExtraction;
+import com.margai.curriculum.api.ParagraphVerification;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import com.margai.curriculum.api.SeatType;
@@ -230,6 +232,132 @@ class CurriculumImportTest {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isZero();
     }
 
+    /**
+     * `ncert verify --read-pages` reads the rows it checks back through the door it loaded them
+     * through, with the offsets that say which characters each page printed (D15): a paragraph
+     * straddling a page break is judged against each page for the part that page carries.
+     */
+    @Test
+    void readsBackTheEditionsRowsWithTheirPageStarts() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, List.of(
+                new NcertParagraphRow((short) 8, "8.1", (short) 1, "Another chapter entirely.", false, List.of(),
+                        new ParagraphExtraction(List.of(1), new BigDecimal("0.95"), null))));
+
+        List<NcertParagraphRow> rows = imports.paragraphs("phy11-part1", BookLanguage.en, List.of((short) 7));
+
+        assertThat(rows).extracting(NcertParagraphRow::address).containsExactly("ch 7 §7.9 ¶1", "ch 7 §7.9 ¶2");
+        assertThat(rows.get(1).extraction().pages()).containsExactly(12, 13);
+        assertThat(rows.get(1).extraction().pageStarts()).containsExactly(0, 14);
+        assertThat(rows.get(1).figureRefs()).containsExactly("Fig. 7.9");
+    }
+
+    /** Every row loaded through 2026-09-14 carries the old shape; reading it must not fail, only say it has no offsets. */
+    @Test
+    void aRowLoadedBeforePageStartsExistedReadsBackWithoutThem() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        jdbc.update("UPDATE ncert_paragraphs SET extraction = "
+                + "'{\"en\": {\"pages\": [12], \"aiCallId\": \"6b610845-8fc9-495e-9d09-07fa8bfbc532\", \"confidence\": 0.9}}'::jsonb");
+
+        List<NcertParagraphRow> rows = imports.paragraphs("phy11-part1", BookLanguage.en, List.of((short) 7));
+
+        assertThat(rows).allSatisfy(row -> {
+            assertThat(row.extraction().pageStarts()).isEmpty();
+            assertThat(row.extraction().verification()).isNull();
+        });
+    }
+
+    @Test
+    void recordsAVerdictOnTheRowItNames() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        int recorded = imports.recordVerifications("phy11-part1", BookLanguage.en, List.of(
+                verdictFor(paragraphs().get(1), ParagraphVerification.Verdict.differs)));
+
+        assertThat(recorded).isEqualTo(1);
+        ParagraphVerification stored = imports.paragraphs("phy11-part1", BookLanguage.en, List.of((short) 7))
+                .get(1).extraction().verification();
+        assertThat(stored.verdict()).isEqualTo(ParagraphVerification.Verdict.differs);
+        assertThat(stored.differences()).containsExactly(new ParagraphVerification.Difference(12, "-G", "G"));
+        assertThat(stored.model()).isEqualTo("claude-sonnet-5");
+    }
+
+    /** Reloading the frozen run must not cost a re-verification: the verdict is about the text, which did not move. */
+    @Test
+    void reloadingTheSameTextKeepsTheVerdict() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        imports.recordVerifications("phy11-part1", BookLanguage.en, List.of(
+                verdictFor(paragraphs().getFirst(), ParagraphVerification.Verdict.matches)));
+
+        NcertLoadReport again = imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        assertThat(again.unchanged()).isEqualTo(2);
+        assertThat(imports.paragraphs("phy11-part1", BookLanguage.en, List.of((short) 7))
+                .getFirst().extraction().verification().verdict())
+                .isEqualTo(ParagraphVerification.Verdict.matches);
+    }
+
+    /** A verdict on words the row no longer holds is a verdict on nothing: a correction drops it. */
+    @Test
+    void aChangedTextDropsTheVerdict() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        imports.recordVerifications("phy11-part1", BookLanguage.en, List.of(
+                verdictFor(paragraphs().getFirst(), ParagraphVerification.Verdict.differs)));
+
+        NcertLoadReport corrected = imports.loadParagraphs("phy11-part1", BookLanguage.en, List.of(
+                new NcertParagraphRow((short) 7, "7.9", (short) 1, "The gravitational potential energy of a body!",
+                        false, List.of(), new ParagraphExtraction(List.of(12), new BigDecimal("0.96"), null)),
+                paragraphs().get(1)));
+
+        assertThat(corrected.updated()).isEqualTo(1);
+        assertThat(imports.paragraphs("phy11-part1", BookLanguage.en, List.of((short) 7))
+                .getFirst().extraction().verification()).isNull();
+    }
+
+    @Test
+    void aVerdictOnTextTheRowNoLongerHoldsIsRefusedAndWritesNothing() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        NcertParagraphRow stale = new NcertParagraphRow((short) 7, "7.9", (short) 2, "W = G M m / r.", true,
+                List.of(), paragraphs().get(1).extraction());
+
+        assertThatThrownBy(() -> imports.recordVerifications("phy11-part1", BookLanguage.en, List.of(
+                verdictFor(paragraphs().getFirst(), ParagraphVerification.Verdict.matches),
+                verdictFor(stale, ParagraphVerification.Verdict.matches))))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessageContaining("ch 7 §7.9 ¶2")
+                .hasMessageContaining("text has changed since it was verified");
+        assertThat(imports.paragraphs("phy11-part1", BookLanguage.en, List.of((short) 7)))
+                .allSatisfy(row -> assertThat(row.extraction().verification()).isNull());
+    }
+
+    @Test
+    void aVerdictForAnAddressTheBookDoesNotHaveIsRefused() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        NcertParagraphRow elsewhere = new NcertParagraphRow((short) 7, "7.10", (short) 4, "Nowhere.", false,
+                List.of(), paragraphs().getFirst().extraction());
+
+        assertThatThrownBy(() -> imports.recordVerifications("phy11-part1", BookLanguage.en, List.of(
+                verdictFor(elsewhere, ParagraphVerification.Verdict.matches))))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessageContaining("ch 7 §7.10 ¶4")
+                .hasMessageContaining("not in phy11-part1");
+    }
+
+    private static NcertVerificationRow verdictFor(NcertParagraphRow row, ParagraphVerification.Verdict verdict) {
+        return new NcertVerificationRow(row.chapterNo(), row.section(), row.paraNo(), new ParagraphVerification(
+                verdict,
+                verdict == ParagraphVerification.Verdict.differs
+                        ? List.of(new ParagraphVerification.Difference(12, "-G", "G")) : List.of(),
+                ParagraphVerification.sha256(row.text()), List.of(), "claude-sonnet-5", "ncert_verify.v1"));
+    }
+
     private void loadTaxonomy() {
         imports.loadTaxonomy(TaxonomyCsvReader.read(TAXONOMY));
     }
@@ -241,7 +369,7 @@ class CurriculumImportTest {
                         new ParagraphExtraction(List.of(12), new BigDecimal("0.96"), null)),
                 new NcertParagraphRow((short) 7, "7.9", (short) 2,
                         "W = -G M m / r (Fig. 7.9).", true, List.of("Fig. 7.9"),
-                        new ParagraphExtraction(List.of(12, 13), new BigDecimal("0.91"), null)));
+                        new ParagraphExtraction(List.of(12, 13), List.of(0, 14), new BigDecimal("0.91"), null, null)));
     }
 
     @Test

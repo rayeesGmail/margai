@@ -1,5 +1,6 @@
 package com.margai.curriculum.api;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -67,4 +68,20 @@ public interface CurriculumImport {
      * one address twice in the same extraction.
      */
     NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows);
+
+    /**
+     * What {@code ncert verify} checks (D15): the rows of the given chapters that carry this
+     * edition's text, as the load wrote them — their text, figure references and this edition's
+     * provenance, verdict included. Ordered by chapter, then section as printed (7.2 before 7.10),
+     * then paragraph number, which is reading order. Refused when the book is not registered.
+     */
+    List<NcertParagraphRow> paragraphs(String bookCode, BookLanguage language, Collection<Short> chapters);
+
+    /**
+     * {@code ncert verify --read-pages} (D15): each verdict onto the row at its address, inside this
+     * edition's provenance, replacing any earlier verdict. Refused as a whole, writing nothing: an
+     * address the book does not have, and a verdict whose text hash is not the row's current text —
+     * the row was reloaded with different words after it was read. Returns the rows written.
+     */
+    int recordVerifications(String bookCode, BookLanguage language, List<NcertVerificationRow> verdicts);
 }

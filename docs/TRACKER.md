@@ -559,6 +559,32 @@ v3 DRY RUN 6 — bio11 chapter 1 on Sonnet 5, 16:49 (₹15.82; 8 pages billed; c
   of a dog ?" with the book's space before the mark. Confidence 0.90–0.97. Every defect the
   morning's v2 audit listed for this chapter is gone. Spend on v3 dry runs ₹120.09; Sonnet has
   now read both dry-run chapters clean on the amended prompt.
+v3 DRY RUN 7 — chapter 7 on Claude Opus 5 (`visionopus`: adaptive thinking, low effort), 17:07
+  (₹79.74, 2.5× Sonnet; cache write 10,345). 101 paragraphs → 95 rows, zero splits, zero
+  repairs, no flag of any kind. The glyph table entirely clean for the first time on any run:
+  all seven primes on page 5, `= − (2 G m^2 / l)(2 + 1/sqrt(2))` with its grouping parentheses,
+  `(1.52)^(3/2) × 365` under the new exponent rule, `≅` kept, no ASCII `x`, `m_p r_p v_p`. Page
+  3: the 7.3 heading and "Legend has it…" as §7.3 ¶1, the three laws three paragraphs. Page 5:
+  the Answer joined to the left column's equations, "Alternatively, one expects…" its own
+  paragraph as the page indents it (Sonnet had merged it), part (b) with its primes, (1), (2),
+  §7.4 clean. Page 11: "or" joined to the two equations, "A point to note…" in §7.8, §7.9 cut
+  into 18 rows against Sonnet's 9 — closer to the print, where Sonnet merged. It even keeps
+  NCERT's own "central force ." with the space before the stop, which the other two silently
+  tidied. Confidence 0.90–0.93. Three stray-letter hits are the check's false positives (`l`,
+  the unit `s`). THE TABLE, chapter 7 on v3:
+  | run | model | prompt | structural failure | glyphs | cost |
+  |---|---|---|---|---|---|
+  | 1 | Haiku | tail | page-8 tail paraphrased into the text; primes lost on page 5 | 5 lost | ₹13.81 |
+  | 2 | Sonnet | tail | 7.3 heading skipped, 14 paragraphs under §7.2; two wrong joins | clean | ₹31.22 |
+  | 3 | Haiku | no tail | page 5 read right column first, left column's top lost | unreadable | ₹13.64 |
+  | 4 | Haiku | fact + left-column rule | pages 5 and 11 right column first, equations dropped | 5 of 7 primes | ₹13.97 |
+  | 5 | Sonnet | fact + rule + headings check | none | `^3/2` unbracketed | ₹31.63 |
+  | 6 | Sonnet | bio11 ch 1 | none; 30/30 exact | — | ₹15.82 |
+  | 7 | Opus | + exponent rule | none | clean | ₹79.74 |
+  Spend on v3 dry runs ₹199.83. Haiku is out for transcription: three runs, three different
+  invisible failures, on the layout NCERT Physics uses on one page in six. Sonnet and Opus both
+  read the chapter clean on the final prompt; Opus reads it closer to the print. The pair
+  decision — who transcribes, who verifies — goes to the founder with this table.
 ```
 
 ```

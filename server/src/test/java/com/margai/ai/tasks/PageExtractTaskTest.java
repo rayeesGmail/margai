@@ -79,7 +79,8 @@ class PageExtractTaskTest {
 
         PreviousPage previous = PreviousPage.of(page, PreviousPage.none());
 
-        assertThat(previous).isEqualTo(new PreviousPage("7.9"));
+        // The fixture's last paragraph ends "(Fig. 7.9)." — a finished sentence.
+        assertThat(previous).isEqualTo(new PreviousPage("7.9", false));
     }
 
     /**
@@ -89,7 +90,7 @@ class PageExtractTaskTest {
     @Test
     void aPageWithNoParagraphsCarriesTheSectionAcrossWithoutATail() {
         NcertPage empty = new NcertPage(List.of(), BigDecimal.ONE);
-        PreviousPage before = new PreviousPage("7.9");
+        PreviousPage before = new PreviousPage("7.9", true);
 
         PreviousPage after = PreviousPage.of(empty, before);
 
@@ -105,12 +106,23 @@ class PageExtractTaskTest {
     }
 
     @Test
-    void aPageHandsForwardOnlyItsLastSection() {
+    void aPageHandsForwardItsLastSectionAndWhetherItsLastSentenceIsOpen() {
         String paragraph = "the end of the page, in section 7.9.";
         NcertPage page = new NcertPage(
                 List.of(new NcertPage.Paragraph("7.9", paragraph, false, List.of())), BigDecimal.ONE);
 
-        assertThat(PreviousPage.of(page, PreviousPage.none())).isEqualTo(new PreviousPage("7.9"));
+        assertThat(PreviousPage.of(page, PreviousPage.none())).isEqualTo(new PreviousPage("7.9", false));
+        // Page 4 of chapter 7 ends "The individual forces in vector notation are" — the sentence
+        // is open, and the next page's call is told so, without the words (D15, run 3).
+        NcertPage open = new NcertPage(
+                List.of(new NcertPage.Paragraph("7.3", "The individual forces in vector notation are", false, List.of())),
+                BigDecimal.ONE);
+        assertThat(PreviousPage.of(open, PreviousPage.none())).isEqualTo(new PreviousPage("7.3", true));
+        // A displayed equation number closes a paragraph as far as this fact is concerned.
+        NcertPage equation = new NcertPage(
+                List.of(new NcertPage.Paragraph("7.5", "and hence F = (G m M_E / R_E^3) r (7.10)", false, List.of())),
+                BigDecimal.ONE);
+        assertThat(PreviousPage.of(equation, PreviousPage.none())).isEqualTo(new PreviousPage("7.5", false));
     }
 
     /** {@code <} opens a StringTemplate expression, so the reversible-reaction arrow is escaped. */
@@ -147,12 +159,18 @@ class PageExtractTaskTest {
         variables.put("chapter", 6);
         variables.put("page", 8);
         variables.put("previous_section", "6.2");
-        String user = prompts.render(com.margai.ai.api.PromptRef.named("ncert_extract"), variables).user();
-        assertThat(user).contains("section 6.2")
+        variables.put("previous_ended_mid_sentence", true);
+        String open = prompts.render(com.margai.ai.api.PromptRef.named("ncert_extract"), variables).user();
+        assertThat(open).contains("section 6.2")
+                .contains("ended in the middle of a sentence")
+                .contains("top of the left")
                 .contains("continues_previous_page")
                 .contains("first word printed here")
                 .doesNotContain("last words of the previous page")
                 .doesNotContain("previous_tail").doesNotContain("previous_para_no").doesNotContain("plus one");
+        variables.put("previous_ended_mid_sentence", false);
+        String closed = prompts.render(com.margai.ai.api.PromptRef.named("ncert_extract"), variables).user();
+        assertThat(closed).contains("ended with a finished sentence").doesNotContain("ended in the middle of a sentence");
     }
 
     /** The two rules the first measurement asked for, both in the cached prefix. */
@@ -161,6 +179,7 @@ class PageExtractTaskTest {
         String system = prompts.systemPrefix("ncert_extract");
         assertThat(system).contains("check the headings")
                 .contains("Law of periods")
+                .contains("top of the left")
                 .doesNotContain("last words of the previous page");
     }
 

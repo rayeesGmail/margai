@@ -462,6 +462,43 @@ RULING, ~15:40 (founder): improve the prompt and measure both models again rathe
   for the headings check and the law rule), verify green, eval gate PASS (placeholder). Next:
   both models on chapter 7 and bio11 chapter 1 — two runs each on v3 is the minimum to tell
   variance from cause for Haiku's primes and Sonnet's skip.
+v3 DRY RUN 3 — chapter 7 on Haiku, amended prompt, 15:35 (₹13.64; cache write 7,351). 102
+  paragraphs → 91 rows, **zero splits, zero repairs, no tail echo anywhere** — the echo is
+  gone with the tail. And a new failure, worse than the last: **page 5 read in the wrong order
+  with its left column's top lost.** The model took the top of the RIGHT column, "cases, a
+  simple law results when you do that :", as the continuation of the Example 7.2 Answer from
+  page 4 — it is flush left and mid-sentence, exactly the cue the no-tail rule names — and
+  never transcribed the left column's F_GA / F_GB / F_GC equations, F_R, "Alternatively…",
+  "(b) Now if the mass at vertex A is doubled" or the primed lines. The left column's last
+  paragraph ("For the gravitational force between an extended object… For two special") came
+  out under §7.4, after §7.4's opening, and page 6's first paragraph was then flagged as
+  continuing it: "For two special The bar AB has two small lead spheres". No check saw it: the
+  coverage ratio held above 60% because what was lost is symbol-font mathematics that barely
+  registers in the layer; the split check does not pair "…do that :" with "(1) The force…";
+  the diff sees only words that are present. The glyph table saw it indirectly — 0 hits for
+  `Gm(2m) / 1`, `i_hat`, the primes — which is how it was found. "3. Law of periods" joined
+  onto "2. Law of areas" again despite the new rule. The primes question is unanswerable on
+  this run: the line was never transcribed.
+  Diagnosis: v2's three runs and v3's first all read page 5 correctly, with the tail. The tail
+  told the model *what* the continuation was — equations — and where; the typography rule told
+  it only "mid-sentence, flush left", and on a two-column page whose left column opens with
+  displayed equations the right column's top fits that description better. The cue is right
+  on a one-column page and wrong on this one. Proposed, not yet done: (1) the rule that a
+  continuation of the previous page can only be at the top of the LEFT (or only) column —
+  the right column's top continues the left column's bottom of the same page, never the
+  previous page; (2) the call carries one fact about the previous page and no text —
+  whether its last paragraph ended without terminal punctuation — so the model knows a
+  sentence is open without being given words to complete; (3) a third Haiku run.
+  Founder: go, ~15:50. Done as one commit: `PreviousPage(section, endedMidSentence)` — the fact
+  computed in Java from the previous page's last paragraph by the split check's own
+  finished-sentence signature — and `previous_ended_mid_sentence` in the call; the prefix
+  states the left-column rule with the page-5 case as its example; the user turn says either
+  "ended in the middle of a sentence — the rest is the first thing printed on this page, at the
+  top of the left or only column, prose or displayed equation" or "ended with a finished
+  sentence — usually a new paragraph", and in both cases that the right column's top continues
+  this page's left column, never the previous page. Tests first, verify green, eval gate PASS
+  (placeholder). Spend on v3 dry runs so far ₹58.67 (three chapter-7 runs: Haiku ₹13.81 and
+  ₹13.64, Sonnet ₹31.22).
 ```
 
 ```

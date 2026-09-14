@@ -83,7 +83,9 @@ across pages. So the extract report names a paragraph by its position on the pag
 #1`, because ¶n does not exist until the load. A blank paragraph or a flag on any paragraph but
 the first is refused where the model's output is decoded and the page is re-called at once, with
 both attempts on the ledger. Nothing of the previous page's text travels with the call — only its
-section — so the flag is judged from the page's own typography: the first v3 measurement showed
+section and one fact, whether its last paragraph stopped mid-sentence — so the flag is judged
+from the page's own typography, with the rule that a continuation can only sit at the top of the
+left or only column: the first v3 measurement showed
 the cheap model echoing a quoted tail on two of twelve pages, once as a paraphrase no repair can
 see. The prompt also checks its own headings before finishing, because the reasoning model on the
 same measurement skipped a heading at a column top and filed the next two pages under the

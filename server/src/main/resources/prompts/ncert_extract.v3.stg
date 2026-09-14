@@ -134,15 +134,27 @@ paragraphs take the section its box sits in. "Example 7.1" is the name of a box,
 and a paragraph filed under it can never be found again.
 
 **Whether the page's first paragraph continues the previous page** is the one other thing you
-decide about addresses, and it is a judgement about this page's typography alone — nothing of
-the previous page's text is shown to you. Set continues_previous_page to true on the page's
-first paragraph only when it is the rest of the paragraph the previous page ended in the middle
-of: its first line begins mid-sentence, in lower case or after a comma, or it begins flush left
-with no indent where the page's own paragraphs are indented. Set it to false when this page
-starts a new paragraph — an indent, a heading above it, a printed label, a numbered item. On
-every other paragraph of the page it is false. A first paragraph that continues the previous
+decide about addresses. Nothing of the previous page's text is shown to you; you are told two
+facts — the section it ended in, and whether its last paragraph stopped in the middle of a
+sentence — and you decide from this page's typography. Set continues_previous_page to true on
+the page's first paragraph only when it is the rest of the paragraph the previous page ended in
+the middle of: its first line begins mid-sentence, in lower case or after a comma, or it begins
+flush left with no indent where the page's own paragraphs are indented, or it opens with the
+displayed equations that the previous page's open sentence ran into. Set it to false when this
+page starts a new paragraph — an indent, a heading above it, a printed label, a numbered item.
+On every other paragraph of the page it is false. A first paragraph that continues the previous
 page is in the section you were told the previous page ended in, and its text begins with the
 first word printed on THIS page — never with words you suppose ended the page before.
+
+**The continuation of the previous page can only be at the top of the left column, or of the
+only column.** Reading order is the whole left column, then the whole right column, so the top
+of the right column continues the bottom of the left column of THIS page — never the previous
+page — however mid-sentence it looks. On the third measurement of this version, a page whose
+left column opened with three displayed equations continuing an Answer, and whose right column
+opened mid-sentence, was read right column first: the right column's top was flagged as the
+Answer's continuation and the whole of the left column's top — the equations, an alternative
+argument, part (b) of the example and its primed quantities — was never transcribed. The left
+column's top is the first thing on the page. Transcribe it first, whatever it contains.
 
 **A paragraph that begins with a printed label — "Answer", "Solution", "Example 4.9" — never
 continues the previous page**, even when it is the very first thing on the page and the previous
@@ -477,17 +489,22 @@ are one sentence, not two paragraphs, however they happen to fall across the two
 <endif>
 <if(v.previous_section)>
 The previous page ended inside section <v.previous_section>. A page with no heading on it is
-still in that section. Decide from THIS page alone whether its first paragraph is the rest of
-the paragraph the previous page ended in the middle of:
-
-- If it is — its first line begins mid-sentence, or it begins flush left with no indent where
-  the page's paragraphs are indented — set continues_previous_page to true on that paragraph,
-  keep it in section <v.previous_section>, and transcribe only the words printed on THIS page,
-  starting with the first word printed here. Never write the words that ended the previous page.
-- If this page starts a new paragraph — an indent, a heading, a printed label such as "Answer",
-  "Solution" or "Example", a numbered item — set it to false. An Answer never continues its
-  question.
-- Every other paragraph on this page has the flag false.
+still in that section.
+<if(v.previous_ended_mid_sentence)>
+The previous page's last paragraph ended in the middle of a sentence. The rest of that sentence
+is the first thing printed on this page — at the top of the left column, or of the only column
+— whether it is prose or a displayed equation the sentence ran into. That first paragraph gets
+continues_previous_page true, stays in section <v.previous_section>, and is transcribed starting
+with the first word printed here, on THIS page. Never write the words that ended the previous page.
+<else>
+The previous page's last paragraph ended with a finished sentence. This page's first paragraph
+is usually a new one (flag false); it continues the previous paragraph only if it plainly runs
+on flush left, with no indent, where the page's own paragraphs are indented.
+<endif>
+Whatever the case: the top of the right column continues the bottom of the left column of this
+page, never the previous page. A paragraph opening with a printed label — "Answer", "Solution",
+"Example" — or a numbered item never continues the previous page. Every other paragraph on this
+page has the flag false.
 <endif>
 <if(v.page_text)>
 Below is this page's embedded text layer. It is authoritative for characters — letters, digits,

@@ -55,6 +55,9 @@ public class PageExtractTask implements NcertPageExtractor {
         // beside them, at any size, cost every prime on chapter 7 (PageTiles, D14).
         variables.put("tiles", images.size() > 1 ? images.size() : null);
         variables.put("previous_section", previous == null ? null : previous.section());
+        // A fact, never words: whether the page before stopped mid-sentence. Words were echoed;
+        // without any hint the model took the wrong column for a continuation (D15, runs 1–3).
+        variables.put("previous_ended_mid_sentence", previous != null && previous.endedMidSentence());
         return ai.complete(AiRequest.of(AiFeature.pipeline_extract, Tier.vision, prompt, variables,
                         NcertPage.class, ctx)
                 .withImages(images));

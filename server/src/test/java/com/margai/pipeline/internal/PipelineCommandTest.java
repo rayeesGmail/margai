@@ -338,8 +338,15 @@ class PipelineCommandTest {
             return paragraphsAnswer.stream().filter(row -> chapters.contains(row.chapterNo())).toList();
         }
 
+        /** When set, {@link #recordVerifications} refuses as the real door does on a changed text. */
+        boolean refuseVerifications;
+
         @Override
         public int recordVerifications(String bookCode, BookLanguage language, List<NcertVerificationRow> verdicts) {
+            if (refuseVerifications) {
+                throw new CurriculumImportException("1 verdict(s) cannot be recorded, nothing was written:\n  "
+                        + "ch 7 §7.2 ¶1: the text has changed since it was verified");
+            }
             verifications.addAll(verdicts);
             return verdicts.size();
         }

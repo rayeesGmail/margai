@@ -40,11 +40,13 @@ import picocli.CommandLine.Option;
  * "the pair" — Claude Opus 5 transcribes, Claude Sonnet 5 verifies).
  *
  * <p>Without {@code --read-pages} it spends nothing: the rows are held to the print's typography
- * ({@link LayoutChecks} over {@link PdfLayout}) and the clean share is counted from verdicts already on
- * the rows. With it, every page of the selected chapters is read by the verify tier with the parts of
- * the paragraphs printed on it, one call per page, and each row gets a verdict once all its pages are
- * read. It resumes from {@code verify/{book}/{lang}.jsonl} like {@code ncert extract} resumes from its
- * JSONL, and reports its cost from the ledger.
+ * ({@link LayoutChecks} over {@link PdfLayout}), and the reads already in {@code verify/{book}/{lang}.jsonl}
+ * are re-judged with the current rulings and their verdicts written onto the rows — so a ruling takes
+ * effect without paying again. With it, every page of the selected chapters that has no current read is
+ * read by the verify tier with the parts of the paragraphs printed on it, one call per page, first; a
+ * row gets a verdict once all its pages are read. It resumes like {@code ncert extract}, and reports its
+ * cost from the ledger. A page whose paragraphs a correction changed has no current read until
+ * {@code --read-pages} reads it again.
  *
  * <p>What it never does is change a word. A flag is adjudicated by the founder against the rendered
  * page, and the outcome is an entry in {@code ncert-corrections.yaml} that {@code ncert load} applies —
@@ -352,6 +354,14 @@ class NcertVerifyCommand extends NcertBookCommand {
             }
         }
         String verifying = verifier.model();
+        // Unknown is refused too: a corpus loaded into a database without its ai_calls rows could be the
+        // verifier's own transcription (the bucket holds a Sonnet run beside the Opus one).
+        if (unknown > 0) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "the ledger cannot name the model that transcribed " + unknown + " of these rows, so the second "
+                            + "read cannot be shown independent of it — verify against the database whose ai_calls "
+                            + "ledger holds the extraction's calls");
+        }
         if (rowsByModel.containsKey(verifying)) {
             throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
                     "the verifier must not be the transcriber: " + verifying + " transcribed " + rowsByModel.get(verifying)
@@ -359,9 +369,8 @@ class NcertVerifyCommand extends NcertBookCommand {
                             + "(`--spring.profiles.active=pipeline,live,visionsonnet` for an Opus corpus)");
         }
         report.line("verifier: " + verifying + " (prompt " + verifier.promptVersion() + "); transcribed by: "
-                + (rowsByModel.isEmpty() ? "unknown" : rowsByModel.entrySet().stream()
-                        .map(entry -> entry.getKey() + " (" + entry.getValue() + " rows)").collect(Collectors.joining(", ")))
-                + (unknown > 0 && !rowsByModel.isEmpty() ? ", unknown (" + unknown + " rows with no ledger row)" : ""));
+                + rowsByModel.entrySet().stream()
+                        .map(entry -> entry.getKey() + " (" + entry.getValue() + " rows)").collect(Collectors.joining(", ")));
     }
 
     /** One row's part on one page. */

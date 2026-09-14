@@ -304,6 +304,49 @@ class NcertVerifyCommandTest {
                 .contains("no model was called");
     }
 
+    /** A corpus whose transcriber the ledger cannot name — loaded into a database without its ai_calls — could be the verifier's own. */
+    @Test
+    void theSecondReadRefusesRowsWhoseTranscriberTheLedgerCannotName() {
+        ledger.remove(TRANSCRIBED_P2);
+
+        assertThat(run("--read-pages")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(verifier.calls).isEmpty();
+        assertThat(out.toString()).contains("the ledger cannot name the model that transcribed 1 of these rows");
+    }
+
+    /** A run that paid for its pages says what they cost even when recording the verdicts refuses. */
+    @Test
+    void theCostIsReportedWhenRecordingTheVerdictsRefuses() {
+        imports.refuseVerifications = true;
+
+        assertThat(run("--read-pages")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("| 3 | 9000 | 3000 | 1200 | 0 | ₹4.41 |")
+                .contains("the text has changed since it was verified");
+    }
+
+    @Test
+    void thePageLevelSignalsAreCountedBesideTheCleanShare() {
+        verifier.omitted.put(2, List.of("v_x = v cos theta"));
+
+        run("--read-pages");
+
+        assertThat(out.toString()).contains("not in the clean share, adjudicate before recording it: 2 page-level start flags, "
+                + "1 passages no row carries");
+    }
+
+    @Test
+    void theBooksCleanShareIsNotComputedWhileASelectedChapterHasNoRows() throws IOException {
+        Files.writeString(inputs.resolve(NcertRegisterCommand.FILE), Files.readString(inputs.resolve(NcertRegisterCommand.FILE))
+                + "      - {no: 8, en: keph108.pdf}\n");
+
+        run("--read-pages");
+
+        assertThat(out.toString()).contains("| 7 | 3 | 3 | 3 | 0 | 0 | 0 | 0 | 100.0% |")
+                .contains("clean for the book (PLAN D15 ✅): not computed — a selected chapter has no loaded rows");
+    }
+
     @Test
     void pagesAndRedoWithoutReadPagesAreRefused() {
         assertThat(run("--pages", "2")).isEqualTo(InputFileCommand.EXIT_FAILED);

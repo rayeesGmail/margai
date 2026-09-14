@@ -1,19 +1,20 @@
-# NCERT ingest — register, render, extract, load
+# NCERT ingest — register, render, extract, load, verify
 
-The four `ncert` commands of TECH_PLAN §6.3, in the order they must run, and the spot-check that
+The five `ncert` commands of TECH_PLAN §6.3, in the order they must run, and the spot-check that
 closes PLAN D14's ✅. D14 does the two English pilot books; D15 repeats it for the remaining eight,
-D16 for the Hindi editions.
+with the second read (`ncert verify`, D15) before a book is taken as canonical; D16 for the Hindi
+editions.
 
-Two of the four need credentials **Claude does not have** — the AWS profile for the content bucket
-and the live provider key — so `render`, `extract` and `load` are founder-run, as the D5 live smoke
-was. `register` is database-only and Claude runs it.
+Four of the five need credentials **Claude does not have** — the AWS profile for the content bucket
+and the live provider key — so `render`, `extract`, `load` and `verify` are founder-run, as the D5
+live smoke was. `register` is database-only and Claude runs it.
 
 ## Before you start
 
 | Needs | Why |
 |---|---|
 | `AWS_PROFILE=margai` | the content bucket (`margai-beta-content`), for `render`, `extract`, `load` |
-| `MARGAI_AI_ANTHROPIC_API_KEY` | the VISION calls, for `extract` only (docs/runbooks/ai-provider-keys.md) |
+| `MARGAI_AI_ANTHROPIC_API_KEY` | the VISION calls, for `extract` and `verify --read-pages` only (docs/runbooks/ai-provider-keys.md) |
 | `AI_LIVE=1` | the `live` profile; without it every call answers from a fixture (DEV_SPEC §13.7) |
 | a database | local: `docker compose up -d db`; the commands read `DB_URL` |
 
@@ -246,6 +247,132 @@ or a page between them is missing from the JSONL. Every refusal is named at once
 
 Every run's report is its own file: a second run of the same command on the same day writes
 `<date>-<command>-2.md`, a third `-3.md`, and nothing overwrites an earlier run's (D15).
+
+**The load applies `pipeline/inputs/ncert-corrections.yaml`** (D15) after its page-break repairs and
+before it numbers: the founder's rulings on what `ncert verify` flagged. `text`, `join` and `split`
+entries change the frozen run's pages; `misprint` and `false_positive` rule on a flag and change
+nothing. Each applied entry is one line of the report; an entry whose span is not on its page exactly
+once refuses the load by name. The file's own header and `pipeline/inputs/README.md` say how to write
+one. Each row now also records where each of its pages' parts begins (`pageStarts` in the row's
+`extraction`), which verify needs — a row loaded before 2026-09-14's build has none, and verify asks for
+the reload.
+
+## 5. verify — the second read (D15, DECISIONS 2026-09-14 "the pair")
+
+Claude Opus 5 transcribes; Claude Sonnet 5 reads every page again and judges each paragraph with one
+question — *does this text match the print?* — naming the printed and transcribed spans where not.
+Beside it, free code checks hold the rows to the print's typography. **Nothing here changes a word:**
+a flag is adjudicated against the rendered page, and the outcome is an entry in
+`ncert-corrections.yaml` that the next `ncert load` applies.
+
+```
+# free: layout checks, and the second read's verdicts re-judged from the artefact with today's rulings
+AWS_PROFILE=margai DB_URL=… java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline ncert verify --book phy11-part1 --lang en --chapters 7
+
+# the second read: one Sonnet call per page, on the visionsonnet shape (the provider key sourced first, below)
+AI_LIVE=1 AWS_PROFILE=margai DB_URL=… java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live,visionsonnet ncert verify --book phy11-part1 --lang en --chapters 7 --read-pages
+```
+
+Give each command on one line: a space after a `\` continuation broke a run on 2026-09-14. **The
+provider key never goes on the command line**, where it lands in the shell history: source the untracked
+key file into the shell first, as docs/runbooks/ai-provider-keys.md says. (The extract commands above
+still show the older inline form; follow the key runbook for them too.)
+
+**What it sends.** Each page's bands — the images the transcriber read — and never the text layer: the
+transcriber was told to trust the layer for characters, and a verifier handed the same authority would
+repeat its misreadings. With the bands, every paragraph's part printed on that page as a numbered item;
+a paragraph that straddles a page break is judged on each page for its own part, marked as beginning
+on the previous page or running on to the next.
+
+**It refuses before any call** when the second read would not be the ruling's: on the fake client (no
+`AI_LIVE=1`), on a verify tier that is not `margai.pipeline.verify-model` — `claude-sonnet-5`, which only
+the `visionsonnet` profile sets — when the `ai_calls` ledger says the verifying model transcribed the
+rows, and when the ledger cannot name a row's transcriber at all (run it against the database the
+extraction ran against). The report's first line of the read says both models: `verifier: claude-sonnet-5 (prompt
+ncert_verify.v1); transcribed by: claude-opus-5 (102 rows)`.
+
+**It resumes.** Every page read is a line of `verify/{book}/{lang}.jsonl` in the content bucket, holding
+the model's answer as given. A page is read again only when the text of its paragraphs changed since
+(a correction, a reload), when the prompt version changed, when the read was made by any model but the
+pinned verifier, or with `--redo`. `--pages 4,6` reads only those pages of each selected chapter; both
+options belong to `--read-pages` and are refused without it. Code's judgements and the founder's rulings
+are applied when the report is written, never stored in the artefact, and **every run — the free one
+too — re-judges the rows from the artefact and writes the verdicts onto them**, so a `misprint` or
+`false_positive` ruling takes effect on the next run at ₹0. A `text`, `join` or `split` correction is
+different: it changes the words of that page's paragraphs (and a join or split renumbers the rest of
+its section), so after the re-load those rows have no current read, the free run reports them "without
+a verdict", and `--read-pages` reads just those pages again (≈ ₹1 each) — the rest resume.
+
+**Read the report in this order:**
+
+1. **`verifier: … transcribed by: …`** — two different models, or stop.
+2. **`the second read's flags — adjudicate these against the page`** — one line per difference: the
+   address, the page, the span as printed, the span as the row carries it. Render the page (pymupdf
+   from the scratchpad) and look. Each real one becomes a `text` entry; a verifier error becomes a
+   `false_positive`; the book's own error, kept, becomes a `misprint`.
+3. **`rows the verifier could not find on their page`** and **`running text the page prints that no
+   row carries`** — the second is the one check that sees lost text (run 9's three equations on page
+   5); a real one is re-extracted or, for a sentence, joined in with a correction.
+4. **The free checks**: `where rows start against where the print starts paragraphs` (per page, the
+   rows that begin there against the indents, headings, labels and item markers the print begins
+   there), `joins across page breaks against the print`, `figure_refs against the paragraph and the
+   chapter's captions`. These are measured guesses about typography — they route attention and never
+   refuse. A real segmentation defect becomes a `join` or `split` entry.
+5. **`set aside by code`** — spans that differ only in spacing or a glyph variant (≅ ≃ ≈, the dashes,
+   quotation marks, × and ·), which leave the row matching, and spans the verifier quoted that the row
+   does not carry, which leave the row **not judged** — a claim nobody can place is not a match. Skim
+   them: a long list of the second kind means the verifier is misquoting, which is a prompt problem.
+6. **`clean paragraphs`** — per chapter: rows, verdicts, matches, differs, not on page, not judged,
+   join or figure flags, and the clean share: the second read matches and no join or figure flag names
+   the row. The line under it, `clean for the book (PLAN D15 ✅)`, appears when every chapter of the
+   book was selected, every chapter has loaded rows and every row has a verdict. **Two signals name no
+   row and are not in the share** — page-level start flags and passages no row carries — and the line
+   after it counts them: adjudicate both before recording the number, which is the one from the run
+   after adjudication.
+7. **The cost line**, from the ledger.
+
+**Cost** at the config's Sonnet 5 price row, estimated before the first run: about ₹1.05 per page
+(two bands ~3,250 input tokens, the page's paragraphs ~800, a ~4,400-token cached prefix at a tenth,
+~300 output tokens): chapter 7's 12 pages ≈ ₹14, `phy11-part1` ≈ ₹190, the ten English books ≈
+₹2,000. The first chapter's report is where to check it.
+
+### The verifier's chapter-7 calibration, before any book
+
+Chapter 7 in `margai_d15` holds Opus run 11's 102 rows. It is the calibration set because every row of
+it was read against the rendered pages on 2026-09-14 — so a flag can be scored as real or not without
+reading cold.
+
+```
+# 1. reload chapter 7 so its rows carry pageStarts (no model, no cost; 102 updated, 0 inserted)
+AWS_PROFILE=margai DB_URL=jdbc:postgresql://localhost:5432/margai_d15 java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline ncert load --book phy11-part1 --lang en --chapters 7
+
+# 2. the free checks (no model, no cost)
+AWS_PROFILE=margai DB_URL=jdbc:postgresql://localhost:5432/margai_d15 java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline ncert verify --book phy11-part1 --lang en --chapters 7
+
+# 3. the second read (~₹14; the provider key sourced into the shell first, never typed here)
+AI_LIVE=1 AWS_PROFILE=margai DB_URL=jdbc:postgresql://localhost:5432/margai_d15 java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live,visionsonnet ncert verify --book phy11-part1 --lang en --chapters 7 --read-pages
+```
+
+**The pass mark, set before the run (founder, D15 plan question 5):** the vector r in §7.3 ¶5 is flagged
+(printed `|r|^3 r`, transcribed `|r|^3 r_hat`), and **no more than 10 flags on the 102 rows turn out to
+be wrong against the page**. Every flag is read against the rendered page and scored; the false-positive
+count and each miss go into the TRACKER day log. If the vector r is missed, one call per page is the
+wrong unit and the fallback is one paragraph per call (about 3.5× the cost) — a build change, decided
+then, not a prompt rule. **The prompt does not describe chapter 7**: its examples are invented and a
+test keeps the must-find's text out. It does teach the must-find's *class* by name — a hat written by
+analogy where the page prints a bold vector — so finding the vector r shows a taught class found in
+unseen text, not the verifier's reach into classes nobody named; the calibration's other flags and its
+misses say more about that. The notation block copied from the frozen extraction prompt quotes a few
+chapter-7 symbols (`F'_GB`, `g(h) ≅`, `F_GA`) as conventions both readers were given; a find on exactly
+those counts for less. **Bracket flags** are raised only where a bracket changes what a sum, an exponent
+or a function covers; the grouping of products and quotients (`G Mm / d^2 L` for G(Mm/d²)L) is left to
+the transcription's conventions and not flagged (DECISIONS 2026-09-14), so it is not scored.
+
+A ₹0 preview of the free checks on these rows and the real `keph107.pdf`, run before the build was
+committed, raised 7 page-level start flags and 1 figure flag and no join flag; two of them look like
+real defects of run 11 (§7.9 ¶4 carries "where we have used the relation…", which page 11 indents after
+a display; `Fig. 7.5` sits on Example 7.2's stem rather than on its part (b)). The calibration reads all
+of them against the pages.
 
 ## The D14 ✅ — 20 random paragraphs against the PDFs
 

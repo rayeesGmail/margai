@@ -240,12 +240,12 @@ class PipelineCommandTest {
                 }
                 if (cls == NcertRenderCommand.class) {
                     return cls.cast(new NcertRenderCommand(new NcertRenderCommandTest.RecordingStore(), imports,
-                            new PipelineProperties(72, 10, 1), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5"), writer));
                 }
                 if (cls == NcertExtractCommand.class) {
                     return cls.cast(new NcertExtractCommand(new NcertRenderCommandTest.RecordingStore(),
                             new NcertExtractCommandTest.RecordingExtract(), new NcertExtractCommandTest.StubSpend(),
-                            new PipelineProperties(72, 10, 1), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5"), writer));
                 }
                 if (cls == NcertLoadCommand.class) {
                     return cls.cast(new NcertLoadCommand(new NcertRenderCommandTest.RecordingStore(),
@@ -254,7 +254,9 @@ class PipelineCommandTest {
                 if (cls == NcertVerifyCommand.class) {
                     return cls.cast(new NcertVerifyCommand(new NcertRenderCommandTest.RecordingStore(), imports,
                             new NcertVerifyCommandTest.StubVerifier(), ids -> Map.of(),
-                            new NcertExtractCommandTest.StubSpend(), new PipelineProperties(72, 10, 1), writer));
+                            new NcertExtractCommandTest.StubSpend(),
+                            new com.margai.ai.api.AiClientInfo("anthropic", List.of("ledger")),
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5"), writer));
                 }
                 return CommandLine.defaultFactory().create(cls);
             }

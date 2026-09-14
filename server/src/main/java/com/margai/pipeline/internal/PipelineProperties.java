@@ -18,9 +18,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *                         subscripts survive; 2 sends each half unscaled. The D14 audit found
  *                         every transcription error in a small glyph and none in the prose, which
  *                         is what this exists to fix ({@link PageTiles}).
+ * @param verifyModel      the model the second read must run on (DECISIONS 2026-09-14 "the pair":
+ *                         Sonnet 5 verifies). {@code ncert verify --read-pages} refuses when the
+ *                         verify tier is any other model, and counts no verdict another model gave —
+ *                         a forgotten profile must fail, not verify with whatever VISION is.
  */
 @ConfigurationProperties(prefix = "margai.pipeline")
-public record PipelineProperties(int renderDpi, int extractBatchSize, int pageTiles) {
+public record PipelineProperties(int renderDpi, int extractBatchSize, int pageTiles, String verifyModel) {
 
     public PipelineProperties {
         renderDpi = renderDpi <= 0 ? 150 : renderDpi;

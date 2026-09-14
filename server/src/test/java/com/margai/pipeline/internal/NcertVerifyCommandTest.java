@@ -3,6 +3,7 @@ package com.margai.pipeline.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.ai.api.AiCallContext;
+import com.margai.ai.api.AiClientInfo;
 import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.ImagePart;
 import com.margai.ai.api.Usage;
@@ -58,6 +59,7 @@ class NcertVerifyCommandTest {
     private final PipelineCommandTest.RecordingImport imports = new PipelineCommandTest.RecordingImport();
     private final StubVerifier verifier = new StubVerifier();
     private final Map<UUID, String> ledger = new HashMap<>();
+    private AiClientInfo client = new AiClientInfo("anthropic", List.of("ledger", "breaker"));
     private CommandLine commandLine;
 
     @BeforeEach
@@ -81,7 +83,11 @@ class NcertVerifyCommandTest {
         imports.paragraphsAnswer = rows();
         ledger.put(TRANSCRIBED_P1, "claude-opus-5");
         ledger.put(TRANSCRIBED_P2, "claude-opus-5");
+        build();
+    }
 
+    /** The command line; picocli makes the command objects here, so a test that swaps the client rebuilds it. */
+    private void build() {
         Reports writer = new Reports(ReportTest.CLOCK);
         CommandLine.IFactory siblings = PipelineCommandTest.siblingFactory(imports, writer);
         CommandLine.IFactory factory = new CommandLine.IFactory() {
@@ -89,7 +95,8 @@ class NcertVerifyCommandTest {
             public <K> K create(Class<K> cls) throws Exception {
                 if (cls == NcertVerifyCommand.class) {
                     return cls.cast(new NcertVerifyCommand(store, imports, verifier, ids -> filter(ids),
-                            new NcertExtractCommandTest.StubSpend(), new PipelineProperties(72, 1, 1), writer));
+                            new NcertExtractCommandTest.StubSpend(), client,
+                            new PipelineProperties(72, 1, 1, "claude-sonnet-5"), writer));
                 }
                 return siblings.create(cls);
             }
@@ -161,13 +168,17 @@ class NcertVerifyCommandTest {
                 .contains("- ch 7 p2 §7.2 ¶1: printed \"G m_1 m_2 / |r|^3\" · transcribed \"G m_1m_2 / |r|^3\"");
     }
 
+    /**
+     * A misquoted claim is not a match: the verifier said something differs and could not say where, so
+     * nothing is known about the row — it is not judged, and it is not counted clean (spec-auditor, D15).
+     */
     @Test
-    void aTranscribedSpanTheRowDoesNotCarryIsAVerifierErrorNotAFlag() {
+    void aTranscribedSpanTheRowDoesNotCarryLeavesTheRowNotJudged() {
         verifier.differs(2, 2, "where G is a constant", "where G was the constant");
 
         run("--read-pages");
 
-        assertThat(imports.verifications.get(2).verification().verdict()).isEqualTo(ParagraphVerification.Verdict.matches);
+        assertThat(imports.verifications.get(2).verification().verdict()).isEqualTo(ParagraphVerification.Verdict.not_judged);
         assertThat(out.toString())
                 .contains("## set aside by code: the verifier quoted a transcription the row does not carry")
                 .contains("- ch 7 p2 §7.2 ¶1: transcribed \"where G was the constant\"");
@@ -228,6 +239,76 @@ class NcertVerifyCommandTest {
         assertThat(out.toString()).contains("the verifier must not be the transcriber")
                 .contains("claude-sonnet-5 transcribed 1 of these rows")
                 .contains("visionsonnet");
+    }
+
+    /** Fixtures recorded as verdicts on real rows would be a stand-in mistaken for the real read. */
+    @Test
+    void theSecondReadRefusesTheFakeClient() {
+        client = new AiClientInfo(AiClientInfo.FAKE, List.of("ledger"));
+        build();
+
+        assertThat(run("--read-pages")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(verifier.calls).isEmpty();
+        assertThat(imports.verifications).isEmpty();
+        assertThat(out.toString()).contains("the AI client is the fake").contains("AI_LIVE=1");
+    }
+
+    /** The ruling names the verifier; a forgotten profile would otherwise verify with whatever VISION is. */
+    @Test
+    void theSecondReadRefusesAVerifyTierThatIsNotTheRulingsVerifier() {
+        verifier.model = "claude-haiku-4-5";
+
+        assertThat(run("--read-pages")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(verifier.calls).isEmpty();
+        assertThat(out.toString()).contains("the verify tier is claude-haiku-4-5, not claude-sonnet-5")
+                .contains("visionsonnet");
+    }
+
+    /** A read by any other model — an earlier misconfigured run — is neither reused nor counted. */
+    @Test
+    void aPageReadByAnotherModelIsReadAgainAndItsVerdictsAreNotCounted() {
+        verifier.model = "claude-sonnet-5";
+        verifier.answeringModel = "claude-haiku-4-5";
+        run("--read-pages");
+        imports.verifications.clear();
+        out.getBuffer().setLength(0);
+
+        verifier.answeringModel = "claude-sonnet-5";
+        run("--read-pages");
+
+        assertThat(verifier.calls).containsExactly(1, 2, 1, 2);
+        assertThat(imports.verifications).allSatisfy(row ->
+                assertThat(row.verification().model()).isEqualTo("claude-sonnet-5"));
+    }
+
+    /** The runbook's promise: a ruling added after a read takes effect at ₹0, on the free run too. */
+    @Test
+    void aFreeRunAppliesARulingAddedSinceFromTheArtefactWithoutCallingTheModel() throws IOException {
+        verifier.differs(2, 2, "|r|^3 r where", "|r|^3 r_hat where");
+        run("--read-pages");
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 2, kind: false_positive,
+                     printed: "|r|^3 r where", transcribed: "|r|^3 r_hat where", reason: "read against the page"}
+                """);
+        imports.verifications.clear();
+        out.getBuffer().setLength(0);
+
+        assertThat(run()).isZero();
+
+        assertThat(verifier.calls).containsExactly(1, 2);
+        assertThat(imports.verifications.get(2).verification().verdict()).isEqualTo(ParagraphVerification.Verdict.matches);
+        assertThat(out.toString()).contains("| 7 | 3 | 3 | 3 | 0 | 0 | 0 | 0 | 100.0% |")
+                .contains("no model was called");
+    }
+
+    @Test
+    void pagesAndRedoWithoutReadPagesAreRefused() {
+        assertThat(run("--pages", "2")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("--pages and --redo choose what --read-pages reads");
     }
 
     @Test
@@ -318,6 +399,22 @@ class NcertVerifyCommandTest {
     }
 
     @Test
+    void aStoredVerdictByAnotherModelDoesNotCount() {
+        List<NcertParagraphRow> rows = new ArrayList<>();
+        for (NcertParagraphRow row : rows()) {
+            rows.add(new NcertParagraphRow(row.chapterNo(), row.section(), row.paraNo(), row.text(), false, List.of(),
+                    row.extraction().withVerification(new ParagraphVerification(ParagraphVerification.Verdict.matches,
+                            List.of(), ParagraphVerification.sha256(row.text()), List.of(), "claude-haiku-4-5",
+                            "ncert_verify.v1"))));
+        }
+        imports.paragraphsAnswer = rows;
+
+        run();
+
+        assertThat(out.toString()).contains("| 7 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | — (3 rows without a verdict) |");
+    }
+
+    @Test
     void theCostComesFromTheLedgerAndTheIndependenceIsStated() {
         run("--read-pages");
 
@@ -389,6 +486,8 @@ class NcertVerifyCommandTest {
         final Map<Integer, Map<Integer, PageVerdicts.ItemVerdict>> answers = new HashMap<>();
         final Map<Integer, List<Integer>> only = new HashMap<>();
         final Map<Integer, List<String>> omitted = new HashMap<>();
+        String model = "claude-sonnet-5";
+        String answeringModel = "claude-sonnet-5";
 
         void differs(int page, int item, String printed, String transcribed) {
             answers.computeIfAbsent(page, p -> new HashMap<>()).put(item, new PageVerdicts.ItemVerdict(item,
@@ -414,12 +513,12 @@ class NcertVerifyCommandTest {
                         new PageVerdicts.ItemVerdict(item.number(), PageVerdicts.Verdict.matches, List.of())));
             }
             return new AiResponse<>(new PageVerdicts(verdicts, omitted.getOrDefault(page, List.of())), Usage.none(),
-                    "claude-sonnet-5", Duration.ZERO, UUID.randomUUID());
+                    answeringModel, Duration.ZERO, UUID.randomUUID());
         }
 
         @Override
         public String model() {
-            return "claude-sonnet-5";
+            return model;
         }
 
         @Override

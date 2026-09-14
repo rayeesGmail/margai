@@ -9,7 +9,8 @@ spring:
 margai:
   # The content bucket F8 created on 2026-09-12, with the pipeline's prefixes at its root:
   # source/{ncert,syllabus,pyq}/…, pages/{book}/{lang}/{chapter}/{page}.png,
-  # extract/{book}/{lang}.jsonl (DECISIONS 2026-09-12 F8, D14). Credentials come from the SDK's
+  # extract/{book}/{lang}.jsonl (DECISIONS 2026-09-12 F8, D14), verify/{book}/{lang}.jsonl
+  # (D15, `ncert verify --read-pages`). Credentials come from the SDK's
   # default chain — AWS_PROFILE=margai on the laptop (TECH_PLAN §7.4).
   storage:
     content-bucket: margai-beta-content
@@ -24,6 +25,10 @@ margai:
     # subscript, an exponent, a prime, a minus sign, while the prose around them was perfect.
     # Set to 1 to send whole pages again (the two are directly comparable on the same chapter).
     page-tiles: 2
+    # The pair (DECISIONS 2026-09-14): Opus 5 transcribes, Sonnet 5 verifies. `ncert verify --read-pages`
+    # refuses to run unless the VISION tier is this model — the `visionsonnet` profile sets it — and a
+    # verdict any other model gave is neither reused nor counted.
+    verify-model: claude-sonnet-5
   ai:
     # A page transcription is not an answer. The 1,024 default sizes a reasoning answer inside the
     # 20 s budget (§4.11); a full NCERT body page is 400–900 words plus JSON field names, escapes

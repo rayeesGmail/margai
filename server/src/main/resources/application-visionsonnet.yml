@@ -4,16 +4,20 @@
 #
 # Since 2026-09-14 (D15, DECISIONS "the pair") this is how the verifier runs: Claude Opus 5
 # transcribes on the `visionopus` shape, and Sonnet 5 reads every transcribed page again with the
-# `ncert_verify` prompt. `ncert verify --read-pages` refuses to run when the tier's model is the one
-# the ledger says transcribed the rows, so running it without this profile over an Opus corpus fails
-# loudly instead of verifying Opus with Opus.
+# `ncert_verify` prompt. `ncert verify --read-pages` refuses to run unless the VISION tier is
+# `margai.pipeline.verify-model` (claude-sonnet-5, application-pipeline.yml) — so running it without
+# this profile fails before any call, whatever the default VISION model is — and refuses again if the
+# ledger says the verifying model transcribed the rows.
 #
 # History: first tried at D14 (2026-09-13) as the transcriber and closed by RULING 1 — 2.2× the cost
 # and neither run loadable on prompt v1; reopened for one measurement on v3 (2026-09-14), where
 # Sonnet was structurally wrong in two full chapter-7 runs of three (a skipped heading, a two-column
 # page read right column first) and was the one read of any model to see the vector r that Opus
-# wrote `r_hat` four times. A verifier handed one page and a list of paragraphs has no layout to
-# get wrong, so the ruling kept it for this job.
+# wrote `r_hat` four times. The ruling kept it for this job on the premise that a verifier handed
+# one paragraph and one band has no layout to get wrong; the build hands it a whole page and its
+# paragraphs as a list (DECISIONS 2026-09-14, plan question 1), which keeps the per-item judgement
+# free of layout but asks the page's layout of it for `omitted` — the skill run 9 failed. The
+# chapter-7 calibration measures exactly that before any book.
 #
 # It is a separate profile, and not merged into `pipeline`, because the VISION tier also serves
 # student photo doubts (SPEC §6.3), which must not change model as a side effect of a

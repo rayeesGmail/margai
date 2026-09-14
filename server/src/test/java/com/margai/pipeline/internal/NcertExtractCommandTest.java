@@ -77,7 +77,7 @@ class NcertExtractCommandTest {
         page(9, 1);
 
         Reports writer = new Reports(ReportTest.CLOCK);
-        PipelineProperties properties = new PipelineProperties(72, 2, 1);
+        PipelineProperties properties = new PipelineProperties(72, 2, 1, "claude-sonnet-5");
         CommandLine.IFactory siblings =
                 PipelineCommandTest.siblingFactory(new PipelineCommandTest.RecordingImport(), writer);
         CommandLine.IFactory factory = new CommandLine.IFactory() {

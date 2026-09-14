@@ -50,17 +50,25 @@ final class NcertCorrections {
         }
         List<String> notes = new ArrayList<>();
         int rulings = 0;
-        for (NcertCorrection entry : corrections) {
-            if (!entry.kind().changesText()) {
+        for (NcertCorrection written : corrections) {
+            if (!written.kind().changesText()) {
                 rulings++;
                 continue;
             }
+            NcertCorrection entry = new NcertCorrection(written.book(), written.language(), written.chapter(),
+                    written.page(), written.kind(), spaced(written.transcribed()), spaced(written.printed()),
+                    spaced(written.at()), written.reason(), written.address());
             Integer at = index.get(entry.chapter() + "/" + entry.page());
             if (at == null) {
                 throw refuse(entry, "that page is not in the extraction");
             }
             ExtractedPage page = out.get(at);
-            List<NcertPage.Paragraph> paragraphs = new ArrayList<>(page.paragraphs());
+            // Single-spaced as the load will store them, so a span copied from a verify report — which
+            // quotes the loaded row — is found where the extraction had a line break or a double space.
+            List<NcertPage.Paragraph> paragraphs = new ArrayList<>(page.paragraphs().stream()
+                    .map(paragraph -> new NcertPage.Paragraph(paragraph.section(), singleSpaced(paragraph.text()),
+                            paragraph.continuesPreviousPage(), paragraph.figureRefs()))
+                    .toList());
             String note = switch (entry.kind()) {
                 case text -> replace(entry, paragraphs);
                 case join -> join(entry, paragraphs, hasTextBefore(out, at));
@@ -162,6 +170,15 @@ final class NcertCorrections {
             throw refuse(entry, "\"" + span + "\" occurs " + count + " times there, not once");
         }
         return where;
+    }
+
+    private static String singleSpaced(String text) {
+        return text.strip().replaceAll("\\s+", " ");
+    }
+
+    /** An entry's span single-spaced the same way; inner spaces only, since a span's edges are part of it. */
+    private static String spaced(String span) {
+        return span == null ? null : span.replaceAll("\\s+", " ");
     }
 
     private static boolean hasTextBefore(List<ExtractedPage> pages, int at) {

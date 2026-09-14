@@ -114,6 +114,21 @@ class NcertCorrectionsTest {
                 "ch 7 page 4 §7.3: \"|r|^3 r_hat\" → \"|r|^3 r\" (the third form prints the vector r)");
     }
 
+    /**
+     * A span is copied from the verify report, which quotes the loaded row — single-spaced — while the
+     * extraction may carry a line break or a double space there; the load single-spaces anyway, so the
+     * match is made on single-spaced text (spec-auditor, D15).
+     */
+    @Test
+    void aSpanCopiedFromTheReportMatchesTheExtractionsUnevenSpacing() {
+        List<ExtractedPage> pages = List.of(page(4, p("7.3", "F = - G m_1m_2 /  |r|^3\nr_hat where G is")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                text(4, "|r|^3 r_hat where", "|r|^3 r where")));
+
+        assertThat(applied.pages().getFirst().paragraphs().getFirst().text()).isEqualTo("F = - G m_1m_2 / |r|^3 r where G is");
+    }
+
     /** Found twice, a span does not say which of the two the founder meant. */
     @Test
     void aSpanFoundTwiceOnThePageIsRefused() {

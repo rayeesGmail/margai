@@ -2,6 +2,7 @@ package com.margai.pipeline.internal;
 
 import com.margai.ai.api.AiCallContext;
 import com.margai.ai.api.AiCallModels;
+import com.margai.ai.api.AiClientInfo;
 import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.AiSpend;
 import com.margai.ai.api.ImagePart;
@@ -77,21 +78,27 @@ class NcertVerifyCommand extends NcertBookCommand {
     private final AiCallModels models;
     private final AiSpend spend;
     private final PipelineProperties properties;
+    private final AiClientInfo client;
 
     NcertVerifyCommand(ObjectStore content, CurriculumImport imports, NcertPageVerifier verifier, AiCallModels models,
-            AiSpend spend, PipelineProperties properties, Reports reports) {
+            AiSpend spend, AiClientInfo client, PipelineProperties properties, Reports reports) {
         super(reports);
         this.content = content;
         this.imports = imports;
         this.verifier = verifier;
         this.models = models;
         this.spend = spend;
+        this.client = client;
         this.properties = properties;
     }
 
     @Override
     void run(BookDefinition definition, List<BookDefinition.Chapter> selected, Report report) {
         report.line("content store: " + content.describe());
+        if (!readPages && ((pages != null && !pages.isEmpty()) || redo)) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "--pages and --redo choose what --read-pages reads — add --read-pages, or drop them for the free checks");
+        }
         Set<Short> chapterNos = new LinkedHashSet<>();
         selected.forEach(chapter -> chapterNos.add(chapter.no()));
         List<NcertParagraphRow> rows = imports.paragraphs(definition.code(), language, chapterNos);
@@ -108,22 +115,63 @@ class NcertVerifyCommand extends NcertBookCommand {
             }
         }
 
-        Map<String, Set<LayoutChecks.Kind>> rowCodeFlags = layoutChecks(definition, selected, byChapter, report);
+        CodeFlags codeFlags = layoutChecks(definition, selected, byChapter, report);
+        List<NcertCorrection> rulings = rulings(definition, chapterNos, report);
 
-        // A verdict already on a row counts while it names the row's current text.
-        Map<String, ParagraphVerification> verdicts = new HashMap<>();
-        for (NcertParagraphRow row : rows) {
-            ParagraphVerification stored = row.extraction().verification();
-            if (stored != null && stored.textSha256().equals(ParagraphVerification.sha256(row.text()))) {
-                verdicts.put(row.address(), stored);
-            }
+        String key = ContentKeys.verify(definition.code(), language);
+        Map<String, VerifiedPage> done = new TreeMap<>();
+        if (content.exists(key)) {
+            VerifyJsonl.read(key, content.get(key)).forEach(page -> done.put(page.address(), page));
         }
         if (readPages) {
-            verdicts.putAll(readPages(definition, rows, byChapter, rulings(definition, chapterNos, report), report));
+            // Every refusal before the first call: the second read is only worth its cost when it is the
+            // ruling's verifier, a real one, and not the model that transcribed.
+            guardLiveClient();
+            guardVerifyModel();
+            guardIndependence(rows, report);
+            read(definition, byChapter, done, key, report);
         } else {
             report.line("no model was called: add --read-pages for the second read");
         }
-        clean(definition, selected, byChapter, verdicts, rowCodeFlags, report);
+
+        // A verdict already on a row counts while it names the row's current text and was given by the
+        // ruling's verifier on the current prompt; the artefact, where there is one, then re-judges every
+        // row it covers at no cost, so a ruling added since a read takes effect on a free run too.
+        Map<String, ParagraphVerification> verdicts = new HashMap<>();
+        for (NcertParagraphRow row : rows) {
+            ParagraphVerification stored = row.extraction().verification();
+            if (stored != null && stored.textSha256().equals(ParagraphVerification.sha256(row.text()))
+                    && Objects.equals(stored.model(), properties.verifyModel())
+                    && Objects.equals(stored.promptVersion(), verifier.promptVersion())) {
+                verdicts.put(row.address(), stored);
+            }
+        }
+        int omitted = 0;
+        if (!done.isEmpty()) {
+            Judged judged = judge(definition.code(), byChapter, done, rulings, report);
+            verdicts.putAll(judged.verdicts());
+            omitted = judged.omitted();
+        } else {
+            report.line("no second read in the artefact yet: " + key + " does not exist");
+        }
+        clean(definition, selected, byChapter, verdicts, codeFlags, omitted, report);
+    }
+
+    private void guardLiveClient() {
+        if (!client.isLive()) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "the AI client is the fake (" + client + "): a second read from fixtures would be recorded on "
+                            + "the real rows — run with AI_LIVE=1 and the live profile");
+        }
+    }
+
+    private void guardVerifyModel() {
+        if (!Objects.equals(verifier.model(), properties.verifyModel())) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "the verify tier is " + verifier.model() + ", not " + properties.verifyModel()
+                            + " (margai.pipeline.verify-model, DECISIONS 2026-09-14 \"the pair\") — run with "
+                            + "`--spring.profiles.active=pipeline,live,visionsonnet`");
+        }
     }
 
     private void refuseRowsWithoutOffsets(BookDefinition definition, List<NcertParagraphRow> rows) {
@@ -140,8 +188,16 @@ class NcertVerifyCommand extends NcertBookCommand {
                 .collect(Collectors.joining("\n  ")));
     }
 
-    /** The free checks, per chapter; returns the kinds of flag raised on each row, by address. */
-    private Map<String, Set<LayoutChecks.Kind>> layoutChecks(BookDefinition definition,
+    /** What the free checks raised: the kinds of flag on each row, by address, and the page-level flags. */
+    private record CodeFlags(Map<String, Set<LayoutChecks.Kind>> onRows, int pageLevel) {
+    }
+
+    /** The verdicts a re-judging of the artefact gave, and how many passages no row carries it found. */
+    private record Judged(Map<String, ParagraphVerification> verdicts, int omitted) {
+    }
+
+    /** The free checks, per chapter. */
+    private CodeFlags layoutChecks(BookDefinition definition,
             List<BookDefinition.Chapter> selected, Map<Short, List<NcertParagraphRow>> byChapter, Report report) {
         List<String> starts = new ArrayList<>();
         List<String> joins = new ArrayList<>();
@@ -193,7 +249,7 @@ class NcertVerifyCommand extends NcertBookCommand {
         report.section("where rows start against where the print starts paragraphs").list(starts);
         report.section("joins across page breaks against the print").list(joins);
         report.section("figure_refs against the paragraph and the chapter's captions").list(figures);
-        return onRows;
+        return new CodeFlags(onRows, starts.size());
     }
 
     /** The founder's rulings on flags: the corrections file's misprint and false_positive entries for these chapters. */
@@ -207,15 +263,9 @@ class NcertVerifyCommand extends NcertBookCommand {
                 .stream().filter(entry -> !entry.kind().changesText()).toList();
     }
 
-    private Map<String, ParagraphVerification> readPages(BookDefinition definition, List<NcertParagraphRow> rows,
-            Map<Short, List<NcertParagraphRow>> byChapter, List<NcertCorrection> rulings, Report report) {
-        guardIndependence(rows, report);
-
-        String key = ContentKeys.verify(definition.code(), language);
-        Map<String, VerifiedPage> done = new TreeMap<>();
-        if (content.exists(key)) {
-            VerifyJsonl.read(key, content.get(key)).forEach(page -> done.put(page.address(), page));
-        }
+    /** Reads every selected page the artefact does not already hold a current read of, flushing as it goes. */
+    private void read(BookDefinition definition, Map<Short, List<NcertParagraphRow>> byChapter,
+            Map<String, VerifiedPage> done, String key, Report report) {
         String runId = "pipeline-ncert-verify-" + UUID.randomUUID();
         report.line("request id: " + runId);
         AiCallContext ctx = AiCallContext.system(runId);
@@ -272,9 +322,8 @@ class NcertVerifyCommand extends NcertBookCommand {
         if (strayVerdicts > 0) {
             report.line("verdicts for item numbers the call did not have, ignored: " + strayVerdicts);
         }
-
-        Map<String, ParagraphVerification> verdicts = judge(definition.code(), byChapter, done, rulings, report);
-
+        // Before anything that can refuse: a run that paid for its pages reports what they cost whatever
+        // happens after.
         AiSpend.RunSpend bill = spend.of(runId);
         report.section("cost (from the ai_calls ledger)").table(
                 List.of("calls", "input", "output", "cache read", "cache write", "cost"),
@@ -282,7 +331,6 @@ class NcertVerifyCommand extends NcertBookCommand {
                         String.valueOf(bill.usage().inputTokens()), String.valueOf(bill.usage().outputTokens()),
                         String.valueOf(bill.usage().cacheReadTokens()), String.valueOf(bill.usage().cacheWriteTokens()),
                         bill.rupees())));
-        return verdicts;
     }
 
     /**
@@ -339,9 +387,9 @@ class NcertVerifyCommand extends NcertBookCommand {
         return byPage;
     }
 
-    /** Whether the artefact's read of a page was of exactly these parts, with this prompt. */
+    /** Whether the artefact's read of a page was of exactly these parts, by the ruling's verifier, with this prompt. */
     private boolean current(VerifiedPage existing, List<Placed> placed) {
-        if (!Objects.equals(existing.promptVersion(), verifier.promptVersion()) || existing.items().size() != placed.size()) {
+        if (!valid(existing) || existing.items().size() != placed.size()) {
             return false;
         }
         for (int index = 0; index < placed.size(); index++) {
@@ -352,6 +400,12 @@ class NcertVerifyCommand extends NcertBookCommand {
             }
         }
         return true;
+    }
+
+    /** A read counts only when the ruling's verifier made it with the current prompt; an earlier misconfigured run's does not. */
+    private boolean valid(VerifiedPage read) {
+        return Objects.equals(read.model(), properties.verifyModel())
+                && Objects.equals(read.promptVersion(), verifier.promptVersion());
     }
 
     private record Recorded(VerifiedPage page, int stray) {
@@ -396,7 +450,7 @@ class NcertVerifyCommand extends NcertBookCommand {
      * Every row whose pages all carry a current read gets a verdict, after code's judgements and the
      * founder's rulings; the report lists what is left for a person.
      */
-    private Map<String, ParagraphVerification> judge(String bookCode, Map<Short, List<NcertParagraphRow>> byChapter,
+    private Judged judge(String bookCode, Map<Short, List<NcertParagraphRow>> byChapter,
             Map<String, VerifiedPage> done, List<NcertCorrection> rulings, Report report) {
         List<String> flags = new ArrayList<>();
         List<String> notOnPage = new ArrayList<>();
@@ -418,7 +472,7 @@ class NcertVerifyCommand extends NcertBookCommand {
                     pagesOfChapter.add(part.page());
                     VerifiedPage read = done.get(chapter.getKey() + "/" + part.page());
                     String sha = ParagraphVerification.sha256(part.text());
-                    VerifiedPage.Item item = read == null ? null : read.items().stream()
+                    VerifiedPage.Item item = read == null || !valid(read) ? null : read.items().stream()
                             .filter(candidate -> candidate.address().equals(row.address()) && candidate.partSha256().equals(sha))
                             .findFirst().orElse(null);
                     if (item == null) {
@@ -433,6 +487,7 @@ class NcertVerifyCommand extends NcertBookCommand {
                 List<ParagraphVerification.Difference> differences = new ArrayList<>();
                 boolean absent = false;
                 boolean unjudged = false;
+                boolean misquoted = false;
                 for (int index = 0; index < parts.size(); index++) {
                     ParagraphParts.Part part = parts.get(index);
                     VerifiedPage.Item item = items.get(index);
@@ -452,6 +507,7 @@ class NcertVerifyCommand extends NcertBookCommand {
                                 if (VerdictSpans.sameExceptSpacingAndGlyphs(span.printed(), span.transcribed())) {
                                     glyphOnly.add(line);
                                 } else if (!VerdictSpans.carries(part.text(), span.transcribed())) {
+                                    misquoted = true;
                                     notCarried.add(at + ": transcribed \"" + span.transcribed() + "\" (printed \"" + span.printed() + "\")");
                                 } else if (ruledOn(rulings, chapter.getKey(), part.page(), span)) {
                                     ruled++;
@@ -465,9 +521,11 @@ class NcertVerifyCommand extends NcertBookCommand {
                         }
                     }
                 }
+                // A claim of a difference the verifier could not place is not a match: nothing is known
+                // about that part, so the row is not judged, and it is not counted clean.
                 ParagraphVerification.Verdict verdict = absent ? ParagraphVerification.Verdict.not_on_page
                         : !differences.isEmpty() ? ParagraphVerification.Verdict.differs
-                        : unjudged ? ParagraphVerification.Verdict.not_judged
+                        : unjudged || misquoted ? ParagraphVerification.Verdict.not_judged
                         : ParagraphVerification.Verdict.matches;
                 ParagraphVerification verification = new ParagraphVerification(verdict,
                         verdict == ParagraphVerification.Verdict.differs ? differences : List.of(),
@@ -479,7 +537,7 @@ class NcertVerifyCommand extends NcertBookCommand {
             }
             for (int page : pagesOfChapter) {
                 VerifiedPage read = done.get(chapter.getKey() + "/" + page);
-                if (read != null && (pages == null || pages.isEmpty() || pages.contains(page))) {
+                if (read != null && valid(read) && (pages == null || pages.isEmpty() || pages.contains(page))) {
                     read.omitted().forEach(text -> omitted.add("ch " + chapter.getKey() + " p" + page + ": \"" + text + "\""));
                 }
             }
@@ -495,10 +553,12 @@ class NcertVerifyCommand extends NcertBookCommand {
         report.section("running text the page prints that no row carries").list(omitted);
         report.section("items the verifier returned no verdict for").list(notJudged);
         report.section("set aside by code: the spans differ only in spacing or a glyph variant").list(glyphOnly);
-        report.section("set aside by code: the verifier quoted a transcription the row does not carry").list(notCarried);
+        report.section("set aside by code: the verifier quoted a transcription the row does not carry")
+                .line("the row is left not judged: the verifier claimed a difference it could not place")
+                .list(notCarried);
         report.line("flags set aside by the founder's rulings in " + NcertCorrectionsYamlReader.FILE + ": " + ruled);
         report.line("verdicts recorded on rows: " + recorded.size());
-        return verdicts;
+        return new Judged(verdicts, omitted.size());
     }
 
     private static boolean ruledOn(List<NcertCorrection> rulings, short chapter, int page, VerifiedPage.Span span) {
@@ -510,10 +570,14 @@ class NcertVerifyCommand extends NcertBookCommand {
     /**
      * PLAN D15's ✅, "% paragraphs extracted cleanly per book": a paragraph is clean when its second read
      * matches — after code's judgements and the founder's rulings — and no join or figure flag names it.
+     * Two signals name no row and so cannot enter the share: where the print starts paragraphs the rows
+     * do not (a page-level flag), and running text no row carries. They are counted beside it, to be
+     * adjudicated before the number is recorded (DECISIONS 2026-09-14).
      */
     private void clean(BookDefinition definition, List<BookDefinition.Chapter> selected,
             Map<Short, List<NcertParagraphRow>> byChapter, Map<String, ParagraphVerification> verdicts,
-            Map<String, Set<LayoutChecks.Kind>> rowCodeFlags, Report report) {
+            CodeFlags codeFlags, int omitted, Report report) {
+        Map<String, Set<LayoutChecks.Kind>> rowCodeFlags = codeFlags.onRows();
         List<List<String>> table = new ArrayList<>();
         long allRows = 0;
         long allClean = 0;
@@ -552,13 +616,18 @@ class NcertVerifyCommand extends NcertBookCommand {
         report.section("clean paragraphs — the second read matches and no join or figure flag names the row")
                 .table(List.of("chapter", "rows", "with a verdict", "matches", "differs", "not on page", "not judged",
                         "join or figure flags", "clean"), table);
-        if (complete && selected.size() == definition.chapters().size()) {
+        boolean wholeBook = selected.size() == definition.chapters().size() && byChapter.size() == selected.size();
+        if (complete && wholeBook) {
             report.line("clean for the book (PLAN D15 ✅): " + allClean + " of " + allRows + " paragraphs, "
                     + percent(allClean, allRows));
         } else {
             report.line("clean for the book (PLAN D15 ✅): not computed — "
-                    + (complete ? "only some chapters were selected" : "some rows have no verdict yet"));
+                    + (!complete ? "some rows have no verdict yet"
+                            : selected.size() != definition.chapters().size() ? "only some chapters were selected"
+                            : "a selected chapter has no loaded rows"));
         }
+        report.line("not in the clean share, adjudicate before recording it: " + codeFlags.pageLevel()
+                + " page-level start flags, " + omitted + " passages no row carries");
     }
 
     private static String count(Map<ParagraphVerification.Verdict, Long> counts, ParagraphVerification.Verdict verdict) {

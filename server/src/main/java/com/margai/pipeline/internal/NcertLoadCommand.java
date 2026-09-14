@@ -309,7 +309,9 @@ class NcertLoadCommand extends NcertBookCommand {
             if (!text.isEmpty()) {
                 text.append(' ');
             }
-            text.append(paragraph.text().strip());
+            // Single spaces within a paragraph, as the prompt asks: one model set its displayed
+            // equations on their own lines (D15, run 5), and a line break is not a difference.
+            text.append(paragraph.text().strip().replaceAll("\\s+", " "));
             pages.add(page.page());
             paragraph.figureRefs().stream().filter(ref -> !figureRefs.contains(ref)).forEach(figureRefs::add);
             if (confidence == null || (page.confidence() != null && page.confidence().compareTo(confidence) < 0)) {

@@ -524,6 +524,27 @@ v3 DRY RUN 4 — chapter 7 on Haiku, with the open-sentence fact and the left-co
   structure can — column-aware tiling (the left column's bands before the right column's, so
   reading order is the images' order), or a net that compares the first paragraph's opening
   words with the layer's top-left line and flags the page. Spend on v3 dry runs ₹72.64.
+v3 DRY RUN 5 — chapter 7 on Sonnet 5, the amended prompt (no tail, the open-sentence fact, the
+  left-column rule, the headings check, one law per paragraph, a heading is never text), 16:06
+  (₹31.63; cache write 10,278). 95 paragraphs → 86 rows; **no diff flag, no coverage flag, no
+  low-confidence page, zero splits, zero repairs** — the cleanest report of the day, and the
+  rows bear it out on every page that failed before. Page 3: "7.3 UNIVERSAL LAW OF GRAVITATION"
+  and "Legend has it…" present as §7.3 ¶1, "This clearly shows…" as §7.3 ¶2 on page 4 and not
+  joined to the Example 7.1 Answer; §7.3 has 15 rows. The three laws are three paragraphs.
+  Page 5: the Answer joins the left column's F_GA / F_GB / F_GC, F_R and the superposition
+  working in reading order; part (b) carries **all seven primes** — `F'_GA = G2m.2m/1 j_hat`,
+  `F'_GB = F_GB and F'_GC = F_GC`, `F'_R = F'_GA + F'_GB + F'_GC`, `F'_R = 2Gm^2 j_hat` — then
+  (1), (2), then §7.4 without the heading's words. Page 11: "or" joins the two displayed
+  equations `v^2 = (2GM/R)(4/5 - 1/2)`, `v = (3GM/5R)^1/2`; "A point to note…" in §7.8; the
+  satellite paragraph whole. Confidence 0.90–0.95. What is left is notation and segmentation,
+  none of it structural: the fractional exponent written `(1.52)^3/2` and `(3GM/5R)^1/2`
+  without brackets (both Sonnet runs; Haiku wrote `^(3/2)`) — a prompt rule; grouping
+  parentheses dropped once, `− 2 G m^2 / l (2 + 1/sqrt(2))`, same value; "Alternatively, one
+  expects…" merged into the Answer where the page indents it; two rows carry line breaks
+  between displayed equations where the rule says single spaces — normalised at load. Five
+  chapter-7 runs on v3: Haiku ×3, each with a structural failure the nets could not see (an
+  echoed tail, a lost column, the wrong column joined); Sonnet ×2, the first with a skipped
+  heading the headings check then closed, the second clean. Spend on v3 dry runs ₹104.27.
 ```
 
 ```

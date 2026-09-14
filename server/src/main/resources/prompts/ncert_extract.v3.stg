@@ -218,6 +218,10 @@ EQUATIONS AND FORMULAE
 Transcribe mathematics inline in plain text, keeping every symbol readable:
 
 - Subscripts with an underscore and superscripts with a caret: v_0, a_max, E = mc^2, x^2 + y^2.
+  **An exponent of more than one character is bracketed**: (1.52)^(3/2), (3GM/5R)^(1/2),
+  e^(-E/kT), 10^(-11) — never (1.52)^3/2, which reads as a cube divided by two. A subscript of
+  more than one character likewise: v_(max), R_(ES), or the plain forms v_max and R_ES where no
+  operator follows.
 - **Copy the case of a subscript or superscript exactly.** M_E is not M_e, r_A is not r_a. The book
   distinguishes them and so do you.
 - **A prime is part of the symbol and is always kept.** F'_GB is not F_GB: the book primes a symbol

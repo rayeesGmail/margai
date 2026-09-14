@@ -391,6 +391,21 @@ class NcertLoadCommandTest {
         assertThat(row.figureRefs()).containsExactly("Fig. 7.9", "Table 7.1");
     }
 
+    /**
+     * Sonnet set displayed equations on their own lines inside a paragraph's text (D15, run 5);
+     * the rule asks for single spaces, and the loader makes it so rather than asking again.
+     */
+    @Test
+    void lineBreaksInsideAParagraphAreNormalisedToSingleSpaces() {
+        jsonl(page(7, 5, "0.95", p("7.3", "(b) Now if the mass at vertex A is doubled then\nF'_GA = 4Gm^2 j_hat\n"
+                + "F'_GB = F_GB and F'_GC = F_GC")));
+
+        run();
+
+        assertThat(imports.rows.getFirst().text())
+                .isEqualTo("(b) Now if the mass at vertex A is doubled then F'_GA = 4Gm^2 j_hat F'_GB = F_GB and F'_GC = F_GC");
+    }
+
     /** The rows the load deleted are named under their own heading, so a corpus event's losses are on the record. */
     @Test
     void theAddressesTheLoadDeletedAreReported() {

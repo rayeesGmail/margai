@@ -584,7 +584,8 @@ v3 DRY RUN 7 — chapter 7 on Claude Opus 5 (`visionopus`: adaptive thinking, lo
   | 8 | Opus | + five notation rules | none | clean but the vector r | ₹80.62 |
   | 9 | Sonnet | + five notation rules | page 5 right column first: three equations lost, page 6's §7.4 filed under §7.3 | 13 subscripts dropped | ₹31.98 |
   | 10 | Opus | frozen; pages 4, 6, 8 redone | none | 0 characters changed, 5 boundaries moved | ₹24.80 |
-  Spend on v3 dry runs ₹199.83 (rows 8–10, 18:05, 18:27 and 18:56, are read below). Haiku is out for transcription: three runs, three different
+  | 11 | Opus | frozen; effort xhigh, pages 4, 6, 8 | none | 0 characters changed, 0 boundaries moved; no thinking emitted | ₹24.79 |
+  Spend on v3 dry runs ₹199.83 (rows 8–11, 18:05, 18:27, 18:56 and 21:07, are read below). Haiku is out for transcription: three runs, three different
   invisible failures, on the layout NCERT Physics uses on one page in six. Sonnet and Opus both
   read the chapter clean on the final prompt; Opus reads it closer to the print. The pair
   decision — who transcribes, who verifies — goes to the founder with this table.
@@ -706,6 +707,23 @@ v3 DRY RUN 10 — the first repeat: Opus on chapter 7 pages 4, 6 and 8 again, fr
   against the layer's indented line starts, not by another prompt line; an inline fraction
   followed by a factor — "G Mm / d^2 L" for G (Mm/d²) L this time, bracketed in run 8 — is a
   notation the frozen prompt leaves to the dice (PARKED). Spend on v3 dry runs ₹337.23.
+v3 DRY RUN 11 — the founder's question "what if Opus at xhigh effort?", 21:07: pages 4, 6 and 8
+  again with `MARGAI_AI_TIER_VISION_EFFORT=xhigh` over the `visionopus` profile (₹24.79). THE
+  LEDGER ANSWERED FIRST: output tokens page by page 1,466 / 1,425 / 1,496 against run 10's
+  1,470 / 1,425 / 1,497 — the size of the JSON and nothing more. Output tokens include thinking
+  tokens, so no thinking was emitted at either setting. The cause is the request shape: every
+  extraction call forces the tool (`ToolChoiceTool` in `MessageRequestMapper`), and a forced
+  tool call leaves no thinking channel for effort to spend in. So `visionopus`'s "adaptive at
+  low effort" has been a no-thinking read on every Opus row in this table, and xhigh had nothing
+  to act on; whether thinking would help is untested and needs tool choice auto for this task,
+  a code change (PARKED). The profile's comment is corrected in the same commit. THE THIRD DRAW
+  of the same three pages, 21:15, for what it is worth as dice data: the load inserted 0 and
+  deleted 0 — all 102 boundaries exactly where run 10 put them, where run 8 → 10 had moved five
+  — and the text differs in nothing but glyph variants: `≃` for `≅` at (7.4) (the page prints
+  ≃), `-` for `−` in (7.24), `m_1m_2` unspaced, one bracket dropped in (7.19). The vector r is
+  `r_hat` a fourth time. Confidence moved 0.93 ↔ 0.90 on all three pages, in opposite
+  directions — noise, as ruled at D14. For the verify build the normalisation list grows:
+  spacing, bracket placement, `≅ ≃ ≈` as one, `− -` as one. Spend on v3 dry runs ₹362.02.
 ```
 
 ```
@@ -2530,6 +2548,7 @@ Tomorrow's first task:
 ## 🅿️ PARKED (Sunday review only)
 
 - _idea · date · one line_
+- **thinking is structurally off for every extraction call, so effort cannot be measured** · 2026-09-14 (D15) · the request forces the tool (`ToolChoiceTool`) and the ledger shows output tokens identical page by page at effort `low` and `xhigh` (dry runs 10 and 11) — no thinking block is ever emitted; the `visionopus` profile's `adaptive` is accepted by the API, not acted on. To test whether thinking improves the read, the task needs tool choice `auto` with the prompt asking for the call and the schema check refusing prose — a mapper change per request or per tier — then one chapter at `high`, read in full, against runs 7–11
 - **an inline fraction followed by a factor needs a bracket** · 2026-09-14 (D15) · G (Mm/d²) L = τθ came out `G (Mm / d^2) L` on one Opus run and `G Mm / d^2 L` on the repeat of the same page, and the second reads as d²L in the denominator; the prompt is frozen (DECISIONS 2026-09-14), so this is the first candidate for its next amendment, only if the second read cannot flag it
 - **paragraph boundaries checked by code against the text layer's indented line starts** · 2026-09-14 (D15) · the repeat on the frozen prompt moved five boundaries on three pages with zero character changes, so segmentation is the layer the sampling moves; the layer knows which lines start indented, so `ncert load` or the second read can count printed paragraphs per page and name a page whose row count differs — the check the Sonnet column failure (run 9, three equations lost) would also trip
 - ~~**`ncert load --prune` for a corpus event** · 2026-09-14 (D15) · the load reports the addresses a chapter no longer carries and leaves the rows in place, which was right for a subset load into a full book and is wrong for a re-extraction that replaces the book: 85 stale rows sat beside the canonical 1,017 until today, sampleable by the ✅ and embeddable by D17. A flag that deletes the orphans of the chapters this load carries, refused once embeddings or anchors exist unless the D17 migrate path is taken. Until it exists the corpus event deletes by hand before the load (day log 2026-09-14)~~ · **done the same day, without a flag**: the load deletes them, names them, refuses if any is anchored, spares a row holding the other edition's text (DECISIONS 2026-09-14)

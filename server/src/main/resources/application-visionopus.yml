@@ -14,6 +14,14 @@
 # so adaptive at `low` effort, which still cuts cost. `temperature` is rejected outright, and an
 # empty value binds to null, which is how "send nothing" is spelled. The cacheable prefix
 # minimum is 1,024 tokens as on the reasoning tier.
+#
+# Measured 2026-09-14 (D15, dry runs 10 and 11): `adaptive` here means "accepted by the API", not
+# "thinking on". Every extraction request forces the tool call (`ToolChoiceTool` in
+# `MessageRequestMapper`), and with the tool forced no thinking block is emitted at any effort —
+# the ledger's output tokens were identical page by page at `low` and at `xhigh`
+# (`MARGAI_AI_TIER_VISION_EFFORT=xhigh` over this profile), the size of the JSON and nothing
+# more. So `effort` has nothing to act on for this task until the request allows tool choice
+# auto (TRACKER PARKED); every Opus row in the D15 table is a no-thinking read.
 margai:
   ai:
     tier:

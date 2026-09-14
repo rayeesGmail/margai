@@ -27,6 +27,23 @@ class SplitSentencesTest {
                 .contains("§1.2 ¶7").contains("international usage").contains("in scientific");
     }
 
+    /**
+     * bio11 §1.2.1, pages 6–7: "…Solanum includes species like nigrum and" then "melongena. Human
+     * beings belong to…". The completing word is followed by a full stop, not a space, and the
+     * check missed it (D15, 2026-09-14).
+     */
+    @Test
+    void aOneWordCompletionEndingInAFullStopIsFound() {
+        List<String> found = SplitSentences.find(List.of(
+                row("1.2.1", 1, "For example, Panthera has another specific epithet called tigris and "
+                        + "Solanum includes species like nigrum and"),
+                row("1.2.1", 2, "melongena. Human beings belong to the species sapiens which is grouped "
+                        + "in the genus Homo.")));
+
+        assertThat(found).singleElement(org.assertj.core.api.InstanceOfAssertFactories.STRING)
+                .contains("§1.2.1 ¶2").contains("nigrum and").contains("melongena.");
+    }
+
     /** NCERT does this on purpose after a displayed equation; it is not a split sentence. */
     @Test
     void aLowerCaseOpeningAfterAFinishedEquationIsNotASplit() {

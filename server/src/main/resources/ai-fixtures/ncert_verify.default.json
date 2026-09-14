@@ -1,0 +1,1 @@
+{"items": [{"item": 1, "verdict": "matches", "differences": []}, {"item": 2, "verdict": "differs", "differences": [{"printed": "|r|^3 r", "transcribed": "|r|^3 r_hat"}]}], "omitted": []}

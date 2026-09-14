@@ -1,24 +1,28 @@
-# An experiment, not a default: the VISION tier on the reasoning model.
+# The verify shape: the VISION tier on Claude Sonnet 5, for the second read of the NCERT corpus.
 #
-#   java -jar server.jar --spring.profiles.active=pipeline,live,visionsonnet ncert extract …
+#   java -jar server.jar --spring.profiles.active=pipeline,live,visionsonnet ncert verify --read-pages …
 #
-# First tried at D14 (2026-09-13) on prompt v1 and closed by RULING 1: 2.2× the cost, and neither
-# run loadable — one restarted numbering inside a band, the other filed paragraphs under
-# "Example 7.1" as a section. Reopened for ONE measurement on 2026-09-14 (D15, DECISIONS): v3
-# takes numbering away from every model, which makes half of that evidence moot, and what remains
-# with the model — reading order, box and biography detection, the continue-or-start judgement,
-# rule-following — is where the cheap model drifted on the corpus event. So v3's two dry runs,
-# phy11-part1 chapter 7 and bio11 chapter 1, run on both models and are read against the same
-# defect list. The eight books go on whichever reads cleaner; if equal, the cheap model keeps
-# the job and this profile is deleted again.
+# Since 2026-09-14 (D15, DECISIONS "the pair") this is how the verifier runs: Claude Opus 5
+# transcribes on the `visionopus` shape, and Sonnet 5 reads every transcribed page again with the
+# `ncert_verify` prompt. `ncert verify --read-pages` refuses to run when the tier's model is the one
+# the ledger says transcribed the rows, so running it without this profile over an Opus corpus fails
+# loudly instead of verifying Opus with Opus.
 #
-# It is a separate profile, and not merged into `pipeline`, for two reasons: the two configurations
-# stay directly comparable on the same chapter, and the VISION tier also serves student photo
-# doubts (SPEC §6.3), which must not change model as a side effect of a content-pipeline decision.
+# History: first tried at D14 (2026-09-13) as the transcriber and closed by RULING 1 — 2.2× the cost
+# and neither run loadable on prompt v1; reopened for one measurement on v3 (2026-09-14), where
+# Sonnet was structurally wrong in two full chapter-7 runs of three (a skipped heading, a two-column
+# page read right column first) and was the one read of any model to see the vector r that Opus
+# wrote `r_hat` four times. A verifier handed one page and a list of paragraphs has no layout to
+# get wrong, so the ruling kept it for this job.
 #
-# The request shape moves with the model (§4.11, DECISIONS 2026-09-12): the reasoning model refuses
-# `temperature` outright and takes `effort` instead, and its cacheable prefix is 1,024 tokens
-# rather than 4,096. An empty `temperature` binds to null, which is how "send nothing" is spelled.
+# It is a separate profile, and not merged into `pipeline`, because the VISION tier also serves
+# student photo doubts (SPEC §6.3), which must not change model as a side effect of a
+# content-pipeline decision, and because the transcriber's shape (`visionopus`) is the other one.
+#
+# Request shape (§4.11, DECISIONS 2026-09-12): the model refuses `temperature` outright and takes
+# `effort` instead, and its cacheable prefix is 1,024 tokens. An empty `temperature` binds to null,
+# which is how "send nothing" is spelled. The tool is forced on every call, so no thinking is emitted
+# whatever `effort` says (TRACKER PARKED, dry runs 10 and 11).
 margai:
   ai:
     tier:

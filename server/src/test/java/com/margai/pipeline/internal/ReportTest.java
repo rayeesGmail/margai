@@ -59,18 +59,26 @@ class ReportTest {
         assertThat(text).endsWith("## orphan edges\n\n- A -> B\n- C -> D\n");
     }
 
+    /**
+     * A same-day re-run gets its own file, numbered from 2, and the earlier run's file is left as
+     * it was: `ncert extract` ran five times on 2026-09-13 and a one-page redo on 2026-09-14
+     * overwrote the whole-book report the commit was meant to carry (TRACKER, PARKED → D15).
+     */
     @Test
-    void writesTheDatedFileAndOverwritesItOnASameDayRerun() throws IOException {
+    void writesTheDatedFileAndNumbersASameDayRerunInsteadOfOverwriting() throws IOException {
         Path input = Files.writeString(dir.resolve("cutoffs.csv"), "x");
         Path reports = dir.resolve("reports/nested");
         Reports writer = new Reports(CLOCK);
 
         Reports.Written first = writer.write(reports, new Report("margai-pipeline cutoffs load", input).read("40 rows"));
         Reports.Written second = writer.write(reports, new Report("margai-pipeline cutoffs load", input).read("41 rows"));
+        Reports.Written third = writer.write(reports, new Report("margai-pipeline cutoffs load", input).read("42 rows"));
 
         assertThat(first.path()).isEqualTo(reports.resolve("2026-09-12-cutoffs-load.md"));
-        assertThat(second.path()).isEqualTo(first.path());
-        assertThat(Files.readString(first.path())).isEqualTo(second.text()).contains("- read: 41 rows");
-        assertThat(Files.list(reports)).hasSize(1);
+        assertThat(second.path()).isEqualTo(reports.resolve("2026-09-12-cutoffs-load-2.md"));
+        assertThat(third.path()).isEqualTo(reports.resolve("2026-09-12-cutoffs-load-3.md"));
+        assertThat(Files.readString(first.path())).isEqualTo(first.text()).contains("- read: 40 rows");
+        assertThat(Files.readString(second.path())).isEqualTo(second.text()).contains("- read: 41 rows");
+        assertThat(Files.list(reports)).hasSize(3);
     }
 }

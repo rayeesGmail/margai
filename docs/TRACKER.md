@@ -582,7 +582,8 @@ v3 DRY RUN 7 — chapter 7 on Claude Opus 5 (`visionopus`: adaptive thinking, lo
   | 6 | Sonnet | bio11 ch 1 | none; 30/30 exact | — | ₹15.82 |
   | 7 | Opus | + exponent rule | none | clean | ₹79.74 |
   | 8 | Opus | + five notation rules | none | clean but the vector r | ₹80.62 |
-  Spend on v3 dry runs ₹199.83 (row 8, 18:05, is read below). Haiku is out for transcription: three runs, three different
+  | 9 | Sonnet | + five notation rules | page 5 right column first: three equations lost, page 6's §7.4 filed under §7.3 | 13 subscripts dropped | ₹31.98 |
+  Spend on v3 dry runs ₹199.83 (rows 8 and 9, 18:05 and 18:27, are read below). Haiku is out for transcription: three runs, three different
   invisible failures, on the layout NCERT Physics uses on one page in six. Sonnet and Opus both
   read the chapter clean on the final prompt; Opus reads it closer to the print. The pair
   decision — who transcribes, who verifies — goes to the founder with this table.
@@ -644,6 +645,39 @@ v3 DRY RUN 8 — chapter 7 on Opus again, on the amended prompt, 18:05 (₹80.62
   standard: text exact 98 of 99 (the vector r), address 99 of 99, figure refs right after the
   guard. Stray-letter hits at §7.7 ¶11, §7.9 ¶5, §7.9 ¶17 are `l`, `s`, `d` — false positives.
   Spend on v3 dry runs ₹280.45. Sonnet on the same prompt is next (~₹32), then the pair.
+v3 DRY RUN 9 — chapter 7 on Sonnet again, on the same amended prompt, 18:27 (₹31.98). 98
+  paragraphs → 88 rows, no repair, one character flag (page 10, a "GMm" count the layer spaces
+  differently — the text is right). THE FULL READ, 18:40 — all 88 rows against the 12 pages.
+  **Structural failure on page 5, the Haiku failure of runs 3 and 4, now on Sonnet's third run
+  of this chapter**: the right column was read first. Consequences: (1) the three displayed
+  equations F_GA, F_GB, F_GC at the top of the left column are gone — nowhere in the chapter;
+  (2) the right column's opening fragment "cases, a simple law results when you do that :" is
+  glued onto Answer (a) from page 4; (3) the left column's last paragraph "For the gravitational
+  force… For two special" became the page's last paragraph, so the fact told page 6 "§7.3, mid-
+  sentence", and page 6's "The bar AB has two small lead spheres…" was glued onto "For two
+  special" as §7.3 ¶16; (4) the next three paragraphs of page 6 — (7.7), "Observation of θ…",
+  "Since Cavendish's…" — are §7.3 ¶17–19, so §7.4 holds one row. Sonnet's runs 2 and 5 read this
+  page right; the layout NCERT Physics uses on one page in six is a coin Sonnet flips. Text
+  defects besides: the subscripts of h_1, h_2, W_12, W_o, r_1, r_2 written h1, h2, W12, Wo, r1,
+  r2 in §7.7 ¶2–3 — 13 occurrences, while the same row writes W_1 and W(r_2) with the underscore;
+  "4pi/3" where the page misprints "4p/3" (Opus kept the misprint); the grouping of the
+  denominator in (7.40) and (7.42) lost — `Gm M_E / 2(R_E + h)`, which a verifier can read two
+  ways. And one thing Sonnet alone got right: the vector r in the third form of Eq. (7.5),
+  written plain `r` where every other run of every model wrote `r_hat`. Segmentation: two wrong
+  joins across pages where the page after indents and the page before ended with a stop —
+  pages 3→4 "This clearly shows…" and 9→10 "By the principle of energy conservation…"; about
+  twelve indented paragraphs merged into the one before (page 3 "The area SBAC…"; page 8's
+  (7.17)–(7.19) and "Thus, as we go down…" into one row with page 7's last sentence; (7.21),
+  (7.22) and "The work done…" into (7.20)'s row; "where M_E…" and "In place of Eq. (7.21)…"
+  into (7.23)'s; "The neutral point…" into the Answer on page 10; (7.34)–(7.39) into one row on
+  page 11; Answer (ii) into (i)); one split against the page — "Equation (7.5) can be
+  expressed…" on page 4 is flush-left, so it belongs to "Stated Mathematically…" — which also
+  corrects run 7's read above: Opus's join there was right, not a merge. By the ✅ standard:
+  text exact 81 of 88, address 84 of 88, figure refs right but "Fig. 7.1(b)" added to a
+  paragraph that names only 7.1a. Spend on v3 dry runs ₹312.43. THE PAIR, from runs 7–9: Opus
+  twice structurally clean and closer to the print; Sonnet structurally wrong in two runs of
+  three (run 2 the heading, run 9 the column), but the one read to see the vector r. Opus
+  transcribes, Sonnet verifies — to the founder.
 ```
 
 ```

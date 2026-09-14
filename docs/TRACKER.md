@@ -283,6 +283,62 @@ BUT ONE FABRICATION OUTSIDE THE SAMPLE, caught by the character diff and read on
   page**; if it recurs, the page joins the known-defect list by name, and v3's
   continues-previous-page boolean is the structural answer (a paragraph that merely continues
   carries no tail to "complete").
+RULING, ~10:05 (founder, on Claude's recommendation after the founder asked why v3 was not being
+  built instead of patching pages): the HOW TO RESUME order of 2026-09-13 is superseded. Every
+  defect that cost money this morning is one defect — continuation and numbering decided by the
+  model from a quoted text tail — and a whole-book bio11 run on v2 (~₹235) would build a corpus
+  meant to be superseded. New order: (1) redo ch 6 p8 (₹2) so the v2 corpus is a clean baseline
+  and the D14 tick is claimable on v2 if v3 disappoints; (2) bio11 chapter 1 on v2 (₹13) BEFORE
+  writing v3, because Biology's conventions — scientific names, genus capitalisation, "Figure
+  10.2 b" labels — are untested on any prompt and belong in v3; (3) build v3: section + text + one
+  continues-previous-page boolean from the model, ¶n assigned by the loader, a blank text rejected
+  where the output is parsed, hanging item labels and equation parentheses as rules, the biology
+  conventions from (2); verify, eval gate, spec-auditor; (4) chapter 7 on v3 (₹14) against today's
+  chapter-7 result and the whole-book defect list; (5) if v3 proves better, bio11 and the eight
+  books on v3 and phy11-part1 re-run on v3 as a corpus event; if not, bio11 on v2. Cost of the
+  reorder: two to three hours of build before any book runs; saving: one whole-book extraction and
+  a single-prompt corpus.
+CH 6 P8 REDONE AT 09:50 (₹1.99): the character diff returned the same 21 flags, word for word —
+  the fabrication is deterministic for this page, as ch 6 p18's missing label was last night. No
+  further re-rolls. **KNOWN DEFECTS IN phy11-part1 AS LOADED ON v2 (1,023 rows, 100% coverage):
+  `ch 6 §6.2 ¶47` carries an invented lead-in clause and a repeat of page 7's tail before the
+  page's real fragment (deterministic, 2 of 2 calls); ~16 genuine mid-sentence splits among the
+  32 listed; hanging item labels "(a)"/"(b)" dropped at §6.9 ¶7–8; equation numbers in square
+  brackets in §6.7.3.** phy11-part1's half of the D14 tick is earned on v2 — 20/20 text, 20/20
+  address, 100% coverage — but the box stays unticked, per last night's ruling, until bio11 is on
+  the same final prompt, which the reorder makes v3 if chapter 7 proves it. Spend on phy11-part1
+  today ₹136 over five runs.
+STEP 2 OF THE NEW ORDER, 09:54–10:15 — bio11 chapter 1, and a correction to the record. The
+  extract called nothing: `extract/bio11/en.jsonl` already held all 252 pages (846 paragraphs).
+  The ledger dates it — 291 extract calls for ₹240 between 14:00 and 16:00 on 2026-09-13 beyond
+  the phy runs the day log accounts for — so bio11 WAS extracted yesterday afternoon, on the
+  early v2 before the label rule, the notation fixes, bands-only and the radical rule; last
+  night's "bio11 not yet extracted" was wrong. Chapter 1 loaded from it for ₹0: 9 pages, 33
+  rows, apparatus at page 9 (Summary, 1 page), no splits, no repairs. Every row read against the
+  nine pages rendered from kebo101.pdf:
+  - text exact on 31 of 33 rows; address 33/33 (§1 for the pre-section text, §1.1, §1.2,
+    §1.2.1–§1.2.7 all right); figure refs `Figure 1.1` ×2 and `Table 1.1` exact, Biology's
+    "Figure" kept; every binomial with the genus capitalised and the epithet not — Mangifera
+    indica, Solanum tuberosum, Panthera leo, P. pardus, P. tigris, Homo sapiens — italics
+    flattened to plain text as expected; Table 1.1, the Figure 1.1 hierarchy diagram, the
+    contents sidebar and the QR code all skipped; the unit opener's prose (p1) stored as §1 ¶1;
+  - **the Ernst Mayr biography (p2) transcribed as §1 ¶2** — the prompt already says a biography
+    is skipped; the model kept a full-page portrait-and-life-story anyway (confidence 0.92, the
+    only row below 0.95). bio11 has five unit openers with one each → v3 names the page shape;
+  - **a word lost at a page break**: page 5 ends "…systematic arrangement of organisms. Linnaeus"
+    and page 6 opens "used Systema Naturae as the title of his publication"; ¶15 ends at
+    "organisms." and ¶16 begins "used Systema…" — "Linnaeus" is gone and the sentence has no
+    subject. Invisible to all three checks: the diff looks for words here that are not on the
+    page, never the reverse; coverage is a ratio; the split check needs an unfinished left half;
+  - the p6→p7 continuation "…nigrum and" / "melongena. Human beings…" unjoined (the known class)
+    and **missed by the split check**: `OPENS_LOWERCASE_WORD` wants a space or comma after the
+    first word, and a one-word completion ends in a full stop. One character in a regex, with a
+    test — goes in with v3;
+  - list markers: "1." "2." "3." on p4 rewritten as "(1)" "(2)" "(3)", and "4." on p5 dropped —
+    the phy "(a)/(b)" drift again. v3: the printed marker, exactly.
+  The ₹8 redo of chapter 1 on the final v2 is skipped: the later v2 rules were physics-glyph
+  rules, and v3 re-runs this chapter anyway as its biology dry run, beside chapter 7 as its
+  physics one. Before any v3 run the bio11 JSONL is moved aside like phy's.
 ```
 
 ```

@@ -108,17 +108,32 @@ class PageVerifyTaskTest {
         assertThat(prompts.systemPrefix("ncert_verify")).contains(notation);
     }
 
-    /** The calibration case, the ruling's grouping question and the book's own misprint, all in the cached prefix. */
+    /** The kinds of difference that matter — the hat, the grouping bracket, the misprint kept — taught in the cached prefix. */
     @Test
     void theSystemPrefixTeachesTheDifferencesThatMatter() {
         String system = prompts.systemPrefix("ncert_verify");
 
-        assertThat(system).contains("r_hat").contains("the vector r")
-                .contains("G (Mm / d^2) L")
-                .contains("4p/3")
+        assertThat(system).contains("r_hat").contains("unit vector")
+                .contains("(m v^2) / (2 r)").contains("(k / m) x")
+                .contains("resistence")
                 .contains("not_on_page").contains("omitted")
                 .contains("≅, ≃ and ≈")
                 .doesNotContain("text layer of this page");
+    }
+
+    /**
+     * Chapter 7 is the verifier's calibration set: a prompt that carried its answers would make a pass
+     * prove nothing (spec-auditor, D15). The must-find and the defects the dry runs read on its pages stay
+     * out of everything but the notation block copied from the frozen extraction prompt.
+     */
+    @Test
+    void theSystemPrefixCarriesNoneOfTheCalibrationChaptersAnswers() {
+        String system = prompts.systemPrefix("ncert_verify");
+
+        assertThat(system).doesNotContain("|r|^3").doesNotContain("Mm / d^2").doesNotContain("4p/3")
+                .doesNotContain("Cavendish").doesNotContain("neighouring").doesNotContain("(V_i)")
+                .doesNotContain("THE GRAVITATIONAL CONSTANT").doesNotContain("superposition")
+                .doesNotContain("R_E + h").doesNotContain("torsion");
     }
 
     private static List<VerifyItem> items() {

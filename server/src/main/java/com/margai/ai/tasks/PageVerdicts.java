@@ -33,19 +33,19 @@ public record PageVerdicts(List<ItemVerdict> items, List<String> omitted) {
     /**
      * One item's verdict. The shape is refused where the output is decoded — a {@code differs} that
      * names nothing, or another verdict that names something — so the schema layer's repair call
-     * answers it, as for a blank paragraph in {@link NcertPage}.
+     * answers it, as for a blank paragraph in {@link NcertPage}. The refusals state the fault and give
+     * no instruction: how to name a difference is the prompt's to say (.claude/rules/ai-layer.md).
      */
     public record ItemVerdict(int item, Verdict verdict, List<Difference> differences) {
 
         public ItemVerdict {
             differences = differences == null ? List.of() : List.copyOf(differences);
             if (verdict == Verdict.differs && differences.isEmpty()) {
-                throw new IllegalArgumentException("item " + item + " is 'differs' but names no difference — "
-                        + "quote the printed and the transcribed span of each");
+                throw new IllegalArgumentException("item " + item + " is 'differs' but names no difference");
             }
             if (verdict != Verdict.differs && !differences.isEmpty()) {
                 throw new IllegalArgumentException("item " + item + " is '" + verdict
-                        + "' and must name no difference — a difference makes the verdict 'differs'");
+                        + "' and must name no difference");
             }
         }
     }
@@ -60,8 +60,7 @@ public record PageVerdicts(List<ItemVerdict> items, List<String> omitted) {
 
         public Difference {
             if (printed == null || printed.isBlank() || transcribed == null || transcribed.isBlank()) {
-                throw new IllegalArgumentException("both spans must quote text — include a word on either side of "
-                        + "a dropped or added mark so neither span is empty");
+                throw new IllegalArgumentException("both spans must quote text");
             }
             if (printed.equals(transcribed)) {
                 throw new IllegalArgumentException("the printed and transcribed spans are identical ('" + printed

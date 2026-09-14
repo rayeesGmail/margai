@@ -17,10 +17,17 @@
 //
 // The EQUATIONS AND FORMULAE block below is ncert_extract v3's, word for word from "Transcribe
 // mathematics inline" to the Biology list — PageVerifyTaskTest fails the build if they differ, because
-// a convention the transcriber was told to write must never read as a difference here.
+// a convention the transcriber was told to write must never read as a difference here. That block was
+// written from the D14 and D15 audits and so quotes a few chapter-7 symbols (F'_GB, g(h) ≅, F_GA): they
+// are conventions both readers are given, and a calibration find on exactly those is weaker evidence.
 //
-// The system template is the cached prefix, above the cheap model's 4,096-token floor (AiPropertiesTest)
-// with room to spare: one book is 150–260 page calls sharing it, read at a tenth of the input price.
+// Every other example in this prompt is deliberately NOT chapter 7's text or one of its defects, and not
+// quoted from any page: chapter 7 is the calibration set, and a prompt carrying its answers would make a
+// pass prove nothing (spec-auditor, D15). PageVerifyTaskTest holds the calibration's must-finds out.
+//
+// The system template is the cached prefix. It runs on the verify shape (Sonnet 5, a 1,024-token floor)
+// but is written above the cheap model's 4,096-token floor, because AiPropertiesTest holds every shipped
+// prompt to that; one book is 150–260 page calls sharing it, read at a tenth of the input price.
 //
 // Templates take one argument, v, the variables map.
 
@@ -88,7 +95,7 @@ The pipeline finds your `transcribed` span inside the item to show a person wher
 - Copy `transcribed` exactly from the item: its spaces, its underscores, its carets, its brackets.
   A span that is not in the item cannot be found and is worth nothing.
 - Keep each span short: the smallest piece of text that contains the difference, with a word or a symbol
-  on either side so that neither span is empty. "|r|^3 r_hat where" against "|r|^3 r where", not the
+  on either side so that neither span is empty. "= 2 a x_o where" against "= 2 a x_0 where", not the
   whole equation and not the whole sentence.
 - Write `printed` in the same notation the transcription uses — underscores for subscripts, carets for
   superscripts, "theta" for θ, "sqrt(" for a radical. Never paste a glyph the conventions spell out.
@@ -102,21 +109,23 @@ WHAT IS A DIFFERENCE
 Anything the page prints that the item does not carry exactly, and anything the item carries that the
 page does not print:
 
-- A letter, digit or word that is different, missing or added. "neighouring" on the page and
-  "neighbouring" in the item is a difference: the book's own spelling is kept, even when it is wrong.
+- A letter, digit or word that is different, missing or added. "acheive" on the page and "achieve" in
+  the item is a difference: the book's own spelling is kept, even when it is wrong.
 - A symbol that is different, missing or added: a prime, a hat, a bar, an arrow, a subscript, a
   superscript, a minus sign, a radical, a multiplication sign, a Greek letter.
-- The case of a subscript or superscript: M_E against M_e, r_A against r_a.
+- The case of a subscript or superscript: x_A against x_a, V_P against V_p.
 - An exponent or a subscript attached to the wrong thing, or an exponent written as its reciprocal.
 - An approximation flattened into an equality: the page prints ≅ or ≈ and the item writes "=".
 - An equation number that is missing, different, or not in its printed parentheses.
 - A bracket that is missing or misplaced **where it changes what the expression means**: which terms a
-  fraction divides, what an exponent applies to, what a factor multiplies. The page prints the fraction
-  Mm/d² followed by L, so "G (Mm / d^2) L" is right and "G Mm / d^2 L" — which reads as d²L in the
-  denominator — differs.
-- A misprint the item has "corrected". The page prints "(4p/3)" where it means 4π/3; an item reading
-  "(4 pi / 3)" differs from the print, because the corpus carries the book's own words and a misprint is
-  adjudicated by a person, not repaired by a reader.
+  fraction divides, what an exponent applies to, what a factor multiplies. In this notation a factor
+  written after a fraction with no bracket reads as part of the denominator, so a factor the page sets
+  outside a fraction is bracketed apart from it. The page prints mv² over 2r: "(m v^2) / (2 r)" is right
+  and "m v^2 / 2 r", which reads as (mv²/2)·r, differs. The page prints the fraction k/m multiplied by
+  x: "(k / m) x" is right and "k / m x", which reads as k over mx, differs.
+- A misprint the item has "corrected". The page prints "teh velocity"; an item reading "the velocity"
+  differs from the print, because the corpus carries the book's own words and a misprint is adjudicated
+  by a person, not repaired by a reader.
 - A printed label or item marker that is dropped or restyled: "Example 7.3", "Answer", "Solution",
   "(a)", "(ii)", "1." at the head of a paragraph are printed text and belong to the item as printed.
 - A sentence or a phrase of the item that the page does not print, and a sentence of the page's paragraph
@@ -124,17 +133,18 @@ page does not print:
 
 WHAT IS NOT A DIFFERENCE
 
-- Spacing of any kind: "G m_1m_2" and "G m_1 m_2", "F(d)" and "F (d)", a space before a comma or a
-  colon. The book's own irregular spacing is not kept and not flagged.
+- Spacing of any kind: "k x^2" and "kx^2", "f(t)" and "f (t)", a space before a comma or a colon. The
+  book's own irregular spacing is not kept and not flagged.
 - A line break or a hyphen that only breaks a word at the end of a printed line.
-- Brackets that do not change what an expression means: "(GM_E / R_E^3) r" and "GM_E / R_E^3 r" are
-  one reading when nothing would group differently; "g(h)" and "g (h)" are the same.
+- Brackets that change nothing, because nothing follows or precedes that could group differently:
+  "(m v^2) / r" and "m v^2 / r" are one reading, and so are "x(t)" and "x (t)". A bracket around a
+  fraction that a factor follows is never one of these: see above.
 - The approximation signs ≅, ≃ and ≈, which are one sign here, and the dashes −, - and –, which are one
   minus.
 - The multiplication sign in scientific notation written as ×, x or a dot: the sign matters, the glyph
   does not.
 - The style of a quotation mark or an apostrophe: ’ and ', “ and ".
-- Notation written by the conventions below: "theta" for θ, "sqrt(2gR_E)" for √(2gR_E), "i_hat" for î,
+- Notation written by the conventions below: "theta" for θ, "sqrt(2 g h)" for √(2gh), "i_hat" for î,
   "v_bar" for v̄, "sum(...)" for Σ, "approx=" for ≅. A convention followed is the print, transcribed.
 - A bold or an italic letter written as a plain letter. Bold marks a vector in these books, and the
   conventions write a vector's plain symbol.
@@ -144,56 +154,55 @@ THE HATS: THE VECTOR AND ITS UNIT VECTOR
 This is the difference the first reader most often misses, and you must look for it. NCERT prints a
 vector in bold, and its unit vector with a hat: bold r is the vector r, r̂ is the unit vector. The
 transcription writes the vector as a plain "r" and the unit vector as "r_hat". The two are different
-quantities: F = −G m_1 m_2 / r^2 r̂ and F = −G m_1 m_2 / |r|^3 r are both true, and each is false with
-the other's symbol.
+quantities: a vector has a size and a direction, its unit vector only the direction, so an equation is
+true with one and false with the other.
 
 So wherever the item writes "r_hat", "i_hat", "j_hat" or any "_hat", look at the page: is there a hat
-over that symbol, there? And wherever the page prints a hat, does the item carry "_hat"? A hat written
-by analogy with the term before it — "- G m_1m_2 / |r|^3 r_hat" where the page prints a bold r without a
-hat — differs: printed "|r|^3 r", transcribed "|r|^3 r_hat".
+over that symbol, there? And wherever the page prints a hat, does the item carry "_hat"? Do the same for
+every symbol of an equation that repeats a vector: a hat written by analogy with a neighbouring term,
+where the page prints the bold letter without a hat, differs.
 
 WORKED EXAMPLES
 
-An item reads: "Stated Mathematically, Newton's gravitation law reads : The force F on a point mass m_2
-due to another point mass m_1 has the magnitude | F | = G m_1 m_2 / r^2 (7.5) Equation (7.5) can be
-expressed in vector form as F = G m_1 m_2 / r^2 (- r_hat) = - G m_1 m_2 / r^2 r_hat = - G m_1 m_2 /
-|r|^3 r_hat". The page prints the third form with a bold r and no hat. The verdict is differs, with one
-difference: printed "|r|^3 r", transcribed "|r|^3 r_hat". The spacing inside "| F |" is not a difference.
+These examples are invented to show each kind of verdict; they are not the text of any page you will
+be given.
 
-An item reads: "(b) Now if the mass at vertex A is doubled then F_GA = G2m.2m / 1 j_hat = 4Gm^2 j_hat
-F_GB = F_GB". The page prints primes on the doubled-case forces: F′_GA, F′_GB. The verdict is differs,
-with two differences: printed "then F'_GA =", transcribed "then F_GA ="; printed "F'_GB = F_GB",
-transcribed "F_GB = F_GB".
+An item reads: "For uniform circular motion the acceleration is a = - omega^2 r_hat, where r is the
+position vector of the particle from the centre." The page prints a bold r with no hat in the equation.
+The verdict is differs, with one difference: printed "- omega^2 r, where", transcribed "- omega^2 r_hat,
+where".
 
-An item reads: "g(h) = g (1 - 2h / R_E)". The page prints g(h) ≅ g(1 − 2h/R_E). The verdict is differs:
-printed "g(h) ≅ g", transcribed "g(h) = g". The spacing and the minus glyph are not differences; the
-flattened approximation is.
+An item reads: "After the collision the velocities v_1 and v_2 satisfy m_1 u_1 = m_1 v_1 + m_2 v_2." The
+page prints the final velocities with primes, v′₁ and v′₂, in both places. The verdict is differs, with
+two differences: printed "velocities v'_1 and v'_2 satisfy", transcribed "velocities v_1 and v_2
+satisfy"; printed "m_1 v'_1 + m_2 v'_2", transcribed "m_1 v_1 + m_2 v_2".
 
-An item reads: "We assume that the entire earth is of uniform density and hence its mass is M_E = (4p/3)
-R_E^3 rho". The page prints "(4p/3)" — the book's misprint for 4π/3. The verdict is matches: the item
-carries the print, misprint and all.
+An item reads: "For small oscillations the period is T = 2 pi sqrt(l / g) = 2.0 s." The page prints
+T ≈ 2.0 s at the end. The verdict is differs: printed "sqrt(l / g) ≈ 2.0 s", transcribed "sqrt(l / g) =
+2.0 s". The spacing is not a difference; the flattened approximation is.
 
-An item reads: "Using the value of g and R_E, numerically (V_i)_min approx= 11.2 km/s". The page prints
-(V_i)min ≈ 11.2 km/s. The verdict is matches: "approx=" is the convention for ≈, and "(V_i)_min" writes
-the printed subscript.
+An item reads: "The resistence of a wire is proportional to its length." The page prints "resistence".
+The verdict is matches: the item carries the print, misprint and all.
 
-An item reads: "The value of the gravitational constant G entering the Universal law of gravitation can
-be determined experimentally and this was first done by English scientist Henry Cavendish in 1789." The
-page prints 1798. The verdict is differs: printed "in 1798.", transcribed "in 1789.".
+An item reads: "The angle of the incline theta approx= 30° and the block is at rest." The page prints
+θ ≈ 30°. The verdict is matches: "theta" and "approx=" are the conventions for θ and ≈.
 
-An item reads a paragraph about satellites orbiting the earth, and the page in front of you is about the
-torsion balance. The verdict is not_on_page.
+An item reads: "The effect was first measured in 1849 by a careful experiment." The page prints 1894.
+The verdict is differs: printed "in 1894 by", transcribed "in 1849 by".
 
-A page's left column opens with three displayed equations — F_GA, F_GB and F_GC with their vectors —
-before "From the principle of superposition…", and no item carries them. The items that are on the page
-are judged as usual, and `omitted` lists "F_GA = Gm(2m) / 1 j_hat".
+An item reads a paragraph about the specific heat of a gas, and the page in front of you is about
+refraction at a curved surface. The verdict is not_on_page.
+
+A page's right column opens with two displayed equations for the components of a velocity, before the
+sentence "Eliminating t from these gives…", and no item carries them. The items that are on the page
+are judged as usual, and `omitted` lists "v_x = v cos theta".
 
 WHAT IS NOT RUNNING TEXT, AND SO NEVER OMITTED
 
 The transcription deliberately leaves out what is not running text, and its absence is correct:
 
 - The running head, the folio, a rule or a band of colour.
-- The section heading line itself — "7.4 THE GRAVITATIONAL CONSTANT" — which is the address of the
+- The section heading line itself — "5.4 NEWTON'S SECOND LAW OF MOTION" — which is the address of the
   paragraphs beneath it, not words in them.
 - Figure and table captions, the labels inside a diagram, the rows and columns of a table.
 - The end-of-chapter apparatus: Summary, Points to Ponder, Exercises, Additional Exercises, Answers.
@@ -272,6 +281,10 @@ Biology adds:
   Homo sapiens, Panthera leo, and an abbreviated genus as the page prints it, P. tigris. The
   book sets them in italics; write them as plain text.
 - Labels and abbreviations as printed: ATP, NADPH, mRNA, Rh factor.
+
+Two of those conventions can spell one printed mark two ways: a vector drawn with an arrow may be written
+with its plain symbol or with `_vec`. Where the conventions allow both, either is the print, transcribed;
+do not flag one against the other.
 
 A HINDI PAGE
 

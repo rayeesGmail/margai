@@ -221,9 +221,35 @@ THE FREE CHECKS, every item read against the pages: 5 real, ~10 noise.
     defensible on 2026-09-14) and "The total force on m₁ is" set under Fig. 7.4 (running text or caption —
     undecided).
   - the corrections file cannot yet say two of these: no kind removes a figure_ref, and none drops a row.
-OPEN FOR THE FOUNDER (the message of this session lists them with a recommendation each): the pass mark
-  set on a false must-find; whether and how to measure recall (seeded defects); the second read's three
-  false-flag classes code can remove; the missing correction kinds; the four split corrections drafted.
+RULINGS, founder: "approved as written, recommended option per ruling" — (1) the pass mark is void and the
+  vector-r claim is corrected in place (d0398fd: the 2026-09-14 day log, the pair ruling, the visionsonnet
+  header); (2) recall is measured on seeded defects, after code sets aside `√x`/`sqrt(x)`, a single-token
+  `^-n`/`^(-n)` and a trailing full stop (a47be53), under its own artefact tag (655f3ac); (3) `figure_ref`
+  and `drop` correction kinds (ba80219); (4) the four split corrections, each span checked once on its page
+  (89605db) — they apply at chapter 7's next load of `margai_d15`, which waits for the recall result.
+THE SEEDED COPY: `margai_d15_seeded`, created from `margai_d15` (template copy: rows, pageStarts, the Opus
+  ledger rows the guard needs), with twelve defects injected by SQL from the session scratchpad, each into a
+  single-page row where its span occurred once, each confirmed to change one row; the real database checked
+  untouched. The key to score against — page: row — class (the seeded text):
+  - p2: §7.1 ¶3 — word changed ("hailing from Sweden" for Denmark)
+  - p4: §7.3 ¶6 — hat added ("along - r_hat.")
+  - p5: §7.3 ¶14 — prime dropped ("F_GB = F_GB" for F'_GB)
+  - p7: §7.5 ¶5 — subscript case ("G M_e m"); §7.6 ¶3 — approximation flattened ("g(h) = g"); §7.5 ¶6 —
+    equation number changed ("(7.21)" for (7.12))
+  - p9: §7.7 ¶12 — leading minus lost ("= 4 sqrt(2)")
+  - p10: §7.8 ¶4 — bracket around a sum lost ("GmM_E / h + R_E")
+  - p11: §7.9 ¶5 — digit changed ("6300 km"); §7.8 ¶16 — sentence dropped ("The calculation of this speed is
+    left as an exercise to the students."); §7.9 ¶3 — displayed equation dropped ("V^2 = G M_E / (R_E + h)
+    (7.35)")
+  - p12: §7.9 ¶11 — exponent changed ("3.84×10^6")
+  None is of a class code now sets aside. Recall = seeds named by a flag at the right row (the dropped
+  sentence and equation may surface as `omitted` on their page instead); every other signal is scored
+  against the page as before.
+HOW TO RESUME: the founder rebuilds the jar and runs the one command in the runbook's "The seeded recall
+  run" (`DB_URL=…/margai_d15_seeded … --read-pages --artefact-tag seeded`, ~₹15); Claude scores it against
+  the key above. Then, per DECISIONS 2026-09-15: poor recall → drop the paid second read for the free checks
+  and spot reads; good recall → the false-flag rate decides whether the book runs carry it. Either way,
+  chapter 7 of `margai_d15` is reloaded with the four splits.
 Reports 2026-09-15-ncert-load(-2), -ncert-verify (free), -2 (`--pages 1`), -3 (the finished read) committed;
   the two stopped runs wrote none. Server tests 697, verify green, eval PASS (placeholder) before each
   AI-path commit.

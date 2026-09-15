@@ -19,4 +19,15 @@
 # Example:
 #   - {book: phy11-part1, lang: en, chapter: 7, page: 4, kind: text, address: "ch 7 §7.3 ¶5",
 #      transcribed: "|r|^3 r_hat", printed: "|r|^3 r", reason: "the third form prints the vector r"}
-corrections: []
+corrections:
+  # phy11-part1 chapter 7, Opus run 11 — the free checks of the 2026-09-15 calibration, each read against
+  # the page rendered at 170–220 DPI; approved by the founder 2026-09-15 (ruling 4). Each line is indented
+  # after a displayed equation, which the transcriber's own prompt (ncert_extract v3) says starts a paragraph.
+  - {book: phy11-part1, lang: en, chapter: 7, page: 3, kind: split, address: "ch 7 §7.2 ¶7",
+     at: "where v is the velocity", reason: "indented after the display (7.2)"}
+  - {book: phy11-part1, lang: en, chapter: 7, page: 7, kind: split, address: "ch 7 §7.6 ¶3",
+     at: "For h/R_E << 1, using binomial expression", reason: "indented after the display for g(h)"}
+  - {book: phy11-part1, lang: en, chapter: 7, page: 8, kind: split, address: "ch 7 §7.6 ¶7",
+     at: "Substituting for M_s from above", reason: "indented after the display (7.17)"}
+  - {book: phy11-part1, lang: en, chapter: 7, page: 11, kind: split, address: "ch 7 §7.9 ¶4",
+     at: "where we have used the relation", reason: "indented after the display (7.36)"}

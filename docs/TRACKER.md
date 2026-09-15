@@ -177,6 +177,59 @@
 ## 📝 Day log (append newest on top)
 
 ```
+D15 · 2026-09-15 · the verifier's chapter-7 calibration — run, scored against the rendered pages;
+  the pass mark's must-find turns out not to be a defect (rulings needed)
+Founder-run from `server/` on `d15-ncert-books`, `margai_d15`. (a) `ncert load --chapters 7` 07:41 failed on
+  an expired SSO session (report `-load.md`, nothing written); after the login, 07:42: 102
+  updated, 0 inserted, 0 deleted, corrections none, all 102 rows now carry pageStarts (checked in the
+  database). (b) free `ncert verify` 07:49: 7 start flags, 1 figure flag, 0 join — the ₹0 preview exactly.
+  (c) `--read-pages` on `pipeline,live,visionsonnet`, in four runs, each stopped or finished on evidence:
+  - 07:51, stopped after 2 pages: every page's first answer failed the schema ("/items: string found") and
+    was repaired — ₹5.90 for two pages, neither kept (the artefact flushed every 10). Nothing logged the
+    rejected output, so 6a311e3 excerpts it for pipeline features; 08:00 `--pages 1` (₹3.59) showed the
+    cause: Sonnet sent its whole, correct answer as a string inside `items`, the output's first field —
+    named after a JSON-Schema keyword. Fixed at root in 59e41ca (`verdicts`, and a test that no pipeline
+    output field is a schema keyword); 330a547 writes the artefact after every page.
+  - 08:09, stopped at page 4: page 2 decoded clean (the rename confirmed); pages 3–4 returned `differs` with
+    identical printed and transcribed spans, which the record refused into a repair — fixed in 2b8eb9d
+    (accepted, set aside by code, listed).
+  - 08:16, finished: 9 pages, ₹15.37 (cache write 7,251 — the prefix on Sonnet's tokenizer; 1 repair, page 4,
+    a stringified `verdicts` array: 1 page in 9). 102 of 102 rows with a verdict: 96 matches, 6 differs,
+    7 flags, 1 omitted passage, 8 identical/glyph set-asides, no misquotes. Total spend on the calibration
+    ≈ ₹25.
+THE MUST-FIND IS NOT A DEFECT. Page 4 rendered at 300 DPI prints the third form of Eq. (7.5) as
+  −G m₁m₂/|r|³ r̂ — with the hat, the book's own physics error, in all three forms. Opus's `|r|^3 r_hat` is
+  the print and Sonnet's `matches` is right. The 2026-09-14 full read and the pair ruling's evidence
+  ("Sonnet the one read to see the vector r") had it backwards: Sonnet run 9's plain `r` corrected the book.
+THE SECOND READ, all 8 signals read against the pages: 8 wrong, 0 real.
+  - p9 §7.7 ¶12 `−4√2 G m / l` vs `sqrt(2)` — the convention; p11 §7.9 ¶8 ×2 `10^-11` vs `10^(-11)` — the
+    convention (bracketed exponent) and spacing.
+  - p10 §7.8 ¶13 and ¶14 — the verifier dropped a full stop the page prints after each display.
+  - p10 §7.8 ¶10 `R_E` vs `r_E` — the page prints r_E; the verifier corrected the book.
+  - p12 §7.10 ¶4 "total energy of a satellite" — invented; the page prints "an circularly orbiting".
+  - omitted p8 "7.7 GRAVITATIONAL POTENTIAL ENERGY" — a heading, which the prompt says is never omitted.
+  By the page, run 11 has no character defect left for the verifier to find (E ( ) on page 9 stays as the
+  2026-09-14 read ruled it), so this run measures false flags and cannot measure recall.
+THE FREE CHECKS, every item read against the pages: 5 real, ~10 noise.
+  - real, by v3's own rule (a line indented after a display starts a paragraph): p3 §7.2 ¶7 swallows
+    "where v is the velocity…"; p7 §7.6 ¶3 swallows "For h/R_E << 1, using binomial expression,"; p8 §7.6 ¶7
+    swallows "Substituting for M_s from above, we get"; p11 §7.9 ¶4 swallows "where we have used the
+    relation…". And §7.3 ¶9 (Example 7.2's stem) carries `Fig. 7.5`, which only ¶11 mentions.
+  - noise: page 5's boxed law statements (1)/(2) and §7.4 ¶1 after its heading, and two false printed starts
+    there; page 3's Example box line "equal times to traverse BAC and"; page 11's indented "Which is
+    approximately 85 minutes."; page 12's "Answer Given k…" label; page 4's flush law statement (ruled
+    defensible on 2026-09-14) and "The total force on m₁ is" set under Fig. 7.4 (running text or caption —
+    undecided).
+  - the corrections file cannot yet say two of these: no kind removes a figure_ref, and none drops a row.
+OPEN FOR THE FOUNDER (the message of this session lists them with a recommendation each): the pass mark
+  set on a false must-find; whether and how to measure recall (seeded defects); the second read's three
+  false-flag classes code can remove; the missing correction kinds; the four split corrections drafted.
+Reports 2026-09-15-ncert-load(-2), -ncert-verify (free), -2 (`--pages 1`), -3 (the finished read) committed;
+  the two stopped runs wrote none. Server tests 697, verify green, eval PASS (placeholder) before each
+  AI-path commit.
+```
+
+```
 D15 · 2026-09-14 (late evening) · HOW TO RESUME step 1 — `ncert verify [--read-pages]` built; not yet
   calibrated
 The plan (seven tasks, eight spec-silent choices, five closing questions) was approved with "ok, let's

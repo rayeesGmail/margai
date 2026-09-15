@@ -262,8 +262,13 @@ THE SEEDED RECALL RUN, founder, 22:44 — `margai_d15_seeded`, `--artefact-tag s
     and "an circularly" came back as identical or equal spans and were set aside, not flagged.
   One run of twelve pages is a small sample on a model that samples at its default temperature; whether the
   three misses are habit or dice needs a repeat of those pages (DECISIONS 2026-09-14, repeat before change).
-HOW TO RESUME: rulings open for the founder on the seeded result (this session's closing message); chapter 7
-  of `margai_d15` is reloaded with the four splits once they are given.
+RULINGS on the seeded result, founder: "approved as written, recommended option per ruling" (DECISIONS
+  2026-09-15) — (1) repeat the three missed pages; (2) code sets aside omitted headings and captions and a
+  trailing ? or ! (fa6b7d7); (3) the paid second read is kept, its blind spots named if the misses repeat.
+HOW TO RESUME: the founder rebuilds the jar and runs the repeat (`… margai_d15_seeded … --read-pages
+  --artefact-tag seeded --redo --pages 5,7,11`, ~₹5); Claude scores the three misses (prime p5 §7.3 ¶14,
+  ≅ p7 §7.6 ¶3, equation p11 §7.9 ¶3) and writes the runbook's blind-spot note accordingly; then chapter 7 of
+  `margai_d15` is reloaded with the four splits, and the phy11-part1 corpus event is next.
 Reports 2026-09-15-ncert-load(-2), -ncert-verify (free), -2 (`--pages 1`), -3 (the finished read) committed;
   the two stopped runs wrote none. Server tests 697, verify green, eval PASS (placeholder) before each
   AI-path commit.

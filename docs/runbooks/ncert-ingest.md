@@ -361,6 +361,14 @@ second read's 8 signals were all wrong against the page; the free checks found 5
 noise items. Chapter 7 as transcribed has no character defect left, so it can measure false flags but not
 recall — which is what the seeded run below is for.
 
+**What the second read does not see — aim the spot reads here (measured 2026-09-15, two draws each on seeded
+defects):** a **dropped prime** (F'_GB written F_GB), an **approximation sign read as =** (the verifier
+quotes the page's ≅ as =), and a **dropped displayed equation**. It found, twice where repeated, a changed
+word, digit or exponent, an added hat, a subscript's case, a lost leading minus, a lost bracket around a
+sum, a changed equation number and a dropped sentence. The free checks cannot see the first two either —
+the symbol fonts leave primes and ≅ unmapped in the text layer — so a book is not clean of them until a
+person has read its primes and approximation signs against the page.
+
 ### The seeded recall run
 
 A scratch copy of the database, `margai_d15_seeded`, whose chapter-7 rows carry a dozen injected defects

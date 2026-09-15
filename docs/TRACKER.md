@@ -265,10 +265,24 @@ THE SEEDED RECALL RUN, founder, 22:44 — `margai_d15_seeded`, `--artefact-tag s
 RULINGS on the seeded result, founder: "approved as written, recommended option per ruling" (DECISIONS
   2026-09-15) — (1) repeat the three missed pages; (2) code sets aside omitted headings and captions and a
   trailing ? or ! (fa6b7d7); (3) the paid second read is kept, its blind spots named if the misses repeat.
-HOW TO RESUME: the founder rebuilds the jar and runs the repeat (`… margai_d15_seeded … --read-pages
-  --artefact-tag seeded --redo --pages 5,7,11`, ~₹5); Claude scores the three misses (prime p5 §7.3 ¶14,
-  ≅ p7 §7.6 ¶3, equation p11 §7.9 ¶3) and writes the runbook's blind-spot note accordingly; then chapter 7 of
-  `margai_d15` is reloaded with the four splits, and the phy11-part1 corpus event is next.
+THE REPEAT, founder, 23:04 — pages 5, 7, 11 with `--redo` under the seeded tag, ₹7.22 (one repair: page 7's
+  `verdicts` again sent as a string — 2 calls of 24 so far); report `-ncert-verify-5.md`.
+  - The three misses are HABIT, missed twice each: the prime (page 5 — the verifier quoted §7.3 ¶14's
+    `F'_GA …` as identical and did not see `F_GB = F_GB` lost its prime); ≅ flattened (page 7 — its rejected
+    first answer quoted the page as `g(h) = g`: it reads the printed ≅ as =); the displayed equation dropped
+    (page 11 — neither flagged nor omitted).
+  - The other seeds on those pages found again: subscript case and equation number (p7), digit (p11); the
+    dropped sentence found again, this time as omitted text rather than a difference.
+  - Wrong signals on the three pages: none — the heading 7.4 set aside by the new code, "to be cube" not
+    raised this draw.
+  CONCLUSION by ruling 3: the paid second read is kept; its blind spots — a dropped prime, an approximation
+  sign read as =, a dropped displayed equation — are named in the runbook, and the founder's spot reads aim
+  at them. The free checks cannot see the first two either (the symbol fonts leave primes and ≅ unmapped in
+  the layer); a numbered displayed equation leaves its number in the layer, which a free check could hold
+  the rows to (open for the founder).
+HOW TO RESUME: (1) a ₹0 reload of chapter 7 into `margai_d15` proves the four split corrections apply; (2) the
+  phy11-part1 corpus event — open for the founder: whether chapter 7 stays run 11, so its adjudicated
+  corrections still apply, or is re-extracted with the book.
 Reports 2026-09-15-ncert-load(-2), -ncert-verify (free), -2 (`--pages 1`), -3 (the finished read) committed;
   the two stopped runs wrote none. Server tests 697, verify green, eval PASS (placeholder) before each
   AI-path commit.
@@ -2769,6 +2783,7 @@ Tomorrow's first task:
 - **a correction that moves a paragraph's section** · 2026-09-14 (D15) · `ncert-corrections.yaml` can replace a span, join and split, but not re-file a paragraph under another section — run 2's defect (a skipped heading filed §7.3's paragraphs under §7.2) has no deterministic remedy but a re-extraction of the page. Add a `section` kind (page + opening words + the printed section) when an adjudication first needs one
 - **what the free checks missed on chapter 7, from the ₹0 preview** · 2026-09-14 (D15) · page 5's boxed law statements "(1)…" and "(2)…" are rows the print's layer does not start (the item marker may not be in the box's text layer); page 11's "Which is approximately 85 minutes.", indented before an Example box, is not seen as a start because the box's first line sits close beneath it; page 3 raises two starts ("where v is the velocity", "equal times to traverse") that look like lines after displays. Read each against the rendered page in the calibration and tune only what the calibration shows twice
 - ~~**`--pages` and `--redo` without `--read-pages` are ignored silently**~~ · **done the same evening** after the spec-auditor named it: refused with the reason · 2026-09-14 (D15)
+- **the verify output's `verdicts` array sometimes arrives as a JSON string** · 2026-09-15 (D15) · after the `items` rename the whole-answer wrap is gone, but 2 page calls in 24 still sent `"verdicts":"[{…}]"` — a correct array, stringified — and each cost a repair call. A decode that parses a string holding exactly the array the schema expects would save the call; it touches `StructuredOutput` for every feature, so it wants its own measured change
 - **`ncert_extract` v3 spells an arrow-marked vector two ways** · 2026-09-14 (D15, spec-auditor) · its notation says a vector "marked by an arrow or by bold keeps its plain symbol" and, three lines on, that a vector arrow "is `_vec`"; the frozen prompt is not edited, and `ncert_verify` v1 declares the two spellings equivalent so neither is flagged. A candidate for v3's next amendment, which needs a defect the second read cannot catch — this one it deliberately does not
 - **verify through the real batch lane** · 2026-09-14 (D15, spec-auditor) · pages are independent, so a whole-book `ncert verify --read-pages` is a natural first `completeBatch` caller at half price once D55's batch lane returns results per request; today it calls page by page so every paid page reaches the artefact (DECISIONS 2026-09-14)
 - ~~**`ncert load --prune` for a corpus event** · 2026-09-14 (D15) · the load reports the addresses a chapter no longer carries and leaves the rows in place, which was right for a subset load into a full book and is wrong for a re-extraction that replaces the book: 85 stale rows sat beside the canonical 1,017 until today, sampleable by the ✅ and embeddable by D17. A flag that deletes the orphans of the chapters this load carries, refused once embeddings or anchors exist unless the D17 migrate path is taken. Until it exists the corpus event deletes by hand before the load (day log 2026-09-14)~~ · **done the same day, without a flag**: the load deletes them, names them, refuses if any is anchored, spares a row holding the other edition's text (DECISIONS 2026-09-14)

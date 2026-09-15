@@ -308,14 +308,12 @@ class NcertVerifyCommand extends NcertBookCommand {
                 strayVerdicts += recorded.stray();
                 done.put(recorded.page().address(), recorded.page());
                 called++;
-                if (called % properties.extractBatchSize() == 0) {
-                    flush(key, done);
-                    log.info("ncert verify {} {}: {} pages read, flushed", definition.code(), language, called);
-                }
+                // Every page, not every batch: a page is paid for when it is read, and the first
+                // calibration run lost both of its pages to an interruption before a ten-page flush.
+                flush(key, done);
+                log.info("ncert verify {} {}: ch {} p{} read and written ({} this run)", definition.code(), language,
+                        chapter.getKey(), page, called);
             }
-        }
-        if (called > 0) {
-            flush(key, done);
         }
         report.section("pages read by the second read")
                 .table(List.of("pages", "read this run", "from earlier runs"), List.of(List.of(

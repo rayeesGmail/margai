@@ -96,7 +96,7 @@ class NcertVerifyCommandTest {
                 if (cls == NcertVerifyCommand.class) {
                     return cls.cast(new NcertVerifyCommand(store, imports, verifier, ids -> filter(ids),
                             new NcertExtractCommandTest.StubSpend(), client,
-                            new PipelineProperties(72, 1, 1, "claude-sonnet-5"), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5"), writer));
                 }
                 return siblings.create(cls);
             }
@@ -347,6 +347,23 @@ class NcertVerifyCommandTest {
                 .contains("clean for the book (PLAN D15 ✅): not computed — a selected chapter has no loaded rows");
     }
 
+    /**
+     * A page is paid for when it is read, so it is written when it is read: the first calibration run was
+     * stopped after two pages and lost both, because the artefact was flushed every ten (2026-09-15).
+     */
+    @Test
+    void everyPageReadIsInTheArtefactBeforeTheNextIsSent() {
+        List<Integer> pagesStoredWhenCalled = new ArrayList<>();
+        verifier.onCall = () -> {
+            String key = ContentKeys.verify("phy11-part1", BookLanguage.en);
+            pagesStoredWhenCalled.add(store.exists(key) ? VerifyJsonl.read(key, store.get(key)).size() : 0);
+        };
+
+        run("--read-pages");
+
+        assertThat(pagesStoredWhenCalled).containsExactly(0, 1);
+    }
+
     @Test
     void pagesAndRedoWithoutReadPagesAreRefused() {
         assertThat(run("--pages", "2")).isEqualTo(InputFileCommand.EXIT_FAILED);
@@ -531,6 +548,8 @@ class NcertVerifyCommandTest {
         final Map<Integer, List<String>> omitted = new HashMap<>();
         String model = "claude-sonnet-5";
         String answeringModel = "claude-sonnet-5";
+        Runnable onCall = () -> {
+        };
 
         void differs(int page, int item, String printed, String transcribed) {
             answers.computeIfAbsent(page, p -> new HashMap<>()).put(item, new PageVerdicts.ItemVerdict(item,
@@ -545,6 +564,7 @@ class NcertVerifyCommandTest {
         @Override
         public AiResponse<PageVerdicts> verify(String bookTitle, short chapter, int page, List<ImagePart> images,
                 List<VerifyItem> given, AiCallContext ctx) {
+            onCall.run();
             calls.add(page);
             items.add(given);
             List<PageVerdicts.ItemVerdict> verdicts = new ArrayList<>();

@@ -164,7 +164,7 @@ class NcertVerifyCommandTest {
         assertThat(imports.verifications).allSatisfy(row ->
                 assertThat(row.verification().verdict()).isEqualTo(ParagraphVerification.Verdict.matches));
         assertThat(out.toString())
-                .contains("## set aside by code: the spans differ only in spacing or a glyph variant")
+                .contains("## set aside by code: the spans differ only in spacing or a glyph variant, or not at all")
                 .contains("- ch 7 p2 §7.2 ¶1: printed \"G m_1 m_2 / |r|^3\" · transcribed \"G m_1m_2 / |r|^3\"");
     }
 
@@ -172,6 +172,19 @@ class NcertVerifyCommandTest {
      * A misquoted claim is not a match: the verifier said something differs and could not say where, so
      * nothing is known about the row — it is not judged, and it is not counted clean (spec-auditor, D15).
      */
+    /** Sonnet listed spans it had checked as differences with both sides the same (2026-09-15): no difference. */
+    @Test
+    void identicalSpansAreSetAsideAndTheRowMatches() {
+        verifier.differs(2, 2, "|r|^3 r_hat where", "|r|^3 r_hat where");
+
+        run("--read-pages");
+
+        assertThat(imports.verifications.get(2).verification().verdict()).isEqualTo(ParagraphVerification.Verdict.matches);
+        assertThat(out.toString())
+                .contains("## set aside by code: the spans differ only in spacing or a glyph variant, or not at all")
+                .contains("- ch 7 p2 §7.2 ¶1: printed \"|r|^3 r_hat where\" · transcribed \"|r|^3 r_hat where\"");
+    }
+
     @Test
     void aTranscribedSpanTheRowDoesNotCarryLeavesTheRowNotJudged() {
         verifier.differs(2, 2, "where G is a constant", "where G was the constant");

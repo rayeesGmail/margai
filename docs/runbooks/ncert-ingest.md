@@ -319,7 +319,8 @@ a verdict", and `--read-pages` reads just those pages again (≈ ₹1 each) — 
    chapter's captions`. These are measured guesses about typography — they route attention and never
    refuse. A real segmentation defect becomes a `join` or `split` entry.
 5. **`set aside by code`** — spans that differ only in spacing or a glyph variant (≅ ≃ ≈, the dashes,
-   quotation marks, × and ·), which leave the row matching, and spans the verifier quoted that the row
+   quotation marks, × and ·), or not at all (the verifier listing a span it checked — seen on the first
+   calibration pages), which leave the row matching, and spans the verifier quoted that the row
    does not carry, which leave the row **not judged** — a claim nobody can place is not a match. Skim
    them: a long list of the second kind means the verifier is misquoting, which is a prompt problem.
 6. **`clean paragraphs`** — per chapter: rows, verdicts, matches, differs, not on page, not judged,

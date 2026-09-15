@@ -40,15 +40,22 @@ class PageVerdictsTest {
                 .hasMessageContaining("item 2 is 'matches' and must name no difference");
     }
 
-    /** A span the pipeline must find in the row cannot be empty, and two equal spans are not a difference. */
+    /** A span the pipeline must find in the row cannot be empty. */
     @Test
-    void aBlankOrIdenticalSpanIsRefused() {
+    void aBlankSpanIsRefused() {
         assertThatThrownBy(() -> new PageVerdicts.Difference("r", " "))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("both spans must quote text");
-        assertThatThrownBy(() -> new PageVerdicts.Difference("G m", "G m"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("the printed and transcribed spans are identical");
+    }
+
+    /**
+     * Two equal spans name no difference, and code can see that for nothing (VerdictSpans), so they are
+     * accepted here and set aside by the pipeline. Refusing them at decode cost a repair call on page after
+     * page of the first calibration run, where Sonnet listed spans it had checked (2026-09-15).
+     */
+    @Test
+    void identicalSpansAreAcceptedForThePipelineToSetAside() {
+        assertThat(new PageVerdicts.Difference("r_hat_21", "r_hat_21").printed()).isEqualTo("r_hat_21");
     }
 
     @Test

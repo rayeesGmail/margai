@@ -559,7 +559,7 @@ class NcertVerifyCommand extends NcertBookCommand {
         report.section("rows the verifier could not find on their page").list(notOnPage);
         report.section("running text the page prints that no row carries").list(omitted);
         report.section("items the verifier returned no verdict for").list(notJudged);
-        report.section("set aside by code: the spans differ only in spacing or a glyph variant").list(glyphOnly);
+        report.section("set aside by code: the spans differ only in spacing or a glyph variant, or not at all").list(glyphOnly);
         report.section("set aside by code: the verifier quoted a transcription the row does not carry")
                 .line("the row is left not judged: the verifier claimed a difference it could not place")
                 .list(notCarried);

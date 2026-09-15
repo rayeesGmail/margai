@@ -57,6 +57,10 @@ public record PageVerdicts(List<ItemVerdict> verdicts, List<String> omitted) {
     /**
      * One place the item is not what the page prints.
      *
+     * <p>Two equal spans are accepted: they name no difference, which the pipeline sees for nothing and
+     * sets aside ({@code VerdictSpans}). Refusing them here cost a repair call on page after page of the
+     * first calibration run, where the verifier listed spans it had checked (2026-09-15, D15).
+     *
      * @param printed     the span as the page prints it, written in the transcription's notation
      * @param transcribed the same span copied exactly from the item, so the pipeline can find it there
      */
@@ -65,10 +69,6 @@ public record PageVerdicts(List<ItemVerdict> verdicts, List<String> omitted) {
         public Difference {
             if (printed == null || printed.isBlank() || transcribed == null || transcribed.isBlank()) {
                 throw new IllegalArgumentException("both spans must quote text");
-            }
-            if (printed.equals(transcribed)) {
-                throw new IllegalArgumentException("the printed and transcribed spans are identical ('" + printed
-                        + "'), so they name no difference");
             }
         }
     }

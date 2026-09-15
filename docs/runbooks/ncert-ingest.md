@@ -354,26 +354,35 @@ AWS_PROFILE=margai DB_URL=jdbc:postgresql://localhost:5432/margai_d15 java -jar 
 AI_LIVE=1 AWS_PROFILE=margai DB_URL=jdbc:postgresql://localhost:5432/margai_d15 java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live,visionsonnet ncert verify --book phy11-part1 --lang en --chapters 7 --read-pages
 ```
 
-**The pass mark, set before the run (founder, D15 plan question 5):** the vector r in §7.3 ¶5 is flagged
-(printed `|r|^3 r`, transcribed `|r|^3 r_hat`), and **no more than 10 flags on the 102 rows turn out to
-be wrong against the page**. Every flag is read against the rendered page and scored; the false-positive
-count and each miss go into the TRACKER day log. If the vector r is missed, one call per page is the
-wrong unit and the fallback is one paragraph per call (about 3.5× the cost) — a build change, decided
-then, not a prompt rule. **The prompt does not describe chapter 7**: its examples are invented and a
-test keeps the must-find's text out. It does teach the must-find's *class* by name — a hat written by
-analogy where the page prints a bold vector — so finding the vector r shows a taught class found in
-unseen text, not the verifier's reach into classes nobody named; the calibration's other flags and its
-misses say more about that. The notation block copied from the frozen extraction prompt quotes a few
-chapter-7 symbols (`F'_GB`, `g(h) ≅`, `F_GA`) as conventions both readers were given; a find on exactly
-those counts for less. **Bracket flags** are raised only where a bracket changes what a sum, an exponent
-or a function covers; the grouping of products and quotients (`G Mm / d^2 L` for G(Mm/d²)L) is left to
-the transcription's conventions and not flagged (DECISIONS 2026-09-14), so it is not scored.
+**Result, 2026-09-15 (TRACKER day log):** the pass mark set before the run — the vector r in §7.3 ¶5
+flagged, no more than 10 wrong flags — is **void**: page 4 prints r̂ in all three forms of Eq. (7.5), so
+the must-find was the book's own print and the verifier's `matches` was right (DECISIONS 2026-09-15). The
+second read's 8 signals were all wrong against the page; the free checks found 5 real defects among ~10
+noise items. Chapter 7 as transcribed has no character defect left, so it can measure false flags but not
+recall — which is what the seeded run below is for.
 
-A ₹0 preview of the free checks on these rows and the real `keph107.pdf`, run before the build was
-committed, raised 7 page-level start flags and 1 figure flag and no join flag; two of them look like
-real defects of run 11 (§7.9 ¶4 carries "where we have used the relation…", which page 11 indents after
-a display; `Fig. 7.5` sits on Example 7.2's stem rather than on its part (b)). The calibration reads all
-of them against the pages.
+### The seeded recall run
+
+A scratch copy of the database, `margai_d15_seeded`, whose chapter-7 rows carry a dozen injected defects
+listed in the TRACKER day log, is read with its own artefact tag so the real `verify/phy11-part1/en.jsonl`
+is never touched:
+
+```
+AI_LIVE=1 AWS_PROFILE=margai DB_URL=jdbc:postgresql://localhost:5432/margai_d15_seeded java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live,visionsonnet ncert verify --book phy11-part1 --lang en --chapters 7 --read-pages --artefact-tag seeded
+```
+
+Score it against the seed list: each seeded defect found (a flag naming it) or missed, and every other
+flag against the page. The code set-asides added for the seeded run — `√x` / `sqrt(x)`, a single-token
+exponent `^-n` / `^(-n)`, a trailing full stop — are seeded against on purpose: none of the seeds is of
+those classes.
+
+**The prompt does not describe chapter 7**: its examples are invented and a test keeps the calibration's
+text out. It does teach the classes that matter by name — a hat written by analogy where the page prints a
+bold vector, a prime, a lost minus — so a seeded defect of a taught class found shows the verifier doing
+what it was taught on unseen text. The notation block copied from the frozen extraction prompt quotes a
+few chapter-7 symbols (`F'_GB`, `g(h) ≅`, `F_GA`) as conventions both readers were given. **Bracket flags**
+are raised only where a bracket changes what a sum, an exponent or a function covers; the grouping of
+products and quotients is left to the transcription's conventions and not flagged (DECISIONS 2026-09-14).
 
 ## The D14 ✅ — 20 random paragraphs against the PDFs
 

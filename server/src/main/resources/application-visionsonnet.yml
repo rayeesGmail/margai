@@ -12,8 +12,9 @@
 # History: first tried at D14 (2026-09-13) as the transcriber and closed by RULING 1 — 2.2× the cost
 # and neither run loadable on prompt v1; reopened for one measurement on v3 (2026-09-14), where
 # Sonnet was structurally wrong in two full chapter-7 runs of three (a skipped heading, a two-column
-# page read right column first) and was the one read of any model to see the vector r that Opus
-# wrote `r_hat` four times. The ruling kept it for this job on the premise that a verifier handed
+# page read right column first) and was thought to be the one read of any model to see the vector r
+# that Opus wrote `r_hat` four times — a misreading, corrected 2026-09-15: the page prints r̂ there,
+# so Sonnet had corrected the book (DECISIONS, the pair row). The ruling kept it for this job on the premise that a verifier handed
 # one paragraph and one band has no layout to get wrong; the build hands it a whole page and its
 # paragraphs as a list (DECISIONS 2026-09-14, plan question 1), which keeps the per-item judgement
 # free of layout but asks the page's layout of it for `omitted` — the skill run 9 failed. The

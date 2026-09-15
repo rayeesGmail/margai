@@ -738,7 +738,8 @@ THE FULL READ OF THE OPUS RUN, 17:20 — every one of the 95 rows against all 12
   wrote τ (the D14 class; the rule "where a span of the layer is garbage, read the image" was
   not applied); (2) page 4, §7.3 ¶5 — the last term of the vector form of Eq. (7.5) written
   `− G m_1 m_2 / |r|^3 r_hat` where the book prints the vector r, not r_hat — **all three
-  models made this one**; (3) page 4, §7.3 ¶2 — `a_m alpha R_m^(-2)` for ∝, which Sonnet also
+  models made this one** [**corrected 2026-09-15**: page 4 at 300 DPI prints r̂ in all three forms —
+  the book's own error, which the transcription rightly kept; not a defect]; (3) page 4, §7.3 ¶2 — `a_m alpha R_m^(-2)` for ∝, which Sonnet also
   wrote and Haiku got right as `∝`. Lesser: `"Eq. (7.5)"` placed in figure_refs (Opus only);
   three merges of printed paragraphs — "Stated Mathematically…" with "Equation (7.5) can be
   expressed…" on page 4, the three (7.20)–(7.22) paragraphs on page 8, the three escape-speed
@@ -804,7 +805,8 @@ v3 DRY RUN 9 — chapter 7 on Sonnet again, on the same amended prompt, 18:27 (�
   "4pi/3" where the page misprints "4p/3" (Opus kept the misprint); the grouping of the
   denominator in (7.40) and (7.42) lost — `Gm M_E / 2(R_E + h)`, which a verifier can read two
   ways. And one thing Sonnet alone got right: the vector r in the third form of Eq. (7.5),
-  written plain `r` where every other run of every model wrote `r_hat`. Segmentation: two wrong
+  written plain `r` where every other run of every model wrote `r_hat` [**corrected 2026-09-15**: the
+  page prints r̂ there — Sonnet's plain `r` corrected the book, the others kept the print]. Segmentation: two wrong
   joins across pages where the page after indents and the page before ended with a stop —
   pages 3→4 "This clearly shows…" and 9→10 "By the principle of energy conservation…"; about
   twelve indented paragraphs merged into the one before (page 3 "The area SBAC…"; page 8's
@@ -817,7 +819,8 @@ v3 DRY RUN 9 — chapter 7 on Sonnet again, on the same amended prompt, 18:27 (�
   text exact 81 of 88, address 84 of 88, figure refs right but "Fig. 7.1(b)" added to a
   paragraph that names only 7.1a. Spend on v3 dry runs ₹312.43. THE PAIR, from runs 7–9: Opus
   twice structurally clean and closer to the print; Sonnet structurally wrong in two runs of
-  three (run 2 the heading, run 9 the column), but the one read to see the vector r. Opus
+  three (run 2 the heading, run 9 the column), but the one read to see the vector r [**corrected
+  2026-09-15**: a misreading — the page prints r̂, so this was Sonnet departing from the print]. Opus
   transcribes, Sonnet verifies — to the founder.
 FOUNDER, ~18:50: "why is every run creating a new issue?" Because no two runs shared a prompt
   (nine runs, nine prompts), both current models sample at the API default with no temperature

@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,9 @@ class NcertVerifyCommand extends NcertBookCommand {
     /** How many words of a row a report line quotes. */
     private static final int QUOTED_WORDS = 7;
 
+    /** An artefact tag becomes part of an object key. */
+    private static final Pattern TAG = Pattern.compile("[a-z0-9][a-z0-9-]{0,31}");
+
     @Option(names = "--read-pages", description = "Also read every page with the verify tier (spends; resumes).")
     boolean readPages;
 
@@ -73,6 +77,10 @@ class NcertVerifyCommand extends NcertBookCommand {
 
     @Option(names = "--redo", description = "With --read-pages, read again pages already in the artefact.")
     boolean redo;
+
+    @Option(names = "--artefact-tag", paramLabel = "TAG",
+            description = "Keep this run's reads in verify/{book}/{lang}.TAG.jsonl — for a scratch run such as the seeded recall run.")
+    String artefactTag;
 
     private final ObjectStore content;
     private final CurriculumImport imports;
@@ -120,7 +128,11 @@ class NcertVerifyCommand extends NcertBookCommand {
         CodeFlags codeFlags = layoutChecks(definition, selected, byChapter, report);
         List<NcertCorrection> rulings = rulings(definition, chapterNos, report);
 
-        String key = ContentKeys.verify(definition.code(), language);
+        if (artefactTag != null && !TAG.matcher(artefactTag).matches()) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "--artefact-tag must be lowercase letters, digits and hyphens, at most 32 — it becomes part of an object key");
+        }
+        String key = ContentKeys.verify(definition.code(), language, artefactTag);
         Map<String, VerifiedPage> done = new TreeMap<>();
         if (content.exists(key)) {
             VerifyJsonl.read(key, content.get(key)).forEach(page -> done.put(page.address(), page));

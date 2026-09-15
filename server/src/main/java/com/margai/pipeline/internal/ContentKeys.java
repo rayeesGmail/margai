@@ -36,7 +36,15 @@ final class ContentKeys {
 
     /** {@code ncert verify --read-pages}' artefact: one line per page read (D15). */
     static String verify(String book, BookLanguage language) {
-        return "verify/" + book + "/" + language + ".jsonl";
+        return verify(book, language, null);
+    }
+
+    /**
+     * The same, under a tag for a scratch run — the seeded recall run reads a copy of the database and
+     * must never write into the real artefact (DECISIONS 2026-09-15): {@code verify/{book}/{lang}.{tag}.jsonl}.
+     */
+    static String verify(String book, BookLanguage language, String tag) {
+        return "verify/" + book + "/" + language + (tag == null ? "" : "." + tag) + ".jsonl";
     }
 
     /**

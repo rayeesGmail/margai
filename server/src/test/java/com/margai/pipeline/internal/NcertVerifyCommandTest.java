@@ -377,6 +377,23 @@ class NcertVerifyCommandTest {
         assertThat(pagesStoredWhenCalled).containsExactly(0, 1);
     }
 
+    /** The seeded recall run reads a scratch database and must never write into the real artefact (DECISIONS 2026-09-15). */
+    @Test
+    void anArtefactTagKeepsTheReadsInAnArtefactOfTheirOwn() {
+        assertThat(run("--read-pages", "--artefact-tag", "seeded")).isZero();
+
+        assertThat(store.exists("verify/phy11-part1/en.seeded.jsonl")).isTrue();
+        assertThat(store.exists(ContentKeys.verify("phy11-part1", BookLanguage.en))).isFalse();
+        assertThat(out.toString()).contains("artefact: verify/phy11-part1/en.seeded.jsonl (2 pages)");
+    }
+
+    @Test
+    void anArtefactTagThatIsNotAPlainWordIsRefused() {
+        assertThat(run("--read-pages", "--artefact-tag", "../en")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("--artefact-tag must be lowercase letters, digits and hyphens");
+    }
+
     @Test
     void pagesAndRedoWithoutReadPagesAreRefused() {
         assertThat(run("--pages", "2")).isEqualTo(InputFileCommand.EXIT_FAILED);

@@ -424,7 +424,7 @@ class NcertVerifyCommand extends NcertBookCommand {
     private Recorded record(short chapter, int page, List<Placed> placed, AiResponse<PageVerdicts> response) {
         Map<Integer, PageVerdicts.ItemVerdict> byNumber = new HashMap<>();
         int stray = 0;
-        for (PageVerdicts.ItemVerdict verdict : response.output().items()) {
+        for (PageVerdicts.ItemVerdict verdict : response.output().verdicts()) {
             if (verdict.item() < 1 || verdict.item() > placed.size()) {
                 stray++;
             } else {

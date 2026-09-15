@@ -51,8 +51,8 @@ class PageVerifyTaskTest {
         AiResponse<PageVerdicts> response = task.verify("Physics Part-I, Textbook for Class XI", (short) 7, 4,
                 List.of(image(), image()), items(), new AiCallContext(null, requestId, false));
 
-        assertThat(response.output().items()).extracting(PageVerdicts.ItemVerdict::item).containsExactly(1, 2);
-        assertThat(response.output().items().get(1).verdict()).isEqualTo(PageVerdicts.Verdict.differs);
+        assertThat(response.output().verdicts()).extracting(PageVerdicts.ItemVerdict::item).containsExactly(1, 2);
+        assertThat(response.output().verdicts().get(1).verdict()).isEqualTo(PageVerdicts.Verdict.differs);
         Map<String, Object> row = jdbc.queryForMap(
                 "SELECT feature, tier, prompt_name, status FROM ai_calls WHERE request_id = ?", requestId);
         assertThat(row.get("feature")).isEqualTo("pipeline_verify");

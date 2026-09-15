@@ -3,8 +3,11 @@ package com.margai.ai.tasks;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.margai.ai.internal.StructuredOutput;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
 
 /**
  * The verifier's output held to what a verdict means (D15): a verdict of {@code differs} names where,
@@ -52,7 +55,39 @@ class PageVerdictsTest {
     void absentListsAreEmpty() {
         PageVerdicts verdicts = new PageVerdicts(null, null);
 
-        assertThat(verdicts.items()).isEmpty();
+        assertThat(verdicts.verdicts()).isEmpty();
         assertThat(verdicts.omitted()).isEmpty();
+    }
+
+    /**
+     * The calibration of 2026-09-15: with the output's first field named {@code items}, Sonnet 5 read the
+     * tool as taking one {@code items} parameter and sent its whole, correct answer as a string inside it —
+     * {"items":"{\"items\":[…],\"omitted\":[]}"} — on every page, so each page cost a repair call. A field
+     * named after a JSON-Schema keyword sits in the tool schema as {"items":{"type":"array","items":…}}.
+     */
+    @Test
+    void noFieldOfAPipelineOutputIsNamedAfterAJsonSchemaKeyword() {
+        StructuredOutput codec = new StructuredOutput();
+        for (Class<?> output : List.of(PageVerdicts.class, NcertPage.class)) {
+            assertThat(propertyNames(codec.schemaFor(output))).as("tool schema properties of %s", output.getSimpleName())
+                    .doesNotContainAnyElementsOf(List.of("items", "properties", "type", "required", "enum",
+                            "additionalProperties", "anyOf", "oneOf", "allOf", "not", "$ref", "format"));
+        }
+    }
+
+    private static List<String> propertyNames(JsonNode schema) {
+        List<String> names = new ArrayList<>();
+        JsonNode properties = schema.get("properties");
+        if (properties != null) {
+            for (String name : properties.propertyNames()) {
+                names.add(name);
+                names.addAll(propertyNames(properties.get(name)));
+            }
+        }
+        JsonNode items = schema.get("items");
+        if (items != null && items.isObject()) {
+            names.addAll(propertyNames(items));
+        }
+        return names;
     }
 }

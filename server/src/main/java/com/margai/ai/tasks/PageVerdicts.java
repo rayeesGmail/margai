@@ -10,13 +10,17 @@ import java.util.List;
  * <p>It answers one question per item and judges nothing code can compute: spacing, glyph variants and
  * figure references are the pipeline's to check (.claude/rules/ai-layer.md).
  *
- * @param items   one verdict per item of the call, by the item's number
- * @param omitted the opening words of each passage of running text on the page that no item carries
+ * <p>The first field is {@code verdicts}, not {@code items}: named after the JSON-Schema keyword, it
+ * made Sonnet 5 read the tool as taking one {@code items} parameter and send its whole answer as a
+ * string inside it, on every page of the first calibration run (2026-09-15, D15).
+ *
+ * @param verdicts one verdict per item of the call, by the item's number
+ * @param omitted  the opening words of each passage of running text on the page that no item carries
  */
-public record PageVerdicts(List<ItemVerdict> items, List<String> omitted) {
+public record PageVerdicts(List<ItemVerdict> verdicts, List<String> omitted) {
 
     public PageVerdicts {
-        items = items == null ? List.of() : List.copyOf(items);
+        verdicts = verdicts == null ? List.of() : List.copyOf(verdicts);
         omitted = omitted == null ? List.of() : List.copyOf(omitted);
     }
 

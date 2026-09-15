@@ -57,7 +57,7 @@ final class NcertCorrections {
             }
             NcertCorrection entry = new NcertCorrection(written.book(), written.language(), written.chapter(),
                     written.page(), written.kind(), spaced(written.transcribed()), spaced(written.printed()),
-                    spaced(written.at()), written.reason(), written.address());
+                    spaced(written.at()), written.reason(), written.address(), written.removeRef(), written.addRef());
             Integer at = index.get(entry.chapter() + "/" + entry.page());
             if (at == null) {
                 throw refuse(entry, "that page is not in the extraction");
@@ -73,6 +73,8 @@ final class NcertCorrections {
                 case text -> replace(entry, paragraphs);
                 case join -> join(entry, paragraphs, hasTextBefore(out, at));
                 case split -> split(entry, paragraphs);
+                case figure_ref -> figureRef(entry, paragraphs);
+                case drop -> drop(entry, paragraphs, continuedOnNextPage(out, at));
                 default -> throw new IllegalStateException("not a text-changing kind: " + entry.kind());
             };
             out.set(at, new ExtractedPage(page.chapterNo(), page.page(), page.confidence(), page.aiCallId(),
@@ -93,16 +95,7 @@ final class NcertCorrections {
     }
 
     private static String join(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs, boolean textBefore) {
-        List<Integer> starting = new ArrayList<>();
-        for (int at = 0; at < paragraphs.size(); at++) {
-            if (paragraphs.get(at).text().strip().startsWith(entry.at())) {
-                starting.add(at);
-            }
-        }
-        if (starting.size() != 1) {
-            throw refuse(entry, starting.size() + " paragraphs start with \"" + entry.at() + "\" there, not one");
-        }
-        int at = starting.getFirst();
+        int at = onlyStart(entry, paragraphs);
         NcertPage.Paragraph paragraph = paragraphs.get(at);
         String section = paragraph.section().strip();
         if (at == 0) {
@@ -153,6 +146,78 @@ final class NcertCorrections {
         paragraphs.add(found + 1, new NcertPage.Paragraph(paragraph.section(), second, false, secondRefs));
         return entry.where() + " §" + section + ": a new paragraph starts at \"" + entry.at() + "\" ("
                 + entry.reason() + ")";
+    }
+
+    private static String figureRef(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs) {
+        int found = onlyOccurrence(entry, entry.at(), paragraphs);
+        NcertPage.Paragraph paragraph = paragraphs.get(found);
+        List<String> refs = new ArrayList<>(paragraph.figureRefs());
+        String label = entry.removeRef() != null ? entry.removeRef().strip() : entry.addRef().strip();
+        boolean carried = refs.stream().anyMatch(ref -> ref.strip().equals(label));
+        String change;
+        if (entry.removeRef() != null) {
+            if (!carried) {
+                throw refuse(entry, "the paragraph holding \"" + entry.at() + "\" carries no \"" + label + "\"");
+            }
+            refs.removeIf(ref -> ref.strip().equals(label));
+            change = "removed from";
+        } else {
+            if (carried) {
+                throw refuse(entry, "the paragraph holding \"" + entry.at() + "\" already carries \"" + label + "\"");
+            }
+            refs.add(label);
+            change = "added to";
+        }
+        paragraphs.set(found, new NcertPage.Paragraph(paragraph.section(), paragraph.text(),
+                paragraph.continuesPreviousPage(), refs));
+        return entry.where() + " §" + paragraph.section().strip() + ": \"" + label + "\" " + change
+                + " the paragraph holding \"" + entry.at() + "\" (" + entry.reason() + ")";
+    }
+
+    private static String drop(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs, boolean lastContinued) {
+        int at = onlyStart(entry, paragraphs);
+        NcertPage.Paragraph paragraph = paragraphs.get(at);
+        // Dropping part of a paragraph would leave the other part joined to its neighbour; that is a
+        // text correction, not a drop.
+        if (paragraph.continuesPreviousPage()) {
+            throw refuse(entry, "\"" + entry.at() + "\" continues the previous page's paragraph — correct its text instead");
+        }
+        if (at == paragraphs.size() - 1 && lastContinued) {
+            throw refuse(entry, "page " + (entry.page() + 1) + " continues the paragraph starting \"" + entry.at()
+                    + "\" — correct its text instead");
+        }
+        paragraphs.remove(at);
+        return entry.where() + " §" + paragraph.section().strip() + ": the paragraph starting \"" + entry.at()
+                + "\" dropped (" + entry.reason() + ")";
+    }
+
+    /** The index of the one paragraph starting with the entry's words, refusing any other count. */
+    private static int onlyStart(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs) {
+        List<Integer> starting = new ArrayList<>();
+        for (int at = 0; at < paragraphs.size(); at++) {
+            if (paragraphs.get(at).text().strip().startsWith(entry.at())) {
+                starting.add(at);
+            }
+        }
+        if (starting.size() != 1) {
+            throw refuse(entry, starting.size() + " paragraphs start with \"" + entry.at() + "\" there, not one");
+        }
+        return starting.getFirst();
+    }
+
+    /** Whether the next page of the chapter that carries text opens by continuing this page's last paragraph. */
+    private static boolean continuedOnNextPage(List<ExtractedPage> pages, int at) {
+        ExtractedPage page = pages.get(at);
+        for (int after = at + 1; after < pages.size(); after++) {
+            ExtractedPage next = pages.get(after);
+            if (next.chapterNo() != page.chapterNo()) {
+                return false;
+            }
+            if (!next.paragraphs().isEmpty()) {
+                return next.paragraphs().getFirst().continuesPreviousPage();
+            }
+        }
+        return false;
     }
 
     /** The index of the one paragraph holding the span, refusing when the page holds it other than once. */

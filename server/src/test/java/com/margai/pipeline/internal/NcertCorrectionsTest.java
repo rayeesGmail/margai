@@ -234,6 +234,103 @@ class NcertCorrectionsTest {
                 .hasMessageContaining("join correction on ch 7 page 1: \"Early in our lives\" has no paragraph before it to join");
     }
 
+    @Test
+    void readsAFigureRefAndADropEntry() throws IOException {
+        Path file = write("""
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 4, kind: figure_ref, at: "Three equal masses",
+                     remove: "Fig. 7.5", reason: "only part (b) mentions it"}
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 4, kind: drop, at: "The total force on m_1",
+                     reason: "part of the Fig. 7.4 caption"}
+                """);
+
+        List<NcertCorrection> corrections = NcertCorrectionsYamlReader.read(file);
+
+        assertThat(corrections.getFirst().kind()).isEqualTo(NcertCorrection.Kind.figure_ref);
+        assertThat(corrections.getFirst().removeRef()).isEqualTo("Fig. 7.5");
+        assertThat(corrections.getFirst().addRef()).isNull();
+        assertThat(corrections.get(1).kind()).isEqualTo(NcertCorrection.Kind.drop);
+        assertThat(corrections.get(1).at()).isEqualTo("The total force on m_1");
+    }
+
+    @Test
+    void aFigureRefEntryNamesExactlyOneOfRemoveOrAdd() throws IOException {
+        Path both = write("""
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 4, kind: figure_ref, at: "x", remove: "Fig. 7.5",
+                     add: "Fig. 7.4", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(both))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (figure_ref): give exactly one of 'remove' or 'add'");
+        Path neither = write("""
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 4, kind: figure_ref, at: "x", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(neither))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (figure_ref): give exactly one of 'remove' or 'add'");
+    }
+
+    @Test
+    void aFigureRefIsRemovedFromOrAddedToTheParagraphHoldingItsSpan() {
+        List<ExtractedPage> pages = List.of(page(4,
+                new NcertPage.Paragraph("7.3", "Example 7.2 Three equal masses of m kg each.", false, List.of("Fig. 7.5")),
+                new NcertPage.Paragraph("7.3", "(b) What is the force (see Fig. 7.5)", false, List.of())));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                figureRef(4, "Three equal masses", "Fig. 7.5", null),
+                figureRef(4, "What is the force", null, "Fig. 7.5")));
+
+        List<NcertPage.Paragraph> paragraphs = applied.pages().getFirst().paragraphs();
+        assertThat(paragraphs.get(0).figureRefs()).isEmpty();
+        assertThat(paragraphs.get(1).figureRefs()).containsExactly("Fig. 7.5");
+        assertThat(applied.notes()).containsExactly(
+                "ch 7 page 4 §7.3: \"Fig. 7.5\" removed from the paragraph holding \"Three equal masses\" (read against the page)",
+                "ch 7 page 4 §7.3: \"Fig. 7.5\" added to the paragraph holding \"What is the force\" (read against the page)");
+    }
+
+    @Test
+    void removingAFigureRefTheParagraphDoesNotCarryIsRefused() {
+        List<ExtractedPage> pages = List.of(page(4, p("7.3", "Example 7.2 Three equal masses.")));
+
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(figureRef(4, "Three equal", "Fig. 7.5", null))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("figure_ref correction on ch 7 page 4: the paragraph holding \"Three equal\" carries no \"Fig. 7.5\"");
+    }
+
+    @Test
+    void aDropRemovesTheParagraphStartingWithItsWords() {
+        List<ExtractedPage> pages = List.of(page(4, p("7.3", "as shown in Fig 7.4."),
+                p("7.3", "The total force on m_1 is F_1 = sum"), p("7.3", "Example 7.2 Three equal masses.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                correction(4, NcertCorrection.Kind.drop, null, null, "The total force on m_1")));
+
+        assertThat(applied.pages().getFirst().paragraphs()).extracting(NcertPage.Paragraph::text)
+                .containsExactly("as shown in Fig 7.4.", "Example 7.2 Three equal masses.");
+        assertThat(applied.notes()).containsExactly(
+                "ch 7 page 4 §7.3: the paragraph starting \"The total force on m_1\" dropped (read against the page)");
+    }
+
+    /** A continuation is the rest of a paragraph, and a paragraph the next page continues has a rest; both are text corrections. */
+    @Test
+    void aDropThatWouldCutAParagraphInHalfIsRefused() {
+        List<ExtractedPage> continuing = List.of(page(3, p("7.3", "Ends mid")),
+                page(4, new NcertPage.Paragraph("7.3", "sentence here.", true, List.of())));
+        assertThatThrownBy(() -> NcertCorrections.apply(continuing, List.of(
+                correction(4, NcertCorrection.Kind.drop, null, null, "sentence here"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("drop correction on ch 7 page 4: \"sentence here\" continues the previous page's paragraph");
+
+        List<ExtractedPage> continued = List.of(page(3, p("7.3", "Starts here and runs")),
+                page(4, new NcertPage.Paragraph("7.3", "on to the next page.", true, List.of())));
+        assertThatThrownBy(() -> NcertCorrections.apply(continued, List.of(
+                correction(3, NcertCorrection.Kind.drop, null, null, "Starts here"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("drop correction on ch 7 page 3: page 4 continues the paragraph starting \"Starts here\"");
+    }
+
     /** Rulings on the verifier's flags change no text; verify reads them, the load only counts them. */
     @Test
     void misprintAndFalsePositiveRulingsChangeNothing() {
@@ -275,6 +372,11 @@ class NcertCorrectionsTest {
             String at) {
         return new NcertCorrection("phy11-part1", BookLanguage.en, (short) 7, page, kind, transcribed, printed, at,
                 "read against the page", null);
+    }
+
+    private static NcertCorrection figureRef(int page, String at, String remove, String add) {
+        return new NcertCorrection("phy11-part1", BookLanguage.en, (short) 7, page, NcertCorrection.Kind.figure_ref,
+                null, null, at, "read against the page", null, remove, add);
     }
 
     private static ExtractedPage page(int page, NcertPage.Paragraph... paragraphs) {

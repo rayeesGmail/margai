@@ -11,6 +11,8 @@
 #   kind: text            transcribed + printed — the span must occur exactly once on the page
 #   kind: join            at — the words a paragraph starts with; it is the rest of the one before
 #   kind: split           at — a span occurring once on the page; a new paragraph starts there
+#   kind: figure_ref      at — a span once on the page naming the paragraph; remove OR add — one label
+#   kind: drop            at — the words a paragraph starts with; it is not running text and goes
 #   kind: misprint        transcribed + printed as the verifier quoted them — the book's own error, kept
 #   kind: false_positive  transcribed + printed as the verifier quoted them — the verifier was wrong
 #

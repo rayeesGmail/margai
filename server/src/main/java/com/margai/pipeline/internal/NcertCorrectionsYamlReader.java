@@ -29,9 +29,11 @@ final class NcertCorrectionsYamlReader {
             NcertCorrection.Kind.text, Set.of("transcribed", "printed"),
             NcertCorrection.Kind.join, Set.of("at"),
             NcertCorrection.Kind.split, Set.of("at"),
+            NcertCorrection.Kind.figure_ref, Set.of("at", "remove", "add"),
+            NcertCorrection.Kind.drop, Set.of("at"),
             NcertCorrection.Kind.misprint, Set.of("transcribed", "printed"),
             NcertCorrection.Kind.false_positive, Set.of("transcribed", "printed"));
-    private static final Set<String> KIND_SPECIFIC = Set.of("transcribed", "printed", "at");
+    private static final Set<String> KIND_SPECIFIC = Set.of("transcribed", "printed", "at", "remove", "add");
     private static final YAMLMapper YAML = YAMLMapper.builder().build();
 
     private NcertCorrectionsYamlReader() {
@@ -89,6 +91,11 @@ final class NcertCorrectionsYamlReader {
                 () -> new InputFormatException(file, 0, label + ": lang must be one of "
                         + Arrays.toString(BookLanguage.values())));
         boolean spans = KIND_KEYS.get(kind).contains("printed");
+        String remove = optional(file, entry, "remove", label);
+        String add = optional(file, entry, "add", label);
+        if (kind == NcertCorrection.Kind.figure_ref && (remove == null) == (add == null)) {
+            throw new InputFormatException(file, 0, label + ": give exactly one of 'remove' or 'add'");
+        }
         return new NcertCorrection(
                 required(file, entry, "book", label),
                 language,
@@ -99,7 +106,9 @@ final class NcertCorrectionsYamlReader {
                 spans ? required(file, entry, "printed", label) : null,
                 spans ? null : required(file, entry, "at", label),
                 required(file, entry, "reason", label),
-                optional(file, entry, "address", label));
+                optional(file, entry, "address", label),
+                remove,
+                add);
     }
 
     /**

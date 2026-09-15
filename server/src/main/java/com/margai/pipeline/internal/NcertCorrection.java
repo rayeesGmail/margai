@@ -15,9 +15,11 @@ import com.margai.curriculum.api.BookLanguage;
  * @param transcribed the span as the extraction carries it ({@code text}), or as the verifier quoted
  *                    the transcription ({@code misprint}, {@code false_positive})
  * @param printed     the span as the page prints it, in the transcription's notation
- * @param at          the words a paragraph starts with ({@code join}), or where a new one must start
- *                    ({@code split})
+ * @param at          the words a paragraph starts with ({@code join}, {@code drop}), where a new one must
+ *                    start ({@code split}), or a span naming the paragraph ({@code figure_ref})
  * @param address     where the flag was raised, for a reader of the file; never used to apply it
+ * @param removeRef   the figure or table label a {@code figure_ref} entry removes, or null
+ * @param addRef      the label a {@code figure_ref} entry adds, or null
  */
 record NcertCorrection(
         String book,
@@ -29,7 +31,15 @@ record NcertCorrection(
         String printed,
         String at,
         String reason,
-        String address) {
+        String address,
+        String removeRef,
+        String addRef) {
+
+    /** An entry of any kind but {@code figure_ref}, which alone names a label. */
+    NcertCorrection(String book, BookLanguage language, short chapter, int page, Kind kind, String transcribed,
+            String printed, String at, String reason, String address) {
+        this(book, language, chapter, page, kind, transcribed, printed, at, reason, address, null, null);
+    }
 
     enum Kind {
         /** Replace a transcribed span with what the page prints. */
@@ -38,6 +48,10 @@ record NcertCorrection(
         join,
         /** A new paragraph starts at {@code at}. */
         split,
+        /** Remove or add one figure or table label on the paragraph holding {@code at} (DECISIONS 2026-09-15). */
+        figure_ref,
+        /** The paragraph starting {@code at} is not running text — a caption, a margin note — and goes (DECISIONS 2026-09-15). */
+        drop,
         /** The book prints an error and the transcription rightly keeps it: a flag, not a defect. */
         misprint,
         /** The verifier was wrong about this span: a flag, not a defect. */
@@ -45,7 +59,7 @@ record NcertCorrection(
 
         /** Whether this kind changes the extraction, or only rules on a flag. */
         boolean changesText() {
-            return this == text || this == join || this == split;
+            return this != misprint && this != false_positive;
         }
     }
 

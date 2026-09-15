@@ -29,7 +29,9 @@ committed.
   reader and is never used to apply the entry.
 - **A span must occur exactly once on its page**, or the load refuses by name: not at all means the
   page is not what the entry was written against, twice means the entry does not say which.
-- **`text`, `join` and `split` change the extraction; `misprint` and `false_positive` do not** — they
+- **`text`, `join`, `split`, `figure_ref` (remove or add one label on the paragraph holding a span) and
+  `drop` (remove a paragraph that is not running text) change the extraction; `misprint` and
+  `false_positive` do not** — they
   rule on a flag (the book's own error kept; the verifier wrong), and `ncert verify` reads them so a
   ruled flag is not raised again.
 - Quote every value holding a comma or a colon: in YAML's `{…}` form an unquoted comma starts a new key,

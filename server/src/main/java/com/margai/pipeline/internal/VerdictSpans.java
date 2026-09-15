@@ -29,7 +29,8 @@ final class VerdictSpans {
     private static final Pattern RADICAL_OF_ONE_TOKEN = Pattern.compile("√\\(([A-Za-z0-9_.]+)\\)");
     /** An exponent of one token: 10^-11 and 10^(-11) name one thing; e^(-E/kT) keeps its bracket. */
     private static final Pattern EXPONENT_OF_ONE_TOKEN = Pattern.compile("\\^\\((-?[A-Za-z0-9_.]+)\\)");
-    private static final Pattern TRAILING_FULL_STOP = Pattern.compile("\\.+$");
+    /** A full stop, question or exclamation mark ending a span — the verifier drops them (2026-09-15). */
+    private static final Pattern TRAILING_FULL_STOP = Pattern.compile("[.?!]+$");
 
     private VerdictSpans() {
     }
@@ -41,8 +42,8 @@ final class VerdictSpans {
         squashed = SINGLE_QUOTE.matcher(squashed).replaceAll("'");
         squashed = DOUBLE_QUOTE.matcher(squashed).replaceAll("\"");
         squashed = TIMES.matcher(squashed).replaceAll("×");
-        // The calibration's three code-visible false-flag classes (DECISIONS 2026-09-15): the convention's
-        // sqrt() for √ and bracketed exponents, and a full stop the verifier dropped after a display.
+        // The calibration's code-visible false-flag classes (DECISIONS 2026-09-15): the convention's sqrt()
+        // for √ and bracketed exponents, and sentence punctuation the verifier dropped at a span's end.
         squashed = RADICAL_OF_ONE_TOKEN.matcher(squashed.replace("sqrt(", "√(")).replaceAll("√$1");
         squashed = EXPONENT_OF_ONE_TOKEN.matcher(squashed).replaceAll("^$1");
         return TRAILING_FULL_STOP.matcher(squashed).replaceAll("");

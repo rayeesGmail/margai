@@ -65,6 +65,12 @@ class NcertVerifyCommand extends NcertBookCommand {
     /** How many words of a row a report line quotes. */
     private static final int QUOTED_WORDS = 7;
 
+    /**
+     * A section heading as the verifier quotes one — "7.4 THE GRAVITATIONAL CONSTANT", "5.2.2 Inheritance of
+     * One Gene" — a printed section number and a word; "3.84 × 10^8 m" is not one.
+     */
+    private static final Pattern OMITTED_HEADING = Pattern.compile("\\d{1,2}(\\.\\d{1,2})+\\s+\\p{L}{2,}");
+
     /** An artefact tag becomes part of an object key. */
     private static final Pattern TAG = Pattern.compile("[a-z0-9][a-z0-9-]{0,31}");
 
@@ -477,6 +483,7 @@ class NcertVerifyCommand extends NcertBookCommand {
         List<String> glyphOnly = new ArrayList<>();
         List<String> notCarried = new ArrayList<>();
         List<String> omitted = new ArrayList<>();
+        List<String> omittedHeadings = new ArrayList<>();
         int ruled = 0;
         List<NcertVerificationRow> recorded = new ArrayList<>();
         Map<String, ParagraphVerification> verdicts = new HashMap<>();
@@ -557,7 +564,11 @@ class NcertVerifyCommand extends NcertBookCommand {
             for (int page : pagesOfChapter) {
                 VerifiedPage read = done.get(chapter.getKey() + "/" + page);
                 if (read != null && valid(read) && (pages == null || pages.isEmpty() || pages.contains(page))) {
-                    read.omitted().forEach(text -> omitted.add("ch " + chapter.getKey() + " p" + page + ": \"" + text + "\""));
+                    for (String text : read.omitted()) {
+                        String line = "ch " + chapter.getKey() + " p" + page + ": \"" + text + "\"";
+                        // A heading or a caption is never running text, which code can see for itself.
+                        (headingOrCaption(text) ? omittedHeadings : omitted).add(line);
+                    }
                 }
             }
         }
@@ -575,9 +586,16 @@ class NcertVerifyCommand extends NcertBookCommand {
         report.section("set aside by code: the verifier quoted a transcription the row does not carry")
                 .line("the row is left not judged: the verifier claimed a difference it could not place")
                 .list(notCarried);
+        report.section("set aside by code: a heading or a caption listed as omitted text").list(omittedHeadings);
         report.line("flags set aside by the founder's rulings in " + NcertCorrectionsYamlReader.FILE + ": " + ruled);
         report.line("verdicts recorded on rows: " + recorded.size());
         return new Judged(verdicts, omitted.size());
+    }
+
+    /** A printed section number followed by a word, or a figure or table label — as omitted text, never running text. */
+    private static boolean headingOrCaption(String text) {
+        String stripped = text == null ? "" : text.strip();
+        return OMITTED_HEADING.matcher(stripped).lookingAt() || FigureLabels.of(stripped).isPresent();
     }
 
     private static boolean ruledOn(List<NcertCorrection> rulings, short chapter, int page, VerifiedPage.Span span) {

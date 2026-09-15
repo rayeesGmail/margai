@@ -339,6 +339,27 @@ class NcertVerifyCommandTest {
                 .contains("the text has changed since it was verified");
     }
 
+    /**
+     * The seeded run listed two figure captions and two section headings as running text no row carries
+     * (2026-09-15). Code can recognise both, so they are set aside, listed, and not counted.
+     */
+    @Test
+    void anOmittedHeadingOrCaptionIsSetAsideByCode() {
+        verifier.omitted.put(2, List.of("7.4 THE GRAVITATIONAL CONSTANT", "5.2.2 Inheritance of One Gene",
+                "Fig. 7.3 Gravitational force on m_1 due to m_2", "Table 7.1 Data from measurement",
+                "v_x = v cos theta", "3.84 × 10^8 m is the distance"));
+
+        run("--read-pages");
+
+        assertThat(out.toString())
+                .contains("## running text the page prints that no row carries\n\n- ch 7 p2: \"v_x = v cos theta\"\n"
+                        + "- ch 7 p2: \"3.84 × 10^8 m is the distance\"\n")
+                .contains("## set aside by code: a heading or a caption listed as omitted text")
+                .contains("- ch 7 p2: \"7.4 THE GRAVITATIONAL CONSTANT\"")
+                .contains("- ch 7 p2: \"Table 7.1 Data from measurement\"")
+                .contains("2 passages no row carries");
+    }
+
     @Test
     void thePageLevelSignalsAreCountedBesideTheCleanShare() {
         verifier.omitted.put(2, List.of("v_x = v cos theta"));

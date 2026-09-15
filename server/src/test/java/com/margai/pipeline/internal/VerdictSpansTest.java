@@ -29,6 +29,14 @@ class VerdictSpansTest {
         assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("– 4 G M m / 5 R", "– 4 G M m / 5 R .")).isTrue();
     }
 
+    /** The seeded run's "?" the verifier dropped (2026-09-15): trailing sentence punctuation, like a full stop. */
+    @Test
+    void aTrailingQuestionOrExclamationMarkIsLikeAFullStop() {
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("traverse BAC and CPB", "traverse BAC and CPB ?")).isTrue();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("what a result", "what a result!")).isTrue();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("CPB? Answer", "CPB Answer")).isFalse();
+    }
+
     /** Only a single token loses its brackets: around a quotient or a sum they still say what is covered. */
     @Test
     void aBracketAroundMoreThanOneTokenStillCounts() {

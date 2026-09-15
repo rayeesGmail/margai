@@ -17,6 +17,27 @@ class VerdictSpansTest {
         assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("6.67 · 10^-11", "6.67 × 10^-11")).isTrue();
     }
 
+    /**
+     * The calibration's three false-flag classes code can see (2026-09-15): a radical, a single-token
+     * exponent and a trailing full stop, each written two ways that name one thing.
+     */
+    @Test
+    void aRadicalASingleTokenExponentAndATrailingFullStopAreWrittenTwoWaysForOneThing() {
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("− 4√2 G m / l", "− 4 sqrt(2) G m / l")).isTrue();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("√(l / g)", "sqrt(l / g)")).isTrue();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("6.67 × 10^-11 × (459 × 60)^2", "6.67 × 10^(-11) × (459 × 60)^2")).isTrue();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("– 4 G M m / 5 R", "– 4 G M m / 5 R .")).isTrue();
+    }
+
+    /** Only a single token loses its brackets: around a quotient or a sum they still say what is covered. */
+    @Test
+    void aBracketAroundMoreThanOneTokenStillCounts() {
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("sqrt(l / g)", "sqrt(l) / g")).isFalse();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("e^(-E/kT)", "e^-E/kT")).isFalse();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("10^-11", "10^11")).isFalse();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("equal. Then", "equal Then")).isFalse();
+    }
+
     @Test
     void aSymbolOrAWordIsADifference() {
         assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("|r|^3 r", "|r|^3 r_hat")).isFalse();

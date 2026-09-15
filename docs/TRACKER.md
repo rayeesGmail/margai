@@ -245,11 +245,25 @@ THE SEEDED COPY: `margai_d15_seeded`, created from `margai_d15` (template copy: 
   None is of a class code now sets aside. Recall = seeds named by a flag at the right row (the dropped
   sentence and equation may surface as `omitted` on their page instead); every other signal is scored
   against the page as before.
-HOW TO RESUME: the founder rebuilds the jar and runs the one command in the runbook's "The seeded recall
-  run" (`DB_URL=…/margai_d15_seeded … --read-pages --artefact-tag seeded`, ~₹15); Claude scores it against
-  the key above. Then, per DECISIONS 2026-09-15: poor recall → drop the paid second read for the free checks
-  and spot reads; good recall → the false-flag rate decides whether the book runs carry it. Either way,
-  chapter 7 of `margai_d15` is reloaded with the four splits.
+THE SEEDED RECALL RUN, founder, 22:44 — `margai_d15_seeded`, `--artefact-tag seeded`, 12 pages read fresh, no
+  repair call, ₹17.85 (report `-ncert-verify-4.md`). Scored against the key:
+  - FOUND 9 of 12, each a flag at the seeded row naming the seeded span: word (p2 "Sweden"), hat added (p4
+    "- r_hat"), subscript case (p7 "M_e"), equation number (p7 "(7.21)"), leading minus lost (p9), bracket
+    around a sum lost (p10 "/ h + R_E"), digit (p11 "6300"), sentence dropped (p11 §7.8 ¶16, as a
+    difference), exponent (p12 "10^6").
+  - MISSED 3: the dropped prime (p5 §7.3 ¶14 "F_GB = F_GB"), the approximation flattened (p7 §7.6 ¶3
+    "g(h) = g"), the displayed equation dropped (p11 §7.9 ¶3 — no flag, and not under `omitted`). These are
+    the classes the whole D14/D15 audit turned on — the glyph a downscaled page loses, a physics error
+    that reads plausibly, and run 9's lost equations — and the prompt names all three.
+  - WRONG 6: p7 §7.6 ¶6 "to be cube" — the book's misprint, which the verifier corrected; p3 §7.2 ¶8 a "?"
+    the page prints, dropped; `omitted` ×4 — the captions of Figs. 7.3 and 7.4 and the headings 7.4 and
+    7.5, which the prompt says are never running text.
+  - The code set-asides worked as ruled: the full stops after E_i and E_N, `V_f.`, and the book's `r_E`
+    and "an circularly" came back as identical or equal spans and were set aside, not flagged.
+  One run of twelve pages is a small sample on a model that samples at its default temperature; whether the
+  three misses are habit or dice needs a repeat of those pages (DECISIONS 2026-09-14, repeat before change).
+HOW TO RESUME: rulings open for the founder on the seeded result (this session's closing message); chapter 7
+  of `margai_d15` is reloaded with the four splits once they are given.
 Reports 2026-09-15-ncert-load(-2), -ncert-verify (free), -2 (`--pages 1`), -3 (the finished read) committed;
   the two stopped runs wrote none. Server tests 697, verify green, eval PASS (placeholder) before each
   AI-path commit.

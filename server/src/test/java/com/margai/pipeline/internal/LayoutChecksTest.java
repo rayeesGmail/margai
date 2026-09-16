@@ -146,6 +146,61 @@ class LayoutChecksTest {
         assertThat(result.flags()).isEmpty();
     }
 
+    /**
+     * The blind spot the seeded run found: the second read does not see a displayed equation the
+     * transcription dropped, twice over (TRACKER 2026-09-15). The number beside it stays in the layer, so
+     * code can hold the page's rows to the numbers the page prints — the seeded drop of chapter 7 page 11's
+     * (7.35) left the rows carrying it twice where the print carries it three times.
+     */
+    @Test
+    void anEquationNumberThePrintCarriesMoreOftenThanTheRowsIsFlagged() {
+        String equating = "Equating R.H.S of Eqs. (7.33) and (7.34) and cancelling out m, we get";
+        String thus = "Thus V decreases as h increases. From equation (7.35), the speed V";
+        LayoutChecks.Result result = LayoutChecks.check(
+                List.of(row("7.9", 3, equating, 11), row("7.9", 4, thus, 11)),
+                shapes(numbered(11, List.of(equating, thus), "(7.33)", "(7.34)", "(7.35)", "(7.35)")));
+
+        assertThat(result.flags()).singleElement().satisfies(flag -> {
+            assertThat(flag.kind()).isEqualTo(LayoutChecks.Kind.equation);
+            assertThat(flag.page()).isEqualTo(11);
+            assertThat(flag.address()).isNull();
+            assertThat(flag.message()).isEqualTo("ch 7 p11: the print numbers (7.35) twice, the rows carry"
+                    + " it once — a displayed equation the transcription may have dropped");
+        });
+    }
+
+    @Test
+    void equationNumbersThePagesRowsAllCarryAreNotFlagged() {
+        String equating = "Equating R.H.S of Eqs. (7.33) and (7.34) and cancelling out m, we get"
+                + " V^2 = G M_E / (R_E + h) (7.35)";
+        String thus = "Thus V decreases as h increases. From equation (7.35), the speed V";
+        LayoutChecks.Result result = LayoutChecks.check(
+                List.of(row("7.9", 3, equating, 11), row("7.9", 4, thus, 11)),
+                shapes(numbered(11, List.of(equating, thus), "(7.33)", "(7.34)", "(7.35)", "(7.35)")));
+
+        assertThat(result.flags()).isEmpty();
+    }
+
+    /** A number the layer loses — chapter 7's own (7.16) — is never held against the rows. */
+    @Test
+    void anEquationNumberTheRowsCarryAndThePrintDoesNotIsNotFlagged() {
+        String text = "g(d) = g (1 - d / R_E) (7.16) and thus F (d) = G M_s m / (R_E - d)^2 (7.17)";
+        LayoutChecks.Result result = LayoutChecks.check(List.of(row("7.6", 6, text, 8)),
+                shapes(numbered(8, List.of(text), "(7.17)")));
+
+        assertThat(result.flags()).isEmpty();
+    }
+
+    /** Another chapter's number on the page — a cross-reference, a stray decimal — is not this check's business. */
+    @Test
+    void aNumberThatIsNotThisChaptersIsNotHeldAgainstTheRows() {
+        String text = "The total energy of an orbiting satellite";
+        LayoutChecks.Result result = LayoutChecks.check(List.of(row("7.10", 1, text, 12)),
+                shapes(numbered(12, List.of(text), "(1.52)")));
+
+        assertThat(result.flags()).isEmpty();
+    }
+
     @Test
     void aPageTheChapterPdfDoesNotHaveIsReportedNotCompared() {
         LayoutChecks.Result result = LayoutChecks.check(List.of(row("7.3", 1, "Text of a page.", 20)),
@@ -179,6 +234,12 @@ class LayoutChecksTest {
 
     private static Numbered shape(int page, PdfLayout.Top top, String topLine, String... starts) {
         return new Numbered(page, new PdfLayout.PageShape(List.of(starts), top, topLine, List.of()));
+    }
+
+    /** A page that starts the given paragraphs and prints the given equation numbers. */
+    private static Numbered numbered(int page, List<String> starts, String... equationNumbers) {
+        return new Numbered(page, new PdfLayout.PageShape(starts, PdfLayout.Top.starts, starts.getFirst(),
+                List.of(), List.of(equationNumbers)));
     }
 
     private static Numbered shape(int page, PdfLayout.Top top, String topLine, List<String> captions) {

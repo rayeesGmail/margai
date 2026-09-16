@@ -366,8 +366,29 @@ class NcertVerifyCommandTest {
 
         run("--read-pages");
 
-        assertThat(out.toString()).contains("not in the clean share, adjudicate before recording it: 2 page-level start flags, "
-                + "1 passages no row carries");
+        assertThat(out.toString()).contains("not in the clean share, adjudicate before recording it: 2 page-level start"
+                + " flags, 0 numbered equations the print carries that the rows do not, 1 passages no row carries");
+    }
+
+    /** The free check that closes the second read's blind spot: a numbered equation dropped from a row. */
+    @Test
+    void aNumberedEquationThePrintCarriesAndTheRowsDoNotIsReportedAndCountedBesideTheShare() throws IOException {
+        store.put("source/ncert/2022-ed/en/phy11-part1/keph107.pdf", numbering(), "application/pdf");
+        List<NcertParagraphRow> rows = new ArrayList<>(rows());
+        NcertParagraphRow vector = rows.get(2);
+        rows.set(2, new NcertParagraphRow(vector.chapterNo(), vector.section(), vector.paraNo(),
+                "Numbered on the page as (7.5) and referred to again.", true, List.of(), vector.extraction()));
+        imports.paragraphsAnswer = rows;
+
+        run();
+
+        assertThat(out.toString())
+                .contains("| chapter | pages compared | page breaks judged | page breaks undecided | start flags"
+                        + " | join flags | figure flags | equation flags |")
+                .contains("## numbered equations the print carries that the rows do not")
+                .contains("ch 7 p2: the print numbers (7.5) twice, the rows carry it once"
+                        + " — a displayed equation the transcription may have dropped")
+                .contains("1 numbered equations the print carries that the rows do not");
     }
 
     @Test
@@ -603,6 +624,27 @@ class NcertVerifyCommandTest {
                     content.showText("with the same of and to in a that as it for on by an which be are this.");
                     content.endText();
                 }
+            }
+            var bytes = new java.io.ByteArrayOutputStream();
+            document.save(bytes);
+            return bytes.toByteArray();
+        }
+    }
+
+    /** The same chapter, whose second page numbers an equation and then refers to that number. */
+    private static byte[] numbering() throws IOException {
+        try (org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.Loader.loadPDF(pdf(2))) {
+            try (var content = new org.apache.pdfbox.pdmodel.PDPageContentStream(document, document.getPage(1),
+                    org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode.APPEND, true)) {
+                content.beginText();
+                content.setFont(new org.apache.pdfbox.pdmodel.font.PDType1Font(
+                        org.apache.pdfbox.pdmodel.font.Standard14Fonts.FontName.HELVETICA), 11);
+                content.setLeading(14);
+                content.newLineAtOffset(50, 700);
+                content.showText("V^2 = G M / (R + h) (7.5)");
+                content.newLine();
+                content.showText("and from equation (7.5), the speed of the page is what we use it for.");
+                content.endText();
             }
             var bytes = new java.io.ByteArrayOutputStream();
             document.save(bytes);

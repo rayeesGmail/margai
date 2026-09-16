@@ -219,6 +219,28 @@ class PdfLayoutTest {
         assertThat(shape.captions()).containsExactly("fig 7.3", "table 7.1");
     }
 
+    /**
+     * The printed number of a displayed equation survives in the layer even where the equation itself does
+     * not, so it is collected as the print carries it — every occurrence, in reading order.
+     */
+    @Test
+    void everyPrintedEquationNumberIsCollectedAsOftenAsItIsPrinted() {
+        PdfLayout.PageShape shape = shape(
+                line(109.7, 100, "Bookman", "Equating R.H.S of Eqs. (7.33) and (7.34) and cancelling out m,"),
+                line(300.0, 130, "Bookman", "V^2 = G M_E / (R_E + h) (7.35)"),
+                line(109.7, 160, "Bookman", "Thus V decreases as h increases. From equation (7.35),"),
+                line(109.7, 700, "Bookman", "which is 1.52 (not a number of this chapter's)"));
+
+        assertThat(shape.equationNumbers()).containsExactly("(7.33)", "(7.34)", "(7.35)", "(7.35)");
+    }
+
+    /** The real chapter: page 11, whose displayed (7.35) is also referred to in the running text. */
+    @Test
+    void chapterSevenPageElevenNumbersItsEquationsAsPrinted() throws IOException {
+        assertThat(chapterSeven().get(10).equationNumbers())
+                .filteredOn("(7.35)"::equals).hasSize(3);
+    }
+
     /** The real chapter: page 4, where run 9 joined an indented top line onto page 3. */
     @Test
     void chapterSevenPageFourAsPrinted() throws IOException {

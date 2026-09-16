@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -92,17 +93,28 @@ final class PdfLayout {
         unknown
     }
 
+    /** An equation's printed number, "(7.35)" — the layer keeps it where it loses the equation itself. */
+    private static final Pattern EQUATION_NUMBER = Pattern.compile("\\(\\d{1,2}\\.\\d{1,3}\\)");
+
     /**
-     * @param starts   the opening words of each line that starts a paragraph, in reading order
-     * @param top      how the page's first line of running text begins
-     * @param topLine  that line's opening words, or null when there is none
-     * @param captions the figure and table labels the page's bold captions carry ("fig 7.3")
+     * @param starts          the opening words of each line that starts a paragraph, in reading order
+     * @param top             how the page's first line of running text begins
+     * @param topLine         that line's opening words, or null when there is none
+     * @param captions        the figure and table labels the page's bold captions carry ("fig 7.3")
+     * @param equationNumbers every printed equation number of the page, in reading order, as often as
+     *                        the page prints it — a displayed equation's label and every reference to it
      */
-    record PageShape(List<String> starts, Top top, String topLine, List<String> captions) {
+    record PageShape(List<String> starts, Top top, String topLine, List<String> captions,
+            List<String> equationNumbers) {
 
         PageShape {
             starts = List.copyOf(starts);
             captions = List.copyOf(captions);
+            equationNumbers = List.copyOf(equationNumbers);
+        }
+
+        PageShape(List<String> starts, Top top, String topLine, List<String> captions) {
+            this(starts, top, topLine, captions, List.of());
         }
     }
 
@@ -200,12 +212,17 @@ final class PdfLayout {
         }
 
         Set<String> captions = new LinkedHashSet<>();
+        List<String> equationNumbers = new ArrayList<>();
         for (Line line : lines) {
             if (line.bold) {
                 FigureLabels.of(line.text).ifPresent(label -> captions.add(label.base()));
             }
+            Matcher number = EQUATION_NUMBER.matcher(line.text);
+            while (number.find()) {
+                equationNumbers.add(number.group());
+            }
         }
-        return new PageShape(starts, top, topLine, List.copyOf(captions));
+        return new PageShape(starts, top, topLine, List.copyOf(captions), equationNumbers);
     }
 
     /**

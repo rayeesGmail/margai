@@ -208,8 +208,12 @@ class NcertVerifyCommand extends NcertBookCommand {
                 .collect(Collectors.joining("\n  ")));
     }
 
-    /** What the free checks raised: the kinds of flag on each row, by address, and the page-level flags. */
-    private record CodeFlags(Map<String, Set<LayoutChecks.Kind>> onRows, int pageLevel) {
+    /**
+     * What the free checks raised: the kinds of flag on each row, by address, and the two page-level
+     * counts — where the print starts paragraphs the rows do not, and the equation numbers it carries
+     * that they do not. Neither names a row, so neither can enter the clean share.
+     */
+    private record CodeFlags(Map<String, Set<LayoutChecks.Kind>> onRows, int startFlags, int equationFlags) {
     }
 
     /** The verdicts a re-judging of the artefact gave, and how many passages no row carries it found. */
@@ -222,6 +226,7 @@ class NcertVerifyCommand extends NcertBookCommand {
         List<String> starts = new ArrayList<>();
         List<String> joins = new ArrayList<>();
         List<String> figures = new ArrayList<>();
+        List<String> equations = new ArrayList<>();
         List<List<String>> summary = new ArrayList<>();
         Map<String, Set<LayoutChecks.Kind>> onRows = new HashMap<>();
         for (BookDefinition.Chapter chapter : selected) {
@@ -233,13 +238,15 @@ class NcertVerifyCommand extends NcertBookCommand {
             // The same per-chapter trust judgement extract makes: a layer that is not the page's words
             // (every Hindi book, one Chemistry file) has no prose for the typography rules to find.
             if (!PdfTextLayer.isLegible(PdfTextLayer.pages(pdf))) {
-                summary.add(List.of(String.valueOf(chapter.no()), "withheld: illegible text layer", "—", "—", "—", "—", "—"));
+                summary.add(List.of(String.valueOf(chapter.no()), "withheld: illegible text layer",
+                        "—", "—", "—", "—", "—", "—"));
                 continue;
             }
             LayoutChecks.Result result = LayoutChecks.check(ofChapter, PdfLayout.pages(pdf));
             long startFlags = 0;
             long joinFlags = 0;
             long figureFlags = 0;
+            long equationFlags = 0;
             for (LayoutChecks.Flag flag : result.flags()) {
                 switch (flag.kind()) {
                     case starts -> {
@@ -254,6 +261,10 @@ class NcertVerifyCommand extends NcertBookCommand {
                         figures.add(flag.message());
                         figureFlags++;
                     }
+                    case equation -> {
+                        equations.add(flag.message());
+                        equationFlags++;
+                    }
                 }
                 if (flag.address() != null) {
                     onRows.computeIfAbsent(flag.address(), address -> new LinkedHashSet<>()).add(flag.kind());
@@ -261,15 +272,17 @@ class NcertVerifyCommand extends NcertBookCommand {
             }
             summary.add(List.of(String.valueOf(chapter.no()), String.valueOf(result.pagesCompared()),
                     String.valueOf(result.boundariesJudged()), String.valueOf(result.boundariesUndecided()),
-                    String.valueOf(startFlags), String.valueOf(joinFlags), String.valueOf(figureFlags)));
+                    String.valueOf(startFlags), String.valueOf(joinFlags), String.valueOf(figureFlags),
+                    String.valueOf(equationFlags)));
         }
         report.section("the print's typography against the rows (free; routes attention, never refuses)")
                 .table(List.of("chapter", "pages compared", "page breaks judged", "page breaks undecided",
-                        "start flags", "join flags", "figure flags"), summary);
+                        "start flags", "join flags", "figure flags", "equation flags"), summary);
         report.section("where rows start against where the print starts paragraphs").list(starts);
         report.section("joins across page breaks against the print").list(joins);
         report.section("figure_refs against the paragraph and the chapter's captions").list(figures);
-        return new CodeFlags(onRows, starts.size());
+        report.section("numbered equations the print carries that the rows do not").list(equations);
+        return new CodeFlags(onRows, starts.size(), equations.size());
     }
 
     /** The founder's rulings on flags: the corrections file's misprint and false_positive entries for these chapters. */
@@ -680,8 +693,9 @@ class NcertVerifyCommand extends NcertBookCommand {
                             : selected.size() != definition.chapters().size() ? "only some chapters were selected"
                             : "a selected chapter has no loaded rows"));
         }
-        report.line("not in the clean share, adjudicate before recording it: " + codeFlags.pageLevel()
-                + " page-level start flags, " + omitted + " passages no row carries");
+        report.line("not in the clean share, adjudicate before recording it: " + codeFlags.startFlags()
+                + " page-level start flags, " + codeFlags.equationFlags() + " numbered equations the print carries"
+                + " that the rows do not, " + omitted + " passages no row carries");
     }
 
     private static String count(Map<ParagraphVerification.Verdict, Long> counts, ParagraphVerification.Verdict verdict) {

@@ -3,12 +3,17 @@ package com.margai.pipeline.internal;
 import com.margai.curriculum.api.NcertParagraphRow;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The free half of {@code ncert verify} (D15, DECISIONS 2026-09-14 "the pair"): a chapter's loaded rows
@@ -34,13 +39,17 @@ final class LayoutChecks {
     /** How many words of a row's opening a flag quotes. */
     private static final int QUOTED_WORDS = 7;
 
+    /** An equation's printed number, as the print and the transcription both write it. */
+    private static final Pattern EQUATION_NUMBER = Pattern.compile("\\(\\d{1,2}\\.\\d{1,3}\\)");
+
     private LayoutChecks() {
     }
 
     enum Kind {
         starts,
         join,
-        figure
+        figure,
+        equation
     }
 
     /**
@@ -78,6 +87,7 @@ final class LayoutChecks {
             }
             compared++;
             starts(chapter, page, rows, shapes.get(page - 1)).ifPresent(flags::add);
+            flags.addAll(equations(chapter, page, rows, shapes.get(page - 1)));
         }
 
         int judged = 0;
@@ -154,6 +164,55 @@ final class LayoutChecks {
                     .append(String.join(" · ", printed.stream().map(start -> "\"" + start + "\"").toList()));
         }
         return Optional.of(new Flag(Kind.starts, page, null, message.toString()));
+    }
+
+    /**
+     * The page's own numbered equations against the rows printed on it. A displayed equation the
+     * transcription drops takes its number with it, and the number is the part of it the text layer keeps
+     * — the blind spot the seeded run measured twice (TRACKER 2026-09-15, ruling 2026-09-16). Counted, not
+     * merely listed, because a page prints the same number both beside the equation and in the sentence
+     * that refers to it; and only where the print carries more than the rows, since a number the layer
+     * itself loses is nothing against a row.
+     */
+    private static List<Flag> equations(short chapter, int page, List<NcertParagraphRow> rows, PdfLayout.PageShape shape) {
+        String mine = chapter + ".";
+        Map<String, Integer> printed = new LinkedHashMap<>();
+        shape.equationNumbers().stream().filter(number -> number.startsWith("(" + mine))
+                .forEach(number -> printed.merge(number, 1, Integer::sum));
+        if (printed.isEmpty()) {
+            return List.of();
+        }
+        Map<String, Integer> carried = new HashMap<>();
+        for (NcertParagraphRow row : rows) {
+            for (ParagraphParts.Part part : ParagraphParts.of(row)) {
+                if (part.page() != page) {
+                    continue;
+                }
+                Matcher number = EQUATION_NUMBER.matcher(part.text());
+                while (number.find()) {
+                    carried.merge(number.group(), 1, Integer::sum);
+                }
+            }
+        }
+        List<Flag> flags = new ArrayList<>();
+        printed.forEach((number, times) -> {
+            int rowsCarry = carried.getOrDefault(number, 0);
+            if (times > rowsCarry) {
+                flags.add(new Flag(Kind.equation, page, null, "ch " + chapter + " p" + page + ": the print numbers "
+                        + number + " " + times(times) + ", the rows carry it " + times(rowsCarry)
+                        + " — a displayed equation the transcription may have dropped"));
+            }
+        });
+        return flags;
+    }
+
+    private static String times(int count) {
+        return switch (count) {
+            case 0 -> "not at all";
+            case 1 -> "once";
+            case 2 -> "twice";
+            default -> count + " times";
+        };
     }
 
     private static Optional<Flag> join(short chapter, int before, int page, List<NcertParagraphRow> rows,

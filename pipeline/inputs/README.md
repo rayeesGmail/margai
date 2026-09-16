@@ -13,7 +13,7 @@ dated 2026-09-10 record the spec-silent choices.
 | `archetypes.yaml` | `archetype_tracks`, `archetype_track_steps` | `backbone load` | 4 tracks, 744 steps |
 | `cutoffs.csv` | `cutoffs` | `cutoffs load` | 40 qualifying rows, 2019–2026 |
 | `books.yaml` | `ncert_books` | `ncert register` (D14) | 10 books, 79 chapters, both editions |
-| `ncert-corrections.yaml` | `ncert_paragraphs`, through the extraction | `ncert load` (D15) | the founder's rulings on `ncert verify` flags; empty until the first adjudication |
+| `ncert-corrections.yaml` | `ncert_paragraphs`, through the extraction | `ncert load` (D15) | the founder's rulings on `ncert verify` flags; seven entries from chapter 7's adjudication (2026-09-15/16) |
 
 ## ncert-corrections.yaml
 

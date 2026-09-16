@@ -58,10 +58,17 @@ final class LayoutChecks {
     record Flag(Kind kind, int page, String address, String message) {
     }
 
-    record Result(List<Flag> flags, int pagesCompared, int boundariesJudged, int boundariesUndecided) {
+    /**
+     * @param paired the printed starts matched to a row only after allowing for math the text layer
+     *               dropped — not flags, but the one place a page can be quiet because of a guess, so
+     *               they are named for the founder to spot-check
+     */
+    record Result(List<Flag> flags, List<String> paired, int pagesCompared, int boundariesJudged,
+            int boundariesUndecided) {
 
         Result {
             flags = List.copyOf(flags);
+            paired = List.copyOf(paired);
         }
     }
 
@@ -71,10 +78,11 @@ final class LayoutChecks {
      */
     static Result check(List<NcertParagraphRow> rows, List<PdfLayout.PageShape> shapes) {
         if (rows.isEmpty()) {
-            return new Result(List.of(), 0, 0, 0);
+            return new Result(List.of(), List.of(), 0, 0, 0);
         }
         short chapter = rows.getFirst().chapterNo();
         List<Flag> flags = new ArrayList<>();
+        List<String> paired = new ArrayList<>();
         TreeSet<Integer> textPages = new TreeSet<>();
         rows.forEach(row -> textPages.addAll(row.extraction().pages()));
 
@@ -86,7 +94,9 @@ final class LayoutChecks {
                 continue;
             }
             compared++;
-            starts(chapter, page, rows, shapes.get(page - 1)).ifPresent(flags::add);
+            Starts starts = starts(chapter, page, rows, shapes.get(page - 1));
+            starts.flag().ifPresent(flags::add);
+            paired.addAll(starts.paired());
             flags.addAll(equations(chapter, page, rows, shapes.get(page - 1)));
         }
 
@@ -111,10 +121,14 @@ final class LayoutChecks {
         for (NcertParagraphRow row : rows) {
             flags.addAll(figures(chapter, row, captions));
         }
-        return new Result(flags, compared, judged, undecided);
+        return new Result(flags, paired, compared, judged, undecided);
     }
 
-    private static Optional<Flag> starts(short chapter, int page, List<NcertParagraphRow> rows, PdfLayout.PageShape shape) {
+    /** A page's start check: its flag, if any, and every pairing that needed the dropped-math allowance. */
+    private record Starts(Optional<Flag> flag, List<String> paired) {
+    }
+
+    private static Starts starts(short chapter, int page, List<NcertParagraphRow> rows, PdfLayout.PageShape shape) {
         List<NcertParagraphRow> starting = new ArrayList<>();
         List<String> openings = new ArrayList<>();
         for (NcertParagraphRow row : rows) {
@@ -137,11 +151,18 @@ final class LayoutChecks {
         }
         // What is left over on both sides, once more: a line whose math the layer dropped is the row's
         // opening with a run cut out of it, and only the leftovers can still be paired (ruling, 2026-09-16).
+        // Each pairing is named: it is a guess, and a page it quiets would otherwise leave no trace.
+        List<String> paired = new ArrayList<>();
         for (Iterator<Integer> left = unmatched.iterator(); left.hasNext();) {
-            String opening = openings.get(left.next());
+            int index = left.next();
+            String opening = openings.get(index);
             Optional<String> match = printed.stream()
                     .filter(start -> ParagraphParts.openingWithMathDropped(start, opening)).findFirst();
             if (match.isPresent()) {
+                NcertParagraphRow row = starting.get(index);
+                paired.add("ch " + chapter + " p" + page + ": the print starts \"" + match.get() + "\" where §"
+                        + row.section() + " ¶" + row.paraNo() + " starts \"" + quote(opening)
+                        + "\" — the layer dropped the line's math");
                 printed.remove(match.get());
                 left.remove();
             }
@@ -152,7 +173,7 @@ final class LayoutChecks {
             unmatchedRows.add("§" + row.section() + " ¶" + row.paraNo() + " \"" + quote(openings.get(index)) + "\"");
         }
         if (unmatchedRows.isEmpty() && printed.isEmpty()) {
-            return Optional.empty();
+            return new Starts(Optional.empty(), paired);
         }
         StringBuilder message = new StringBuilder("ch " + chapter + " p" + page + ": " + starting.size()
                 + " rows start here, the print starts " + shape.starts().size() + " paragraphs");
@@ -163,7 +184,7 @@ final class LayoutChecks {
             message.append(unmatchedRows.isEmpty() ? " — " : " · ").append("printed starts no row begins with: ")
                     .append(String.join(" · ", printed.stream().map(start -> "\"" + start + "\"").toList()));
         }
-        return Optional.of(new Flag(Kind.starts, page, null, message.toString()));
+        return new Starts(Optional.of(new Flag(Kind.starts, page, null, message.toString())), paired);
     }
 
     /**
@@ -200,7 +221,7 @@ final class LayoutChecks {
             if (times > rowsCarry) {
                 flags.add(new Flag(Kind.equation, page, null, "ch " + chapter + " p" + page + ": the print numbers "
                         + number + " " + times(times) + ", the rows carry it " + times(rowsCarry)
-                        + " — a displayed equation the transcription may have dropped"));
+                        + " — a displayed equation dropped, its number altered, or a reference to it lost"));
             }
         });
         return flags;

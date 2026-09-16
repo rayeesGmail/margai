@@ -1,6 +1,7 @@
 package com.margai.pipeline.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.margai.ai.api.AiCallContext;
 import com.margai.ai.api.AiClientInfo;
@@ -387,7 +388,7 @@ class NcertVerifyCommandTest {
                         + " | join flags | figure flags | equation flags |")
                 .contains("## numbered equations the print carries that the rows do not")
                 .contains("ch 7 p2: the print numbers (7.5) twice, the rows carry it once"
-                        + " — a displayed equation the transcription may have dropped")
+                        + " — a displayed equation dropped, its number altered, or a reference to it lost")
                 .contains("1 numbered equations the print carries that the rows do not");
     }
 
@@ -498,18 +499,53 @@ class NcertVerifyCommandTest {
      */
     @Test
     void aRowThatOnlyMovedDownItsSectionKeepsTheReadItAlreadyHas() {
+        verifier.differs(2, 2, "|r|^3 r where", "|r|^3 r_hat where");
         run("--read-pages");
         List<NcertParagraphRow> rows = new ArrayList<>(rows());
         NcertParagraphRow vector = rows.get(2);
-        rows.set(2, new NcertParagraphRow(vector.chapterNo(), vector.section(), (short) 2, vector.text(), true,
-                List.of(), vector.extraction()));
+        rows.set(2, new NcertParagraphRow(vector.chapterNo(), vector.section(), (short) 2, vector.text(),
+                vector.hasEquations(), vector.figureRefs(), vector.extraction()));
         imports.paragraphsAnswer = rows;
         imports.verifications.clear();
 
         run("--read-pages");
 
         assertThat(verifier.calls).containsExactly(1, 2);
-        assertThat(imports.verifications).extracting(NcertVerificationRow::address).contains("ch 7 §7.2 ¶2");
+        // The verdict the read gave that part, now at the address the row moved to — not merely some verdict.
+        assertThat(imports.verifications).filteredOn(row -> row.address().equals("ch 7 §7.2 ¶2")).singleElement()
+                .satisfies(row -> {
+                    assertThat(row.verification().verdict()).isEqualTo(ParagraphVerification.Verdict.differs);
+                    assertThat(row.verification().differences()).singleElement().satisfies(difference ->
+                            assertThat(difference.printed()).isEqualTo("|r|^3 r where"));
+                });
+    }
+
+    /**
+     * Two paragraphs printing the same words on one page cannot be told apart by their words, and after a
+     * renumbering the address one of them now has is the address the other had when the page was read. The
+     * read is mapped to the page's parts in order, so each keeps its own verdict and neither takes the
+     * other's.
+     */
+    @Test
+    void twoPartsOfOnePagePrintingTheSameWordsKeepTheirOwnVerdictsAcrossARenumbering() {
+        imports.paragraphsAnswer = List.of(rows().getFirst(), duplicate((short) 1), duplicate((short) 2));
+        verifier.differs(2, 2, "Answers", "Answer");
+        run("--read-pages");
+        imports.paragraphsAnswer = List.of(rows().getFirst(), duplicate((short) 2), duplicate((short) 3));
+        imports.verifications.clear();
+
+        run("--read-pages");
+
+        assertThat(verifier.calls).containsExactly(1, 2);
+        assertThat(imports.verifications).extracting(NcertVerificationRow::address, row -> row.verification().verdict())
+                .contains(tuple("ch 7 §7.2 ¶2", ParagraphVerification.Verdict.matches),
+                        tuple("ch 7 §7.2 ¶3", ParagraphVerification.Verdict.differs));
+    }
+
+    /** A paragraph of §7.2 printing the one word page 2 prints twice. */
+    private static NcertParagraphRow duplicate(short paraNo) {
+        return new NcertParagraphRow((short) 7, "7.2", paraNo, "Answer", false, List.of(),
+                new ParagraphExtraction(List.of(2), List.of(0), new BigDecimal("0.9"), TRANSCRIBED_P2, null));
     }
 
     @Test

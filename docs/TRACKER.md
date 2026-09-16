@@ -305,11 +305,48 @@ THE FREE VERIFY AFTER THE RELOAD, founder, 2026-09-16 07:07 — ₹0 (report `20
     "total energy of a satellite"): the other six of the calibration's eight are now set aside by code, with
     the p8 heading under omitted text. Two `false_positive` entries would clear them and turn both rows to
     `matches`; they need no reload, since `ncert verify` reads the rulings file itself.
-HOW TO RESUME: founder rulings, open — (1) two `false_positive` entries and a `figure_ref` entry for §7.3 ¶9's
-  `Fig. 7.5`; (2) a read matched to a renumbered row by page and part hash, so a structural correction
-  re-reads only the pages whose text it changed; (3) a fallback opening match for a line whose math the layer
-  drops; (4) a free equation-number check; (5) chapter 7 kept as run 11 in the corpus event. Then the paid
-  re-read of the changed pages (₹5–10) computes chapter 7's clean share, and the phy11-part1 corpus event.
+THE FIVE RULINGS, founder 2026-09-16, "approved as written, recommended option per ruling" — all five built
+  the same morning, 718 server tests, verify green, ₹0 (DECISIONS 2026-09-16):
+  1. Three more entries in `ncert-corrections.yaml` (6b19d2c): `figure_ref` removing `Fig. 7.5` from §7.3 ¶9
+     (applies at the next load), and `false_positive` on the two remaining second-read signals (p10 `r_E`,
+     p12 the invented "total energy of a satellite") — these need no reload. A test now reads the committed
+     file, so its YAML and its keys fail here rather than on the founder's machine; a mistyped span still
+     fails only at the load, by name.
+  2. A read is matched to a row by its part's hash, not the address the row had when the page was read
+     (541dba4, corrected after the audit): a read made of exactly the page's parts is mapped item by item,
+     which is right however the rows have been renumbered and right where a page prints the same words
+     twice; where the page's parts have changed, a part whose words appear once in the read keeps its
+     verdict and an ambiguous one is left without any, rather than guessing by an address that has moved.
+     Renumbering alone no longer costs a paid re-read or a fresh draw.
+  3. A printed start whose math the layer dropped is paired with its row (bfb2542): leftovers on both sides
+     are matched once more where the layer's letters all appear, in order and close together, at the row's
+     opening. Only the layer may be missing letters. Every pairing is named in its own report section — it
+     is a guess, and a page it quiets would otherwise leave no trace (added after the audit).
+  4. The free equation-number check (d926a30): each page's printed `(7.n)` numbers counted against the
+     numbers its rows carry, flagged only where the print carries one more often.
+  5. Chapter 7 stays Opus run 11 through the book's corpus event: extract without `--redo`, which resumes
+     over its pages, and copy the JSONL aside rather than move it (runbook §3).
+THE AUDIT of the five-ruling build (spec-auditor, FAIL → fixed): the resume block's "76 rows with a verdict"
+  was the pre-ruling-2 number (corrected below); the pairing of ruling 3 claimed a safeguard — "the counts
+  agreeing" — that the code does not implement and that is not a safeguard at all, since a pairing removes
+  one from each side and leaves any mismatch standing (DECISIONS corrected: the real guards are that only
+  leftovers are paired, that the letters agree from the first and run in order, and that every pairing is
+  named); the pairing left no trace in the report (now its own section); the same-words tie-break by address
+  was unsound after a renumbering (now mapped in order, ambiguity left unjudged, with a test); the equation
+  flag named one cause for a signal with several (reworded); four doc lines overstated or miscounted.
+THE ₹0 PREVIEW of rulings 3 and 4 over the real rows (a throwaway JUnit test on `margai_d15` and
+  `margai_d15_seeded` with the real PDF, deleted after): start flags 6 → 5 — page 7's cleared, exactly the
+  one ruling 3 was for — and equation flags 0 on the corrected chapter, while on the seeded copy the check
+  names the dropped (7.35) on p11 (the blind spot the paid read missed on both draws) and the altered (7.12)
+  on p7. Two true positives, no false ones.
+HOW TO RESUME: (1) the founder's ₹0 `ncert load --chapters 7` then free `ncert verify --chapters 7` on
+  `margai_d15` — expect the figure flag gone, start flags 5, equation flags 0, one pairing named on p7, the
+  two rulings set aside (differs 0), and **≈ 98 of 106 rows with a verdict**: ruling 2 takes back from the
+  artefact every row the splits only renumbered, leaving the 8 rows the four splits really rewrote (four
+  shortened, four new). The audit caught this: before ruling 2 the number was 76; (2) `--read-pages` on the
+  four pages those 8 rows sit on (3, 7, 8, 11 — page 12 no longer re-read), ≈ ₹5, which completes chapter 7's
+  clean share; (3) the phy11-part1 corpus event on Opus (~₹750), verify (~₹250), adjudicate, load; then bio11
+  and the eight books.
 Reports 2026-09-15-ncert-load(-2), -ncert-verify (free), -2 (`--pages 1`), -3 (the finished read) committed;
   the two stopped runs wrote none. Server tests 697, verify green, eval PASS (placeholder) before each
   AI-path commit.
@@ -2811,6 +2848,7 @@ Tomorrow's first task:
 - **what the free checks missed on chapter 7, from the ₹0 preview** · 2026-09-14 (D15) · page 5's boxed law statements "(1)…" and "(2)…" are rows the print's layer does not start (the item marker may not be in the box's text layer); page 11's "Which is approximately 85 minutes.", indented before an Example box, is not seen as a start because the box's first line sits close beneath it; page 3 raises two starts ("where v is the velocity", "equal times to traverse") that look like lines after displays. Read each against the rendered page in the calibration and tune only what the calibration shows twice
 - ~~**`--pages` and `--redo` without `--read-pages` are ignored silently**~~ · **done the same evening** after the spec-auditor named it: refused with the reason · 2026-09-14 (D15)
 - **the verify output's `verdicts` array sometimes arrives as a JSON string** · 2026-09-15 (D15) · after the `items` rename the whole-answer wrap is gone, but 2 page calls in 24 still sent `"verdicts":"[{…}]"` — a correct array, stringified — and each cost a repair call. A decode that parses a string holding exactly the array the schema expects would save the call; it touches `StructuredOutput` for every feature, so it wants its own measured change
+- **no ruling can retire a page-level flag** · 2026-09-16 (D15, spec-auditor) · `ncert-corrections.yaml` rules on a second-read span (`misprint`, `false_positive`), which is per row; a start flag or an equation flag names a page, so a founder who scores one as noise — six start flags on chapter 7 are exactly that — has no way to record it, and the run after adjudication still carries them in the line under the D15 ✅ number. A `page_flag` kind keyed on chapter, page and the flag's own words would let the caveat line fall to what is really unresolved. Decide it on the first whole book, where the count is what a person actually has to carry
 - **`ncert_extract` v3 spells an arrow-marked vector two ways** · 2026-09-14 (D15, spec-auditor) · its notation says a vector "marked by an arrow or by bold keeps its plain symbol" and, three lines on, that a vector arrow "is `_vec`"; the frozen prompt is not edited, and `ncert_verify` v1 declares the two spellings equivalent so neither is flagged. A candidate for v3's next amendment, which needs a defect the second read cannot catch — this one it deliberately does not
 - **verify through the real batch lane** · 2026-09-14 (D15, spec-auditor) · pages are independent, so a whole-book `ncert verify --read-pages` is a natural first `completeBatch` caller at half price once D55's batch lane returns results per request; today it calls page by page so every paid page reaches the artefact (DECISIONS 2026-09-14)
 - ~~**`ncert load --prune` for a corpus event** · 2026-09-14 (D15) · the load reports the addresses a chapter no longer carries and leaves the rows in place, which was right for a subset load into a full book and is wrong for a re-extraction that replaces the book: 85 stale rows sat beside the canonical 1,017 until today, sampleable by the ✅ and embeddable by D17. A flag that deletes the orphans of the chapters this load carries, refused once embeddings or anchors exist unless the D17 migrate path is taken. Until it exists the corpus event deletes by hand before the load (day log 2026-09-14)~~ · **done the same day, without a flag**: the load deletes them, names them, refuses if any is anchored, spares a row holding the other edition's text (DECISIONS 2026-09-14)

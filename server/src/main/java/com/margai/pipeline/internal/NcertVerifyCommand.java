@@ -227,6 +227,7 @@ class NcertVerifyCommand extends NcertBookCommand {
         List<String> joins = new ArrayList<>();
         List<String> figures = new ArrayList<>();
         List<String> equations = new ArrayList<>();
+        List<String> paired = new ArrayList<>();
         List<List<String>> summary = new ArrayList<>();
         Map<String, Set<LayoutChecks.Kind>> onRows = new HashMap<>();
         for (BookDefinition.Chapter chapter : selected) {
@@ -243,6 +244,7 @@ class NcertVerifyCommand extends NcertBookCommand {
                 continue;
             }
             LayoutChecks.Result result = LayoutChecks.check(ofChapter, PdfLayout.pages(pdf));
+            paired.addAll(result.paired());
             long startFlags = 0;
             long joinFlags = 0;
             long figureFlags = 0;
@@ -279,6 +281,9 @@ class NcertVerifyCommand extends NcertBookCommand {
                 .table(List.of("chapter", "pages compared", "page breaks judged", "page breaks undecided",
                         "start flags", "join flags", "figure flags", "equation flags"), summary);
         report.section("where rows start against where the print starts paragraphs").list(starts);
+        report.section("printed starts paired with a row only after allowing for math the layer dropped")
+                .line("each of these quieted a page; read them against the page if a page looks too clean")
+                .list(paired);
         report.section("joins across page breaks against the print").list(joins);
         report.section("figure_refs against the paragraph and the chapter's captions").list(figures);
         report.section("numbered equations the print carries that the rows do not").list(equations);
@@ -432,11 +437,16 @@ class NcertVerifyCommand extends NcertBookCommand {
      * is not a reason to pay for the page again (founder's ruling, 2026-09-16).
      */
     private boolean current(VerifiedPage existing, List<Placed> placed) {
-        if (!valid(existing) || existing.items().size() != placed.size()) {
+        return valid(existing) && sameParts(existing, placed);
+    }
+
+    /** Whether the read was made of exactly these parts, in this order — whatever the rows are called now. */
+    private static boolean sameParts(VerifiedPage read, List<Placed> placed) {
+        if (read.items().size() != placed.size()) {
             return false;
         }
         for (int index = 0; index < placed.size(); index++) {
-            if (!existing.items().get(index).partSha256()
+            if (!read.items().get(index).partSha256()
                     .equals(ParagraphVerification.sha256(placed.get(index).part().text()))) {
                 return false;
             }
@@ -507,6 +517,8 @@ class NcertVerifyCommand extends NcertBookCommand {
 
         for (Map.Entry<Short, List<NcertParagraphRow>> chapter : byChapter.entrySet()) {
             Set<Integer> pagesOfChapter = new LinkedHashSet<>();
+            Map<Integer, Map<String, VerifiedPage.Item>> itemsOfPage = itemsByPage(chapter.getKey(),
+                    chapter.getValue(), done);
             for (NcertParagraphRow row : chapter.getValue()) {
                 List<ParagraphParts.Part> parts = ParagraphParts.of(row);
                 List<VerifiedPage> reads = new ArrayList<>();
@@ -514,7 +526,7 @@ class NcertVerifyCommand extends NcertBookCommand {
                 for (ParagraphParts.Part part : parts) {
                     pagesOfChapter.add(part.page());
                     VerifiedPage read = done.get(chapter.getKey() + "/" + part.page());
-                    VerifiedPage.Item item = read == null || !valid(read) ? null : itemOf(read, row, part);
+                    VerifiedPage.Item item = itemsOfPage.getOrDefault(part.page(), Map.of()).get(row.address());
                     if (item == null) {
                         break;
                     }
@@ -613,19 +625,40 @@ class NcertVerifyCommand extends NcertBookCommand {
     }
 
     /**
-     * The item of a read that judged this part of this row: the one whose part hash is the part's words.
-     * Where a page prints the same words twice the hash cannot tell them apart, so the address the row had
-     * when the page was read decides; if that names neither, the row is left without a verdict.
+     * Which item of each page's read judged which row, by page and row address. A read that was made of
+     * exactly this page's parts, in order, is mapped item by item — which is right however the rows have
+     * since been renumbered, and right even where a page prints the same words twice. Where the page's
+     * parts have changed since (a correction rewrote, split or joined one of them), every part whose words
+     * still appear exactly once in the read keeps its verdict and the rest are left without one: an item
+     * that could be either of two identical parts names neither, and the page is read again.
      */
-    private static VerifiedPage.Item itemOf(VerifiedPage read, NcertParagraphRow row, ParagraphParts.Part part) {
-        String sha = ParagraphVerification.sha256(part.text());
-        List<VerifiedPage.Item> sameWords = read.items().stream()
-                .filter(candidate -> candidate.partSha256().equals(sha)).toList();
-        if (sameWords.size() == 1) {
-            return sameWords.getFirst();
+    private Map<Integer, Map<String, VerifiedPage.Item>> itemsByPage(short chapter,
+            List<NcertParagraphRow> rows, Map<String, VerifiedPage> done) {
+        Map<Integer, Map<String, VerifiedPage.Item>> byPage = new HashMap<>();
+        for (Map.Entry<Integer, List<Placed>> onPage : partsByPage(rows).entrySet()) {
+            VerifiedPage read = done.get(chapter + "/" + onPage.getKey());
+            if (read == null || !valid(read)) {
+                continue;
+            }
+            List<Placed> placed = onPage.getValue();
+            Map<String, VerifiedPage.Item> ofRow = new HashMap<>();
+            if (sameParts(read, placed)) {
+                for (int index = 0; index < placed.size(); index++) {
+                    ofRow.put(placed.get(index).row().address(), read.items().get(index));
+                }
+            } else {
+                for (Placed at : placed) {
+                    String sha = ParagraphVerification.sha256(at.part().text());
+                    List<VerifiedPage.Item> sameWords = read.items().stream()
+                            .filter(candidate -> candidate.partSha256().equals(sha)).toList();
+                    if (sameWords.size() == 1) {
+                        ofRow.put(at.row().address(), sameWords.getFirst());
+                    }
+                }
+            }
+            byPage.put(onPage.getKey(), ofRow);
         }
-        return sameWords.stream().filter(candidate -> candidate.address().equals(row.address()))
-                .findFirst().orElse(null);
+        return byPage;
     }
 
     private static boolean ruledOn(List<NcertCorrection> rulings, short chapter, int page, VerifiedPage.Span span) {

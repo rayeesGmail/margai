@@ -210,6 +210,14 @@ extractions, and from D17 a chapter's paragraphs carry embeddings and question a
 re-cut would re-point. If a book must be re-extracted after that, it is re-embedded and re-anchored
 with it (DECISIONS 2026-09-13; the guard lands with D17).
 
+**A chapter already adjudicated stays as it was extracted.** The corrections in
+`ncert-corrections.yaml` are written against one run's exact words — a span that must occur once on
+its page — so re-extracting a chapter that has them invalidates them by name. Run the book's own
+extraction without `--redo`: it resumes over that chapter's pages, keeps its lines of the JSONL, and
+pays nothing for them. Copy the JSONL aside first (`aws s3 cp` to a dated key) rather than moving it:
+a move is what makes the run pay for the chapter again. This is how `phy11-part1` chapter 7 keeps
+Opus run 11 through the book's corpus event (founder's ruling, 2026-09-16).
+
 ## 4. load — JSONL into ncert_paragraphs
 
 ```
@@ -249,9 +257,10 @@ Every run's report is its own file: a second run of the same command on the same
 `<date>-<command>-2.md`, a third `-3.md`, and nothing overwrites an earlier run's (D15).
 
 **The load applies `pipeline/inputs/ncert-corrections.yaml`** (D15) after its page-break repairs and
-before it numbers: the founder's rulings on what `ncert verify` flagged. `text`, `join` and `split`
-entries change the frozen run's pages; `misprint` and `false_positive` rule on a flag and change
-nothing. Each applied entry is one line of the report; an entry whose span is not on its page exactly
+before it numbers: the founder's rulings on what `ncert verify` flagged. `text`, `join`, `split`,
+`figure_ref` (one label removed from or added to the paragraph holding a span) and `drop` (a paragraph
+that is not running text removed) change the frozen run's pages; `misprint` and `false_positive` rule
+on a flag and change nothing, and `ncert verify` reads those two itself. Each applied entry is one line of the report; an entry whose span is not on its page exactly
 once refuses the load by name. The file's own header and `pipeline/inputs/README.md` say how to write
 one. Each row now also records where each of its pages' parts begins (`pageStarts` in the row's
 `extraction`), which verify needs — a row loaded before 2026-09-14's build has none, and verify asks for
@@ -299,9 +308,12 @@ options belong to `--read-pages` and are refused without it. Code's judgements a
 are applied when the report is written, never stored in the artefact, and **every run — the free one
 too — re-judges the rows from the artefact and writes the verdicts onto them**, so a `misprint` or
 `false_positive` ruling takes effect on the next run at ₹0. A `text`, `join` or `split` correction is
-different: it changes the words of that page's paragraphs (and a join or split renumbers the rest of
-its section), so after the re-load those rows have no current read, the free run reports them "without
-a verdict", and `--read-pages` reads just those pages again (≈ ₹1 each) — the rest resume.
+different: it changes the words of that page's paragraphs, so after the re-load those rows have no
+current read, the free run reports them "without a verdict", and `--read-pages` reads just those pages
+again (≈ ₹1 each) — the rest resume. **Renumbering is not a change of words.** A join or split moves
+every later row of its section down a number; a read is matched to a row by the hash of its part, so
+those rows keep their verdicts at their new addresses and their pages are not read again (founder's
+ruling, 2026-09-16). Only where a page prints the same words twice does the address decide.
 
 **Read the report in this order:**
 
@@ -316,8 +328,18 @@ a verdict", and `--read-pages` reads just those pages again (≈ ₹1 each) — 
 4. **The free checks**: `where rows start against where the print starts paragraphs` (per page, the
    rows that begin there against the indents, headings, labels and item markers the print begins
    there), `joins across page breaks against the print`, `figure_refs against the paragraph and the
-   chapter's captions`. These are measured guesses about typography — they route attention and never
-   refuse. A real segmentation defect becomes a `join` or `split` entry.
+   chapter's captions`, and `numbered equations the print carries that the rows do not`. These are
+   measured guesses about typography — they route attention and never refuse. A real segmentation
+   defect becomes a `join` or `split` entry. The equation check is the one aimed at the second read's
+   blind spot: a dropped displayed equation takes its number with it, and the number is the part of it
+   the text layer keeps, so the page's own `(7.n)` labels are counted against the numbers its rows
+   carry — both the label beside an equation and every sentence referring to it. It speaks only where
+   the print carries a number more often than the rows, since a number the layer itself loses (chapter
+   7's own `(7.16)`) says nothing about a row. On chapter 7 as corrected it is silent; on the seeded
+   copy it names the dropped `(7.35)` and the altered `(7.12)` (founder's ruling, 2026-09-16). The
+   section under it, `printed starts paired with a row only after allowing for math the layer dropped`,
+   names every pairing the start check needed that allowance for: each one quieted a page, so read them
+   against the page when a page looks too clean.
 5. **`set aside by code`** — spans that differ only in spacing or a glyph variant (≅ ≃ ≈, the dashes,
    quotation marks, × and ·), or not at all (the verifier listing a span it checked — seen on the first
    calibration pages), which leave the row matching, and spans the verifier quoted that the row
@@ -326,10 +348,10 @@ a verdict", and `--read-pages` reads just those pages again (≈ ₹1 each) — 
 6. **`clean paragraphs`** — per chapter: rows, verdicts, matches, differs, not on page, not judged,
    join or figure flags, and the clean share: the second read matches and no join or figure flag names
    the row. The line under it, `clean for the book (PLAN D15 ✅)`, appears when every chapter of the
-   book was selected, every chapter has loaded rows and every row has a verdict. **Two signals name no
-   row and are not in the share** — page-level start flags and passages no row carries — and the line
-   after it counts them: adjudicate both before recording the number, which is the one from the run
-   after adjudication.
+   book was selected, every chapter has loaded rows and every row has a verdict. **Three signals name
+   no row and are not in the share** — page-level start flags, numbered equations the print carries
+   that the rows do not, and passages no row carries — and the line after it counts them: adjudicate
+   all three before recording the number, which is the one from the run after adjudication.
 7. **The cost line**, from the ledger.
 
 **Cost** at the config's Sonnet 5 price row, estimated before the first run: about ₹1.05 per page
@@ -367,7 +389,10 @@ quotes the page's ≅ as =), and a **dropped displayed equation**. It found, twi
 word, digit or exponent, an added hat, a subscript's case, a lost leading minus, a lost bracket around a
 sum, a changed equation number and a dropped sentence. The free checks cannot see the first two either —
 the symbol fonts leave primes and ≅ unmapped in the text layer — so a book is not clean of them until a
-person has read its primes and approximation signs against the page.
+person has read its primes and approximation signs against the page. **The third is now code's** (ruling,
+2026-09-16): a numbered displayed equation leaves its number in the layer, and the equation check holds
+the page's numbers to its rows, which catches the seeded drop the paid read missed twice. An unnumbered
+display is still nobody's.
 
 ### The seeded recall run
 

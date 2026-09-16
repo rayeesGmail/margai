@@ -133,10 +133,11 @@ class LayoutChecksTest {
     /**
      * Chapter 7 page 7 after the split correction: the print does start the paragraph the row starts, but
      * the layer maps no glyph for its math, so the two openings only meet once what is left of the line is
-     * paired with it. The counts agreeing is what makes the pairing safe (founder's ruling, 2026-09-16).
+     * paired with it. The pairing is a guess — only leftovers are paired, the letters must agree from the
+     * first and run in order — so every one of them is named in the report (founder's ruling, 2026-09-16).
      */
     @Test
-    void aPrintedStartTheLayerStrippedOfItsMathIsPairedWithItsRow() {
+    void aPrintedStartTheLayerStrippedOfItsMathIsPairedWithItsRowAndNamed() {
         LayoutChecks.Result result = LayoutChecks.check(List.of(
                         row("7.6", 3, "This is clearly less than the value of g on the surface of earth", 7),
                         row("7.6", 4, "For h/R_E << 1, using binomial expression, g(h) ≅ g (1 - 2h / R_E)", 7)),
@@ -144,13 +145,17 @@ class LayoutChecksTest {
                         "This is clearly less than the value", "For , using binomial expression,")));
 
         assertThat(result.flags()).isEmpty();
+        assertThat(result.paired()).containsExactly("ch 7 p7: the print starts \"For , using binomial expression,\""
+                + " where §7.6 ¶4 starts \"For h/R_E << 1, using binomial expression,\""
+                + " — the layer dropped the line's math");
     }
 
     /**
      * The blind spot the seeded run found: the second read does not see a displayed equation the
      * transcription dropped, twice over (TRACKER 2026-09-15). The number beside it stays in the layer, so
-     * code can hold the page's rows to the numbers the page prints — the seeded drop of chapter 7 page 11's
-     * (7.35) left the rows carrying it twice where the print carries it three times.
+     * code can hold the page's rows to the numbers the page prints. This is the shape of the seeded drop on
+     * chapter 7 page 11, cut down to the two rows that matter: the print numbers (7.35) beside the display
+     * and again in the sentence referring to it, and the rows that lost the display carry it one time fewer.
      */
     @Test
     void anEquationNumberThePrintCarriesMoreOftenThanTheRowsIsFlagged() {
@@ -165,7 +170,7 @@ class LayoutChecksTest {
             assertThat(flag.page()).isEqualTo(11);
             assertThat(flag.address()).isNull();
             assertThat(flag.message()).isEqualTo("ch 7 p11: the print numbers (7.35) twice, the rows carry"
-                    + " it once — a displayed equation the transcription may have dropped");
+                    + " it once — a displayed equation dropped, its number altered, or a reference to it lost");
         });
     }
 

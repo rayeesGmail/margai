@@ -55,6 +55,30 @@ class ParagraphPartsTest {
         assertThat(ParagraphParts.sameOpening("Given k = 10^-13 s^2 m^(-3) and the", "Given k = 10 s m and the")).isTrue();
     }
 
+    /**
+     * Chapter 7 page 7: the layer maps no glyph for the symbol fonts, so the line the print starts with
+     * "For h/R_E << 1, using binomial expression," reaches us with its math cut out. The split correction
+     * that made this row is right and the opening comparison missed it (founder's ruling, 2026-09-16).
+     */
+    @Test
+    void anOpeningTheLayerStrippedOfItsMathIsStillTheSameOpening() {
+        assertThat(ParagraphParts.sameOpening("For , using binomial expression,",
+                "For h/R_E << 1, using binomial expression, g(h) ≅ g (1 - 2h / R_E)")).isFalse();
+        assertThat(ParagraphParts.openingWithMathDropped("For , using binomial expression,",
+                "For h/R_E << 1, using binomial expression, g(h) ≅ g (1 - 2h / R_E)")).isTrue();
+    }
+
+    @Test
+    void anOpeningThatIsAnotherParagraphsIsNotPairedWithIt() {
+        // Different paragraphs of chapter 7 page 4, one of them a subsequence of the other's letters.
+        assertThat(ParagraphParts.openingWithMathDropped("The force on m is directed",
+                "The total force on m_1 is F_1 = Gm_2 m_1 / r_21^2")).isFalse();
+        assertThat(ParagraphParts.openingWithMathDropped("Stated Mathematically, Newtons gravitation",
+                "Every body in the universe attracts every other body")).isFalse();
+        // Too little of the line survives to say whose opening it was.
+        assertThat(ParagraphParts.openingWithMathDropped("For ,", "For h/R_E << 1, using binomial")).isFalse();
+    }
+
     static NcertParagraphRow row(String text, List<Integer> pages, List<Integer> starts) {
         return new NcertParagraphRow((short) 7, "7.3", (short) 1, text, false, List.of(),
                 new ParagraphExtraction(pages, starts, new BigDecimal("0.90"), null, null));

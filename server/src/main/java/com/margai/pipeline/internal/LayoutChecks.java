@@ -3,6 +3,7 @@ package com.margai.pipeline.internal;
 import com.margai.curriculum.api.NcertParagraphRow;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -114,16 +115,31 @@ final class LayoutChecks {
             }
         }
         List<String> printed = new ArrayList<>(shape.starts());
-        List<String> unmatchedRows = new ArrayList<>();
+        List<Integer> unmatched = new ArrayList<>();
         for (int index = 0; index < starting.size(); index++) {
             String opening = openings.get(index);
             Optional<String> match = printed.stream().filter(start -> ParagraphParts.sameOpening(start, opening)).findFirst();
             if (match.isPresent()) {
                 printed.remove(match.get());
             } else {
-                NcertParagraphRow row = starting.get(index);
-                unmatchedRows.add("§" + row.section() + " ¶" + row.paraNo() + " \"" + quote(opening) + "\"");
+                unmatched.add(index);
             }
+        }
+        // What is left over on both sides, once more: a line whose math the layer dropped is the row's
+        // opening with a run cut out of it, and only the leftovers can still be paired (ruling, 2026-09-16).
+        for (Iterator<Integer> left = unmatched.iterator(); left.hasNext();) {
+            String opening = openings.get(left.next());
+            Optional<String> match = printed.stream()
+                    .filter(start -> ParagraphParts.openingWithMathDropped(start, opening)).findFirst();
+            if (match.isPresent()) {
+                printed.remove(match.get());
+                left.remove();
+            }
+        }
+        List<String> unmatchedRows = new ArrayList<>();
+        for (int index : unmatched) {
+            NcertParagraphRow row = starting.get(index);
+            unmatchedRows.add("§" + row.section() + " ¶" + row.paraNo() + " \"" + quote(openings.get(index)) + "\"");
         }
         if (unmatchedRows.isEmpty() && printed.isEmpty()) {
             return Optional.empty();

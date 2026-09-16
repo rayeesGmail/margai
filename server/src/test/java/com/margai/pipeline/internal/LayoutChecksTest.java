@@ -130,6 +130,22 @@ class LayoutChecksTest {
                         "ch 7 §7.3 ¶7: the paragraph mentions fig 7.4, which figure_refs does not carry");
     }
 
+    /**
+     * Chapter 7 page 7 after the split correction: the print does start the paragraph the row starts, but
+     * the layer maps no glyph for its math, so the two openings only meet once what is left of the line is
+     * paired with it. The counts agreeing is what makes the pairing safe (founder's ruling, 2026-09-16).
+     */
+    @Test
+    void aPrintedStartTheLayerStrippedOfItsMathIsPairedWithItsRow() {
+        LayoutChecks.Result result = LayoutChecks.check(List.of(
+                        row("7.6", 3, "This is clearly less than the value of g on the surface of earth", 7),
+                        row("7.6", 4, "For h/R_E << 1, using binomial expression, g(h) ≅ g (1 - 2h / R_E)", 7)),
+                shapes(shape(7, PdfLayout.Top.continues, "This is clearly less than the value",
+                        "This is clearly less than the value", "For , using binomial expression,")));
+
+        assertThat(result.flags()).isEmpty();
+    }
+
     @Test
     void aPageTheChapterPdfDoesNotHaveIsReportedNotCompared() {
         LayoutChecks.Result result = LayoutChecks.check(List.of(row("7.3", 1, "Text of a page.", 20)),

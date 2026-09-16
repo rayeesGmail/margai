@@ -306,7 +306,7 @@ THE FREE VERIFY AFTER THE RELOAD, founder, 2026-09-16 07:07 — ₹0 (report `20
     the p8 heading under omitted text. Two `false_positive` entries would clear them and turn both rows to
     `matches`; they need no reload, since `ncert verify` reads the rulings file itself.
 THE FIVE RULINGS, founder 2026-09-16, "approved as written, recommended option per ruling" — all five built
-  the same morning, 718 server tests, verify green, ₹0 (DECISIONS 2026-09-16):
+  the same morning, 720 server tests, verify green, ₹0 (DECISIONS 2026-09-16):
   1. Three more entries in `ncert-corrections.yaml` (6b19d2c): `figure_ref` removing `Fig. 7.5` from §7.3 ¶9
      (applies at the next load), and `false_positive` on the two remaining second-read signals (p10 `r_E`,
      p12 the invented "total energy of a satellite") — these need no reload. A test now reads the committed
@@ -334,6 +334,13 @@ THE AUDIT of the five-ruling build (spec-auditor, FAIL → fixed): the resume bl
   named); the pairing left no trace in the report (now its own section); the same-words tie-break by address
   was unsound after a renumbering (now mapped in order, ambiguity left unjudged, with a test); the equation
   flag named one cause for a signal with several (reworded); four doc lines overstated or miscounted.
+  THE RE-AUDIT returned FAIL again on two: the runbook still told a person the address decides a tie the
+  fix had deleted (rewritten to what the code does), and the branch that recovers those 22 rows had no test
+  — every test reached the other branch (now `onAPageASplitChangedTheUntouchedPartKeepsItsVerdictAndThe
+  SplitHalvesDoNot`, which fails without it). With them: a part is matched only where its words appear once
+  on both sides; the pairing's safety argument has its own test (two leftover rows against one leftover
+  printed start — the second row is still flagged); and the summary table counts `starts paired` per
+  chapter, so a book-sized run has a number to watch rather than only a list.
 THE ₹0 PREVIEW of rulings 3 and 4 over the real rows (a throwaway JUnit test on `margai_d15` and
   `margai_d15_seeded` with the real PDF, deleted after): start flags 6 → 5 — page 7's cleared, exactly the
   one ruling 3 was for — and equation flags 0 on the corrected chapter, while on the seeded copy the check

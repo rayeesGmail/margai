@@ -521,6 +521,31 @@ class NcertVerifyCommandTest {
     }
 
     /**
+     * What a split correction really leaves behind, and the path that pays for chapter 7: the page's parts
+     * are no longer the ones that were read, so the halves of the split paragraph have no verdict — but the
+     * untouched paragraph beside them on the same page keeps its own, for nothing, on a free run.
+     */
+    @Test
+    void onAPageASplitChangedTheUntouchedPartKeepsItsVerdictAndTheSplitHalvesDoNot() {
+        run("--read-pages");
+        List<NcertParagraphRow> rows = new ArrayList<>(rows());
+        NcertParagraphRow vector = rows.get(2);
+        rows.set(2, new NcertParagraphRow((short) 7, "7.2", (short) 1, "F = - G m_1m_2 / |r|^3 r_hat", true,
+                List.of(), vector.extraction()));
+        rows.add(new NcertParagraphRow((short) 7, "7.2", (short) 2, "where G is the constant.", true, List.of(),
+                vector.extraction()));
+        imports.paragraphsAnswer = rows;
+        imports.verifications.clear();
+
+        assertThat(run()).isZero();
+
+        assertThat(verifier.calls).containsExactly(1, 2);
+        assertThat(imports.verifications).extracting(NcertVerificationRow::address)
+                .containsExactly("ch 7 §7.1 ¶1", "ch 7 §7.1 ¶2");
+        assertThat(out.toString()).contains("| 7 | 4 | 2 | 2 | 0 | 0 | 0 | 0 | — (2 rows without a verdict) |");
+    }
+
+    /**
      * Two paragraphs printing the same words on one page cannot be told apart by their words, and after a
      * renumbering the address one of them now has is the address the other had when the page was read. The
      * read is mapped to the page's parts in order, so each keeps its own verdict and neither takes the

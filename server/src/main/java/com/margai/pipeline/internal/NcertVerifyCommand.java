@@ -240,7 +240,7 @@ class NcertVerifyCommand extends NcertBookCommand {
             // (every Hindi book, one Chemistry file) has no prose for the typography rules to find.
             if (!PdfTextLayer.isLegible(PdfTextLayer.pages(pdf))) {
                 summary.add(List.of(String.valueOf(chapter.no()), "withheld: illegible text layer",
-                        "—", "—", "—", "—", "—", "—"));
+                        "—", "—", "—", "—", "—", "—", "—"));
                 continue;
             }
             LayoutChecks.Result result = LayoutChecks.check(ofChapter, PdfLayout.pages(pdf));
@@ -275,11 +275,11 @@ class NcertVerifyCommand extends NcertBookCommand {
             summary.add(List.of(String.valueOf(chapter.no()), String.valueOf(result.pagesCompared()),
                     String.valueOf(result.boundariesJudged()), String.valueOf(result.boundariesUndecided()),
                     String.valueOf(startFlags), String.valueOf(joinFlags), String.valueOf(figureFlags),
-                    String.valueOf(equationFlags)));
+                    String.valueOf(equationFlags), String.valueOf(result.paired().size())));
         }
         report.section("the print's typography against the rows (free; routes attention, never refuses)")
                 .table(List.of("chapter", "pages compared", "page breaks judged", "page breaks undecided",
-                        "start flags", "join flags", "figure flags", "equation flags"), summary);
+                        "start flags", "join flags", "figure flags", "equation flags", "starts paired"), summary);
         report.section("where rows start against where the print starts paragraphs").list(starts);
         report.section("printed starts paired with a row only after allowing for math the layer dropped")
                 .line("each of these quieted a page; read them against the page if a page looks too clean")
@@ -628,9 +628,9 @@ class NcertVerifyCommand extends NcertBookCommand {
      * Which item of each page's read judged which row, by page and row address. A read that was made of
      * exactly this page's parts, in order, is mapped item by item — which is right however the rows have
      * since been renumbered, and right even where a page prints the same words twice. Where the page's
-     * parts have changed since (a correction rewrote, split or joined one of them), every part whose words
-     * still appear exactly once in the read keeps its verdict and the rest are left without one: an item
-     * that could be either of two identical parts names neither, and the page is read again.
+     * parts have changed since (a correction rewrote, split or joined one of them), a part keeps its verdict
+     * only where its words appear exactly once on both sides — one item of the read, one part of the page.
+     * Two parts and one item, or one part and two items, name nobody, and the page is read again.
      */
     private Map<Integer, Map<String, VerifiedPage.Item>> itemsByPage(short chapter,
             List<NcertParagraphRow> rows, Map<String, VerifiedPage> done) {
@@ -647,11 +647,13 @@ class NcertVerifyCommand extends NcertBookCommand {
                     ofRow.put(placed.get(index).row().address(), read.items().get(index));
                 }
             } else {
+                Map<String, Long> partsWithTheWords = placed.stream().collect(Collectors.groupingBy(
+                        at -> ParagraphVerification.sha256(at.part().text()), Collectors.counting()));
                 for (Placed at : placed) {
                     String sha = ParagraphVerification.sha256(at.part().text());
                     List<VerifiedPage.Item> sameWords = read.items().stream()
                             .filter(candidate -> candidate.partSha256().equals(sha)).toList();
-                    if (sameWords.size() == 1) {
+                    if (sameWords.size() == 1 && partsWithTheWords.get(sha) == 1) {
                         ofRow.put(at.row().address(), sameWords.getFirst());
                     }
                 }

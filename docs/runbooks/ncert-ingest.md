@@ -311,9 +311,12 @@ too — re-judges the rows from the artefact and writes the verdicts onto them**
 different: it changes the words of that page's paragraphs, so after the re-load those rows have no
 current read, the free run reports them "without a verdict", and `--read-pages` reads just those pages
 again (≈ ₹1 each) — the rest resume. **Renumbering is not a change of words.** A join or split moves
-every later row of its section down a number; a read is matched to a row by the hash of its part, so
-those rows keep their verdicts at their new addresses and their pages are not read again (founder's
-ruling, 2026-09-16). Only where a page prints the same words twice does the address decide.
+every later row of its section down a number, and a read is matched to the page's words, never to the
+address a row had when the page was read (founder's ruling, 2026-09-16): a read made of exactly the
+page's parts is mapped to them in order, so those rows keep their verdicts at their new addresses and
+the page is not read again. On a page a correction did change, every part whose words appear exactly
+once in the read keeps its verdict — this is what leaves only the rewritten paragraphs to pay for —
+and a part the read cannot be matched to unambiguously is left without one, to be read again.
 
 **Read the report in this order:**
 
@@ -338,8 +341,9 @@ ruling, 2026-09-16). Only where a page prints the same words twice does the addr
    7's own `(7.16)`) says nothing about a row. On chapter 7 as corrected it is silent; on the seeded
    copy it names the dropped `(7.35)` and the altered `(7.12)` (founder's ruling, 2026-09-16). The
    section under it, `printed starts paired with a row only after allowing for math the layer dropped`,
-   names every pairing the start check needed that allowance for: each one quieted a page, so read them
-   against the page when a page looks too clean.
+   names every pairing the start check needed that allowance for, and the summary table counts them per
+   chapter under `starts paired`: each one quieted a page, so read them against the page when a page looks
+   too clean, and watch the count rather than the list on a whole book.
 5. **`set aside by code`** — spans that differ only in spacing or a glyph variant (≅ ≃ ≈, the dashes,
    quotation marks, × and ·), or not at all (the verifier listing a span it checked — seen on the first
    calibration pages), which leave the row matching, and spans the verifier quoted that the row

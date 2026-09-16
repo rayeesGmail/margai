@@ -151,6 +151,25 @@ class LayoutChecksTest {
     }
 
     /**
+     * A pairing takes one from each side, so it can never quiet a page whose counts disagree: the row the
+     * print does not start is still named. This is the whole safety argument for the pairing — that a page
+     * with a real defect cannot be silenced by it (DECISIONS 2026-09-16).
+     */
+    @Test
+    void aPairingLeavesTheOtherUnmatchedRowFlagged() {
+        LayoutChecks.Result result = LayoutChecks.check(List.of(
+                        row("7.6", 3, "For h/R_E << 1, using binomial expression, g(h) ≅ g (1 - 2h / R_E)", 7),
+                        row("7.6", 4, "Since mass of a sphere is proportional to be cube of its radius", 7)),
+                shapes(shape(7, PdfLayout.Top.continues, "For , using binomial expression,",
+                        "For , using binomial expression,")));
+
+        assertThat(result.paired()).hasSize(1);
+        assertThat(result.flags()).singleElement().satisfies(flag ->
+                assertThat(flag.message()).isEqualTo("ch 7 p7: 2 rows start here, the print starts 1 paragraphs"
+                        + " — rows the print does not start: §7.6 ¶4 \"Since mass of a sphere is proportional\""));
+    }
+
+    /**
      * The blind spot the seeded run found: the second read does not see a displayed equation the
      * transcription dropped, twice over (TRACKER 2026-09-15). The number beside it stays in the layer, so
      * code can hold the page's rows to the numbers the page prints. This is the shape of the seeded drop on

@@ -341,9 +341,10 @@ THE ₹0 PREVIEW of rulings 3 and 4 over the real rows (a throwaway JUnit test o
   on p7. Two true positives, no false ones.
 HOW TO RESUME: (1) the founder's ₹0 `ncert load --chapters 7` then free `ncert verify --chapters 7` on
   `margai_d15` — expect the figure flag gone, start flags 5, equation flags 0, one pairing named on p7, the
-  two rulings set aside (differs 0), and **≈ 98 of 106 rows with a verdict**: ruling 2 takes back from the
-  artefact every row the splits only renumbered, leaving the 8 rows the four splits really rewrote (four
-  shortened, four new). The audit caught this: before ruling 2 the number was 76; (2) `--read-pages` on the
+  two rulings set aside (differs 0), and **98 of 106 rows with a verdict**: ruling 2 takes back from the
+  artefact every row the splits only renumbered (22 of the 26 updated), leaving exactly the 8 rows the four
+  splits rewrote — four shortened firsts and four new seconds, whose words the artefact has never been read
+  against. The audit caught this: before ruling 2 the number was 76; (2) `--read-pages` on the
   four pages those 8 rows sit on (3, 7, 8, 11 — page 12 no longer re-read), ≈ ₹5, which completes chapter 7's
   clean share; (3) the phy11-part1 corpus event on Opus (~₹750), verify (~₹250), adjudicate, load; then bio11
   and the eight books.

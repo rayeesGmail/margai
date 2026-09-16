@@ -355,10 +355,22 @@ THE RULINGS PROVED, founder 22:46 and 22:47 — two ₹0 runs on `margai_d15`, e
   `matches`**. Ruling 2 is what earned the 22: the two exponent set-asides now listed at p11 §7.9 ¶9 are
   spans of rows that had no verdict this morning — the recovered-by-words branch, working on the real
   artefact. The 8 rows left are exactly the four split halves and their four new siblings.
-HOW TO RESUME: (1) the paid re-read of those 8 rows' four pages — `--read-pages --pages 3,7,8,11` on
-  `pipeline,live,visionsonnet`, ≈ ₹5 — which completes chapter 7's clean share and is the first fresh draw
-  the equation check and the pairing meet; (2) the phy11-part1 corpus event on Opus (~₹750), verify (~₹250),
-  adjudicate, load; then bio11 and the eight books.
+THE PAID RE-READ, founder 22:52 — `--read-pages --pages 3,7,8,11`, 4 pages, ₹6.99, no repair call (the
+  stringified `verdicts` array did not recur: 2 in 28 calls now); report `-ncert-verify-3.md`. **106 of 106
+  rows with a verdict, 104 matches, 2 differs, clean 98.1%**; the free checks unchanged on a fresh draw —
+  equation flags 0, the p7 pairing named again, joins 0, figure 0.
+  Both new flags are THE BOOK'S OWN MISPRINTS, read against the pages rendered at 3× (scratchpad pymupdf;
+  page 8 is a private-use-encoded page, so only the image can be read):
+  - p7 §7.6 ¶7: the page prints "Since mass of a sphere is proportional **to be** cube of its radius." The
+    verifier quoted it as "to the cube" — the same span it corrected in the seeded run, so this is habit.
+  - p8 §7.6 ¶11: the page prints "the acceleration **due gravity** decreases by a factor". The verifier
+    quoted it as "due to gravity".
+  This is the verifier's third and fourth silent repair of the book's grammar (with `r_E` → `R_E` and the
+  invented "total energy of a satellite"): it reads the page as it should be written, not as it is. Two
+  `misprint` entries would take chapter 7 to 106 matches; drafted, awaiting the founder's word.
+HOW TO RESUME: (1) the two `misprint` entries above, then a free `ncert verify` (₹0) to see 106/106 matches;
+  (2) the phy11-part1 corpus event on Opus (~₹750), verify (~₹250), adjudicate, load; then bio11 and the
+  eight books.
 Reports 2026-09-15-ncert-load(-2), -ncert-verify (free), -2 (`--pages 1`), -3 (the finished read) committed;
   the two stopped runs wrote none. Server tests 697, verify green, eval PASS (placeholder) before each
   AI-path commit.

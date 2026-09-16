@@ -368,9 +368,24 @@ THE PAID RE-READ, founder 22:52 — `--read-pages --pages 3,7,8,11`, 4 pages, �
   This is the verifier's third and fourth silent repair of the book's grammar (with `r_E` → `R_E` and the
   invented "total energy of a satellite"): it reads the page as it should be written, not as it is. Two
   `misprint` entries would take chapter 7 to 106 matches; drafted, awaiting the founder's word.
-HOW TO RESUME: (1) the two `misprint` entries above, then a free `ncert verify` (₹0) to see 106/106 matches;
-  (2) the phy11-part1 corpus event on Opus (~₹750), verify (~₹250), adjudicate, load; then bio11 and the
-  eight books.
+CHAPTER 7 IS CLOSED, founder 23:03 — the two `misprint` entries committed (d7fd697) and a ₹0 verify run:
+  the second read's flags **none**, rulings set aside **4**, **106 of 106 rows, 106 matches, clean 100.0%**
+  (report `-ncert-verify-4.md`). What stands beside the number, all of it scored against the pages already:
+  5 page-level start flags (p3's Example-box line, p4's flush law statement and the line under Fig. 7.4,
+  p5's boxed (1)/(2) and §7.4 ¶1, p11's indented "Which is approximately 85 minutes.", p12's "Answer Given
+  k…"), 0 equation flags, 0 passages no row carries, 1 named pairing on p7. Chapter 7 cost ₹6.99 today and
+  about ₹32 across the whole calibration.
+DATABASE STATE at the close: `margai_d15` holds phy11-part1 ch 7 (106 rows) and bio11 ch 1 (30 rows) only —
+  the v2 corpus of 1,056 rows is in `margai_d14`. So the corpus event's load writes the other 14 chapters
+  fresh; nothing of v2 is in the way, and `ncert load` without `--chapters` will report no deletions.
+HOW TO RESUME — the phy11-part1 corpus event, in this order: (1) `aws sso login --profile margai` (the 22:45
+  failure was an expired session); (2) copy the artefact aside, never move it:
+  `aws s3 cp s3://margai-beta-content/extract/phy11-part1/en.jsonl s3://margai-beta-content/extract/phy11-part1/en.run11-backup.jsonl --profile margai`;
+  (3) `ncert extract --book phy11-part1 --lang en` on `pipeline,live,visionopus` (~₹750, resumes over ch 7's
+  12 pages, which stay Opus run 11 — ruling 5); (4) `ncert load --book phy11-part1 --lang en`; (5) free
+  `ncert verify`, then `--read-pages` (~₹250 on Sonnet); (6) adjudicate the flags against the rendered pages,
+  write the rulings, reload, re-verify → the book's clean share, which is PLAN D15's ✅. Then bio11 and the
+  eight remaining books.
 Reports 2026-09-15-ncert-load(-2), -ncert-verify (free), -2 (`--pages 1`), -3 (the finished read) committed;
   the two stopped runs wrote none. Server tests 697, verify green, eval PASS (placeholder) before each
   AI-path commit.

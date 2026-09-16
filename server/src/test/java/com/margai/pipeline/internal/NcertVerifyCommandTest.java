@@ -470,6 +470,27 @@ class NcertVerifyCommandTest {
         assertThat(verifier.calls).containsExactly(1, 2, 2);
     }
 
+    /**
+     * A correction that splits or joins a paragraph moves every later row of its section down a number.
+     * The page's words are unchanged, so the read still holds: a row is matched to it by the hash of its
+     * part, never by the address it had when the page was read (founder's ruling, 2026-09-16).
+     */
+    @Test
+    void aRowThatOnlyMovedDownItsSectionKeepsTheReadItAlreadyHas() {
+        run("--read-pages");
+        List<NcertParagraphRow> rows = new ArrayList<>(rows());
+        NcertParagraphRow vector = rows.get(2);
+        rows.set(2, new NcertParagraphRow(vector.chapterNo(), vector.section(), (short) 2, vector.text(), true,
+                List.of(), vector.extraction()));
+        imports.paragraphsAnswer = rows;
+        imports.verifications.clear();
+
+        run("--read-pages");
+
+        assertThat(verifier.calls).containsExactly(1, 2);
+        assertThat(imports.verifications).extracting(NcertVerificationRow::address).contains("ch 7 §7.2 ¶2");
+    }
+
     @Test
     void pagesRestrictsTheReadAndOnlyRowsWhosePagesWereAllReadGetAVerdict() {
         assertThat(run("--read-pages", "--pages", "2")).isZero();

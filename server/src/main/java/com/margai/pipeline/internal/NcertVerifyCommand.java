@@ -412,15 +412,19 @@ class NcertVerifyCommand extends NcertBookCommand {
         return byPage;
     }
 
-    /** Whether the artefact's read of a page was of exactly these parts, by the ruling's verifier, with this prompt. */
+    /**
+     * Whether the artefact's read of a page was of exactly these parts, by the ruling's verifier, with this
+     * prompt. The parts are the words the page prints, so they are what is compared: a correction that
+     * splits or joins a paragraph moves every later row of its section down a number, and renumbering alone
+     * is not a reason to pay for the page again (founder's ruling, 2026-09-16).
+     */
     private boolean current(VerifiedPage existing, List<Placed> placed) {
         if (!valid(existing) || existing.items().size() != placed.size()) {
             return false;
         }
         for (int index = 0; index < placed.size(); index++) {
-            VerifiedPage.Item item = existing.items().get(index);
-            if (!item.address().equals(placed.get(index).row().address())
-                    || !item.partSha256().equals(ParagraphVerification.sha256(placed.get(index).part().text()))) {
+            if (!existing.items().get(index).partSha256()
+                    .equals(ParagraphVerification.sha256(placed.get(index).part().text()))) {
                 return false;
             }
         }
@@ -497,10 +501,7 @@ class NcertVerifyCommand extends NcertBookCommand {
                 for (ParagraphParts.Part part : parts) {
                     pagesOfChapter.add(part.page());
                     VerifiedPage read = done.get(chapter.getKey() + "/" + part.page());
-                    String sha = ParagraphVerification.sha256(part.text());
-                    VerifiedPage.Item item = read == null || !valid(read) ? null : read.items().stream()
-                            .filter(candidate -> candidate.address().equals(row.address()) && candidate.partSha256().equals(sha))
-                            .findFirst().orElse(null);
+                    VerifiedPage.Item item = read == null || !valid(read) ? null : itemOf(read, row, part);
                     if (item == null) {
                         break;
                     }
@@ -596,6 +597,22 @@ class NcertVerifyCommand extends NcertBookCommand {
     private static boolean headingOrCaption(String text) {
         String stripped = text == null ? "" : text.strip();
         return OMITTED_HEADING.matcher(stripped).lookingAt() || FigureLabels.of(stripped).isPresent();
+    }
+
+    /**
+     * The item of a read that judged this part of this row: the one whose part hash is the part's words.
+     * Where a page prints the same words twice the hash cannot tell them apart, so the address the row had
+     * when the page was read decides; if that names neither, the row is left without a verdict.
+     */
+    private static VerifiedPage.Item itemOf(VerifiedPage read, NcertParagraphRow row, ParagraphParts.Part part) {
+        String sha = ParagraphVerification.sha256(part.text());
+        List<VerifiedPage.Item> sameWords = read.items().stream()
+                .filter(candidate -> candidate.partSha256().equals(sha)).toList();
+        if (sameWords.size() == 1) {
+            return sameWords.getFirst();
+        }
+        return sameWords.stream().filter(candidate -> candidate.address().equals(row.address()))
+                .findFirst().orElse(null);
     }
 
     private static boolean ruledOn(List<NcertCorrection> rulings, short chapter, int page, VerifiedPage.Span span) {

@@ -385,7 +385,7 @@ class NcertVerifyCommandTest {
 
         assertThat(out.toString())
                 .contains("| chapter | pages compared | page breaks judged | page breaks undecided | start flags"
-                        + " | join flags | figure flags | equation flags |")
+                        + " | join flags | figure flags | equation flags | starts paired |")
                 .contains("## numbered equations the print carries that the rows do not")
                 .contains("ch 7 p2: the print numbers (7.5) twice, the rows carry it once"
                         + " — a displayed equation dropped, its number altered, or a reference to it lost")

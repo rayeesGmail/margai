@@ -31,3 +31,14 @@ corrections:
      at: "Substituting for M_s from above", reason: "indented after the display (7.17)"}
   - {book: phy11-part1, lang: en, chapter: 7, page: 11, kind: split, address: "ch 7 §7.9 ¶4",
      at: "where we have used the relation", reason: "indented after the display (7.36)"}
+  # The fifth free-check finding of the same calibration, and the second read's two remaining signals, both
+  # read against the rendered page and scored wrong on 2026-09-15; approved by the founder 2026-09-16 (ruling 1).
+  - {book: phy11-part1, lang: en, chapter: 7, page: 4, kind: figure_ref, address: "ch 7 §7.3 ¶9",
+     at: "Three equal masses of m kg each", remove: "Fig. 7.5",
+     reason: "Example 7.2's stem names no figure; the figure belongs to part (b), which carries it too"}
+  - {book: phy11-part1, lang: en, chapter: 7, page: 10, kind: false_positive, address: "ch 7 §7.8 ¶10",
+     printed: "R_E replaced by the radius", transcribed: "r_E replaced by the radius",
+     reason: "the page prints r_E — the verifier corrected the book"}
+  - {book: phy11-part1, lang: en, chapter: 7, page: 12, kind: false_positive, address: "ch 7 §7.10 ¶4",
+     printed: "total energy of a satellite", transcribed: "total energy of an circularly orbiting satellite",
+     reason: "the page prints \"an circularly orbiting\" — the verifier invented the shorter phrase"}

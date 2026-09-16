@@ -368,6 +368,20 @@ class NcertCorrectionsTest {
                 transcribed, printed, null, "the third form prints the vector r", null);
     }
 
+    /**
+     * The file the founder's rulings really live in. A typo in it fails a load by name and writes nothing,
+     * which costs a round trip to the founder's machine to discover; this reads it where it is committed.
+     */
+    @Test
+    void theCommittedRulingsFileParses() {
+        Path file = Path.of("../pipeline/inputs/" + NcertCorrectionsYamlReader.FILE);
+
+        List<NcertCorrection> corrections = NcertCorrectionsYamlReader.read(file);
+
+        assertThat(corrections).isNotEmpty()
+                .allSatisfy(correction -> assertThat(correction.reason()).isNotBlank());
+    }
+
     private static NcertCorrection correction(int page, NcertCorrection.Kind kind, String transcribed, String printed,
             String at) {
         return new NcertCorrection("phy11-part1", BookLanguage.en, (short) 7, page, kind, transcribed, printed, at,

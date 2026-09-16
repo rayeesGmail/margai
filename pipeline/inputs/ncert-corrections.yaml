@@ -42,3 +42,12 @@ corrections:
   - {book: phy11-part1, lang: en, chapter: 7, page: 12, kind: false_positive, address: "ch 7 §7.10 ¶4",
      printed: "total energy of a satellite", transcribed: "total energy of an circularly orbiting satellite",
      reason: "the page prints \"an circularly orbiting\" — the verifier invented the shorter phrase"}
+  # The two flags of the 2026-09-16 re-read of pages 3, 7, 8 and 11, each read against the page rendered at
+  # 3× (page 8's text layer is private-use encoded, so only the image can say); approved by the founder the
+  # same evening. Both are the book's own grammar, which the verifier repaired silently — its habit.
+  - {book: phy11-part1, lang: en, chapter: 7, page: 7, kind: misprint, address: "ch 7 §7.6 ¶7",
+     printed: "proportional to the cube", transcribed: "proportional to be cube",
+     reason: "the page prints \"to be cube\" — the book's own error, kept"}
+  - {book: phy11-part1, lang: en, chapter: 7, page: 8, kind: misprint, address: "ch 7 §7.6 ¶11",
+     printed: "acceleration due to gravity decreases", transcribed: "acceleration due gravity decreases",
+     reason: "the page prints \"due gravity\" — the book's own error, kept"}

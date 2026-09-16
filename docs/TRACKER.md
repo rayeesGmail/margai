@@ -280,9 +280,20 @@ THE REPEAT, founder, 23:04 — pages 5, 7, 11 with `--redo` under the seeded tag
   at them. The free checks cannot see the first two either (the symbol fonts leave primes and ≅ unmapped in
   the layer); a numbered displayed equation leaves its number in the layer, which a free check could hold
   the rows to (open for the founder).
-HOW TO RESUME: (1) a ₹0 reload of chapter 7 into `margai_d15` proves the four split corrections apply; (2) the
-  phy11-part1 corpus event — open for the founder: whether chapter 7 stays run 11, so its adjudicated
-  corrections still apply, or is re-extracted with the book.
+THE RELOAD, founder, 23:10 — `ncert load --chapters 7` into `margai_d15`, ₹0 (report `-ncert-load-3.md`): all
+  four split corrections applied and named; 4 inserted, 26 updated, 76 unchanged, 0 deleted; 106 rows; no
+  page-break repair, no mid-sentence start. Checked in the database: each new row starts at its `at` span
+  (§7.2 ¶8, §7.6 ¶4, §7.6 ¶9, §7.9 ¶5). The 30 inserted or updated rows carry no verdict now — by design a load
+  drops a verdict whose address holds other text — but only the 4 split rows' texts changed: the other 26
+  moved one number down their section with the same text. The artefact matches a read to a row by address
+  and part hash, so a `--read-pages` would re-read pages 3, 7, 8, 11 and 12, page 12 only for renumbering, and
+  every fresh draw can raise new wrong signals on rows already adjudicated. §7.3 ¶9's `Fig. 7.5` (a real
+  defect of the calibration) has no correction entry yet — ruling 4 named the four splits only.
+HOW TO RESUME: (1) free `ncert verify --chapters 7` on `margai_d15` (₹0) — expect the start flags 7 → 3, the
+  figure flag still 1, 76 of 106 rows with a verdict; (2) founder rulings, open: a free equation-number check;
+  chapter 7 kept as run 11 in the corpus event; a `figure_ref` entry removing `Fig. 7.5` from §7.3 ¶9; a read
+  matched to a renumbered row by page and part hash, so a structural correction re-reads only the pages
+  whose text it changed; (3) the paid re-read of the changed pages, then the phy11-part1 corpus event.
 Reports 2026-09-15-ncert-load(-2), -ncert-verify (free), -2 (`--pages 1`), -3 (the finished read) committed;
   the two stopped runs wrote none. Server tests 697, verify green, eval PASS (placeholder) before each
   AI-path commit.

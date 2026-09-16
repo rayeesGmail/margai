@@ -289,11 +289,27 @@ THE RELOAD, founder, 23:10 — `ncert load --chapters 7` into `margai_d15`, ₹0
   and part hash, so a `--read-pages` would re-read pages 3, 7, 8, 11 and 12, page 12 only for renumbering, and
   every fresh draw can raise new wrong signals on rows already adjudicated. §7.3 ¶9's `Fig. 7.5` (a real
   defect of the calibration) has no correction entry yet — ruling 4 named the four splits only.
-HOW TO RESUME: (1) free `ncert verify --chapters 7` on `margai_d15` (₹0) — expect the start flags 7 → 3, the
-  figure flag still 1, 76 of 106 rows with a verdict; (2) founder rulings, open: a free equation-number check;
-  chapter 7 kept as run 11 in the corpus event; a `figure_ref` entry removing `Fig. 7.5` from §7.3 ¶9; a read
-  matched to a renumbered row by page and part hash, so a structural correction re-reads only the pages
-  whose text it changed; (3) the paid re-read of the changed pages, then the phy11-part1 corpus event.
+THE FREE VERIFY AFTER THE RELOAD, founder, 2026-09-16 07:07 — ₹0 (report `2026-09-16-ncert-verify.md`):
+  start flags 7 → 6, join 0, figure 1; 76 of 106 rows with a verdict, 74 matches, 2 differs, 0 not judged;
+  the clean share is not computed while 30 rows have none.
+  - The splits are confirmed by the print itself: p8's flag is gone, p3's and p11's split lines are matched,
+    and p7 now counts 10 rows against 10 printed paragraphs.
+  - p7 still flags, and the flag is an artefact: the text layer drops the symbol-font glyphs, so the printed
+    line reads "For , using binomial expression," against the row's "For h/R_E << 1, using binomial
+    expression," and the 12-letter opening comparison (`ParagraphParts.sameOpening`) misses. The layer's
+    opening is a subsequence of the row's — a fallback pass could pair them (open for the founder).
+  - The other five start flags are the noise the calibration already scored: p3's Example-box line, p4's
+    flush law statement and the line under Fig. 7.4, p5's boxed (1)/(2) and §7.4 ¶1, p11's indented "Which is
+    approximately 85 minutes.", p12's "Answer Given k…".
+  - The second read is down to its two known-wrong signals (p10 §7.8 ¶10 `r_E`, p12 §7.10 ¶4 the invented
+    "total energy of a satellite"): the other six of the calibration's eight are now set aside by code, with
+    the p8 heading under omitted text. Two `false_positive` entries would clear them and turn both rows to
+    `matches`; they need no reload, since `ncert verify` reads the rulings file itself.
+HOW TO RESUME: founder rulings, open — (1) two `false_positive` entries and a `figure_ref` entry for §7.3 ¶9's
+  `Fig. 7.5`; (2) a read matched to a renumbered row by page and part hash, so a structural correction
+  re-reads only the pages whose text it changed; (3) a fallback opening match for a line whose math the layer
+  drops; (4) a free equation-number check; (5) chapter 7 kept as run 11 in the corpus event. Then the paid
+  re-read of the changed pages (₹5–10) computes chapter 7's clean share, and the phy11-part1 corpus event.
 Reports 2026-09-15-ncert-load(-2), -ncert-verify (free), -2 (`--pages 1`), -3 (the finished read) committed;
   the two stopped runs wrote none. Server tests 697, verify green, eval PASS (placeholder) before each
   AI-path commit.

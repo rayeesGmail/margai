@@ -94,3 +94,117 @@ corrections:
   - {book: phy11-part1, lang: en, chapter: 6, page: 23, kind: text, address: "ch 6 §6.9 ¶5",
      transcribed: "(1/2) m upsilon^2", printed: "(1/2) m v^2",
      reason: "the translational kinetic energy ch 5 §5.6 ¶1 already writes with v"}
+
+  # ── The first paid read of chapters 1–6 (2026-09-18, ₹116.88) ────────────────────────────────────
+  # Every one of the second read's twenty flags was adjudicated against the page: the text layer where it
+  # carries the characters, the page rendered at 4.5–6× where only the image can (the ± set as a plus over
+  # a rule, the hats, the signs). Not one is a transcription defect. Three are the book's own errors and
+  # seventeen are the verifier repairing the book or dropping a glyph. Approved by the founder 2026-09-18,
+  # "approved as written, recommended option per ruling".
+
+  # The book's own errors, kept — the verifier read the page as it should be written, not as it is.
+  - {book: phy11-part1, lang: en, chapter: 3, page: 3, kind: misprint, address: "ch 3 §3.4 ¶1",
+     printed: "section 3.4", transcribed: "section 4.2",
+     reason: "the layer prints \"As mentioned in section 4.2\" — the cross-reference the rationalised edition left behind, since that material is now §3.4"}
+  - {book: phy11-part1, lang: en, chapter: 3, page: 8, kind: misprint, address: "ch 3 §3.6 ¶11",
+     printed: "v_b^2 + v_c^2", transcribed: "v_b^2 + v_b^2",
+     reason: "the page prints the Law of cosines as R = sqrt(v_b^2 + v_b^2 + 2 v_b v_c cos 120), and its own next line substitutes 25^2 + 10^2"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 19, kind: misprint, address: "ch 6 §6.8 ¶15",
+     printed: "opposite directions applied", transcribed: "opposite diretions applied",
+     reason: "the layer itself prints \"diretions\""}
+
+  # The verifier wrong against the page: a glyph it dropped, a convention it does not hold, or the book's
+  # own looseness it tidied away.
+  - {book: phy11-part1, lang: en, chapter: 1, page: 4, kind: false_positive, address: "ch 1 §1.3 ¶21",
+     printed: "s = 2πr", transcribed: "s = 2 pi r",
+     reason: "the convention spells Greek letters out"}
+  - {book: phy11-part1, lang: en, chapter: 1, page: 6, kind: false_positive, address: "ch 1 §1.3.3 ¶2",
+     printed: "l b = 163.62 cm^2 + 1.6%", transcribed: "l b = 163.62 cm^2 ± 1.6%",
+     reason: "the page sets ± as a plus over a rule; the verifier read the plus and not the bar, and an error is quoted ±"}
+  - {book: phy11-part1, lang: en, chapter: 1, page: 6, kind: false_positive, address: "ch 1 §1.3.3 ¶2",
+     printed: "= 163.62 + 2.6 cm^2", transcribed: "= 163.62 ± 2.6 cm^2",
+     reason: "the same ± set in two pieces, five lines down"}
+  - {book: phy11-part1, lang: en, chapter: 1, page: 6, kind: false_positive, address: "ch 1 §1.3.3 ¶3",
+     printed: "l b = 164 + 3 cm^2", transcribed: "l b = 164 ± 3 cm^2",
+     reason: "the same ± in the rounded result"}
+  - {book: phy11-part1, lang: en, chapter: 3, page: 6, kind: false_positive, address: "ch 3 §3.5 ¶4",
+     printed: "lambda = A n_hat", transcribed: "lambda = lambda n_hat",
+     reason: "the layer prints \"the result is a vector λ = λ n_hat\"; the row is faithful and the verifier rewrote the book"}
+  - {book: phy11-part1, lang: en, chapter: 4, page: 7, kind: false_positive, address: "ch 4 §4.5 ¶26",
+     printed: "Force  time duration", transcribed: "Force × time duration",
+     reason: "the layer prints \"Impulse = Force × time duration\"; the verifier lost the ×"}
+  - {book: phy11-part1, lang: en, chapter: 4, page: 9, kind: false_positive, address: "ch 4 §4.6 ¶11",
+     printed: "inclined at 30 to the normal", transcribed: "inclined at 30° to the normal",
+     reason: "the layer prints 30°; the verifier lost the degree sign"}
+  - {book: phy11-part1, lang: en, chapter: 5, page: 7, kind: false_positive, address: "ch 5 §5.6 ¶3",
+     printed: "speed v_r of the block", transcribed: "speed v_f of the block",
+     reason: "the layer prints \"the final kinetic energy and speed v_f of the block\""}
+  - {book: phy11-part1, lang: en, chapter: 5, page: 9, kind: false_positive, address: "ch 5 §5.8 ¶8",
+     printed: "E_0 = mv_f^2", transcribed: "E_0 = (1/2) mv_f^2",
+     reason: "the layer prints \"E0 = (1/2) mvf 2 (5.11 c)\"; the verifier lost the half"}
+  - {book: phy11-part1, lang: en, chapter: 5, page: 13, kind: false_positive, address: "ch 5 §5.11 ¶2",
+     printed: "speed v_1i", transcribed: "speed v_1i,",
+     reason: "the layer prints \"speed v1i , the subscript 'i'\" — the comma is the page's"}
+  - {book: phy11-part1, lang: en, chapter: 5, page: 15, kind: false_positive, address: "ch 5 §5.11.3 ¶4",
+     printed: "theta_2 = 37", transcribed: "theta_2 = 37°",
+     reason: "the layer prints \"θ2 = 37°\"; the verifier lost the degree sign"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 12, kind: false_positive, address: "ch 6 §6.5 ¶24",
+     printed: "(a_y b_z − a_z b_y) i_hat + (a_z b_x − a_x b_z) j_hat + (a_x b_y − a_y b_x) k_hat",
+     transcribed: "(a_y b_z − a_z b_y) i + (a_z b_x − a_x b_z) j + (a_x b_y − a_y b_x) k",
+     reason: "the page drops the hats on that final line alone, hatting every line above it; the row is faithful"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 12, kind: false_positive, address: "ch 6 §6.5 ¶27",
+     printed: "−4 j_hat + 5 k_hat)·(−2 i_hat + j_hat + 3 k_hat)",
+     transcribed: "−4 j_hat + 5 k_hat)·(−2 i_hat + j_hat − 3 k_hat)",
+     reason: "the Answer prints −3 k_hat and works it to −25; Example 6.4's stem prints +3 k_hat, so the book contradicts itself and both rows are faithful"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 16, kind: false_positive, address: "ch 6 §6.7.2 ¶11",
+     printed: "p_i = (m_i v_i)", transcribed: "p = (m_i v_i)",
+     reason: "the page prints a bare p there, subscripting p_i only in the display above it"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 21, kind: false_positive, address: "ch 6 §6.8.2 ¶3",
+     printed: "tau_i = r_i x m_i g", transcribed: "tau_i = r_i × m_i g",
+     reason: "the layer prints \"τi = ri × mi g\"; the verifier read the cross as a letter x"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 28, kind: false_positive, address: "ch 6 §6.11 ¶6",
+     printed: "phi_1= F_1(r_1 dtheta)sinalpha_1",
+     transcribed: "F_1 ds_1 cos phi_1 = F_1 (r_1 dtheta) sin alpha_1",
+     reason: "the page prints the unspaced form; the spacing is the founder's ruling of 2026-09-17, so the verifier is quoting the print against a correction"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 28, kind: false_positive, address: "ch 6 §6.11 ¶7",
+     printed: "tau_1= r_1F_1 sinalpha", transcribed: "tau_1 = r_1 F_1 sin alpha,",
+     reason: "the same ruling in the next paragraph"}
+
+  # Paragraphs a row swallowed: a line indented after a display starts a paragraph (ncert_extract v3), which
+  # is the class chapter 7's four splits settled on 2026-09-15. Each measured from the page's own line
+  # geometry — the line indented, the line below it back at the column margin — and read on the rendered
+  # page. The last two are named nowhere in the verify report: the start check never saw those printed
+  # starts, so it under-reports as well as over-reports.
+  - {book: phy11-part1, lang: en, chapter: 3, page: 11, kind: split, address: "ch 3 §3.7.1 ¶15",
+     at: "where t is in seconds and",
+     reason: "indented after the display for r in Example 3.1's box"}
+  - {book: phy11-part1, lang: en, chapter: 3, page: 15, kind: split, address: "ch 3 §3.10 ¶3",
+     at: "Let the angle between position vectors",
+     reason: "indented after the display for |a|"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 17, kind: split, address: "ch 6 §6.7.2 ¶20",
+     at: "Here K_1, K_2 and K_3 are constants",
+     reason: "indented after the display (6.29 b); named by no flag in the report"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 23, kind: split, address: "ch 6 §6.9 ¶1",
+     at: "where m_i is the mass of the particle",
+     reason: "indented after the display for k_i; named by no flag in the report"}
+
+  # The reverse of the same rule: flush after a display is the paragraph running on, so these two rows split
+  # where the print does not. Both were named by the load's own mid-sentence check and read on the page.
+  - {book: phy11-part1, lang: en, chapter: 5, page: 12, kind: join, address: "ch 5 §5.9 ¶19",
+     at: "where we take the positive square root",
+     reason: "flush after the display for x_m, and it finishes the sentence the row before stops in the middle of"}
+  - {book: phy11-part1, lang: en, chapter: 5, page: 12, kind: join, address: "ch 5 §5.9 ¶20",
+     at: "which, as expected, is less than the result",
+     reason: "flush after \"x_m = 1.35 m\", continuing the same paragraph"}
+
+  # References the model left out of figure_refs. The paragraph's own words carry each one and FigureLabels
+  # reads all three, so these are omissions by the transcriber, not gaps in the parser.
+  - {book: phy11-part1, lang: en, chapter: 3, page: 13, kind: figure_ref, address: "ch 3 §3.9 ¶5",
+     at: "If we take the initial position to be the origin", add: "Fig. 3.17",
+     reason: "the paragraph says \"shown graphically at few instants in Fig. 3.17\""}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 24, kind: figure_ref, address: "ch 6 §6.9 ¶9",
+     at: "(b) Next, take a rigid rod of negligible mass", add: "Table 6.1",
+     reason: "the paragraph says \"Table 6.1 simply gives the moment of inertia\""}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 28, kind: figure_ref, address: "ch 6 §6.11 ¶5",
+     at: "Figure 6.30 shows a cross-section", add: "Fig. 6.30",
+     reason: "the paragraph opens \"Figure 6.30 shows a cross-section\", the label spelled out"}

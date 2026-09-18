@@ -169,6 +169,12 @@ corrections:
   - {book: phy11-part1, lang: en, chapter: 6, page: 28, kind: false_positive, address: "ch 6 §6.11 ¶7",
      printed: "tau_1= r_1F_1 sinalpha", transcribed: "tau_1 = r_1 F_1 sin alpha,",
      reason: "the same ruling in the next paragraph"}
+  # The twenty-first, from the redo of ch 4 p17 (2026-09-19): the row had been left without a verdict because
+  # the verifier's first quote could not be placed. Read again, it drops the × a second time — the same habit
+  # as the ch 4 p7 and ch 6 p21 flags above — and this time the quote is placeable, so the row is judged.
+  - {book: phy11-part1, lang: en, chapter: 4, page: 17, kind: false_positive, address: "ch 4 §4.11 ¶11",
+     printed: "270 – R'  =  27  0.1N", transcribed: "270 – R' = 27 × 0.1N",
+     reason: "the layer prints \"270 – R′ = 27 × 0.1N\"; the verifier lost the × twice on this span"}
 
   # Paragraphs a row swallowed: a line indented after a display starts a paragraph (ncert_extract v3), which
   # is the class chapter 7's four splits settled on 2026-09-15. Each measured from the page's own line

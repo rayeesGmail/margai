@@ -81,6 +81,10 @@ class NcertLoadCommand extends NcertBookCommand {
         // frozen, so a defect in it is corrected here, on the record, rather than re-drawn.
         NcertCorrections.Applied corrected = NcertCorrections.apply(pages, corrections(definition, chapters, report));
         pages = corrected.pages();
+        // Last, so a correction's span is the one the verify report quoted: the book's own degree
+        // sign for a zero exponent, written as the convention has it (D15, 2026-09-17).
+        DimensionalBrackets.Applied dimensioned = DimensionalBrackets.apply(pages);
+        pages = dimensioned.pages();
         Numbered numbered = number(pages, jsonlKey);
         List<NcertParagraphRow> rows = numbered.rows();
         report.section("page-break repairs to the model's continuation flags (deterministic, each one named)")
@@ -88,6 +92,8 @@ class NcertLoadCommand extends NcertBookCommand {
         report.section("corrections from " + NcertCorrectionsYamlReader.FILE + " (founder-adjudicated, each one named)")
                 .list(corrected.notes())
                 .line("rulings on verifier flags that change no text: " + corrected.rulings());
+        report.section("zero exponents the book set as a degree sign (deterministic, each one named)")
+                .list(dimensioned.notes());
         report.section("figure_refs that are not figure or table labels — dropped")
                 .list(numbered.droppedRefs());
         NcertLoadReport result = imports.loadParagraphs(definition.code(), language, rows);
@@ -176,8 +182,22 @@ class NcertLoadCommand extends NcertBookCommand {
     record Numbered(List<NcertParagraphRow> rows, List<String> droppedRefs) {
     }
 
-    /** What figure_refs may hold: a figure or a table label as the books print them. */
-    private static final Pattern FIGURE_REF = Pattern.compile("^(Fig\\.?|Figure|Table)\\b.*", Pattern.CASE_INSENSITIVE);
+    /**
+     * What figure_refs may hold: a figure or a table label as the books print them, singular or
+     * plural — a sentence naming several parts at once prints "Figs. 3.15(a) to (d)" or
+     * "Figures 4.8(b)", and taking only the singular dropped four real references from phy11-part1
+     * (D15, 2026-09-17). An equation number a paragraph cites is still not a figure reference.
+     */
+    private static final Pattern FIGURE_REF =
+            Pattern.compile("^(Fig(?:ure)?s?\\.?|Tables?)\\b.*", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * A footnote, which the books set at the foot of the page under a rule. It is the page's last
+     * paragraph but never what the next page continues: the body above it is. Before this, four of
+     * phy11-part1's nine footnotes had absorbed the following page's opening words — polluting the
+     * footnote and truncating the body paragraph, two rows each (D15, 2026-09-17).
+     */
+    private static final Pattern FOOTNOTE = Pattern.compile("^\\*+\\s");
 
     static Numbered number(List<ExtractedPage> pages, String jsonlKey) {
         List<Joined> rows = new ArrayList<>();
@@ -217,7 +237,11 @@ class NcertLoadCommand extends NcertBookCommand {
                 int paraNo = counters.merge(chapter + " " + section, 1, Integer::sum);
                 Joined joined = new Joined(chapter, section, paraNo, page, paragraph);
                 rows.add(joined);
-                last = joined;
+                // A footnote is never the paragraph the next page continues, so it never becomes the
+                // anchor: the body above it stays the one a continuation joins to.
+                if (!FOOTNOTE.matcher(paragraph.text().stripLeading()).find()) {
+                    last = joined;
+                }
             }
         }
         if (!refusals.isEmpty()) {

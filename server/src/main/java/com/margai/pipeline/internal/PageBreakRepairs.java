@@ -28,7 +28,14 @@ import java.util.regex.Pattern;
  * page 15 repeated "much smaller (even by 2 or 3 orders of magnitude) than static or sliding
  * friction" from page 14 (D14); chapter 6 page 8 invented "are made of the same material and
  * have the same thickness, then", repeated the whole quoted tail, and only then transcribed the
- * page's real words, on two calls out of two (D15).</li>
+ * page's real words, on two calls out of two (D15).
+ * <p>The lead-in clause holds only where the repeat stands at the head of the page, so it is
+ * bounded: where more characters precede the span than the span is long, nothing is cut — the page
+ * is left whole and named for a human. A re-transcription comes first and its lead-in is an
+ * invention; a span found deep in the page is the book using the same words twice. Chapter 6 pages
+ * 18–19 was the second kind — page 18 broke mid-sentence on "to be satisfied for mechanical" and
+ * page 19 printed that wording again two sentences later — and 124 characters of the
+ * coplanar-forces case were cut before the bound existed (2026-09-17).</li>
  * <li><b>A printed label opens the page.</b> "Answer", "Solution" and "Example 4.9" are set in
  * bold by the book and always begin a paragraph. Where the page's first paragraph is flagged as
  * continuing the previous page and opens with one of these, the flag is cleared. Both real
@@ -73,7 +80,16 @@ final class PageBreakRepairs {
                 String where = "ch " + page.chapterNo() + " §" + first.section().strip() + ": page " + page.page();
 
                 Repeat repeat = repeatedTail(last.text(), first.text());
-                if (repeat != null) {
+                if (repeat != null && repeat.leadIn() >= repeat.length()) {
+                    // A re-transcription stands at the head of the page. A match further into it than
+                    // the match is long is the book repeating its own wording, and the words before it
+                    // are this page's (D15, 2026-09-17: ch 6 pages 18-19 lost the coplanar-forces case
+                    // this way — silently, but for one line of the report).
+                    notes.add(where + " carries a " + repeat.length() + "-character span that also ends page "
+                            + previous.page() + ", but " + repeat.leadIn() + " characters stand in front of it — "
+                            + "further in than the span is long, so this is the book repeating a phrase and not "
+                            + "the page repeating the previous one: left whole, read it against the page");
+                } else if (repeat != null) {
                     if (repeat.remainder().isEmpty()) {
                         paragraphs.removeFirst();
                         notes.add(where + "'s first paragraph was nothing but the end of page " + previous.page()

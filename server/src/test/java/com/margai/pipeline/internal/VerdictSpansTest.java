@@ -59,6 +59,23 @@ class VerdictSpansTest {
         assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("G (Mm / d^2) L", "G Mm / d^2 L")).isFalse();
     }
 
+    /**
+     * The load writes a zero exponent the book set as a degree sign into the convention
+     * ({@link DimensionalBrackets}, 2026-09-17), so the row no longer reads character for character
+     * against the print. That is a difference code made and code must therefore set aside, or every
+     * dimensional formula in chapter 1 would be flagged at the next paid read. Outside a dimensional
+     * bracket a degree sign still means what it says.
+     */
+    @Test
+    void aZeroExponentTheLoadRewroteIsNotADifference() {
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("[M° L^3 T°]", "[M^0 L^3 T^0]")).isTrue();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("volume is [M° L^3 T°],", "volume is [M^0 L^3 T^0],")).isTrue();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("[M L^-3 T°]", "[M L^-3 T^0]")).isTrue();
+
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("inclined at 30°", "inclined at 30^0")).isFalse();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("the symbol L°m", "the symbol L^0m")).isFalse();
+    }
+
     @Test
     void aSpanIsCarriedHoweverTheVerifierSpacedIt() {
         String part = "F = - G m_1m_2 / |r|^3 r_hat where G is the constant.";

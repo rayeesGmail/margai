@@ -36,7 +36,11 @@ final class VerdictSpans {
     }
 
     static String normalise(String text) {
-        String squashed = SPACE.matcher(text == null ? "" : text).replaceAll("");
+        // Before the spacing goes, because a dimensional formula is recognised by it: the load
+        // rewrote the book's degree sign into the zero exponent it means, and code's own rewrite
+        // must not come back as the corpus's difference (2026-09-17).
+        String dimensioned = DimensionalBrackets.normalise(text == null ? "" : text);
+        String squashed = SPACE.matcher(dimensioned).replaceAll("");
         squashed = APPROX.matcher(squashed).replaceAll("≈");
         squashed = MINUS.matcher(squashed).replaceAll("-");
         squashed = SINGLE_QUOTE.matcher(squashed).replaceAll("'");

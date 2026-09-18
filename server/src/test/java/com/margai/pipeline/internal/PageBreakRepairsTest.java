@@ -108,6 +108,33 @@ class PageBreakRepairsTest {
                 .contains("continuing");
     }
 
+    /**
+     * The real one, and the reason the rule has a bound (D15, the phy11-part1 corpus event of
+     * 2026-09-17). Chapter 6 page 18 ends mid-sentence on "to be satisfied for mechanical", and page
+     * 19 both completes it and, two sentences later, prints the same wording again — the book
+     * repeats the phrase. The repeat was found at that second, innocent occurrence, and the 124
+     * characters of real prose in front of it were cut on the reasoning that nothing can precede a
+     * re-transcribed tail: the coplanar-forces case was lost from the corpus, silently but for one
+     * line of the load report. A re-transcription stands at the head of the page; a match further
+     * into it than its own length is a coincidence of wording, and nothing is cut.
+     */
+    @Test
+    void aRepeatFurtherIntoThePageThanItsOwnLengthIsACoincidenceAndNothingIsCut() {
+        String opening = "equilibrium of a rigid body. In a number of problems all the forces acting on the body "
+                + "are coplanar. Then we need only three conditions to be satisfied for mechanical equilibrium. "
+                + "Two of these conditions correspond to translational equilibrium.";
+        PageBreakRepairs.Repaired repaired = PageBreakRepairs.apply(List.of(
+                page(18, p("6.8", "Eq. (6.31a) and (6.31b) give six independent conditions to be "
+                        + "satisfied for mechanical")),
+                page(19, continuing("6.8", opening))));
+
+        List<NcertPage.Paragraph> paragraphs = repaired.pages().get(1).paragraphs();
+        assertThat(paragraphs).hasSize(1);
+        assertThat(paragraphs.getFirst().text()).isEqualTo(opening);
+        assertThat(repaired.notes()).singleElement(org.assertj.core.api.InstanceOfAssertFactories.STRING)
+                .contains("page 19").contains("left whole");
+    }
+
     /** A first paragraph that is nothing but the previous page's ending is not a paragraph at all. */
     @Test
     void aPureRepeatIsRemovedEntirely() {

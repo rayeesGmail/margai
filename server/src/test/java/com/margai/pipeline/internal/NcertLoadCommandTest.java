@@ -267,6 +267,52 @@ class NcertLoadCommandTest {
                 .containsExactly("The first paragraph.", "The second runs on and finishes here.");
     }
 
+    /**
+     * A footnote sits at the foot of the page, so it is the page's last paragraph — but it is not
+     * what the next page continues. Before this, chapter 5's definition of potential energy read
+     * "* The variation of g with height is discussed in Chapter 7 on Gravitation. energy V(x) is
+     * defined if…": the footnote was polluted and the body paragraph it stole from was left
+     * truncated at "the potential". Four of phy11-part1's nine footnotes had taken a continuation
+     * this way, costing two paragraphs each (D15, the corpus event of 2026-09-17).
+     */
+    @Test
+    void aContinuationJoinsTheBodyParagraphAndNotAFootnoteBelowIt() {
+        imports.renderedPagesAnswer = 8;
+        jsonl(page(7, 7, "0.95",
+                        p("7.7", "Mathematically, (for simplicity, in one dimension) the potential"),
+                        p("7.7", "* The variation of g with height is discussed in Chapter 7 on Gravitation.")),
+                page(7, 8, "0.95", continuing("7.7", "energy V(x) is defined if the force F(x) can be written as")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::text).containsExactly(
+                "Mathematically, (for simplicity, in one dimension) the potential energy V(x) is defined "
+                        + "if the force F(x) can be written as",
+                "* The variation of g with height is discussed in Chapter 7 on Gravitation.");
+    }
+
+    /**
+     * NCERT prints the plural when a sentence names several parts at once — "Figs. 3.15(a) to (d)",
+     * "Figures 4.8(b)" — and the rule that decides what figure_refs may hold took only the singular,
+     * so four real references were dropped from phy11-part1 and `ncert verify` then reported the
+     * paragraphs as mentioning a figure they do not carry (D15, 2026-09-17). A reference naming no
+     * figure or table at all is still dropped.
+     */
+    @Test
+    void aPluralFigureLabelIsAReferenceAndAnEquationNumberIsNot() {
+        imports.renderedPagesAnswer = 1;
+        jsonl(page(7, 1, "0.95",
+                new NcertPage.Paragraph("7.7", "As shown, the velocity turns with the particle.",
+                        false, List.of("Figs. 3.15(a) to (d)", "Figures 4.8(b)", "Eq. (7.5)", "4.8(c)"))));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).singleElement()
+                .extracting(NcertParagraphRow::figureRefs).asInstanceOf(
+                        org.assertj.core.api.InstanceOfAssertFactories.list(String.class))
+                .containsExactly("Figs. 3.15(a) to (d)", "Figures 4.8(b)");
+    }
+
     /** The flag says "the rest of the previous paragraph"; a new heading says it is not. The loader refuses rather than guesses. */
     @Test
     void aContinuationIntoADifferentSectionIsRefused() {

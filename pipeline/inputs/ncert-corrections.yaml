@@ -51,3 +51,46 @@ corrections:
   - {book: phy11-part1, lang: en, chapter: 7, page: 8, kind: misprint, address: "ch 7 §7.6 ¶11",
      printed: "acceleration due to gravity decreases", transcribed: "acceleration due gravity decreases",
      reason: "the page prints \"due gravity\" — the book's own error, kept"}
+  # The corpus event of 2026-09-17, chapters 1–6 on Opus. The extract's character diff against each page's
+  # text layer found one class in six places: the prompt has the model write a Greek letter by name
+  # (ncert_extract v3, "Greek letters by name when they are symbols") and shows it spaced —
+  # "T = 2 pi sqrt(l / g)" — but never says the name must be separated from what follows, so the model ran
+  # it into its neighbour. The layer holds the real glyphs on every one of these pages, so nothing was lost;
+  # only the spacing is wrong, and each span below was read against the page and checked to occur once on it.
+  # Approved by the founder 2026-09-17. The prompt itself is frozen: this is v3's second amendment candidate
+  # after "G Mm / d^2 L" (DECISIONS 2026-09-14, the freeze row).
+  - {book: phy11-part1, lang: en, chapter: 3, page: 16, kind: text, address: "ch 3 §3.10 ¶8",
+     transcribed: "s = 2piR. Therefore, v = 2piR/T = 2piRnu (3.47)",
+     printed: "s = 2 pi R. Therefore, v = 2 pi R / T = 2 pi R nu (3.47)",
+     reason: "pi and nu run into R and T; the same paragraph spaces nu^2 correctly"}
+  - {book: phy11-part1, lang: en, chapter: 3, page: 16, kind: text, address: "ch 3 §3.10 ¶8",
+     transcribed: "omega = 2pinu, v = 2piRnu, a_c = 4pi^2 nu^2 R (3.48)",
+     printed: "omega = 2 pi nu, v = 2 pi R nu, a_c = 4 pi^2 nu^2 R (3.48)",
+     reason: "the same class in the display of Eq. (3.48)"}
+  - {book: phy11-part1, lang: en, chapter: 5, page: 6, kind: text, address: "ch 5 §5.6 ¶1",
+     transcribed: "Thus dK = Fdx", printed: "Thus dK = F dx",
+     reason: "the same paragraph writes \"F dx\" spaced three times over"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 28, kind: text, address: "ch 6 §6.11 ¶6",
+     transcribed: "F_1 ds_1 cosphi_1 = F_1(r_1 dtheta)sinalpha_1",
+     printed: "F_1 ds_1 cos phi_1 = F_1 (r_1 dtheta) sin alpha_1",
+     reason: "cos and sin run into phi and alpha; the sentence after it spaces both"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 28, kind: text, address: "ch 6 §6.11 ¶7",
+     transcribed: "tau_1 = r_1F_1 sinalpha , Therefore",
+     printed: "tau_1 = r_1 F_1 sin alpha, Therefore",
+     reason: "sin runs into alpha, r_1 into F_1, and a space stands before the comma"}
+  - {book: phy11-part1, lang: en, chapter: 2, page: 8, kind: false_positive, address: "ch 2 §2.4 ¶26",
+     printed: "in successive taus", transcribed: "in successive taus",
+     reason: "the page prints \"τs\" and \"taus\" is its faithful plural — the diff flagged the layer's glyph, not a defect"}
+  # The Greek letter NCERT sets for speed. Approved by the founder 2026-09-17 with the six above: the book
+  # sets υ, a typographic variant of v, and its meaning is speed — ch 5 §5.6 ¶1 writes the same quantity
+  # "(1/2) m v^2" while ch 6 §6.9 ¶5 writes "(1/2) m upsilon^2", so the corpus disagreed with itself, and a
+  # student's "1/2 mv^2" would not reach the rotational-kinetic-energy passage at all.
+  - {book: phy11-part1, lang: en, chapter: 6, page: 23, kind: text, address: "ch 6 §6.9 ¶1",
+     transcribed: "upsilon_i = r_i omega", printed: "v_i = r_i omega",
+     reason: "υ is the book's glyph for speed, written v by the convention"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 23, kind: text, address: "ch 6 §6.9 ¶1",
+     transcribed: "(1/2) m_i upsilon_i^2", printed: "(1/2) m_i v_i^2",
+     reason: "the same glyph in the particle's kinetic energy"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 23, kind: text, address: "ch 6 §6.9 ¶5",
+     transcribed: "(1/2) m upsilon^2", printed: "(1/2) m v^2",
+     reason: "the translational kinetic energy ch 5 §5.6 ¶1 already writes with v"}

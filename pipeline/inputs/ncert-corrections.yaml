@@ -175,6 +175,14 @@ corrections:
   - {book: phy11-part1, lang: en, chapter: 4, page: 17, kind: false_positive, address: "ch 4 §4.11 ¶11",
      printed: "270 – R'  =  27  0.1N", transcribed: "270 – R' = 27 × 0.1N",
      reason: "the layer prints \"270 – R′ = 27 × 0.1N\"; the verifier lost the × twice on this span"}
+  # The twenty-second, from the fresh read of ch 6 p23 after its split (2026-09-19). The layer prints "For a
+  # particle at a distance from the axis, the linear velocity is υ_i = r_i ω" — no subscript on "distance",
+  # which is the book's own looseness, and υ for speed, which the founder's ruling of 2026-09-17 writes v.
+  # The verifier stopped its quote where the glyph parts company with the correction.
+  - {book: phy11-part1, lang: en, chapter: 6, page: 23, kind: false_positive, address: "ch 6 §6.9 ¶1",
+     printed: "For a particle at a distance from the axis",
+     transcribed: "For a particle at a distance from the axis, the linear velocity is v_i = r_i omega",
+     reason: "the page carries the whole span; only υ differs from v, which is the founder's ruling of 2026-09-17"}
 
   # Paragraphs a row swallowed: a line indented after a display starts a paragraph (ncert_extract v3), which
   # is the class chapter 7's four splits settled on 2026-09-15. Each measured from the page's own line

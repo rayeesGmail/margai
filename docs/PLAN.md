@@ -98,11 +98,18 @@ tools; your reviews focus on output quality.)*
   archetype track definitions drafted. ✅ *Taxonomy queryable; graph has no cycles.*
 - **D14 —** NCERT ingest: extraction of 2 pilot books (one Physics, one Bio), EN first;
   paragraph addressing scheme. ✅ *Spot-check 20 random paragraphs against the PDFs.*
-- **D15 —** NCERT ingest: remaining EN books; equations/figures handling. ✅ *Coverage
-  report: % paragraphs extracted cleanly per book.*
+- **D15 —** NCERT ingest: remaining EN books; equations/figures handling. The **first**
+  verified book is embedded and its retrieval tested before the rest are extracted: the
+  embedding pin moves provider, model and width together, so changing any of them
+  re-embeds the corpus — ~900 paragraphs is where a wrong pin, chunk or hybrid weighting
+  is cheap to find and ~9,000 is not (founder ruling 2026-09-19; DECISIONS, TECH_PLAN
+  §4.9 — added 2026-09-19). ✅ *Coverage report: % paragraphs extracted cleanly per book;
+  and on that first book, a query → top-passages run, including a Hindi query that reaches
+  an English paragraph.*
 - **D16 —** Hindi ingest + EN↔HI paragraph alignment. ✅ *20 aligned pairs spot-checked.*
-- **D17 —** Embeddings + hybrid retrieval; a test harness: query → top passages.
-  ✅ *15 hand-written concept queries return the right paragraphs.*
+- **D17 —** Embeddings + hybrid retrieval over the whole corpus, on the pin settled at D15
+  (amended 2026-09-19); the test harness widened to it. ✅ *15 hand-written concept queries
+  return the right paragraphs.*
 - **D18 —** Buffer for extraction mess (there will be some). **Week-3 gate:** NCERT
   layer searchable in both languages.
 - **D19 —** PYQ ingest: papers loaded, question records created, tagging pass.

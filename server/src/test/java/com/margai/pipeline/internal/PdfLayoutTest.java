@@ -311,6 +311,20 @@ class PdfLayoutTest {
         assertThat(chapterSix().get(22).starts()).anyMatch(start -> start.startsWith("where m"));
     }
 
+    /**
+     * The cost of admitting math-bearing prose, caught on the first real run (2026-09-19): chapter 6
+     * page 27 opens with "= 2π × angular speed in rev/s", a displayed definition continuing from page 26,
+     * set 35.7 pt in. Three words among seven tokens kept it out of prose before; counting only tokens of
+     * two characters or more let it in, and the indent band then read it as a paragraph start — which
+     * flagged §6.10 ¶13 as a row running across a page that opens a new paragraph. A paragraph never
+     * opens with an operator.
+     */
+    @Test
+    void aLineOpeningWithAnOperatorIsADisplayCarriedOnAndNotAParagraph() throws IOException {
+        assertThat(chapterSix().get(26).starts()).noneMatch(start -> start.startsWith("="));
+        assertThat(chapterSix().get(26).top()).isNotEqualTo(PdfLayout.Top.starts);
+    }
+
     private static List<PdfLayout.PageShape> chapterSeven() throws IOException {
         // CI has no PDFs: guard on the file itself, not the directory whose manifest is committed.
         assumeTrue(Files.isRegularFile(CHAPTER_7), "the founder's NCERT PDFs are not on this machine");

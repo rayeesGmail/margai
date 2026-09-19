@@ -208,8 +208,25 @@ THE TWELVE ENTRIES, one per join flag, each with its own evidence rather than on
   opens with the display `v_B = sqrt(3gL)` — this row's own tail — and the line the check quotes,
   "(iii) The ratio of the kinetic", is the paragraph after it. Noise, but for a reason the blanket one
   would have got wrong. All twelve checked to match exactly one row, and the row each names.
-Next: the founder's ₹0 `ncert verify` (no `--read-pages`), which should report **894 of 894, 100.0%**
-  and list the twelve as set aside. Then bio11 and the eight remaining books.
+THE ₹0 RUN, founder 07:51 — **893 of 894, 99.9%**, not the 894 predicted. All twelve rulings landed and
+  are listed under the new section with their reasons; chapters 1–5 and 7 are at 100.0%. The fix also did
+  its other half, pairing printed starts the check had been blind to: ch 1 p6's Example 1.2, ch 5 p7
+  §5.6 ¶3, ch 6 p16 §6.7.2 ¶8 and ch 6 p29 §6.11 ¶15 all stopped being flagged as rows the print does not
+  start.
+THE MISSING ROW WAS MY OWN REGRESSION, not a real flag. Chapter 6 page 27 opens with
+  `= 2π × angular speed in rev/s`, the tail of a definition begun on p26, set 35.7 pt in. Three words
+  among seven tokens had kept it out of prose; counting only tokens of two characters or more let it in,
+  and the indent band then read it as a paragraph start — which flagged §6.10 ¶13 as a row running across
+  a page that opens a new paragraph. Caught on the first real run, diagnosed from the page's own line
+  geometry, and fixed test-first: **a display carried onto a new line or page opens with its operator, and
+  a paragraph never does.** Tests 746 → 747, pipeline suite 341 green. The right lesson is the one the plan
+  named before the work started — the old rule got 219 of 275 right and relaxing it risks them — so the
+  relaxation is now fenced on both sides.
+Next: the founder's ₹0 `ncert verify` again, which should now report **894 of 894, 100.0%**. Beside it,
+  86 page-level start flags rather than 85: the relaxation surfaced a handful of new printed-start claims
+  (mostly display fragments and the "Answer" label class, e.g. ch 5 p6 "The plot of the applied force",
+  which §5.5 ¶6 carries behind its Answer label) — outside the clean share, unadjudicated, and worth one
+  pass before bio11. Then bio11 and the eight remaining books.
 ```
 
 ```

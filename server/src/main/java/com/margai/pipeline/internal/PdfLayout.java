@@ -75,6 +75,8 @@ final class PdfLayout {
     /** A numbered law ("3. Law of periods") or an item marker ("(a)", "(ii)") opens its paragraph (prompt v3). */
     private static final Pattern ITEM = Pattern.compile("^(\\d{1,2}\\.\\s+\\p{Lu}|\\((?:[a-h]|i{1,3}|iv|vi{0,3}|ix|x)\\)\\s)");
     private static final Pattern WORD = Pattern.compile("(?=[A-Za-z’']{2,})[A-Za-z’']*[AEIOUYaeiouy][A-Za-z’']*");
+    /** A display continued onto a new line or page opens with its operator; a paragraph never does. */
+    private static final Pattern OPENS_WITH_OPERATOR = Pattern.compile("\\s*[=+×÷≈≅≤≥<>−–—]\\s");
 
     private PdfLayout() {
     }
@@ -372,6 +374,13 @@ final class PdfLayout {
          * a display's symbol runs — "mV GmM mV" — are not words however many letters they carry.
          */
         boolean isProse() {
+            // A display carried onto the next line or the next page opens with its operator, and no
+            // paragraph does. Chapter 6 page 27 begins "= 2π × angular speed in rev/s", the tail of a
+            // definition started on page 26: prose enough by the count below, 35.7 pt in, and read as a
+            // paragraph start until this line was added (2026-09-19).
+            if (OPENS_WITH_OPERATOR.matcher(text).lookingAt()) {
+                return false;
+            }
             List<String> tokens = Arrays.stream(text.split(" "))
                     .map(token -> token.replaceAll("^[^A-Za-z]+|[^A-Za-z]+$", ""))
                     .toList();

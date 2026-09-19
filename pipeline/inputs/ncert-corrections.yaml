@@ -15,6 +15,8 @@
 #   kind: drop            at — the words a paragraph starts with; it is not running text and goes
 #   kind: misprint        transcribed + printed as the verifier quoted them — the book's own error, kept
 #   kind: false_positive  transcribed + printed as the verifier quoted them — the verifier was wrong
+#   kind: noise           flag (join or figure) + at — one of the free checks was wrong about the paragraph
+#                         starting there; the row leaves the flag behind and counts clean
 #
 # Example:
 #   - {book: phy11-part1, lang: en, chapter: 7, page: 4, kind: text, address: "ch 7 §7.3 ¶5",
@@ -187,8 +189,9 @@ corrections:
   # Paragraphs a row swallowed: a line indented after a display starts a paragraph (ncert_extract v3), which
   # is the class chapter 7's four splits settled on 2026-09-15. Each measured from the page's own line
   # geometry — the line indented, the line below it back at the column margin — and read on the rendered
-  # page. The last two are named nowhere in the verify report: the start check never saw those printed
-  # starts, so it under-reports as well as over-reports.
+  # page. Three of the four are named in the verify report's printed-start lists; the ch 6 p17 one is named
+  # nowhere, because the start check never saw that printed start (corrected 2026-09-19: an earlier note
+  # here claimed two were invisible, which the report itself disproves).
   - {book: phy11-part1, lang: en, chapter: 3, page: 11, kind: split, address: "ch 3 §3.7.1 ¶15",
      at: "where t is in seconds and",
      reason: "indented after the display for r in Example 3.1's box"}
@@ -200,7 +203,7 @@ corrections:
      reason: "indented after the display (6.29 b); named by no flag in the report"}
   - {book: phy11-part1, lang: en, chapter: 6, page: 23, kind: split, address: "ch 6 §6.9 ¶1",
      at: "where m_i is the mass of the particle",
-     reason: "indented after the display for k_i; named by no flag in the report"}
+     reason: "indented after the display for k_i; the report names it as a printed start no row begins with"}
 
   # The reverse of the same rule: flush after a display is the paragraph running on, so these two rows split
   # where the print does not. Both were named by the load's own mid-sentence check and read on the page.
@@ -210,6 +213,50 @@ corrections:
   - {book: phy11-part1, lang: en, chapter: 5, page: 12, kind: join, address: "ch 5 §5.9 ¶20",
      at: "which, as expected, is less than the result",
      reason: "flush after \"x_m = 1.35 m\", continuing the same paragraph"}
+
+  # ── The twelve join flags, every one read against its pages and ruled noise (founder, 2026-09-19) ──
+  # The clean share marks a row unclean when a join flag names it, so until the `noise` kind existed these
+  # twelve cost the book twelve rows that no entry could return. Nine are the same finding: the row before
+  # ends on a complete sentence, so nothing is cut at the page break, and a paragraph set at a column top
+  # need not be indented — ch 5 p4 opens flush with a bold new definition whose predecessor ends "…as shown
+  # in Fig. 5.2.", which is what makes a flush page top no evidence of continuation. The other three are
+  # named individually.
+  - {book: phy11-part1, lang: en, chapter: 1, page: 4, kind: noise, flag: join, address: "ch 1 §1.3 ¶5",
+     at: "This shows that the location of decimal",
+     reason: "§1.3 ¶4 ends \"…namely four.\"; nothing is cut at the break"}
+  - {book: phy11-part1, lang: en, chapter: 1, page: 9, kind: noise, flag: join, address: "ch 1 §1.6.1 ¶8",
+     at: "The dimensions of RHS are",
+     reason: "§1.6.1 ¶7 ends on the completed dimensional equation [M L^2 T^-2]"}
+  - {book: phy11-part1, lang: en, chapter: 2, page: 4, kind: noise, flag: join, address: "ch 2 §2.3 ¶4",
+     at: "Instantaneous acceleration is defined in the same way",
+     reason: "§2.3 ¶3 ends \"…and (v_1, t_1).\"; a new definition begins here"}
+  - {book: phy11-part1, lang: en, chapter: 2, page: 6, kind: noise, flag: join, address: "ch 2 §2.4 ¶4",
+     at: "This equation can also be obtained by",
+     reason: "§2.4 ¶3 ends on the display (2.8); nothing is cut at the break"}
+  - {book: phy11-part1, lang: en, chapter: 3, page: 9, kind: noise, flag: join, address: "ch 3 §3.7.1 ¶1",
+     at: "The position vector r of a particle",
+     reason: "p8 ends with the heading \"3.7.1 Position Vector and Displacement\" and the first paragraph after a heading is flush — the check read that flushness as a continuation"}
+  - {book: phy11-part1, lang: en, chapter: 3, page: 11, kind: noise, flag: join, address: "ch 3 §3.7.1 ¶14",
+     at: "Note that in one dimension,",
+     reason: "§3.7.1 ¶13 ends on the displayed second derivatives; nothing is cut"}
+  - {book: phy11-part1, lang: en, chapter: 4, page: 8, kind: noise, flag: join, address: "ch 4 §4.5 ¶27",
+     at: "A large force acting for a short time",
+     reason: "§4.5 ¶26 ends on the display (4.7); the impulse definition begins here"}
+  - {book: phy11-part1, lang: en, chapter: 4, page: 10, kind: noise, flag: join, address: "ch 4 §4.7 ¶3",
+     at: "The total momentum of an isolated system",
+     reason: "§4.7 ¶2 ends \"…law of conservation of momentum :\" and this is what it introduces"}
+  - {book: phy11-part1, lang: en, chapter: 5, page: 4, kind: noise, flag: join, address: "ch 5 §5.3 ¶2",
+     at: "The work done by the force is defined",
+     reason: "§5.3 ¶1 ends \"…as shown in Fig. 5.2.\"; this is the page whose bold definition is set flush at the column top, which is why a flush top proves nothing"}
+  - {book: phy11-part1, lang: en, chapter: 5, page: 10, kind: noise, flag: join, address: "ch 5 §5.8 ¶14",
+     at: "(ii) It is clear from Eq. (5.14)",
+     reason: "p10 opens with the display v_B = sqrt(3gL), which is this row's own tail; the line the check quotes, \"(iii) The ratio of the kinetic\", is the paragraph after it"}
+  - {book: phy11-part1, lang: en, chapter: 5, page: 14, kind: noise, flag: join, address: "ch 5 §5.11.1 ¶1",
+     at: "In all collisions the total linear momentum",
+     reason: "p13 ends with the heading \"5.11.1 Elastic and Inelastic Collisions\"; the paragraph after a heading is flush"}
+  - {book: phy11-part1, lang: en, chapter: 6, page: 23, kind: noise, flag: join, address: "ch 6 §6.8.2 ¶17",
+     at: "Answer The ladder AB is 3 m long",
+     reason: "p23's first line is indented 17.7 pt, so the print does start a paragraph there; the row carries p22's \"Answer\" label with it, the convention chapter 7's \"Answer Given k…\" settled on 2026-09-15"}
 
   # References the model left out of figure_refs. The paragraph's own words carry each one and FigureLabels
   # reads all three, so these are omissions by the transcriber, not gaps in the parser.

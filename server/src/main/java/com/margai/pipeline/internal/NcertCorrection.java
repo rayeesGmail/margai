@@ -20,6 +20,7 @@ import com.margai.curriculum.api.BookLanguage;
  * @param address     where the flag was raised, for a reader of the file; never used to apply it
  * @param removeRef   the figure or table label a {@code figure_ref} entry removes, or null
  * @param addRef      the label a {@code figure_ref} entry adds, or null
+ * @param flag        which free check a {@code noise} entry rules on, or null
  */
 record NcertCorrection(
         String book,
@@ -33,12 +34,13 @@ record NcertCorrection(
         String reason,
         String address,
         String removeRef,
-        String addRef) {
+        String addRef,
+        LayoutChecks.Kind flag) {
 
-    /** An entry of any kind but {@code figure_ref}, which alone names a label. */
+    /** An entry of any kind but {@code figure_ref} and {@code noise}, which alone name a label or a check. */
     NcertCorrection(String book, BookLanguage language, short chapter, int page, Kind kind, String transcribed,
             String printed, String at, String reason, String address) {
-        this(book, language, chapter, page, kind, transcribed, printed, at, reason, address, null, null);
+        this(book, language, chapter, page, kind, transcribed, printed, at, reason, address, null, null, null);
     }
 
     enum Kind {
@@ -55,11 +57,19 @@ record NcertCorrection(
         /** The book prints an error and the transcription rightly keeps it: a flag, not a defect. */
         misprint,
         /** The verifier was wrong about this span: a flag, not a defect. */
-        false_positive;
+        false_positive,
+        /**
+         * One of the free checks was wrong about the paragraph starting {@code at}: a flag, not a defect
+         * (D15, 2026-09-19). The typography rules are measured guesses and a page top can be set flush
+         * where a paragraph really does start, so an adjudicated flag needs a way off the clean share —
+         * which `misprint` and `false_positive` cannot give it, since they are matched on the verifier's
+         * quoted spans and a free check quotes none.
+         */
+        noise;
 
         /** Whether this kind changes the extraction, or only rules on a flag. */
         boolean changesText() {
-            return this != misprint && this != false_positive;
+            return this != misprint && this != false_positive && this != noise;
         }
     }
 

@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 class PdfLayoutTest {
 
     private static final Path CHAPTER_7 = Path.of("../ncert/2022-ed/en/phy11-part1/keph107.pdf");
+    private static final Path CHAPTER_6 = Path.of("../ncert/2022-ed/en/phy11-part1/keph106.pdf");
     private static final double WIDTH = 657;
 
     @Test
@@ -287,10 +288,38 @@ class PdfLayoutTest {
                 .noneMatch(start -> start.startsWith("mutually opposing"));
     }
 
+    /**
+     * Chapter 6 page 17: after the display "L_x = K_1, L_y = K_2 and L_z = K_3 (6.29 b)" the print sets
+     * "Here K_1, K_2 and K_3 are constants; L_x, L_y and" 17.7 pt in, and the line below it returns to
+     * the column margin — a first line by every rule this class already holds. §6.7.2 ¶20 had swallowed
+     * it, and **no flag in any verify report names it**: the check never saw the printed start (found by
+     * reading the page's line geometry, 2026-09-19).
+     */
+    @Test
+    void chapterSixPageSeventeenStartsWhereTheParagraphOpensWithMath() throws IOException {
+        assertThat(chapterSix().get(16).starts()).anyMatch(start -> start.startsWith("Here K"));
+    }
+
+    /**
+     * Page 23's "where m_i is the mass of the particle" is the same shape — indented after the display
+     * for k_i, and §6.9 ¶1 had swallowed it — but this one the check does see, and names as a printed
+     * start no row begins with. It is here as a guard: whatever makes page 17 visible must not cost
+     * page 23, whose line carries subscripts of its own.
+     */
+    @Test
+    void chapterSixPageTwentyThreeAlreadyStartsWhereTheParagraphOpensWithMath() throws IOException {
+        assertThat(chapterSix().get(22).starts()).anyMatch(start -> start.startsWith("where m"));
+    }
+
     private static List<PdfLayout.PageShape> chapterSeven() throws IOException {
         // CI has no PDFs: guard on the file itself, not the directory whose manifest is committed.
         assumeTrue(Files.isRegularFile(CHAPTER_7), "the founder's NCERT PDFs are not on this machine");
         return PdfLayout.pages(Files.readAllBytes(CHAPTER_7));
+    }
+
+    private static List<PdfLayout.PageShape> chapterSix() throws IOException {
+        assumeTrue(Files.isRegularFile(CHAPTER_6), "the founder's NCERT PDFs are not on this machine");
+        return PdfLayout.pages(Files.readAllBytes(CHAPTER_6));
     }
 
     private static PdfLayout.PageShape shape(List<?>... lines) {

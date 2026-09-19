@@ -58,6 +58,54 @@ class NcertCorrectionsTest {
         assertThat(corrections.get(1).at()).isEqualTo("and hence the acceleration");
     }
 
+    /**
+     * A ruling on one of the free checks (D15, 2026-09-19). The clean share marks a row unclean when a
+     * join or figure flag names it, so the twelve join flags of phy11-part1 — every one adjudicated
+     * against its page and ruled noise — cost the book twelve rows that no other entry could return. The
+     * flag is named the way every other entry is, by page and by the words the paragraph starts with,
+     * never by an address, which a join or a split moves.
+     */
+    @Test
+    void readsARulingOnAFreeCheckFlag() throws IOException {
+        Path file = write("""
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 1, page: 4, kind: noise, flag: join,
+                     at: "This shows that the location of", address: "ch 1 §1.3 ¶5",
+                     reason: "§1.3 ¶4 ends on a full stop, so nothing is cut across the page break"}
+                """);
+
+        List<NcertCorrection> corrections = NcertCorrectionsYamlReader.read(file);
+
+        assertThat(corrections).singleElement().satisfies(entry -> {
+            assertThat(entry.kind()).isEqualTo(NcertCorrection.Kind.noise);
+            assertThat(entry.flag()).isEqualTo(LayoutChecks.Kind.join);
+            assertThat(entry.at()).isEqualTo("This shows that the location of");
+            assertThat(entry.kind().changesText()).isFalse();
+        });
+    }
+
+    @Test
+    void aRulingOnAFreeCheckNeedsAFlagItCanName() throws IOException {
+        Path noFlag = write("""
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 1, page: 4, kind: noise, at: "This shows", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(noFlag))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (noise): 'flag' is required");
+
+        // The page-level start flags are outside the clean share already; 85 entries a book would bury
+        // the file and rule on nothing (founder, 2026-09-19).
+        Path startFlag = write("""
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 1, page: 4, kind: noise, flag: starts,
+                     at: "This shows", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(startFlag))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("flag must be one of [join, figure]");
+    }
+
     @Test
     void anEmptyListIsNoCorrections() throws IOException {
         assertThat(NcertCorrectionsYamlReader.read(write("corrections: []\n"))).isEmpty();
@@ -390,7 +438,7 @@ class NcertCorrectionsTest {
 
     private static NcertCorrection figureRef(int page, String at, String remove, String add) {
         return new NcertCorrection("phy11-part1", BookLanguage.en, (short) 7, page, NcertCorrection.Kind.figure_ref,
-                null, null, at, "read against the page", null, remove, add);
+                null, null, at, "read against the page", null, remove, add, null);
     }
 
     private static ExtractedPage page(int page, NcertPage.Paragraph... paragraphs) {

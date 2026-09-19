@@ -259,8 +259,12 @@ Every run's report is its own file: a second run of the same command on the same
 **The load applies `pipeline/inputs/ncert-corrections.yaml`** (D15) after its page-break repairs and
 before it numbers: the founder's rulings on what `ncert verify` flagged. `text`, `join`, `split`,
 `figure_ref` (one label removed from or added to the paragraph holding a span) and `drop` (a paragraph
-that is not running text removed) change the frozen run's pages; `misprint` and `false_positive` rule
-on a flag and change nothing, and `ncert verify` reads those two itself. Each applied entry is one line of the report; an entry whose span is not on its page exactly
+that is not running text removed) change the frozen run's pages; `misprint`, `false_positive` and
+`noise` rule on a flag and change nothing, and `ncert verify` reads those three itself. The first two
+answer the second read, matched on the spans the verifier quoted; `noise` answers one of the **free**
+checks, which quotes no span, so it names the check (`flag: join` or `flag: figure`) and the words the
+paragraph starts with — and only those two checks, because they are the two that enter the clean share
+(D15, 2026-09-19). Each applied entry is one line of the report; an entry whose span is not on its page exactly
 once refuses the load by name. The file's own header and `pipeline/inputs/README.md` say how to write
 one. Each row now also records where each of its pages' parts begins (`pageStarts` in the row's
 `extraction`), which verify needs — a row loaded before 2026-09-14's build has none, and verify asks for
@@ -333,7 +337,13 @@ and a part the read cannot be matched to unambiguously is left without one, to b
    there), `joins across page breaks against the print`, `figure_refs against the paragraph and the
    chapter's captions`, and `numbered equations the print carries that the rows do not`. These are
    measured guesses about typography — they route attention and never refuse. A real segmentation
-   defect becomes a `join` or `split` entry. The equation check is the one aimed at the second read's
+   defect becomes a `join` or `split` entry; a join or figure flag read against its page and found
+   wrong becomes a `noise` entry, which is what takes the row off the clean share's wrong side, and the
+   next run lists it under `free-check flags set aside by the founder's rulings` with its reason. **Do
+   not read the start check's silence as a clean page**: on `phy11-part1` it named three of the four
+   paragraphs a row had swallowed and missed the fourth outright (ch 6 p17, 2026-09-19), because a line
+   the layer strips of its subscripts could not be seen as prose at all. That hole is closed, but the
+   check remains a floor on segmentation defects, never a ceiling. The equation check is the one aimed at the second read's
    blind spot: a dropped displayed equation takes its number with it, and the number is the part of it
    the text layer keeps, so the page's own `(7.n)` labels are counted against the numbers its rows
    carry — both the label beside an equation and every sentence referring to it. It speaks only where

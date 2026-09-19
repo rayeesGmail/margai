@@ -594,6 +594,38 @@ class NcertVerifyCommandTest {
                 .contains("clean for the book (PLAN D15 ✅): 2 of 3 paragraphs, 66.7%");
     }
 
+    /**
+     * A free check's flag is a measured guess, so an adjudicated one needs a way off the clean share
+     * (D15, 2026-09-19): phy11-part1's twelve join flags were all read against their pages and ruled
+     * noise, and cost the book twelve rows that no entry could return. A {@code noise} ruling names the
+     * check and the words the paragraph starts with, and the row counts clean again.
+     */
+    @Test
+    void aFreeCheckFlagRuledNoiseLeavesTheCleanShare() throws IOException {
+        List<NcertParagraphRow> rows = new ArrayList<>(rows());
+        NcertParagraphRow first = rows.getFirst();
+        rows.set(0, new NcertParagraphRow(first.chapterNo(), first.section(), first.paraNo(), first.text(),
+                false, List.of("Fig. 7.9"), first.extraction()));
+        imports.paragraphsAnswer = rows;
+
+        run("--read-pages");
+        assertThat(out.toString()).contains("| 7 | 3 | 3 | 3 | 0 | 0 | 0 | 1 | 66.7% |");
+
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 1, kind: noise, flag: figure,
+                     at: "Early in our lives", address: "ch 7 §7.1 ¶1",
+                     reason: "the figure is printed on the page and the paragraph is its caption's subject"}
+                """);
+        out.getBuffer().setLength(0);
+
+        run("--read-pages");
+
+        assertThat(out.toString()).contains("| 7 | 3 | 3 | 3 | 0 | 0 | 0 | 0 | 100.0% |")
+                .contains("free-check flags set aside by the founder's rulings")
+                .contains("ch 7 §7.1 ¶1");
+    }
+
     /** Without --read-pages, a verdict already on a row still counts, as long as it names the row's current text. */
     @Test
     void storedVerdictsOnTheRowsCountWithoutReadingAgain() {

@@ -131,8 +131,8 @@ class NcertVerifyCommand extends NcertBookCommand {
             }
         }
 
-        CodeFlags codeFlags = layoutChecks(definition, selected, byChapter, report);
         List<NcertCorrection> rulings = rulings(definition, chapterNos, report);
+        CodeFlags codeFlags = layoutChecks(definition, selected, byChapter, rulings, report);
 
         if (artefactTag != null && !TAG.matcher(artefactTag).matches()) {
             throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
@@ -221,13 +221,14 @@ class NcertVerifyCommand extends NcertBookCommand {
     }
 
     /** The free checks, per chapter. */
-    private CodeFlags layoutChecks(BookDefinition definition,
-            List<BookDefinition.Chapter> selected, Map<Short, List<NcertParagraphRow>> byChapter, Report report) {
+    private CodeFlags layoutChecks(BookDefinition definition, List<BookDefinition.Chapter> selected,
+            Map<Short, List<NcertParagraphRow>> byChapter, List<NcertCorrection> rulings, Report report) {
         List<String> starts = new ArrayList<>();
         List<String> joins = new ArrayList<>();
         List<String> figures = new ArrayList<>();
         List<String> equations = new ArrayList<>();
         List<String> paired = new ArrayList<>();
+        List<String> ruledNoise = new ArrayList<>();
         List<List<String>> summary = new ArrayList<>();
         Map<String, Set<LayoutChecks.Kind>> onRows = new HashMap<>();
         for (BookDefinition.Chapter chapter : selected) {
@@ -249,7 +250,14 @@ class NcertVerifyCommand extends NcertBookCommand {
             long joinFlags = 0;
             long figureFlags = 0;
             long equationFlags = 0;
+            Map<String, NcertParagraphRow> byAddress = ofChapter.stream()
+                    .collect(Collectors.toMap(NcertParagraphRow::address, row -> row, (first, second) -> first));
             for (LayoutChecks.Flag flag : result.flags()) {
+                NcertCorrection ruled = noiseRuling(rulings, chapter.no(), flag, byAddress.get(flag.address()));
+                if (ruled != null) {
+                    ruledNoise.add(flag.message() + " — ruled noise: " + ruled.reason());
+                    continue;
+                }
                 switch (flag.kind()) {
                     case starts -> {
                         starts.add(flag.message());
@@ -287,7 +295,30 @@ class NcertVerifyCommand extends NcertBookCommand {
         report.section("joins across page breaks against the print").list(joins);
         report.section("figure_refs against the paragraph and the chapter's captions").list(figures);
         report.section("numbered equations the print carries that the rows do not").list(equations);
+        report.section("free-check flags set aside by the founder's rulings")
+                .line("each was read against its page and ruled noise; the row counts clean")
+                .list(ruledNoise);
         return new CodeFlags(onRows, starts.size(), equations.size());
+    }
+
+    /**
+     * The founder's {@code noise} ruling on this flag, or null. Named the way every other entry is — by
+     * page and by the words the paragraph starts with, never by an address, which a join or a split moves
+     * (D15, 2026-09-19). The typography rules are measured guesses, so an adjudicated flag needs a way
+     * off the clean share; without one, phy11-part1's twelve ruled join flags cost it twelve rows.
+     */
+    private static NcertCorrection noiseRuling(List<NcertCorrection> rulings, short chapter,
+            LayoutChecks.Flag flag, NcertParagraphRow row) {
+        if (row == null || flag.address() == null) {
+            return null;
+        }
+        String text = row.text() == null ? "" : row.text().replaceAll("\\s+", " ").strip();
+        return rulings.stream()
+                .filter(entry -> entry.kind() == NcertCorrection.Kind.noise)
+                .filter(entry -> entry.chapter() == chapter && entry.page() == flag.page()
+                        && entry.flag() == flag.kind())
+                .filter(entry -> text.startsWith(entry.at().replaceAll("\\s+", " ").strip()))
+                .findFirst().orElse(null);
     }
 
     /** The founder's rulings on flags: the corrections file's misprint and false_positive entries for these chapters. */
@@ -664,9 +695,11 @@ class NcertVerifyCommand extends NcertBookCommand {
     }
 
     private static boolean ruledOn(List<NcertCorrection> rulings, short chapter, int page, VerifiedPage.Span span) {
-        return rulings.stream().anyMatch(ruling -> ruling.chapter() == chapter && ruling.page() == page
-                && VerdictSpans.normalise(ruling.printed()).equals(VerdictSpans.normalise(span.printed()))
-                && VerdictSpans.normalise(ruling.transcribed()).equals(VerdictSpans.normalise(span.transcribed())));
+        // A noise entry rules on a free check and quotes no span, so it can never answer for one here.
+        return rulings.stream().filter(ruling -> ruling.kind() != NcertCorrection.Kind.noise)
+                .anyMatch(ruling -> ruling.chapter() == chapter && ruling.page() == page
+                        && VerdictSpans.normalise(ruling.printed()).equals(VerdictSpans.normalise(span.printed()))
+                        && VerdictSpans.normalise(ruling.transcribed()).equals(VerdictSpans.normalise(span.transcribed())));
     }
 
     /**

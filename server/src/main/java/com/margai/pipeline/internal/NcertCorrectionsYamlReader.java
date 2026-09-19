@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,8 +33,18 @@ final class NcertCorrectionsYamlReader {
             NcertCorrection.Kind.figure_ref, Set.of("at", "remove", "add"),
             NcertCorrection.Kind.drop, Set.of("at"),
             NcertCorrection.Kind.misprint, Set.of("transcribed", "printed"),
-            NcertCorrection.Kind.false_positive, Set.of("transcribed", "printed"));
-    private static final Set<String> KIND_SPECIFIC = Set.of("transcribed", "printed", "at", "remove", "add");
+            NcertCorrection.Kind.false_positive, Set.of("transcribed", "printed"),
+            NcertCorrection.Kind.noise, Set.of("at", "flag"));
+    private static final Set<String> KIND_SPECIFIC = Set.of("transcribed", "printed", "at", "remove", "add", "flag");
+    /**
+     * The checks a {@code noise} entry may rule on: the two that name a row and so enter the clean share.
+     * The page-level start flags are outside it already, and 85 entries a book would bury this file
+     * without changing a number (founder, 2026-09-19).
+     */
+    // An EnumSet, not Set.of: a refusal names the kinds it allows, and that message must read the same
+    // way every run.
+    private static final Set<LayoutChecks.Kind> RULEABLE =
+            EnumSet.of(LayoutChecks.Kind.join, LayoutChecks.Kind.figure);
     private static final YAMLMapper YAML = YAMLMapper.builder().build();
 
     private NcertCorrectionsYamlReader() {
@@ -96,6 +107,14 @@ final class NcertCorrectionsYamlReader {
         if (kind == NcertCorrection.Kind.figure_ref && (remove == null) == (add == null)) {
             throw new InputFormatException(file, 0, label + ": give exactly one of 'remove' or 'add'");
         }
+        LayoutChecks.Kind flag = null;
+        if (kind == NcertCorrection.Kind.noise) {
+            flag = Enums.parse(required(file, entry, "flag", label), LayoutChecks.Kind.class,
+                    () -> new InputFormatException(file, 0, label + ": flag must be one of " + RULEABLE));
+            if (!RULEABLE.contains(flag)) {
+                throw new InputFormatException(file, 0, label + ": flag must be one of " + RULEABLE);
+            }
+        }
         return new NcertCorrection(
                 required(file, entry, "book", label),
                 language,
@@ -108,7 +127,8 @@ final class NcertCorrectionsYamlReader {
                 required(file, entry, "reason", label),
                 optional(file, entry, "address", label),
                 remove,
-                add);
+                add,
+                flag);
     }
 
     /**

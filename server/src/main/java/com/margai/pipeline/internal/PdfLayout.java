@@ -372,12 +372,18 @@ final class PdfLayout {
          * a display's symbol runs — "mV GmM mV" — are not words however many letters they carry.
          */
         boolean isProse() {
-            String[] tokens = text.split(" ");
-            long words = Arrays.stream(tokens)
+            List<String> tokens = Arrays.stream(text.split(" "))
                     .map(token -> token.replaceAll("^[^A-Za-z]+|[^A-Za-z]+$", ""))
-                    .filter(token -> WORD.matcher(token).matches())
-                    .count();
-            return words >= 3 && words * 2 >= tokens.length;
+                    .toList();
+            long words = tokens.stream().filter(token -> WORD.matcher(token).matches()).count();
+            // What is left of a symbol the layer could not carry does not count against the words.
+            // PDFBox drops a subscript and strands its letter, so chapter 6 page 17's "Here K₁, K₂ and
+            // K₃ are constants; Lx, Ly and" arrives as "Here K , K  and K  are constants; L , L  and" —
+            // five words among fifteen tokens, which failed this test and left the line unable to start
+            // a paragraph, hiding a printed start no report has ever named (2026-09-19). One character
+            // is never a word of the line; it is the arithmetic the layer lost.
+            long counted = tokens.stream().filter(token -> token.length() >= 2).count();
+            return words >= 3 && words * 2 >= counted;
         }
 
         /** Every letter a capital, and enough of them to be words. */

@@ -57,7 +57,8 @@ final class NcertCorrections {
             }
             NcertCorrection entry = new NcertCorrection(written.book(), written.language(), written.chapter(),
                     written.page(), written.kind(), spaced(written.transcribed()), spaced(written.printed()),
-                    spaced(written.at()), written.reason(), written.address(), written.removeRef(), written.addRef());
+                    spaced(written.at()), written.reason(), written.address(), written.removeRef(), written.addRef(),
+                    written.flag());
             Integer at = index.get(entry.chapter() + "/" + entry.page());
             if (at == null) {
                 throw refuse(entry, "that page is not in the extraction");

@@ -36,7 +36,8 @@ import tools.jackson.databind.JsonNode;
 /**
  * TECH_PLAN §4.11 without the network: usage mapping incl. cache tokens, the tool input as the
  * typed answer, a response without a tool call as invalid output, SDK failures classified for
- * the retry decorator and the ledger, and both embedding wire shapes.
+ * the retry decorator and the ledger. The embedding wire shapes are
+ * {@link BedrockEmbeddingClientTest}'s since the halves were split (2026-09-20).
  */
 class BedrockAiClientTest {
 
@@ -107,49 +108,12 @@ class BedrockAiClientTest {
                 .isRetryable()).isFalse();
     }
 
+    /** The embed half now lives in {@link BedrockEmbeddingClient}; its tests moved with it. */
     @Test
-    void embeddingBodiesAndResponsesFollowTheModelFamily() {
-        BedrockAiClient client = new BedrockAiClient(null, properties("cohere.embed-multilingual-v3"), prompts(), codec);
-        EmbedRequest request = new EmbedRequest(AiFeature.embed, "hello", EmbedRequest.InputType.search_query,
-                AiCallContext.system("r"));
+    void embeddingIsDelegatedSoTheTwoWiringsCannotDrift() {
+        BedrockAiClient client = new BedrockAiClient(null, properties("cohere.embed-v4:0"), prompts(), codec);
 
-        JsonNode cohereBody = codec.parse(client.embedBody("cohere.embed-multilingual-v3", request), null, null);
-        assertThat(cohereBody.path("texts").get(0).asString()).isEqualTo("hello");
-        assertThat(cohereBody.path("input_type").asString()).isEqualTo("search_query");
-        assertThat(cohereBody.path("truncate").asString()).isEqualTo("END");
-
-        JsonNode titanBody = codec.parse(client.embedBody("amazon.titan-embed-text-v2:0", request), null, null);
-        assertThat(titanBody.path("inputText").asString()).isEqualTo("hello");
-        assertThat(titanBody.path("dimensions").asInt()).isEqualTo(1024);
-
-        String ones = "1.0,".repeat(1023) + "1.0";
-        BedrockAiClient.Embedding cohere = client.parseEmbedding("cohere.embed-multilingual-v3",
-                "{\"embeddings\": [[" + ones + "]], \"response_type\": \"embeddings_floats\"}", null);
-        assertThat(cohere.values()).hasSize(1024).contains(1f);
-        assertThat(cohere.bodyTokens()).isEmpty();
-        BedrockAiClient.Embedding cohereTyped = client.parseEmbedding("cohere.embed-multilingual-v3",
-                "{\"embeddings\": {\"float\": [[" + ones + "]]}}", null);
-        assertThat(cohereTyped.values()).hasSize(1024);
-        BedrockAiClient.Embedding titan = client.parseEmbedding("amazon.titan-embed-text-v2:0",
-                "{\"embedding\": [" + ones + "], \"inputTextTokenCount\": 2}", null);
-        assertThat(titan.values()).hasSize(1024);
-        assertThat(titan.bodyTokens()).hasValue(2);
-
-        assertThatThrownBy(() -> client.parseEmbedding("cohere.embed-multilingual-v3",
-                "{\"embeddings\": [[0.1, 0.2]]}", null))
-                .isInstanceOf(InvalidOutputException.class)
-                .hasMessageContaining("2 dimensions");
-    }
-
-    @Test
-    void embeddingInputTokensComeFromTheHeaderThenTheBodyThenAnEstimate() {
-        BedrockAiClient.Embedding counted = new BedrockAiClient.Embedding(new float[0], java.util.OptionalInt.of(2));
-        BedrockAiClient.Embedding uncounted = new BedrockAiClient.Embedding(new float[0], java.util.OptionalInt.empty());
-
-        assertThat(BedrockAiClient.inputTokens(Optional.of(" 3 "), counted, "hello")).isEqualTo(3);
-        assertThat(BedrockAiClient.inputTokens(Optional.empty(), counted, "hello")).isEqualTo(2);
-        assertThat(BedrockAiClient.inputTokens(Optional.empty(), uncounted, "hello world!")).isEqualTo(3);
-        assertThat(BedrockAiClient.inputTokens(Optional.empty(), uncounted, "hi")).isEqualTo(1);
+        assertThat(client).extracting("embeddings").isInstanceOf(BedrockEmbeddingClient.class);
     }
 
     private static AiProperties properties(String embedModel) {

@@ -58,10 +58,19 @@ margai:
     # means re-embedding the corpus, so the D17 retrieval harness settles Hindi and Hinglish
     # quality before D16 fills the tables (DECISIONS 2026-09-12).
     embed:
-      provider: cohere
-      model: embed-v4.0
+      # Bedrock since 2026-09-20 (DECISIONS): the SAME Cohere model, reached through AWS rather
+      # than Cohere's own API, so the pin's meaning and D15's measured result are unchanged. The
+      # direct key is a trial key capped at 1,000 calls/month and the corpus needs ~9,000, and no
+      # payment method can be attached to that account. Bedrock bills through the AWS account that
+      # already pays for S3 and SES, and authenticates by IAM — so there is no second API key to
+      # hold or rotate. `cohere` and `embed-v4.0` remain a valid pair if the direct account is
+      # ever funded; changing any of provider/model/dimensions re-embeds the corpus (§4.9).
+      provider: bedrock
+      # An INFERENCE PROFILE, not a bare model id: v4 has no on-demand throughput on Bedrock and
+      # refuses with a ValidationException naming the profile (measured 2026-09-20).
+      model: global.cohere.embed-v4:0
       dimensions: 1024
-      send-output-dimension: true   # the v4 line accepts the width; the v3 line errors on it
+      send-output-dimension: true   # v4 answers 1,536 unless asked; the column is vector(1024)
     # Hybrid retrieval (§4.3 stage 6, §4.9). Eight from each half is what the pipeline stage
     # specifies; the rest is what D15's spike exists to settle on one verified book, before nine
     # more are extracted and a change costs a corpus re-embedding.
@@ -108,6 +117,8 @@ margai:
          {"input": 5.00, "output": 25.00, "cache_read": 0.50, "cache_write": 6.25,
           "batch_input": 2.50, "batch_output": 12.50},
        "embed-v4.0":
+         {"input": 0.12},
+       "global.cohere.embed-v4:0":
          {"input": 0.12}}
     usd-inr: 90
     budget:

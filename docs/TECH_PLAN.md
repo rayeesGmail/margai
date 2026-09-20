@@ -1396,6 +1396,16 @@ a re-learn block candidate.
   the `vector(n)` columns equal, and D17's retrieval harness must cover Hindi and Hinglish queries —
   if the v4 line underperforms the v3 one there, the swap happens **before** the D16 corpus
   embedding, while it is still free (founder rider, 2026-09-12).
+  **Amended 2026-09-20 (D15, DECISIONS): the provider is now `bedrock` and the model
+  `global.cohere.embed-v4:0` — the same Cohere v4 line, reached through AWS rather than Cohere's
+  own API.** The direct key is a trial key capped at 1,000 calls a month against a corpus needing
+  ~9,000, and no payment method can be attached to that account. Because it is the same model the
+  pin's meaning is unchanged and D15's measured result stands; because it is Bedrock, embeddings
+  authenticate by **IAM and need no API key at all**, so `MARGAI_AI_COHERE_API_KEY` leaves the live
+  profile. Two facts measured on 2026-09-20: v4 has **no on-demand throughput** and must be invoked
+  through an inference profile, and `output_dimension` is honoured so the answer is 1,024 wide at
+  `embeddings.float[0]`. This is not the Marketplace path §4.11 calls dormant — that 403 was a
+  Marketplace subscription for the Anthropic models; serverless embedding models bill like S3 does.
   **Price confirmed 2026-09-12** on the provider's own pricing page: **0.12 USD per 1M text
   tokens**, identical to the Bedrock figure the table already carried, so nothing was ever
   mispriced. The same model charges **0.47 for image tokens** — irrelevant today, since

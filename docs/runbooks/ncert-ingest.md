@@ -18,9 +18,9 @@ as the D5 live smoke was. `register` is database-only and Claude runs it.
 
 | Needs | Why |
 |---|---|
-| `AWS_PROFILE=margai` | the content bucket (`margai-beta-content`), for `render`, `extract`, `load`. **Not needed by `embed`** — it touches no objects |
+| `AWS_PROFILE=margai` | the content bucket (`margai-beta-content`) for `render`, `extract`, `load` — and since 2026-09-20 the **Bedrock embedding calls** for `embed` too, which is the one command that needs it without touching S3 |
 | `MARGAI_AI_ANTHROPIC_API_KEY` | the VISION calls, for `extract` and `verify --read-pages` only (docs/runbooks/ai-provider-keys.md) |
-| `MARGAI_AI_COHERE_API_KEY` | the embedding calls, for `embed` — a **second** provider key (docs/runbooks/ai-provider-keys.md). Sourced, never inline. Note the `live` profile refuses to start unless **both** keys are set, whichever command you are running |
+| ~~`MARGAI_AI_COHERE_API_KEY`~~ | **no longer needed** (2026-09-20, DECISIONS): embeddings moved to Bedrock, which authenticates by IAM. `ncert embed` needs `AWS_PROFILE=margai` instead, and there is no second provider key to hold or rotate |
 | `AI_LIVE=1` | the `live` profile; without it every call answers from a fixture (DEV_SPEC §13.7) |
 | a database | local: `docker compose up -d db`; the commands read `DB_URL` |
 
@@ -493,16 +493,15 @@ English paragraph, and whether it does is what this run measures.
 
 ```
 DB_URL=jdbc:postgresql://localhost:5432/margai_d15 \
-AI_LIVE=1 \
+AWS_PROFILE=margai AI_LIVE=1 \
 java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live \
   ncert embed --book phy11-part1
 ```
 
-**Both provider keys must be in the environment**, not just the embedding one: `AnthropicConfiguration`
-and `CohereConfiguration` each refuse a blank key while the `live` profile is active, so the
-application will not start without `MARGAI_AI_ANTHROPIC_API_KEY` *and* `MARGAI_AI_COHERE_API_KEY` —
-even though this command only calls Cohere. Sourced from your untracked local file, never typed on
-the command line. No `AWS_PROFILE` is needed: nothing here touches S3.
+Since 2026-09-20 the embedding provider is **Bedrock** (`global.cohere.embed-v4:0`, an inference
+profile — v4 has no on-demand throughput), so this needs `AWS_PROFILE=margai` and **no embedding
+key at all**: IAM is the auth. `MARGAI_AI_ANTHROPIC_API_KEY` is still required because the `live`
+profile wires the completion provider whatever command you are running.
 
 It **resumes**, because a paragraph waits for a vector exactly when its `embedding` is null, which
 is also how `ncert load` expresses staleness. So a second run over an embedded book calls for

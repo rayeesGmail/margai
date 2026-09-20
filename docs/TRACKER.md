@@ -359,18 +359,20 @@ THE CHUNK A/B IS RUN AND **REJECTED** on its pre-set gate, founder 16:35, ₹8.9
     switched off: they cost nothing there and the fragment half was never measured alone (the run
     bundled the prefix with dropping 14 fragments, deliberately, to spend one run instead of two —
     so the prefix is convicted and the fragments are merely un-acquitted).
-  - **The corpus is now in the treatment state and must be reverted** before it is used: one
-    `ncert embed --book phy11-part1 --redo`, about a minute, which also restores the 14 fragments'
-    vectors.
+  - **Reverted, founder 16:48**: 894 of 894 back on the bare chunk, all 14 fragments carrying
+    vectors again, and the score back at 8/15 · 10/15 · MRR 0.618 — **the third identical
+    reproduction of the day**, down to the same 909 calls and the same 77,641 tokens. So the
+    pipeline is deterministic run to run and the baseline the nine books inherit is trustworthy.
+DAY'S EMBEDDING SPEND, ledger against truth: 3,716 calls and 325,362 tokens across both routes —
+  **ledger ₹37.11, true ≈₹3.52**, the gap being the one-paisa floor per call. The book is embedded
+  once and the ten re-runs are what a spike costs.
 
 HOW TO RESUME — the spike is done; what it leaves open, in order:
-  1. **Revert the corpus to the bare chunk**: `ncert embed --book phy11-part1 --redo`. The A/B
-     left it in the rejected arm, and every number this day log quotes is the bare one.
-  2. **bio11**, on the frozen prompt: its 30 chapter-1 rows are still the early v2, and it carries
+  1. **bio11**, on the frozen prompt: its 30 chapter-1 rows are still the early v2, and it carries
      D14's tick. Then the eight remaining books, all on the settled pin — extract, verify, load,
      embed. The nine are ~₹700 each on the 2026-09-19 measurement, and about ten minutes of
      embedding each at the paced rate.
-  3. ~~Get a production embedding key before D17.~~ **Done differently, 2026-09-20**: the route
+  2. ~~Get a production embedding key before D17.~~ **Done differently, 2026-09-20**: the route
      moved to Bedrock instead, which has no trial cap at all, so this is closed.
 OPEN FOR THE FOUNDER, none of it blocking the nine books:
   (a) **The floor.** Similarities ran 0.27–0.60 across the whole run, so `similarity-floor` 0.30

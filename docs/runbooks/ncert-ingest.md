@@ -63,11 +63,30 @@ found only after a guard written for the first, on a run that reported `result: 
 page with a blanked image. If a render ever *did* write such pages, every page it wrote is suspect
 and `--redo` is the only way back.
 
-Before a book is rendered for the first time, the cheap pre-flight is
-`./mvnw test -Dtest=PdfPageRendererTest`: with the PDFs on the machine it draws every page of both
-pilot books and fails on any decoder gap, for free, in about 90 seconds.
+**Before a book is rendered for the first time, run the free pre-flight.** With the PDFs on the
+machine it draws every page of the chapters `books.yaml` names — the same files `render` will
+render — at 72 DPI, and fails on any decoder gap. It costs nothing but time:
 
-Expect roughly 264 pages for `bio11` and 184 for `phy11-part1`, matching `ncert/2022-ed/en/manifest.md`.
+```
+cd server
+./mvnw test -Dtest=PdfPageRendererTest#everyPageOfEverySelectedBookRendersWithNoMissingDecoder \
+  -Dncert.preflight=bio11
+```
+
+`-Dncert.preflight` takes `all` (every book of `books.yaml`) or a comma-separated list of book
+codes; **left off it sweeps the two pilot books**, which is what `./mvnw verify` pays on every
+commit — about 80 seconds for 395 pages. All ten is about 7 minutes for 1,690, so it is run
+deliberately before a render rather than on every commit. A code `books.yaml` does not carry fails
+the run instead of quietly sweeping nothing.
+
+The test prints a page count per book. Check it against `ncert/2022-ed/en/manifest.md` before
+rendering — 143 pages for `phy11-part1`, 252 for `bio11` — and note that these are chapter pages
+only: prelims, answers and appendices are deliberately outside the sweep because nothing renders
+them.
+
+**Run all ten 2026-09-20 (D15): 79 chapters, 1,690 pages, every page drawn, no decoder gap.** So
+the eight books never yet rendered carry no JPEG2000/JBIG2 surprise, and the guard has to be
+re-run only when the PDFs or the decoder dependencies change.
 
 ## 3. extract — page images through the VISION tier
 

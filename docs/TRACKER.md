@@ -367,6 +367,7 @@ DAY'S EMBEDDING SPEND, ledger against truth: 3,716 calls and 325,362 tokens acro
   **ledger ₹37.11, true ≈₹3.52**, the gap being the one-paisa floor per call. The book is embedded
   once and the ten re-runs are what a spike costs.
 
+
 HOW TO RESUME — the spike is done; what it leaves open, in order:
   1. **bio11**, on the frozen prompt: its 30 chapter-1 rows are still the early v2, and it carries
      D14's tick. Then the eight remaining books, all on the settled pin — extract, verify, load,
@@ -379,13 +380,31 @@ OPEN FOR THE FOUNDER, none of it blocking the nine books:
       sits almost exactly where noise begins — it is doing real work on q12, the one grounding
       failure, and has no headroom beneath it. Worth revisiting on a second book's evidence rather
       than tuned on one.
-  (b) **The chunk.** q07 (rank 11) and q03 (rank 7) return the right *neighbourhood* and not the
-      paragraph, which is the signature of a chunk carrying too little standalone context. The
-      first lever is prefixing the chapter/section heading before embedding — a spec question,
-      since §6.4 says `text_en`, and a corpus re-embedding, so it wants deciding before the nine.
-  (c) **q09 and how a query is worded.** It misses outright and is the most obliquely worded in the
+  (b) ~~**The chunk.**~~ **Answered the same day and rejected** (DECISIONS): prefixing the section
+      title was measured against a pre-set gate and failed it — it helps find the right section and
+      hurts finding the right paragraph inside it, which is the distinction that matters once a
+      query is already in the right neighbourhood. q07 and q03 still return the neighbourhood and
+      not the paragraph; what that wants is not more context per chunk.
+  (c) **The `global.` inference profile routes outside India.** Everything else here is
+      deliberately ap-south-1 (TECH_PLAN §7). Public NCERT text is hard to object to, but
+      `HybridRetriever` embeds the **query** too, and from D37 that is a student's own words and
+      from D38 can include a photo they took. It wants a ruling — accepted with a reason, or an
+      `apac.`-scoped profile if one appears — **before D37**, not before the nine books.
+  (d) **q09 and how a query is worded.** It misses outright and is the most obliquely worded in the
       set, naming neither moment of inertia nor rotation in either language. Whether that is a
       retrieval weakness or an unfair query is a judgement about what a real student types.
+SESSION CLOSED 2026-09-20, tree clean, **20 commits on `d15-ncert-books` awaiting the founder's
+  review and push** (58b9f3f → 335243f). Server tests 747 → 823, `./mvnw verify` green through
+  every commit gate, eval gate PASS (placeholder) and stamped, matching HEAD. **D15 is not ticked**:
+  its ✅ is a coverage report per book across the remaining EN books, and this is one book of ten —
+  but **the retrieval half of the ✅ is met and settled**, which is what the day was for.
+  Spend: **ledger ₹37.11, true ≈₹3.52** (the one-paisa floor; 3,716 embedding calls across two
+  routes, a book embedded once and re-run nine times because a spike is re-runs).
+  What the day actually settled, in one line each: the pin is Bedrock's `global.cohere.embed-v4:0`
+  and needs no API key; a Hindi query reaches an English paragraph with no `text_hi` in the corpus
+  at all; the full-text half ANDs its terms and had to be told not to; the chunk stays `text_en`
+  because a section prefix helps find the section and hurts finding the paragraph; and the ledger
+  over-reports small calls ~11× by design, so no plan should read it as a bill.
 ```
 
 ```

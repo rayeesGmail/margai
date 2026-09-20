@@ -4,11 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.ai.api.AiCallContext;
 import com.margai.ai.api.AiClientInfo;
+import com.margai.ai.internal.TestAiProperties;
+import com.margai.ai.retrieval.HybridRetriever;
 import com.margai.ai.tasks.EmbeddingService;
 import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.ParagraphEmbedding;
+import com.margai.curriculum.api.ParagraphRetrievalRepository;
 import com.margai.curriculum.api.ParagraphToEmbed;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -153,7 +156,8 @@ class NcertEmbedCommandTest {
             @Override
             public <K> K create(Class<K> cls) throws Exception {
                 if (cls == NcertEmbedCommand.class) {
-                    return cls.cast(new NcertEmbedCommand(imports, embeddings, spend, client, properties, writer));
+                    return cls.cast(new NcertEmbedCommand(imports, embeddings, noRetriever(), spend, client,
+                            properties, writer));
                 }
                 return siblings.create(cls);
             }
@@ -164,6 +168,27 @@ class NcertEmbedCommandTest {
 
     private String report() {
         return out.toString();
+    }
+
+    /**
+     * A real retriever over an empty corpus: the command's query run is exercised for its wiring
+     * and its report, while what retrieval actually returns is {@link HybridRetrieverTest}'s
+     * subject and the founder's scored run's.
+     */
+    static HybridRetriever noRetriever() {
+        return new HybridRetriever(new ParagraphRetrievalRepository() {
+            @Override
+            public List<com.margai.curriculum.api.ParagraphMatch> nearestByEmbedding(float[] query,
+                    com.margai.curriculum.api.BookSubject subject, UUID nodeId, int limit) {
+                return List.of();
+            }
+
+            @Override
+            public List<com.margai.curriculum.api.ParagraphMatch> matchingText(String query,
+                    com.margai.curriculum.api.BookSubject subject, UUID nodeId, int limit) {
+                return List.of();
+            }
+        }, new StubEmbeddings(), TestAiProperties.standard());
     }
 
     /** Records what was embedded and on which side of the space, and answers a 1,024-wide vector. */

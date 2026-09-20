@@ -3,11 +3,13 @@ package com.margai.pipeline.internal;
 import com.margai.ai.api.AiCallContext;
 import com.margai.ai.api.AiClientInfo;
 import com.margai.ai.api.AiSpend;
+import com.margai.ai.retrieval.HybridRetriever;
 import com.margai.ai.tasks.EmbeddingService;
 import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.ParagraphEmbedding;
 import com.margai.curriculum.api.ParagraphToEmbed;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,17 +46,23 @@ class NcertEmbedCommand extends NcertBookCommand {
     @Option(names = "--redo", description = "Embed every paragraph again, replacing the vectors already stored.")
     boolean redo;
 
+    @Option(names = "--queries", paramLabel = "FILE", defaultValue = "../eval/retrieval-queries.json",
+            description = "The concept queries to run afterwards (default: ${DEFAULT-VALUE}).")
+    Path queriesFile;
+
     private final CurriculumImport imports;
     private final EmbeddingService embeddings;
+    private final HybridRetriever retriever;
     private final AiSpend spend;
     private final AiClientInfo client;
     private final PipelineProperties properties;
 
-    NcertEmbedCommand(CurriculumImport imports, EmbeddingService embeddings, AiSpend spend, AiClientInfo client,
-            PipelineProperties properties, Reports reports) {
+    NcertEmbedCommand(CurriculumImport imports, EmbeddingService embeddings, HybridRetriever retriever,
+            AiSpend spend, AiClientInfo client, PipelineProperties properties, Reports reports) {
         super(reports);
         this.imports = imports;
         this.embeddings = embeddings;
+        this.retriever = retriever;
         this.spend = spend;
         this.client = client;
         this.properties = properties;
@@ -70,6 +78,7 @@ class NcertEmbedCommand extends NcertBookCommand {
         report.line("chunk: one paragraph, its English text as loaded (§6.4)");
         AiCallContext ctx = AiCallContext.system(runId);
 
+        List<RetrievalQuery> queries = queriesFor(definition, report);
         List<ParagraphToEmbed> waiting = imports.paragraphsToEmbed(definition.code(), redo);
         report.read(waiting.size() + " paragraph(s) waiting for a vector"
                 + (redo ? " (--redo: the whole book)" : ""));
@@ -77,6 +86,7 @@ class NcertEmbedCommand extends NcertBookCommand {
         int embedded = 0;
         Map<Short, Integer> perChapter = new TreeMap<>();
         List<ParagraphEmbedding> batch = new ArrayList<>();
+        List<RetrievalRun.Result> results = List.of();
         try {
             for (ParagraphToEmbed paragraph : waiting) {
                 batch.add(new ParagraphEmbedding(paragraph.paragraphId(),
@@ -88,9 +98,11 @@ class NcertEmbedCommand extends NcertBookCommand {
                 }
             }
             embedded += imports.storeEmbeddings(definition.code(), batch);
+            results = RetrievalRun.run(queries, definition, retriever, ctx);
         } finally {
-            // Before anything that can refuse (§10.5): a run that dies mid-book has still spent,
-            // and the report is where the founder reads what it spent.
+            // After all the paid work and before the scoring, which can still refuse (§10.5): a
+            // run that dies has still spent, and the report is where the founder reads what it
+            // spent. The query embeddings are on the same request id, so this is the whole bill.
             AiSpend.RunSpend bill = spend.of(runId);
             report.section("cost").table(List.of("calls", "input tokens", "spent"),
                     List.of(List.of(String.valueOf(bill.calls()),
@@ -111,6 +123,29 @@ class NcertEmbedCommand extends NcertBookCommand {
         report.section("paragraphs still without a vector")
                 .list(stillWaiting.stream().map(ParagraphToEmbed::address).toList(),
                         "none — every English paragraph of the book is embedded");
+
+        RetrievalRun.report(results, queries, report);
+    }
+
+    /**
+     * The concept queries, when the set on disk is written against this book. A set for another
+     * book is not run and says so; an absent file is named rather than assumed. Neither fails the
+     * run — embedding the other nine books must not depend on a query set that exists for one.
+     */
+    private List<RetrievalQuery> queriesFor(BookDefinition definition, Report report) {
+        if (!Files.isRegularFile(queriesFile)) {
+            report.line("concept queries: none at " + queriesFile.toAbsolutePath() + " — not run");
+            return List.of();
+        }
+        RetrievalQueriesReader.QuerySet set = RetrievalQueriesReader.read(queriesFile);
+        if (!set.book().equals(definition.code())) {
+            report.line("concept queries: the set at " + queriesFile + " is written against '" + set.book()
+                    + "', not '" + definition.code() + "' — not run");
+            return List.of();
+        }
+        report.line("concept queries: " + set.queries().size() + " from " + queriesFile
+                + " (" + set.queries().stream().filter(RetrievalQuery::isHindi).count() + " in Hindi)");
+        return set.queries();
     }
 
     /**

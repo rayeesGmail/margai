@@ -1,0 +1,128 @@
+{
+  "book": "phy11-part1",
+  "queries": [
+    {
+      "id": "q01-significant-figures",
+      "language": "en",
+      "text": "if I multiply two measured lengths how many digits should I keep in the answer",
+      "expect": [{ "chapter": 1, "section": "1.3.1", "para": 2 }],
+      "note": "Chapter 1, significant figures. The book states the rule; the student asks it as a question about their own working."
+    },
+    {
+      "id": "q02-speed-vs-velocity",
+      "language": "en",
+      "text": "is speed the same thing as velocity or is there a difference",
+      "expect": [{ "chapter": 2, "section": "2.2", "para": 10 }],
+      "note": "Chapter 2. The only chapter-2 concept in the set, so the book's one straight-line-motion chapter is represented."
+    },
+    {
+      "id": "q03-displacement-vs-path",
+      "language": "en",
+      "text": "if I walk around a park and come back to where I started how much have I moved",
+      "expect": [{ "chapter": 3, "section": "3.2.1", "para": 2 }],
+      "note": "Displacement does not depend on the path taken. Deliberately phrased with none of the book's own words — no 'displacement', no 'path length' — so the full-text half cannot answer it and only the vector half can."
+    },
+    {
+      "id": "q04-friction-contact-area",
+      "language": "en",
+      "text": "does friction depend on how much surface area is touching",
+      "expect": [{ "chapter": 4, "section": "4.9.1", "para": 2 }],
+      "note": "Written first as 'why is it easier to pull a lawn roller than push it', which the rationalised edition does not cover in the body text; changed to another chapter-4 friction concept that it does."
+    },
+    {
+      "id": "q05-inertia-bus",
+      "language": "en",
+      "text": "why do I get thrown backwards when a bus suddenly starts moving",
+      "expect": [{ "chapter": 4, "section": "4.4", "para": 8 }],
+      "note": "The book uses this exact situation to illustrate the first law, so both halves should find it. Included as a control: a query that fails here indicates something wrong beyond the pin."
+    },
+    {
+      "id": "q06-car-turning-flat-road",
+      "language": "en",
+      "text": "what stops a car from skidding sideways when it takes a turn on a flat road",
+      "expect": [
+        { "chapter": 4, "section": "4.10", "para": 9 },
+        { "chapter": 4, "section": "4.10", "para": 2 }
+      ],
+      "note": "Static friction provides the centripetal force. Two addresses because the definition of centripetal force and its application to the road are adjacent and either is a right answer."
+    },
+    {
+      "id": "q07-zero-work",
+      "language": "en",
+      "text": "if I carry my bag across a flat room have I done any work on it",
+      "expect": [{ "chapter": 5, "section": "5.3", "para": 7 }],
+      "note": "Force perpendicular to displacement does no work. The book's example is a block on a table and the moon's orbit, not a bag, so the wording shares almost nothing with the paragraph."
+    },
+    {
+      "id": "q08-rotational-kinetic-energy",
+      "language": "en",
+      "text": "a spinning wheel is made of many particles so what is its total kinetic energy 1/2 mv^2 for each one",
+      "expect": [
+        { "chapter": 6, "section": "6.9", "para": 6 },
+        { "chapter": 6, "section": "6.9", "para": 1 }
+      ],
+      "note": "The case the corpus rulings were made for: the book prints its speed glyph as a form of upsilon, and the founder's ruling of 2026-09-17 normalised it to v so that '1/2 mv^2' could reach §6.9 at all. If this query misses, that ruling bought nothing."
+    },
+    {
+      "id": "q09-moment-of-inertia-hi",
+      "language": "hi",
+      "text": "किसी वस्तु को घुमाना शुरू करना कितना कठिन होगा यह किन बातों पर निर्भर करता है",
+      "expect": [
+        { "chapter": 6, "section": "6.9", "para": 13 },
+        { "chapter": 6, "section": "6.9", "para": 11 }
+      ],
+      "note": "Hindi → English paragraph. Moment of inertia, asked without naming it in either language — so neither the Hindi tsv half nor a keyword match can carry it and only the cross-lingual vector space can."
+    },
+    {
+      "id": "q10-angular-momentum-conservation",
+      "language": "en",
+      "text": "why does a skater spin faster when she pulls her arms in",
+      "expect": [{ "chapter": 6, "section": "6.12.1", "para": 3 }],
+      "note": "The book's own illustration is a swivel chair, not a skater, so the everyday framing differs from the text while the physics is the same paragraph."
+    },
+    {
+      "id": "q11-escape-speed",
+      "language": "en",
+      "text": "how fast does a rocket have to go to leave the earth for good",
+      "expect": [
+        { "chapter": 7, "section": "7.8", "para": 9 },
+        { "chapter": 7, "section": "7.8", "para": 6 }
+      ],
+      "note": "Escape speed, 11.2 km/s. Written before the address was looked up; the paragraph that names the number and the one that derives it are both right answers."
+    },
+    {
+      "id": "q12-dimensional-analysis-hi",
+      "language": "hi",
+      "text": "विमीय विश्लेषण से किसी समीकरण के बारे में क्या पता चलता है और क्या नहीं",
+      "expect": [
+        { "chapter": 1, "section": "1.6.2", "para": 9 },
+        { "chapter": 1, "section": "1.6", "para": 1 }
+      ],
+      "note": "Hindi → English paragraph. What dimensional analysis can and cannot test — the target paragraph is explicitly about its limits."
+    },
+    {
+      "id": "q13-inertia-hi",
+      "language": "hi",
+      "text": "जड़त्व किसे कहते हैं और न्यूटन के पहले नियम से इसका क्या संबंध है",
+      "expect": [
+        { "chapter": 4, "section": "4.4", "para": 8 },
+        { "chapter": 4, "section": "4.4", "para": 2 }
+      ],
+      "note": "Hindi → English paragraph, on a concept whose English query (q05) is also in the set — so a Hindi miss beside an English hit isolates the cross-lingual space rather than the corpus."
+    },
+    {
+      "id": "q14-momentum-conservation-hi",
+      "language": "hi",
+      "text": "बंदूक से गोली चलाने पर बंदूक पीछे क्यों हटती है",
+      "expect": [{ "chapter": 4, "section": "4.7", "para": 1 }],
+      "note": "Hindi → English paragraph. Conservation of momentum, asked as the recoil of a gun, which is the book's own example in that paragraph."
+    },
+    {
+      "id": "q15-gravity-with-depth-hi",
+      "language": "hi",
+      "text": "पृथ्वी की सतह से नीचे जाने पर गुरुत्वीय त्वरण का मान कैसे बदलता है",
+      "expect": [{ "chapter": 7, "section": "7.6", "para": 11 }],
+      "note": "Hindi → English paragraph. g decreases below the surface as well as above it."
+    }
+  ]
+}

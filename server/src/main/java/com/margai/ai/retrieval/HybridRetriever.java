@@ -41,7 +41,8 @@ public class HybridRetriever {
     private final EmbeddingService embeddings;
     private final AiProperties.Retrieval config;
 
-    HybridRetriever(ParagraphRetrievalRepository paragraphs, EmbeddingService embeddings, AiProperties properties) {
+    public HybridRetriever(ParagraphRetrievalRepository paragraphs, EmbeddingService embeddings,
+            AiProperties properties) {
         this.paragraphs = paragraphs;
         this.embeddings = embeddings;
         this.config = properties.retrieval();

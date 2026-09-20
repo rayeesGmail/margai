@@ -262,7 +262,7 @@ class PipelineCommandTest {
                 }
                 if (cls == NcertEmbedCommand.class) {
                     return cls.cast(new NcertEmbedCommand(imports, new NcertEmbedCommandTest.StubEmbeddings(),
-                            new NcertExtractCommandTest.StubSpend(),
+                            NcertEmbedCommandTest.noRetriever(), new NcertExtractCommandTest.StubSpend(),
                             new com.margai.ai.api.AiClientInfo("cohere", List.of("ledger")),
                             new PipelineProperties(72, 10, 1, "claude-sonnet-5", 100), writer));
                 }

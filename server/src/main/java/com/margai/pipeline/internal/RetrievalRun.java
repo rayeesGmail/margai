@@ -57,7 +57,7 @@ final class RetrievalRun {
         return results;
     }
 
-    private static int rankOfFirstExpected(RetrievalQuery query, RetrievedPassages retrieved) {
+    static int rankOfFirstExpected(RetrievalQuery query, RetrievedPassages retrieved) {
         List<RetrievedPassages.Passage> passages = retrieved.passages();
         for (int index = 0; index < passages.size(); index++) {
             var paragraph = passages.get(index).paragraph();
@@ -85,6 +85,8 @@ final class RetrievalRun {
 
         report.section("which half of the hybrid actually fired")
                 .line("a query the text half never answers is a query where hybrid retrieval is vector retrieval")
+                .line("counted over the passages that survived the token cap, and a query whose grounding failed "
+                        + "carries none — so this under-reports both halves rather than over-reporting either")
                 .table(List.of("half", "queries it returned something for"), List.of(
                         List.of("vector", count(results, result -> result.foundBy("vector")) + " of " + results.size()),
                         List.of("full text", count(results, result -> result.foundBy("text")) + " of " + results.size())));

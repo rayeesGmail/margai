@@ -1,20 +1,26 @@
-# NCERT ingest — register, render, extract, load, verify
+# NCERT ingest — register, render, extract, load, verify, embed
 
-The five `ncert` commands of TECH_PLAN §6.3, in the order they must run, and the spot-check that
+The six `ncert` commands of TECH_PLAN §6.3, in the order they must run, and the spot-check that
 closes PLAN D14's ✅. D14 does the two English pilot books; D15 repeats it for the remaining eight,
 with the second read (`ncert verify`, D15) before a book is taken as canonical; D16 for the Hindi
 editions.
 
-Four of the five need credentials **Claude does not have** — the AWS profile for the content bucket
-and the live provider key — so `render`, `extract`, `load` and `verify` are founder-run, as the D5
-live smoke was. `register` is database-only and Claude runs it.
+*Order amended 2026-09-19/20 (founder; DECISIONS, PLAN D15): the **first verified book is embedded
+and its retrieval tested before the other nine are extracted**, so `ncert embed` (§7 below) runs on
+`phy11-part1` now rather than at D17. The embedding pin moves provider, model and width together,
+so a wrong pin re-embeds the corpus — cheap across 894 paragraphs, expensive across ~9,000.*
+
+Five of the six need credentials **Claude does not have** — the AWS profile for the content bucket
+and the live provider keys — so `render`, `extract`, `load`, `verify` and `embed` are founder-run,
+as the D5 live smoke was. `register` is database-only and Claude runs it.
 
 ## Before you start
 
 | Needs | Why |
 |---|---|
-| `AWS_PROFILE=margai` | the content bucket (`margai-beta-content`), for `render`, `extract`, `load` |
+| `AWS_PROFILE=margai` | the content bucket (`margai-beta-content`), for `render`, `extract`, `load`. **Not needed by `embed`** — it touches no objects |
 | `MARGAI_AI_ANTHROPIC_API_KEY` | the VISION calls, for `extract` and `verify --read-pages` only (docs/runbooks/ai-provider-keys.md) |
+| `MARGAI_AI_COHERE_API_KEY` | the embedding calls, for `embed` only — a **second** provider key, and the `live` profile refuses to start without it (docs/runbooks/ai-provider-keys.md). Sourced, never inline |
 | `AI_LIVE=1` | the `live` profile; without it every call answers from a fixture (DEV_SPEC §13.7) |
 | a database | local: `docker compose up -d db`; the commands read `DB_URL` |
 
@@ -479,11 +485,47 @@ Also read the extract report's low-confidence list: those pages are the model te
 look, and they should be checked whether or not the random sample lands on them — while remembering
 that at D14 it was silent about every defect that mattered.
 
+## 7. embed — a vector per paragraph, and the scored concept queries
+
+Runs after a book is canonical (verified, loaded, its clean share read). It embeds `text_en` and
+only that (§6.4): the pinned multilingual model is what is meant to carry a Hindi question to an
+English paragraph, and whether it does is what this run measures.
+
+```
+DB_URL=jdbc:postgresql://localhost:5432/margai_d15 \
+AI_LIVE=1 SPRING_PROFILES_ACTIVE=pipeline,live \
+java -jar target/server.jar ncert embed --book phy11-part1
+```
+
+`MARGAI_AI_COHERE_API_KEY` must be in the environment — sourced from your untracked local file,
+never typed on the command line. No `AWS_PROFILE` is needed: nothing here touches S3.
+
+It **resumes**, because a paragraph waits for a vector exactly when its `embedding` is null, which
+is also how `ncert load` expresses staleness. So a second run over an embedded book calls for
+nothing and costs nothing, and a run interrupted at paragraph 800 keeps its 800. Re-running is
+therefore the cheap way to re-score after a retrieval-parameter change: it embeds nothing and pays
+only for the query embeddings.
+
+Then it runs `eval/retrieval-queries.json` through the hybrid retriever and prints, per query, the
+top three passages, and over the set **hit@1, hit@3 and MRR — with Hindi scored on its own line.**
+Read the Hindi line first: it is the cross-lingual pin, and §4.9's founder rider of 2026-09-12 says
+a swap happens while it is still free, which is now and not after nine more books.
+
+Cost for phy11-part1's 894 paragraphs: **well under ₹5** at the pinned model's 0.12 USD/1M tokens.
+
+`--chapters 7` embeds one chapter, for staging a book the way `extract` is staged.
+`--redo` re-embeds paragraphs that already have vectors. `--queries none` embeds without scoring —
+needed for any book the committed query set is not written against.
+
 ## If something goes wrong
 
 | Symptom | Cause | Fix |
 |---|---|---|
 | `input file not found: …/books.yaml` | run from the wrong directory | run from `server/`, or pass `--inputs` |
+| `no concept queries at …` (from `embed`) | run from the wrong directory, so the default `../eval/retrieval-queries.json` did not resolve | run from `server/`, pass `--queries` with the right path, or `--queries none` to embed without scoring |
+| `the AI client is the fake` (from `embed`) | `AI_LIVE=1` or the `live` profile missing | a fixture vector on a real row is invisible to every check, so the run refuses rather than writing one |
+| `embedding is over the canonical English text` | `--lang hi` | there is no Hindi embedding pass (§6.4); drop the flag |
+| the `live` profile will not start | `MARGAI_AI_COHERE_API_KEY` not set | it is a second key, distinct from the Anthropic one (docs/runbooks/ai-provider-keys.md) |
 | `book '…' is not registered` | step 1 not run against this database | run `ncert register` |
 | `chapter N of '…' has no rendered pages` | step 2 not run, or a chapter subset | run `ncert render` for that chapter |
 | `no extraction at extract/…` | step 3 not run for this edition | run `ncert extract` |

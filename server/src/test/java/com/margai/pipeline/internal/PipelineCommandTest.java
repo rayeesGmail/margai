@@ -342,7 +342,7 @@ class PipelineCommandTest {
         final List<ParagraphEmbedding> storedEmbeddings = new ArrayList<>();
 
         @Override
-        public List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, boolean redo) {
+        public List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, Collection<Short> chapters, boolean redo) {
             return toEmbedAnswer;
         }
 

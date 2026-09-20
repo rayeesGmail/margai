@@ -123,10 +123,48 @@ class NcertEmbedCommandTest {
         assertThat(report()).contains("the AI client is the fake");
     }
 
+    /**
+     * `--chapters` is inherited from {@link NcertBookCommand} and advertised as "only these
+     * chapter numbers". It has to reach the query, not just the report: a run that embedded and
+     * paid for all 894 paragraphs while reporting one chapter's count is the silent no-op this
+     * command refuses the fake client and `--lang hi` to prevent (spec-auditor, D15).
+     */
+    @Test
+    void chaptersNarrowsWhatIsEmbeddedAndNotOnlyWhatIsReported() {
+        assertThat(run(100, "--chapters", "7")).isZero();
+
+        assertThat(imports.chaptersAsked).as("the selection reaches the query")
+                .containsExactly(List.of((short) 7), List.of((short) 7));
+        assertThat(report()).contains("in chapters [7]");
+    }
+
+    @Test
+    void thewholeBookAsksForEveryChapter() {
+        assertThat(run()).isZero();
+
+        assertThat(imports.chaptersAsked).allSatisfy(asked -> assertThat(asked).isEmpty());
+    }
+
+    /**
+     * The default is a relative path, so a run launched from the wrong directory would embed a
+     * whole book, spend, and produce no acceptance evidence. It refuses before any call.
+     */
+    @Test
+    void refusesWhenTheQuerySetIsMissingRatherThanEmbeddingWithNoEvidence() {
+        int status = commandLine().execute("ncert", "embed", "--book", "phy11-part1",
+                "--queries", inputs.resolve("absent.json").toString(),
+                "--inputs", inputs.toString(), "--reports", reports.toString());
+
+        assertThat(status).isEqualTo(1);
+        assertThat(embeddings.documents).as("nothing was paid for").isEmpty();
+        assertThat(report()).contains("no concept queries at").contains("--queries none");
+    }
+
     /** §6.4 pins the canonical text; a `--lang hi` run would silently do nothing. */
     @Test
     void refusesAHindiPassBecauseTheVectorIsOverTheEnglishText() {
         int status = commandLine().execute("ncert", "embed", "--book", "phy11-part1", "--lang", "hi",
+                "--queries", NcertEmbedCommand.SKIP_QUERIES,
                 "--inputs", inputs.toString(), "--reports", reports.toString());
 
         assertThat(status).isEqualTo(1);
@@ -139,8 +177,16 @@ class NcertEmbedCommandTest {
     }
 
     private int run(int batchSize) {
-        return commandLine(batchSize).execute("ncert", "embed", "--book", "phy11-part1",
-                "--inputs", inputs.toString(), "--reports", reports.toString());
+        return run(batchSize, new String[0]);
+    }
+
+    /** Hermetic by default: the committed query set is {@link RetrievalRunTest}'s subject. */
+    private int run(int batchSize, String... extra) {
+        List<String> args = new ArrayList<>(List.of("ncert", "embed", "--book", "phy11-part1",
+                "--queries", NcertEmbedCommand.SKIP_QUERIES,
+                "--inputs", inputs.toString(), "--reports", reports.toString()));
+        args.addAll(List.of(extra));
+        return commandLine(batchSize).execute(args.toArray(String[]::new));
     }
 
     private CommandLine commandLine() {
@@ -222,9 +268,11 @@ class NcertEmbedCommandTest {
         List<ParagraphToEmbed> waiting = List.of();
         final List<ParagraphEmbedding> stored = new ArrayList<>();
         final List<Integer> batchSizes = new ArrayList<>();
+        final List<Collection<Short>> chaptersAsked = new ArrayList<>();
 
         @Override
-        public List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, boolean redo) {
+        public List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, Collection<Short> chapters, boolean redo) {
+            chaptersAsked.add(List.copyOf(chapters));
             // Second call of the run: the report's "still without a vector" line, after storing.
             return waiting.stream().filter(paragraph -> stored.stream()
                     .noneMatch(embedding -> embedding.paragraphId().equals(paragraph.paragraphId()))).toList();

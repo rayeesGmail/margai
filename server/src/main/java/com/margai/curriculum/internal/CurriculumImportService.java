@@ -108,8 +108,8 @@ class CurriculumImportService implements CurriculumImport {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, boolean redo) {
-        return ncertEmbeddings.waiting(bookCode, redo);
+    public List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, Collection<Short> chapters, boolean redo) {
+        return ncertEmbeddings.waiting(bookCode, chapters, redo);
     }
 
     @Override

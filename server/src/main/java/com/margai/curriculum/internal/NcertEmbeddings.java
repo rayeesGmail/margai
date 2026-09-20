@@ -52,17 +52,23 @@ class NcertEmbeddings {
         this.entityManager = entityManager;
     }
 
-    List<ParagraphToEmbed> waiting(String bookCode, boolean redo) {
+    List<ParagraphToEmbed> waiting(String bookCode, Collection<Short> chapters, boolean redo) {
         UUID bookId = book(bookCode);
+        boolean everyChapter = chapters == null || chapters.isEmpty();
         Query query = entityManager.createNativeQuery("""
                 SELECT p.id, p.chapter_no, p.section, p.para_no, p.text_en
                   FROM ncert_paragraphs p
                  WHERE p.book_id = :book
                    AND p.text_en IS NOT NULL AND btrim(p.text_en) <> ''
-                   AND (:redo = TRUE OR p.embedding IS NULL)"""
+                   AND (:redo = TRUE OR p.embedding IS NULL)
+                   AND (:everyChapter = TRUE OR p.chapter_no IN (:chapters))"""
                 + READING_ORDER);
         query.setParameter("book", bookId);
         query.setParameter("redo", redo);
+        query.setParameter("everyChapter", everyChapter);
+        // A bound empty list is not valid SQL, so the flag above short-circuits it; the parameter
+        // still has to be set because the statement names it either way.
+        query.setParameter("chapters", everyChapter ? List.of((short) -1) : chapters);
         List<ParagraphToEmbed> waiting = new ArrayList<>();
         for (Object row : query.getResultList()) {
             Object[] columns = (Object[]) row;

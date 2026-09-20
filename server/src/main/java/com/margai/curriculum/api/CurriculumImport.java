@@ -90,10 +90,13 @@ public interface CurriculumImport {
      * A paragraph needs one when its {@code embedding} is null — which is also how staleness is
      * expressed, since {@code ncert load} clears the embedding of any row whose text it changes —
      * so a re-run embeds only what is missing and costs nothing for what is not. {@code redo}
-     * takes the whole book regardless. Paragraphs with no English text are skipped: §6.4 embeds
-     * {@code text_en} and nothing else. Refused when the book is not registered.
+     * takes every selected paragraph regardless. Paragraphs with no English text are skipped: §6.4
+     * embeds {@code text_en} and nothing else. Refused when the book is not registered.
+     *
+     * @param chapters only these chapters, or every chapter when empty — a chapter is staged alone
+     *                 before a book here as everywhere else in the pipeline (DECISIONS 2026-09-18)
      */
-    List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, boolean redo);
+    List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, Collection<Short> chapters, boolean redo);
 
     /**
      * {@code ncert embed} (D15): the vectors onto their rows. Refused as a whole, writing nothing,

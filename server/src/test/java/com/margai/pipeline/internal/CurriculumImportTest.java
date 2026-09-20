@@ -368,7 +368,7 @@ class CurriculumImportTest {
         imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
         imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
 
-        List<ParagraphToEmbed> waiting = imports.paragraphsToEmbed("phy11-part1", false);
+        List<ParagraphToEmbed> waiting = imports.paragraphsToEmbed("phy11-part1", List.of(), false);
         assertThat(waiting).extracting(ParagraphToEmbed::address)
                 .containsExactly("ch 7 §7.9 ¶1", "ch 7 §7.9 ¶2");
         assertThat(waiting.getFirst().text()).isEqualTo("The gravitational potential energy of a body.");
@@ -376,9 +376,9 @@ class CurriculumImportTest {
         imports.storeEmbeddings("phy11-part1", List.of(
                 new ParagraphEmbedding(waiting.getFirst().paragraphId(), vector(0.1f))));
 
-        assertThat(imports.paragraphsToEmbed("phy11-part1", false)).extracting(ParagraphToEmbed::address)
+        assertThat(imports.paragraphsToEmbed("phy11-part1", List.of(), false)).extracting(ParagraphToEmbed::address)
                 .as("an embedded paragraph is not waiting any more").containsExactly("ch 7 §7.9 ¶2");
-        assertThat(imports.paragraphsToEmbed("phy11-part1", true)).as("--redo takes the whole book")
+        assertThat(imports.paragraphsToEmbed("phy11-part1", List.of(), true)).as("--redo takes the whole book")
                 .hasSize(2);
     }
 
@@ -387,7 +387,7 @@ class CurriculumImportTest {
     void theVectorRoundTripsThroughThePgvectorColumn() {
         imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
         imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
-        ParagraphToEmbed first = imports.paragraphsToEmbed("phy11-part1", false).getFirst();
+        ParagraphToEmbed first = imports.paragraphsToEmbed("phy11-part1", List.of(), false).getFirst();
         float[] stored = vector(0.25f);
 
         assertThat(imports.storeEmbeddings("phy11-part1", List.of(
@@ -408,7 +408,7 @@ class CurriculumImportTest {
     void anEmbeddingForAParagraphOfAnotherBookIsRefusedAndWritesNothing() {
         imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
         imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
-        List<ParagraphToEmbed> waiting = imports.paragraphsToEmbed("phy11-part1", false);
+        List<ParagraphToEmbed> waiting = imports.paragraphsToEmbed("phy11-part1", List.of(), false);
         UUID foreign = UUID.randomUUID();
 
         assertThatThrownBy(() -> imports.storeEmbeddings("phy11-part1", List.of(
@@ -441,7 +441,7 @@ class CurriculumImportTest {
                 List.of(corrected, paragraphs().get(1)));
 
         assertThat(report.embeddingsCleared()).isEqualTo(1);
-        assertThat(imports.paragraphsToEmbed("phy11-part1", false)).extracting(ParagraphToEmbed::address)
+        assertThat(imports.paragraphsToEmbed("phy11-part1", List.of(), false)).extracting(ParagraphToEmbed::address)
                 .containsExactly("ch 7 §7.9 ¶1");
     }
 
@@ -455,7 +455,7 @@ class CurriculumImportTest {
         NcertLoadReport again = imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
 
         assertThat(again.embeddingsCleared()).isZero();
-        assertThat(imports.paragraphsToEmbed("phy11-part1", false)).isEmpty();
+        assertThat(imports.paragraphsToEmbed("phy11-part1", List.of(), false)).isEmpty();
     }
 
     /**
@@ -485,18 +485,18 @@ class CurriculumImportTest {
                 (short) 1, "गुरुत्वीय स्थितिज ऊर्जा।", false, List.of(),
                 new ParagraphExtraction(List.of(12), new BigDecimal("0.90"), null))));
 
-        assertThat(imports.paragraphsToEmbed("phy11-part1", false)).isEmpty();
+        assertThat(imports.paragraphsToEmbed("phy11-part1", List.of(), false)).isEmpty();
     }
 
     @Test
     void embeddingAnUnregisteredBookIsRefused() {
-        assertThatThrownBy(() -> imports.paragraphsToEmbed("nosuchbook", false))
+        assertThatThrownBy(() -> imports.paragraphsToEmbed("nosuchbook", List.of(), false))
                 .isInstanceOf(CurriculumImportException.class)
                 .hasMessageContaining("is not registered");
     }
 
     private void embedEverything() {
-        imports.storeEmbeddings("phy11-part1", imports.paragraphsToEmbed("phy11-part1", true).stream()
+        imports.storeEmbeddings("phy11-part1", imports.paragraphsToEmbed("phy11-part1", List.of(), true).stream()
                 .map(waiting -> new ParagraphEmbedding(waiting.paragraphId(), vector(0.1f)))
                 .toList());
     }

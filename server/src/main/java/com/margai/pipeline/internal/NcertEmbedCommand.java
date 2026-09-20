@@ -46,8 +46,11 @@ class NcertEmbedCommand extends NcertBookCommand {
     @Option(names = "--redo", description = "Embed every paragraph again, replacing the vectors already stored.")
     boolean redo;
 
+    /** {@code --queries none}: embed without scoring, said out loud rather than by a missing file. */
+    static final String SKIP_QUERIES = "none";
+
     @Option(names = "--queries", paramLabel = "FILE", defaultValue = "../eval/retrieval-queries.json",
-            description = "The concept queries to run afterwards (default: ${DEFAULT-VALUE}).")
+            description = "The concept queries to run afterwards, or 'none' (default: ${DEFAULT-VALUE}).")
     Path queriesFile;
 
     private final CurriculumImport imports;
@@ -79,9 +82,13 @@ class NcertEmbedCommand extends NcertBookCommand {
         AiCallContext ctx = AiCallContext.system(runId);
 
         List<RetrievalQuery> queries = queriesFor(definition, report);
-        List<ParagraphToEmbed> waiting = imports.paragraphsToEmbed(definition.code(), redo);
+        List<Short> chapterNumbers = selected.stream().map(BookDefinition.Chapter::no).toList();
+        boolean wholeBook = chapterNumbers.size() == definition.chapters().size();
+        List<ParagraphToEmbed> waiting = imports.paragraphsToEmbed(definition.code(),
+                wholeBook ? List.of() : chapterNumbers, redo);
         report.read(waiting.size() + " paragraph(s) waiting for a vector"
-                + (redo ? " (--redo: the whole book)" : ""));
+                + (wholeBook ? "" : " in chapters " + chapterNumbers)
+                + (redo ? " (--redo: every selected paragraph, embedded or not)" : ""));
 
         int embedded = 0;
         Map<Short, Integer> perChapter = new TreeMap<>();
@@ -116,7 +123,8 @@ class NcertEmbedCommand extends NcertBookCommand {
         }
         report.section("paragraphs embedded per chapter").table(List.of("chapter", "embedded"), rows);
 
-        List<ParagraphToEmbed> stillWaiting = imports.paragraphsToEmbed(definition.code(), false);
+        List<ParagraphToEmbed> stillWaiting = imports.paragraphsToEmbed(definition.code(),
+                wholeBook ? List.of() : chapterNumbers, false);
         report.section("ncert_paragraphs.embedding")
                 .table(List.of("embedded this run", "still without a vector"),
                         List.of(List.of(String.valueOf(embedded), String.valueOf(stillWaiting.size()))));
@@ -128,14 +136,26 @@ class NcertEmbedCommand extends NcertBookCommand {
     }
 
     /**
-     * The concept queries, when the set on disk is written against this book. A set for another
-     * book is not run and says so; an absent file is named rather than assumed. Neither fails the
-     * run — embedding the other nine books must not depend on a query set that exists for one.
+     * The concept queries, when the set on disk is written against this book. A set written for
+     * another book is not run and says so — embedding the other nine books must not depend on a
+     * query set that exists for one.
+     *
+     * <p>A <em>missing</em> file refuses the run instead, before anything is paid for. The default
+     * is a relative path, so a command launched from the wrong directory would otherwise embed a
+     * whole book, spend the money and produce no acceptance evidence — the silent no-op this
+     * command already refuses the fake client and {@code --lang hi} to prevent. {@code --queries
+     * none} is the way to say it was meant.
      */
     private List<RetrievalQuery> queriesFor(BookDefinition definition, Report report) {
-        if (!Files.isRegularFile(queriesFile)) {
-            report.line("concept queries: none at " + queriesFile.toAbsolutePath() + " — not run");
+        if (SKIP_QUERIES.equals(queriesFile.toString())) {
+            report.line("concept queries: skipped by --queries none");
             return List.of();
+        }
+        if (!Files.isRegularFile(queriesFile)) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "no concept queries at " + queriesFile.toAbsolutePath() + " — this run would embed the book, "
+                            + "spend, and produce no acceptance evidence (PLAN D15 ✅). Run from `server/`, pass "
+                            + "--queries with the right path, or --queries none to embed without scoring");
         }
         RetrievalQueriesReader.QuerySet set = RetrievalQueriesReader.read(queriesFile);
         if (!set.book().equals(definition.code())) {

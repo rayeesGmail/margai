@@ -121,7 +121,26 @@ class NcertEmbedCommandTest {
         assertThat(run(100)).isEqualTo(1);
 
         assertThat(imports.stored).as("the two bought before the failure are kept").hasSize(2);
-        assertThat(report()).contains("the embedding provider is out of quota");
+        assertThat(report()).contains("the embedding provider refused the call")
+                .as("a 429 is a capacity problem and names the pacing knob")
+                .contains("margai.pipeline.embed-calls-per-minute");
+    }
+
+    /**
+     * An expired AWS session reads as a 403, and an earlier version reported it as a quota problem
+     * and pointed at the rate knob — which could not have helped. The remedy has to match the
+     * refusal (2026-09-20: three different refusals hit this command in one day).
+     */
+    @Test
+    void anAuthFailureNamesCredentialsRatherThanTheRateLimit() {
+        embeddings.failWith = com.margai.ai.api.AiUnavailableException.permanent("AccessDeniedException",
+                "AccessDeniedException: Bearer Token has expired (Status Code: 403)", null);
+
+        assertThat(run(100)).isEqualTo(1);
+
+        assertThat(report()).contains("reads like credentials, not capacity")
+                .contains("aws sso login")
+                .doesNotContain("embed-calls-per-minute (currently");
     }
 
     /**
@@ -364,9 +383,14 @@ class NcertEmbedCommandTest {
         final List<String> queries = new ArrayList<>();
         /** Which call refuses, 1-based; 0 never refuses. */
         int failOnCall;
+        /** The refusal to throw; a 429 by default, since that is what a capacity failure looks like. */
+        RuntimeException failWith;
 
         @Override
         public float[] ofDocument(String text, AiCallContext ctx) {
+            if (failWith != null) {
+                throw failWith;
+            }
             if (failOnCall > 0 && documents.size() + 1 == failOnCall) {
                 throw com.margai.ai.api.AiUnavailableException.retryable("HTTP_429",
                         "HTTP_429 from the embedding provider", null);

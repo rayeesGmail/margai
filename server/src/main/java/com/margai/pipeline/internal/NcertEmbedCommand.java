@@ -158,14 +158,14 @@ class NcertEmbedCommand extends NcertBookCommand {
             }
             if (e instanceof AiUnavailableException) {
                 // A provider refusal is an operating condition with a remedy, not a defect: say
-                // what it was, what survived, and which knob moves it — rather than the stack
-                // trace the first live run printed.
+                // what it was, what survived, and which remedy fits — rather than the stack trace
+                // the first live run printed. The remedy has to match the refusal: an earlier
+                // version named the rate limit for every failure, and an expired SSO token was
+                // reported as a quota problem, pointing at a knob that could not have helped.
                 throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
-                        "the embedding provider is out of quota or unavailable (" + e.getMessage() + ") after "
-                                + embedded + " paragraph(s) this run — those are stored, so re-running embeds only "
-                                + "what is left and pays for nothing twice. If it is the per-minute cap, lower "
-                                + "margai.pipeline.embed-calls-per-minute (currently "
-                                + properties.embedCallsPerMinute() + ")");
+                        "the embedding provider refused the call (" + e.getMessage() + ") after " + embedded
+                                + " paragraph(s) this run — those are stored, so re-running embeds only what is "
+                                + "left and pays for nothing twice. " + remedyFor(e));
             }
             throw e;
         } finally {
@@ -242,6 +242,25 @@ class NcertEmbedCommand extends NcertBookCommand {
         report.line("concept queries: " + set.queries().size() + " from " + queriesFile
                 + " (" + set.queries().stream().filter(RetrievalQuery::isHindi).count() + " in Hindi)");
         return set.queries();
+    }
+
+    /**
+     * The remedy that fits the refusal. Three have actually happened on this command in one day —
+     * a monthly quota, an expired SSO session and a per-minute cap — and each wants a different
+     * thing done next, so naming the wrong one costs the reader a wrong guess at the worst moment.
+     */
+    private String remedyFor(RuntimeException failure) {
+        String message = String.valueOf(failure.getMessage());
+        if (message.contains("expired") || message.contains("AccessDenied") || message.contains("403")) {
+            return "That reads like credentials, not capacity: refresh the AWS session "
+                    + "(`aws sso login --profile margai`) and run it again.";
+        }
+        if (message.contains("429") || message.contains("Throttl") || message.contains("quota")) {
+            return "That reads like a rate or quota limit: lower "
+                    + "margai.pipeline.embed-calls-per-minute (currently " + properties.embedCallsPerMinute()
+                    + "), or check the provider's remaining allowance if the cap is a monthly one.";
+        }
+        return "Check the provider's status and the run's credentials before re-running.";
     }
 
     /**

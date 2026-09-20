@@ -20,15 +20,27 @@ public final class TestAiProperties {
     private TestAiProperties() {
     }
 
+    /** The four retrieval parameters at their {@code application.yml} defaults (§4.3 stage 6). */
+    public static final AiProperties.Retrieval RETRIEVAL =
+            new AiProperties.Retrieval(8, 8, 60, 2500, new BigDecimal("0.30"));
+
     /** The three completion tiers and the embedding pin, with no price table. */
     public static AiProperties standard() {
         return withEmbed(EMBED, DIMENSIONS);
     }
 
     public static AiProperties withEmbed(String model, int dimensions) {
+        return withEmbed(model, dimensions, RETRIEVAL);
+    }
+
+    public static AiProperties withRetrieval(AiProperties.Retrieval retrieval) {
+        return withEmbed(EMBED, DIMENSIONS, retrieval);
+    }
+
+    public static AiProperties withEmbed(String model, int dimensions, AiProperties.Retrieval retrieval) {
         return new AiProperties(AiProperties.Provider.anthropic,
                 new AiProperties.Tiers(model(CHEAP), model(REASON), model(VISION)),
-                new AiProperties.Embed("cohere", model, dimensions, true),
+                new AiProperties.Embed("cohere", model, dimensions, true), retrieval,
                 "{}", BigDecimal.ONE, new AiProperties.Budget(1, 1), 100, 1024, Duration.ofSeconds(20),
                 new AiProperties.Anthropic(""), new AiProperties.Cohere("", "https://example.invalid"),
                 new AiProperties.Bedrock("ap-south-1"), Map.of());

@@ -62,6 +62,23 @@ margai:
       model: embed-v4.0
       dimensions: 1024
       send-output-dimension: true   # the v4 line accepts the width; the v3 line errors on it
+    # Hybrid retrieval (§4.3 stage 6, §4.9). Eight from each half is what the pipeline stage
+    # specifies; the rest is what D15's spike exists to settle on one verified book, before nine
+    # more are extracted and a change costs a corpus re-embedding.
+    retrieval:
+      k-vector: 8
+      k-text: 8
+      # Reciprocal-rank fusion's constant. The halves score on scales that cannot be compared —
+      # cosine similarity in 0..1 against an unbounded ts_rank — so they are fused by rank. 60 is
+      # the conventional flat setting, which treats the two halves as near-equals.
+      rrf-k: 60
+      token-cap: 2500
+      # Cosine similarity a vector match must clear to count as grounding. No number was ever
+      # specified for this; 0.30 is a deliberately permissive opening bid, because at D15 the cost
+      # of letting a weak passage through is a line in a report, and the cost of a floor set too
+      # high is a grounding failure on a question the corpus can actually answer. The spike's
+      # scored run is what moves it.
+      similarity-floor: 0.30
     # Keys are the auth model for AI now (§9.2): SSM SecureStrings in a deployed environment,
     # an untracked local file on a laptop, blank here, never a value in this repository.
     anthropic:

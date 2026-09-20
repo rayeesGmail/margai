@@ -98,25 +98,50 @@ class NcertParagraphRetrievalTest {
     }
 
     /**
-     * <strong>The text half ANDs the query's words.</strong> {@code websearch_to_tsquery} joins
-     * bare terms with {@code &}, so a paragraph must contain every content word of the question,
-     * not any of them. Pinned here because it is not visible in the SQL and it decides how much
-     * work the full-text half actually does: a student's whole-sentence question carries six or
-     * eight content words and few NCERT paragraphs hold all of them, so on natural questions this
-     * half may fire rarely or never — which would make "hybrid" retrieval vector retrieval with a
-     * second query attached. Whether that is what happens is one of the things D15's scored run
-     * measures; the remedy, if so, is a founder decision about the query's boolean shape, not a
-     * silent switch to OR here.
+     * <strong>The text half ORs the query's words</strong> (founder decision 2026-09-20). Left as
+     * {@code websearch_to_tsquery} gives it, a paragraph had to contain <em>every</em> content
+     * word of the question: over phy11-part1's 894 verified paragraphs that returned nothing at
+     * all for 13 of the 15 concept queries. A student's whole-sentence question carries six or
+     * eight content words and few NCERT paragraphs hold all of them, so the AND made "hybrid"
+     * retrieval vector retrieval with a second query attached.
      */
     @Test
-    void theTextHalfRequiresEveryWordOfTheQueryNotAnyOfThem() {
+    void theTextHalfMatchesAnyWordOfTheQueryNotOnlyEveryWord() {
         paragraph(physics, 7, "7.9", 1, "The escape speed of a body.", null, null);
 
         assertThat(retrieval.matchingText("escape speed", null, null, 8))
                 .as("both words present").hasSize(1);
-        assertThat(retrieval.matchingText("escape speed satellite orbit", null, null, 8))
-                .as("two of the four words are absent, so the paragraph does not match at all")
-                .isEmpty();
+        assertThat(retrieval.matchingText("how fast to escape the earth for good", null, null, 8))
+                .as("only 'escape' is shared, and that is enough to be a candidate to rank")
+                .hasSize(1);
+        assertThat(retrieval.matchingText("photosynthesis chlorophyll", null, null, 8))
+                .as("no word in common, so still no match").isEmpty();
+    }
+
+    /**
+     * A hyphen between tokens parses as NOT, so {@code v - u} becomes {@code 'v' & !'u'}. OR-ing
+     * that unchanged would match every paragraph lacking "u" — nearly the whole book. The
+     * negation is stripped before the rewrite, which makes a minus an ordinary separator.
+     */
+    @Test
+    void aMinusSignInAPhysicsQueryDoesNotBecomeANegation() {
+        paragraph(physics, 7, "7.9", 1, "The escape speed of a body.", null, null);
+        paragraph(physics, 2, "2.3", 1, "Acceleration is the change of velocity.", null, null);
+
+        assertThat(retrieval.matchingText("v - u acceleration", null, null, 8))
+                .as("'acceleration' matches its own paragraph; the minus excludes nothing")
+                .extracting(ParagraphMatch::section).containsExactly("2.3");
+    }
+
+    /** A quoted phrase survives the rewrite: the phrase operator carries no {@code &}. */
+    @Test
+    void aQuotedPhraseStaysAPhrase() {
+        paragraph(physics, 7, "7.9", 1, "The escape speed of a body.", null, null);
+        paragraph(physics, 2, "2.2", 1, "Speed is the magnitude of velocity.", null, null);
+
+        assertThat(retrieval.matchingText("\"escape speed\"", null, null, 8))
+                .as("only the paragraph where the two words are adjacent")
+                .extracting(ParagraphMatch::section).containsExactly("7.9");
     }
 
     @Test

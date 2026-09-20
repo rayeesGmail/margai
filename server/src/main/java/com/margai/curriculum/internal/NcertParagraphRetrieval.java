@@ -38,12 +38,27 @@ class NcertParagraphRetrieval implements ParagraphRetrievalRepository {
      * reaches {@code text_hi}'s tokens. Parsing one way only would leave the other edition
      * unreachable by the half of retrieval that exists to catch what embeddings miss.
      *
+     * <p><strong>The terms are then OR'd rather than AND'd</strong> (founder decision 2026-09-20,
+     * DECISIONS; TECH_PLAN §4.3 stage 6 amended). {@code websearch_to_tsquery} joins bare terms
+     * with {@code &}, so a paragraph had to contain <em>every</em> content word of the question:
+     * measured over phy11-part1's 894 verified paragraphs, that found the expected paragraph for
+     * 1 of the 15 concept queries, against 6 when OR'd, and made the full-text half return nothing
+     * at all for 13 of them. An all-or-nothing filter on a student's whole sentence is not a
+     * retrieval strategy; ranking is, and {@code ts_rank} does that job.
+     *
+     * <p>The negation operator is stripped before the rewrite, and that is not cosmetic: a hyphen
+     * between tokens parses as NOT, so the physics query {@code v - u} becomes {@code 'v' & !'u'},
+     * and OR-ing that unchanged would match every paragraph that lacks "u" — nearly the whole
+     * book. Stripping {@code !} makes a minus an ordinary separator, which over a physics corpus
+     * is what a student means by it. Quoted phrases survive: {@code <->} carries no {@code &}.
+     *
      * <p>Written out twice rather than computed once in a {@code LATERAL} alias: Hibernate's
      * native-query handling reads the alias as a schema qualifier and the statement never reaches
      * PostgreSQL. Repeating it costs one more parse of a short string.
      */
-    private static final String TSQUERY =
-            "(websearch_to_tsquery('english', :text) || websearch_to_tsquery('simple', :text))";
+    private static final String TSQUERY = """
+            replace(regexp_replace((websearch_to_tsquery('english', :text)
+                                 || websearch_to_tsquery('simple', :text))::text, '!', '', 'g'), '&', '|')::tsquery""";
 
     private static final String FILTERS = """
              AND (CAST(:subject AS varchar) IS NULL OR b.subject = CAST(:subject AS varchar))

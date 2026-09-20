@@ -109,6 +109,22 @@ class NcertEmbedCommandTest {
     }
 
     /**
+     * The first live run died on call 101 of 894 against a trial key's 100-per-minute cap and threw
+     * away the vectors bought since the last commit — paid for, then discarded, with the rows left
+     * null for the next run to buy again (2026-09-20). What is in hand is committed before the
+     * failure propagates.
+     */
+    @Test
+    void aFailureMidBatchKeepsTheVectorsAlreadyPaidFor() {
+        embeddings.failOnCall = 3;
+
+        assertThat(run(100)).isEqualTo(1);
+
+        assertThat(imports.stored).as("the two bought before the failure are kept").hasSize(2);
+        assertThat(report()).contains("the embedding provider is out of quota");
+    }
+
+    /**
      * A fixture vector stored on a real row is invisible: every retrieval over it is wrong, nothing
      * fails, and it reads as a bad embedding pin rather than as a run that never reached a provider.
      */
@@ -195,7 +211,7 @@ class NcertEmbedCommandTest {
 
     private CommandLine commandLine(int batchSize) {
         Reports writer = new Reports(ReportTest.CLOCK);
-        PipelineProperties properties = new PipelineProperties(72, 10, 1, "claude-sonnet-5", batchSize);
+        PipelineProperties properties = new PipelineProperties(72, 10, 1, "claude-sonnet-5", batchSize, 0);
         CommandLine.IFactory siblings = PipelineCommandTest.siblingFactory(
                 new PipelineCommandTest.RecordingImport(), writer);
         CommandLine.IFactory factory = new CommandLine.IFactory() {
@@ -242,9 +258,15 @@ class NcertEmbedCommandTest {
 
         final List<String> documents = new ArrayList<>();
         final List<String> queries = new ArrayList<>();
+        /** Which call refuses, 1-based; 0 never refuses. */
+        int failOnCall;
 
         @Override
         public float[] ofDocument(String text, AiCallContext ctx) {
+            if (failOnCall > 0 && documents.size() + 1 == failOnCall) {
+                throw com.margai.ai.api.AiUnavailableException.retryable("HTTP_429",
+                        "HTTP_429 from the embedding provider", null);
+            }
             documents.add(text);
             return vector(documents.size());
         }

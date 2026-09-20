@@ -33,6 +33,14 @@ margai:
     # (~900 calls at 0.12 USD/1M tokens) but not free, and a run interrupted late should keep what
     # it paid for — the next run embeds only rows whose embedding is still null.
     embed-batch-size: 100
+    # The embedding key is a TRIAL key, capped by the provider at 100 calls/minute — one call per
+    # paragraph reaches that in about forty seconds, and the first live run on phy11-part1 died on
+    # call 101 of 894 (2026-09-20). Retry cannot rescue a per-minute window: the chain backs off
+    # 0.6 s then 1.1 s, which is right for a transient 5xx and useless here, and the provider sends
+    # no Retry-After. So the run paces itself instead of being throttled. 90 leaves 10% headroom;
+    # a book of ~900 paragraphs then takes about ten minutes.
+    # On a production key raise this, or set it to 0 for no pacing at all.
+    embed-calls-per-minute: 90
   ai:
     # A page transcription is not an answer. The 1,024 default sizes a reasoning answer inside the
     # 20 s budget (§4.11); a full NCERT body page is 400–900 words plus JSON field names, escapes

@@ -3,6 +3,7 @@ package com.margai.pipeline.internal;
 import com.margai.ai.api.AiCallContext;
 import com.margai.ai.api.AiClientInfo;
 import com.margai.ai.api.AiSpend;
+import com.margai.ai.api.AiUnavailableException;
 import com.margai.ai.retrieval.HybridRetriever;
 import com.margai.ai.tasks.EmbeddingService;
 import com.margai.curriculum.api.BookLanguage;
@@ -90,12 +91,21 @@ class NcertEmbedCommand extends NcertBookCommand {
                 + (wholeBook ? "" : " in chapters " + chapterNumbers)
                 + (redo ? " (--redo: every selected paragraph, embedded or not)" : ""));
 
+        CallPacer pacer = CallPacer.perMinute(properties.embedCallsPerMinute(), Thread::sleep);
+        if (pacer.isThrottled() && !waiting.isEmpty()) {
+            report.line("pacing: " + properties.embedCallsPerMinute() + " calls/minute"
+                    + " (margai.pipeline.embed-calls-per-minute) — about "
+                    + pacer.estimateFor(waiting.size()).toMinutes() + " min for "
+                    + waiting.size() + " paragraphs");
+        }
+
         int embedded = 0;
         Map<Short, Integer> perChapter = new TreeMap<>();
         List<ParagraphEmbedding> batch = new ArrayList<>();
         List<RetrievalRun.Result> results = List.of();
         try {
             for (ParagraphToEmbed paragraph : waiting) {
+                pacer.awaitTurn();
                 batch.add(new ParagraphEmbedding(paragraph.paragraphId(),
                         embeddings.ofDocument(paragraph.text(), ctx)));
                 perChapter.merge(paragraph.chapterNo(), 1, Integer::sum);
@@ -105,7 +115,29 @@ class NcertEmbedCommand extends NcertBookCommand {
                 }
             }
             embedded += imports.storeEmbeddings(definition.code(), batch);
+            batch.clear();
             results = RetrievalRun.run(queries, definition, retriever, ctx);
+        } catch (RuntimeException e) {
+            // Keep what was already paid for. The first live run died on call 101 of 894 and
+            // discarded the vectors bought since the last commit — up to a batch of them, thrown
+            // away for nothing, since the rows they belong to are still null and the next run will
+            // buy them again (2026-09-20).
+            if (!batch.isEmpty()) {
+                embedded += imports.storeEmbeddings(definition.code(), batch);
+                batch.clear();
+            }
+            if (e instanceof AiUnavailableException) {
+                // A provider refusal is an operating condition with a remedy, not a defect: say
+                // what it was, what survived, and which knob moves it — rather than the stack
+                // trace the first live run printed.
+                throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                        "the embedding provider is out of quota or unavailable (" + e.getMessage() + ") after "
+                                + embedded + " paragraph(s) this run — those are stored, so re-running embeds only "
+                                + "what is left and pays for nothing twice. If it is the per-minute cap, lower "
+                                + "margai.pipeline.embed-calls-per-minute (currently "
+                                + properties.embedCallsPerMinute() + ")");
+            }
+            throw e;
         } finally {
             // After all the paid work and before the scoring, which can still refuse (§10.5): a
             // run that dies has still spent, and the report is where the founder reads what it

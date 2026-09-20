@@ -26,10 +26,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *                         before committing. Embedding is cheap but not free, and a run
  *                         interrupted at paragraph 800 should keep the 800 it paid for rather
  *                         than re-buy them.
+ * @param embedCallsPerMinute
+ *                         the rate {@code ncert embed} holds itself to. The embedding key is a
+ *                         trial key capped at 100 calls per minute, which one call per paragraph
+ *                         reaches in about forty seconds — the first live run died on call 101 of
+ *                         894 (2026-09-20). A quota is a fixed property of the key, so it is
+ *                         paced rather than tripped and retried; 0 or less means no pacing, which
+ *                         is what a production key wants.
  */
 @ConfigurationProperties(prefix = "margai.pipeline")
 public record PipelineProperties(int renderDpi, int extractBatchSize, int pageTiles, String verifyModel,
-        int embedBatchSize) {
+        int embedBatchSize, int embedCallsPerMinute) {
 
     public PipelineProperties {
         renderDpi = renderDpi <= 0 ? 150 : renderDpi;

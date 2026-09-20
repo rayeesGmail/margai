@@ -1,0 +1,222 @@
+package com.margai.pipeline.internal;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.margai.ai.api.AiCallContext;
+import com.margai.ai.api.AiClientInfo;
+import com.margai.ai.tasks.EmbeddingService;
+import com.margai.curriculum.api.BookLanguage;
+import com.margai.curriculum.api.CurriculumImport;
+import com.margai.curriculum.api.NcertParagraphRow;
+import com.margai.curriculum.api.ParagraphEmbedding;
+import com.margai.curriculum.api.ParagraphToEmbed;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import picocli.CommandLine;
+
+/**
+ * {@code ncert embed} with a recording embedder in place of the provider: every waiting paragraph
+ * is embedded once as a <em>document</em>, the vectors are committed in batches so an interrupted
+ * run keeps what it paid for, a book with nothing waiting calls for nothing, and the two refusals
+ * hold — the fake client, and a {@code --lang hi} pass §6.4 does not have.
+ */
+class NcertEmbedCommandTest {
+
+    @TempDir
+    Path inputs;
+
+    @TempDir
+    Path reports;
+
+    private final StringWriter out = new StringWriter();
+    private final StubEmbeddings embeddings = new StubEmbeddings();
+    private final EmbeddingImport imports = new EmbeddingImport();
+    private final NcertExtractCommandTest.StubSpend spend = new NcertExtractCommandTest.StubSpend();
+    private AiClientInfo client = new AiClientInfo("cohere", List.of("ledger"));
+
+    @BeforeEach
+    void setUp() throws IOException {
+        Files.writeString(inputs.resolve(NcertRegisterCommand.FILE), """
+                books:
+                  - code: phy11-part1
+                    subject: physics
+                    class_level: 11
+                    part: 1
+                    title_en: "Physics Part-I, Textbook for Class XI"
+                    edition_year: 2023
+                    source:
+                      en: source/ncert/2022-ed/en/phy11-part1/
+                      hi: source/ncert/2022-ed/hi/phy11-part1/
+                    chapters:
+                      - {no: 6, en: keph106.pdf, hi: hhph106.pdf}
+                      - {no: 7, en: keph107.pdf, hi: hhph107.pdf}
+                """);
+        imports.waiting = List.of(
+                new ParagraphToEmbed(UUID.randomUUID(), (short) 6, "6.9", (short) 1, "Kinetic energy is one half."),
+                new ParagraphToEmbed(UUID.randomUUID(), (short) 7, "7.9", (short) 1, "Gravitational potential."),
+                new ParagraphToEmbed(UUID.randomUUID(), (short) 7, "7.9", (short) 2, "W = -G M m / r."));
+    }
+
+    @Test
+    void embedsEveryWaitingParagraphOnceAsADocument() {
+        assertThat(run()).isZero();
+
+        assertThat(embeddings.documents)
+                .containsExactly("Kinetic energy is one half.", "Gravitational potential.", "W = -G M m / r.");
+        assertThat(embeddings.queries).as("nothing here is a query").isEmpty();
+        assertThat(imports.stored).hasSize(3);
+        assertThat(report()).contains("| 6 | 1 |").contains("| 7 | 2 |");
+    }
+
+    /** §10.5: the cost comes from the ledger, and it is in the report even on the way out. */
+    @Test
+    void reportsTheRunsCostFromTheLedger() {
+        run();
+
+        assertThat(spend.asked).singleElement().asString().startsWith("pipeline-ncert-embed-");
+        assertThat(report()).contains("| 3 | 9000 | ₹4.41 |");
+    }
+
+    /** A run interrupted late keeps what it paid for: vectors are committed as it goes. */
+    @Test
+    void commitsInBatchesRatherThanOnceAtTheEnd() {
+        assertThat(run(2)).isZero();
+
+        assertThat(imports.batchSizes).as("two, then the remainder").containsExactly(2, 1);
+    }
+
+    @Test
+    void aBookWithNothingWaitingCallsForNothing() {
+        imports.waiting = List.of();
+
+        assertThat(run()).isZero();
+
+        assertThat(embeddings.documents).isEmpty();
+        assertThat(report()).contains("none — every English paragraph of the book is embedded");
+    }
+
+    /**
+     * A fixture vector stored on a real row is invisible: every retrieval over it is wrong, nothing
+     * fails, and it reads as a bad embedding pin rather than as a run that never reached a provider.
+     */
+    @Test
+    void refusesToEmbedOnTheFakeClient() {
+        client = new AiClientInfo(AiClientInfo.FAKE, List.of("ledger"));
+
+        assertThat(run()).isEqualTo(1);
+
+        assertThat(embeddings.documents).isEmpty();
+        assertThat(imports.stored).isEmpty();
+        assertThat(report()).contains("the AI client is the fake");
+    }
+
+    /** §6.4 pins the canonical text; a `--lang hi` run would silently do nothing. */
+    @Test
+    void refusesAHindiPassBecauseTheVectorIsOverTheEnglishText() {
+        int status = commandLine().execute("ncert", "embed", "--book", "phy11-part1", "--lang", "hi",
+                "--inputs", inputs.toString(), "--reports", reports.toString());
+
+        assertThat(status).isEqualTo(1);
+        assertThat(embeddings.documents).isEmpty();
+        assertThat(report()).contains("no --lang hi pass");
+    }
+
+    private int run() {
+        return run(100);
+    }
+
+    private int run(int batchSize) {
+        return commandLine(batchSize).execute("ncert", "embed", "--book", "phy11-part1",
+                "--inputs", inputs.toString(), "--reports", reports.toString());
+    }
+
+    private CommandLine commandLine() {
+        return commandLine(100);
+    }
+
+    private CommandLine commandLine(int batchSize) {
+        Reports writer = new Reports(ReportTest.CLOCK);
+        PipelineProperties properties = new PipelineProperties(72, 10, 1, "claude-sonnet-5", batchSize);
+        CommandLine.IFactory siblings = PipelineCommandTest.siblingFactory(
+                new PipelineCommandTest.RecordingImport(), writer);
+        CommandLine.IFactory factory = new CommandLine.IFactory() {
+            @Override
+            public <K> K create(Class<K> cls) throws Exception {
+                if (cls == NcertEmbedCommand.class) {
+                    return cls.cast(new NcertEmbedCommand(imports, embeddings, spend, client, properties, writer));
+                }
+                return siblings.create(cls);
+            }
+        };
+        PrintWriter printer = new PrintWriter(out, true);
+        return PipelineRunner.commandLine(factory).setOut(printer).setErr(printer);
+    }
+
+    private String report() {
+        return out.toString();
+    }
+
+    /** Records what was embedded and on which side of the space, and answers a 1,024-wide vector. */
+    static final class StubEmbeddings implements EmbeddingService {
+
+        final List<String> documents = new ArrayList<>();
+        final List<String> queries = new ArrayList<>();
+
+        @Override
+        public float[] ofDocument(String text, AiCallContext ctx) {
+            documents.add(text);
+            return vector(documents.size());
+        }
+
+        @Override
+        public float[] ofQuery(String text, AiCallContext ctx) {
+            queries.add(text);
+            return vector(queries.size());
+        }
+
+        private static float[] vector(int seed) {
+            float[] values = new float[1024];
+            values[0] = seed;
+            return values;
+        }
+    }
+
+    /** The curriculum door as `ncert embed` uses it: what is waiting, and what was stored when. */
+    static final class EmbeddingImport extends PipelineCommandTest.RecordingImport {
+
+        List<ParagraphToEmbed> waiting = List.of();
+        final List<ParagraphEmbedding> stored = new ArrayList<>();
+        final List<Integer> batchSizes = new ArrayList<>();
+
+        @Override
+        public List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, boolean redo) {
+            // Second call of the run: the report's "still without a vector" line, after storing.
+            return waiting.stream().filter(paragraph -> stored.stream()
+                    .noneMatch(embedding -> embedding.paragraphId().equals(paragraph.paragraphId()))).toList();
+        }
+
+        @Override
+        public int storeEmbeddings(String bookCode, List<ParagraphEmbedding> embeddings) {
+            if (!embeddings.isEmpty()) {
+                batchSizes.add(embeddings.size());
+            }
+            stored.addAll(embeddings);
+            return embeddings.size();
+        }
+
+        @Override
+        public List<NcertParagraphRow> paragraphs(String bookCode, BookLanguage language, Collection<Short> chapters) {
+            return List.of();
+        }
+    }
+}

@@ -22,13 +22,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *                         Sonnet 5 verifies). {@code ncert verify --read-pages} refuses when the
  *                         verify tier is any other model, and counts no verdict another model gave —
  *                         a forgotten profile must fail, not verify with whatever VISION is.
+ * @param embedBatchSize   how many paragraph vectors one {@code ncert embed} transaction writes
+ *                         before committing. Embedding is cheap but not free, and a run
+ *                         interrupted at paragraph 800 should keep the 800 it paid for rather
+ *                         than re-buy them.
  */
 @ConfigurationProperties(prefix = "margai.pipeline")
-public record PipelineProperties(int renderDpi, int extractBatchSize, int pageTiles, String verifyModel) {
+public record PipelineProperties(int renderDpi, int extractBatchSize, int pageTiles, String verifyModel,
+        int embedBatchSize) {
 
     public PipelineProperties {
         renderDpi = renderDpi <= 0 ? 150 : renderDpi;
         extractBatchSize = extractBatchSize <= 0 ? 10 : extractBatchSize;
         pageTiles = pageTiles <= 0 ? 1 : pageTiles;
+        embedBatchSize = embedBatchSize <= 0 ? 100 : embedBatchSize;
     }
 }

@@ -29,6 +29,10 @@ margai:
     # refuses to run unless the VISION tier is this model — the `visionsonnet` profile sets it — and a
     # verdict any other model gave is neither reused nor counted.
     verify-model: claude-sonnet-5
+    # `ncert embed` commits its vectors every this many paragraphs. Embedding a book is cheap
+    # (~900 calls at 0.12 USD/1M tokens) but not free, and a run interrupted late should keep what
+    # it paid for — the next run embeds only rows whose embedding is still null.
+    embed-batch-size: 100
   ai:
     # A page transcription is not an answer. The 1,024 default sizes a reasoning answer inside the
     # 20 s budget (§4.11); a full NCERT body page is 400–900 words plus JSON field names, escapes

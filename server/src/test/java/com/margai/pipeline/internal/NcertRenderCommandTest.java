@@ -67,7 +67,7 @@ class NcertRenderCommandTest {
         store.puts.clear();
 
         Reports writer = new Reports(ReportTest.CLOCK);
-        PipelineProperties properties = new PipelineProperties(72, 10, 1, "claude-sonnet-5", 100, 0);
+        PipelineProperties properties = new PipelineProperties(72, 10, 1, "claude-sonnet-5", 100, 0, 40);
         CommandLine.IFactory siblings = PipelineCommandTest.siblingFactory(imports, writer);
         CommandLine.IFactory factory = new CommandLine.IFactory() {
             @Override

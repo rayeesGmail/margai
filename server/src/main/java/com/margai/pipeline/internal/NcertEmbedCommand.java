@@ -50,6 +50,24 @@ class NcertEmbedCommand extends NcertBookCommand {
     /** {@code --queries none}: embed without scoring, said out loud rather than by a missing file. */
     static final String SKIP_QUERIES = "none";
 
+    /**
+     * What text gets embedded (D15 experiment). {@code none} is §6.4 as written — the paragraph's
+     * own {@code text_en} and nothing else — and is the default, so the spec'd behaviour is what
+     * runs unless the experiment is asked for by name.
+     *
+     * <p>{@code section} embeds the experimental input instead: the section's printed title
+     * prefixed to the paragraph, and paragraphs too short to answer anything on their own left
+     * unembedded. Both are changes to the embedded string only — stored text, addresses and what a
+     * student is shown are untouched — and both force a corpus re-embed, which is why they are
+     * measured on one book before nine more are extracted.
+     */
+    enum Context { none, section }
+
+    @Option(names = "--context", paramLabel = "WHAT", defaultValue = "none",
+            description = "What to embed: ${COMPLETION-CANDIDATES} (default: ${DEFAULT-VALUE}). "
+                    + "'section' is the D15 experiment — the section title prefixed, fragments skipped.")
+    Context context;
+
     @Option(names = "--queries", paramLabel = "FILE", defaultValue = "../eval/retrieval-queries.json",
             description = "The concept queries to run afterwards, or 'none' (default: ${DEFAULT-VALUE}).")
     Path queriesFile;
@@ -82,11 +100,23 @@ class NcertEmbedCommand extends NcertBookCommand {
         report.line("chunk: one paragraph, its English text as loaded (§6.4)");
         AiCallContext ctx = AiCallContext.system(runId);
 
+        NcertSectionTitles titles = context == Context.section
+                ? NcertSectionTitles.read(io.input(NcertSectionTitles.FILE), definition.code())
+                : NcertSectionTitles.none();
+        report.line("embedding input: " + (context == Context.section
+                ? "the section title prefixed to the paragraph, fragments under "
+                        + properties.embedMinCharacters() + " characters skipped (D15 experiment; "
+                        + titles.size() + " titles read)"
+                : "the paragraph's own text_en, and nothing else (§6.4)"));
+
         List<RetrievalQuery> queries = queriesFor(definition, report);
         List<Short> chapterNumbers = selected.stream().map(BookDefinition.Chapter::no).toList();
         boolean wholeBook = chapterNumbers.size() == definition.chapters().size();
         List<ParagraphToEmbed> waiting = imports.paragraphsToEmbed(definition.code(),
                 wholeBook ? List.of() : chapterNumbers, redo);
+        List<ParagraphToEmbed> fragments = context == Context.section
+                ? waiting.stream().filter(this::isFragment).toList() : List.of();
+        waiting = waiting.stream().filter(paragraph -> !fragments.contains(paragraph)).toList();
         report.read(waiting.size() + " paragraph(s) waiting for a vector"
                 + (wholeBook ? "" : " in chapters " + chapterNumbers)
                 + (redo ? " (--redo: every selected paragraph, embedded or not)" : ""));
@@ -106,8 +136,8 @@ class NcertEmbedCommand extends NcertBookCommand {
         try {
             for (ParagraphToEmbed paragraph : waiting) {
                 pacer.awaitTurn();
-                batch.add(new ParagraphEmbedding(paragraph.paragraphId(),
-                        embeddings.ofDocument(paragraph.text(), ctx)));
+                batch.add(new ParagraphEmbedding(paragraph.paragraphId(), embeddings.ofDocument(
+                        titles.embeddingInput(paragraph.section(), paragraph.text()), ctx)));
                 perChapter.merge(paragraph.chapterNo(), 1, Integer::sum);
                 if (batch.size() >= properties.embedBatchSize()) {
                     embedded += imports.storeEmbeddings(definition.code(), batch);
@@ -155,8 +185,15 @@ class NcertEmbedCommand extends NcertBookCommand {
         }
         report.section("paragraphs embedded per chapter").table(List.of("chapter", "embedded"), rows);
 
+        if (!fragments.isEmpty()) {
+            report.section("fragments left unembedded (too short to answer anything alone)")
+                    .line("a vector for \"Answer\" or \"No work is done if :\" can never be usefully "
+                            + "retrieved and competes for a place in the top k")
+                    .list(fragments.stream().map(f -> f.address() + " — \"" + f.text() + "\"").toList());
+        }
         List<ParagraphToEmbed> stillWaiting = imports.paragraphsToEmbed(definition.code(),
-                wholeBook ? List.of() : chapterNumbers, false);
+                wholeBook ? List.of() : chapterNumbers, false).stream()
+                .filter(paragraph -> context != Context.section || !isFragment(paragraph)).toList();
         report.section("ncert_paragraphs.embedding")
                 .table(List.of("embedded this run", "still without a vector"),
                         List.of(List.of(String.valueOf(embedded), String.valueOf(stillWaiting.size()))));
@@ -198,6 +235,17 @@ class NcertEmbedCommand extends NcertBookCommand {
         report.line("concept queries: " + set.queries().size() + " from " + queriesFile
                 + " (" + set.queries().stream().filter(RetrievalQuery::isHindi).count() + " in Hindi)");
         return set.queries();
+    }
+
+    /**
+     * Too short to be an answer on its own. Measured on phy11-part1: every one of the 14
+     * paragraphs under 40 characters is "Answer", "No work is done if :", "(ii) Normal reaction,
+     * N" or the like, while the band just above carries real content — "All the non-zero digits
+     * are significant" is 42 characters and is exactly what a significant-figures question wants.
+     * So the threshold is deliberately low, and configurable.
+     */
+    private boolean isFragment(ParagraphToEmbed paragraph) {
+        return paragraph.text().strip().length() < properties.embedMinCharacters();
     }
 
     /**

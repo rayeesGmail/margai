@@ -41,6 +41,11 @@ margai:
     # a book of ~900 paragraphs then takes about ten minutes.
     # On a production key raise this, or set it to 0 for no pacing at all.
     embed-calls-per-minute: 90
+    # `ncert embed --context section` only: below this a paragraph is a fragment and is not
+    # embedded. Measured on phy11-part1 — every paragraph under 40 characters is "Answer", a list
+    # stub or a stranded equation, and 42 characters is already "All the non-zero digits are
+    # significant", which a significant-figures question should be able to find.
+    embed-min-characters: 40
   ai:
     # A page transcription is not an answer. The 1,024 default sizes a reasoning answer inside the
     # 20 s budget (§4.11); a full NCERT body page is 400–900 words plus JSON field names, escapes

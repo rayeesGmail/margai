@@ -521,6 +521,33 @@ Cost for phy11-part1's 894 paragraphs: **well under ₹5** at the pinned model's
 `--redo` re-embeds paragraphs that already have vectors. `--queries none` embeds without scoring —
 needed for any book the committed query set is not written against.
 
+### The D15 chunk experiment: `--context section`
+
+`--context none` is the default and is §6.4 as written — the paragraph's own `text_en` and nothing
+else. `--context section` embeds an experimental input instead:
+
+- the section's printed title prefixed, from `pipeline/inputs/ncert-section-titles.yaml`
+  (`5.3 Work · (iii) the force and displacement are mutually perpendicular…`), because `section`
+  in the database is the bare number `5.3` and a number means nothing to an embedding model;
+- paragraphs under `embed-min-characters` left unembedded — `Answer`, `No work is done if :`,
+  `(ii) Normal reaction, N` can never be usefully retrieved and compete for a place in the top k.
+
+Stored text, addresses and what a student is shown are untouched; only the embedded string changes.
+Both force a corpus re-embed, which is why they are measured on one book before nine more exist.
+
+To run the A/B against the committed baseline (8/15 · 10/15 · MRR 0.618):
+
+```
+DB_URL=… AI_LIVE=1 java -jar target/server-0.1.0-SNAPSHOT.jar \
+  --spring.profiles.active=pipeline,live \
+  ncert embed --book phy11-part1 --redo --context section
+```
+
+`--redo` is required: the existing vectors are the control, and without it nothing is re-embedded.
+About ₹9 and ten minutes. **The bar, set in advance:** adopt if q07 moves from rank 11 into the top
+three *and* nothing currently in the top three drops out. A one-hit swing on 15 queries is noise.
+Reverting is the same command without `--context section`, for another ₹9.
+
 ## If something goes wrong
 
 | Symptom | Cause | Fix |

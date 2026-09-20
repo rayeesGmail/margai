@@ -97,7 +97,7 @@ class NcertVerifyCommandTest {
                 if (cls == NcertVerifyCommand.class) {
                     return cls.cast(new NcertVerifyCommand(store, imports, verifier, ids -> filter(ids),
                             new NcertExtractCommandTest.StubSpend(), client,
-                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", 100, 0), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", 100, 0, 40), writer));
                 }
                 return siblings.create(cls);
             }

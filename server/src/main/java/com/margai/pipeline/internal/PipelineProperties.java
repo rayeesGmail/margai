@@ -36,12 +36,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "margai.pipeline")
 public record PipelineProperties(int renderDpi, int extractBatchSize, int pageTiles, String verifyModel,
-        int embedBatchSize, int embedCallsPerMinute) {
+        int embedBatchSize, int embedCallsPerMinute, int embedMinCharacters) {
 
     public PipelineProperties {
         renderDpi = renderDpi <= 0 ? 150 : renderDpi;
         extractBatchSize = extractBatchSize <= 0 ? 10 : extractBatchSize;
         pageTiles = pageTiles <= 0 ? 1 : pageTiles;
         embedBatchSize = embedBatchSize <= 0 ? 100 : embedBatchSize;
+        embedMinCharacters = embedMinCharacters <= 0 ? 40 : embedMinCharacters;
     }
 }

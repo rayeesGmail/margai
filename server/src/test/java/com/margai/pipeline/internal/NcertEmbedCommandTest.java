@@ -176,6 +176,108 @@ class NcertEmbedCommandTest {
         assertThat(report()).contains("no concept queries at").contains("--queries none");
     }
 
+    // ── the D15 experiment: --context section ───────────────────────────────────────────────────
+
+    /** Default is §6.4 as written, so the spec'd behaviour runs unless the experiment is named. */
+    @Test
+    void byDefaultTheParagraphIsEmbeddedBareAsTheSpecSays() {
+        assertThat(run()).isZero();
+
+        assertThat(embeddings.documents).containsExactly(
+                "Kinetic energy is one half.", "Gravitational potential.", "W = -G M m / r.");
+        assertThat(report()).contains("the paragraph's own text_en, and nothing else");
+    }
+
+    @Test
+    void contextSectionPrefixesTheSectionTitleToWhatIsEmbedded() throws IOException {
+        sectionTitles("""
+                books:
+                  phy11-part1:
+                    "6.9": "Moment of inertia"
+                    "7": "Gravitation"
+                """);
+
+        imports.waiting = List.of(
+                new ParagraphToEmbed(UUID.randomUUID(), (short) 6, "6.9", (short) 1,
+                        "The kinetic energy of a rotating body is one half I omega squared."),
+                new ParagraphToEmbed(UUID.randomUUID(), (short) 7, "7.9", (short) 1,
+                        "The gravitational potential energy of a body at a height above the ground."));
+
+        assertThat(run(100, "--context", "section")).isZero();
+
+        assertThat(embeddings.documents).containsExactly(
+                "6.9 Moment of inertia · The kinetic energy of a rotating body is one half I omega squared.",
+                "7.9 Gravitation · The gravitational potential energy of a body at a height above the ground.");
+        assertThat(report()).contains("the section title prefixed");
+    }
+
+    /** A sub-section is about its section's subject, so it inherits the title it has no line for. */
+    @Test
+    void aSectionWithNoTitleOfItsOwnFallsBackToItsParent() {
+        NcertSectionTitles titles = NcertSectionTitles.read(
+                Path.of("..", "pipeline", "inputs", NcertSectionTitles.FILE), "phy11-part1");
+
+        assertThat(titles.titleFor("5.11.2")).isEqualTo("Collisions in One Dimension");
+        assertThat(titles.titleFor("5.11.9")).as("no line of its own: its parent's")
+                .isEqualTo("Collisions");
+        assertThat(titles.titleFor("9.9")).as("nothing anywhere: embedded bare").isNull();
+    }
+
+    /** The committed harvest is the experiment's foundation; a bad one voids the result. */
+    @Test
+    void theCommittedSectionTitlesCoverTheQueriesTheExperimentTurnsOn() {
+        NcertSectionTitles titles = NcertSectionTitles.read(
+                Path.of("..", "pipeline", "inputs", NcertSectionTitles.FILE), "phy11-part1");
+
+        assertThat(titles.size()).isGreaterThanOrEqualTo(70);
+        assertThat(titles.titleFor("5.3")).isEqualTo("Work");
+        assertThat(titles.titleFor("6.9")).isEqualTo("Moment of inertia");
+        assertThat(titles.titleFor("4.10")).isEqualTo("Circular motion");
+        assertThat(titles.titleFor("1.3.1"))
+                .isEqualTo("Rules for Arithmetic Operations with Significant Figures");
+        assertThat(titles.embeddingInput("5.3", "(iii) the force and displacement"))
+                .isEqualTo("5.3 Work · (iii) the force and displacement");
+    }
+
+    @Test
+    void contextSectionLeavesFragmentsUnembeddedAndNamesThem() throws IOException {
+        sectionTitles("""
+                books:
+                  phy11-part1:
+                    "6.9": "Moment of inertia"
+                    "7": "Gravitation"
+                """);
+        imports.waiting = List.of(
+                new ParagraphToEmbed(UUID.randomUUID(), (short) 7, "7.9", (short) 1, "Answer"),
+                new ParagraphToEmbed(UUID.randomUUID(), (short) 7, "7.9", (short) 2,
+                        "A paragraph long enough to answer a question on its own."));
+
+        assertThat(run(100, "--context", "section")).isZero();
+
+        assertThat(embeddings.documents).as("only the paragraph that could ever be retrieved")
+                .containsExactly("7.9 Gravitation · A paragraph long enough to answer a question on its own.");
+        assertThat(report()).contains("fragments left unembedded").contains("\"Answer\"");
+    }
+
+    /** A book the file does not carry must fail rather than quietly embed bare. */
+    @Test
+    void contextSectionRefusesABookTheTitlesFileDoesNotCarry() throws IOException {
+        sectionTitles("""
+                books:
+                  bio11:
+                    "1.1": "The Living World"
+                """);
+
+        assertThat(run(100, "--context", "section")).isEqualTo(1);
+
+        assertThat(embeddings.documents).isEmpty();
+        assertThat(report()).contains("carries no section titles for book 'phy11-part1'");
+    }
+
+    private void sectionTitles(String yaml) throws IOException {
+        Files.writeString(inputs.resolve(NcertSectionTitles.FILE), yaml);
+    }
+
     /** §6.4 pins the canonical text; a `--lang hi` run would silently do nothing. */
     @Test
     void refusesAHindiPassBecauseTheVectorIsOverTheEnglishText() {
@@ -211,7 +313,7 @@ class NcertEmbedCommandTest {
 
     private CommandLine commandLine(int batchSize) {
         Reports writer = new Reports(ReportTest.CLOCK);
-        PipelineProperties properties = new PipelineProperties(72, 10, 1, "claude-sonnet-5", batchSize, 0);
+        PipelineProperties properties = new PipelineProperties(72, 10, 1, "claude-sonnet-5", batchSize, 0, 40);
         CommandLine.IFactory siblings = PipelineCommandTest.siblingFactory(
                 new PipelineCommandTest.RecordingImport(), writer);
         CommandLine.IFactory factory = new CommandLine.IFactory() {

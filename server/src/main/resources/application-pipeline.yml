@@ -33,14 +33,15 @@ margai:
     # (~900 calls at 0.12 USD/1M tokens) but not free, and a run interrupted late should keep what
     # it paid for — the next run embeds only rows whose embedding is still null.
     embed-batch-size: 100
-    # The embedding key is a TRIAL key, capped by the provider at 100 calls/minute — one call per
-    # paragraph reaches that in about forty seconds, and the first live run on phy11-part1 died on
-    # call 101 of 894 (2026-09-20). Retry cannot rescue a per-minute window: the chain backs off
-    # 0.6 s then 1.1 s, which is right for a transient 5xx and useless here, and the provider sends
-    # no Retry-After. So the run paces itself instead of being throttled. 90 leaves 10% headroom;
-    # a book of ~900 paragraphs then takes about ten minutes.
-    # On a production key raise this, or set it to 0 for no pacing at all.
-    embed-calls-per-minute: 90
+    # 0 = no pacing (2026-09-20). This existed for the Cohere TRIAL key, which capped calls at 100
+    # a minute AND 1,000 a month — the first live run died on call 101 of 894, and the month's
+    # allowance ran out the same day. Embeddings now go through Bedrock, which has neither cap, so
+    # holding a book to ten minutes is friction with nothing behind it.
+    # Retry still covers a transient throttle the way it covers any 5xx; what it cannot rescue is a
+    # window measured in minutes, which is why pacing exists at all. If Bedrock's own per-account
+    # rate limit ever bites, set a number here rather than lowering the retry's guard — the run
+    # reports what refused it and now names the remedy that fits.
+    embed-calls-per-minute: 0
     # `ncert embed --context section` only: below this a paragraph is a fragment and is not
     # embedded. Measured on phy11-part1 — every paragraph under 40 characters is "Answer", a list
     # stub or a stranded equation, and 42 characters is already "All the non-zero digits are

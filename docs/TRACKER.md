@@ -337,12 +337,35 @@ THE BEDROCK SWITCH IS VALIDATED, founder 16:14 — **894 of 894 re-embedded thro
   ~₹8. Right for a breaker, wrong for planning — **every embedding rupee figure in this day log is
   the ledger's, not the bill's.** Recorded rather than changed (DECISIONS).
 
+THE CHUNK A/B IS RUN AND **REJECTED** on its pre-set gate, founder 16:35, ₹8.95 ledger
+  (≈₹0.80 true). Unpaced, so 880 paragraphs took five minutes rather than ten.
+  - The gate was q07 into the top three with nothing already there dropping out. **Both halves
+    failed**: q07 moved 11 → 9 and never reached the top three, while **q06 fell 3 → 8, q11 fell
+    1 → 3, q01 fell 5 → 10**. The set: hit@3 10/15 → 9/15, MRR 0.618 → 0.591; english 6/10 → 5/10
+    hit@1 and MRR 0.677 → 0.587.
+  - **The mechanism is visible in the passages, not inferred.** In every degraded query the top
+    three fills with *other paragraphs of the same section*: q06's becomes §4.10 ¶17 and ¶15 where
+    the expected ¶18 had been, q01's stays wholly inside §1.3, q11's inside §7.8. A section title
+    repeated across every paragraph of a section is a term they now all share, so it lifts them
+    together and flattens the within-section distinction — which is the distinction that matters,
+    because these queries were already landing in the right section.
+  - **Hindi moved the other way, for the same reason**: 2/5 → 3/5 hit@1, MRR 0.500 → 0.600. A Hindi
+    query's difficulty is reaching the right section across the language gap, and an English
+    section title is exactly that anchor. It gains where English loses, from one cause. Five
+    queries is not enough to act on, and it is the first thing to re-test if Hindi retrieval ever
+    becomes the binding problem.
+  - **So the chunk stays `text_en`, §6.4 is unamended, and retrieval is not touched again until
+    D17** — the rule set with the gate. The `--context section` flag and its code stay in the tree,
+    switched off: they cost nothing there and the fragment half was never measured alone (the run
+    bundled the prefix with dropping 14 fragments, deliberately, to spend one run instead of two —
+    so the prefix is convicted and the fragments are merely un-acquitted).
+  - **The corpus is now in the treatment state and must be reverted** before it is used: one
+    `ncert embed --book phy11-part1 --redo`, about a minute, which also restores the 14 fragments'
+    vectors.
+
 HOW TO RESUME — the spike is done; what it leaves open, in order:
-  1. **The chunk A/B**, now on a stable provider: `ncert embed --book phy11-part1 --redo
-     --context section`. The gate is unchanged and was set before any result — q07 moves from rank
-     11 into the top three, and nothing currently in the top three drops out. Set
-     `embed-calls-per-minute: 0` first: Bedrock has no trial cap, so the ten-minute pacing is now
-     pure friction.
+  1. **Revert the corpus to the bare chunk**: `ncert embed --book phy11-part1 --redo`. The A/B
+     left it in the rejected arm, and every number this day log quotes is the bare one.
   2. **bio11**, on the frozen prompt: its 30 chapter-1 rows are still the early v2, and it carries
      D14's tick. Then the eight remaining books, all on the settled pin — extract, verify, load,
      embed. The nine are ~₹700 each on the 2026-09-19 measurement, and about ten minutes of

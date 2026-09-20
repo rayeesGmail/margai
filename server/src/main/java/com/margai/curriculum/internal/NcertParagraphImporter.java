@@ -13,8 +13,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,10 +38,13 @@ class NcertParagraphImporter {
 
     private final NcertBookRepository books;
     private final NcertParagraphRepository paragraphs;
+    private final NcertEmbeddings embeddings;
 
-    NcertParagraphImporter(NcertBookRepository books, NcertParagraphRepository paragraphs) {
+    NcertParagraphImporter(NcertBookRepository books, NcertParagraphRepository paragraphs,
+            NcertEmbeddings embeddings) {
         this.books = books;
         this.paragraphs = paragraphs;
+        this.embeddings = embeddings;
     }
 
     NcertLoadReport load(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
@@ -53,6 +58,12 @@ class NcertParagraphImporter {
         int unchanged = 0;
         Set<String> inFile = new HashSet<>();
         Map<Short, Integer> perChapter = new TreeMap<>();
+        // Rows whose English text this load actually rewrote. Their vectors describe words the row
+        // no longer carries, so they are dropped below and the next `ncert embed` re-reads them
+        // (§4.9). Deliberately not "rows that changed": a load that only moves a figure reference
+        // or re-stamps provenance leaves the words alone, and re-embedding for that would be paid
+        // work for an identical vector.
+        List<UUID> rewritten = new ArrayList<>();
         for (NcertParagraphRow row : rows) {
             String address = row.address();
             if (!inFile.add(address)) {
@@ -64,10 +75,16 @@ class NcertParagraphImporter {
             if (paragraph == null) {
                 paragraphs.save(new NcertParagraph(book.getId(), row, language));
                 inserted++;
-            } else if (paragraph.apply(row, language)) {
-                updated++;
             } else {
-                unchanged++;
+                boolean textRewritten = !Objects.equals(paragraph.text(language), row.text());
+                if (paragraph.apply(row, language)) {
+                    updated++;
+                    if (textRewritten && language == BookLanguage.en) {
+                        rewritten.add(paragraph.getId());
+                    }
+                } else {
+                    unchanged++;
+                }
             }
         }
         paragraphs.flush();
@@ -89,8 +106,15 @@ class NcertParagraphImporter {
         // since v3 the loader numbers them, so the rows a run no longer carries are rows no run
         // produced — 85 of them sat beside phy11-part1's canonical 1,017 on 2026-09-14, sampleable
         // by the ✅ and embeddable by D17. The one thing a load may not delete is a row something
-        // already points at: an anchored paragraph (D23's node_id; D17's embedding joins this check
-        // when the entity gains the column) makes the re-extraction a migration, not a load.
+        // already points at: an anchored paragraph (D23's node_id) makes the re-extraction a
+        // migration, not a load.
+        //
+        // An embedding is NOT such a thing, and this is the correction of a note left here at D14
+        // ("D17's embedding joins this check"). A vector is a property of the row, not a pointer to
+        // it: refusing to delete an embedded orphan would refuse every re-load of an embedded book,
+        // which is every load after D15. Deleting one loses a vector that describes words nobody
+        // carries any more — the right outcome. It is counted and named instead, because a load
+        // quietly throwing away paid work should be visible in the report.
         List<String> anchored = orphans.stream()
                 .filter(paragraph -> paragraph.getNodeId() != null)
                 .map(NcertParagraph::address).toList();
@@ -100,9 +124,11 @@ class NcertParagraphImporter {
                     + String.join(", ", anchored) + " — re-extracting an anchored chapter is a corpus event that "
                     + "re-anchors what it moved (D17 guard), not a load; nothing was written");
         }
+        long embeddedOrphans = embeddings.embeddedAmong(orphans.stream().map(NcertParagraph::getId).toList());
         paragraphs.deleteAll(orphans);
+        int cleared = embeddings.clearFor(rewritten);
         return new NcertLoadReport(inserted, updated, unchanged, perChapter,
-                orphans.stream().map(NcertParagraph::address).toList());
+                orphans.stream().map(NcertParagraph::address).toList(), cleared, (int) embeddedOrphans);
     }
 
     List<NcertParagraphRow> paragraphs(String bookCode, BookLanguage language, Collection<Short> chapters) {

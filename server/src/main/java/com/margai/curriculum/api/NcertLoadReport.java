@@ -11,13 +11,21 @@ import java.util.TreeMap;
  * were kept, as every other loader keeps its orphans). A re-extraction that cuts paragraphs
  * differently is the case that produces them, and since v3 the loader numbers them, so a
  * one-page redo shifts every address after it.
+ *
+ * <p>The last two are about paid work this load destroyed (D15): {@code embeddingsCleared} counts
+ * rows whose English text it rewrote, whose vectors described the old words and were dropped, and
+ * {@code embeddedOrphans} counts deleted rows that carried one. Both are re-earned by the next
+ * {@code ncert embed} for the price of the paragraphs involved — but silently losing embeddings is
+ * exactly the kind of thing a report exists to say out loud.
  */
 public record NcertLoadReport(
         int inserted,
         int updated,
         int unchanged,
         Map<Short, Integer> perChapter,
-        List<String> orphans) {
+        List<String> orphans,
+        int embeddingsCleared,
+        int embeddedOrphans) {
 
     public NcertLoadReport {
         perChapter = perChapter == null ? Map.of() : new TreeMap<>(perChapter);

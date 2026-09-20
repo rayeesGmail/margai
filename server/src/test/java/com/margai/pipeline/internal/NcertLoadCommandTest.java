@@ -589,7 +589,7 @@ class NcertLoadCommandTest {
             this.rows = new ArrayList<>(rows);
             Map<Short, Integer> perChapter = new java.util.TreeMap<>();
             rows.forEach(row -> perChapter.merge(row.chapterNo(), 1, Integer::sum));
-            return new NcertLoadReport(rows.size(), 0, 0, perChapter, orphansAnswer);
+            return new NcertLoadReport(rows.size(), 0, 0, perChapter, orphansAnswer, 0, 0);
         }
     }
 }

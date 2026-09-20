@@ -21,7 +21,9 @@ import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.NcertRegisterReport;
 import com.margai.curriculum.api.NcertVerificationRow;
 import com.margai.curriculum.api.NodeKind;
+import com.margai.curriculum.api.ParagraphEmbedding;
 import com.margai.curriculum.api.ParagraphExtraction;
+import com.margai.curriculum.api.ParagraphToEmbed;
 import com.margai.curriculum.api.ParagraphVerification;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
@@ -34,6 +36,7 @@ import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -356,6 +359,153 @@ class CurriculumImportTest {
                 verdict == ParagraphVerification.Verdict.differs
                         ? List.of(new ParagraphVerification.Difference(12, "-G", "G")) : List.of(),
                 ParagraphVerification.sha256(row.text()), List.of(), "claude-sonnet-5", "ncert_verify.v1"));
+    }
+
+    // ── `ncert embed` (D15): the embedding column, whose null is the whole state machine ──────────
+
+    @Test
+    void everyParagraphWithEnglishTextWaitsToBeEmbeddedUntilItHasAVector() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        List<ParagraphToEmbed> waiting = imports.paragraphsToEmbed("phy11-part1", false);
+        assertThat(waiting).extracting(ParagraphToEmbed::address)
+                .containsExactly("ch 7 §7.9 ¶1", "ch 7 §7.9 ¶2");
+        assertThat(waiting.getFirst().text()).isEqualTo("The gravitational potential energy of a body.");
+
+        imports.storeEmbeddings("phy11-part1", List.of(
+                new ParagraphEmbedding(waiting.getFirst().paragraphId(), vector(0.1f))));
+
+        assertThat(imports.paragraphsToEmbed("phy11-part1", false)).extracting(ParagraphToEmbed::address)
+                .as("an embedded paragraph is not waiting any more").containsExactly("ch 7 §7.9 ¶2");
+        assertThat(imports.paragraphsToEmbed("phy11-part1", true)).as("--redo takes the whole book")
+                .hasSize(2);
+    }
+
+    /** The stored vector is the stored vector — 1,024 floats in, the same 1,024 out. */
+    @Test
+    void theVectorRoundTripsThroughThePgvectorColumn() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        ParagraphToEmbed first = imports.paragraphsToEmbed("phy11-part1", false).getFirst();
+        float[] stored = vector(0.25f);
+
+        assertThat(imports.storeEmbeddings("phy11-part1", List.of(
+                new ParagraphEmbedding(first.paragraphId(), stored)))).isEqualTo(1);
+
+        String readBack = jdbc.queryForObject(
+                "SELECT embedding::text FROM ncert_paragraphs WHERE id = ?", String.class, first.paragraphId());
+        assertThat(readBack).startsWith("[0.25,").endsWith("]");
+        assertThat(readBack.split(",")).as("every dimension survived").hasSize(1024);
+    }
+
+    /**
+     * A vector on the wrong paragraph is a wrong anchor under every answer that retrieves it, and
+     * unlike a wrong transcription nobody can see it by reading the row. So the batch is checked
+     * before any of it is written.
+     */
+    @Test
+    void anEmbeddingForAParagraphOfAnotherBookIsRefusedAndWritesNothing() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        List<ParagraphToEmbed> waiting = imports.paragraphsToEmbed("phy11-part1", false);
+        UUID foreign = UUID.randomUUID();
+
+        assertThatThrownBy(() -> imports.storeEmbeddings("phy11-part1", List.of(
+                new ParagraphEmbedding(waiting.getFirst().paragraphId(), vector(0.1f)),
+                new ParagraphEmbedding(foreign, vector(0.2f)))))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessageContaining(foreign.toString())
+                .hasMessageContaining("nothing was written");
+
+        assertThat(jdbc.queryForObject(
+                "SELECT count(*) FROM ncert_paragraphs WHERE embedding IS NOT NULL", Long.class)).isZero();
+    }
+
+    /**
+     * The staleness half of the same mechanism (D15): a load that rewrites a paragraph's words
+     * drops the vector that described the old ones, so `ncert embed` picks the row up again.
+     * Without this the row would keep a vector for text it was corrected away from, and no report
+     * anywhere would say so.
+     */
+    @Test
+    void aLoadThatRewritesTheTextClearsThatParagraphsEmbedding() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        embedEverything();
+
+        NcertParagraphRow corrected = new NcertParagraphRow((short) 7, "7.9", (short) 1,
+                "The gravitational potential energy of a body, corrected.", false, List.of(),
+                paragraphs().getFirst().extraction());
+        NcertLoadReport report = imports.loadParagraphs("phy11-part1", BookLanguage.en,
+                List.of(corrected, paragraphs().get(1)));
+
+        assertThat(report.embeddingsCleared()).isEqualTo(1);
+        assertThat(imports.paragraphsToEmbed("phy11-part1", false)).extracting(ParagraphToEmbed::address)
+                .containsExactly("ch 7 §7.9 ¶1");
+    }
+
+    /** An idempotent re-load changes no words, so the book stays embedded and nothing is re-paid. */
+    @Test
+    void anIdempotentReloadClearsNoEmbeddings() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        embedEverything();
+
+        NcertLoadReport again = imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        assertThat(again.embeddingsCleared()).isZero();
+        assertThat(imports.paragraphsToEmbed("phy11-part1", false)).isEmpty();
+    }
+
+    /**
+     * An embedding is a property of the row, not a pointer to it, so an embedded orphan is deleted
+     * like any other — the vector described words nobody carries any more. It is counted, because
+     * a load quietly throwing away paid work should be visible in the report.
+     */
+    @Test
+    void anEmbeddedParagraphTheExtractionDropsIsDeletedAndCounted() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        embedEverything();
+
+        NcertLoadReport report = imports.loadParagraphs("phy11-part1", BookLanguage.en,
+                List.of(paragraphs().getFirst()));
+
+        assertThat(report.orphans()).containsExactly("ch 7 §7.9 ¶2");
+        assertThat(report.embeddedOrphans()).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(1);
+    }
+
+    /** §6.4 embeds `text_en` and nothing else, so a Hindi-only row is not waiting for a vector. */
+    @Test
+    void aParagraphWithNoEnglishTextIsNotWaitingToBeEmbedded() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(new NcertParagraphRow((short) 7, "7.9",
+                (short) 1, "गुरुत्वीय स्थितिज ऊर्जा।", false, List.of(),
+                new ParagraphExtraction(List.of(12), new BigDecimal("0.90"), null))));
+
+        assertThat(imports.paragraphsToEmbed("phy11-part1", false)).isEmpty();
+    }
+
+    @Test
+    void embeddingAnUnregisteredBookIsRefused() {
+        assertThatThrownBy(() -> imports.paragraphsToEmbed("nosuchbook", false))
+                .isInstanceOf(CurriculumImportException.class)
+                .hasMessageContaining("is not registered");
+    }
+
+    private void embedEverything() {
+        imports.storeEmbeddings("phy11-part1", imports.paragraphsToEmbed("phy11-part1", true).stream()
+                .map(waiting -> new ParagraphEmbedding(waiting.paragraphId(), vector(0.1f)))
+                .toList());
+    }
+
+    /** A 1,024-wide vector, the pinned width `EmbeddingDimensionTest` holds the column to. */
+    private static float[] vector(float first) {
+        float[] values = new float[1024];
+        values[0] = first;
+        return values;
     }
 
     private void loadTaxonomy() {

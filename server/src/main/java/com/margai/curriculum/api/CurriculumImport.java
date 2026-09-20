@@ -84,4 +84,21 @@ public interface CurriculumImport {
      * the row was reloaded with different words after it was read. Returns the rows written.
      */
     int recordVerifications(String bookCode, BookLanguage language, List<NcertVerificationRow> verdicts);
+
+    /**
+     * {@code ncert embed} (D15): the book's paragraphs that still need a vector, in reading order.
+     * A paragraph needs one when its {@code embedding} is null — which is also how staleness is
+     * expressed, since {@code ncert load} clears the embedding of any row whose text it changes —
+     * so a re-run embeds only what is missing and costs nothing for what is not. {@code redo}
+     * takes the whole book regardless. Paragraphs with no English text are skipped: §6.4 embeds
+     * {@code text_en} and nothing else. Refused when the book is not registered.
+     */
+    List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, boolean redo);
+
+    /**
+     * {@code ncert embed} (D15): the vectors onto their rows. Refused as a whole, writing nothing,
+     * when any id is not a paragraph of this book — a vector on the wrong paragraph is a wrong
+     * anchor under every answer that retrieves it, and it would be invisible. Returns rows written.
+     */
+    int storeEmbeddings(String bookCode, List<ParagraphEmbedding> embeddings);
 }

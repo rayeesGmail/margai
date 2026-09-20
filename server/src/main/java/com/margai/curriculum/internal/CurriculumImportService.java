@@ -11,6 +11,8 @@ import com.margai.curriculum.api.NcertLoadReport;
 import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.NcertRegisterReport;
 import com.margai.curriculum.api.NcertVerificationRow;
+import com.margai.curriculum.api.ParagraphEmbedding;
+import com.margai.curriculum.api.ParagraphToEmbed;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import com.margai.curriculum.api.SyllabusNodeRow;
@@ -39,15 +41,18 @@ class CurriculumImportService implements CurriculumImport {
     private final CutoffImporter cutoffs;
     private final NcertBookImporter ncertBooks;
     private final NcertParagraphImporter ncertParagraphs;
+    private final NcertEmbeddings ncertEmbeddings;
 
     CurriculumImportService(TaxonomyImporter taxonomy, PrerequisiteImporter prerequisites, BackboneImporter backbone,
-            CutoffImporter cutoffs, NcertBookImporter ncertBooks, NcertParagraphImporter ncertParagraphs) {
+            CutoffImporter cutoffs, NcertBookImporter ncertBooks, NcertParagraphImporter ncertParagraphs,
+            NcertEmbeddings ncertEmbeddings) {
         this.taxonomy = taxonomy;
         this.prerequisites = prerequisites;
         this.backbone = backbone;
         this.cutoffs = cutoffs;
         this.ncertBooks = ncertBooks;
         this.ncertParagraphs = ncertParagraphs;
+        this.ncertEmbeddings = ncertEmbeddings;
     }
 
     @Override
@@ -99,5 +104,16 @@ class CurriculumImportService implements CurriculumImport {
     @Override
     public int recordVerifications(String bookCode, BookLanguage language, List<NcertVerificationRow> verdicts) {
         return ncertParagraphs.recordVerifications(bookCode, language, verdicts);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, boolean redo) {
+        return ncertEmbeddings.waiting(bookCode, redo);
+    }
+
+    @Override
+    public int storeEmbeddings(String bookCode, List<ParagraphEmbedding> embeddings) {
+        return ncertEmbeddings.store(bookCode, embeddings);
     }
 }

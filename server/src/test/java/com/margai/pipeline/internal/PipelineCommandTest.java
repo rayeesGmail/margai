@@ -15,6 +15,8 @@ import com.margai.curriculum.api.NcertLoadReport;
 import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.NcertRegisterReport;
 import com.margai.curriculum.api.NcertVerificationRow;
+import com.margai.curriculum.api.ParagraphEmbedding;
+import com.margai.curriculum.api.ParagraphToEmbed;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import com.margai.curriculum.api.SyllabusNodeRow;
@@ -321,12 +323,27 @@ class PipelineCommandTest {
 
         @Override
         public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
-            return new NcertLoadReport(rows.size(), 0, 0, Map.of(), List.of());
+            return new NcertLoadReport(rows.size(), 0, 0, Map.of(), List.of(), 0, 0);
         }
 
         @Override
         public Integer renderedPages(String bookCode, BookLanguage language) {
             return renderedPagesAnswer;
+        }
+
+        /** What {@link #paragraphsToEmbed} answers: the rows `ncert embed` still has to read. */
+        List<ParagraphToEmbed> toEmbedAnswer = List.of();
+        final List<ParagraphEmbedding> storedEmbeddings = new ArrayList<>();
+
+        @Override
+        public List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, boolean redo) {
+            return toEmbedAnswer;
+        }
+
+        @Override
+        public int storeEmbeddings(String bookCode, List<ParagraphEmbedding> embeddings) {
+            storedEmbeddings.addAll(embeddings);
+            return embeddings.size();
         }
 
         /** What {@link #paragraphs} answers: the rows `ncert verify` reads. */

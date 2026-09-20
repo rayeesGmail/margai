@@ -103,6 +103,18 @@ class NcertLoadCommand extends NcertBookCommand {
                         String.valueOf(result.inserted()), String.valueOf(result.updated()),
                         String.valueOf(result.unchanged()))));
 
+        // Named rather than left silent (D15): a load that rewrites a paragraph's words throws
+        // away the vector that described the old ones, and a load that deletes an embedded row
+        // throws away its vector outright. Both are re-earned by `ncert embed` at the price of the
+        // paragraphs involved — but a run that quietly destroys paid work should say so.
+        if (result.embeddingsCleared() > 0 || result.embeddedOrphans() > 0) {
+            report.section("embeddings this load dropped")
+                    .line("run `ncert embed --book " + definition.code() + "` to earn them back")
+                    .table(List.of("cleared (text rewritten)", "deleted with their paragraph"),
+                            List.of(List.of(String.valueOf(result.embeddingsCleared()),
+                                    String.valueOf(result.embeddedOrphans()))));
+        }
+
         List<List<String>> perChapter = new ArrayList<>();
         for (BookDefinition.Chapter chapter : selected) {
             long chapterPages = pages.stream().filter(page -> page.chapterNo() == chapter.no()).count();

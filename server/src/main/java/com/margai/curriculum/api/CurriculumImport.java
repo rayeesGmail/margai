@@ -2,6 +2,7 @@ package com.margai.curriculum.api;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * The curriculum module's door for the pipeline (TECH_PLAN §1.3, §6.3): the D13 loads. Every
@@ -104,4 +105,13 @@ public interface CurriculumImport {
      * anchor under every answer that retrieves it, and it would be invisible. Returns rows written.
      */
     int storeEmbeddings(String bookCode, List<ParagraphEmbedding> embeddings);
+
+    /**
+     * {@code ncert embed} (D15): drop the vectors of these paragraphs, so they leave the index.
+     * Used when a run decides a paragraph should not be retrievable at all — a fragment under
+     * {@code --context section} — because skipping it at embed time only declines to write a new
+     * vector and leaves any older one in place, which would keep it competing for a place in the
+     * top k. Returns the rows cleared.
+     */
+    int clearEmbeddings(String bookCode, Collection<UUID> paragraphIds);
 }

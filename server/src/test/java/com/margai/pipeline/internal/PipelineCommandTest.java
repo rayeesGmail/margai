@@ -352,6 +352,15 @@ class PipelineCommandTest {
             return embeddings.size();
         }
 
+        /** Ids whose vectors a run dropped, so a fragment leaves the index rather than lingering. */
+        final List<java.util.UUID> clearedEmbeddings = new ArrayList<>();
+
+        @Override
+        public int clearEmbeddings(String bookCode, Collection<java.util.UUID> paragraphIds) {
+            clearedEmbeddings.addAll(paragraphIds);
+            return paragraphIds.size();
+        }
+
         /** What {@link #paragraphs} answers: the rows `ncert verify` reads. */
         List<NcertParagraphRow> paragraphsAnswer = List.of();
         final List<NcertVerificationRow> verifications = new ArrayList<>();

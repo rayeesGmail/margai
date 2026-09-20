@@ -257,6 +257,8 @@ class NcertEmbedCommandTest {
         assertThat(embeddings.documents).as("only the paragraph that could ever be retrieved")
                 .containsExactly("7.9 Gravitation · A paragraph long enough to answer a question on its own.");
         assertThat(report()).contains("fragments left unembedded").contains("\"Answer\"");
+        assertThat(imports.clearedEmbeddings).as("and any vector it already had is dropped, so it "
+                + "leaves the index instead of only missing the new one").hasSize(1);
     }
 
     /** A book the file does not carry must fail rather than quietly embed bare. */

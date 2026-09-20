@@ -19,6 +19,7 @@ import com.margai.curriculum.api.SyllabusNodeRow;
 import com.margai.curriculum.api.TaxonomyLoadReport;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,5 +116,10 @@ class CurriculumImportService implements CurriculumImport {
     @Override
     public int storeEmbeddings(String bookCode, List<ParagraphEmbedding> embeddings) {
         return ncertEmbeddings.store(bookCode, embeddings);
+    }
+
+    @Override
+    public int clearEmbeddings(String bookCode, Collection<UUID> paragraphIds) {
+        return ncertEmbeddings.clearFor(paragraphIds);
     }
 }

@@ -186,7 +186,14 @@ class NcertEmbedCommand extends NcertBookCommand {
         report.section("paragraphs embedded per chapter").table(List.of("chapter", "embedded"), rows);
 
         if (!fragments.isEmpty()) {
+            // Skipping only declines to write a NEW vector; an older one from a bare run would
+            // stay in the index and keep competing for a place in the top k (found on the first
+            // experimental run, 2026-09-20).
+            int cleared = imports.clearEmbeddings(definition.code(),
+                    fragments.stream().map(ParagraphToEmbed::paragraphId).toList());
             report.section("fragments left unembedded (too short to answer anything alone)")
+                    .line(cleared + " of them carried a vector from an earlier run and it was dropped, "
+                            + "so they leave the index rather than only missing the new one")
                     .line("a vector for \"Answer\" or \"No work is done if :\" can never be usefully "
                             + "retrieved and competes for a place in the top k")
                     .list(fragments.stream().map(f -> f.address() + " — \"" + f.text() + "\"").toList());

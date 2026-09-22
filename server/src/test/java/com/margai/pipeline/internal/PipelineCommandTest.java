@@ -2,6 +2,7 @@ package com.margai.pipeline.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.margai.ai.api.AiClientInfo;
 import com.margai.common.api.AttemptType;
 import com.margai.curriculum.api.ArchetypeTrackRow;
 import com.margai.curriculum.api.BackboneLoadReport;
@@ -247,6 +248,7 @@ class PipelineCommandTest {
                 if (cls == NcertExtractCommand.class) {
                     return cls.cast(new NcertExtractCommand(new NcertRenderCommandTest.RecordingStore(),
                             new NcertExtractCommandTest.RecordingExtract(), new NcertExtractCommandTest.StubSpend(),
+                            new AiClientInfo("anthropic", List.of("ledger")),
                             new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
                 }
                 if (cls == NcertLoadCommand.class) {

@@ -1,6 +1,7 @@
 package com.margai.pipeline.internal;
 
 import com.margai.ai.api.AiCallContext;
+import com.margai.ai.api.AiClientInfo;
 import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.AiSpend;
 import com.margai.ai.api.ImagePart;
@@ -55,19 +56,22 @@ class NcertExtractCommand extends NcertBookCommand {
     private final ObjectStore content;
     private final NcertPageExtractor extract;
     private final AiSpend spend;
+    private final AiClientInfo client;
     private final PipelineProperties properties;
 
-    NcertExtractCommand(ObjectStore content, NcertPageExtractor extract, AiSpend spend,
+    NcertExtractCommand(ObjectStore content, NcertPageExtractor extract, AiSpend spend, AiClientInfo client,
             PipelineProperties properties, Reports reports) {
         super(reports);
         this.content = content;
         this.extract = extract;
         this.spend = spend;
+        this.client = client;
         this.properties = properties;
     }
 
     @Override
     void run(BookDefinition definition, List<BookDefinition.Chapter> selected, Report report) {
+        guardLiveClient();
         guardTranscribeModel();
         report.line("content store: " + content.describe());
         report.line("page tiles: " + properties.pageTiles()
@@ -241,6 +245,26 @@ class NcertExtractCommand extends NcertBookCommand {
                         String.valueOf(bill.usage().cacheReadTokens()), String.valueOf(bill.usage().cacheWriteTokens()),
                         bill.rupees())));
         report.line("jsonl: " + jsonlKey + " (" + done.size() + " pages, " + alreadyDone + " of them from earlier runs)");
+    }
+
+    /**
+     * A real provider, or the run does not start — checked before the model, because a fixture is
+     * not a cheaper transcription but a different kind of thing altogether.
+     *
+     * <p>The damage is specific to this command and quieter than a wrong model. Fixture text would
+     * be written to {@code extract/{book}/{lang}.jsonl}, which is the book's canonical artefact and
+     * the one every later stage reads. And because {@code ncert extract} <em>resumes</em> — the
+     * JSONL is read first and a page already in it is never called for again — the fabricated pages
+     * would survive the next real run untouched, with nothing downstream able to tell a fixture
+     * from a page of NCERT. A run that fails costs nothing; this one costs the book.
+     */
+    private void guardLiveClient() {
+        if (!client.isLive()) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "the AI client is the fake (" + client + "): fixture text would be written to the book's "
+                            + "canonical JSONL, and a later run resumes past those pages rather than calling for "
+                            + "them — run with AI_LIVE=1 and the live profile");
+        }
     }
 
     /**

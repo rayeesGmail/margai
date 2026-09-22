@@ -3,6 +3,7 @@ package com.margai.pipeline.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.ai.api.AiCallContext;
+import com.margai.ai.api.AiClientInfo;
 import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.AiSpend;
 import com.margai.ai.api.ImagePart;
@@ -45,6 +46,7 @@ class NcertExtractCommandTest {
     private final NcertRenderCommandTest.RecordingStore store = new NcertRenderCommandTest.RecordingStore();
     private final RecordingExtract extract = new RecordingExtract();
     private final StubSpend spend = new StubSpend();
+    private AiClientInfo client = new AiClientInfo("anthropic", List.of("ledger", "breaker"));
     private CommandLine commandLine;
 
     @BeforeEach
@@ -76,6 +78,11 @@ class NcertExtractCommandTest {
         page(8, 2);
         page(9, 1);
 
+        build();
+    }
+
+    /** Wiring the command, so a test that changes {@link #client} can rebuild before it runs. */
+    private void build() {
         Reports writer = new Reports(ReportTest.CLOCK);
         PipelineProperties properties = new PipelineProperties(72, 2, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40);
         CommandLine.IFactory siblings =
@@ -84,7 +91,7 @@ class NcertExtractCommandTest {
             @Override
             public <K> K create(Class<K> cls) throws Exception {
                 if (cls == NcertExtractCommand.class) {
-                    return cls.cast(new NcertExtractCommand(store, extract, spend, properties, writer));
+                    return cls.cast(new NcertExtractCommand(store, extract, spend, client, properties, writer));
                 }
                 return siblings.create(cls);
             }
@@ -100,6 +107,23 @@ class NcertExtractCommandTest {
      * fail before the first call, because the alternative is a book transcribed by the rejected
      * model with nothing but the ledger to say so.
      */
+    /**
+     * Fixture text written to the book's canonical JSONL is worse than a failed run, because the
+     * command resumes: a later real run reads the artefact first and calls for nothing it already
+     * holds, so the fabricated pages would never be re-read and nothing downstream could tell.
+     */
+    @Test
+    void refusesTheFakeClient() {
+        client = new AiClientInfo(AiClientInfo.FAKE, List.of("ledger"));
+        build();
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(extract.calls).isEmpty();
+        assertThat(store.exists(ContentKeys.extract("phy11-part2", BookLanguage.en))).isFalse();
+        assertThat(out.toString()).contains("the AI client is the fake").contains("AI_LIVE=1");
+    }
+
     @Test
     void refusesAVisionTierThatIsNotTheRulingsTranscriber() {
         extract.model = "claude-haiku-4-5";

@@ -8,6 +8,7 @@ import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.ImagePart;
 import com.margai.ai.api.PromptRef;
 import com.margai.ai.api.Tier;
+import com.margai.ai.internal.AiProperties;
 import com.margai.ai.internal.PromptRegistry;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,9 +35,11 @@ public class PageExtractTask implements NcertPageExtractor {
 
     private final AiClient ai;
     private final PromptRef prompt;
+    private final AiProperties properties;
 
-    PageExtractTask(AiClient ai, PromptRegistry prompts) {
+    PageExtractTask(AiClient ai, PromptRegistry prompts, AiProperties properties) {
         this.ai = ai;
+        this.properties = properties;
         this.prompt = prompts.require("ncert_extract");
     }
 
@@ -61,5 +64,10 @@ public class PageExtractTask implements NcertPageExtractor {
         return ai.complete(AiRequest.of(AiFeature.pipeline_extract, Tier.vision, prompt, variables,
                         NcertPage.class, ctx)
                 .withImages(images));
+    }
+
+    @Override
+    public String model() {
+        return properties.modelFor(Tier.vision);
     }
 }

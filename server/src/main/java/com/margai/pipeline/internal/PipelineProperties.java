@@ -22,6 +22,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *                         Sonnet 5 verifies). {@code ncert verify --read-pages} refuses when the
  *                         verify tier is any other model, and counts no verdict another model gave —
  *                         a forgotten profile must fail, not verify with whatever VISION is.
+ * @param transcribeModel  the model the first read must run on (DECISIONS 2026-09-14 "the pair":
+ *                         Opus 5 transcribes). {@code ncert extract} refuses when the VISION tier
+ *                         is any other model — the mirror of {@code verifyModel}, and added on
+ *                         2026-09-22 because it was missing: the VISION default is
+ *                         {@code claude-haiku-4-5}, which the D15 dry runs put out of this job
+ *                         after three runs and three layout failures, and only the
+ *                         {@code visionopus} profile selects Opus. Without the guard a forgotten
+ *                         profile does not fail — it spends a whole book's budget on the rejected
+ *                         model and says so nowhere but the ledger.
  * @param embedBatchSize   how many paragraph vectors one {@code ncert embed} transaction writes
  *                         before committing. Embedding is cheap but not free, and a run
  *                         interrupted at paragraph 800 should keep the 800 it paid for rather
@@ -36,7 +45,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "margai.pipeline")
 public record PipelineProperties(int renderDpi, int extractBatchSize, int pageTiles, String verifyModel,
-        int embedBatchSize, int embedCallsPerMinute, int embedMinCharacters) {
+        String transcribeModel, int embedBatchSize, int embedCallsPerMinute, int embedMinCharacters) {
 
     public PipelineProperties {
         renderDpi = renderDpi <= 0 ? 150 : renderDpi;

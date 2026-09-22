@@ -334,7 +334,7 @@ class NcertEmbedCommandTest {
 
     private CommandLine commandLine(int batchSize) {
         Reports writer = new Reports(ReportTest.CLOCK);
-        PipelineProperties properties = new PipelineProperties(72, 10, 1, "claude-sonnet-5", batchSize, 0, 40);
+        PipelineProperties properties = new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", batchSize, 0, 40);
         CommandLine.IFactory siblings = PipelineCommandTest.siblingFactory(
                 new PipelineCommandTest.RecordingImport(), writer);
         CommandLine.IFactory factory = new CommandLine.IFactory() {

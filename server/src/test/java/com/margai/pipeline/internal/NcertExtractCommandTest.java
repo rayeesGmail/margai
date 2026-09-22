@@ -77,7 +77,7 @@ class NcertExtractCommandTest {
         page(9, 1);
 
         Reports writer = new Reports(ReportTest.CLOCK);
-        PipelineProperties properties = new PipelineProperties(72, 2, 1, "claude-sonnet-5", 100, 0, 40);
+        PipelineProperties properties = new PipelineProperties(72, 2, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40);
         CommandLine.IFactory siblings =
                 PipelineCommandTest.siblingFactory(new PipelineCommandTest.RecordingImport(), writer);
         CommandLine.IFactory factory = new CommandLine.IFactory() {
@@ -91,6 +91,25 @@ class NcertExtractCommandTest {
         };
         PrintWriter printer = new PrintWriter(out, true);
         commandLine = PipelineRunner.commandLine(factory).setOut(printer).setErr(printer);
+    }
+
+    /**
+     * The mirror of {@code ncert verify --read-pages}'s guard, and the one this command went
+     * without until 2026-09-22. The VISION default is Haiku, which the D15 dry runs put out of
+     * transcription; only the {@code visionopus} profile selects Opus. A forgotten profile has to
+     * fail before the first call, because the alternative is a book transcribed by the rejected
+     * model with nothing but the ledger to say so.
+     */
+    @Test
+    void refusesAVisionTierThatIsNotTheRulingsTranscriber() {
+        extract.model = "claude-haiku-4-5";
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(extract.calls).isEmpty();
+        assertThat(store.exists(ContentKeys.extract("phy11-part2", BookLanguage.en))).isFalse();
+        assertThat(out.toString()).contains("the vision tier is claude-haiku-4-5, not claude-opus-5")
+                .contains("visionopus");
     }
 
     @Test
@@ -410,6 +429,14 @@ class NcertExtractCommandTest {
         final List<String> empty = new ArrayList<>();
         final List<String> degree = new ArrayList<>();
         final List<String> lowConfidence = new ArrayList<>();
+
+        /** The VISION tier as the run finds it configured; the ruling's transcriber unless a test says otherwise. */
+        String model = "claude-opus-5";
+
+        @Override
+        public String model() {
+            return model;
+        }
 
         @Override
         public AiResponse<NcertPage> read(String bookTitle, short chapter, int page, List<ImagePart> images,

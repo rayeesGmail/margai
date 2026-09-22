@@ -29,6 +29,12 @@ margai:
     # refuses to run unless the VISION tier is this model — the `visionsonnet` profile sets it — and a
     # verdict any other model gave is neither reused nor counted.
     verify-model: claude-sonnet-5
+    # The other half of the same ruling, and the guard that was missing until 2026-09-22: `ncert
+    # extract` refuses unless the VISION tier is this model — the `visionopus` profile sets it. The
+    # VISION default is `claude-haiku-4-5`, which the D15 dry runs put out of transcription after
+    # three runs and three different layout failures on the two-column page, so a forgotten profile
+    # used to spend a whole book on the rejected model and say so nowhere but the ledger.
+    transcribe-model: claude-opus-5
     # `ncert embed` commits its vectors every this many paragraphs. Embedding a book is cheap
     # (~900 calls at 0.12 USD/1M tokens) but not free, and a run interrupted late should keep what
     # it paid for — the next run embeds only rows whose embedding is still null.

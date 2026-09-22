@@ -269,3 +269,18 @@ corrections:
   - {book: phy11-part1, lang: en, chapter: 6, page: 28, kind: figure_ref, address: "ch 6 §6.11 ¶5",
      at: "Figure 6.30 shows a cross-section", add: "Fig. 6.30",
      reason: "the paragraph opens \"Figure 6.30 shows a cross-section\", the label spelled out"}
+
+  # ── bio11: the unit-opener essay (founder ruling 2026-09-22, DECISIONS) ─────────────────────────
+  # NCERT opens each of Biology's five units with a page of framing prose facing the unit's biography
+  # page. The transcriber returned nothing for four of them (ch 5, 8, 11, 14 p1) and transcribed this
+  # one, on five pages that are structurally identical — same 40 pt "UNIT n" banner, same single
+  # drawing, the banner in every page's text layer. The prompt has no rule for the page, so the two
+  # answers are dice, not a rule applied inconsistently. The ruling is OUT, for the reason the prompt
+  # already excludes a biography: it is framing and history, not chapter teaching — "in the following
+  # chapters of this unit, you will get a description" — and it competes with real paragraphs for
+  # exactly the broad queries a student asks. The prompt is frozen (debb920), so the rule belongs in
+  # its next revision, before the eight remaining books; this entry settles bio11 at no cost.
+  # The other four essays never became rows, so this is the only one to drop.
+  - {book: bio11, lang: en, chapter: 1, page: 1, kind: drop, address: "ch 1 §1 ¶1",
+     at: "Biology is the science of life forms and living processes.",
+     reason: "the Unit 1 opener essay, not chapter text"}

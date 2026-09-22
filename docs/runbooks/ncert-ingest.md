@@ -94,9 +94,19 @@ re-run only when the PDFs or the decoder dependencies change.
 
 ```
 AI_LIVE=1 AWS_PROFILE=margai MARGAI_AI_ANTHROPIC_API_KEY=… DB_URL=… \
-  java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live \
+  java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live,visionopus \
   ncert extract --book bio11 --lang en
 ```
+
+**`visionopus` is not optional.** Opus 5 transcribes by the pair ruling of 2026-09-14 (DECISIONS),
+and that profile is the only thing that selects it: the VISION tier's default in `application.yml`
+is `claude-haiku-4-5`, which the D15 dry runs put out of this job after three runs and three
+different layout failures on the two-column page. Unlike `ncert verify --read-pages`, which refuses
+to start unless the tier is `margai.pipeline.verify-model`, **`ncert extract` has no transcriber
+guard** — leave the profile off and the run spends a book's budget on the model that was rejected,
+and says so nowhere but the ledger. Until that guard exists, the startup log is the check: the
+`AiClient chain` must end in `anthropic` rather than `fake`, and the VISION tier must read
+`claude-opus-5`.
 
 Start with one chapter (`--chapters 1`) and read its report before letting the book run: the cost
 line and the low-confidence list are both in it, and a prompt that is reading the pages wrongly is
@@ -130,9 +140,9 @@ which makes it the hardest case for FIX 1 as well as the cheapest.
 #    name, and the old version's corpus stays re-derivable from its own artefact (FIX 5)
 aws s3 mv s3://margai-beta-content/extract/phy11-part1/en.jsonl s3://margai-beta-content/extract/phy11-part1/en.v2.jsonl --profile margai
 
-# 1. extract one chapter
+# 1. extract one chapter (visionopus, or the run silently reads on Haiku — see §3)
 AI_LIVE=1 AWS_PROFILE=margai MARGAI_AI_ANTHROPIC_API_KEY=… DB_URL=… \
-  java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live \
+  java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live,visionopus \
   ncert extract --book phy11-part1 --lang en --chapters 7
 
 # 2. load the same chapter (no model, no cost; coverage prints — for a subset, which is correct)

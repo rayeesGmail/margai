@@ -22,6 +22,8 @@ class PdfLayoutTest {
 
     private static final Path CHAPTER_7 = Path.of("../ncert/2022-ed/en/phy11-part1/keph107.pdf");
     private static final Path CHAPTER_6 = Path.of("../ncert/2022-ed/en/phy11-part1/keph106.pdf");
+    private static final Path BIO_CHAPTER_1 = Path.of("../ncert/2022-ed/en/bio11/kebo101.pdf");
+    private static final Path BIO_CHAPTER_4 = Path.of("../ncert/2022-ed/en/bio11/kebo104.pdf");
     private static final double WIDTH = 657;
 
     @Test
@@ -323,6 +325,102 @@ class PdfLayoutTest {
     void aLineOpeningWithAnOperatorIsADisplayCarriedOnAndNotAParagraph() throws IOException {
         assertThat(chapterSix().get(26).starts()).noneMatch(start -> start.startsWith("="));
         assertThat(chapterSix().get(26).top()).isNotEqualTo(PdfLayout.Top.starts);
+    }
+
+    /**
+     * Biology sets its sub-headings in Title Case — "1.2.2 Genus", "4.1.4 Coelom" — where Physics
+     * sets "7.5 ACCELERATION DUE TO GRAVITY". The heading rule was measured on Physics and demanded
+     * capitals, so on {@code bio11} no heading was ever recognised, the "first line after a heading
+     * starts a paragraph" rule never fired, and a page of five headed paragraphs reported that the
+     * print starts none of them: 262 of the 357 rows named by the first whole-book run (2026-09-23).
+     */
+    @Test
+    void aTitleCaseSectionHeadingIsStillAHeading() {
+        PdfLayout.PageShape shape = shape(
+                line(174, 100, "Bookman", "as Homo sapiens. The scientific name is written"),
+                line(174, 125, "Bookman-Demi", "1.2.2 Genus"),
+                line(174, 137, "Bookman-Demi", "Genus comprises a group of related species which"),
+                line(174, 149, "Bookman", "has more characters in common in comparison to"));
+
+        assertThat(shape.starts()).containsExactly("Genus comprises a group of related");
+    }
+
+    /** "14.2.1 Respiratory Volumes and / Capacities": the wrap is the heading, not its first paragraph. */
+    @Test
+    void aTitleCaseHeadingWrappedToASecondLineIsStillTheHeading() {
+        PdfLayout.PageShape shape = shape(
+                line(174, 100, "Bookman", "using a spirometer which helps in clinical work"),
+                line(174, 125, "Bookman-Demi", "14.2.1 Respiratory Volumes and"),
+                line(174, 137, "Bookman-Demi", "Capacities"),
+                line(174, 149, "Bookman-Demi", "Tidal Volume (TV): Volume of air inspired or"),
+                line(174, 161, "Bookman", "expired during a normal respiration. It is approx."));
+
+        assertThat(shape.starts()).containsExactly("Tidal Volume (TV): Volume of air");
+    }
+
+    /**
+     * The signal the join check never looked at. A justified paragraph's last line is ragged and every
+     * other line is set to the column's measure, so a short last line proves the paragraph closed on
+     * this page — which is the only thing that separates bio11's real page-break joins from its false
+     * ones, the book setting a page's first line flush left whether it continues or not.
+     */
+    @Test
+    void aLastLineShortOfTheMeasureEndsItsParagraph() {
+        PdfLayout.PageShape shape = shape(
+                line(174, 100, "Bookman", "gametes. Fertilisation is internal and development"),
+                line(174, 112, "Bookman", "is indirect having a larval stage which is quite"),
+                line(174, 124, "Bookman", "morphologically distinct."));
+
+        assertThat(shape.bottom()).isEqualTo(PdfLayout.Bottom.ends);
+    }
+
+    @Test
+    void aLastLineSetToTheFullMeasureRunsOnToTheNextPage() {
+        PdfLayout.PageShape shape = shape(
+                line(174, 100, "Bookman", "an internal endoderm, are called diploblastic ani"),
+                line(174, 112, "Bookman", "layer, mesoglea, is present in between the ectode"),
+                line(174, 124, "Bookman", "and the endoderm as shown in the figure (Figure 4"));
+
+        assertThat(shape.bottom()).isEqualTo(PdfLayout.Bottom.continues);
+    }
+
+    /** A figure caption below the text sets its own margin, so it is not the paragraph's last line. */
+    @Test
+    void aCaptionBelowTheTextIsNotWhatTheBottomIsMeasuredOn() {
+        PdfLayout.PageShape shape = shape(
+                line(174, 100, "Bookman", "Bryophytes include the various mosses and liverwo"),
+                line(174, 112, "Bookman", "commonly growing in moist shaded areas in the hil"),
+                line(95, 260, "Bookman-Demi", "Figure 3.2 Bryophytes: A liverwort"));
+
+        assertThat(shape.bottom()).isEqualTo(PdfLayout.Bottom.continues);
+    }
+
+    /** bio11 ch 1 p7: five Title-Case headings, five paragraphs, and the check saw none of them. */
+    @Test
+    void bioElevenPageSevenStartsAParagraphUnderEveryTitleCaseHeading() throws IOException {
+        assertThat(biologyChapterOne().get(6).starts())
+                .anyMatch(start -> start.startsWith("Genus comprises"))
+                .anyMatch(start -> start.startsWith("The next category"))
+                .anyMatch(start -> start.startsWith("You have seen earlier"))
+                .anyMatch(start -> start.startsWith("This category includes"))
+                .anyMatch(start -> start.startsWith("Classes comprising"));
+    }
+
+    /** The two bio11 page ends the 2026-09-23 adjudication settled by hand, now settled by code. */
+    @Test
+    void bioElevenPageEndsAreReadTheWayTheAdjudicationReadThem() throws IOException {
+        assertThat(biologyChapterFour().get(3).bottom()).isEqualTo(PdfLayout.Bottom.ends);
+        assertThat(biologyChapterFour().get(1).bottom()).isEqualTo(PdfLayout.Bottom.continues);
+    }
+
+    private static List<PdfLayout.PageShape> biologyChapterOne() throws IOException {
+        assumeTrue(Files.isRegularFile(BIO_CHAPTER_1), "the founder's NCERT PDFs are not on this machine");
+        return PdfLayout.pages(Files.readAllBytes(BIO_CHAPTER_1));
+    }
+
+    private static List<PdfLayout.PageShape> biologyChapterFour() throws IOException {
+        assumeTrue(Files.isRegularFile(BIO_CHAPTER_4), "the founder's NCERT PDFs are not on this machine");
+        return PdfLayout.pages(Files.readAllBytes(BIO_CHAPTER_4));
     }
 
     private static List<PdfLayout.PageShape> chapterSeven() throws IOException {

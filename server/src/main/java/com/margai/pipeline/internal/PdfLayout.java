@@ -67,7 +67,17 @@ final class PdfLayout {
     /** How many words of a starting line a report quotes. */
     private static final int QUOTED_WORDS = 6;
 
-    private static final Pattern HEADING = Pattern.compile("^\\d{1,2}(\\.\\d{1,2})+\\s+[A-Z][A-Z ,'’()-]{3,}");
+    /**
+     * A numbered section heading. The title may be capitals, as Physics sets it ("7.5 ACCELERATION DUE
+     * TO GRAVITY"), or Title Case, as Biology sets its sub-headings ("1.2.2 Genus", "4.1.4 Coelom") —
+     * a difference that cost {@code bio11} its whole start check until 2026-09-23, because no heading
+     * was recognised, so the rule below that a heading's next line starts a paragraph never fired and
+     * a page of five headed paragraphs reported that the print starts none of them. The number and the
+     * bold face are what make it a heading; the case of the title never was.
+     */
+    private static final Pattern HEADING = Pattern.compile("^\\d{1,2}(\\.\\d{1,2})+\\s+\\p{Lu}[\\p{L} ,'’()-]{3,}");
+    /** A heading too long for its line wraps ("14.2.1 Respiratory Volumes and / Capacities"). */
+    private static final int HEADING_WRAP_WORDS = 4;
     /** A worked example's label, behind at most a box ornament glyph or two ("tExample 7.3"), in any font. */
     private static final Pattern EXAMPLE = Pattern.compile("^.{0,2}?Example\\s+\\d{1,2}\\.\\d{1,2}\\b");
     /** Set in bold by the book; in running prose the word would not open a line in bold. */
@@ -95,6 +105,33 @@ final class PdfLayout {
         unknown
     }
 
+    /**
+     * Whether the page's last line of running text closes its paragraph or runs on to the next page.
+     *
+     * <p>A justified paragraph's last line is ragged; every other line is set to the column's measure.
+     * So a last line short of the measure <em>proves</em> the paragraph ended on this page, and that
+     * is the one thing that separates a real page-break join from a false one where the book — as
+     * {@code bio11} does throughout — sets a page's first line flush left whether it continues or not.
+     * Measured across the fifteen join flags of the first whole-book run (2026-09-23): the twelve
+     * false ones end 37–228 pt short of the measure, the three real ones within 0.2 pt of it.
+     *
+     * <p>Only {@link #ends} silences a flag, and it is the verdict that needs the stronger evidence,
+     * so a page this cannot read stays as it was.
+     */
+    enum Bottom {
+        /** The last line stops short of the measure: it is a paragraph's last line. */
+        ends,
+        /** The last line is set to the full measure, which only a line with text after it is. */
+        continues,
+        /** No body text at a column margin to measure, so the page says nothing either way. */
+        unknown
+    }
+
+    /** Within this many points of the column's measure, a line is set to it. */
+    private static final double AT_MEASURE = 2;
+    /** Within this many points of the column's margin, a line starts at it rather than indented. */
+    private static final double AT_MARGIN = 3;
+
     /** An equation's printed number, "(7.35)" — the layer keeps it where it loses the equation itself. */
     private static final Pattern EQUATION_NUMBER = Pattern.compile("\\(\\d{1,2}\\.\\d{1,3}\\)");
 
@@ -107,16 +144,22 @@ final class PdfLayout {
      *                        the page prints it — a displayed equation's label and every reference to it
      */
     record PageShape(List<String> starts, Top top, String topLine, List<String> captions,
-            List<String> equationNumbers) {
+            List<String> equationNumbers, Bottom bottom) {
 
         PageShape {
             starts = List.copyOf(starts);
             captions = List.copyOf(captions);
             equationNumbers = List.copyOf(equationNumbers);
+            bottom = bottom == null ? Bottom.unknown : bottom;
         }
 
         PageShape(List<String> starts, Top top, String topLine, List<String> captions) {
-            this(starts, top, topLine, captions, List.of());
+            this(starts, top, topLine, captions, List.of(), Bottom.unknown);
+        }
+
+        PageShape(List<String> starts, Top top, String topLine, List<String> captions,
+                List<String> equationNumbers) {
+            this(starts, top, topLine, captions, equationNumbers, Bottom.unknown);
         }
     }
 
@@ -182,7 +225,8 @@ final class PdfLayout {
                     topJudged = true;
                 }
                 // A heading may run to a second line of capitals, which is still the heading.
-                boolean heading = line.bold && (HEADING.matcher(line.text).find() || (afterHeading && line.isCapitals()));
+                boolean heading = line.bold && (HEADING.matcher(line.text).find()
+                        || (afterHeading && (line.isCapitals() || line.isHeadingWrap())));
                 boolean isProse = prose.contains(line);
                 boolean start = false;
                 if (isProse && !heading) {
@@ -224,7 +268,36 @@ final class PdfLayout {
                 equationNumbers.add(number.group());
             }
         }
-        return new PageShape(starts, top, topLine, List.copyOf(captions), equationNumbers);
+        return new PageShape(starts, top, topLine, List.copyOf(captions), equationNumbers,
+                bottom(columns, prose));
+    }
+
+    /**
+     * How the page's last paragraph ends, measured on the last line that starts at its column's own
+     * margin. Reading order ends in the right column where there is one; a line set in from the
+     * margin is an indented first line, and a caption or a label sets a margin of its own, so neither
+     * is what the page's last paragraph ends on ({@code bio11} ch 3 p6, whose figure caption sits
+     * below the two lines that matter).
+     */
+    private static Bottom bottom(Map<Boolean, List<Line>> columns, Set<Line> prose) {
+        for (boolean right : new boolean[] {true, false}) {
+            List<Line> column = columns.getOrDefault(right, List.of()).stream().filter(prose::contains).toList();
+            if (column.isEmpty()) {
+                continue;
+            }
+            Double margin = commonest(column.stream().map(line -> line.x).toList());
+            List<Line> atMargin = margin == null ? List.of()
+                    : column.stream().filter(line -> Math.abs(line.x - margin) <= AT_MARGIN).toList();
+            // A stray segment on one side of the gutter is not a column: fall through to the other
+            // rather than calling the page unreadable, which is what a figure page's caption does.
+            if (atMargin.isEmpty()) {
+                continue;
+            }
+            double measure = atMargin.stream().mapToDouble(line -> line.end).max().orElseThrow();
+            Line last = atMargin.stream().max(Comparator.comparingDouble(line -> line.y)).orElseThrow();
+            return measure - last.end > AT_MEASURE ? Bottom.ends : Bottom.continues;
+        }
+        return Bottom.unknown;
     }
 
     /**
@@ -346,7 +419,11 @@ final class PdfLayout {
     }
 
     /** One run of glyphs on one baseline with no wide gap in it. */
-    private record Line(double x, double y, double size, boolean bold, String text, int glyphs) {
+    /**
+     * @param x   where the line begins, and {@code end} where its last glyph stops — the pair is what
+     *            tells a line set to the column's measure from a paragraph's ragged last one
+     */
+    private record Line(double x, double end, double y, double size, boolean bold, String text, int glyphs) {
 
         static Line of(List<Glyph> glyphs) {
             StringBuilder text = new StringBuilder();
@@ -365,8 +442,8 @@ final class PdfLayout {
             String font = first.font == null ? "" : first.font.toLowerCase(Locale.ROOT);
             boolean bold = font.contains("bold") || font.contains("demi") || font.contains("black")
                     || font.contains("heavy");
-            return new Line(first.x, first.y, size, bold, text.toString().replaceAll("\\s+", " ").strip(),
-                    glyphs.size());
+            return new Line(first.x, previous.x + previous.width, first.y, size, bold,
+                    text.toString().replaceAll("\\s+", " ").strip(), glyphs.size());
         }
 
         /**
@@ -399,6 +476,18 @@ final class PdfLayout {
         boolean isCapitals() {
             String letters = text.replaceAll("[^\\p{L}]", "");
             return letters.length() >= 3 && letters.equals(letters.toUpperCase(Locale.ROOT));
+        }
+
+        /**
+         * The rest of a Title-Case heading that did not fit its line: a few bold words, no sentence.
+         * The word count is what keeps a run-in label out — "Tidal Volume (TV): Volume of air inspired
+         * or" is bold and Title Case at its head, and it opens a paragraph rather than closing a
+         * heading.
+         */
+        boolean isHeadingWrap() {
+            return !text.isEmpty() && Character.isUpperCase(text.charAt(0))
+                    && text.split(" ").length <= HEADING_WRAP_WORDS
+                    && text.chars().noneMatch(character -> ".:;?!".indexOf(character) >= 0);
         }
 
         String quote() {

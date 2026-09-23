@@ -110,7 +110,8 @@ final class LayoutChecks {
                     undecided++;
                 } else {
                     judged++;
-                    join(chapter, previous, page, rows, shape).ifPresent(flags::add);
+                    PdfLayout.PageShape before = previous <= shapes.size() ? shapes.get(previous - 1) : null;
+                    join(chapter, previous, page, rows, shape, before).ifPresent(flags::add);
                 }
             }
             previous = page;
@@ -237,7 +238,7 @@ final class LayoutChecks {
     }
 
     private static Optional<Flag> join(short chapter, int before, int page, List<NcertParagraphRow> rows,
-            PdfLayout.PageShape shape) {
+            PdfLayout.PageShape shape, PdfLayout.PageShape beforeShape) {
         NcertParagraphRow joined = null;
         NcertParagraphRow freshStart = null;
         for (NcertParagraphRow row : rows) {
@@ -254,7 +255,14 @@ final class LayoutChecks {
             return Optional.of(new Flag(Kind.join, page, joined.address(), joined.address() + " runs from p" + before
                     + " onto p" + page + ", but p" + page + " opens a new paragraph: \"" + shape.topLine() + "\""));
         }
-        if (shape.top() == PdfLayout.Top.continues && joined == null && freshStart != null) {
+        // Only this direction: here the previous page has the casting vote, because a flush first line
+        // is no evidence at all in a book that sets every page's first line flush. A last line short of
+        // its column's measure is a paragraph's last line, so nothing ran across the break and there is
+        // nothing to flag — on bio11, twelve of fifteen flags, each 37-228 pt short (D15, 2026-09-23).
+        // The branch above is the opposite case, where a page ending its paragraph is the corroboration
+        // of a row that ran across anyway, so it is never silenced.
+        boolean printEndedThere = beforeShape != null && beforeShape.bottom() == PdfLayout.Bottom.ends;
+        if (shape.top() == PdfLayout.Top.continues && !printEndedThere && joined == null && freshStart != null) {
             return Optional.of(new Flag(Kind.join, page, freshStart.address(), freshStart.address()
                     + " starts a paragraph at the top of p" + page + ", but the print continues p" + before + "'s: \""
                     + shape.topLine() + "\""));

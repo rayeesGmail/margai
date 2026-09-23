@@ -85,6 +85,53 @@ class LayoutChecksTest {
                 });
     }
 
+    /**
+     * bio11 sets every page's first line flush left, continuation or not, so a flush top is no
+     * evidence and this check fired on twelve pages that were nothing of the kind (2026-09-23). The
+     * previous page settles it: a last line short of its column's measure is a paragraph's last line.
+     */
+    @Test
+    void aFreshStartIsNotFlaggedWhereThePreviousPageEndedItsParagraph() {
+        LayoutChecks.Result result = LayoutChecks.check(List.of(
+                        row("4.2.1", 1, "Sponges are generally marine and mostly asymmetrical", 4),
+                        row("4.2.1", 2, "Examples: Sycon (Scypha), Spongilla (Fresh water sponge)", 5)),
+                shapes(ending(4, PdfLayout.Bottom.ends),
+                        shape(5, PdfLayout.Top.continues, "Examples: Sycon (Scypha), Spongilla")));
+
+        assertThat(result.flags()).filteredOn(flag -> flag.kind() == LayoutChecks.Kind.join).isEmpty();
+        assertThat(result.boundariesJudged()).isEqualTo(1);
+    }
+
+    /** And the real ones survive: p2's last line is set to the measure, so the paragraph runs on. */
+    @Test
+    void aFreshStartIsStillFlaggedWhereThePreviousPagesLastLineFillsTheMeasure() {
+        LayoutChecks.Result result = LayoutChecks.check(List.of(
+                        row("4.1.3", 1, "Animals in which the cells are arranged in two embryonic layers", 2),
+                        row("4.1.3", 2, "Those animals in which the developing embryo has a third", 3)),
+                shapes(ending(2, PdfLayout.Bottom.continues),
+                        shape(3, PdfLayout.Top.continues, "Those animals in which the developing")));
+
+        assertThat(result.flags()).filteredOn(flag -> flag.kind() == LayoutChecks.Kind.join).singleElement()
+                .satisfies(flag -> assertThat(flag.address()).endsWith("§4.1.3 ¶2"));
+    }
+
+    /**
+     * The opposite direction is never silenced by it: a page that ended its paragraph is the
+     * corroboration of a row that ran across the break anyway, not a reason to say nothing.
+     */
+    @Test
+    void aRowRunningAcrossAPageThatOpensAParagraphIsFlaggedEvenWhereThePrintEndedThere() {
+        LayoutChecks.Result result = LayoutChecks.check(List.of(
+                        new NcertParagraphRow((short) 7, "7.8", (short) 3,
+                                "If the object was thrown initially. The escape speed is thus", false, List.of(),
+                                new ParagraphExtraction(List.of(9, 10), List.of(0, 35), new BigDecimal("0.9"), null, null))),
+                shapes(ending(9, PdfLayout.Bottom.ends),
+                        shape(10, PdfLayout.Top.starts, "The escape speed is thus")));
+
+        assertThat(result.flags()).filteredOn(flag -> flag.kind() == LayoutChecks.Kind.join).singleElement()
+                .satisfies(flag -> assertThat(flag.message()).contains("opens a new paragraph"));
+    }
+
     /** A page that opens with a display or a figure cannot say; it is counted, never flagged. */
     @Test
     void anUndecidablePageTopIsCountedNotFlagged() {
@@ -264,6 +311,12 @@ class LayoutChecksTest {
     private static Numbered numbered(int page, List<String> starts, String... equationNumbers) {
         return new Numbered(page, new PdfLayout.PageShape(starts, PdfLayout.Top.starts, starts.getFirst(),
                 List.of(), List.of(equationNumbers)));
+    }
+
+    /** A page judged only by how its last paragraph ends. */
+    private static Numbered ending(int page, PdfLayout.Bottom bottom) {
+        return new Numbered(page, new PdfLayout.PageShape(List.of(), PdfLayout.Top.unknown, null,
+                List.of(), List.of(), bottom));
     }
 
     private static Numbered shape(int page, PdfLayout.Top top, String topLine, List<String> captions) {

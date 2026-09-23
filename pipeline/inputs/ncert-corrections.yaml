@@ -284,3 +284,59 @@ corrections:
   - {book: bio11, lang: en, chapter: 1, page: 1, kind: drop, address: "ch 1 §1 ¶1",
      at: "Biology is the science of life forms and living processes.",
      reason: "the Unit 1 opener essay, not chapter text"}
+
+  # ── bio11: the free layout checks of 2026-09-23, adjudicated against the rendered pages ────────
+  # THE JOINS. Three of the fifteen join flags are real, and each was judged on the signal the check
+  # does not look at: the PREVIOUS page's last line against its column measure. A justified
+  # paragraph's last line is ragged; every other line is set to the full measure, so a last line AT
+  # the measure means the paragraph runs on. The other twelve end 37-228 pt short of it, which
+  # proves the paragraph closed there, and bio11 sets a page's first line flush left whether it
+  # continues or not (ch 4 p5 is a new paragraph at 0.0 pt indent) — which is why the check could
+  # not tell them apart. `at` is what the row that should be absorbed starts with.
+  - {book: bio11, lang: en, chapter: 3, page: 7, kind: join, address: "ch 3 §3.2 ¶2",
+     at: "Bryophytes are also called amphibians of",
+     reason: "p6's last line sits at 533.8 of a 534.0 measure: §3.2 ¶1 runs on past the figure"}
+  - {book: bio11, lang: en, chapter: 4, page: 3, kind: join, address: "ch 4 §4.1.3 ¶2",
+     at: "Those animals in which the developing",
+     reason: "p2's last line is at the measure; diploblastic and triploblastic are one printed paragraph"}
+  - {book: bio11, lang: en, chapter: 12, page: 5, kind: join, address: "ch 12 §12.2 ¶5",
+     at: "There are three major ways in",
+     reason: "p4's last line is at the measure; the three fates of pyruvate continue that sentence"}
+
+  # THE FIGURE FLAGS, all sixteen noise and the rows all faithful. Every flagged label is in its
+  # chapter's own text layer on the row's own page; five are sub-figure letters the running text
+  # really prints — "(Figure 14.2a)" against a caption reading "Figure 14.2 ... (a) inspiration".
+  # The check's caption collector is gated on the first glyph's font name carrying bold/demi, and
+  # bio11 mixes caption faces — ch 17 p6's caption is plain `Bookman` — so those captions are never
+  # collected and every reference to them reads as naming a caption the chapter does not print.
+  - {book: bio11, lang: en, chapter: 2, page: 2, kind: noise, flag: figure, address: "ch 2 §2 ¶3",
+     at: "R.H. Whittaker (1969) proposed a Five", reason: "Table 2.1 is printed; the caption is not collected"}
+  - {book: bio11, lang: en, chapter: 2, page: 8, kind: noise, flag: figure, address: "ch 2 §2.3.1 ¶1",
+     at: "Members of phycomycetes are found in", reason: "Figure 2.5a: the caption prints the bare Figure 2.5"}
+  - {book: bio11, lang: en, chapter: 2, page: 8, kind: noise, flag: figure, address: "ch 2 §2.3.2 ¶1",
+     at: "Commonly known as sac-fungi, the ascomycetes", reason: "Figure 2.5b: the caption prints the bare Figure 2.5"}
+  - {book: bio11, lang: en, chapter: 2, page: 9, kind: noise, flag: figure, address: "ch 2 §2.3.3 ¶1",
+     at: "Commonly known forms of basidiomycetes are", reason: "Figure 2.5c: the caption prints the bare Figure 2.5"}
+  - {book: bio11, lang: en, chapter: 4, page: 5, kind: noise, flag: figure, address: "ch 4 §4.2.2 ¶1",
+     at: "They are aquatic, mostly marine, sessile", reason: "Figure 4.7's caption is printed on the row's own page"}
+  - {book: bio11, lang: en, chapter: 4, page: 7, kind: noise, flag: figure, address: "ch 4 §4.2.6 ¶1",
+     at: "They may be aquatic (marine and", reason: "Figure 4.11's caption is printed on the row's own page"}
+  - {book: bio11, lang: en, chapter: 4, page: 9, kind: noise, flag: figure, address: "ch 4 §4.2.10 ¶2",
+     at: "This phylum consists of a small", reason: "Figure 4.15's caption is printed on the row's own page"}
+  - {book: bio11, lang: en, chapter: 7, page: 5, kind: noise, flag: figure, address: "ch 7 §7.2.2 ¶8",
+     at: "Frogs have well organised male and", reason: "Figure 7.3's caption is printed on the row's own page"}
+  - {book: bio11, lang: en, chapter: 9, page: 1, kind: noise, flag: figure, address: "ch 9 §9 ¶1",
+     at: "There is a wide diversity in", reason: "Table 9.1 is printed; the caption is not collected"}
+  - {book: bio11, lang: en, chapter: 10, page: 2, kind: noise, flag: figure, address: "ch 10 §10.1.1 ¶1",
+     at: "A typical eukaryotic cell cycle is", reason: "Figure 10.1's caption is printed on the row's own page"}
+  - {book: bio11, lang: en, chapter: 14, page: 5, kind: noise, flag: figure, address: "ch 14 §14.2 ¶1",
+     at: "Breathing involves two stages : inspiration",
+     reason: "Figure 14.2a and 14.2b: the page prints both in the running text, the caption the bare label"}
+  - {book: bio11, lang: en, chapter: 14, page: 9, kind: noise, flag: figure, address: "ch 14 §14.4.1 ¶1",
+     at: "Haemoglobin is a red coloured iron", reason: "Figure 14.5's caption is printed on the row's own page"}
+  - {book: bio11, lang: en, chapter: 16, page: 2, kind: noise, flag: figure, address: "ch 16 §16.1 ¶1",
+     at: "In humans, the excretory system consists", reason: "Figure 16.2's caption is printed on the row's own page"}
+  - {book: bio11, lang: en, chapter: 17, page: 6, kind: noise, flag: figure, address: "ch 17 §17.2.2 ¶2",
+     at: "Muscle contraction is initiated by a", reason: "Figure 17.4's caption is set in plain Bookman and is not collected"}
+  - {book: bio11, lang: en, chapter: 17, page: 6, kind: noise, flag: figure, address: "ch 17 §17.2.2 ¶3",
+     at: "This pulls the attached actin filaments", reason: "Figure 17.4's caption is set in plain Bookman and is not collected"}

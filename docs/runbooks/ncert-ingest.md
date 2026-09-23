@@ -112,6 +112,13 @@ Start with one chapter (`--chapters 1`) and read its report before letting the b
 line and the low-confidence list are both in it, and a prompt that is reading the pages wrongly is
 cheapest to catch after twenty pages rather than after two hundred.
 
+**Prompt v4 (2026-09-23) is the active version** and differs from v3 in one rule: a unit opener —
+the page with the unit number set large above a drawing and a few paragraphs of framing prose,
+facing the unit's biography — carries no running text and returns no paragraphs. It is what the
+eight remaining books run behind; `phy11-part1` and `bio11` are canonical on v3 and are not
+re-read, because this command resumes on a page's presence in the JSONL and not on the prompt
+version (prompt-changelog 2026-09-23).
+
 **Since prompt v3 (D15, 2026-09-14) the model does not number paragraphs.** It returns each
 paragraph's section and text and, on the page's first paragraph, one flag — whether it is the
 rest of the paragraph the previous page ended in — and `ncert load` counts ¶1, ¶2, ¶3 per section

@@ -267,6 +267,50 @@ class NcertExtractCommandTest {
         assertThat(written.get(1).paragraphs()).isEmpty();
     }
 
+    /**
+     * A page that returned nothing is not a ratio and is not a defect. Eleven of {@code bio11}'s
+     * fourteen coverage flags were this — five unit openers, five biographies and the plates, every
+     * one a page the prompt tells the model to return nothing for — so they are a checklist of
+     * their own, ordered prose-first: the layer's sentences are what tells a biography from a
+     * plate, and their character counts are not (recalibration, 2026-09-23).
+     */
+    @Test
+    void pagesThatReturnedNothingAreAChecklistOfTheirOwnOrderedProseFirst() throws IOException {
+        store.put("source/ncert/2022-ed/en/phy11-part2/keph201.pdf",
+                pdf(List.of(List.of("Fig. 3.1 Algae : (a) Volvox (b) Ulothrix (c) Fucus"),
+                        List.of("Katherine Esau was born in Ukraine in the year 1898 and she studied there.",
+                                "She received the degree in the year 1931 and she taught there until 1963.",
+                                "The book that she wrote in the year 1953 is the one that is read today."))),
+                "application/pdf");
+        extract.empty.add("8/1");
+        extract.empty.add("8/2");
+
+        assertThat(run()).isZero();
+
+        String report = out.toString();
+        assertThat(report).contains("## pages that returned no running text");
+        assertThat(report).contains("ch 8 p1: nothing came back; the layer holds")
+                .contains("and no sentence-length run")
+                .contains("in 3 sentence-length runs");
+        assertThat(report.indexOf("ch 8 p2: nothing came back"))
+                .isLessThan(report.indexOf("ch 8 p1: nothing came back"));
+        assertThat(report).doesNotContain("ch 8 p1: only 0% of the page's characters came back");
+    }
+
+    /**
+     * The 400-character floor is right — a ratio against a plate's caption means nothing — but it
+     * was silent, and its silence hid three pages of {@code bio11} including a biography nobody
+     * would have found except by hand. The fixture's pages are all under it.
+     */
+    @Test
+    void aPageTheRatioCannotJudgeIsNamedRatherThanPassedOverInSilence() {
+        assertThat(run()).isZero();
+
+        assertThat(out.toString()).contains("and 3 page(s) the ratio could not judge:")
+                .contains("ch 8 p1: the layer holds")
+                .contains("characters, too few to measure a ratio against");
+    }
+
     @Test
     void lowConfidencePagesAreListedForTheFounder() {
         extract.lowConfidence.add("9/1");

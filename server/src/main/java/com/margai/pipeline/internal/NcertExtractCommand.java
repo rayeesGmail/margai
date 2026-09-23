@@ -12,6 +12,7 @@ import com.margai.storage.api.ObjectStore;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +94,8 @@ class NcertExtractCommand extends NcertBookCommand {
         List<String> diffFlags = new ArrayList<>();
         List<String> notationFlags = new ArrayList<>();
         List<String> structureFlags = new ArrayList<>();
+        List<EmptyPage> emptyPages = new ArrayList<>();
+        List<String> notJudged = new ArrayList<>();
         List<String> lowConfidence = new ArrayList<>();
         int called = 0;
         int skipped = 0;
@@ -190,8 +193,17 @@ class NcertExtractCommand extends NcertBookCommand {
                     }
                     String transcribed = response.output().paragraphs().stream()
                             .map(NcertPage.Paragraph::text).collect(java.util.stream.Collectors.joining(" "));
-                    PageCoverage.check(pageText, transcribed)
-                            .ifPresent(reason -> structureFlags.add("ch " + chapter.no() + " p" + page + ": " + reason));
+                    PageCoverage.Assessment coverage = PageCoverage.of(pageText, transcribed);
+                    String onPage = "ch " + chapter.no() + " p" + page + ": " + coverage.reason();
+                    switch (coverage.verdict()) {
+                        case TOO_LITTLE_CAME_BACK, TOO_MUCH_CAME_BACK -> structureFlags.add(onPage);
+                        // Not a defect list but a checklist, and ordered prose-first at the end of
+                        // the run: a page whose layer reads as sentences and returned nothing is
+                        // the one to look at (D15, 2026-09-23).
+                        case NOTHING_CAME_BACK -> emptyPages.add(new EmptyPage(onPage, coverage.sentenceRuns()));
+                        case NOT_JUDGED -> notJudged.add(onPage);
+                        case MATCHED -> { }
+                    }
                 }
                 previous = PreviousPage.of(response.output(), previous);
                 if (read.confidence() != null && read.confidence().compareTo(LOW_CONFIDENCE) < 0) {
@@ -228,9 +240,19 @@ class NcertExtractCommand extends NcertBookCommand {
         report.section("characters that differ from the page's text layer — adjudicate these")
                 .line("checked: " + checked)
                 .list(diffFlags, pagesChecked == 0 ? "nothing was checked" : "none on the pages checked");
-        report.section("pages whose text is not all there — or is there twice")
+        Report coverage = report.section("pages whose text is not all there — or is there twice")
                 .line("checked: " + checked)
                 .list(structureFlags, pagesChecked == 0 ? "nothing was checked" : "none on the pages checked");
+        // Named rather than passed over: the floor is right — a ratio against 200 characters means
+        // nothing — but its silence hid three pages of bio11, one of them a biography (D15).
+        if (!notJudged.isEmpty()) {
+            coverage.line("").line("and " + notJudged.size() + " page(s) the ratio could not judge:").list(notJudged);
+        }
+        report.section("pages that returned no running text — confirm each is a plate, a biography or a table")
+                .line("checked: " + checked)
+                .list(emptyPages.stream().sorted(Comparator.comparingInt(EmptyPage::sentenceRuns).reversed())
+                        .map(EmptyPage::line).toList(),
+                        pagesChecked == 0 ? "nothing was checked" : "every page checked returned something");
         report.section("notation to adjudicate — a glyph the layer garbled and the model copied")
                 .line("checked: every paragraph of the " + called + " page(s) called this run")
                 .list(notationFlags, called == 0 ? "nothing was checked" : "none");
@@ -300,5 +322,12 @@ class NcertExtractCommand extends NcertBookCommand {
     /** Where a page already in the JSONL left off, so a resumed run carries its section and tail forward too. */
     private static PreviousPage previousOf(ExtractedPage page, PreviousPage before) {
         return PreviousPage.of(new NcertPage(page.paragraphs(), page.confidence()), before);
+    }
+
+    /**
+     * A page the model returned nothing for, held until the report can order them: the ones whose
+     * layer reads as running text first, because those are the ones worth opening.
+     */
+    private record EmptyPage(String line, int sentenceRuns) {
     }
 }

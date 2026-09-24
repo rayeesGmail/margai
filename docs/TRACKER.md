@@ -285,10 +285,59 @@ THE THIRD CAUSE OF THE START FLAGS — **built on the founder's instruction, and
   `continues` to `starts`. **Carry the method note**: pymupdf's span sizes are not PDFBox's per-glyph
   sizes, this bug lives exactly in the gap between them, and an offline estimate of it reads zero —
   measure this class in Java. The next free verify run is where the 129 becomes a real number.
+**THE SECOND READ, 2026-09-24: 193 pages, ₹188.32, 694 verdicts — 685 of 694 clean, 98.7%**, and
+  PLAN D15's ✅ line computes for the first time (report `-ncert-verify.md`). Nine flags on 694 rows:
+  **one real defect** (ch 9 §9.8.3 ¶2 lost the reversible arrow, so "E + S <-> ES" read "E + S ES" —
+  fixed by a `text` ruling, the prompt's own notation block fixing `<->`), **one misprint kept** (the
+  layer prints "aqueduct passess through": the row is faithful and the verifier corrected NCERT), and
+  **seven verifier errors** — three quoting a prefix of the print and calling the remainder an
+  addition, two the Greek-letter convention of the shared notation block ("alpha type" for α type),
+  one the same block's rule that a condition above an arrow is written after it in brackets (the
+  carbonic-anhydrase row did exactly that), one a symbol misread (the page prints ⚥ for bisexual and
+  ♂ for male, read at 300 dpi because the layer carries no symbol there). Also one `not_on_page`
+  claim that is a verifier miss — the row's 226 characters sit at the foot of ch 11 p9 verbatim — and
+  **no ruling can answer it**, because `ruledOn` is consulted only for a `differs` span; that page
+  has to be read again. The free checks, re-judged with this session's three fixes: **start flags
+  129 → 84 pages, join flags 3 → 0, figure flags 0 raised of 16** (all ruled, the rows counting
+  clean), equations 0. The two join `noise` entries never fired — the small-caps fix made those
+  pages' headings visible, so `top` became `starts` and the flags went at source.
+**AND THEN THE FINDING THAT MATTERS MORE THAN ANY OF IT — `ChapterApparatus` DISCARDS TEACHING.**
+  Chasing the one "passage no row carries" that was not a question or a figure interior: ch 12
+  §12.7 ¶3 ends *"as shown in the equation below :"* and the equation is not in the corpus. A ₹8.99
+  redo of that page reproduced the same output, which is the "repeat before change" rule earning its
+  keep — it proved the skip is a rule, not dice. The reason is not the transcriber at all: **the
+  equation is at the top of p12, and `ChapterApparatus.find` returns the first page carrying a line
+  equal to SUMMARY and `covers(page) = page >= firstPage`, so the whole page is never sent** — with
+  everything printed above the heading on it. Page 12 opens with the glucose-oxidation equation, its
+  RQ = 1.0, then *"When fats are used in respiration, the RQ is less than 1…"*, the tripalmitin
+  equation, RQ = 0.7, and *"When proteins are respiratory substrates the ratio would be about 0.9"*.
+  **Measured across both closed books** (prose lines only, running-head zone excluded, ≥100
+  characters): **bio11 loses prose above the boundary in 14 of its 19 chapters, ≈12,850 characters;
+  phy11-part1 in 2 of 7, ≈2,310.** Verified by hand in two: ch 12's RQ values for fats and proteins,
+  and **ch 14 p11's "Occupational Respiratory Disorders"** — a named subsection of §14.6 on dust,
+  fibrosis and silicosis, which appears in **zero rows**. Both are NEET material.
+  **This is invisible to every number we have**: coverage counts pages *extracted*, and an
+  apparatus-skipped page counts as legitimately skipped, so "100.0% coverage" and "98.7% clean" are
+  both true and neither can see it. The second read cannot see it either — it only reads pages that
+  were sent. **So neither book is canonical yet**, and the fix belongs before the eight others, not
+  after. The shape of it: `ChapterApparatus` returns the boundary's position *within* its page, and
+  extract sends that page while still skipping every page after it — the prompt already carries the
+  rule to skip Summary and Exercises, and the reason the page-level skip exists (NCERT numbers its
+  exercises like section numbers, so the model mis-addressed them) is then confined to one page per
+  chapter, with the second read and the start check watching it. Note the re-extraction is not free
+  and not cheap per page: 16 boundary pages as single-page calls is ≈₹9 each, because a lone call
+  pays the whole 11,025-token prefix as a cache *write* with nothing to amortise it — the ₹4.36 a
+  long run gets does not apply. Batching per chapter is the cheaper shape.
 HOW TO RESUME:
-  1. **The paid second read, and nothing before it** (≈₹190): `--read-pages` over bio11's 19
-     chapters on `pipeline,live,visionsonnet`, the key sourced into the shell. Then adjudicate its
-     flags, then `ncert embed --book bio11`, and bio11 is canonical the way phy11-part1 is.
+  1. ~~The paid second read~~ — **run 2026-09-24, ₹188.32, 685 of 694 clean**; its nine flags and
+     the one `not_on_page` miss are all adjudicated and ruled. What is left of it: re-read ch 9 p12
+     and ch 12 p11 (the pages the rulings changed — a plain `--read-pages` resumes into exactly
+     those, ≈₹2) and `--redo --chapters 11 --pages 9` for the verifier's one miss (≈₹1).
+  1b. **THEN THE APPARATUS BOUNDARY, before the eight books and before either book is called
+     canonical** (above): `ChapterApparatus` discards the whole page the SUMMARY starts on, which
+     costs bio11 prose in 14 of 19 chapters and phy11-part1 in 2 of 7 — including a named §14.6
+     subsection that reaches no row. Code first, then re-extract the 16 boundary pages, then reload
+     and re-verify those pages. Founder's call on the shape; the recommendation is in the day log.
   2. ~~The number-only heading line~~ — **built as the small-caps fix instead** (above); the free
      verify is what turns 93 recovered starts into a new flag count, and it is ₹0, so run it with
      step 1.

@@ -340,3 +340,16 @@ corrections:
      at: "Muscle contraction is initiated by a", reason: "Figure 17.4's caption is set in plain Bookman and is not collected"}
   - {book: bio11, lang: en, chapter: 17, page: 6, kind: noise, flag: figure, address: "ch 17 §17.2.2 ¶3",
      at: "This pulls the attached actin filaments", reason: "Figure 17.4's caption is set in plain Bookman and is not collected"}
+
+  # THE TWO JOIN FLAGS THE GEOMETRY CANNOT REACH. Thirteen of the fifteen are now settled in code by
+  # the previous page's last line; these two are not, and the reason is the same on both pages: the
+  # paragraph's true last line — "in a synchronised fashion.", "When would they be perpendicular to
+  # the incident light?" — is not what the layer calls prose, so the lowest prose line is an earlier
+  # one set to the full measure and the page reads as running on. Both were read against the print on
+  # 2026-09-23: the previous page's paragraph closes, 228 pt and 73 pt short of the measure.
+  - {book: bio11, lang: en, chapter: 11, page: 7, kind: noise, flag: join, address: "ch 11 §11.4 ¶1",
+     at: "Looking at plants have you ever",
+     reason: "p6 closes 73 pt short of the measure; §11.4 opens a new section under its own heading"}
+  - {book: bio11, lang: en, chapter: 18, page: 2, kind: noise, flag: join, address: "ch 18 §18.1 ¶1",
+     at: "The neural system of all animals is",
+     reason: "p1 closes 228 pt short of the measure; §18.1 opens a new section under its own heading"}

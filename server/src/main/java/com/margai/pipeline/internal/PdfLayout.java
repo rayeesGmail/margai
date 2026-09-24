@@ -282,7 +282,10 @@ final class PdfLayout {
     private static Bottom bottom(Map<Boolean, List<Line>> columns, Set<Line> prose) {
         for (boolean right : new boolean[] {true, false}) {
             List<Line> column = columns.getOrDefault(right, List.of()).stream().filter(prose::contains).toList();
-            if (column.isEmpty()) {
+            // Reading order ends in the right column, but only where there is one: a handful of lines
+            // reaching across the gutter is not a column, and on bio11 ch 4 p10 two of them outvoted
+            // the twenty-nine that are the page (2026-09-23).
+            if (column.isEmpty() || (right && column.size() < MARGIN_LINES)) {
                 continue;
             }
             Double margin = commonest(column.stream().map(line -> line.x).toList());

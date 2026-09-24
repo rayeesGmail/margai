@@ -413,6 +413,17 @@ class PdfLayoutTest {
         assertThat(biologyChapterFour().get(1).bottom()).isEqualTo(PdfLayout.Bottom.continues);
     }
 
+    /**
+     * bio11 ch 4 p10 is a figure page whose body sits in one column of 29 prose lines, with two lines
+     * reaching across the notional gutter. Reading order ends in the right column where there is one,
+     * and those two outvoted the twenty-nine that are the page: the bottom read "continues" and the
+     * join flag on p11 survived a ruling of noise (found on the first real run, 2026-09-23).
+     */
+    @Test
+    void aFewLinesAcrossTheGutterAreNotTheColumnReadingOrderEndsIn() throws IOException {
+        assertThat(biologyChapterFour().get(9).bottom()).isEqualTo(PdfLayout.Bottom.ends);
+    }
+
     private static List<PdfLayout.PageShape> biologyChapterOne() throws IOException {
         assumeTrue(Files.isRegularFile(BIO_CHAPTER_1), "the founder's NCERT PDFs are not on this machine");
         return PdfLayout.pages(Files.readAllBytes(BIO_CHAPTER_1));

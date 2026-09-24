@@ -197,7 +197,18 @@ final class PdfLayout {
                 || (rightMargin != null && gap(previous, next) > SEGMENT_GAP
                         && next.x >= rightMargin - 2 && previous.x + previous.width < rightMargin - 5));
         double body = bodySize(lines);
-        List<Line> readable = lines.stream().filter(line -> line.size >= body - BODY_SIZE_TOLERANCE).toList();
+        // A line's size is its commonest glyph's, which a heading set in SMALL CAPS loses: bio11 sets
+        // "2.4 KINGDOM PLANTAE" with a 13 pt initial and 9 pt capitals, so the modal size is 9 against
+        // a body of 10 and the floor — which is here to drop running heads and captions — dropped the
+        // heading before anything could read it. Its largest glyph is what says it is not small text
+        // (2026-09-24; the three headings of ch 2 p10, and the rows beneath them, were named by the
+        // start check as rows the print does not start).
+        // The bold face is what keeps the running head out: bio11 sets that in small caps too
+        // ("BIOLOGICAL CLASSIFICATION", 7 pt on an 11 pt initial), and admitting it would make the
+        // page's first line something that is neither prose nor a heading, which says nothing.
+        List<Line> readable = lines.stream()
+                .filter(line -> line.size >= body - BODY_SIZE_TOLERANCE || (line.bold && line.largest >= body))
+                .toList();
         Set<Line> prose = prose(readable, body);
         Map<Boolean, List<Line>> columns = new HashMap<>();
         for (Line line : readable) {
@@ -426,7 +437,8 @@ final class PdfLayout {
      * @param x   where the line begins, and {@code end} where its last glyph stops — the pair is what
      *            tells a line set to the column's measure from a paragraph's ragged last one
      */
-    private record Line(double x, double end, double y, double size, boolean bold, String text, int glyphs) {
+    private record Line(double x, double end, double y, double size, double largest, boolean bold, String text,
+            int glyphs) {
 
         static Line of(List<Glyph> glyphs) {
             StringBuilder text = new StringBuilder();
@@ -445,7 +457,8 @@ final class PdfLayout {
             String font = first.font == null ? "" : first.font.toLowerCase(Locale.ROOT);
             boolean bold = font.contains("bold") || font.contains("demi") || font.contains("black")
                     || font.contains("heavy");
-            return new Line(first.x, previous.x + previous.width, first.y, size, bold,
+            double largest = glyphs.stream().mapToDouble(Glyph::size).max().orElse(size);
+            return new Line(first.x, previous.x + previous.width, first.y, size, largest, bold,
                     text.toString().replaceAll("\\s+", " ").strip(), glyphs.size());
         }
 

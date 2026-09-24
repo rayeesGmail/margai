@@ -23,6 +23,7 @@ class PdfLayoutTest {
     private static final Path CHAPTER_7 = Path.of("../ncert/2022-ed/en/phy11-part1/keph107.pdf");
     private static final Path CHAPTER_6 = Path.of("../ncert/2022-ed/en/phy11-part1/keph106.pdf");
     private static final Path BIO_CHAPTER_1 = Path.of("../ncert/2022-ed/en/bio11/kebo101.pdf");
+    private static final Path BIO_CHAPTER_2 = Path.of("../ncert/2022-ed/en/bio11/kebo102.pdf");
     private static final Path BIO_CHAPTER_4 = Path.of("../ncert/2022-ed/en/bio11/kebo104.pdf");
     private static final double WIDTH = 657;
 
@@ -345,6 +346,45 @@ class PdfLayoutTest {
         assertThat(shape.starts()).containsExactly("Genus comprises a group of related");
     }
 
+    /**
+     * The limit of every start rule on this book, pinned so it is not "fixed" speculatively again.
+     *
+     * <p>bio11 sets its top-level section headings in a face PDFBox cannot map. Chapter 2 page 10
+     * prints "2.4 KINGDOM PLANTAE", "2.5 KINGDOM ANIMALIA" and "2.6 VIRUSES, VIROIDS, PRIONS AND
+     * LICHENS" — pymupdf reads all three as bold 13 pt — and the layer PDFBox hands us carries only
+     * the body text: the paragraphs run from one section into the next with nothing between them.
+     * So the three rows that open those sections can be paired with a printed start by no rule over
+     * this layer, and they are three of the report's remaining page-level start flags.
+     *
+     * <p>On 2026-09-24 a rule for a heading line carrying only its number was written against this
+     * page and reverted, because the number is missing too: what pymupdf shows as "2.4" set apart
+     * from its title is not what this layer contains. A fix here has to come from somewhere other
+     * than the characters — the vertical gap the missing heading leaves is the only trace of it.
+     */
+    @Test
+    void aSmallCapsHeadingIsNotSmallText() {
+        PdfLayout.PageShape shape = shape(
+                concat(glyphs(42, 100, 13, "Bookman,Bold", "2.4 K"),
+                        glyphs(75, 100, 9, "Bookman,Bold", "INGDOM PLANTAE")),
+                line(42, 125, "Bookman", "Kingdom Plantae includes all eukaryotic chlorophyll"),
+                line(42, 137, "Bookman", "organisms commonly called plants. A few members are"),
+                line(42, 149, "Bookman", "heterotrophic such as the insectivorous plants or para"));
+
+        assertThat(shape.starts()).containsExactly("Kingdom Plantae includes all eukaryotic chlorophyll");
+        assertThat(shape.top()).isEqualTo(PdfLayout.Top.starts);
+    }
+
+    /** ch 2 p10 sets 2.4, 2.5 and 2.6 this way, and named all three of their paragraphs as unstarted. */
+    @Test
+    void bioElevenPageTenStartsAParagraphUnderEachOfItsSmallCapsHeadings() throws IOException {
+        assertThat(biologyChapterTwo().get(9).starts())
+                .anyMatch(start -> start.startsWith("Kingdom Plantae includes"))
+                .anyMatch(start -> start.startsWith("This kingdom is characterised"))
+                .anyMatch(start -> start.startsWith("In the five kingdom classification"))
+                .hasSize(6);
+        assertThat(biologyChapterTwo().get(9).top()).isEqualTo(PdfLayout.Top.starts);
+    }
+
     /** "14.2.1 Respiratory Volumes and / Capacities": the wrap is the heading, not its first paragraph. */
     @Test
     void aTitleCaseHeadingWrappedToASecondLineIsStillTheHeading() {
@@ -429,6 +469,11 @@ class PdfLayoutTest {
         return PdfLayout.pages(Files.readAllBytes(BIO_CHAPTER_1));
     }
 
+    private static List<PdfLayout.PageShape> biologyChapterTwo() throws IOException {
+        assumeTrue(Files.isRegularFile(BIO_CHAPTER_2), "the founder's NCERT PDFs are not on this machine");
+        return PdfLayout.pages(Files.readAllBytes(BIO_CHAPTER_2));
+    }
+
     private static List<PdfLayout.PageShape> biologyChapterFour() throws IOException {
         assumeTrue(Files.isRegularFile(BIO_CHAPTER_4), "the founder's NCERT PDFs are not on this machine");
         return PdfLayout.pages(Files.readAllBytes(BIO_CHAPTER_4));
@@ -449,6 +494,13 @@ class PdfLayoutTest {
         List<PdfLayout.Glyph> glyphs = new ArrayList<>();
         Arrays.stream(lines).forEach(line -> line.forEach(glyph -> glyphs.add((PdfLayout.Glyph) glyph)));
         return PdfLayout.shape(glyphs, WIDTH);
+    }
+
+    /** One line built from runs of different sizes — a heading set in small caps. */
+    private static List<PdfLayout.Glyph> concat(List<PdfLayout.Glyph> first, List<PdfLayout.Glyph> rest) {
+        List<PdfLayout.Glyph> all = new ArrayList<>(first);
+        all.addAll(rest);
+        return all;
     }
 
     private static List<PdfLayout.Glyph> line(double x, double y, String font, String text) {

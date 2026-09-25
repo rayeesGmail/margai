@@ -464,6 +464,174 @@ class PdfLayoutTest {
         assertThat(biologyChapterFour().get(9).bottom()).isEqualTo(PdfLayout.Bottom.ends);
     }
 
+    /**
+     * The page a chapter's Summary starts on carries teaching above the heading and apparatus below it
+     * (D15, 2026-09-24). Cut there, the page is what was taught on it: nothing below the heading in its
+     * column, and none of the right column when the heading is in the left, because reading order has
+     * already left the teaching behind.
+     */
+    @Test
+    void aPageCutAtItsApparatusHeadingKeepsOnlyWhatIsPrintedAboveIt() {
+        PdfLayout.PageShape shape = cut("SUMMARY",
+                line(91.7, 100, "Bookman", "When fats are used in respiration, the RQ is"),
+                line(73.7, 112, "Bookman", "less than one, as shown in the equation that"),
+                line(73.7, 124, "Bookman", "follows the example which the book sets here."),
+                line(91.7, 136, "Bookman", "When proteins are respiratory substrates the"),
+                line(73.7, 148, "Bookman", "ratio would be about nine tenths of the whole."),
+                line(73.7, 172, "Bookman,Bold", "SUMMARY"),
+                line(91.7, 190, "Bookman", "Plants unlike animals have no special systems"),
+                line(73.7, 202, "Bookman", "for breathing or for the exchange of the gases."),
+                line(373.7, 100, "Bookman", "Cellular respiration is the breakdown of the"),
+                line(355.7, 112, "Bookman", "food materials within the cell to release the"),
+                line(355.7, 124, "Bookman", "energy that is trapped for the synthesis of it."));
+
+        assertThat(shape.starts()).containsExactly("When fats are used in respiration,",
+                "When proteins are respiratory substrates the");
+        assertThat(shape.apparatus()).isEqualTo(new PdfLayout.Apparatus(true, 5));
+    }
+
+    /** A heading in the right column leaves the whole left column taught, and what is above it in its own. */
+    @Test
+    void aHeadingInTheRightColumnKeepsTheLeftColumnWhole() {
+        PdfLayout.PageShape shape = cut("SUMMARY",
+                line(91.7, 100, "Bookman", "Occupational respiratory disorders are caused"),
+                line(73.7, 112, "Bookman", "by the dust of the industries where grinding or"),
+                line(73.7, 124, "Bookman", "stone breaking is done and so many workers get"),
+                line(73.7, 136, "Bookman", "exposed to it every day of their working lives."),
+                line(373.7, 100, "Bookman", "Long exposure can give rise to inflammation"),
+                line(355.7, 112, "Bookman", "leading to fibrosis and thus causing a serious"),
+                line(355.7, 136, "Bookman,Bold", "SUMMARY"),
+                line(373.7, 154, "Bookman", "Cells utilise oxygen for the metabolism of the"),
+                line(355.7, 166, "Bookman", "food and they produce the gas carbon dioxide."));
+
+        assertThat(shape.starts()).containsExactly("Occupational respiratory disorders are caused",
+                "Long exposure can give rise to");
+        assertThat(shape.apparatus()).isEqualTo(new PdfLayout.Apparatus(true, 6));
+    }
+
+    /**
+     * bio11 sets one column and centres its Summary heading, which puts the heading where a second
+     * column would begin (ch 14 p11: x = 262 on a 576 pt page). With no column there, the cut is by
+     * height alone — read as a right-column heading, the whole page was kept, Summary and all.
+     */
+    @Test
+    void aCentredHeadingOnAOneColumnPageCutsByHeightAlone() {
+        PdfLayout.PageShape shape = cut("SUMMARY",
+                line(42, 106, "Bookman", "Occupational Respiratory Disorders: In certain"),
+                line(42, 120, "Bookman", "industries, especially those involving grinding"),
+                line(42, 134, "Bookman", "so much dust is produced that the defence of"),
+                line(300, 227, "Bookman,Bold", "SUMMARY"),
+                line(79, 267, "Bookman", "Cells utilise oxygen for metabolism and produce"),
+                line(79, 281, "Bookman", "energy along with substances like carbon dioxide"),
+                line(97, 337, "Bookman", "The first step in respiration is breathing by"),
+                line(79, 351, "Bookman", "which atmospheric air is taken in by the lungs."));
+
+        assertThat(shape.starts()).isEmpty();
+        assertThat(shape.apparatus()).isEqualTo(new PdfLayout.Apparatus(true, 3));
+    }
+
+    /**
+     * Physics sets its Summary a point smaller than its text. On phy11-part1 ch 4 p18 the Summary
+     * outnumbers the teaching above it, so the page's commonest size is the Summary's — and measured
+     * that way the teaching was not body text and the page read as having nothing above its heading.
+     */
+    @Test
+    void theTextAboveTheCutSetsItsOwnBodySize() {
+        List<List<PdfLayout.Glyph>> summary = new ArrayList<>();
+        for (int line = 0; line < 12; line++) {
+            summary.add(glyphs(140, 311 + 11 * line, 9, "Bookman", "Newton's second law of motion states the rate of change"));
+        }
+        List<Object> page = new ArrayList<>(List.of(
+                line(94, 181, "Bookman", "The important thing to remember is that an"),
+                line(82, 193, "Bookman", "action-reaction pair consists of mutual forces"),
+                line(82, 205, "Bookman", "which are always equal and opposite between"),
+                line(82, 216, "Bookman", "two bodies. Two forces on the same body which"),
+                line(122, 290, "Bookman,Bold", "SUMMARY")));
+        page.addAll(summary);
+
+        PdfLayout.PageShape shape = cut("SUMMARY", page.toArray(List[]::new));
+
+        assertThat(shape.apparatus()).isEqualTo(new PdfLayout.Apparatus(true, 4));
+    }
+
+    /** A Summary at the top of its page leaves nothing taught on it; the running head is not prose. */
+    @Test
+    void aHeadingAtTheTopLeavesNoProseAboveIt() {
+        PdfLayout.PageShape shape = cut("SUMMARY",
+                glyphs(73.7, 60, 7, "Bookman", "RESPIRATION IN PLANTS"),
+                line(73.7, 100, "Bookman,Bold", "SUMMARY"),
+                line(91.7, 118, "Bookman", "Plants unlike animals have no special systems"),
+                line(73.7, 130, "Bookman", "for breathing or for the exchange of the gases."),
+                line(73.7, 142, "Bookman", "The stomata and lenticels allow gas exchange."));
+
+        assertThat(shape.starts()).isEmpty();
+        assertThat(shape.apparatus()).isEqualTo(new PdfLayout.Apparatus(true, 0));
+    }
+
+    /**
+     * bio11 sets its Summary heading with a large initial and small capitals, so the heading may arrive
+     * as runs of two sizes; it is still the heading.
+     */
+    @Test
+    void aSmallCapsHeadingIsFound() {
+        PdfLayout.PageShape shape = cut("SUMMARY",
+                line(91.7, 100, "Bookman", "When fats are used in respiration, the RQ is"),
+                line(73.7, 112, "Bookman", "less than one, as shown in the equation that"),
+                line(73.7, 124, "Bookman", "follows the example which the book sets here."),
+                concat(glyphs(73.7, 150, 13, "Bookman,Bold", "S"), glyphs(80.2, 150, 9, "Bookman,Bold", "UMMARY")),
+                line(91.7, 168, "Bookman", "Plants unlike animals have no special systems"));
+
+        assertThat(shape.apparatus()).isEqualTo(new PdfLayout.Apparatus(true, 3));
+    }
+
+    /**
+     * A heading the geometry cannot find cuts nothing, and says so: the caller then sends the page,
+     * because sending a page is recoverable and discarding teaching is not.
+     */
+    @Test
+    void aHeadingThatIsNotOnThePageCutsNothing() {
+        PdfLayout.PageShape shape = cut("SUMMARY",
+                line(91.7, 100, "Bookman", "When fats are used in respiration, the RQ is"),
+                line(73.7, 112, "Bookman", "less than one, as shown in the equation that"),
+                line(91.7, 124, "Bookman", "When proteins are respiratory substrates the"));
+
+        assertThat(shape.starts()).hasSize(2);
+        assertThat(shape.apparatus().located()).isFalse();
+    }
+
+    /** A page not asked about carries no apparatus reading at all. */
+    @Test
+    void aPageNotAskedAboutHasNoApparatusReading() {
+        assertThat(shape(line(91.7, 100, "Bookman", "When fats are used in respiration, the RQ is"))
+                .apparatus()).isNull();
+    }
+
+    /**
+     * The two pages the finding rests on. bio11 ch 14 p11 prints §14.6's "Occupational Respiratory
+     * Disorders" above its Summary, and its text layer carries the heading <em>first</em> — which is
+     * why the cut is made by position and not by the layer's line order. Ch 1 p9 opens with its Summary.
+     */
+    @Test
+    void biologyChapterFourteenPageElevenCarriesTeachingAboveItsSummary() throws IOException {
+        Path chapter = Path.of("../ncert/2022-ed/en/bio11/kebo114.pdf");
+        assumeTrue(Files.isRegularFile(chapter), "the founder's NCERT PDFs are not on this machine");
+
+        PdfLayout.PageShape page11 = PdfLayout.pages(Files.readAllBytes(chapter), 11, "SUMMARY").get(10);
+
+        assertThat(page11.apparatus()).isEqualTo(new PdfLayout.Apparatus(true, 6));
+        assertThat(page11.topLine()).startsWith("Occupational Respiratory Disorders");
+        assertThat(page11.starts()).noneMatch(start -> start.startsWith("The first step in respiration"));
+    }
+
+    @Test
+    void biologyChapterOnePageNineOpensWithItsSummary() throws IOException {
+        Path chapter = Path.of("../ncert/2022-ed/en/bio11/kebo101.pdf");
+        assumeTrue(Files.isRegularFile(chapter), "the founder's NCERT PDFs are not on this machine");
+
+        assertThat(PdfLayout.pages(Files.readAllBytes(chapter), 9, "SUMMARY").get(8).apparatus())
+                .isEqualTo(new PdfLayout.Apparatus(true, 0));
+    }
+
     private static List<PdfLayout.PageShape> biologyChapterOne() throws IOException {
         assumeTrue(Files.isRegularFile(BIO_CHAPTER_1), "the founder's NCERT PDFs are not on this machine");
         return PdfLayout.pages(Files.readAllBytes(BIO_CHAPTER_1));
@@ -494,6 +662,12 @@ class PdfLayoutTest {
         List<PdfLayout.Glyph> glyphs = new ArrayList<>();
         Arrays.stream(lines).forEach(line -> line.forEach(glyph -> glyphs.add((PdfLayout.Glyph) glyph)));
         return PdfLayout.shape(glyphs, WIDTH);
+    }
+
+    private static PdfLayout.PageShape cut(String heading, List<?>... lines) {
+        List<PdfLayout.Glyph> glyphs = new ArrayList<>();
+        Arrays.stream(lines).forEach(line -> line.forEach(glyph -> glyphs.add((PdfLayout.Glyph) glyph)));
+        return PdfLayout.shape(glyphs, WIDTH, heading);
     }
 
     /** One line built from runs of different sizes — a heading set in small caps. */

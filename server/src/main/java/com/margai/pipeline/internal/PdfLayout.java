@@ -64,6 +64,8 @@ final class PdfLayout {
     private static final int MARGIN_LINES = 3;
     /** A line body text sits within this many points of the body size. */
     private static final double BODY_SIZE_TOLERANCE = 0.9;
+    /** Enough glyphs — three or four lines of a column — for the text above a cut to set its own body size. */
+    private static final int MIN_BODY_GLYPHS = 150;
     /** How many words of a starting line a report quotes. */
     private static final int QUOTED_WORDS = 6;
 
@@ -142,15 +144,22 @@ final class PdfLayout {
      * @param captions        the figure and table labels the page's bold captions carry ("fig 7.3")
      * @param equationNumbers every printed equation number of the page, in reading order, as often as
      *                        the page prints it — a displayed equation's label and every reference to it
+     * @param apparatus       where the chapter's apparatus heading sits on this page, when the page was
+     *                        read as the one that carries it; null on every other page
      */
     record PageShape(List<String> starts, Top top, String topLine, List<String> captions,
-            List<String> equationNumbers, Bottom bottom) {
+            List<String> equationNumbers, Bottom bottom, Apparatus apparatus) {
 
         PageShape {
             starts = List.copyOf(starts);
             captions = List.copyOf(captions);
             equationNumbers = List.copyOf(equationNumbers);
             bottom = bottom == null ? Bottom.unknown : bottom;
+        }
+
+        PageShape(List<String> starts, Top top, String topLine, List<String> captions,
+                List<String> equationNumbers, Bottom bottom) {
+            this(starts, top, topLine, captions, equationNumbers, bottom, null);
         }
 
         PageShape(List<String> starts, Top top, String topLine, List<String> captions) {
@@ -163,17 +172,34 @@ final class PdfLayout {
         }
     }
 
+    /**
+     * Where a chapter's apparatus heading sits on the page that carries it (D15, 2026-09-24).
+     *
+     * @param located         whether the heading was found among the page's lines; when it was not,
+     *                        nothing was cut and the count below is not a measurement
+     * @param proseLinesAbove the body-size prose lines before the heading in reading order — the
+     *                        teaching the page carries; the running head and captions are not counted
+     */
+    record Apparatus(boolean located, int proseLinesAbove) {
+    }
+
     /** Every page of a chapter PDF, in order. */
     static List<PageShape> pages(byte[] pdf) {
+        return pages(pdf, 0, null);
+    }
+
+    /**
+     * Every page of a chapter PDF, in order, the page carrying the apparatus heading cut at it: its
+     * shape is what was taught on it, so the Summary's paragraphs are not printed starts no row takes.
+     *
+     * @param apparatusPage the 1-based page the heading is on
+     * @param heading       the heading, as {@link ChapterApparatus} found it in the text layer
+     */
+    static List<PageShape> pages(byte[] pdf, int apparatusPage, String heading) {
         try (PDDocument document = Loader.loadPDF(pdf)) {
             List<PageShape> shapes = new ArrayList<>();
             for (int page = 1; page <= document.getNumberOfPages(); page++) {
-                GlyphCollector collector = new GlyphCollector();
-                collector.setSortByPosition(true);
-                collector.setStartPage(page);
-                collector.setEndPage(page);
-                collector.getText(document);
-                shapes.add(shape(collector.glyphs, document.getPage(page - 1).getMediaBox().getWidth()));
+                shapes.add(shape(document, page, page == apparatusPage ? heading : null));
             }
             return shapes;
         } catch (IOException e) {
@@ -181,22 +207,61 @@ final class PdfLayout {
         }
     }
 
+    /** One page of a chapter PDF, cut at the apparatus heading it carries. */
+    static PageShape page(byte[] pdf, int page, String heading) {
+        try (PDDocument document = Loader.loadPDF(pdf)) {
+            return shape(document, page, heading);
+        } catch (IOException e) {
+            throw new UncheckedIOException("cannot read the PDF's text layer", e);
+        }
+    }
+
+    private static PageShape shape(PDDocument document, int page, String heading) throws IOException {
+        GlyphCollector collector = new GlyphCollector();
+        collector.setSortByPosition(true);
+        collector.setStartPage(page);
+        collector.setEndPage(page);
+        collector.getText(document);
+        return shape(collector.glyphs, document.getPage(page - 1).getMediaBox().getWidth(), heading);
+    }
+
     static PageShape shape(List<Glyph> glyphs, double pageWidth) {
+        return shape(glyphs, pageWidth, null);
+    }
+
+    /**
+     * @param apparatusHeading the chapter's apparatus heading when this is the page that carries it,
+     *                         else null
+     */
+    static PageShape shape(List<Glyph> glyphs, double pageWidth, String apparatusHeading) {
         // Two passes. A first, cautious cut at every gap wider than a word space finds the prose and
         // so the columns; the second cuts only at the gutter or at a display's spacing, because a
         // justified line in a narrow column can space two words wider than the first cut allows —
         // "Since Cavendish's ⟶ experiment, the" on page 6 of chapter 7.
         List<Line> firstCut = lines(glyphs, (previous, next) -> gap(previous, next) > SEGMENT_GAP);
         if (firstCut.isEmpty()) {
-            return new PageShape(List.of(), Top.unknown, null, List.of());
+            return new PageShape(List.of(), Top.unknown, null, List.of(), List.of(), Bottom.unknown,
+                    apparatusHeading == null ? null : new Apparatus(false, 0));
         }
         double rightFrom = columnBoundary(firstCut, pageWidth);
         Double rightMargin = commonest(prose(firstCut, bodySize(firstCut)).stream()
                 .filter(line -> line.x >= rightFrom).map(line -> line.x).toList());
-        List<Line> lines = lines(glyphs, (previous, next) -> gap(previous, next) > DISPLAY_GAP
+        List<Line> printed = lines(glyphs, (previous, next) -> gap(previous, next) > DISPLAY_GAP
                 || (rightMargin != null && gap(previous, next) > SEGMENT_GAP
                         && next.x >= rightMargin - 2 && previous.x + previous.width < rightMargin - 5));
-        double body = bodySize(lines);
+        double pageBody = bodySize(printed);
+        // The cut reads columns only where the page has a right column of prose: bio11 sets one column
+        // and centres its Summary heading past where a second would begin (ch 14 p11), and read as a
+        // right-column heading it kept the whole page.
+        double cutFrom = prose(printed, pageBody).stream().filter(line -> line.x >= rightFrom).count() >= MARGIN_LINES
+                ? rightFrom : Double.MAX_VALUE;
+        Line apparatusLine = apparatusHeading == null ? null : find(printed, cutFrom, apparatusHeading);
+        List<Line> lines = apparatusLine == null ? printed : above(printed, cutFrom, apparatusLine);
+        // A cut page's body is what is above the cut, when there is enough of it to say: Physics sets
+        // its Summary a point smaller than the text, and on phy11-part1 ch 4 p18 the Summary outnumbers
+        // the teaching above it, so the page's commonest size made that teaching not body text.
+        double body = apparatusLine != null && lines.stream().mapToInt(Line::glyphs).sum() >= MIN_BODY_GLYPHS
+                ? bodySize(lines) : pageBody;
         // A line's size is its commonest glyph's, which a heading set in SMALL CAPS loses: bio11 sets
         // "2.4 KINGDOM PLANTAE" with a 13 pt initial and 9 pt capitals, so the modal size is 9 against
         // a body of 10 and the floor — which is here to drop running heads and captions — dropped the
@@ -279,8 +344,37 @@ final class PdfLayout {
                 equationNumbers.add(number.group());
             }
         }
+        Apparatus apparatus = apparatusHeading == null ? null
+                : new Apparatus(apparatusLine != null, apparatusLine == null ? 0 : prose.size());
         return new PageShape(starts, top, topLine, List.copyOf(captions), equationNumbers,
-                bottom(columns, prose));
+                bottom(columns, prose), apparatus);
+    }
+
+    /**
+     * The apparatus heading's line: the first in reading order — the left column top to bottom, then
+     * the right — that reads as the heading once spaces are ignored, because bio11 sets it with a large
+     * initial and small capitals and a gap between the two can read as a space. Null when there is none.
+     */
+    private static Line find(List<Line> lines, double rightFrom, String heading) {
+        String wanted = heading.replace(" ", "");
+        return lines.stream()
+                .sorted(Comparator.comparing((Line line) -> line.x >= rightFrom).thenComparingDouble(line -> line.y))
+                .filter(line -> line.text.replace(" ", "").equalsIgnoreCase(wanted))
+                .findFirst().orElse(null);
+    }
+
+    /**
+     * What reading order reaches before the heading: in its own column, the lines above it; in the left
+     * column when it heads the right, all of them; in the right column when it is in the left, none.
+     */
+    private static List<Line> above(List<Line> lines, double rightFrom, Line heading) {
+        boolean headingRight = heading.x >= rightFrom;
+        return lines.stream()
+                .filter(line -> {
+                    boolean right = line.x >= rightFrom;
+                    return right == headingRight ? line.y < heading.y - SAME_LINE : !right;
+                })
+                .toList();
     }
 
     /**

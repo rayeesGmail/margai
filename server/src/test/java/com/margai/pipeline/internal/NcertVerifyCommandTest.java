@@ -392,6 +392,22 @@ class NcertVerifyCommandTest {
                 .contains("1 numbered equations the print carries that the rows do not");
     }
 
+    /**
+     * The page a Summary starts on is now sent, so its rows are compared with its print — but only
+     * with what is printed above the heading. The Summary below it is not text any row owes, and
+     * uncut it would raise a flag on every heading page of every book (D15, 2026-09-24).
+     */
+    @Test
+    void whatIsPrintedBelowTheSummaryHeadingIsNotComparedWithTheRows() throws IOException {
+        store.put("source/ncert/2022-ed/en/phy11-part1/keph107.pdf", summaryOnPageTwo(), "application/pdf");
+
+        run();
+
+        assertThat(out.toString())
+                .doesNotContain("ch 7 p2: the print numbers (7.5)")
+                .contains("0 numbered equations the print carries that the rows do not");
+    }
+
     @Test
     void theBooksCleanShareIsNotComputedWhileASelectedChapterHasNoRows() throws IOException {
         Files.writeString(inputs.resolve(NcertRegisterCommand.FILE), Files.readString(inputs.resolve(NcertRegisterCommand.FILE))
@@ -737,6 +753,29 @@ class NcertVerifyCommandTest {
                 content.showText("V^2 = G M / (R + h) (7.5)");
                 content.newLine();
                 content.showText("and from equation (7.5), the speed of the page is what we use it for.");
+                content.endText();
+            }
+            var bytes = new java.io.ByteArrayOutputStream();
+            document.save(bytes);
+            return bytes.toByteArray();
+        }
+    }
+
+    /** The same chapter, whose second page ends its teaching at a Summary that numbers an equation. */
+    private static byte[] summaryOnPageTwo() throws IOException {
+        try (org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.Loader.loadPDF(pdf(2))) {
+            try (var content = new org.apache.pdfbox.pdmodel.PDPageContentStream(document, document.getPage(1),
+                    org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode.APPEND, true)) {
+                content.beginText();
+                content.setFont(new org.apache.pdfbox.pdmodel.font.PDType1Font(
+                        org.apache.pdfbox.pdmodel.font.Standard14Fonts.FontName.HELVETICA), 11);
+                content.setLeading(14);
+                content.newLineAtOffset(50, 700);
+                content.showText("SUMMARY");
+                content.newLine();
+                content.showText("The orbital speed is given by equation (7.5), which is the one we use.");
+                content.newLine();
+                content.showText("From equation (7.5), the speed falls as the radius of the orbit grows.");
                 content.endText();
             }
             var bytes = new java.io.ByteArrayOutputStream();

@@ -239,12 +239,18 @@ class NcertVerifyCommand extends NcertBookCommand {
             byte[] pdf = content.get(definition.sourceKey(language, chapter));
             // The same per-chapter trust judgement extract makes: a layer that is not the page's words
             // (every Hindi book, one Chemistry file) has no prose for the typography rules to find.
-            if (!PdfTextLayer.isLegible(PdfTextLayer.pages(pdf))) {
+            List<String> pageTexts = PdfTextLayer.pages(pdf);
+            if (!PdfTextLayer.isLegible(pageTexts)) {
                 summary.add(List.of(String.valueOf(chapter.no()), "withheld: illegible text layer",
                         "—", "—", "—", "—", "—", "—", "—"));
                 continue;
             }
-            LayoutChecks.Result result = LayoutChecks.check(ofChapter, PdfLayout.pages(pdf));
+            // The page the apparatus starts on is compared only as far as its heading: extract sends
+            // it for what is taught above, and the Summary below is not text any row owes (D15).
+            List<PdfLayout.PageShape> shapes = ChapterApparatus.find(pageTexts)
+                    .map(boundary -> PdfLayout.pages(pdf, boundary.page(), boundary.heading()))
+                    .orElseGet(() -> PdfLayout.pages(pdf));
+            LayoutChecks.Result result = LayoutChecks.check(ofChapter, shapes);
             paired.addAll(result.paired());
             long startFlags = 0;
             long joinFlags = 0;

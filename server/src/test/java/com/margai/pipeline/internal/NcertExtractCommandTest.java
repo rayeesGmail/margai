@@ -364,14 +364,88 @@ class NcertExtractCommandTest {
 
         assertThat(extract.calls).containsExactly("8/1", "8/2", "9/1");
         assertThat(out.toString())
-                .contains("## end-of-chapter apparatus (never sent to the model)")
-                .contains("| 8 | page 3 | SUMMARY | 2 |");
+                .contains("## end-of-chapter apparatus (every page after the heading is never sent to the model)")
+                .contains("| 8 | page 3 | SUMMARY | not sent: nothing taught above the heading | 2 |");
 
         List<ExtractedPage> written = ExtractJsonl.read(ContentKeys.extract("phy11-part2", BookLanguage.en),
                 store.get(ContentKeys.extract("phy11-part2", BookLanguage.en)));
         assertThat(written).extracting(ExtractedPage::address).contains("8/3", "8/4");
         assertThat(written.stream().filter(ExtractedPage::wasSkipped)).hasSize(2)
                 .allSatisfy(page -> assertThat(page.skipped()).isEqualTo("apparatus from SUMMARY"));
+    }
+
+    /**
+     * The heading's page is sent when teaching is printed above the heading — before 2026-09-24 it
+     * never was, and bio11 lost prose in 14 of its 19 chapters to that. Its whole layer goes with it,
+     * because the layer's line order is not the page's (bio11 ch 14 p11 carries the heading first),
+     * and the coverage ratio does not judge it: the layer carries the Summary and the rows must not.
+     */
+    @Test
+    void theHeadingsPageIsSentWhenTeachingIsPrintedAboveIt() throws IOException {
+        store.put("source/ncert/2022-ed/en/phy11-part2/keph201.pdf", pdf(List.of(
+                filled("7.1 the first section of the chapter as we have written it here"),
+                filled("7.2 the second section of the chapter as it is printed on the page"),
+                List.of("When fats are used in respiration the quotient is less than one,",
+                        "and when proteins are used the ratio would be about nine tenths.",
+                        "SUMMARY",
+                        "This is the text of the page and it is written in the words that we use,",
+                        "with the same of and to in a that as it for on by an which be are this."),
+                filled("7.1 Answer the following questions that are set for the student to do"))),
+                "application/pdf");
+        page(8, 3);
+        page(8, 4);
+
+        assertThat(run()).isZero();
+
+        assertThat(extract.calls).containsExactly("8/1", "8/2", "8/3", "9/1");
+        assertThat(extract.pageTexts.get(2)).contains("When fats are used").contains("SUMMARY");
+        assertThat(out.toString())
+                .contains("| 8 | page 3 | SUMMARY | sent: 2 prose line(s) above the heading | 1 |")
+                .contains("ch 8 p3: 1 paragraph(s) — sent: 2 prose line(s) above the heading");
+        // Named on the heading-page checklist and nowhere else: no coverage flag, no empty-page entry.
+        assertThat(out.toString().split("ch 8 p3:", -1)).hasSize(2);
+    }
+
+    /**
+     * An artefact written before 2026-09-24 records the heading's page as apparatus. A plain resume
+     * must read it now, or re-extracting the pages the old skip discarded would need a `--redo` per
+     * chapter — and a single-page call costs twice what a page in a long run does.
+     */
+    @Test
+    void aResumeReadsAHeadingPageAnEarlierRunRecordedAsApparatus() throws IOException {
+        store.put("source/ncert/2022-ed/en/phy11-part2/keph201.pdf", pdf(List.of(
+                filled("7.1 the first section of the chapter as we have written it here"),
+                filled("7.2 the second section of the chapter as it is printed on the page"),
+                List.of("When fats are used in respiration the quotient is less than one,",
+                        "and when proteins are used the ratio would be about nine tenths.",
+                        "SUMMARY",
+                        "This is the text of the page and it is written in the words that we use,",
+                        "with the same of and to in a that as it for on by an which be are this."),
+                filled("7.1 Answer the following questions that are set for the student to do"))),
+                "application/pdf");
+        page(8, 3);
+        page(8, 4);
+        String key = ContentKeys.extract("phy11-part2", BookLanguage.en);
+        store.put(key, ExtractJsonl.write(List.of(
+                ExtractedPage.of((short) 8, 1, new NcertPage(List.of(
+                        new NcertPage.Paragraph("7.1", "text of 8/1", false, List.of())), BigDecimal.ONE), null),
+                ExtractedPage.of((short) 8, 2, new NcertPage(List.of(
+                        new NcertPage.Paragraph("7.2", "text of 8/2", false, List.of())), BigDecimal.ONE), null),
+                ExtractedPage.skipped((short) 8, 3, "apparatus from SUMMARY"),
+                ExtractedPage.skipped((short) 8, 4, "apparatus from SUMMARY"),
+                ExtractedPage.of((short) 9, 1, new NcertPage(List.of(
+                        new NcertPage.Paragraph("8.1", "text of 9/1", false, List.of())), BigDecimal.ONE), null))),
+                "application/x-ndjson");
+
+        assertThat(run()).isZero();
+
+        assertThat(extract.calls).containsExactly("8/3");
+        assertThat(extract.addresses).containsExactly("7.2");
+        List<ExtractedPage> written = ExtractJsonl.read(key, store.get(key));
+        assertThat(written).filteredOn(page -> page.address().equals("8/3")).singleElement()
+                .satisfies(page -> assertThat(page.wasSkipped()).isFalse());
+        assertThat(written).filteredOn(page -> page.address().equals("8/4")).singleElement()
+                .satisfies(page -> assertThat(page.skipped()).isEqualTo("apparatus from SUMMARY"));
     }
 
     /**
@@ -437,11 +511,14 @@ class NcertExtractCommandTest {
      * argument is one page; the filler makes the page legible English by the measured standard.
      */
     private static byte[] pdfWithText(String... pageTexts) throws IOException {
-        return pdf(java.util.Arrays.stream(pageTexts)
-                .map(text -> List.of(text,
-                        "This is the text of the page and it is written in the words that we use,",
-                        "with the same of and to in a that as it for on by an which be are this."))
-                .toList());
+        return pdf(java.util.Arrays.stream(pageTexts).map(NcertExtractCommandTest::filled).toList());
+    }
+
+    /** One page's lines: the given first line, then the filler that makes it legible. */
+    private static List<String> filled(String first) {
+        return List.of(first,
+                "This is the text of the page and it is written in the words that we use,",
+                "with the same of and to in a that as it for on by an which be are this.");
     }
 
     /**

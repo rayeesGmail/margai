@@ -34,11 +34,38 @@ class ChapterApparatusTest {
         Optional<ChapterApparatus.Boundary> boundary = ChapterApparatus.find(pages);
 
         assertThat(boundary).isPresent();
-        assertThat(boundary.orElseThrow().firstPage()).isEqualTo(4);
+        assertThat(boundary.orElseThrow().page()).isEqualTo(4);
         assertThat(boundary.orElseThrow().heading()).isEqualTo("SUMMARY");
         assertThat(boundary.orElseThrow().covers(3)).isFalse();
-        assertThat(boundary.orElseThrow().covers(4)).isTrue();
+        assertThat(boundary.orElseThrow().covers(5)).isTrue();
         assertThat(boundary.orElseThrow().covers(6)).isTrue();
+    }
+
+    /**
+     * The heading's own page is apparatus only when nothing is taught above the heading. Until
+     * 2026-09-24 it always was, and bio11 lost prose in 14 of its 19 chapters to it.
+     */
+    @Test
+    void theHeadingsPageIsSentWhenTeachingIsPrintedAboveIt() {
+        ChapterApparatus.Boundary taught = new ChapterApparatus.Boundary(12, "SUMMARY", 9);
+        ChapterApparatus.Boundary bare = new ChapterApparatus.Boundary(12, "SUMMARY", 0);
+
+        assertThat(taught.covers(12)).isFalse();
+        assertThat(taught.covers(13)).isTrue();
+        assertThat(taught.itsPage()).isEqualTo("sent: 9 prose line(s) above the heading");
+        assertThat(bare.covers(12)).isTrue();
+        assertThat(bare.itsPage()).isEqualTo("not sent: nothing taught above the heading");
+    }
+
+    /** A heading whose place on the page is unknown sends the page: a wasted call is recoverable, lost teaching is not. */
+    @Test
+    void anUnplacedHeadingSendsItsPage() {
+        ChapterApparatus.Boundary unplaced = new ChapterApparatus.Boundary(12, "SUMMARY",
+                ChapterApparatus.Boundary.UNPLACED);
+
+        assertThat(unplaced.covers(12)).isFalse();
+        assertThat(unplaced.covers(13)).isTrue();
+        assertThat(unplaced.itsPage()).isEqualTo("sent: the heading could not be placed on it");
     }
 
     /** Chemistry prints it in title case, and its exercises carry no heading at all. */
@@ -48,7 +75,7 @@ class ChapterApparatusTest {
                 prose("Summary"), prose("1.5 A solution of glucose in water is labelled"));
 
         assertThat(ChapterApparatus.find(pages).orElseThrow().heading()).isEqualTo("SUMMARY");
-        assertThat(ChapterApparatus.find(pages).orElseThrow().firstPage()).isEqualTo(3);
+        assertThat(ChapterApparatus.find(pages).orElseThrow().page()).isEqualTo(3);
     }
 
     /**
@@ -61,7 +88,7 @@ class ChapterApparatusTest {
                 prose("7.2 MORE"), prose("7.3 MORE"), prose("7.4 MORE"),
                 prose("SUMMARY"), prose("EXERCISES"));
 
-        assertThat(ChapterApparatus.find(pages).orElseThrow().firstPage()).isEqualTo(5);
+        assertThat(ChapterApparatus.find(pages).orElseThrow().page()).isEqualTo(5);
     }
 
     @Test
@@ -98,7 +125,8 @@ class ChapterApparatusTest {
     /**
      * The rule against the books themselves: every chapter file of Physics, Chemistry and Biology.
      * This is the assertion the design rests on — a boundary in every file, none of it in the front
-     * half, and the one file whose text layer is garbled correctly refusing to answer.
+     * half, the one file whose text layer is garbled correctly refusing to answer, and every heading
+     * placed on its page so the teaching above it is sent.
      */
     @Test
     void everyEnglishChapterOfEverySubjectHasABoundaryInItsBackHalf() throws IOException {
@@ -110,6 +138,8 @@ class ChapterApparatusTest {
         int pages = 0;
         int apparatus = 0;
         List<String> withoutBoundary = new java.util.ArrayList<>();
+        List<String> unplaced = new java.util.ArrayList<>();
+        List<String> sent = new java.util.ArrayList<>();
 
         try (var books = Files.list(NCERT)) {
             for (Path book : books.filter(Files::isDirectory).sorted().toList()) {
@@ -118,16 +148,26 @@ class ChapterApparatusTest {
                             .filter(path -> path.getFileName().toString().matches("[a-z]{4}\\d{3}\\.pdf"))
                             .sorted().toList()) {
                         files++;
-                        List<String> text = PdfTextLayer.pages(Files.readAllBytes(chapter));
+                        byte[] pdf = Files.readAllBytes(chapter);
+                        List<String> text = PdfTextLayer.pages(pdf);
                         pages += text.size();
-                        Optional<ChapterApparatus.Boundary> boundary = ChapterApparatus.find(text);
+                        Optional<ChapterApparatus.Boundary> boundary = ChapterApparatus.find(text)
+                                .map(found -> found.placedIn(pdf));
                         if (boundary.isEmpty()) {
                             withoutBoundary.add(book.getFileName() + "/" + chapter.getFileName());
                             continue;
                         }
                         withBoundary++;
-                        apparatus += text.size() - boundary.orElseThrow().firstPage() + 1;
-                        assertThat(boundary.orElseThrow().firstPage())
+                        ChapterApparatus.Boundary placed = boundary.orElseThrow();
+                        apparatus += (int) java.util.stream.IntStream.rangeClosed(1, text.size())
+                                .filter(placed::covers).count();
+                        if (placed.proseLinesAbove() == ChapterApparatus.Boundary.UNPLACED) {
+                            unplaced.add(book.getFileName() + "/" + chapter.getFileName());
+                        }
+                        if (placed.sendsItsPage()) {
+                            sent.add(book.getFileName() + "/" + chapter.getFileName());
+                        }
+                        assertThat(boundary.orElseThrow().page())
                                 .as("%s: the apparatus must be in the back half", chapter.getFileName())
                                 .isGreaterThan(text.size() / 2);
                     }
@@ -140,6 +180,23 @@ class ChapterApparatusTest {
                 .as("only the one file whose text layer is custom-encoded may go undetected")
                 .containsExactly("chem11-part2/kech202.pdf");
         assertThat(withBoundary).isEqualTo(78);
-        assertThat(100.0 * apparatus / pages).isBetween(15.0, 20.0);
+        assertThat(unplaced).as("every heading the text layer finds, the glyph positions place").isEmpty();
+        // Measured 2026-09-24: 53 of the 78 heading pages carry teaching above the heading (one of
+        // them, phy12-part2 ch 14 p18, only a figure caption — a wasted call, the safe direction), and
+        // 240 of 1,690 pages (14.2%) are apparatus, down from 17.6% when the heading's page went too.
+        assertThat(sent).hasSize(53);
+        assertThat(100.0 * apparatus / pages).isBetween(13.5, 15.0);
+        // The two closed books, where the page-level skip cost real teaching. bio11's fourteen agree
+        // with the day log's independent pymupdf count; phy11-part1's five do not — that count saw two,
+        // because chapter 7's layer is private-use encoded (so Example 7.8 above its Summary was
+        // invisible to it) and chapter 6 p32 opens both columns with the rotating-chair passage.
+        assertThat(sent).filteredOn(chapter -> chapter.startsWith("bio11/")).containsExactly(
+                "bio11/kebo102.pdf", "bio11/kebo103.pdf", "bio11/kebo105.pdf", "bio11/kebo106.pdf",
+                "bio11/kebo107.pdf", "bio11/kebo108.pdf", "bio11/kebo109.pdf", "bio11/kebo110.pdf",
+                "bio11/kebo112.pdf", "bio11/kebo113.pdf", "bio11/kebo114.pdf", "bio11/kebo115.pdf",
+                "bio11/kebo116.pdf", "bio11/kebo117.pdf");
+        assertThat(sent).filteredOn(chapter -> chapter.startsWith("phy11-part1/")).containsExactly(
+                "phy11-part1/keph102.pdf", "phy11-part1/keph104.pdf", "phy11-part1/keph105.pdf",
+                "phy11-part1/keph106.pdf", "phy11-part1/keph107.pdf");
     }
 }

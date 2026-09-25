@@ -96,6 +96,7 @@ class NcertExtractCommand extends NcertBookCommand {
         List<String> structureFlags = new ArrayList<>();
         List<EmptyPage> emptyPages = new ArrayList<>();
         List<String> notJudged = new ArrayList<>();
+        List<String> boundaryPages = new ArrayList<>();
         List<String> lowConfidence = new ArrayList<>();
         int called = 0;
         int skipped = 0;
@@ -111,7 +112,8 @@ class NcertExtractCommand extends NcertBookCommand {
             // The chapter's own text layer, read once and used twice: to find where the chapter
             // stops teaching, and — when it can be trusted — as the character-level authority sent
             // alongside each page image (DECISIONS 2026-09-13, the §6.1 reversal).
-            List<String> pageTexts = PdfTextLayer.pages(content.get(definition.sourceKey(language, chapter)));
+            byte[] sourcePdf = content.get(definition.sourceKey(language, chapter));
+            List<String> pageTexts = PdfTextLayer.pages(sourcePdf);
             // Trust is judged per chapter, not per page: a page dense with equations scores low on
             // English words by construction, and gating per page would withhold the text layer from
             // exactly the pages it exists to fix.
@@ -122,11 +124,14 @@ class NcertExtractCommand extends NcertBookCommand {
 
             // Pages past the boundary are never sent: the model cannot reliably tell NCERT's
             // chapter-numbered exercises from its sections, and it does not have to if it never
-            // sees them (D14, ChapterApparatus).
-            Optional<ChapterApparatus.Boundary> apparatus = ChapterApparatus.find(pageTexts);
+            // sees them (D14, ChapterApparatus). The heading's own page is sent when teaching is
+            // printed above the heading, and placing it is read from the page's glyphs (D15).
+            Optional<ChapterApparatus.Boundary> apparatus = ChapterApparatus.find(pageTexts)
+                    .map(boundary -> boundary.placedIn(sourcePdf));
             apparatusRows.add(List.of(String.valueOf(chapter.no()),
-                    apparatus.map(boundary -> "page " + boundary.firstPage()).orElse("—"),
+                    apparatus.map(boundary -> "page " + boundary.page()).orElse("—"),
                     apparatus.map(ChapterApparatus.Boundary::heading).orElse("not found: every page is sent"),
+                    apparatus.map(ChapterApparatus.Boundary::itsPage).orElse("—"),
                     String.valueOf(apparatus.map(boundary -> pageKeys.stream()
                             .filter(key -> boundary.covers(ContentKeys.pageNumber(key))).count()).orElse(0L))));
 
@@ -143,6 +148,12 @@ class NcertExtractCommand extends NcertBookCommand {
                     continue;
                 }
                 ExtractedPage existing = done.get(chapter.no() + "/" + page);
+                // Recorded as apparatus by a run whose boundary covered it, and sent now: the record
+                // is not a read, so the page is not done. This is how a plain resume re-extracts
+                // exactly the boundary pages the page-level skip discarded before 2026-09-24.
+                if (existing != null && existing.wasSkipped()) {
+                    existing = null;
+                }
                 // A page this run is not calling for still advances the state, when we know it:
                 // otherwise `--pages 3` would call page 3 with no previous section and no tail, the
                 // model would guess the section and could not judge a continuation, and the remedy
@@ -195,7 +206,15 @@ class NcertExtractCommand extends NcertBookCommand {
                             .map(NcertPage.Paragraph::text).collect(java.util.stream.Collectors.joining(" "));
                     PageCoverage.Assessment coverage = PageCoverage.of(pageText, transcribed);
                     String onPage = "ch " + chapter.no() + " p" + page + ": " + coverage.reason();
-                    switch (coverage.verdict()) {
+                    // The heading's page carries the Summary in its layer and must not in its rows,
+                    // so a ratio of the two says nothing; it goes on a checklist of its own instead.
+                    boolean headingPage = apparatus.map(boundary -> boundary.page() == page).orElse(false);
+                    if (headingPage) {
+                        boundaryPages.add("ch " + chapter.no() + " p" + page + ": "
+                                + read.paragraphs().size() + " paragraph(s) — "
+                                + apparatus.orElseThrow().itsPage());
+                    }
+                    switch (headingPage ? PageCoverage.Verdict.MATCHED : coverage.verdict()) {
                         case TOO_LITTLE_CAME_BACK, TOO_MUCH_CAME_BACK -> structureFlags.add(onPage);
                         // Not a defect list but a checklist, and ordered prose-first at the end of
                         // the run: a page whose layer reads as sentences and returned nothing is
@@ -223,8 +242,8 @@ class NcertExtractCommand extends NcertBookCommand {
         int paragraphs = done.values().stream().mapToInt(page -> page.paragraphs().size()).sum();
         report.section("text layer (authoritative for characters where it is legible)")
                 .table(List.of("chapter", "disposition", "legibility"), textLayerRows);
-        report.section("end-of-chapter apparatus (never sent to the model)")
-                .table(List.of("chapter", "starts at", "heading", "pages not sent"), apparatusRows);
+        report.section("end-of-chapter apparatus (every page after the heading is never sent to the model)")
+                .table(List.of("chapter", "starts at", "heading", "its own page", "pages not sent"), apparatusRows);
         report.section("pages per chapter")
                 .table(List.of("chapter", "pages", "called", "paragraphs"), perChapter);
         report.section("total").table(
@@ -248,6 +267,9 @@ class NcertExtractCommand extends NcertBookCommand {
         if (!notJudged.isEmpty()) {
             coverage.line("").line("and " + notJudged.size() + " page(s) the ratio could not judge:").list(notJudged);
         }
+        report.section("pages the Summary starts on — confirm the rows carry what is above the heading and nothing below it")
+                .line("the coverage ratio cannot judge these: the layer carries the Summary, the rows must not")
+                .list(boundaryPages, "none called this run");
         report.section("pages that returned no running text — confirm each is a plate, a biography or a table")
                 .line("checked: " + checked)
                 .list(emptyPages.stream().sorted(Comparator.comparingInt(EmptyPage::sentenceRuns).reversed())

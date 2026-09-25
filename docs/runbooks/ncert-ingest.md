@@ -191,13 +191,29 @@ without paying for those pages again.
 
 **The end-of-chapter apparatus is never sent.** Before calling for any page, the command reads the
 chapter's own text layer and finds where Summary / Points to Ponder / Exercises / Answers begins;
-that page and everything after it is recorded as skipped and costs nothing. This is not a
+every page after that heading's page is recorded as skipped and costs nothing. This is not a
 politeness — NCERT numbers its exercises with the chapter number (Chapter 7's questions are 7.1,
 7.2, 7.3), so a page of them is indistinguishable from a page of sections, and asking the model to
-ignore them did not work. The report's **apparatus table** says, per chapter, where the boundary fell and
-which heading found it. **Read it.** A boundary that looks too early means real teaching is being
-skipped; `—  not found: every page is sent` means the text layer was unreadable and nothing was
-skipped, which is safe but means the model will see the exercises for that chapter.
+ignore them did not work.
+
+**The heading's own page is sent when anything is taught above the heading** (2026-09-24). Until then
+it never was, and whatever was printed above the Summary went with it — prose in 14 of bio11's 19
+chapters and 5 of phy11-part1's 7, including a named subsection of §14.6 and chapter 7's Example 7.8
+— with no metric able to see it. Where the heading sits is read from the page's glyph positions, not
+the text layer's line order, which on bio11 ch 14 p11 puts the heading first. Across all ten books,
+53 of the 78 heading pages are sent. The prompt's own rule skips the Summary on the page.
+
+The report's **apparatus table** says, per chapter, where the boundary fell, which heading found it,
+and what happened to its page (`sent: N prose line(s) above the heading`, `not sent: nothing taught
+above the heading`, or `sent: the heading could not be placed on it`). **Read it.** A boundary that
+looks too early means real teaching is being skipped; `—  not found: every page is sent` means the
+text layer was unreadable and nothing was skipped, which is safe but means the model will see the
+exercises for that chapter. The **pages the Summary starts on** section lists each heading page called,
+with its paragraph count: read each against the rendered page — the rows should carry what is above
+the heading and nothing below it. The coverage ratio cannot judge these pages, because the layer
+carries the Summary and the rows must not. A resume picks these pages up by itself: a page an earlier
+run recorded as apparatus and this run sends is read, so `ncert extract --book B --lang en` with no
+`--redo` re-extracts exactly the heading pages the old rule discarded, in one run.
 
 **The page's own text layer is sent with the image** (D14, DECISIONS 2026-09-13). The image decides
 layout and reading order; the text layer decides characters, because these books are digitally

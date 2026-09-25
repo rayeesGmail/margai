@@ -554,6 +554,47 @@ class PdfLayoutTest {
         assertThat(shape.apparatus()).isEqualTo(new PdfLayout.Apparatus(true, 4));
     }
 
+    /**
+     * Physics centres its Summary across both columns (phy11-part1 ch 2 p9: x = 258 on a 603 pt page),
+     * and reading order finishes both columns above it before the Summary begins. Read as a left-column
+     * heading, the cut dropped the whole right column — Example 2.7's "Answer" and the Fig. 2.8 caption,
+     * both printed above the heading (2026-09-25, the second read's one figure flag on the book).
+     */
+    @Test
+    void aHeadingCentredAcrossTwoColumnsCutsBothAtItsHeight() {
+        PdfLayout.PageShape shape = cut("SUMMARY",
+                line(91.7, 100, "Bookman", "For the car of a particular make, the braking"),
+                line(73.7, 112, "Bookman", "distance was found to be ten metres for a speed"),
+                line(73.7, 124, "Bookman", "of eleven metres per second and the rest of it."),
+                line(373.7, 100, "Bookman", "Answer The ruler drops under free fall and so"),
+                line(355.7, 112, "Bookman", "the initial velocity is zero and the rest of it"),
+                line(355.7, 124, "Bookman", "follows from the equations that we have seen."),
+                line(355.7, 150, "Bookman,Bold", "Fig. 2.8 Measuring the reaction time."),
+                line(300, 200, "Bookman,Bold", "SUMMARY"),
+                line(91.7, 220, "Bookman", "An object is said to be in motion if its position"),
+                line(73.7, 232, "Bookman", "changes with time and the rest of the summary."),
+                line(373.7, 220, "Bookman", "Instantaneous velocity or simply velocity is"),
+                line(355.7, 232, "Bookman", "defined as the limit of the average velocity."));
+
+        assertThat(shape.starts()).containsExactly("For the car of a particular", "Answer The ruler drops under free");
+        assertThat(shape.captions()).containsExactly("fig 2.8");
+        // Seven: the caption is set at body size in words, so it reads as prose, as on every page.
+        assertThat(shape.apparatus()).isEqualTo(new PdfLayout.Apparatus(true, 7));
+    }
+
+    /** The real page the synthetic case above stands for. */
+    @Test
+    void physicsChapterTwoPageNineKeepsItsRightColumnAboveTheSummary() throws IOException {
+        Path chapter = Path.of("../ncert/2022-ed/en/phy11-part1/keph102.pdf");
+        assumeTrue(Files.isRegularFile(chapter), "the founder's NCERT PDFs are not on this machine");
+
+        PdfLayout.PageShape page9 = PdfLayout.page(Files.readAllBytes(chapter), 9, "SUMMARY");
+
+        assertThat(page9.starts()).anyMatch(start -> start.startsWith("Answer The ruler drops"))
+                .noneMatch(start -> start.startsWith("An object is said"));
+        assertThat(page9.captions()).contains("fig 2.8");
+    }
+
     /** A Summary at the top of its page leaves nothing taught on it; the running head is not prose. */
     @Test
     void aHeadingAtTheTopLeavesNoProseAboveIt() {

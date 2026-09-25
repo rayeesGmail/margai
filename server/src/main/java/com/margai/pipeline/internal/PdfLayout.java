@@ -64,6 +64,8 @@ final class PdfLayout {
     private static final int MARGIN_LINES = 3;
     /** A line body text sits within this many points of the body size. */
     private static final double BODY_SIZE_TOLERANCE = 0.9;
+    /** Within this share of the text block's width of its middle, a heading is centred across the page rather than set in a column. */
+    private static final double CENTRED = 0.05;
     /** Enough glyphs — three or four lines of a column — for the text above a cut to set its own body size. */
     private static final int MIN_BODY_GLYPHS = 150;
     /** How many words of a starting line a report quotes. */
@@ -256,7 +258,18 @@ final class PdfLayout {
         double cutFrom = prose(printed, pageBody).stream().filter(line -> line.x >= rightFrom).count() >= MARGIN_LINES
                 ? rightFrom : Double.MAX_VALUE;
         Line apparatusLine = apparatusHeading == null ? null : find(printed, cutFrom, apparatusHeading);
-        List<Line> lines = apparatusLine == null ? printed : above(printed, cutFrom, apparatusLine);
+        // Physics centres its Summary across both columns (ch 2 p9), and reading order finishes both
+        // columns above it first; read as a left-column heading it dropped the whole right column.
+        // Centred on the printed text block, not on the page: glyph positions are measured from the crop
+        // box and the page width passed in is the media box's, 54 pt wider on that book.
+        Set<Line> pageProse = prose(printed, pageBody);
+        double textLeft = pageProse.stream().mapToDouble(line -> line.x).min().orElse(0);
+        double textRight = pageProse.stream().mapToDouble(line -> line.end).max().orElse(0);
+        boolean centred = apparatusLine != null && textRight > textLeft
+                && Math.abs((apparatusLine.x + apparatusLine.end) / 2 - (textLeft + textRight) / 2)
+                        <= CENTRED * (textRight - textLeft);
+        List<Line> lines = apparatusLine == null ? printed
+                : above(printed, centred ? Double.MAX_VALUE : cutFrom, apparatusLine);
         // A cut page's body is what is above the cut, when there is enough of it to say: Physics sets
         // its Summary a point smaller than the text, and on phy11-part1 ch 4 p18 the Summary outnumbers
         // the teaching above it, so the page's commonest size made that teaching not body text.
@@ -333,12 +346,16 @@ final class PdfLayout {
             }
         }
 
+        // Captions from the whole page, cut or not: a Summary carries no figure, and a figure the
+        // teaching above the heading names can be set anywhere on its page.
         Set<String> captions = new LinkedHashSet<>();
-        List<String> equationNumbers = new ArrayList<>();
-        for (Line line : lines) {
+        for (Line line : printed) {
             if (line.bold) {
                 FigureLabels.of(line.text).ifPresent(label -> captions.add(label.base()));
             }
+        }
+        List<String> equationNumbers = new ArrayList<>();
+        for (Line line : lines) {
             Matcher number = EQUATION_NUMBER.matcher(line.text);
             while (number.find()) {
                 equationNumbers.add(number.group());

@@ -417,6 +417,10 @@ corrections:
      at: "Any species growing exponentially under unlimited resource", reason: "flush left after the display of symbols: the paragraph continues"}
   - {book: bio12, lang: en, chapter: 4, page: 11, kind: split, address: "ch 4 §4.2.2.1 ¶3",
      at: "In the first case, the modified", reason: "p11 opens with an 18 pt indent after the list ends short on p10"}
+  - {book: bio12, lang: en, chapter: 5, page: 28, kind: join, address: "ch 5 §5.10 ¶5",
+     at: "(iv) transferring (blotting) of separated", reason: "one-line list items stay inside their paragraph; the print sets the six steps as one"}
+  - {book: bio12, lang: en, chapter: 5, page: 28, kind: join, address: "ch 5 §5.10 ¶6",
+     at: "(vi) detection of hybridised DNA fragments", reason: "one-line list items stay inside their paragraph; the print sets the six steps as one"}
   - {book: bio12, lang: en, chapter: 5, page: 28, kind: text, address: "ch 5 §5.10 ¶4",
      transcribed: "(v) hybridisation using labelled VNTR probe, and (iv) transferring (blotting) of separated DNA fragments to synthetic membranes, such as nitrocellulose or nylon, (vi)", printed: "(iv) transferring (blotting) of separated DNA fragments to synthetic membranes, such as nitrocellulose or nylon, (v) hybridisation using labelled VNTR probe, and (vi)", reason: "the model swapped list items (iv) and (v); the print and the layer run (iv) then (v)"}
   - {book: bio12, lang: en, chapter: 11, page: 9, kind: figure_ref, address: "ch 11 §11.1.4 ¶2",

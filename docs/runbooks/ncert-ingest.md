@@ -114,8 +114,8 @@ cheapest to catch after twenty pages rather than after two hundred.
 
 **Prompt v5 (2026-09-26) is the active version** and differs from v4 in one rule: an activity or a
 question set in italics in the body of the page, with no box around it, is running text. After
-each book's load, sweep its italic runs against the rows (every run over 60 characters that no row
-carries, less contents lists, captions and overprinted headwords) and `--redo --pages` any page it
+each book's load, sweep its italic runs against the rows (every run over 25 characters that no row
+carries — 60 missed bio11 ch 11 p12's one-line question — less contents lists, captions and overprinted headwords) and `--redo --pages` any page it
 names (DECISIONS 2026-09-26).
 
 **Prompt v4 (2026-09-23) is the active version** and differs from v3 in one rule: a unit opener —

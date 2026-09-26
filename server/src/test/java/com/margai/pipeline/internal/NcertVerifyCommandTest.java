@@ -198,6 +198,27 @@ class NcertVerifyCommandTest {
                 .contains("- ch 7 p2 §7.2 ¶1: transcribed \"where G was the constant\"");
     }
 
+    /**
+     * The verifier can file a claim under the wrong item — phy11-part2 ch 12 p10 put ¶2's (12.28) under ¶1 on
+     * three reads. A ruling on those exact spans is the founder's reading of that claim, so it settles the
+     * claim wherever the verifier filed it (2026-09-26).
+     */
+    @Test
+    void aRulingSettlesAClaimFiledUnderARowThatDoesNotCarryIt() throws IOException {
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 2, kind: misprint,
+                     printed: "where G is a constant", transcribed: "where G was the constant", reason: "read against the page"}
+                """);
+        verifier.differs(2, 2, "where G is a constant", "where G was the constant");
+
+        run("--read-pages");
+
+        assertThat(imports.verifications.get(2).verification().verdict()).isEqualTo(ParagraphVerification.Verdict.matches);
+        assertThat(out.toString()).contains("flags set aside by the founder's rulings in ncert-corrections.yaml: 1")
+                .doesNotContain("- ch 7 p2 §7.2 ¶1: transcribed \"where G was the constant\"");
+    }
+
     @Test
     void aFlagTheFounderHasRuledOnIsNotRaisedAgain() throws IOException {
         Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """

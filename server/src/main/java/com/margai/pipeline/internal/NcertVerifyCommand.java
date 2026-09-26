@@ -595,11 +595,13 @@ class NcertVerifyCommand extends NcertBookCommand {
                                 String line = at + ": printed \"" + span.printed() + "\" · transcribed \"" + span.transcribed() + "\"";
                                 if (VerdictSpans.sameExceptSpacingAndGlyphs(span.printed(), span.transcribed())) {
                                     glyphOnly.add(line);
+                                } else if (ruledOn(rulings, chapter.getKey(), part.page(), span)) {
+                                    // Before the carries test: the verifier can file a claim under the wrong item,
+                                    // and a ruling on its exact spans settles it wherever it was filed (2026-09-26).
+                                    ruled++;
                                 } else if (!VerdictSpans.carries(part.text(), span.transcribed())) {
                                     misquoted = true;
                                     notCarried.add(at + ": transcribed \"" + span.transcribed() + "\" (printed \"" + span.printed() + "\")");
-                                } else if (ruledOn(rulings, chapter.getKey(), part.page(), span)) {
-                                    ruled++;
                                 } else {
                                     flags.add(line);
                                     differences.add(new ParagraphVerification.Difference(part.page(), span.printed(), span.transcribed()));

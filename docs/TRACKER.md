@@ -221,8 +221,13 @@ HOW TO RESUME (supersedes every earlier list):
      load → italic sweep → verify `--read-pages` → rulings checked row by row → reload → re-score → embed.
      Then phy12-part2 (123 pages). Chemistry waits for the Λ-as-L ruling, which today's finding sharpens: the
      pipeline's reader itself produces the Latin letter.
-  2. Optional, ≈₹0.15: re-score retrieval on the grown corpus (`ncert embed --book phy11-part1` embeds nothing
-     and runs the 15 queries) — no book's embed runs them but phy11-part1's.
+  2. **Retrieval on the four-book corpus (₹0.15, report -ncert-embed-4): hit@3 holds at 10/15, hit@1 8 → 7/15,
+     MRR 0.629 → 0.592.** No top-3 answer lost: q08 fell 1 → 2 under its own section's opening (§6.9 ¶1), q03
+     7 → 11 (already a miss). The trend to watch: **in 3 of 15 queries a phy11-part2 passage now takes rank 2
+     from the full-text half alone** (q02 → "fluids in motion", q07 → a thermodynamic process, q11 → thermal
+     conductivity), the OR semantics of 2026-09-20 matching common words across a larger corpus. Re-score after
+     each book (`ncert embed --book phy11-part1`); revisit the text half's weight or a per-subject filter if a
+     top-3 answer is lost.
   3. Open for the founder, unchanged: the G/Ḡ floral-formula convention, the 0.30 similarity floor, the
      `global.` inference profile before D37, q09's wording; and the PARKED after-display enforcement.
 Scratchpad tools worth keeping (session d9c33cd4): `greek.py` (Symbol-font Greek against the rows),

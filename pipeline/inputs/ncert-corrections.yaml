@@ -634,12 +634,8 @@ corrections:
      at: "Energy density of electric field, u =(1/2)epsilon_0 E^2", reason: "the display (2.73) completes ¶6's \"Eq (2.72) shows that\""}
   - {book: phy12-part1, lang: en, chapter: 3, page: 10, kind: join, address: "ch 3 §3.7 ¶2",
      at: "Metals have low resistivities in the range", reason: "p9 ends at the measure with gaps stretched to 3.37 pt against 2.89, and p10 opens flush where this book indents a page-top paragraph: the paragraph runs on"}
-  - {book: phy12-part1, lang: en, chapter: 3, page: 16, kind: figure_ref, address: "ch 3 §3.11 ¶18",
-     at: "We can put these equations in a simpler way", remove: "Fig. (3.14)", reason: "the split moves \"In Fig. (3.14)\" to the next paragraph; this one no longer names it"}
-  - {book: phy12-part1, lang: en, chapter: 3, page: 17, kind: figure_ref, address: "ch 3 §3.11 ¶19",
-     at: "In Fig. (3.14), we had joined", add: "Fig. (3.14)", reason: "the split carries \"In Fig. (3.14)\" into this paragraph; its label stayed with the one before"}
   - {book: phy12-part1, lang: en, chapter: 4, page: 9, kind: figure_ref, address: "ch 4 §4.5 ¶4",
-     at: "Now r^2 = x^2 + R^2", add: "Fig. 4.9", reason: "the split carries \"the element dl in Fig. 4.9\" into this paragraph"}
+     at: "Now r^2 = x^2 + R^2", add: "Fig. 4.9", reason: "both halves of the split name Fig. 4.9, so the split leaves the label with the first; this half names it too"}
   - {book: phy12-part1, lang: en, chapter: 4, page: 12, kind: figure_ref, address: "ch 4 §4.6 ¶3",
      at: "Now, let L be the length (part) of the loop", remove: "Fig. 4.13", reason: "the paragraph names Eq. (4.13), not Fig. 4.13"}
   - {book: phy12-part1, lang: en, chapter: 6, page: 18, kind: figure_ref, address: "ch 6 §6.8 ¶5",

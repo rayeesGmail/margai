@@ -477,3 +477,116 @@ corrections:
      transcribed: "This is the most important cause", printed: "This is the most important", reason: "the layer carries the full span; the verifier quoted a prefix"}
   - {book: bio12, lang: en, chapter: 7, page: 5, kind: misprint, address: "ch 7 §7.1 ¶5",
      transcribed: "P. malaria", printed: "P. malariae", reason: "the page prints P. malaria — the book's own error, kept"}
+
+  # phy11-part2, the whole book on v5, second read of 2026-09-26 (report -ncert-verify-5). Every flag read against
+  # its page: the text layer for characters, renders where the layer carries no glyph, line geometry for boundaries
+  # (DECISIONS 2026-09-19: an indent is judged against the line below it; a line flush after a display runs on),
+  # applied as phy11-part1 applied it — a row that starts flush after a display is joined where the load's own
+  # check says it starts mid-sentence, and a whole sentence starting there is left as the transcriber set it.
+  # Approved by the founder 2026-09-26, the after-display practice with it (enforcing the written rule on both
+  # Physics books is PARKED in TRACKER). The book's stale pre-2023 references in ch 8 (Table 9.1,
+  # Table 9.2) are kept in the text as printed; the figure_refs point at the tables they mean, 8.1 and 8.2,
+  # because a Table 9.1 exists only in chapter 9 (the densities of fluids).
+  - {book: phy11-part2, lang: en, chapter: 13, page: 8, kind: text, address: "ch 13 §13.5 ¶1",
+     transcribed: "The direction of velocity v at a time t", printed: "The direction of velocity v_bar at a time t",
+     reason: "the page draws a bar over the bold v, which the prompt spells _bar; the transcriber dropped it"}
+  - {book: phy11-part2, lang: en, chapter: 12, page: 3, kind: join, address: "ch 12 §12.3 ¶5",
+     at: "where n is the number density", reason: "flush at the column's margin (x 328.4) after P = k_B nT and Fig. 12.1: runs on (the load's mid-sentence flag)"}
+  - {book: phy11-part2, lang: en, chapter: 13, page: 12, kind: join, address: "ch 13 §13.7 ¶18",
+     at: "we also know that at maximum displacement", reason: "flush at the margin (x 82.4) after the display = 0.25 J: runs on (the load's mid-sentence flag)"}
+  - {book: phy11-part2, lang: en, chapter: 9, page: 8, kind: split, address: "ch 9 §9.3 ¶2",
+     at: "Av gives the volume flux", reason: "indented 12 pt after the display (9.11), the line below it back at the margin"}
+  - {book: phy11-part2, lang: en, chapter: 9, page: 13, kind: split, address: "ch 9 §9.5.1 ¶1",
+     at: "This is known as Stokes", reason: "indented 12 pt at the column top after the display (9.17), the line below it back at the margin"}
+  - {book: phy11-part2, lang: en, chapter: 12, page: 5, kind: split, address: "ch 12 §12.3 ¶15",
+     at: "Since 1 mole contains about", reason: "indented 12 pt under a short line in Example 12.2's answer, the line below it back at the margin"}
+  - {book: phy11-part2, lang: en, chapter: 12, page: 7, kind: split, address: "ch 12 §12.4.2 ¶7",
+     at: "The speed is of the order of the speed of sound", reason: "indented 12 pt after the display v_rms = 516 m s^-1, the line below it back at the margin"}
+  - {book: phy11-part2, lang: en, chapter: 11, page: 10, kind: figure_ref, address: "ch 11 §11.8.3 ¶3",
+     at: "shows the P-V curves of an ideal gas", add: "Figure 11.8", reason: "the book prints Figure11.8 without a space, which the load drops as no label"}
+  - {book: phy11-part2, lang: en, chapter: 14, page: 11, kind: figure_ref, address: "ch 14 §14.5 ¶6",
+     at: "The net displacement is then, by the", add: "Fig. 14.10", reason: "the paragraph names Fig. 14.10 and the transcriber's figure_refs omit it"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 5, kind: figure_ref, address: "ch 8 §8.5.1 ¶7",
+     at: "Answer The copper and steel wires", add: "Table 8.1", reason: "the stale \"From Table 9.1\" means this chapter's Young's moduli, Table 8.1"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 6, kind: figure_ref, address: "ch 8 §8.5.1 ¶14",
+     at: "From Table 9.1, the Young", remove: "Table 9.1", reason: "chapter 9's Table 9.1 is the densities of fluids; the book means Table 8.1"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 6, kind: figure_ref, address: "ch 8 §8.5.1 ¶14",
+     at: "From Table 9.1, the Young", add: "Table 8.1", reason: "the stale \"Table 9.1\" means this chapter's Young's moduli, Table 8.1"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 6, kind: figure_ref, address: "ch 8 §8.5.2 ¶2",
+     at: "SI unit of shear modulus is", remove: "Table 9.2", reason: "chapter 9 has no shear moduli; the book means Table 8.2"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 6, kind: figure_ref, address: "ch 8 §8.5.2 ¶2",
+     at: "SI unit of shear modulus is", add: "Table 8.2", reason: "the stale \"Table 9.2\" means this chapter's shear moduli, Table 8.2"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 6, kind: figure_ref, address: "ch 8 §8.5.2 ¶2",
+     at: "SI unit of shear modulus is", remove: "Table 9.1", reason: "chapter 9's Table 9.1 is the densities of fluids; the book means Table 8.1"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 6, kind: figure_ref, address: "ch 8 §8.5.2 ¶2",
+     at: "SI unit of shear modulus is", add: "Table 8.1", reason: "the stale \"Table 9.1\" means this chapter's Young's moduli, Table 8.1"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 5, kind: noise, flag: figure, address: "ch 8 §8.5.1 ¶7",
+     at: "Answer The copper and steel wires", reason: "the text keeps the book's stale \"Table 9.1\"; figure_refs carry the Table 8.1 it means"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 6, kind: noise, flag: figure, address: "ch 8 §8.5.1 ¶14",
+     at: "From Table 9.1, the Young", reason: "the text keeps the book's stale \"Table 9.1\"; figure_refs carry the Table 8.1 it means"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 6, kind: noise, flag: figure, address: "ch 8 §8.5.2 ¶2",
+     at: "SI unit of shear modulus is", reason: "the text keeps the book's stale Tables 9.1 and 9.2; figure_refs carry the 8.1 and 8.2 they mean"}
+  - {book: phy11-part2, lang: en, chapter: 10, page: 8, kind: noise, flag: join, address: "ch 10 §10.6 ¶11",
+     at: "However, in connection with specific heat capacity", reason: "p7 ends at the measure and p8 opens with Table 10.3 across the top; the paragraph resumes under it"}
+  - {book: phy11-part2, lang: en, chapter: 12, page: 8, kind: noise, flag: join, address: "ch 12 §12.4.2 ¶11",
+     at: "(ii) Now ½ m v_rms^2", reason: "p8 opens \"of a molecule of the gas. Therefore,\", the rest of p7's \"where m is the mass\""}
+  - {book: phy11-part2, lang: en, chapter: 14, page: 10, kind: noise, flag: join, address: "ch 14 §14.4.2 ¶8",
+     at: "According to Newton", reason: "p9 ends in Example 14.4's display (= 1.29 kg m^-3) and p10 opens indented (x 58.4 against 46.4)"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 6, kind: misprint, address: "ch 8 §8.5.2 ¶1",
+     transcribed: "Similarly, from Eq. (9.4)", printed: "similarly, from Eq. (8.11)", reason: "the page prints \"from Eq. (9.4)\", the number the rationalised edition left behind"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 6, kind: misprint, address: "ch 8 §8.5.2 ¶4",
+     transcribed: "9.4 × 10^4 N/0.05 m^2", printed: "9.0 × 10^4 N/0.05 m^2", reason: "the page's working prints 9.4 × 10^4 N where Example 8.4's stem gives 9.0 — the book's own error, kept"}
+  - {book: phy11-part2, lang: en, chapter: 8, page: 6, kind: false_positive, address: "ch 8 §8.5.2 ¶4",
+     transcribed: "1.80 × 10^6 N.m^-2", printed: "1.80 × 10^6 N m^-2", reason: "the page prints N.m^-2"}
+  - {book: phy11-part2, lang: en, chapter: 9, page: 5, kind: misprint, address: "ch 9 §9.2.3 ¶5",
+     transcribed: "exhibits large", printed: "exhibit large", reason: "the page prints \"Gases on the other hand, exhibits\" — the book's own grammar, kept"}
+  - {book: phy11-part2, lang: en, chapter: 9, page: 5, kind: misprint, address: "ch 9 §9.2.3 ¶7",
+     transcribed: "9.8 m s^2", printed: "9.8 m s^-2", reason: "the page prints m s² with no minus — the book's own error, kept"}
+  - {book: phy11-part2, lang: en, chapter: 9, page: 6, kind: misprint, address: "ch 9 §9.2.3 ¶12",
+     transcribed: "10 ms^2 × 1000 m", printed: "10 m s^-2 × 1000 m", reason: "the page prints 10 ms² with no minus in part (b) — the book's own error, kept"}
+  - {book: phy11-part2, lang: en, chapter: 9, page: 7, kind: false_positive, address: "ch 9 §9.2.4 ¶9",
+     transcribed: "1.9 × 10^5 Pa", printed: "1.9 × 10^5 Pa m", reason: "the page prints 1.9 × 10^5 Pa; the m belongs to the denominator above it"}
+  - {book: phy11-part2, lang: en, chapter: 9, page: 9, kind: false_positive, address: "ch 9 §9.4.1 ¶1",
+     transcribed: "v_1 A_1 = v_2 A_2 v_2 = (A_1 / A_2) v_1", printed: "v_1 A_1 = v_2 A_2", reason: "the page displays v_2 = (A_1/A_2) v_1 under (9.10); the verifier quoted a prefix"}
+  - {book: phy11-part2, lang: en, chapter: 9, page: 17, kind: misprint, address: "ch 9 §9.6.4 ¶3",
+     transcribed: "If its radius increase by", printed: "If its radius increases by", reason: "the page prints \"If its radius increase by\" — the book's own grammar, kept"}
+  - {book: phy11-part2, lang: en, chapter: 10, page: 3, kind: false_positive, address: "ch 10 §10.4 ¶3",
+     transcribed: "therefore, inferred by extrapolating", printed: "therefore, inferred by", reason: "the layer carries \"inferred by extrapolating\"; the verifier quoted a prefix"}
+  - {book: phy11-part2, lang: en, chapter: 10, page: 6, kind: false_positive, address: "ch 10 §10.5 ¶16",
+     transcribed: "(∆A / A) 1/∆T ≃ 2 alpha_l", printed: "(∆A / A) / ∆T ≃ 2 alpha_l", reason: "the page prints (∆A/A) times the fraction 1/∆T"}
+  - {book: phy11-part2, lang: en, chapter: 10, page: 12, kind: false_positive, address: "ch 10 §10.8.1 ¶5",
+     transcribed: "L_f = 3.34 × 10^5 J kg^-1.", printed: "L_f = 3.34 x 10^5 J kg^-1.", reason: "the page prints ×"}
+  - {book: phy11-part2, lang: en, chapter: 10, page: 20, kind: false_positive, address: "ch 10 §10.10 ¶12",
+     transcribed: "Change in temperature / Time = K Delta T 8 °C / 2 min = K (70 °C)", printed: "Change in temperature / Time = K Delta T", reason: "the page prints both displays; the verifier quoted the first"}
+  - {book: phy11-part2, lang: en, chapter: 11, page: 5, kind: false_positive, address: "ch 11 §11.5 ¶4",
+     transcribed: "ΔQ = ΔW i.e., heat supplied", printed: "ΔQ = ΔW", reason: "the layer carries \"i.e., heat supplied\"; the verifier quoted a prefix"}
+  - {book: phy11-part2, lang: en, chapter: 11, page: 13, kind: false_positive, address: "ch 11 §11.11 ¶12",
+     transcribed: "eta = W / Q_1 = 1 − Q_2 / Q_1 = 1 − (T_2 / T_1) [ln (V_3 / V_4)] / [ln (V_2 / V_1)]", printed: "= 1 − (T_2/T_1) ln(V_3/V_4) / ln(V_2/V_1)", reason: "the row carries (11.23) whole, the stacked logarithms bracketed"}
+  - {book: phy11-part2, lang: en, chapter: 11, page: 13, kind: misprint, address: "ch 11 §11.11 ¶14",
+     transcribed: "(T_2 / T_1)^(1/gamma−1)", printed: "(T_2 / T_1)^(1/(gamma−1))", reason: "(11.25) prints the exponent 1/γ−1 without the brackets (11.24) has — the book's own, kept"}
+  - {book: phy11-part2, lang: en, chapter: 12, page: 6, kind: false_positive, address: "ch 12 §12.4.1 ¶4",
+     transcribed: "P = n m v_x^2_bar (12.12)", printed: "P = n m v_x^2 (12.12)", reason: "the page draws the bar over v_x^2"}
+  - {book: phy11-part2, lang: en, chapter: 12, page: 7, kind: false_positive, address: "ch 12 §12.4.1 ¶7",
+     transcribed: "finding v_x^2_bar. Thus", printed: "finding v^2_x . Thus", reason: "the page draws the bar over v_x^2"}
+  - {book: phy11-part2, lang: en, chapter: 12, page: 8, kind: false_positive, address: "ch 12 §12.4.2 ¶15",
+     transcribed: "Hence difference Delta V / V = 0.44 %.", printed: "Hence difference ΔV/V = 0.44 %.", reason: "the prompt writes a Greek letter by name"}
+  - {book: phy11-part2, lang: en, chapter: 12, page: 9, kind: false_positive, address: "ch 12 §12.5 ¶6",
+     transcribed: "epsilon_v = 1/2 m (dy/dt)^2 + 1/2 ky^2 epsilon = epsilon_t + epsilon_r + epsilon_v (12.26)", printed: "epsilon_v = 1/2 m (dy/dt)^2 + 1/2 ky^2", reason: "the page prints (12.26) under the first display; the verifier quoted a prefix"}
+  - {book: phy11-part2, lang: en, chapter: 12, page: 10, kind: misprint, address: "ch 12 §12.6.2 ¶3",
+     transcribed: "gamma = (9/7) R", printed: "gamma = 9/7", reason: "(12.35) prints γ = 9/7 R — the book's own error, kept"}
+  - {book: phy11-part2, lang: en, chapter: 12, page: 11, kind: false_positive, address: "ch 12 §12.6.3 ¶5",
+     transcribed: "rise in temperature = 2 × 1.5 R × 15.0", printed: "rise in temperature\\n= 2 × 1.5 R × 15.0", reason: "the verifier's line break; the words are the page's"}
+  - {book: phy11-part2, lang: en, chapter: 13, page: 2, kind: false_positive, address: "ch 13 §13.2 ¶1",
+     transcribed: "the Newton's equation", printed: "Newton's equation", reason: "the page prints \"the Newton’s equation\""}
+  - {book: phy11-part2, lang: en, chapter: 13, page: 7, kind: false_positive, address: "ch 13 §13.4 ¶9",
+     transcribed: "sin(15°) means sine of 15 degree, but sin(15) means sine of 15 radians", printed: "sin(15°) means sine of 15 degree", reason: "the layer carries \"but sin(15) means sine of 15 radians\"; the verifier quoted a prefix"}
+  - {book: phy11-part2, lang: en, chapter: 13, page: 9, kind: misprint, address: "ch 13 §13.6 ¶3",
+     transcribed: "is, therefore, calling a linear", printed: "is, therefore, called a linear", reason: "the page prints \"calling a linear harmonic oscillator\" — the book's own grammar, kept"}
+  - {book: phy11-part2, lang: en, chapter: 13, page: 13, kind: misprint, address: "ch 13 §13.8 ¶9",
+     transcribed: "proved that for small q", printed: "proved that for small theta", reason: "the page prints a Latin q set in the body font, the typesetter never switching to Symbol — kept"}
+  - {book: phy11-part2, lang: en, chapter: 14, page: 5, kind: false_positive, address: "ch 14 §14.3 ¶3",
+     transcribed: "y(x,t) = a sin(kx + omega t + phi) (14.4)", printed: "y(x,t) = a sin(kx + omega t + phi)", reason: "the page numbers the display (14.4)"}
+  - {book: phy11-part2, lang: en, chapter: 14, page: 11, kind: false_positive, address: "ch 14 §14.5 ¶6",
+     transcribed: "= a[2 sin[((kx – omega t) + (kx – omega t + phi)) / 2] cos (phi/2)]", printed: "= a[2 sin[((kx – ωt)+(kx – ωt + φ))/2] cos φ/2]", reason: "the page stacks φ over 2; the prompt writes Greek letters by name"}
+  - {book: phy11-part2, lang: en, chapter: 14, page: 12, kind: false_positive, address: "ch 14 §14.6 ¶4",
+     transcribed: "y_2 (x, t) = a sin (kx – omega t)", printed: "y_2 (x, t) = a sin (kx − ωt)", reason: "the page names the incident wave y_2; the prompt writes ω by name"}

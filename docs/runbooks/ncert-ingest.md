@@ -112,6 +112,12 @@ Start with one chapter (`--chapters 1`) and read its report before letting the b
 line and the low-confidence list are both in it, and a prompt that is reading the pages wrongly is
 cheapest to catch after twenty pages rather than after two hundred.
 
+**Prompt v5 (2026-09-26) is the active version** and differs from v4 in one rule: an activity or a
+question set in italics in the body of the page, with no box around it, is running text. After
+each book's load, sweep its italic runs against the rows (every run over 60 characters that no row
+carries, less contents lists, captions and overprinted headwords) and `--redo --pages` any page it
+names (DECISIONS 2026-09-26).
+
 **Prompt v4 (2026-09-23) is the active version** and differs from v3 in one rule: a unit opener —
 the page with the unit number set large above a drawing and a few paragraphs of framing prose,
 facing the unit's biography — carries no running text and returns no paragraphs. It is what the

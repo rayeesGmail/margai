@@ -26,8 +26,8 @@ as the D5 live smoke was. `register` is database-only and Claude runs it.
 
 Build once: `cd server && ./mvnw -q -DskipTests package`, then run everything from `server/`.
 
-The pipeline profile sets the content bucket and raises the ledger's daily budget to ₹2,000 for a
-run (`application-pipeline.yml`). The console workspace spend limit is the independent backstop;
+The pipeline profile sets the content bucket and raises the ledger's daily budget to ₹10,000 for a
+run (`application-pipeline.yml`; ₹2,000 until 2026-09-26). The console workspace spend limit is the independent backstop;
 neither replaces the other.
 
 ## 1. register — books.yaml into ncert_books

@@ -67,5 +67,7 @@ margai:
       # A pipeline day is not a student day: extracting two pilot books is ~450 VISION calls in
       # one run, against a global-daily-paise placeholder sized for student traffic (₹500). The
       # console workspace spend limit F8 set on 2026-09-12 is the independent backstop; this is
-      # the ledger-side one, and it still stops a runaway loop dead (founder ruling, D14).
-      global-daily-paise: 200000   # ₹2,000 per IST day for a pipeline run
+      # the ledger-side one, and it still stops a runaway loop dead (founder ruling, D14). Raised
+      # from ₹2,000 at D15 so the six remaining books can run back to back: ₹2,000 held one
+      # Physics book a day, and a loop still meets the cap (founder, DECISIONS 2026-09-26).
+      global-daily-paise: 1000000   # ₹10,000 per IST day for a pipeline run

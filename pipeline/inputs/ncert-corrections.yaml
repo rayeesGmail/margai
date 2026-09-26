@@ -598,3 +598,129 @@ corrections:
      transcribed: "= a[2 sin[((kx – omega t) + (kx – omega t + phi)) / 2] cos (phi/2)]", printed: "= a[2 sin[((kx – ωt)+(kx – ωt + φ))/2] cos φ/2]", reason: "the page stacks φ over 2; the prompt writes Greek letters by name"}
   - {book: phy11-part2, lang: en, chapter: 14, page: 12, kind: false_positive, address: "ch 14 §14.6 ¶4",
      transcribed: "y_2 (x, t) = a sin (kx – omega t)", printed: "y_2 (x, t) = a sin (kx − ωt)", reason: "the page names the incident wave y_2; the prompt writes ω by name"}
+
+  # phy12-part1, the whole book on v5, second read of 2026-09-27 (report -ncert-verify). Every flag read against its
+  # page as phy11-part2's were: the text layer for characters, renders where the layer carries no glyph, line geometry
+  # for boundaries. This book indents a paragraph 18 pt, at a page's top too, so a page-top line flush with the line
+  # below it continues the page before; an indented line after a display starts a paragraph (DECISIONS 2026-09-19);
+  # a row that starts flush after a display stays as transcribed (DECISIONS 2026-09-26, 52 of them here). Example
+  # blocks are indented whole and items hang their lines 18 pt, so neither is a paragraph start. Approved by the
+  # founder 2026-09-27, the five p_hat restorations with them (DECISIONS 2026-09-27).
+  - {book: phy12-part1, lang: en, chapter: 1, page: 23, kind: text, address: "ch 1 §1.10.1 ¶2",
+     transcribed: "(r + a)^2) p [1.13(a)]", printed: "(r + a)^2) p_hat [1.13(a)]", reason: "the PDF sets a hat (Bookman-Light code 136) over this p that its embedded font cannot draw; the text defines p̂"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 23, kind: text, address: "ch 1 §1.10.1 ¶3",
+     transcribed: "(r – a)^2) p [1.13(b)]", printed: "(r – a)^2) p_hat [1.13(b)]", reason: "the PDF sets a hat (Bookman-Light code 136) over this p that its embedded font cannot draw"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 24, kind: text, address: "ch 1 §1.10.1 ¶4",
+     transcribed: "(r + a)^2] p = q", printed: "(r + a)^2] p_hat = q", reason: "the PDF sets a hat (Bookman-Light code 136) over this p that its embedded font cannot draw"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 24, kind: text, address: "ch 1 §1.10.1 ¶4",
+     transcribed: "(r^2 - a^2)^2 p (1.14)", printed: "(r^2 - a^2)^2 p_hat (1.14)", reason: "the PDF sets a hat (Bookman-Light code 136) over this p that its embedded font cannot draw"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 24, kind: text, address: "ch 1 §1.10.1 ¶6",
+     transcribed: "(r^2 + a^2)^(3/2)) p (1.17)", printed: "(r^2 + a^2)^(3/2)) p_hat (1.17)", reason: "the PDF sets a hat (Bookman-Light code 136) over this p that its embedded font cannot draw"}
+  - {book: phy12-part1, lang: en, chapter: 2, page: 10, kind: split, address: "ch 2 §2.6 ¶1",
+     at: "This shows that V is a constant if r is constant.", reason: "indented 18 pt after the display V = q/4πε₀r, the line below it back at the margin"}
+  - {book: phy12-part1, lang: en, chapter: 3, page: 17, kind: split, address: "ch 3 §3.11 ¶18",
+     at: "In Fig. (3.14), we had joined", reason: "indented 18 pt after the display (3.57), the line below it back at the margin"}
+  - {book: phy12-part1, lang: en, chapter: 4, page: 4, kind: split, address: "ch 4 §4.2.3 ¶2",
+     at: "This summation can be converted to an integral", reason: "indented 18 pt after the display F = Σ I dl × B, a one-line paragraph that closes the page"}
+  - {book: phy12-part1, lang: en, chapter: 4, page: 9, kind: split, address: "ch 4 §4.5 ¶3",
+     at: "Now r^2 = x^2 + R^2", reason: "indented 18 pt after the display (4.8), the line below it back at the margin"}
+  - {book: phy12-part1, lang: en, chapter: 7, page: 19, kind: split, address: "ch 7 §7.8 ¶6",
+     at: "From Eqs. [7.31 (a)] and [7.32 (a)], we have", reason: "indented at the paragraph indent after the display [7.32(a)]; this layout sets a continuation flush"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 36, kind: join, address: "ch 1 §1.14.3 ¶5",
+     at: "The flux through the Gaussian surface, calculated as before", reason: "p35's item (ii) hangs its lines 18 pt and p36's first three lines sit at the same indent (x 210 against the margin 192): the item runs on"}
+  - {book: phy12-part1, lang: en, chapter: 2, page: 15, kind: join, address: "ch 2 §2.8.1 ¶4",
+     at: "(We continue to take potential at infinity", reason: "p14 ends at the measure with its word gaps stretched to 4.84 pt against the page's 2.89, and p15 opens flush: the paragraph runs on (the join flag)"}
+  - {book: phy12-part1, lang: en, chapter: 2, page: 31, kind: join, address: "ch 2 §2.15 ¶7",
+     at: "Energy density of electric field, u =(1/2)epsilon_0 E^2", reason: "the display (2.73) completes ¶6's \"Eq (2.72) shows that\""}
+  - {book: phy12-part1, lang: en, chapter: 3, page: 10, kind: join, address: "ch 3 §3.7 ¶2",
+     at: "Metals have low resistivities in the range", reason: "p9 ends at the measure with gaps stretched to 3.37 pt against 2.89, and p10 opens flush where this book indents a page-top paragraph: the paragraph runs on"}
+  - {book: phy12-part1, lang: en, chapter: 3, page: 16, kind: figure_ref, address: "ch 3 §3.11 ¶18",
+     at: "We can put these equations in a simpler way", remove: "Fig. (3.14)", reason: "the split moves \"In Fig. (3.14)\" to the next paragraph; this one no longer names it"}
+  - {book: phy12-part1, lang: en, chapter: 3, page: 17, kind: figure_ref, address: "ch 3 §3.11 ¶19",
+     at: "In Fig. (3.14), we had joined", add: "Fig. (3.14)", reason: "the split carries \"In Fig. (3.14)\" into this paragraph; its label stayed with the one before"}
+  - {book: phy12-part1, lang: en, chapter: 4, page: 9, kind: figure_ref, address: "ch 4 §4.5 ¶4",
+     at: "Now r^2 = x^2 + R^2", add: "Fig. 4.9", reason: "the split carries \"the element dl in Fig. 4.9\" into this paragraph"}
+  - {book: phy12-part1, lang: en, chapter: 4, page: 12, kind: figure_ref, address: "ch 4 §4.6 ¶3",
+     at: "Now, let L be the length (part) of the loop", remove: "Fig. 4.13", reason: "the paragraph names Eq. (4.13), not Fig. 4.13"}
+  - {book: phy12-part1, lang: en, chapter: 6, page: 18, kind: figure_ref, address: "ch 6 §6.8 ¶5",
+     at: "Thus, the instantaneous value of the emf", add: "Fig. 6.14", reason: "the paragraph names Fig. 6.14 and the transcriber's figure_refs omit it"}
+  - {book: phy12-part1, lang: en, chapter: 7, page: 10, kind: figure_ref, address: "ch 7 §7.6 ¶1",
+     at: "Figure 7.10 shows a series LCR circuit", add: "Figure 7.10", reason: "the paragraph names Figure 7.10 and the transcriber's figure_refs omit it"}
+  - {book: phy12-part1, lang: en, chapter: 7, page: 13, kind: figure_ref, address: "ch 7 §7.6.2 ¶3",
+     at: "Figure 7.16 shows the variation of i_m", add: "Figure 7.16", reason: "the paragraph names Figure 7.16 and the transcriber's figure_refs omit it"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 19, kind: noise, flag: join, address: "ch 1 §1.7.2 ¶8",
+     at: "Solution The electric field vector E_1A", reason: "Example 1.8's solution continues at the top of p19 (x 78, its block's indent) and the heading 1.8 comes after it"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 27, kind: noise, flag: join, address: "ch 1 §1.10.2 ¶6",
+     at: "Clearly, the components of these two forces", reason: "Example 1.9's solution continues at the top of p27 and the heading 1.11 comes after it"}
+  - {book: phy12-part1, lang: en, chapter: 7, page: 9, kind: noise, flag: join, address: "ch 7 §7.5 ¶6",
+     at: "The dimension of capacitive reactance is", reason: "p8 ends in the display (7.18) and p9 opens flush: a row starting flush after a display stays as transcribed (DECISIONS 2026-09-26)"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 19, kind: noise, flag: figure, address: "ch 1 §1.8 ¶1",
+     at: "We have studied electric field in the last section", reason: "p19 prints \"FIGURE 1.12 Field of a point charge.\"; the caption collector missed it"}
+  - {book: phy12-part1, lang: en, chapter: 2, page: 15, kind: noise, flag: figure, address: "ch 2 §2.8.1 ¶5",
+     at: "Thus, if an electron with charge", reason: "\"Physics Part I, Table 6.1\" is the Class XI book's table, not this book's"}
+  - {book: phy12-part1, lang: en, chapter: 3, page: 15, kind: noise, flag: figure, address: "ch 3 §3.11 ¶2",
+     at: "Consider first two cells in series", reason: "p15 prints \"FIGURE 3.13 Two cells of emf's\"; the caption collector missed it"}
+  - {book: phy12-part1, lang: en, chapter: 3, page: 15, kind: noise, flag: figure, address: "ch 3 §3.11 ¶3",
+     at: "Let V(A), V(B), V(C) be the potentials", reason: "p15 prints \"FIGURE 3.13 Two cells of emf's\"; the caption collector missed it"}
+  - {book: phy12-part1, lang: en, chapter: 3, page: 15, kind: noise, flag: figure, address: "ch 3 §3.11 ¶6",
+     at: "In Fig.3.13, we had connected", reason: "p15 prints \"FIGURE 3.13 Two cells of emf's\"; the caption collector missed it"}
+  - {book: phy12-part1, lang: en, chapter: 5, page: 2, kind: noise, flag: figure, address: "ch 5 §5.2 ¶1",
+     at: "We begin our study by examining iron filings", reason: "p2 prints \"FIGURE 5.1\" under the photograph; the caption collector missed it"}
+  - {book: phy12-part1, lang: en, chapter: 5, page: 2, kind: noise, flag: figure, address: "ch 5 §5.2.1 ¶1",
+     at: "The pattern of iron filings permits us", reason: "\"refer to the Chapter 1, Figure 1.14(d)\" names chapter 1's figure; the label carries its chapter"}
+  - {book: phy12-part1, lang: en, chapter: 6, page: 4, kind: noise, flag: figure, address: "ch 6 §6.3 ¶2",
+     at: "If the magnetic field has different magnitudes", reason: "p4 prints \"FIGURE 6.5 Magnetic field B_i\"; the caption collector missed it"}
+  - {book: phy12-part1, lang: en, chapter: 7, page: 5, kind: noise, flag: figure, address: "ch 7 §7.3 ¶1",
+     at: "In the previous section, we learnt that the current", reason: "p5 prints \"FIGURE 7.4 (a) A phasor diagram\"; the caption collector missed it"}
+  - {book: phy12-part1, lang: en, chapter: 7, page: 5, kind: noise, flag: figure, address: "ch 7 §7.3 ¶2",
+     at: "From Fig. 7.4(a) we see that phasors", reason: "p5 prints \"FIGURE 7.4 (a) A phasor diagram\"; the caption collector missed it"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 6, kind: misprint, address: "ch 1 §1.4.3 ¶8",
+     transcribed: "of magnituOde, say", printed: "of magnitude, say", reason: "the page prints \"magnituOde\" — the book's own, kept"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 9, kind: false_positive, address: "ch 1 §1.5 ¶20",
+     transcribed: "the gravitational force is attractive in nature", printed: "the gravitational force is attractive", reason: "the layer carries \"attractive in nature\"; the verifier quoted a prefix"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 13, kind: false_positive, address: "ch 1 §1.6 ¶12",
+     transcribed: "F_1 = F r_hat_1 where r_hat_1 is a unit vector along BC", printed: "F_1 = F r_hat_1", reason: "the page prints \"where r̂1 is a unit vector along BC\" after the display; the verifier quoted a prefix"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 14, kind: false_positive, address: "ch 1 §1.7 ¶1",
+     transcribed: "E(r) = (1 / 4 pi epsilon_0) (Q / r^2) r_hat = (1 / 4 pi epsilon_0) (Q / r^2) r_hat (1.6)", printed: "E(r) = (1 / 4 pi epsilon_0) (Q / r^2) r_hat", reason: "(1.6) prints the same expression twice; the verifier quoted the first"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 23, kind: false_positive, address: "ch 1 §1.9 ¶8",
+     transcribed: "phi ≈ sum E·DeltaS", printed: "phi ~ sum E·DeltaS", reason: "(1.12) prints ≈, which the next paragraph calls \"the approximation sign\""}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 25, kind: false_positive, address: "ch 1 §1.10.2 ¶1",
+     transcribed: "of negative charges* lie", printed: "of negative charges lie", reason: "the page prints the footnote mark \"charges*\""}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 31, kind: false_positive, address: "ch 1 §1.13 ¶16",
+     transcribed: "E_L·DeltaS = DeltaS E_L · n_hat_L = E_L DeltaS cos theta = –E_L DeltaS, since theta = 180° = –E_L a^2", printed: "E_L·DeltaS = DeltaS E_L · n_hat_L = E_L DeltaS cos theta", reason: "the page continues the display to = –E_L a²; the verifier quoted a prefix"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 32, kind: false_positive, address: "ch 1 §1.13 ¶20",
+     transcribed: "i_hat·DeltaS = – DeltaS = + 200 × pi (0.05)^2 = + 1.57 N m^2 C^-1 On the right face, E and DeltaS are parallel and therefore phi_R = E·DeltaS = + 1.57 N m^2 C^-1.", printed: "i_hat·DeltaS = – DeltaS", reason: "the page continues the solution to φR = +1.57 N m² C⁻¹; the verifier quoted a prefix"}
+  - {book: phy12-part1, lang: en, chapter: 1, page: 35, kind: false_positive, address: "ch 1 §1.14.3 ¶2",
+     transcribed: "Or, E = sigma R^2 / (epsilon_0 r^2) = q / (4 pi epsilon_0 r^2)", printed: "E = sigma R^2 / (epsilon_0 r^2) = q / (4 pi epsilon_0 r^2)", reason: "the layer carries \"Or,\" before the display"}
+  - {book: phy12-part1, lang: en, chapter: 2, page: 2, kind: false_positive, address: "ch 2 §2.1 ¶5",
+     transcribed: "W_RP = integral(R to P) F_ext · dr = − integral(R to P) F_ext · dr (2.1)", printed: "W_RP = integral(R to P) F_ext . dr = − integral(R to P) F_ext . dr (2.1)", reason: "the dot product is · either way; a glyph variant"}
+  - {book: phy12-part1, lang: en, chapter: 2, page: 11, kind: false_positive, address: "ch 2 §2.7 ¶1",
+     transcribed: "position vector r_1 and r_2", printed: "r_1 and r_2", reason: "the layer carries \"with position vector r1 and r2\""}
+  - {book: phy12-part1, lang: en, chapter: 2, page: 19, kind: false_positive, address: "ch 2 §2.9 ¶9",
+     transcribed: "By Gauss's law E delta S = |sigma| delta S / epsilon_0 E = |sigma| / epsilon_0 (2.36)", printed: "E delta S = |sigma| delta S / epsilon_0", reason: "the layer carries \"By Gauss's law\" and the display to (2.36); the verifier quoted a part"}
+  - {book: phy12-part1, lang: en, chapter: 2, page: 30, kind: false_positive, address: "ch 2 §2.15 ¶4",
+     transcribed: "= (1/2) Q^2 / C = ((A sigma)^2 / 2) × d / (epsilon_0 A)", printed: "= (1/2)(Q^2/C) = ((A sigma)^2 / 2) × d / (epsilon_0 A)", reason: "the same fraction, bracketed differently; the page stacks Q²/C"}
+  - {book: phy12-part1, lang: en, chapter: 3, page: 7, kind: false_positive, address: "ch 3 §3.5 ¶13",
+     transcribed: "much smaller, about 10^-5 times", printed: "smaller, about 10^-5 times", reason: "the layer carries \"is much smaller, about 10–5 times\""}
+  - {book: phy12-part1, lang: en, chapter: 3, page: 14, kind: false_positive, address: "ch 3 §3.10 ¶3",
+     transcribed: "V = Potential difference between P and A + Potential difference between A and B = epsilon (3.37)", printed: "V = Potential difference between P and A + Potential difference between A and B + Potential difference between B and N = epsilon (3.37)", reason: "the row carries all three terms, as the page does; the verifier misquoted the row"}
+  - {book: phy12-part1, lang: en, chapter: 4, page: 4, kind: false_positive, address: "ch 4 §4.2.3 ¶1",
+     transcribed: "F = (nlA)q v_d × B where q", printed: "F = (nlA)q v_d × B", reason: "the page continues \"where q is the charge on a carrier\"; the verifier quoted a prefix"}
+  - {book: phy12-part1, lang: en, chapter: 4, page: 4, kind: false_positive, address: "ch 4 §4.2.3 ¶1",
+     transcribed: "Thus, F = [(nq v_d)lA] × B = [ jAl ] × B = Il × B (4.4)", printed: "F = [(nq v_d)lA] × B = [ jAl ] × B = Il × B", reason: "the page prints \"Thus,\" and the number (4.4)"}
+  - {book: phy12-part1, lang: en, chapter: 4, page: 4, kind: false_positive, address: "ch 4 §4.2.3 ¶2",
+     transcribed: "F = sum(j) Idl_j × B", printed: "F = sum(j) I l_j × B", reason: "the page prints Σ I dl_j × B; the verifier dropped the d"}
+  - {book: phy12-part1, lang: en, chapter: 4, page: 5, kind: false_positive, address: "ch 4 §4.2.3 ¶4",
+     transcribed: "m g = I lB, B = m g / I l", printed: "m g = I lB", reason: "the page continues the display to B = mg/Il"}
+  - {book: phy12-part1, lang: en, chapter: 4, page: 21, kind: false_positive, address: "ch 4 §4.9.1 ¶18",
+     transcribed: "I dω/dt = mB sin theta", printed: "I dω/dt = mB sinθ", reason: "the prompt writes θ by name"}
+  - {book: phy12-part1, lang: en, chapter: 4, page: 22, kind: false_positive, address: "ch 4 §4.9.2 ¶3",
+     transcribed: "= (mu_0 / 4 pi) (2m / x^3) [4.25(a)]", printed: "= mu_0 / 4 pi (2m / x^3) [4.25(a)]", reason: "the page stacks μ0 over 4π; the bracket is the fraction's"}
+  - {book: phy12-part1, lang: en, chapter: 5, page: 10, kind: false_positive, address: "ch 5 §5.3 ¶22",
+     transcribed: "is always zero integral(S) B.Delta s = 0 . If", printed: "is always zero. If", reason: "the layer carries the display ∮ B.Δs = 0 after \"always zero\""}
+  - {book: phy12-part1, lang: en, chapter: 6, page: 10, kind: false_positive, address: "ch 6 §6.6 ¶3",
+     transcribed: "W = qvBl Since emf", printed: "W = qvBl", reason: "the page continues \"Since emf is the work done per unit charge\""}
+  - {book: phy12-part1, lang: en, chapter: 7, page: 15, kind: false_positive, address: "ch 7 §7.7 ¶6",
+     transcribed: "(X_c – X_L)/ R. So, phi", printed: "X_c – X_L)/ R. So, phi", reason: "the layer carries \"tan–1 (Xc – XL)/ R\"; the verifier dropped the bracket"}
+  - {book: phy12-part1, lang: en, chapter: 8, page: 8, kind: false_positive, address: "ch 8 §8.3.2 ¶18",
+     transcribed: "electric field component along the z-axis is obtained as E_z = 60 sin (0.5 × 10^3 x + 1.5 × 10^11 t) V/m", printed: "electric field component along the z-axis is obtained as", reason: "the page follows with the display E_z = 60 sin(…) V/m; the verifier quoted a prefix"}

@@ -397,3 +397,81 @@ corrections:
   - {book: bio11, lang: en, chapter: 5, page: 13, kind: false_positive, address: "ch 5 §5.8 ¶1",
      transcribed: "⚥ for bisexual plants", printed: "♂ for bisexual plants",
      reason: "the page prints ⚥ for bisexual and ♂ for male; read at 300 dpi, the layer carrying no symbol"}
+
+  # bio12, the whole book on v5, second read of 2026-09-26 (report -ncert-verify-2). Every flag read against
+  # its page: the text layer for characters, glyph geometry for boundaries, renders where the layer could not
+  # say. Approved by the founder 2026-09-26. The same rule as bio11 decides a page-break join, sharpened by
+  # word spacing: a last line at the measure whose gaps are stretched past the page's natural ~2.3 pt is a
+  # justified line, so the paragraph runs on. Also ruled OUT the same day: ch 5 p6's four Griffith flow lines
+  # ("S strain -> Inject into mice -> Mice die"), drawn as graphics with no text layer and restating the
+  # sentences around them — a figure in all but caption. No kind records an omitted passage; this line does.
+  - {book: bio12, lang: en, chapter: 2, page: 9, kind: join, address: "ch 2 §2.4 ¶2",
+     at: "The menstrual phase is followed by the", reason: "flush left under a full-measure line: the paragraph runs on"}
+  - {book: bio12, lang: en, chapter: 3, page: 7, kind: join, address: "ch 3 §3.3 ¶4",
+     at: "Such practices should be avoided because", reason: "p6's last line is at the measure with 3.32 pt gaps against a 2.46 median: justified, runs on"}
+  - {book: bio12, lang: en, chapter: 6, page: 5, kind: join, address: "ch 6 §6.3 ¶4",
+     at: "Such similarities can be interpreted to", reason: "p4's last line is at the measure with stretched gaps (2.75 pt): runs on past Figure 6.2"}
+  - {book: bio12, lang: en, chapter: 6, page: 16, kind: join, address: "ch 6 §6.9 ¶2",
+     at: "Homo erectus probably ate meat. The", reason: "p15's last line is at the measure with 3.26 pt gaps: runs on past Figure 6.11"}
+  - {book: bio12, lang: en, chapter: 11, page: 7, kind: join, address: "ch 11 §11.1.2 ¶13",
+     at: "Any species growing exponentially under unlimited resource", reason: "flush left after the display of symbols: the paragraph continues"}
+  - {book: bio12, lang: en, chapter: 4, page: 11, kind: split, address: "ch 4 §4.2.2.1 ¶3",
+     at: "In the first case, the modified", reason: "p11 opens with an 18 pt indent after the list ends short on p10"}
+  - {book: bio12, lang: en, chapter: 5, page: 6, kind: split, address: "ch 5 §5.2 ¶3",
+     at: "Griffith was able to kill bacteria by heating them.", reason: "indented in the print below the flow lines"}
+  - {book: bio12, lang: en, chapter: 5, page: 28, kind: text, address: "ch 5 §5.10 ¶4",
+     transcribed: "(v) hybridisation using labelled VNTR probe, and (iv) transferring (blotting) of separated DNA fragments to synthetic membranes, such as nitrocellulose or nylon, (vi)", printed: "(iv) transferring (blotting) of separated DNA fragments to synthetic membranes, such as nitrocellulose or nylon, (v) hybridisation using labelled VNTR probe, and (vi)", reason: "the model swapped list items (iv) and (v); the print and the layer run (iv) then (v)"}
+  - {book: bio12, lang: en, chapter: 11, page: 9, kind: figure_ref, address: "ch 11 §11.1.4 ¶2",
+     at: "Interspecific interactions arise from the interact", add: "Table 11.1", reason: "the book prints Table11.1 without a space, which the load drops as no label"}
+  - {book: bio12, lang: en, chapter: 13, page: 5, kind: figure_ref, address: "ch 13 §13.1.2 ¶3",
+     at: "(ii) Species-Area relationships", add: "Figure 13.2", reason: "the book prints Figure13.2 without a space, which the load drops as no label"}
+  - {book: bio12, lang: en, chapter: 10, page: 1, kind: noise, flag: join, address: "ch 10 §10.1 ¶1",
+     at: "Let us take a look at the three options", reason: "one-sentence list items (i)-(iii) stay inside their paragraph (ncert_extract list rule)"}
+  - {book: bio12, lang: en, chapter: 10, page: 6, kind: noise, flag: join, address: "ch 10 §10.2.1 ¶4",
+     at: "In mammals, including humans, insulin is", reason: "p5's last line ends 109 pt short: that paragraph closed on p5"}
+  - {book: bio12, lang: en, chapter: 1, page: 19, kind: noise, flag: figure, address: "ch 1 §1.4.2 ¶2",
+     at: "A typical dicotyledonous embryo", reason: "Figure 1.14a: the caption prints Figure 1.14 (a)"}
+  - {book: bio12, lang: en, chapter: 1, page: 19, kind: noise, flag: figure, address: "ch 1 §1.4.2 ¶3",
+     at: "Embryos of monocotyledons", reason: "Figure 1.14 b: the caption prints Figure 1.14 (b)"}
+  - {book: bio12, lang: en, chapter: 2, page: 12, kind: noise, flag: figure, address: "ch 2 §2.6 ¶1",
+     at: "After implantation, finger-like projections appear", reason: "Figure 2.12's caption is printed on the row's own page"}
+  - {book: bio12, lang: en, chapter: 4, page: 17, kind: noise, flag: figure, address: "ch 4 §4.3.2 ¶5",
+     at: "Following this synthesis of ideas, experimental", reason: "Figure 4.10's caption is printed on the row's own page"}
+  - {book: bio12, lang: en, chapter: 5, page: 25, kind: noise, flag: figure, address: "ch 5 §5.9 ¶7",
+     at: "The fragments were sequenced using automated DNA", reason: "Figure 5.15's caption is printed on the row's own page"}
+  - {book: bio12, lang: en, chapter: 7, page: 17, kind: noise, flag: figure, address: "ch 7 §7.5 ¶5",
+     at: "Coca alkaloid or cocaine is obtained from", reason: "Figure 7.11's caption is printed on the row's own page"}
+  - {book: bio12, lang: en, chapter: 1, page: 11, kind: false_positive, address: "ch 1 §1.2.3 ¶2",
+     transcribed: "Pollination is the mechanism to achieve this objective.", printed: "Pollination is the mechanism", reason: "the layer carries the full sentence; the verifier quoted a prefix"}
+  - {book: bio12, lang: en, chapter: 1, page: 12, kind: false_positive, address: "ch 1 §1.2.3 ¶6",
+     transcribed: "Transfer of pollen grains from anther to the stigma of a different plant", printed: "Transfer of pollen grains from anther", reason: "the layer carries the full clause; the verifier quoted a prefix"}
+  - {book: bio12, lang: en, chapter: 4, page: 16, kind: false_positive, address: "ch 4 §4.3.2 ¶3",
+     transcribed: "segregating with the red chromosomes", printed: "segregating with the red chromosome", reason: "the page prints chromosomes"}
+  - {book: bio12, lang: en, chapter: 4, page: 26, kind: false_positive, address: "ch 4 §4.8.3 ¶6",
+     transcribed: "one of the X chromosomes, i.e., 45 with X0, Such females", printed: "one of the X chromosomes", reason: "the layer carries the full span, the book's own comma included"}
+  - {book: bio12, lang: en, chapter: 5, page: 2, kind: false_positive, address: "ch 5 §5.1 ¶1",
+     transcribed: "phi×174 has", printed: "phi×174", reason: "the layer carries the full span; the verifier quoted a prefix"}
+  - {book: bio12, lang: en, chapter: 5, page: 17, kind: false_positive, address: "ch 5 §5.6 ¶2",
+     transcribed: "biochemists and geneticists", printed: "biochemist and geneticists", reason: "the page prints biochemists"}
+  - {book: bio12, lang: en, chapter: 5, page: 19, kind: false_positive, address: "ch 5 §5.6 ¶14",
+     transcribed: "Met-Phe-Phe-Phe-Phe-Phe-Phe", printed: "Met-Phe-Phe-Phe-Phe-Phe", reason: "the page prints six Phe"}
+  - {book: bio12, lang: en, chapter: 7, page: 16, kind: false_positive, address: "ch 7 §7.4 ¶6",
+     transcribed: "such as alpha-interferon which", printed: "such as α-interferon which", reason: "the prompt writes a Greek letter by name"}
+  - {book: bio12, lang: en, chapter: 7, page: 16, kind: false_positive, address: "ch 7 §7.5 ¶3",
+     transcribed: "white, odourless, bitter crystalline compound", printed: "white, odourless, bitter crystalline", reason: "the layer carries the full span; the verifier quoted a prefix"}
+  - {book: bio12, lang: en, chapter: 8, page: 5, kind: false_positive, address: "ch 8 §8.2.3 ¶1",
+     transcribed: "Clostridium butylicum (a bacterium) of butyric acid", printed: "Clostridium butylicum", reason: "the layer carries the full span; the verifier quoted a prefix"}
+  - {book: bio12, lang: en, chapter: 8, page: 5, kind: false_positive, address: "ch 8 §8.2.3 ¶3",
+     transcribed: "commercialised as blood-cholesterol lowering agents", printed: "commercialised as blood-cholesterol", reason: "the layer carries the full span; the verifier quoted a prefix"}
+  - {book: bio12, lang: en, chapter: 9, page: 4, kind: false_positive, address: "ch 9 §9.1 ¶6",
+     transcribed: "This can also be called as cloning or making multiple identical copies of any template DNA.", printed: "This can also be called as cloning or", reason: "the layer carries the full sentence; the verifier quoted a prefix"}
+  - {book: bio12, lang: en, chapter: 9, page: 7, kind: false_positive, address: "ch 9 §9.2.1 ¶6",
+     transcribed: "5' -> 3' direction", printed: "5' → 3' direction", reason: "the prompt writes an arrow as ->"}
+  - {book: bio12, lang: en, chapter: 9, page: 7, kind: false_positive, address: "ch 9 §9.2.1 ¶6",
+     transcribed: "3' -> 5' direction", printed: "3' → 5' direction", reason: "the prompt writes an arrow as ->"}
+  - {book: bio12, lang: en, chapter: 9, page: 11, kind: false_positive, address: "ch 9 §9.2.3 ¶2",
+     transcribed: "biolistics or gene gun", printed: "biolistics", reason: "the layer carries the full span; the verifier quoted a prefix"}
+  - {book: bio12, lang: en, chapter: 13, page: 7, kind: false_positive, address: "ch 13 §13.1.4 ¶5",
+     transcribed: "This is the most important cause", printed: "This is the most important", reason: "the layer carries the full span; the verifier quoted a prefix"}
+  - {book: bio12, lang: en, chapter: 7, page: 5, kind: misprint, address: "ch 7 §7.1 ¶5",
+     transcribed: "P. malaria", printed: "P. malariae", reason: "the page prints P. malaria — the book's own error, kept"}

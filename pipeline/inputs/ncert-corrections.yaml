@@ -576,6 +576,12 @@ corrections:
      transcribed: "gamma = (9/7) R", printed: "gamma = 9/7", reason: "(12.35) prints γ = 9/7 R — the book's own error, kept"}
   - {book: phy11-part2, lang: en, chapter: 12, page: 10, kind: misprint, address: "ch 12 §12.6.2 ¶3",
      transcribed: "gamma = (9/7) R (12.35)", printed: "gamma = 9/7 (12.35)", reason: "the same flag quoted with its number on the redo of p10 — (12.35) prints γ = 9/7 R, kept"}
+  - {book: phy11-part2, lang: en, chapter: 12, page: 10, kind: misprint, address: "ch 12 §12.6.1 ¶1",
+     transcribed: "C_v (monatomic gas) = dU/dT = (3/2) RT", printed: "C_v (monatomic gas) = dU/dT = (3/2) R", reason: "(12.28) prints dU/dT = 3/2 RT — the book's own error, kept; filed under ¶1 on three reads, the claim belongs to ¶2"}
+  - {book: phy11-part2, lang: en, chapter: 9, page: 13, kind: false_positive, address: "ch 9 §9.5 ¶6",
+     transcribed: "eta = stress / strain rate s^-1", printed: "eta = stress / strain rate", reason: "the page prints s^-1 after the fraction; the verifier quoted a prefix"}
+  - {book: phy11-part2, lang: en, chapter: 9, page: 8, kind: figure_ref, address: "ch 9 §9.3 ¶3",
+     at: "Av gives the volume flux", add: "Fig 9.7b", reason: "the split carried \"(Fig 9.7b)\" into this paragraph; its label stayed with the one before"}
   - {book: phy11-part2, lang: en, chapter: 12, page: 11, kind: false_positive, address: "ch 12 §12.6.3 ¶5",
      transcribed: "rise in temperature = 2 × 1.5 R × 15.0", printed: "rise in temperature\\n= 2 × 1.5 R × 15.0", reason: "the verifier's line break; the words are the page's"}
   - {book: phy11-part2, lang: en, chapter: 13, page: 2, kind: false_positive, address: "ch 13 §13.2 ¶1",

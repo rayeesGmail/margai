@@ -427,7 +427,7 @@ corrections:
      at: "Interspecific interactions arise from the interact", add: "Table 11.1", reason: "the book prints Table11.1 without a space, which the load drops as no label"}
   - {book: bio12, lang: en, chapter: 13, page: 5, kind: figure_ref, address: "ch 13 §13.1.2 ¶3",
      at: "(ii) Species-Area relationships", add: "Figure 13.2", reason: "the book prints Figure13.2 without a space, which the load drops as no label"}
-  - {book: bio12, lang: en, chapter: 10, page: 1, kind: noise, flag: join, address: "ch 10 §10.1 ¶1",
+  - {book: bio12, lang: en, chapter: 10, page: 2, kind: noise, flag: join, address: "ch 10 §10.1 ¶1",
      at: "Let us take a look at the three options", reason: "one-sentence list items (i)-(iii) stay inside their paragraph (ncert_extract list rule)"}
   - {book: bio12, lang: en, chapter: 10, page: 6, kind: noise, flag: join, address: "ch 10 §10.2.1 ¶4",
      at: "In mammals, including humans, insulin is", reason: "p5's last line ends 109 pt short: that paragraph closed on p5"}

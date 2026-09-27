@@ -869,3 +869,7 @@ corrections:
      at: "On the basis of the relative values of electrical conductivity", reason: "the side heading \"On the basis of conductivity\" (¶1, a row of its own) leads this paragraph"}
   - {book: phy12-part2, lang: en, chapter: 14, page: 3, kind: text, address: "ch 14 §14.2 ¶9",
      transcribed: "According to the Bohr atomic model, in an isolated atom", printed: "On the basis of energy bands According to the Bohr atomic model, in an isolated atom", reason: "the page prints the side heading \"On the basis of energy bands\" (Bookman-Demi) above it, the companion of p2's \"On the basis of conductivity\"; the transcriber dropped it"}
+  # The re-read of the thirteen pages the corrections changed (report -ncert-verify-5): one flag, on a split row.
+  # Approved by the founder 2026-09-27.
+  - {book: phy12-part2, lang: en, chapter: 9, page: 20, kind: false_positive, address: "ch 9 §9.6 ¶11",
+     printed: "A/2] ≃ (A + D_m)/2 / A/2", transcribed: "A/2] ≃ ((A + D_m)/2) / (A/2)", reason: "the page stacks (A + D_m)/2 over A/2; the row brackets the fraction as the prompt's convention asks, the verifier's quote drops the brackets and reads as another expression"}

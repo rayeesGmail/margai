@@ -873,3 +873,183 @@ corrections:
   # Approved by the founder 2026-09-27.
   - {book: phy12-part2, lang: en, chapter: 9, page: 20, kind: false_positive, address: "ch 9 §9.6 ¶11",
      printed: "A/2] ≃ (A + D_m)/2 / A/2", transcribed: "A/2] ≃ ((A + D_m)/2) / (A/2)", reason: "the page stacks (A + D_m)/2 over A/2; the row brackets the fraction as the prompt's convention asks, the verifier's quote drops the brackets and reads as another expression"}
+  # chem12-part1, the whole book on v5 (reports -ncert-extract-3/-4, -ncert-load-9), the free checks' rulings at ₹0,
+  # each read against its page; written before the second read ran so its recall on them is measured.
+  # Chapter mottoes (founder, DECISIONS 2026-09-27): the italic line under each chapter's title is not corpus text;
+  # the transcriber kept it in ch 1 and ch 2 and skipped it in ch 3–5.
+  - {book: chem12-part1, lang: en, chapter: 1, page: 1, kind: drop, address: "ch 1 §1 ¶1",
+     at: "Almost all processes in body occur", reason: "the chapter's opening motto, set in magenta italic under the title band"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 1, kind: drop, address: "ch 2 §2 ¶1",
+     at: "Chemical reactions can be used to produce electrical energy", reason: "the chapter's opening motto, set in magenta italic under the title band"}
+  # A lower-case row after a display is the rest of the sentence before it (founder, DECISIONS 2026-09-27): this
+  # book's ch 2 indents every line after a display, so the indent says nothing; the load's check misses these
+  # because a reaction or a bracketed term ends in ")".
+  - {book: chem12-part1, lang: en, chapter: 2, page: 6, kind: join, address: "ch 2 §2.3 ¶2",
+     at: "the electrode potential at any concentration measured", reason: "\"Nernst showed that for the electrode reaction: [display] the electrode potential …\" is one sentence"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 6, kind: join, address: "ch 2 §2.3 ¶3",
+     at: "but concentration of solid M is taken as unity", reason: "the same sentence runs on after the second display into (2.8)"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 23, kind: join, address: "ch 2 §2.5.1 ¶5",
+     at: "but H^+ (aq) is produced by the dissociation", reason: "\"the reaction at the cathode during electrolysis is: [display (2.33)] but H^+ (aq) is produced …\" is one sentence"}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 7, kind: join, address: "ch 3 §3.2.2 ¶4",
+     at: "where exponents x and y may or may not", reason: "the where-clause of the rate expression (3.4)"}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 13, kind: join, address: "ch 3 §3.3.2 ¶10",
+     at: "where, [R]_1 and [R]_2 are the concentrations", reason: "the where-clause of the displays (3.11) and (3.12)"}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 15, kind: join, address: "ch 3 §3.3.2 ¶26",
+     at: "where, p_i is the initial pressure at time t", reason: "the where-clause of the pressure display above it (the load's mid-sentence check names it)"}
+  # Side headings (founder, DECISIONS 2026-09-27): the heading leads the paragraph under it. Eight came out as rows of
+  # their own, three were dropped; ch 2 p19's "Weak Electrolytes", ch 3's "Units of …" and ch 5's (a)–(h) lead theirs.
+  - {book: chem12-part1, lang: en, chapter: 1, page: 6, kind: join, address: "ch 1 §1.3.1 ¶6",
+     at: "The solubility of a solid in a liquid is", reason: "the side heading \"Effect of temperature\" (¶5, a row of its own) leads this paragraph"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 6, kind: join, address: "ch 1 §1.3.1 ¶8",
+     at: "Pressure does not have any significant effect", reason: "the side heading \"Effect of pressure\" (¶7, a row of its own) leads this paragraph"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 9, kind: text, address: "ch 1 §1.3.2 ¶12",
+     transcribed: "Solubility of gases in liquids decreases with rise in temperature.", printed: "Effect of Temperature Solubility of gases in liquids decreases with rise in temperature.",
+     reason: "the page prints the side heading \"Effect of Temperature\" (BookmanOldStyle,BoldItal) above it; the transcriber dropped it"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 17, kind: join, address: "ch 2 §2.4.2 ¶5",
+     at: "For strong electrolytes, Lambda_m increases slowly", reason: "the side heading \"Strong Electrolytes\" (¶4, a row of its own) leads this paragraph, as \"Weak Electrolytes\" leads its own on p19"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 20, kind: join, address: "ch 2 §2.4.2 ¶16",
+     at: "Using Kohlrausch law of independent migration", reason: "the side heading \"Applications of Kohlrausch law\" (¶15, a row of its own) leads this paragraph"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 21, kind: text, address: "ch 2 §2.5 ¶5",
+     transcribed: "Michael Faraday was the first scientist", printed: "Quantitative Aspects of Electrolysis Michael Faraday was the first scientist",
+     reason: "the page prints the side heading \"Quantitative Aspects of Electrolysis\" (Bookman-DemiItalic) above it; the transcriber dropped it"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 21, kind: text, address: "ch 2 §2.5 ¶6",
+     transcribed: "After his extensive investigations on electrolysis", printed: "Faraday's Laws of Electrolysis After his extensive investigations on electrolysis",
+     reason: "the page prints the side heading \"Faraday’s Laws of Electrolysis\" (Bookman-DemiItalic) above it; the transcriber dropped it"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 17, kind: join, address: "ch 4 §4.4.1 ¶5",
+     at: "Potassium dichromate is a very important chemical", reason: "the side heading \"Potassium dichromate K_2Cr_2O_7\" (¶4, a row of its own) leads this paragraph"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 18, kind: join, address: "ch 4 §4.4.1 ¶14",
+     at: "Potassium permanganate is prepared by fusion", reason: "the side heading \"Potassium permanganate KMnO_4\" (¶13, a row of its own) leads this paragraph"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 19, kind: join, address: "ch 4 §4.4.1 ¶24",
+     at: "(a) Iodine is liberated from potassium iodide", reason: "the list label \"1. In acid solutions:\" (¶23, a row of its own) heads items (a)–(f); it leads the first, as a side heading would"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 20, kind: join, address: "ch 4 §4.4.1 ¶30",
+     at: "(a) A notable reaction is the oxidation of iodide", reason: "the list label \"2. In neutral or faintly alkaline solutions:\" (¶29, a row of its own) heads items (a)–(c); it leads the first"}
+  - {book: chem12-part1, lang: en, chapter: 5, page: 3, kind: join, address: "ch 5 §5.1 ¶14",
+     at: "Both double salts as well as complexes", reason: "the side heading \"Difference between a double salt and a complex\" (¶13, a row of its own) leads this paragraph"}
+  - {book: chem12-part1, lang: en, chapter: 5, page: 14, kind: join, address: "ch 5 §5.5.4 ¶3",
+     at: "In an octahedral coordination entity with six ligands", reason: "the side heading \"(a) Crystal field splitting in octahedral coordination entities\" (¶2, a row of its own) leads this paragraph, as (b) leads its own on p16"}
+  # The second read of the uncorrected rows (report -ncert-verify-7, ₹131.15): 35 flags, 13 page-break joins and 5
+  # figure_refs, each read against its page — layer, drawing and line geometry. It flagged none of the free checks'
+  # findings above (the mid-sentence splits, the heading-only rows, the dropped headings, the mottoes).
+  # Two transcription defects; the first restores a book error the transcriber had silently repaired.
+  - {book: chem12-part1, lang: en, chapter: 4, page: 9, kind: text, address: "ch 4 §4.3.4 ¶2",
+     transcribed: "Cr^VI O_4^2–", printed: "Cr^V1 O_4^2–",
+     reason: "the page prints Cr with the superscript \"V1\" (a digit one, in layer and drawing alike) beside Mn^VII; the transcriber corrected the book, which the prompt forbids"}
+  - {book: chem12-part1, lang: en, chapter: 5, page: 13, kind: text, address: "ch 5 §5.5.2 ¶3",
+     transcribed: "[CoF_6.]^3–", printed: "[CoF_6-]^3–",
+     reason: "the page prints a stray subscript dash after F6 (\"[CoF6-]\" in the layer), not a full stop — the book's own mark, kept as printed"}
+  # Page breaks, by the page-top line and the last line's word gaps. This book never starts a paragraph flush (only
+  # under a heading), so a flush page-top line continues; an indented one proves nothing here, because ch 2 and
+  # ch 3 p11 set a sentence's continuation after a display at the same 18 pt indent with the same next-line return.
+  - {book: chem12-part1, lang: en, chapter: 1, page: 15, kind: join, address: "ch 1 §1.5.2 ¶6",
+     at: "For example, ethanol-water mixture (obtained by", reason: "p15 opens flush (x 157, the odd page's margin, the line below the same) under p14's full last line"}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 9, kind: join, address: "ch 3 §3.2.3 ¶7",
+     at: "These may be consecutive reactions (e.g., oxidation", reason: "p8's last line is stretched to the measure (gaps 5.03 pt against the page's 4.10) and p9 opens flush at x 156"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 20, kind: split, address: "ch 4 §4.4.1 ¶25",
+     at: "(c) Oxalate ion or oxalic acid is oxidised", reason: "item (c) of the list, its own row like (a), (b), (d), (e) and (f); the row carried it on from (b) across the page break"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 3, kind: noise, flag: join, address: "ch 1 §1.2 ¶4",
+     at: "(ii) Volume percentage (V/V):", reason: "p3 opens with the rest of item (ii) (\"For example, 10% ethanol solution…\" in its indented block); \"(iii)\" starts lower down, in its own row"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 2, kind: noise, flag: join, address: "ch 2 §2.1 ¶1",
+     at: "We had studied the construction and functioning", reason: "§2.1 opens p2 under its own margin heading; p1's last line is the Objectives box"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 3, kind: noise, flag: join, address: "ch 2 §2.2 ¶1",
+     at: "As mentioned earlier a galvanic cell", reason: "§2.2 opens p3 under its own margin heading; p2 ends in its footnote"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 6, kind: noise, flag: join, address: "ch 2 §2.2.1 ¶7",
+     at: "Sometimes metals like platinum or gold", reason: "p6 opens with the display \"With half-cell reaction: ½ Br2(aq) + e– -> Br–(aq)\" that completes p5's list of half-cells"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 24, kind: noise, flag: join, address: "ch 2 §2.5.1 ¶9",
+     at: "The standard electrode potentials are replaced by", reason: "p24 opens with the display (2.39) that p23's list runs into; the indented line after it proves nothing in this chapter"}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 5, kind: noise, flag: join, address: "ch 3 §3.1 ¶13",
+     at: "It can be seen (Table 3.1) that", reason: "p4 ends in the display r_inst = -d[R]/dt = d[P]/dt and p5 opens indented, which in this book does not prove a new paragraph; the transcriber read it as running on"}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 13, kind: noise, flag: join, address: "ch 3 §3.3.2 ¶7",
+     at: "Rearranging this equation", reason: "p12 ends in the display (3.9) and p13 opens indented (x 173 on an odd page): a row starting after a display stays as transcribed"}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 21, kind: noise, flag: join, address: "ch 3 §3.4 ¶17",
+     at: "Subtracting equation (3.20) from (3.21)", reason: "p20's last line \"temperatures T1 and T2 respectively.\" is short (x1 464 of 533): the paragraph closed there"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 7, kind: noise, flag: join, address: "ch 4 §4.3.2 ¶4",
+     at: "Example 4.2 Why do the transition elements", reason: "p6 ends in Table 4.2 and p7 opens with the label Example 4.2, which never continues anything"}
+  - {book: chem12-part1, lang: en, chapter: 5, page: 2, kind: noise, flag: join, address: "ch 5 §5.1 ¶2",
+     at: "1 mol CoCl_3.6NH_3 (Yellow) gave", reason: "p1's last line \"solution.\" is short (x1 219 of 535): the paragraph closed there and p2 opens with the displayed list"}
+  # Figure links. Three labels are the book's pre-2023 numbering, the chapter having been Unit 3; per DECISIONS
+  # 2026-09-26 the words stay and the link names what they mean. The fourth caption is printed; the collector missed it.
+  - {book: chem12-part1, lang: en, chapter: 2, page: 4, kind: figure_ref, address: "ch 2 §2.2.1 ¶1",
+     at: "The potential of individual half-cell cannot be measured", remove: "Fig.3.3", reason: "the stale \"(Fig.3.3)\" means p4's Fig. 2.3, the standard hydrogen electrode; chapter 3's Fig. 3.3 is a rate plot"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 4, kind: figure_ref, address: "ch 2 §2.2.1 ¶1",
+     at: "The potential of individual half-cell cannot be measured", add: "Fig. 2.3", reason: "the figure the stale label means"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 4, kind: noise, flag: figure, address: "ch 2 §2.2.1 ¶1",
+     at: "The potential of individual half-cell cannot be measured", reason: "the text prints the stale \"Fig.3.3\"; the link names Fig. 2.3, which it means"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 18, kind: figure_ref, address: "ch 2 §2.4.2 ¶8",
+     at: "Solution Taking the square root of concentration", remove: "Fig. 3.7", reason: "the stale \"(Fig. 3.7)\" means p18's Fig. 2.7, which the row already links"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 18, kind: noise, flag: figure, address: "ch 2 §2.4.2 ¶8",
+     at: "Solution Taking the square root of concentration", reason: "the text prints the stale \"Fig. 3.7\"; the link names Fig. 2.7, which it means"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 20, kind: figure_ref, address: "ch 2 §2.4.2 ¶17",
+     at: "Example 2.7 Calculate Lambda^o_m for CaCl_2", remove: "Table 3.4", reason: "the stale \"Table 3.4\" means p19's Table 2.4, the limiting molar conductivities of ions"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 20, kind: figure_ref, address: "ch 2 §2.4.2 ¶17",
+     at: "Example 2.7 Calculate Lambda^o_m for CaCl_2", add: "Table 2.4", reason: "the table the stale label means"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 20, kind: noise, flag: figure, address: "ch 2 §2.4.2 ¶17",
+     at: "Example 2.7 Calculate Lambda^o_m for CaCl_2", reason: "the text prints the stale \"Table 3.4\"; the link names Table 2.4, which it means"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 15, kind: noise, flag: figure, address: "ch 4 §4.3.10 ¶1",
+     at: "When an electron from a lower energy d orbital", reason: "p15 prints \"Fig. 4.5: Colours of some of the first row…\"; the caption collector missed it"}
+  # The flags themselves.
+  - {book: chem12-part1, lang: en, chapter: 1, page: 4, kind: misprint, address: "ch 1 §1.2 ¶16",
+     printed: "Using equation (1.8)", transcribed: "Using equation (2.8)", reason: "the page prints \"Using equation (2.8)\", the pre-2023 number of the book's (1.8); the verifier corrected it"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 9, kind: false_positive, address: "ch 1 §1.4 ¶1",
+     printed: "solutions of (i) liquids in liquids and (ii) solids in liquids", transcribed: "the solutions of (i) liquids in liquids and (ii) solids in liquids", reason: "the page prints \"namely, the solutions of (i) liquids in liquids\"; the verifier dropped \"the\""}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 16, kind: misprint, address: "ch 1 §1.6.1 ¶10",
+     printed: "in equation (1.28)", transcribed: "in equation (2.28)", reason: "the page prints \"in equation (2.28)\", the pre-2023 number of (1.28); the verifier corrected it"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 18, kind: false_positive, address: "ch 1 §1.6.3 ¶2",
+     printed: "point.", transcribed: "point. Delta T_f = T_f^0 – T_f is known as depression in freezing point.", reason: "the row carries the page's sentence \"ΔTf = Tf0 – Tf is known as depression in freezing point.\"; the verifier quoted a prefix"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 21, kind: false_positive, address: "ch 1 §1.6.4 ¶4",
+     printed: "Thus: Π = C R T", transcribed: "Thus: Pi = C R T", reason: "the prompt writes a Greek letter by name; Pi is the page's Π"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 21, kind: false_positive, address: "ch 1 §1.6.4 ¶5",
+     printed: "Here Π is the osmotic pressure", transcribed: "Here Pi is the osmotic pressure", reason: "the prompt writes a Greek letter by name; Pi is the page's Π"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 21, kind: false_positive, address: "ch 1 §1.6.4 ¶5",
+     printed: "Π = (n_2 /V) R T", transcribed: "Pi = (n_2 /V) R T", reason: "the prompt writes a Greek letter by name; Pi is the page's Π"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 21, kind: false_positive, address: "ch 1 §1.6.4 ¶6",
+     printed: "Π V = w_2 R T / M_2", transcribed: "Pi V = w_2 R T / M_2", reason: "the prompt writes a Greek letter by name; Pi is the page's Π"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 21, kind: false_positive, address: "ch 1 §1.6.4 ¶6",
+     printed: "M_2 = w_2 R T / (Π V)", transcribed: "M_2 = w_2 R T / (Pi V)", reason: "the prompt writes a Greek letter by name; Pi is the page's Π"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 21, kind: false_positive, address: "ch 1 §1.6.4 ¶7",
+     printed: "w_2, T, Π and V", transcribed: "w_2, T, Pi and V", reason: "the prompt writes a Greek letter by name; Pi is the page's Π"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 22, kind: false_positive, address: "ch 1 §1.6.4 ¶11",
+     printed: "1.26 g × 0.083 L bar K^-1 mol^-1 × 300 K / (2.57×10^-3 bar × 0.200 L)", transcribed: "1.26 g × 0.083 L bar K^-1 mol^-1 × 300 K / (2.57×10^-3 bar × 0.200 L) = 61,022 g mol^-1", reason: "the page's display ends \"= 61,022 g mol-1\"; the verifier quoted a prefix"}
+  - {book: chem12-part1, lang: en, chapter: 1, page: 26, kind: false_positive, address: "ch 1 §1.7 ¶19",
+     printed: "CH_3COOH <=> H^+ + CH_3COO^-", transcribed: "CH_3COOH <-> H^+ + CH_3COO^-", reason: "the prompt writes a reversible reaction as \"<->\"; the verifier's \"<=>\" is its own spelling of the same ⇌"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 8, kind: false_positive, address: "ch 2 §2.3 ¶8",
+     printed: "a A + bB --(ne-)--> cC + dD", transcribed: "a A + bB --(ne^-)--> cC + dD", reason: "the page prints ne⁻ over the arrow; the verifier dropped the charge's caret"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 15, kind: false_positive, address: "ch 2 §2.4.1 ¶12",
+     printed: "kappa = 1.29 cm^-1 / 520 Ω", transcribed: "kappa = 1.29 cm^-1 / 520 Ω = 0.248 × 10^-2 S cm^-1", reason: "the page's line ends \"= 0.248 × 10–2 S cm–1\"; the verifier quoted a prefix"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 19, kind: false_positive, address: "ch 2 §2.4.2 ¶13",
+     printed: "acetic acid have lower degree", transcribed: "acetic acid have lower degree of dissociation at higher concentrations", reason: "the page prints \"have lower degree of dissociation at higher concentrations\"; the verifier quoted a prefix"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 20, kind: false_positive, address: "ch 2 §2.4.2 ¶19",
+     printed: "Calculate Lambda^o_(m) for HAc", transcribed: "Calculate Lambda^o for HAc", reason: "the page prints \"Calculate Λ0 for HAc\" with no subscript m; the verifier added one"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 20, kind: misprint, address: "ch 2 §2.4.2 ¶22",
+     printed: "48.15 S cm^2 mol^-1", transcribed: "48.15 S cm^3 mol^-1", reason: "the page prints \"= 48.15 S cm3 mol–1\" (molar conductivity is S cm2 mol–1) — the book's own error, kept"}
+  - {book: chem12-part1, lang: en, chapter: 2, page: 21, kind: false_positive, address: "ch 2 §2.5 ¶2",
+     printed: "Cu(s) → Cu^2+(s) + 2e^-", transcribed: "Cu(s) -> Cu^2+(s) + 2e^-", reason: "the prompt writes a reaction arrow as \"->\""}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 4, kind: misprint, address: "ch 3 §3.1 ¶13",
+     printed: "1.90 × 10^-4 mol L^-1s^-1", transcribed: "1.90 × 0^-4 mol L^-1s^-1", reason: "the page prints \"1.90 ×  0-4 mol L-1s-1\", the 1 of 10 missing from layer and drawing alike — the book's own error, kept"}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 9, kind: false_positive, address: "ch 3 §3.2.3 ¶8",
+     printed: "aA + bB → cC + dD", transcribed: "aA + bB -> cC + dD", reason: "the prompt writes a reaction arrow as \"->\""}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 16, kind: false_positive, address: "ch 3 §3.3.3 ¶2",
+     printed: "[R] = [R]_0 / 2", transcribed: "[R] = 1/2 [R]_0", reason: "the page prints \"[R] = ½ [R]0\"; the row's \"1/2 [R]_0\" is that fraction"}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 21, kind: false_positive, address: "ch 3 §3.4 ¶19",
+     printed: "Ae^(-Ea/RT)", transcribed: "Ae^(-E_a/RT)", reason: "the exponent sets E with its a in the superscript's small size; the row's E_a is the same activation energy the line above prints"}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 21, kind: false_positive, address: "ch 3 §3.4 ¶19",
+     printed: "0.02 = Ae^-18230.8/8.314 × 500", transcribed: "0.02 = Ae^(-18230.8/8.314 × 500)", reason: "the prompt brackets an exponent of more than one character"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 12, kind: false_positive, address: "ch 4 §4.3.7 ¶2",
+     printed: "oxidises I⁻ to I_2", transcribed: "oxidises I^- to I_2", reason: "the prompt writes a charge with a caret; I^- is the page's I⁻"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 12, kind: misprint, address: "ch 4 §4.3.7 ¶5",
+     printed: "stabilise V^V as VO_2^+", transcribed: "stabilise V^v as VO_2^+", reason: "the page prints a lower-case superscript v (\"V\\nv as VO2+\" in the layer, a small v on the page) for vanadium(V) — the book's own error, kept"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 13, kind: misprint, address: "ch 4 §4.3.8 ¶2",
+     printed: "related to their E° values", transcribed: "related to their E^e values", reason: "the page prints \"their E e values\" with a superscript e where E° is meant — the book's own error, kept"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 17, kind: false_positive, address: "ch 4 §4.3.14 ¶3",
+     printed: "Mn^VIO_4 2- + 4 H^+", transcribed: "Mn^VI O_4^2- + 4 H^+", reason: "the row carries Mn^VI O_4^2-; the verifier's quote runs the charge into the formula"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 17, kind: false_positive, address: "ch 4 §4.4.1 ¶3",
+     printed: "VO_4 3-", transcribed: "VO_4^3-", reason: "the row carries VO_4^3-; the verifier's quote drops the charge's caret"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 21, kind: misprint, address: "ch 4 §4.5.3 ¶1",
+     printed: "La(III) and Ln(III)", transcribed: "La(II) and Ln(III)", reason: "the page prints \"La(II) and Ln(III) compounds\" — the book's own error, kept"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 24, kind: false_positive, address: "ch 4 §4.6.1 ¶1",
+     printed: "5f^7 7s^2", transcribed: "5f^7 7s^2 and [Rn] 5f^7 6d^1 7s^2", reason: "the page prints \"[Rn] 5f 7 7s2 and [Rn] 5f 7 6d1 7s2\"; the verifier quoted a prefix"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 26, kind: misprint, address: "ch 4 §4.7 ¶1",
+     printed: "TiCl_4 with Al(CH_3)_3", transcribed: "TiCl_4 with A1(CH_3)_3", reason: "the page prints \"A1(CH3)3\" with a digit one, in layer and drawing alike — the book's own error, kept"}
+  - {book: chem12-part1, lang: en, chapter: 5, page: 2, kind: false_positive, address: "ch 5 §5.1 ¶10",
+     printed: "[CoCl(NH_3)_5]^2+ and [CoCl_2(NH_3)_4]^+ are octahedral", transcribed: "[CoCl(NH_3)_5]^2+ and [CoCl_2(NH_3)_4]^+ are octahedral entities", reason: "the page prints \"are octahedral entities\"; the verifier quoted a prefix"}
+  - {book: chem12-part1, lang: en, chapter: 5, page: 11, kind: false_positive, address: "ch 5 §5.5.1 ¶1",
+     printed: "tetrahedral,\ntetrahedral, square planar", transcribed: "octahedral, tetrahedral, square planar", reason: "the page prints \"such as octahedral, tetrahedral, square planar\"; the verifier repeated a word"}

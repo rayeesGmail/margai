@@ -746,3 +746,126 @@ corrections:
      transcribed: "Idl_j × B", printed: "dl_j × B", reason: "the page prints Σ I dl_j × B; the verifier dropped the I"}
   - {book: phy12-part1, lang: en, chapter: 4, page: 9, kind: false_positive, address: "ch 4 §4.5 ¶4",
      transcribed: "is in the x-y plane", printed: "in the x-y plane", reason: "the page prints \"the displacement vector r … is in the x-y plane\"; the verifier quoted a prefix"}
+
+  # phy12-part2, the whole book on v5, second read of 2026-09-27 (report -ncert-verify-4), read against its pages as
+  # phy12-part1's were; the same compositor, so the same rules: an 18 pt paragraph indent, at a page's top too; an
+  # indented line after a display starts a paragraph (DECISIONS 2026-09-19); a row starting flush after a display
+  # stays (DECISIONS 2026-09-26); Example blocks are indented whole and items hang their lines 18 pt. Approved by the
+  # founder 2026-09-27, the side-heading block at the end with them (DECISIONS 2026-09-27).
+  # Three transcription defects found by the free checks before the second read, none of them flagged by it: a
+  # Symbol-font nu read off the image as a Latin v, a Symbol-font mu reaching a unit as the layer's m, and an italic
+  # item label dropped where its sibling "(i) n-type semiconductor" is kept (ncert_extract v5: a printed item marker
+  # is part of the paragraph's text). The mu is written by name, as this book's rows write "muA" on ch 14 p13 and p15.
+  - {book: phy12-part2, lang: en, chapter: 10, page: 6, kind: text, address: "ch 10 §10.3.1 ¶4",
+     transcribed: "the frequency v (= v/lambda)", printed: "the frequency nu (= v/lambda)", reason: "the page sets a Symbol-font ν (the layer's n); the transcriber read it as v, making the sentence v = v/λ"}
+  - {book: phy12-part2, lang: en, chapter: 11, page: 4, kind: text, address: "ch 11 §11.4 ¶2",
+     transcribed: "microammeter (mA)", printed: "microammeter (muA)", reason: "the page prints μA in a Symbol font the layer gives as m; mA is a milliammeter"}
+  - {book: phy12-part2, lang: en, chapter: 14, page: 9, kind: text, address: "ch 14 §14.4 ¶10",
+     transcribed: "This is obtained when Si or Ge is doped with a trivalent", printed: "(ii) p-type semiconductor This is obtained when Si or Ge is doped with a trivalent", reason: "the page prints the item label \"(ii) p-type semiconductor\" (Bookman-DemiItalic) above it, as ¶7 keeps \"(i) n-type semiconductor\""}
+  # Paragraph boundaries by line geometry. Splits: a line indented 18 pt after a display, the line below it back at
+  # the margin or itself a display; ch 10 p5 and p9 open indented at the page top.
+  - {book: phy12-part2, lang: en, chapter: 9, page: 10, kind: split, address: "ch 9 §9.4 ¶3",
+     at: "For values of i larger than i_c", reason: "indented 18 pt after the display (9.12), the line below it back at the margin"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 17, kind: split, address: "ch 9 §9.5.4 ¶2",
+     at: "For the image formed by the second lens B", reason: "indented 18 pt after the display (9.27)"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 17, kind: split, address: "ch 9 §9.5.4 ¶2",
+     at: "Adding Eqs. (9.27) and (9.28), we get", reason: "indented 18 pt after the display (9.28)"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 19, kind: split, address: "ch 9 §9.6 ¶2",
+     at: "From the triangle QNR,", reason: "indented 18 pt after the display ∠A + ∠QNR = 180°"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 19, kind: split, address: "ch 9 §9.6 ¶2",
+     at: "Comparing these two equations, we get", reason: "indented 18 pt after the display r_1 + r_2 + ∠QNR = 180°"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 19, kind: split, address: "ch 9 §9.6 ¶2",
+     at: "The total deviation delta is the sum", reason: "indented 18 pt after the display (9.34)"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 20, kind: split, address: "ch 9 §9.6 ¶3",
+     at: "Equation (9.34) gives", reason: "indented 18 pt after the display δ = D_m, i = e (x 297 against the column's 279); named by no flag, split with its two neighbours"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 20, kind: split, address: "ch 9 §9.6 ¶3",
+     at: "In the same way, Eq. (9.35) gives", reason: "indented 18 pt after the display (9.36)"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 20, kind: split, address: "ch 9 §9.6 ¶3",
+     at: "The refractive index of the prism is", reason: "indented 18 pt after the display (9.37)"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 20, kind: split, address: "ch 9 §9.6 ¶5",
+     at: "It implies that, thin prisms do not deviate light much.", reason: "indented 18 pt after the display D_m = (n_21 – 1)A"}
+  - {book: phy12-part2, lang: en, chapter: 10, page: 5, kind: split, address: "ch 10 §10.3.1 ¶1",
+     at: "In order to determine the shape of the refracted wavefront", reason: "p5 opens indented (x 64 against 46); p4 ends in the display BC = v_1 τ"}
+  - {book: phy12-part2, lang: en, chapter: 10, page: 9, kind: split, address: "ch 10 §10.4 ¶2",
+     at: "Since the distances S_1 P and S_2 P are equal", reason: "p9 opens indented (x 64 against 46); p8 ends in the display S_1P = S_2P"}
+  - {book: phy12-part2, lang: en, chapter: 10, page: 10, kind: split, address: "ch 10 §10.4 ¶9",
+     at: "If phi = 0, ± 2 pi, ± 4 pi", reason: "indented 18 pt after the display (10.11), the line below it back at the margin"}
+  - {book: phy12-part2, lang: en, chapter: 10, page: 16, kind: split, address: "ch 10 §10.7 ¶6",
+     at: "where I_0 is the intensity of the polarized light", reason: "indented 18 pt after the display (10.18), the line below it back at the margin"}
+  - {book: phy12-part2, lang: en, chapter: 12, page: 12, kind: split, address: "ch 12 §12.5 ¶1",
+     at: "Since both n_f and n_i are integers", reason: "indented 18 pt after the display (12.11), the line below it back at the margin"}
+  # Join flags ruled noise, and the figure flags: every "no caption prints" label is printed in its chapter as a
+  # caption the collector missed; one mention the transcriber's figure_refs omit.
+  - {book: phy12-part2, lang: en, chapter: 9, page: 19, kind: noise, flag: join, address: "ch 9 §9.5.4 ¶8",
+     at: "Solution Image formed by the first lens", reason: "Example 9.8's solution continues at the top of p19 (x 64, its block's indent) and the heading 9.6 comes after it"}
+  - {book: phy12-part2, lang: en, chapter: 14, page: 5, kind: noise, flag: join, address: "ch 14 §14.2 ¶17",
+     at: "Case II: In this case, as shown", reason: "p4's last line \"is low or the conductivity is high.\" is short (x1 329 of 521): Case I ends there and the label Case II starts p5"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 9, kind: noise, flag: figure, address: "ch 9 §9.3 ¶8",
+     at: "Some elementary results based on the laws of refraction", reason: "p9 prints \"FIGURE 9.9 Lateral shift\" and \"FIGURE 9.10 Apparent depth\"; the caption collector missed them"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 11, kind: noise, flag: figure, address: "ch 9 §9.4 ¶7",
+     at: "Shine the beam from below the beaker", reason: "p11 prints \"FIGURE 9.12\"; the caption collector missed it"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 11, kind: noise, flag: figure, address: "ch 9 §9.4 ¶8",
+     at: "Pour this water in a long test tube", reason: "p11 prints \"FIGURE 9.12\"; the caption collector missed it"}
+  - {book: phy12-part2, lang: en, chapter: 9, page: 11, kind: noise, flag: figure, address: "ch 9 §9.4.1 ¶1",
+     at: "(i) Prism : Prisms designed to bend light", reason: "p11 prints \"FIGURE 9.13\"; the caption collector missed it"}
+  - {book: phy12-part2, lang: en, chapter: 10, page: 14, kind: noise, flag: figure, address: "ch 10 §10.6.2 ¶1",
+     at: "It is surprisingly easy to see the single-slit", reason: "p14 prints \"FIGURE 10.16\"; the caption collector missed it"}
+  - {book: phy12-part2, lang: en, chapter: 11, page: 6, kind: noise, flag: figure, address: "ch 11 §11.4.3 ¶1",
+     at: "We now study the relation between the frequency nu", reason: "p6 prints \"FIGURE 11.4 Variation of photoelectric current\"; the caption collector missed it"}
+  - {book: phy12-part2, lang: en, chapter: 12, page: 3, kind: noise, flag: figure, address: "ch 12 §12.2 ¶2",
+     at: "A typical graph of the total number of alpha-particles", reason: "p4 prints \"FIGURE 12.3\"; the caption collector missed it"}
+  - {book: phy12-part2, lang: en, chapter: 12, page: 4, kind: noise, flag: figure, address: "ch 12 §12.2 ¶4",
+     at: "The scattering data shown in Fig. 12.3", reason: "p4 prints \"FIGURE 12.3\"; the caption collector missed it"}
+  - {book: phy12-part2, lang: en, chapter: 12, page: 7, kind: noise, flag: figure, address: "ch 12 §12.3 ¶1",
+     at: "As mentioned in Section 12.1, each element", reason: "p8 prints \"FIGURE 12.5 Emission lines in the spectrum of hydrogen\"; the caption collector missed it"}
+  - {book: phy12-part2, lang: en, chapter: 12, page: 13, kind: noise, flag: figure, address: "ch 12 §12.6 ¶3",
+     at: "Figure 12.8 illustrates a standing particle wave", reason: "p12 prints \"FIGURE 12.8 A standing wave\"; the caption collector missed it"}
+  - {book: phy12-part2, lang: en, chapter: 14, page: 11, kind: noise, flag: figure, address: "ch 14 §14.5.1 ¶4",
+     at: "Similarly, when a hole diffuses from p", reason: "p11 prints \"FIGURE 14.10 p-n junction\"; the caption collector missed it"}
+  - {book: phy12-part2, lang: en, chapter: 14, page: 13, kind: noise, flag: figure, address: "ch 14 §14.6.1 ¶5",
+     at: "Due to this concentration gradient, the injected electrons", reason: "p13 prints \"FIGURE 14.14 Forward bias\"; the caption collector missed it"}
+  - {book: phy12-part2, lang: en, chapter: 14, page: 5, kind: figure_ref, address: "ch 14 §14.3 ¶1",
+     at: "Figure 14.4 schematically", add: "Figure 14.4", reason: "the paragraph names Figure 14.4 and the transcriber's figure_refs omit it"}
+  # The second read's flags. The book's own errors, kept: "needle" for needles, "balanced band" where the valence
+  # band is meant, "micrometer" where a microammeter is meant — each in the text layer as printed.
+  - {book: phy12-part2, lang: en, chapter: 10, page: 11, kind: misprint, address: "ch 10 §10.5 ¶2",
+     printed: "the two vibrating needles", transcribed: "the two vibrating needle", reason: "the page prints \"the two vibrating needle\" — the book's own error, kept"}
+  - {book: phy12-part2, lang: en, chapter: 14, page: 4, kind: misprint, address: "ch 14 §14.2 ¶16",
+     printed: "conduction band is partially filled and the valence band", transcribed: "conduction band is partially filled and the balanced band", reason: "the page prints \"the balanced band\" — the book's own error, kept"}
+  - {book: phy12-part2, lang: en, chapter: 14, page: 14, kind: misprint, address: "ch 14 §14.6.2 ¶5",
+     printed: "a microammeter is used", transcribed: "a micrometer is used", reason: "the page prints \"a micrometer is used\" — the book's own error, kept"}
+  # Verifier errors: it reads the Symbol-font ν as v (as the transcriber did once, on ch 10 p6), quotes prefixes, and
+  # annotates its quotes.
+  - {book: phy12-part2, lang: en, chapter: 10, page: 11, kind: false_positive, address: "ch 10 §10.5 ¶2",
+     printed: "italicized locked in phase", transcribed: "locked in phase", reason: "the same words; the verifier annotated its quote"}
+  - {book: phy12-part2, lang: en, chapter: 10, page: 14, kind: false_positive, address: "ch 10 §10.6.2 ¶4",
+     printed: "an angle of (1/2)", transcribed: "an angle of (1/2)°", reason: "the page prints \"of (1/2)°.\"; the verifier dropped the degree sign"}
+  - {book: phy12-part2, lang: en, chapter: 11, page: 7, kind: false_positive, address: "ch 11 §11.4.3 ¶5",
+     printed: "frequency v", transcribed: "frequency nu", reason: "the page sets a Symbol-font ν; the verifier read it as v"}
+  - {book: phy12-part2, lang: en, chapter: 11, page: 7, kind: false_positive, address: "ch 11 §11.4.3 ¶5",
+     printed: "frequency v_0,", transcribed: "frequency nu_0,", reason: "the page sets a Symbol-font ν_0; the verifier read it as v"}
+  - {book: phy12-part2, lang: en, chapter: 11, page: 7, kind: false_positive, address: "ch 11 §11.4.3 ¶6",
+     printed: "frequency v_0,", transcribed: "frequency nu_0,", reason: "the page sets a Symbol-font ν_0; the verifier read it as v"}
+  - {book: phy12-part2, lang: en, chapter: 11, page: 11, kind: false_positive, address: "ch 11 §11.8 ¶1",
+     printed: "radiation, in general) comes out clearly", transcribed: "radiation, in general) comes out clearly from what we have learnt", reason: "the page prints \"comes out clearly from what we have learnt\"; the verifier quoted a prefix"}
+  - {book: phy12-part2, lang: en, chapter: 12, page: 7, kind: false_positive, address: "ch 12 §12.2.2 ¶5",
+     printed: "v = e / sqrt(4 pi epsilon_0 m r)", transcribed: "v = e / sqrt(4 pi epsilon_0 m r) = 2.2 × 10^6 m/s", reason: "the page's display ends \"= 2.2 × 10^6 m/s\"; the verifier quoted a prefix"}
+  - {book: phy12-part2, lang: en, chapter: 12, page: 9, kind: false_positive, address: "ch 12 §12.4 ¶3",
+     printed: "≈ 6.6 × 10^15 Hz", transcribed: "= 6.6 × 10^15 Hz", reason: "the row carries \"≈ 6.6 × 10^15 Hz\" as printed; the verifier misquoted the row"}
+  - {book: phy12-part2, lang: en, chapter: 12, page: 11, kind: false_positive, address: "ch 12 §12.5 ¶1",
+     printed: "photon of frequency v_(if)", transcribed: "photon of frequency nu_(if)", reason: "the page sets a Symbol-font ν_if; the verifier read it as v"}
+  - {book: phy12-part2, lang: en, chapter: 13, page: 8, kind: false_positive, address: "ch 13 §13.5 ¶3",
+     printed: "zero as their distance is more than a few femtometres. This leads to saturation of forces", transcribed: "falls rapidly to zero as their distance is more than a few femtometres. This leads to saturation of forces", reason: "the page prints \"falls rapidly to zero\"; the verifier quoted a prefix"}
+  - {book: phy12-part2, lang: en, chapter: 14, page: 9, kind: false_positive, address: "ch 14 §14.4 ¶11",
+     printed: "helps to reduce the intrinsic concentration", transcribed: "indirectly helps to reduce the intrinsic concentration", reason: "the page prints \"indirectly helps\"; the verifier dropped a word"}
+  # Unnumbered side headings (founder, DECISIONS 2026-09-27): the prompt is silent on them, and this book's five came
+  # out three ways — a heading-only row (ch 9 p10, ch 14 p2), a lead-in (the item label on ch 14 p8), and dropped
+  # (ch 13 p3, ch 14 p3). Ruled: the heading leads the paragraph under it, as the transcriber did on p8.
+  - {book: phy12-part2, lang: en, chapter: 9, page: 10, kind: join, address: "ch 9 §9.4 ¶6",
+     at: "All optical phenomena can be demonstrated very easily", reason: "the italic side heading \"A demonstration for total internal reflection\" (¶5, a row of its own) leads this paragraph"}
+  - {book: phy12-part2, lang: en, chapter: 13, page: 3, kind: text, address: "ch 13 §13.2 ¶7",
+     transcribed: "Since the nuclei of deuterium and tritium are isotopes", printed: "Discovery of Neutron Since the nuclei of deuterium and tritium are isotopes", reason: "the page prints the side heading \"Discovery of Neutron\" (Bookman-DemiItalic) above it; the transcriber dropped it"}
+  - {book: phy12-part2, lang: en, chapter: 14, page: 2, kind: join, address: "ch 14 §14.2 ¶2",
+     at: "On the basis of the relative values of electrical conductivity", reason: "the side heading \"On the basis of conductivity\" (¶1, a row of its own) leads this paragraph"}
+  - {book: phy12-part2, lang: en, chapter: 14, page: 3, kind: text, address: "ch 14 §14.2 ¶9",
+     transcribed: "According to the Bohr atomic model, in an isolated atom", printed: "On the basis of energy bands According to the Bohr atomic model, in an isolated atom", reason: "the page prints the side heading \"On the basis of energy bands\" (Bookman-Demi) above it, the companion of p2's \"On the basis of conductivity\"; the transcriber dropped it"}

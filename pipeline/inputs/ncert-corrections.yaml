@@ -1053,3 +1053,13 @@ corrections:
      printed: "[CoCl(NH_3)_5]^2+ and [CoCl_2(NH_3)_4]^+ are octahedral", transcribed: "[CoCl(NH_3)_5]^2+ and [CoCl_2(NH_3)_4]^+ are octahedral entities", reason: "the page prints \"are octahedral entities\"; the verifier quoted a prefix"}
   - {book: chem12-part1, lang: en, chapter: 5, page: 11, kind: false_positive, address: "ch 5 §5.5.1 ¶1",
      printed: "tetrahedral,\ntetrahedral, square planar", transcribed: "octahedral, tetrahedral, square planar", reason: "the page prints \"such as octahedral, tetrahedral, square planar\"; the verifier repeated a word"}
+  # The re-read of the twenty pages the corrections changed (report -ncert-verify-8, ₹23.54): four flags, two of them
+  # on spans the first read had quoted identically and code had set aside.
+  - {book: chem12-part1, lang: en, chapter: 2, page: 23, kind: false_positive, address: "ch 2 §2.5.1 ¶7",
+     printed: "NaCl (aq) -(H2O)-> Na^+ (aq) + Cl^- (aq)", transcribed: "NaCl (aq) -> (H_2O) Na^+ (aq) + Cl^- (aq)", reason: "the prompt writes a condition over the arrow in brackets after it; the verifier's \"-(H2O)->\" is its own spelling of the same arrow"}
+  - {book: chem12-part1, lang: en, chapter: 3, page: 15, kind: false_positive, address: "ch 3 §3.3.2 ¶24",
+     printed: "x = (p_t - p_i)", transcribed: "x x = (p_t - p_i)", reason: "the row carries the page's two displays in order, \"p_t = (p_i – x) + x + x = p_i + x\" then \"x = (p_t - p_i)\"; the verifier's quote straddles them"}
+  - {book: chem12-part1, lang: en, chapter: 4, page: 9, kind: false_positive, address: "ch 4 §4.3.4 ¶5",
+     printed: "π-acceptor character in addition to the σ-bonding", transcribed: "pi-acceptor character in addition to the sigma-bonding", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part1, lang: en, chapter: 5, page: 13, kind: misprint, address: "ch 5 §5.5.2 ¶3",
+     printed: "[CoF_6]^3–", transcribed: "[CoF_6-]^3–", reason: "the page prints a stray subscript dash after F6 (\"[CoF6-]\" in the layer) — the book's own mark, kept; the verifier dropped it"}

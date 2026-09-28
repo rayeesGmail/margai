@@ -1063,3 +1063,304 @@ corrections:
      printed: "π-acceptor character in addition to the σ-bonding", transcribed: "pi-acceptor character in addition to the sigma-bonding", reason: "the prompt writes a Greek letter by name"}
   - {book: chem12-part1, lang: en, chapter: 5, page: 13, kind: misprint, address: "ch 5 §5.5.2 ¶3",
      printed: "[CoF_6]^3–", transcribed: "[CoF_6-]^3–", reason: "the page prints a stray subscript dash after F6 (\"[CoF6-]\" in the layer) — the book's own mark, kept; the verifier dropped it"}
+  # chem12-part2, the whole book on v5 (reports -ncert-extract-4, -ncert-load-4 after the 15-page re-run, -ncert-verify-2/-3). The free checks ran
+  # first and were held back from the second read so its recall on them is measured: it named 3 of their 66 findings (the dropped
+  # "2. Reduction" and ch 9 p10's two headings).
+  # Chapter mottoes (founder, DECISIONS 2026-09-27): kept in ch 8 only; ch 6, 7, 9 and 10 skipped theirs.
+  - {book: chem12-part2, lang: en, chapter: 8, page: 1, kind: drop, address: "ch 8 §8 ¶1",
+     at: "Carbonyl compounds are of utmost importance", reason: "the chapter's opening motto, set in 9 pt Bookman-LightItalic under the title band at x 236, as ch 6, 7, 9 and 10 set theirs"}
+  # Side headings and standalone list labels lead the paragraph under them (founder, DECISIONS 2026-09-27). This book sets them as
+  # rows of their own 49 times, far more than chem12-part1's 8.
+  - {book: chem12-part2, lang: en, chapter: 6, page: 2, kind: join, address: "ch 6 §6.1.2 ¶3",
+     at: "In alkyl halides, the halogen atom", reason: "the list label \"(a) Alkyl halides or haloalkanes (R—X)\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 2, kind: join, address: "ch 6 §6.1.2 ¶5",
+     at: "These are the compounds in which the halogen atom is bonded to an sp^3-hybridised carbon atom adjacent", reason: "the list label \"(b) Allylic halides\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 2, kind: join, address: "ch 6 §6.1.2 ¶7",
+     at: "These are the compounds in which the halogen atom is bonded to an sp^3-hybridised carbon atom attached", reason: "the list label \"(c) Benzylic halides\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 3, kind: join, address: "ch 6 §6.1.3 ¶3",
+     at: "These are the compounds in which the halogen atom is bonded", reason: "the list label \"(a) Vinylic halides\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 3, kind: join, address: "ch 6 §6.1.3 ¶5",
+     at: "These are the compounds in which the halogen atom is directly", reason: "the list label \"(b) Aryl halides\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 6, kind: join, address: "ch 6 §6.4.2 ¶2",
+     at: "Free radical chlorination or bromination", reason: "the list label \"(I) From alkanes by free radical halogenation\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 7, kind: join, address: "ch 6 §6.4.2 ¶4",
+     at: "(i) Addition of hydrogen halides:", reason: "the list label \"(II) From alkenes\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 13, kind: join, address: "ch 6 §6.7.1 ¶10",
+     at: "The reaction between CH_3Cl and", reason: "the side heading \"(a) Substitution nucleophilic bimolecular (S_N2)\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 21, kind: join, address: "ch 6 §6.7.1 ¶55",
+     at: "When a haloalkane with beta-hydrogen", reason: "the side heading \"2. Elimination reactions\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 28, kind: join, address: "ch 6 §6.7.2 ¶21",
+     at: "Wurtz-Fittig reaction A mixture", reason: "the side heading \"3. Reaction with metals\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 7, kind: join, address: "ch 7 §7.4.1 ¶3",
+     at: "(i) By acid catalysed hydration:", reason: "the side heading \"1. From alkenes\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 7, kind: join, address: "ch 7 §7.4.1 ¶5",
+     at: "The mechanism of the reaction involves", reason: "the side heading \"Mechanism\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 8, kind: join, address: "ch 7 §7.4.1 ¶12",
+     at: "(i) By reduction of aldehydes and", reason: "the side heading \"2. From carbonyl compounds\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 16, kind: join, address: "ch 7 §7.4.4 ¶24",
+     at: "The reactions involving cleavage", reason: "the side heading \"(b) Reactions involving cleavage of carbon – oxygen (C–O) bond in alcohols\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 17, kind: join, address: "ch 7 §7.4.4 ¶33",
+     at: "Step 1: Formation of protonated alcohol.", reason: "the side heading \"Mechanism\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 22, kind: join, address: "ch 7 §7.5 ¶3",
+     at: "Methanol, CH_3OH, also known as", reason: "the side heading \"1. Methanol\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 22, kind: join, address: "ch 7 §7.5 ¶6",
+     at: "Ethanol, C_2H_5OH, is obtained", reason: "the side heading \"2. Ethanol\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 23, kind: join, address: "ch 7 §7.6.1 ¶2",
+     at: "Alcohols undergo dehydration in", reason: "the side heading \"1. By dehydration of alcohols\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 23, kind: join, address: "ch 7 §7.6.1 ¶7",
+     at: "It is an important laboratory method", reason: "the side heading \"2. Williamson synthesis\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 25, kind: join, address: "ch 7 §7.6.3 ¶2",
+     at: "Ethers are the least reactive of", reason: "the side heading \"1. Cleavage of C–O bond in ethers\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 2, kind: join, address: "ch 8 §8.1.1 ¶2",
+     at: "Aldehydes and ketones are the simplest", reason: "the part heading \"I. Aldehydes and ketones\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 2, kind: join, address: "ch 8 §8.1.1 ¶5",
+     at: "Aldehydes and ketones are often", reason: "the side heading \"(a) Common names\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 5, kind: join, address: "ch 8 §8.2.1 ¶4",
+     at: "(i) By ozonolysis of alkenes: As", reason: "the side heading \"3. From hydrocarbons\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 10, kind: join, address: "ch 8 §8.4 ¶3",
+     at: "Contrary to electrophilic addition", reason: "the side heading \"1. Nucleophilic addition reactions\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 10, kind: join, address: "ch 8 §8.4 ¶5",
+     at: "A nucleophile attacks the electrophilic", reason: "the side heading \"(i) Mechanism of nucleophilic addition reactions\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 10, kind: join, address: "ch 8 §8.4 ¶7",
+     at: "Aldehydes are generally more reactive", reason: "the side heading \"(ii) Reactivity\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 13, kind: join, address: "ch 8 §8.4 ¶24",
+     at: "Aldehydes differ from ketones in", reason: "the side heading \"3. Oxidation\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 15, kind: join, address: "ch 8 §8.4 ¶35",
+     at: "Acidity of α-hydrogens of aldehydes", reason: "the side heading \"4. Reactions due to a-hydrogen\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 16, kind: join, address: "ch 8 §8.4 ¶42",
+     at: "(i) Cannizzaro reaction: Aldehydes", reason: "the side heading \"5. Other reactions\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 19, kind: join, address: "ch 8 §8.7 ¶3",
+     at: "Primary alcohols are readily oxidised", reason: "the side heading \"1. From primary alcohols and aldehydes\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 20, kind: join, address: "ch 8 §8.7 ¶6",
+     at: "Aromatic carboxylic acids can be", reason: "the side heading \"2. From alkylbenzenes\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 20, kind: join, address: "ch 8 §8.7 ¶8",
+     at: "Nitriles are hydrolysed to amides", reason: "the side heading \"3. From nitriles and amides\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 20, kind: join, address: "ch 8 §8.7 ¶10",
+     at: "Grignard reagents react with carbon", reason: "the side heading \"4. From Grignard reagents\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 23, kind: join, address: "ch 8 §8.9.1 ¶2",
+     at: "Reactions with metals and alkalies", reason: "the side heading \"Acidity\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 23, kind: join, address: "ch 8 §8.9.1 ¶3",
+     at: "The carboxylic acids like alcohols", reason: "the side heading \"Reactions with metals and alkalies\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 4, kind: join, address: "ch 9 §9.4 ¶3",
+     at: "Nitro compounds are reduced to", reason: "the side heading \"1. Reduction of nitro compounds\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 4, kind: join, address: "ch 9 §9.4 ¶6",
+     at: "You have read (Unit 6, Class XII)", reason: "the side heading \"2. Ammonolysis of alkyl halides\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 8, kind: join, address: "ch 9 §9.6 ¶3",
+     at: "Amines, being basic in nature,", reason: "the side heading \"1. Basic character of amines\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 11, kind: join, address: "ch 9 §9.6 ¶16",
+     at: "pK_b value of aniline is quite", reason: "the side heading \"(b) Arylamines versus ammonia\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 12, kind: join, address: "ch 9 §9.6 ¶22",
+     at: "Amines undergo alkylation on reaction", reason: "the side heading \"2. Alkylation\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 12, kind: join, address: "ch 9 §9.6 ¶24",
+     at: "Aliphatic and aromatic primary", reason: "the side heading \"3. Acylation\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 14, kind: join, address: "ch 9 §9.6 ¶39",
+     at: "You have read earlier that aniline", reason: "the side heading \"7. Electrophilic substitution\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 16, kind: join, address: "ch 9 §9.6 ¶48",
+     at: "The diazonium salts have the general", reason: "the part heading \"II. DIAZONIUM SALTS\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 17, kind: join, address: "ch 9 §9.9 ¶3",
+     at: "Diazonium group being a very good", reason: "the side heading \"A. Reactions involving displacement of nitrogen\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 18, kind: join, address: "ch 9 §9.9 ¶13",
+     at: "The azo products obtained have", reason: "the side heading \"B. Reactions involving retention of diazo group coupling reactions\" (a row of its own) leads this paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 10, page: 12, kind: join, address: "ch 10 §10.2.3 ¶5",
+     at: "When the polypeptide chains run", reason: "the side heading \"(a) Fibrous proteins\" (a row of its own) leads this paragraph"}
+  # Dropped side headings, restored by `text`; ch 8 p18's "Carboxylic Acids" is the part heading of the chapter's second half.
+  - {book: chem12-part2, lang: en, chapter: 6, page: 10, kind: text, address: "ch 6 §6.6 ¶2",
+     transcribed: "Methyl chloride, methyl bromide, ethyl", printed: "Melting and boiling points Methyl chloride, methyl bromide, ethyl", reason: "the page prints the side heading \"Melting and boiling points\" (Bookman-Demi) above it; the transcriber dropped it"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 11, kind: text, address: "ch 6 §6.6 ¶6",
+     transcribed: "Bromo, iodo and polychloro derivatives", printed: "Density Bromo, iodo and polychloro derivatives", reason: "the page prints the side heading \"Density\" (Bookman-Demi) above it; the transcriber dropped it"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 11, kind: text, address: "ch 6 §6.6 ¶7",
+     transcribed: "The haloalkanes are very slightly soluble", printed: "Solubility The haloalkanes are very slightly soluble", reason: "the page prints the side heading \"Solubility\" (Bookman-Demi) above it; the transcriber dropped it"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 24, kind: text, address: "ch 6 §6.7.2 ¶8",
+     transcribed: "Chlorobenzene can be converted into phenol", printed: "Replacement by hydroxyl group Chlorobenzene can be converted into phenol", reason: "the page prints the side heading \"Replacement by hydroxyl group\" (Bookman-DemiItalic) above it; the transcriber dropped it"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 11, kind: text, address: "ch 7 §7.4.3 ¶2",
+     transcribed: "The boiling points of alcohols and phenols", printed: "Boiling Points The boiling points of alcohols and phenols", reason: "the page prints the side heading \"Boiling Points\" (Bookman-Demi) above it; the transcriber dropped it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 12, kind: text, address: "ch 8 §8.4 ¶20",
+     transcribed: "(i) Reduction to alcohols: Aldehydes", printed: "2. Reduction (i) Reduction to alcohols: Aldehydes", reason: "the page prints the side heading \"2. Reduction\" (Bookman-DemiItalic) above it; the transcriber dropped it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 18, kind: text, address: "ch 8 §8.5 ¶2",
+     transcribed: "Carbon compounds containing a carboxyl", printed: "Carboxylic Acids Carbon compounds containing a carboxyl", reason: "the page prints the side heading \"Carboxylic Acids\" (Bookman-DemiItalic) above it; the transcriber dropped it"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 10, kind: text, address: "ch 9 §9.6 ¶10",
+     transcribed: "Basicity of amines is related to their", printed: "Structure-basicity relationship of amines Basicity of amines is related to their", reason: "the page prints the side heading \"Structure-basicity relationship of amines\" (Bookman,Bold) above it; the transcriber dropped it"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 10, kind: text, address: "ch 9 §9.6 ¶11",
+     transcribed: "Let us consider the reaction of an alkanamine", printed: "(a) Alkanamines versus ammonia Let us consider the reaction of an alkanamine", reason: "the page prints the side heading \"(a) Alkanamines versus ammonia\" (Bookman,Bold) above it; the transcriber dropped it"}
+  # Boxed features take their title the same way (founder, 2026-09-28): the box text was kept, its title dropped.
+  - {book: chem12-part2, lang: en, chapter: 6, page: 22, kind: text, address: "ch 6 §6.7.1 ¶58",
+     transcribed: "A chemical reaction is the result of competition;", printed: "Elimination versus substitution A chemical reaction is the result of competition;", reason: "the box titled \"Elimination versus substitution\" (the repeated display-font title over it); the transcriber kept the box text and dropped the title"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 26, kind: text, address: "ch 7 §7.6.3 ¶6",
+     transcribed: "The reaction of an ether with concentrated HI starts", printed: "Mechanism The reaction of an ether with concentrated HI starts", reason: "the box titled \"Mechanism\" (the repeated display-font title over it); the transcriber kept the box text and dropped the title"}
+  # A display or a list item belongs to the paragraph it follows (prompt: an equation on its own line; a one-sentence list item).
+  - {book: chem12-part2, lang: en, chapter: 7, page: 3, kind: join, address: "ch 7 §7.1.1 ¶9",
+     at: "Vinylic alcohol: CH_2 = CH – OH", reason: "the display \"Vinylic alcohol: CH2 = CH – OH\" is set under the (ii) item that names vinylic alcohols"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 8, kind: join, address: "ch 9 §9.5 ¶4",
+     at: "Primary > Secondary > Tertiary", reason: "the display completes \"the order of boiling points of isomeric amines is as follows:\" (p7, the row before)"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 16, kind: join, address: "ch 7 §7.4.4 ¶22",
+     at: "Ar/ROH + R'–COOH <-> (H^+)", reason: "the three esterification equations are displayed under \"2. Esterification … to form esters.\"; the row opened with them"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 5, kind: join, address: "ch 9 §9.4 ¶7",
+     at: "RNH_2 -> (RX) R_2NH", reason: "the display RNH2 -> R2NH -> R3N -> R4N+X- completes \"…and finally quaternary ammonium salt.\""}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 16, kind: join, address: "ch 6 §6.7.1 ¶26",
+     at: "(i) The four isomeric bromobutanes", reason: "item (i) of Example 6.7's statement, whose \"(ii)\" is the next row"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 16, kind: join, address: "ch 6 §6.7.1 ¶27",
+     at: "(ii) C_6H_5CH_2Br, C_6H_5CH(C_6H_5)Br", reason: "item (ii) of Example 6.7's statement"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 21, kind: join, address: "ch 8 §8.7 ¶15",
+     at: "(i) Butan-1-ol to butanoic acid", reason: "the items of Example 8.5's statement; the re-run split them from it, the first draw kept them in one row"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 11, kind: join, address: "ch 8 §8.4 ¶12",
+     at: "Cyanohydrins are useful synthetic intermediates.", reason: "p11 sets this line flush and justified straight after \"…corresponding cyanohydrin.\", with no display between: the paragraph runs on"}
+  # A sentence naming the reaction just drawn joins the item it names (founder, 2026-09-28), as the transcriber kept "This reaction is called Stephen reaction." on p6.
+  - {book: chem12-part2, lang: en, chapter: 8, page: 7, kind: join, address: "ch 8 §8.2.2 ¶8",
+     at: "This reaction is called Etard reaction.", reason: "names the chromyl chloride reaction of item (a), drawn above it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 7, kind: join, address: "ch 8 §8.2.2 ¶12",
+     at: "This reaction is known as Gatterman-Koch reaction.", reason: "names the reaction of the item above it, drawn above it"}
+  # Labels over drawn reactions the transcriber skipped join the paragraph that introduces them (founder, 2026-09-28).
+  - {book: chem12-part2, lang: en, chapter: 6, page: 26, kind: join, address: "ch 6 §6.7.2 ¶14",
+     at: "(i) Halogenation", reason: "\"(i) Halogenation\" labels a drawn reaction; it joins the paragraph that names the four reactions"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 26, kind: join, address: "ch 6 §6.7.2 ¶15",
+     at: "(ii) Nitration", reason: "\"(ii) Nitration\" labels a drawn reaction; it joins the paragraph that names the four reactions"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 26, kind: join, address: "ch 6 §6.7.2 ¶16",
+     at: "(iii) Sulphonation", reason: "\"(iii) Sulphonation\" labels a drawn reaction; it joins the paragraph that names the four reactions (\"(iv) Friedel-Crafts reaction\" runs on at the top of p27)"}
+  # Example 6.5's box interrupts a sentence across p12/p13 ("…i.e., linking through" | box | "carbon atom resulting…"): the rest
+  # of the sentence moves onto p12's row, copied from p13's row word for word, and p13's row goes.
+  - {book: chem12-part2, lang: en, chapter: 6, page: 12, kind: text, address: "ch 6 §6.7.1 ¶4",
+     transcribed: "i.e., linking through", printed: "i.e., linking through carbon atom resulting in alkyl cyanides and through nitrogen atom leading to isocyanides. Similarly nitrite ion also represents an ambident nucleophile with two different points of linkage [^-O— N =O]. The linkage through oxygen results in alkyl nitrites while through nitrogen atom, it leads to nitroalkanes.", reason: "the sentence continues after Example 6.5's box on p13; its rest, as transcribed there, joins it here"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 13, kind: drop, address: "ch 6 §6.7.1 ¶7",
+     at: "carbon atom resulting in alkyl cyanides", reason: "moved onto p12's row by the text correction above"}
+  # Transcription defect found by the second read: the CH3 drawn above the CH2 was dropped.
+  - {book: chem12-part2, lang: en, chapter: 7, page: 26, kind: text, address: "ch 7 §7.6.3 ¶10",
+     transcribed: "I^- + CH_2-O^+H_2", printed: "I^- + CH_3CH_2-O^+H_2", reason: "the page draws CH3 above the CH2 of the protonated ethanol, CH3CH2–OH2+; the row lost the CH3"}
+  # The re-run of 15 pages made 6 of them worse (dice both ways, 2026-09-28): the first draw's text, which the second read passed
+  # clean (-ncert-verify-2), is restored word for word on four of them; the other two are the joins above.
+  - {book: chem12-part2, lang: en, chapter: 7, page: 13, kind: text, address: "ch 7 §7.4.4 ¶6",
+     transcribed: "(i) Reaction with metals: Alcohols and phenols react", printed: "(a) Reactions involving cleavage of O–H bond 1. Acidity of alcohols and phenols (i) Reaction with metals: Alcohols and phenols react", reason: "the re-run dropped the page's two headings over item (i); they lead it, as the side-heading ruling reads"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 13, kind: text, address: "ch 7 §7.4.4 ¶6",
+     transcribed: "alkoxides/phenoxides and hydrogen.", printed: "alkoxides/phenoxides and hydrogen. 2R–O–H + 2Na -> 2R–O–Na + H_2 (Sodium alkoxide) 6 CH_3–C(CH_3)_2–OH + 2 Al -> 2 (CH_3–C(CH_3)_2–O)_3 Al + 3H_2, tert- Butyl alcohol, Aluminium tert- butoxide", reason: "the first draw's two reactions, which the re-run dropped"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 14, kind: text, address: "ch 7 §7.4.4 ¶15",
+     transcribed: "R – O–H <-> R – O^- + H^+", printed: "R – O–H <-> R – O^- + H^+ ; C_6H_5OH <-> C_6H_5O^- + H^+", reason: "the first draw's phenol ionisation, which the re-run dropped"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 24, kind: text, address: "ch 7 §7.6.1 ¶11",
+     transcribed: "for the preparation of t-butyl ethyl ether.", printed: "for the preparation of t-butyl ethyl ether. C_2H_5ONa + CH_3–C(CH_3)_2–Cl -> CH_3–C(CH_3)_2–OC_2H_5", reason: "the first draw's reaction in Example 7.6's statement, which the re-run dropped"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 24, kind: join, address: "ch 7 §7.6.1 ¶12",
+     at: "(i) What would be the major product", reason: "item (i) of Example 7.6's statement"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 24, kind: join, address: "ch 7 §7.6.1 ¶13",
+     at: "(ii) Write a suitable reaction", reason: "item (ii) of Example 7.6's statement"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 24, kind: join, address: "ch 7 §7.6.1 ¶15",
+     at: "(ii)", reason: "part (ii) of Example 7.6's Solution, set in the same box under \"(i)\""}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 24, kind: text, address: "ch 7 §7.6.1 ¶14",
+     transcribed: "predominates over substitution. (ii)", printed: "predominates over substitution. (ii) CH_3–C(CH_3)_2–ONa + CH_3CH_2Cl -> CH_3–C(CH_3)_2–OC_2H_5", reason: "the first draw's reaction for part (ii), which the re-run dropped"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 15, kind: text, address: "ch 8 §8.4 ¶35",
+     transcribed: "Acidity of α-hydrogens", printed: "Acidity of alpha-hydrogens", reason: "the prompt writes a Greek letter by name; the re-run set the glyph, the first draw the name"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 15, kind: text, address: "ch 8 §8.4 ¶35",
+     transcribed: "acidic nature of α-hydrogen.", printed: "acidic nature of alpha-hydrogen.", reason: "the prompt writes a Greek letter by name; the re-run set the glyph, the first draw the name"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 15, kind: text, address: "ch 8 §8.4 ¶36",
+     transcribed: "The acidity of α-hydrogen atoms", printed: "The acidity of alpha-hydrogen atoms", reason: "the prompt writes a Greek letter by name; the re-run set the glyph, the first draw the name"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 15, kind: text, address: "ch 8 §8.4 ¶37",
+     transcribed: "at least one α-hydrogen undergo", printed: "at least one alpha-hydrogen undergo", reason: "the prompt writes a Greek letter by name; the re-run set the glyph, the first draw the name"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 15, kind: text, address: "ch 8 §8.4 ¶37",
+     transcribed: "to form β-hydroxy aldehydes (aldol) or β-hydroxy ketones", printed: "to form beta-hydroxy aldehydes (aldol) or beta-hydroxy ketones", reason: "the prompt writes a Greek letter by name; the re-run set the glyph, the first draw the name"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 15, kind: text, address: "ch 8 §8.4 ¶38",
+     transcribed: "to give α,β-unsaturated", printed: "to give alpha,beta-unsaturated", reason: "the prompt writes a Greek letter by name; the re-run set the glyph, the first draw the name"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 4, kind: join, address: "ch 9 §9.4 ¶4",
+     at: "Reduction with iron scrap and hydrochloric acid", reason: "the re-run split the paragraph here; the print does not start one (the free check's start flags) and the first draw kept it whole"}
+  # Page breaks, by the page-top line and the last line's word gaps.
+  - {book: chem12-part2, lang: en, chapter: 6, page: 6, kind: noise, address: "ch 6 §6.4.1 ¶1",
+     flag: "join", at: "The hydroxyl group of an alcohol is", reason: "§6.4.1 opens p6 under its own margin heading; p5 ends in Table 6.2 and §6.4's one-line opening"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 10, kind: noise, address: "ch 6 §6.6 ¶2",
+     flag: "join", at: "Melting and boiling points", reason: "p10 opens with the side heading the text correction restores; p9 ends in §6.6's complete first paragraph"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 13, kind: noise, address: "ch 6 §6.7.1 ¶5",
+     flag: "join", at: "Example 6.5 Haloalkanes react with KCN", reason: "p13 opens with Example 6.5's box; the sentence it interrupts is mended by the text correction on p12"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 29, kind: noise, address: "ch 6 §6.8 ¶1",
+     flag: "join", at: "Carbon compounds containing more than one", reason: "§6.8 opens p29 under its own margin heading; p28 ends in Intext Questions"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 3, kind: noise, address: "ch 7 §7.1.1 ¶7",
+     flag: "join", at: "Allylic and benzylic alcohols may be", reason: "p3 opens with the display of primary, secondary and tertiary benzylic alcohols; the capitalised sentence after it stays as transcribed"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 6, kind: noise, address: "ch 7 §7.2 ¶7",
+     flag: "join", at: "If both the alkyl groups are", reason: "p5 ends in the ether examples; p6 sets its lines flush at x 220 whether they continue or not (\"According to IUPAC…\" below is flush too), so the flush top proves nothing"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 23, kind: noise, address: "ch 8 §8.8 ¶1",
+     flag: "join", at: "Aliphatic carboxylic acids upto nine", reason: "§8.8 opens p23 under its own margin heading; p22 ends in the Intext Question box"}
+  - {book: chem12-part2, lang: en, chapter: 10, page: 7, kind: noise, address: "ch 10 §10.1.3 ¶1",
+     flag: "join", at: "You have already read that disaccharides", reason: "§10.1.3 opens p7 under its own margin heading; p6 ends in the Haworth structures of fructose"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 12, kind: noise, address: "ch 8 §8.4 ¶22",
+     flag: "figure", at: "* 2,4-DNP-derivatives are yellow", reason: "the row is Table 8.2's footnote, set under the table; the link names the table it annotates"}
+  # The second read's flags (report -ncert-verify-3). One transcription defect (ch 7 p26, corrected above); the rest the verifier's,
+  # mostly the corpus's settled notation: Greek by name, sp^3, conditions after the arrow, the book's barred-O charge as ^- or ‾.
+  - {book: chem12-part2, lang: en, chapter: 6, page: 5, kind: false_positive, address: "ch 6 §6.2 ¶6",
+     printed: "Write IUPAC names of the following:", transcribed: "Example 6.2 Write IUPAC names of the following:", reason: "the row opens with the box label \"Example 6.2\" the page sets beside the statement; the verifier dropped it"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 13, kind: false_positive, address: "ch 6 §6.7.1 ¶7",
+     printed: "[-O—N=O]", transcribed: "[^-O— N =O]", reason: "the page prints the nitrite ion with its charge on O, [⁻O—N=O]; ^- is the prompt's superscript"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 16, kind: false_positive, address: "ch 6 §6.7.1 ¶22",
+     printed: "S_N2 reaction faster? Example 6.6", transcribed: "S_N2 reaction faster?", reason: "the row opens with the label \"Example 6.6\" the page sets beside the statement; the verifier moved it to the end"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 16, kind: false_positive, address: "ch 6 §6.7.1 ¶25",
+     printed: "S_N1 and S_N2 reactions: Example 6.7", transcribed: "S_N1 and S_N2 reactions:", reason: "the row opens with the label \"Example 6.7\" the page sets beside the statement; the verifier moved it to the end"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 21, kind: false_positive, address: "ch 6 §6.7.1 ¶55",
+     printed: "β-hydrogen atom", transcribed: "beta-hydrogen atom", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 21, kind: false_positive, address: "ch 6 §6.7.1 ¶55",
+     printed: "β-carbon", transcribed: "beta-carbon", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 21, kind: false_positive, address: "ch 6 §6.7.1 ¶55",
+     printed: "α-carbon atom", transcribed: "alpha-carbon atom", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 22, kind: false_positive, address: "ch 6 §6.7.1 ¶59",
+     printed: "CH_3CH_2Br + Mg dry ether-> CH_3CH_2MgBr", transcribed: "CH_3CH_2Br + Mg -> CH_3CH_2MgBr (dry ether)", reason: "the prompt writes a condition over an arrow in brackets; \"dry ether\" is the page's"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 2, kind: false_positive, address: "ch 7 §7.1.1 ¶3",
+     printed: "C_(sp3) – OH bond", transcribed: "C_(sp^3)–OH bond", reason: "the page sets sp³ with a superscript 3; sp^3 is the prompt's superscript"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 2, kind: false_positive, address: "ch 7 §7.1.1 ¶3",
+     printed: "an sp3 hybridised", transcribed: "an sp^3 hybridised", reason: "the page sets sp³ with a superscript 3; sp^3 is the prompt's superscript"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 2, kind: false_positive, address: "ch 7 §7.1.1 ¶5",
+     printed: "a sp3 hybridised", transcribed: "a sp^3 hybridised", reason: "the page sets sp³ with a superscript 3; sp^3 is the prompt's superscript"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 2, kind: false_positive, address: "ch 7 §7.1.1 ¶6",
+     printed: "a sp3—hybridised", transcribed: "a sp^3—hybridised", reason: "the page sets sp³ with a superscript 3; sp^3 is the prompt's superscript"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 8, kind: false_positive, address: "ch 7 §7.4.1 ¶9",
+     printed: "CH_3-CH-CH_2 | H BH_2", transcribed: "CH_3–CH–CH_2 (H, BH_2)", reason: "the page draws H and BH2 under the chain; the row writes the same atoms inline"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 8, kind: false_positive, address: "ch 7 §7.4.1 ¶9",
+     printed: "3H_2O_2, OH_bar", transcribed: "3H_2O_2, OH^-", reason: "the book marks a negative charge with a bar over O (ŌH, COŌ); ^- and ‾ carry it"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 8, kind: false_positive, address: "ch 7 §7.4.1 ¶12",
+     printed: "R- CH-R' | OH", transcribed: "R–CH(OH)–R'", reason: "the page draws OH under the CH; R–CH(OH)–R' is the same structure inline"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 10, kind: false_positive, address: "ch 7 §7.4.2 ¶2",
+     printed: "300 atm", transcribed: "320 atmospheric pressure", reason: "the page prints \"320 atmospheric pressure\" (text layer); the verifier misread it"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 14, kind: false_positive, address: "ch 7 §7.4.4 ¶15",
+     printed: "R – O–H <-> R – O:^- + H^+", transcribed: "R – O–H <-> R – O^- + H^+", reason: "the page draws the lone pairs as dots; the row carries the ion without them"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 16, kind: false_positive, address: "ch 7 §7.4.4 ¶27",
+     printed: "form alkenes on treating", transcribed: "form alkenes on treating with a protic acid", reason: "the page prints \"on treating with a protic acid\" (text layer); the verifier quoted a prefix"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 17, kind: false_positive, address: "ch 7 §7.4.4 ¶29",
+     printed: "CH_3-C(-OH)(CH_3)-, CH_3", transcribed: "CH_3-C(CH_3)_2-OH", reason: "the page draws tert-butyl alcohol with a methyl above and below; CH3-C(CH3)2-OH is the same structure"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 27, kind: false_positive, address: "ch 7 §7.6.3 ¶14",
+     printed: "CH_3", transcribed: "CH_2CH_3", reason: "the page prints (ii) CH3–CH2–CH2–O–C(CH3)2–CH2CH3 with its methyls above and below the C, as the row carries it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 7, kind: false_positive, address: "ch 8 §8.2.3 ¶1",
+     printed: "2 R' — C — R with double bond O", transcribed: "2 R' — C(=O) — R", reason: "the page draws the C=O; C(=O) is the same group inline"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 9, kind: false_positive, address: "ch 8 §8.3 ¶5",
+     printed: "Example 8.2 Arrange", transcribed: "Example 8.2 Arrange the following compounds", reason: "the page prints \"Example 8.2 Arrange the following compounds…\"; the verifier quoted a prefix"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 13, kind: false_positive, address: "ch 8 §8.4 ¶27",
+     printed: "3 OH_bar", transcribed: "3 ‾OH", reason: "the book marks a negative charge with a bar over O (ŌH, COŌ); ^- and ‾ carry it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 13, kind: false_positive, address: "ch 8 §8.4 ¶27",
+     printed: "RCOO_bar", transcribed: "RCOO^-", reason: "the book marks a negative charge with a bar over O (ŌH, COŌ); ^- and ‾ carry it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 13, kind: false_positive, address: "ch 8 §8.4 ¶28",
+     printed: "5 OH_bar", transcribed: "5‾OH", reason: "the book marks a negative charge with a bar over O (ŌH, COŌ); ^- and ‾ carry it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 13, kind: false_positive, address: "ch 8 §8.4 ¶28",
+     printed: "RCOO_bar", transcribed: "RCOO^-", reason: "the book marks a negative charge with a bar over O (ŌH, COŌ); ^- and ‾ carry it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 22, kind: false_positive, address: "ch 8 §8.7 ¶16",
+     printed: "C_6H_5CH_2CN [triangle] [down arrow] H_3O^+", transcribed: "C_6H_5CH_2CN -> [Heat, H_3O^+]", reason: "the page's Δ over the arrow is heat; the prompt writes conditions in brackets after the arrow"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 23, kind: false_positive, address: "ch 8 §8.9.1 ¶3",
+     printed: "2R-COO^-Na^+ (with bar over O)", transcribed: "2R-COO^-Na^+", reason: "the book marks a negative charge with a bar over O (ŌH, COŌ); ^- and ‾ carry it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 23, kind: false_positive, address: "ch 8 §8.9.1 ¶3",
+     printed: "R-COO^-Na^+ (with bar over O)", transcribed: "R-COO^-Na^+", reason: "the book marks a negative charge with a bar over O (ŌH, COŌ); ^- and ‾ carry it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 23, kind: false_positive, address: "ch 8 §8.9.1 ¶3",
+     printed: "R-COO^-Na^+ + H_2O + CO_2 (with bar over O)", transcribed: "R-COO^-Na^+ + H_2O + CO_2", reason: "the book marks a negative charge with a bar over O (ŌH, COŌ); ^- and ‾ carry it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 25, kind: false_positive, address: "ch 8 §8.9.1 ¶11",
+     printed: "F < CN < NO_2 < CF_3", transcribed: "Cl < F < CN < NO_2 < CF_3", reason: "the page prints \"Ph < I < Br < Cl < F < CN < NO2 < CF3\" (text layer); the verifier quoted a suffix"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 5, kind: false_positive, address: "ch 9 §9.4 ¶12",
+     printed: "R-C_2H_5OH", transcribed: "->(C_2H_5-Cl) C_2H_5-N(C_2H_5)-C_2H_5", reason: "the page's Solution (i) is the ethylation chain the row carries; the verifier's span is not on the page"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 5, kind: false_positive, address: "ch 9 §9.4 ¶12",
+     printed: "R-C_2H_5-N(CH_3)-CH_3 ; Benzylchloride", transcribed: "C_6H_5-CH_2-N(CH_3)-CH_3 ; Benzylchloride", reason: "the page prints C6H5–CH2–N(CH3)–CH3 over \"N,N-Dimethylphenylmethanamine\", as the row carries it"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 5, kind: false_positive, address: "ch 9 §9.4 ¶13",
+     printed: "H_2/Ni / Na(Hg)/C_2H_5OH", transcribed: "H_2/Ni or Na(Hg)/C_2H_5OH", reason: "the page sets H2/Ni above the arrow and Na(Hg)/C2H5OH below it, two alternatives; \"or\" joins them inline"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 13, kind: false_positive, address: "ch 9 §9.6 ¶30",
+     printed: "C_6H_5—N_2^+Cl^- + NaCl", transcribed: "C_6H_5—N_2^+Cl^- + NaCl + 2H_2O", reason: "the page prints \"+ NaCl + 2H2O\"; the verifier dropped the water"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 15, kind: false_positive, address: "ch 9 §9.6 ¶45",
+     printed: "produces p-aminobenzene sulphonic", transcribed: "produces p-aminobenzene sulphonic acid", reason: "the page prints \"sulphonic acid, commonly known as sulphanilic acid\" (text layer); the verifier quoted a prefix"}
+  - {book: chem12-part2, lang: en, chapter: 10, page: 7, kind: false_positive, address: "ch 10 §10.1.3 ¶4",
+     printed: "between C1 of α-D-glucose", transcribed: "between C1 of alpha-D-glucose", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 10, page: 7, kind: false_positive, address: "ch 10 §10.1.3 ¶4",
+     printed: "C2 of β-D-fructose", transcribed: "C2 of beta-D-fructose", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 10, page: 7, kind: false_positive, address: "ch 10 §10.1.3 ¶6",
+     printed: "two α-D-glucose units", transcribed: "two alpha-D-glucose units", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 10, page: 13, kind: false_positive, address: "ch 10 §10.2.3 ¶9",
+     printed: "β-pleated sheet structure", transcribed: "beta-pleated sheet structure", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 10, page: 13, kind: false_positive, address: "ch 10 §10.2.3 ¶11",
+     printed: "In β-pleated sheet structure", transcribed: "In beta-pleated sheet structure", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 10, page: 13, kind: false_positive, address: "ch 10 §10.2.3 ¶11",
+     printed: "known as β-pleated sheet", transcribed: "known as beta-pleated sheet", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 10, page: 15, kind: false_positive, address: "ch 10 §10.3 ¶1",
+     printed: "6H12O6 Glucose", transcribed: "6H_12O_6 (Glucose)", reason: "the page sets the name \"Glucose\" under the formula; the row brackets it inline"}

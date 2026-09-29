@@ -1400,3 +1400,576 @@ corrections:
      printed: "R <-> H <-> X", transcribed: "R X", reason: "the verifier quoted atoms of the drawn resonance structures, not words of the row; the row carries the page's sentence"}
   - {book: chem12-part2, lang: en, chapter: 9, page: 5, kind: noise, address: "ch 9 §9.4 ¶3",
      flag: join, at: "2. Ammonolysis of alkyl halides", reason: "the row runs onto p5 through the display RNH2 -> R2NH -> R3N -> R4N+X- drawn at the top of p5 (joined by ruling); the layer's first text line, \"The free amine can be obtained…\", is the next paragraph"}
+  # chem11-part1, the whole book on v5 (reports -ncert-extract/-2, -ncert-load-3, -ncert-verify-4 failed at ch 5 p12 and
+  # -ncert-verify-5). Every item was read against the page image and the text layer, chapter by chapter; ch 4's layer is
+  # Caesar-shifted in 28% of its body text, so its pages were read from the image. The free checks ran first and were held
+  # back from the second read. Rulings under the founder's answers of 2026-09-29 (DECISIONS): list items by corpus practice
+  # (a fragment completing the sentence that introduces the list joins it; complete-sentence items stay rows); a worked
+  # Solution set flush in its box is one paragraph (capitalised rows after a display join, v5); an explanatory box the
+  # transcriber skipped is restored from the layer with its title leading, and ch 6 p6's student activity goes; the book's
+  # garbles are restored as printed, while ch 5 p22's blank fraction keeps the transcriber's 3/2. Every entry was
+  # simulated against the loaded rows page by page before the reload: 279 entries, no refusal, 1,454 rows to 1,331.
+  # chem11-part1 chapter 1
+  - {book: chem11-part1, lang: en, chapter: 1, page: 1, kind: join, address: "ch 1 §1 ¶3",
+     at: "People in ancient India, already had the knowledge", reason: "resumes flush at the column margin straight after the list \"i. Philosopher's stone… ii. 'Elixir of life'…\" inside ¶2, where this book indents a new paragraph; the one-sentence items stay in the paragraph that introduces them (v5) and the text after them runs on"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 1, kind: text, address: "ch 1 §1 ¶2",
+     transcribed: "Chemistry, as we understand it today, is not a very old discipline.", printed: "DEVELOPMENT OF CHEMISTRY Chemistry, as we understand it today, is not a very old discipline.", reason: "the page prints the side heading \"DEVELOPMENT OF CHEMISTRY\" (BookmanOldStyle-Bold, blue caps) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 3, kind: misprint, address: "ch 1 §1 ¶15",
+     transcribed: "chalk, red lead and minimum", printed: "chalk, red lead and minium", reason: "the page prints \"red lead and minimum.\" (layer and image) — the book's own error for minium, kept"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 3, kind: misprint, address: "ch 1 §1 ¶17",
+     transcribed: "named 'Paramãnu' (comparable", printed: "named 'Paramānu' (comparable", reason: "the page prints Paramãnu with a tilde (layer and image); the verifier normalised it to ā — the book's form, kept"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 3, kind: misprint, address: "ch 1 §1 ¶17",
+     transcribed: "atoms (Paramãnu), which are eternal", printed: "atoms (Paramānu), which are eternal", reason: "the page prints Paramãnu with a tilde (layer and image); the verifier normalised it to ā — the book's form, kept"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 3, kind: misprint, address: "ch 1 §1 ¶17",
+     transcribed: "these (Paramãnu) could form pairs", printed: "these (Paramānu) could form pairs", reason: "the page prints Paramãnu with a tilde (layer and image); the verifier normalised it to ā — the book's form, kept"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 3, kind: misprint, address: "ch 1 §1 ¶20",
+     transcribed: "structure, properties and interection of matter", printed: "structure, properties and interaction of matter", reason: "the page prints \"interection\" (layer) — the book's own error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 4, kind: misprint, address: "ch 1 §1.1 ¶4",
+     transcribed: "like acids, alkalies, dyes, polymesr metals, etc.", printed: "like acids, alkalies, dyes, polymers metals, etc.", reason: "the page prints \"polymesr\" (layer) — the book's own error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 7, kind: false_positive, address: "ch 1 §1.3.2 ¶1",
+     transcribed: "volume, etc., are quantitative in nature", printed: "volume, etc., are quantitative", reason: "the page prints \"are quantitative in nature.\" (layer); the verifier quoted a prefix"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 10, kind: join, address: "ch 1 §1.3.6 ¶2",
+     at: "Density of a substance is its amount of mass", reason: "flush at x 60 straight after the display \"Density = Mass / Volume\", where the next paragraph (\"This unit is quite large…\") is indented: v5, the paragraph continues"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 11, kind: text, address: "ch 1 §1.4 ¶1",
+     transcribed: "These ideas are discussed below in detail.", printed: "These ideas are discussed below in detail. Reference Standard After defining a unit of measurement such as the kilogram or the metre, scientists agreed on reference standards that make it possible to calibrate all measuring devices. For getting reliable measurements, all devices such as metre sticks and analytical balances have been calibrated by their manufacturers to give correct readings. However, each of these devices is standardised or calibrated against some reference. The mass standard is the kilogram since 1889. It has been defined as the mass of platinum-iridium (Pt-Ir) cylinder that is stored in an airtight jar at International Bureau of Weights and Measures in Sevres, France. Pt-Ir was chosen for this standard because it is highly resistant to chemical attack and its mass will not change for an extremely long time. Scientists are in search of a new standard for mass. This is being attempted through accurate determination of Avogadro constant. Work on this new standard focuses on ways to measure accurately the number of atoms in a well-defined mass of sample. One such method, which uses X-rays to determine the atomic density of a crystal of ultrapure silicon, has an accuracy of about 1 part in 10^6 but has not yet been adopted to serve as a standard. There are other methods but none of them are presently adequate to replace the Pt-Ir cylinder. No doubt, changes are expected within this decade. The metre was originally defined as the length between two marks on a Pt-Ir bar kept at a temperature of 0°C (273.15 K). In 1960 the length of the metre was defined as 1.65076373 × 10^6 times the wavelength of light emitted by a krypton laser. Although this was a cumbersome number, it preserved the length of the metre at its agreed value. The metre was redefined in 1983 by CGPM as the length of path travelled by light in vacuum during a time interval of 1/299 792 458 of a second. Similar to the length and the mass, there are reference standards for other physical quantities.", reason: "the page's left column is the tinted box \"Reference Standard\", three paragraphs of explanation (v5: an explanatory box is running text; the box title leads it, ruling 2026-09-28) that no row carries; restored from the text layer after the paragraph it sits beside, in §1.4 where the page is, and split below"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 11, kind: split, address: "ch 1 §1.4 ¶1",
+     at: "Reference Standard After defining a unit of measurement", reason: "the box \"Reference Standard\" is its own passage, not the rest of 1.4's opening paragraph (applies after the text correction that restores the box)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 11, kind: split, address: "ch 1 §1.4 ¶1",
+     at: "Scientists are in search of a new standard for mass.", reason: "the box's second paragraph, indented at x 92 (applies after the text correction that restores the box)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 11, kind: split, address: "ch 1 §1.4 ¶1",
+     at: "The metre was originally defined as the length", reason: "the box's third paragraph, indented at x 92 (applies after the text correction that restores the box)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 12, kind: join, address: "ch 1 §1.4.1 ¶9",
+     at: "Thus, for adding 6.65×10^4 and 8.95×10^3, exponent", reason: "the \"Addition and Subtraction\" block is set flush throughout; \"Thus, for adding…\" starts flush at x 60 after \"may be.\", where this book indents a new paragraph — the explanation runs on into its worked example"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 12, kind: join, address: "ch 1 §1.4.1 ¶10",
+     at: "Then, these numbers can be added as follows", reason: "flush after the display \"(6.65×10^4) + (0.895×10^4)\": v5, a flush line after a displayed equation continues the paragraph"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 12, kind: join, address: "ch 1 §1.4.1 ¶11",
+     at: "Similarly, the subtraction of two numbers can", reason: "flush after the display \"(6.65 + 0.895)×10^4 = 7.545×10^4\": the same example runs on"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 13, kind: join, address: "ch 1 §1.4.2 ¶13",
+     at: "Here, 18.0 has only one digit after the decimal point", reason: "opens the right column flush straight after the left column's display \"12.11 18.0 1.012 31.122\": v5, a flush line after a display continues the paragraph"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 13, kind: text, address: "ch 1 §1.4.2 ¶12",
+     transcribed: "The result cannot have more digits to the right of the decimal point", printed: "Addition and Subtraction of Significant Figures The result cannot have more digits to the right of the decimal point", reason: "the page prints the side heading \"Addition and Subtraction of Significant Figures\" (bold italic, blue) above this paragraph; the transcriber dropped it — it leads the paragraph (ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 13, kind: text, address: "ch 1 §1.4.2 ¶14",
+     transcribed: "In these operations, the result must be reported", printed: "Multiplication and Division of Significant Figures In these operations, the result must be reported", reason: "the page prints the side heading \"Multiplication and Division of Significant Figures\" (bold italic, blue) above this paragraph; the transcriber dropped it — it leads the paragraph (ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 13, kind: noise, address: "ch 1 §1.4.2 ¶8",
+     flag: "join", at: "(5) Counting the numbers of object, for", reason: "p12 ends \"1.00×10^2 for three significant figures.\" short (x1 524 of 536), and p13 opens with the numbered rule \"(5)\", which is its own paragraph like rules (1)–(4) (v5 numbered rules)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 13, kind: noise, address: "ch 1 §1.4.2 ¶14",
+     flag: "figure", at: "Multiplication and Division of Significant Figures In these operations", reason: "the check read \"significant figures. 2.5×1.25\" as a mention of fig 2.5; the paragraph names no figure (at = the row's opening after the text correction restoring its heading, which noise is matched against at verify)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 16, kind: false_positive, address: "ch 1 §1.7.1 ¶1",
+     transcribed: "scientists could determine the mass of one atom relative to another", printed: "could determine the mass of one atom relative to another", reason: "the page prints \"scientists could determine the mass of one\" (layer); the verifier quoted a suffix"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 17, kind: false_positive, address: "ch 1 §1.7.2 ¶2",
+     transcribed: "(2 × 10^-12) (14.00317 u)", printed: "(2 ×10^-10) (14.00317 u)", reason: "the page prints (2 × 10–12) (layer); the verifier misread the exponent"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 17, kind: false_positive, address: "ch 1 §1.7.4 ¶2",
+     transcribed: "six Cl^- ion", printed: "six Cl- ion", reason: "the page prints Cl– with a superscript minus; ^- is the prompt's superscript"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 18, kind: join, address: "ch 1 §1.7.4 ¶4",
+     at: "Thus, the formula mass of sodium chloride is", reason: "p18 opens flush at x 60 with \"Thus, the formula mass…\", completing p17's \"used to calculate the formula mass\" — this book indents a new paragraph even at a page top (p8), and a flush line starts one only under a heading (chem12-part1 page tops, 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 18, kind: join, address: "ch 1 §1.8 ¶6",
+     at: "Hence, so many entities (atoms, molecules or", reason: "flush after the display \"602213670000000000000000\": v5, a flush line after a displayed equation continues the paragraph"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 18, kind: join, address: "ch 1 §1.8 ¶7",
+     at: "We can, therefore, say that 1 mol of hydrogen", reason: "set flush at x 306 after \"particular substance.\", where this book indents a new paragraph (\"Having defined the mole\" below is indented) — the explanation runs on into its three examples"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 18, kind: false_positive, address: "ch 1 §1.8 ¶4",
+     transcribed: "1.992648 × 10^-23 g / ^12C atom", printed: "1.992648 × 10^-23 g / /^12 C atom", reason: "the page prints one slash before 12C atom in the denominator; the verifier doubled it"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 19, kind: join, address: "ch 1 §1.9.1 ¶5",
+     at: "Step 1. Conversion of mass per cent to grams", reason: "the label \"Solution\" is a row of its own; a printed label is the first words of its paragraph (v5), so the step it heads joins it"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 19, kind: join, address: "ch 1 §1.9.1 ¶6",
+     at: "Since we are having mass per cent, it is", reason: "the bold step heading \"Step 1. Conversion of mass per cent to grams\" (a row of its own) leads the paragraph under it (side-heading ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 19, kind: join, address: "ch 1 §1.9.1 ¶8",
+     at: "Divide the masses obtained above by respective", reason: "the bold step heading \"Step 2. Convert into number moles of each element\" (a row of its own) leads the paragraph under it (ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 19, kind: false_positive, address: "ch 1 §1.9 ¶3",
+     transcribed: "46.068 g) g = 46.068 g", printed: "46.068 g", reason: "the row carries \"(2×12.01 + 6×1.008 + 16.00) g = 46.068 g\" as the page prints it (layer); the verifier misquoted it (set aside as not carried, so the row went unjudged)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 20, kind: join, address: "ch 1 §1.9.1 ¶10",
+     at: "Since 2.021 is smallest value, division by it", reason: "the bold step heading \"Step 3. Divide each of the mole values…amongst them\" (a row of its own) leads the paragraph under it (ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 20, kind: join, address: "ch 1 §1.9.1 ¶13",
+     at: "CH_2Cl is, thus, the empirical formula of the above compound.", reason: "the bold step heading \"Step 4. Write down the empirical formula…respective elements\" (a row of its own) leads the paragraph under it (ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 20, kind: join, address: "ch 1 §1.9.1 ¶15",
+     at: "(a) Determine empirical formula mass by adding", reason: "the bold step heading \"Step 5. Writing molecular formula\" (a row of its own) leads the item under it (ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 20, kind: join, address: "ch 1 §1.10 ¶4",
+     at: "From these relationships, the given data can", reason: "resumes flush at x 317 straight after the bullet list of ¶3 (\"Thus, according to the above chemical reaction,\"), where this book indents a new paragraph; the list's items are one-sentence items inside the paragraph that introduces them (v5), and the sentence after them runs on"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 20, kind: false_positive, address: "ch 1 §1.10 ¶4",
+     transcribed: "mass <-> moles <-> no. of molecules", printed: "mass ⇄ moles ⇄ no. of molecules", reason: "the page prints the double arrow ⇄; <-> is the prompt's equilibrium arrow"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 21, kind: join, address: "ch 1 §1.10.2 ¶4",
+     at: "Equations (a) and (b) are balanced, since there", reason: "flush after the box's three displayed reactions \"(a)…(c) unbalanced equation\": v5, a flush line after a displayed equation continues the paragraph"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 21, kind: join, address: "ch 1 §1.10.2 ¶5",
+     at: "Now, let us take combustion of propane, C_3H_8.", reason: "flush after the display \"P4(s) + 5O2(g) -> P4O10(s) balanced equation\": v5, the paragraph continues and introduces the five steps below"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 21, kind: text, address: "ch 1 §1.10.2 ¶3",
+     transcribed: "According to the law of conservation of mass, a balanced chemical equation", printed: "Balancing a chemical equation According to the law of conservation of mass, a balanced chemical equation", reason: "the tinted box is titled \"Balancing a chemical equation\" (bold, centred over it); the transcriber kept the box text and dropped the title, which leads the box (ruling 2026-09-28)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 21, kind: misprint, address: "ch 1 §1.10.2 ¶9",
+     transcribed: "needed to supply the required 10 CO_2 and 4×1= 4 in water). Therefore, five O_2 molecules are needed to supply the required 10 oxygen atoms.", printed: "needed to supply the required 10 oxygen atoms.", reason: "the page prints the Step 4 sentence twice over, \"…the required 10 CO2 and 4×1= 4 in water). Therefore, five O2 molecules are needed to supply the required 10 oxygen\" (layer, image) — the book's own repeated line, kept"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 22, kind: join, address: "ch 1 §1.10.2 ¶14",
+     at: "(i) 16 g of CH_4 corresponds to one mole.", reason: "a one-sentence item stays inside the paragraph that introduces it (v5): it follows the Solution's balanced equation in the same flush box text"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 22, kind: join, address: "ch 1 §1.10.2 ¶20",
+     at: "According to the above equation, 1 mol N_2 (g) requires", reason: "Problem 1.5's Solution is one worked argument set flush in the box; this line resumes flush after \"= 4.96 × 10^3 mol\": v5, a flush line after a display continues the paragraph"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 22, kind: join, address: "ch 1 §1.10.2 ¶21",
+     at: "But we have only 4.96×10^3 mol H_2.", reason: "Problem 1.5's Solution is one worked argument set flush in the box; this line resumes flush after \"= 5.36 × 10^3 mol H2\": v5, a flush line after a display continues the paragraph"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 22, kind: join, address: "ch 1 §1.10.2 ¶22",
+     at: "Since 3 mol H_2(g) gives 2 mol NH_3(g)", reason: "Problem 1.5's Solution is one worked argument set flush in the box; this line resumes flush after \"…available dihydrogen i.e., 4.96 × 10^3 mol\", the line before the display it introduces: v5, a flush line after a display continues the paragraph"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 22, kind: join, address: "ch 1 §1.10.2 ¶23",
+     at: "3.30 × 10^3 mol NH_3 (g) is obtained.", reason: "Problem 1.5's Solution is one worked argument set flush in the box; this line resumes flush after \"= 3.30 × 10^3 mol NH3 (g)\": v5, a flush line after a display continues the paragraph"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 23, kind: join, address: "ch 1 §1.10.2 ¶34",
+     at: "then, 0.2 mol is present in (1000 mL / 1 mol)", reason: "a lower-case row after the unfinished \"If 1 mol is present in 1L or 1000 mL solution\" completes its sentence (Chemistry ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 23, kind: join, address: "ch 1 §1.10.2 ¶37",
+     at: "Note that the number of moles of solute (NaOH)", reason: "flush at x 306 straight after the display \"∴ V2 = 0.2M×1000mL / 1.0M = 200 L\", where this book indents a new paragraph: v5, the paragraph continues"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 23, kind: misprint, address: "ch 1 §1.10.2 ¶36",
+     transcribed: "V_2 = 200 L", printed: "V_2 = 200 mL", reason: "the page prints \"∴ V2 = 0.2M×1000mL / 1.0M = 200 L\" (image) — the book's own error for 200 mL, kept (set aside as not carried, so the row went unjudged)"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 24, kind: misprint, address: "ch 1 §1.10.2 ¶43",
+     transcribed: "1250 –75.5", printed: "1250 –175.5", reason: "the page prints \"Mass of water in solution = 1250 –75.5\" (layer) — the book's own error for 175.5, kept"}
+  # chem11-part1 chapter 2
+  - {book: chem11-part1, lang: en, chapter: 2, page: 3, kind: join, address: "ch 2 §2.1.2 ¶2",
+     at: "(i) the magnitude of the negative charge", reason: "item (i) is a clause completing \"…depends upon:\" (p3); a one-sentence item stays inside the paragraph that introduces the list (prompt)"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 3, kind: join, address: "ch 2 §2.1.2 ¶3",
+     at: "(ii) the mass of the particle — lighter", reason: "item (ii) completes the same \"depends upon:\" list"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 3, kind: join, address: "ch 2 §2.1.2 ¶4",
+     at: "(iii) the strength of the electrical", reason: "item (iii) completes the same \"depends upon:\" list (top of the right column)"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 3, kind: join, address: "ch 2 §2.1.2 ¶6",
+     at: "Where m_e is the mass of the electron", reason: "\"Where m_e is the mass…\" is set flush after display (2.1), mid-sentence; a flush line after a display continues the paragraph (prompt)"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 4, kind: join, address: "ch 2 §2.2 ¶2",
+     at: "• to account for the stability of atom,", reason: "the four bullets are infinitive fragments completing \"The major problems before the scientists … were:\""}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 4, kind: false_positive, address: "ch 2 §2.1.4 ¶6",
+     transcribed: "mass slightly greater", printed: "a mass slightly greater", reason: "the row carries \"particles having a mass slightly greater\" as the page prints it; the verifier dropped the article from its quote"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 6, kind: false_positive, address: "ch 2 §2.2.2 ¶4",
+     transcribed: "Most of the space in the atom is empty as", printed: "Most of the space", reason: "the page prints \"(i) Most of the space in the atom is empty as most of the α–particles passed through the foil undeflected.\", as the row carries it; the verifier quoted a prefix"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 9, kind: join, address: "ch 2 §2.3 ¶2",
+     at: "(i) Dual character of the electromagnetic", reason: "item (i) is a noun phrase completing \"These were:\""}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 9, kind: join, address: "ch 2 §2.3 ¶3",
+     at: "(ii) Experimental results regarding", reason: "item (ii) completes the same \"These were:\" list"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 11, kind: join, address: "ch 2 §2.3.2 ¶2",
+     at: "(i) the nature of emission of radiation", reason: "item (i) is a noun phrase completing \"…could not be explained … (known as classical physics):\""}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 11, kind: join, address: "ch 2 §2.3.2 ¶3",
+     at: "(ii) ejection of electrons from metal", reason: "item (ii) completes the same list"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 11, kind: join, address: "ch 2 §2.3.2 ¶4",
+     at: "(iii) variation of heat capacity of", reason: "item (iii) completes the same list"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 11, kind: false_positive, address: "ch 2 §2.3.1 ¶20",
+     transcribed: "v_bar = c / lambda = 3 × 10^8 m s^-1", printed: "v_bar = c / lambda", reason: "the page prints v̄ = c/λ = 3×10^8 m s^-1 / 5800×10^-10 m = 5.172×10^14 s^-1 in one display, as the row carries it; the verifier quoted its first member"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 13, kind: text, address: "ch 2 §2.3.2 ¶15",
+     transcribed: "In 1887, H. Hertz performed a very interesting", printed: "Photoelectric Effect In 1887, H. Hertz performed a very interesting", reason: "the page prints the side heading \"Photoelectric Effect\" (BookmanOldStyle-BoldItal) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: text, address: "ch 2 §2.3.2 ¶22",
+     transcribed: "The particle nature of light posed a", printed: "Dual Behaviour of Electromagnetic Radiation The particle nature of light posed a", reason: "the page prints the side heading \"Dual Behaviour of Electromagnetic Radiation\" (BookmanOldStyle-BoldItal, two lines) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: false_positive, address: "ch 2 §2.3.2 ¶19",
+     transcribed: "red light [nu = (4.3 to 4.6) × 10^14 Hz]", printed: "red light [v = (4.3 to 4.6) × 10^14 Hz]", reason: "the page prints ν (the layer carries the glyph); the prompt writes a Greek letter by name, nu — the verifier read ν as v"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: false_positive, address: "ch 2 §2.3.2 ¶19",
+     transcribed: "yellow light (nu = 5.1–5.2 × 10^14 Hz)", printed: "yellow light (v = 5.1–5.2 × 10^14 Hz)", reason: "the page prints ν (the layer carries the glyph); the prompt writes a Greek letter by name, nu — the verifier read ν as v"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: false_positive, address: "ch 2 §2.3.2 ¶19",
+     transcribed: "frequency (nu_0) for potassium", printed: "frequency (v_0) for potassium", reason: "the page prints ν (the layer carries the glyph); the prompt writes a Greek letter by name, nu — the verifier read ν as v"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: false_positive, address: "ch 2 §2.3.2 ¶21",
+     transcribed: "energy equal to h nu", printed: "energy equal to h v", reason: "the page prints ν (the layer carries the glyph); the prompt writes a Greek letter by name, nu — the verifier read ν as v"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: false_positive, address: "ch 2 §2.3.2 ¶21",
+     transcribed: "electron is h nu_0", printed: "electron is h v_0", reason: "the page prints ν (the layer carries the glyph); the prompt writes a Greek letter by name, nu — the verifier read ν as v"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: false_positive, address: "ch 2 §2.3.2 ¶21",
+     transcribed: "(h nu – h nu_0)", printed: "(h v – h v_0)", reason: "the page prints ν (the layer carries the glyph); the prompt writes a Greek letter by name, nu — the verifier read ν as v"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: false_positive, address: "ch 2 §2.3.2 ¶21",
+     transcribed: "h nu = h nu_0 + (1/2) m_e v^2", printed: "h v = h v_0 + (1/2) m_e v^2", reason: "the page prints ν (the layer carries the glyph); the prompt writes a Greek letter by name, nu — the verifier read ν as v"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 16, kind: text, address: "ch 2 §2.3.3 ¶2",
+     transcribed: "The spectrum of radiation emitted by", printed: "Emission and Absorption Spectra The spectrum of radiation emitted by", reason: "the page prints the side heading \"Emission and Absorption Spectra\" (BookmanOldStyle-BoldItal) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 16, kind: text, address: "ch 2 §2.3.3 ¶7",
+     transcribed: "When an electric discharge is passed", printed: "Line Spectrum of Hydrogen When an electric discharge is passed", reason: "the page prints the side heading \"Line Spectrum of Hydrogen\" (BookmanOldStyle-BoldItal) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 17, kind: misprint, address: "ch 2 §2.3.3 ¶10",
+     transcribed: "Bracket", printed: "Brackett", reason: "the running text prints \"Lyman, Balmer, Paschen, Bracket and Pfund series\" (the table beside it spells Brackett); the book's own error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 18, kind: text, address: "ch 2 §2.4 ¶5",
+     transcribed: "nu = ΔE / h = (E_2 − E_1) / h", printed: "n = ΔE / h = (E_2 − E_1) / h", reason: "the page prints equation (2.10) as \"n = ΔE/h\" (the book's own slip for ν); the transcriber corrected it, which the prompt forbids — restored as printed, as chem12-part1's \"Cr^V1\" was"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 19, kind: text, address: "ch 2 §2.4 ¶12",
+     transcribed: "This representation is called an energy level diagram.", printed: "This representation is called an energy level diagram. What does the negative electronic energy (E_n) for hydrogen atom mean? The energy of the electron in a hydrogen atom has a negative sign for all possible orbits (eq. 2.13). What does this negative sign convey? This negative sign means that the energy of the electron in the atom is lower than the energy of a free electron at rest. A free electron at rest is an electron that is infinitely far away from the nucleus and is assigned the energy value of zero. Mathematically, this corresponds to setting n equal to infinity in the equation (2.13) so that E_∞ = 0. As the electron gets closer to the nucleus (as n decreases), E_n becomes larger in absolute value and more and more negative. The most negative energy value is given by n=1 which corresponds to the most stable orbit. We call this the ground state.", reason: "the page prints the explanatory box \"What does the negative electronic energy (En) for hydrogen atom mean?\" in the right column; the transcriber skipped it whole. It explains (eq. 2.13), so it is running text (prompt: a box that reads as part of the chapter's explanation is kept); its title leads it (2026-09-28). Text from the page's layer, in the prompt's notation; the split below makes it its own paragraph"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 19, kind: split, address: "ch 2 §2.4 ¶12",
+     at: "What does the negative electronic energy (E_n) for hydrogen atom mean?", reason: "the restored box is a paragraph of its own (applies after the text correction above)"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 19, kind: noise, address: "ch 2 §2.4 ¶6",
+     flag: "join", at: "iv) The angular momentum of an electron is quantised.", reason: "\"Where m_e is the mass of electron…\" at the top of p19 defines the symbols of display (2.11) that ends p18 — the compositor indents a line after a display mid-sentence (chem12-part1 class); the item runs on as transcribed"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 20, kind: misprint, address: "ch 2 §2.4.1 ¶3",
+     transcribed: "3 × 10^8 m s^-s", printed: "3 × 10^8 m s^-1", reason: "the page prints the denominator of the wavenumber display as \"3×10^8 m s^-s\"; the book's own error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 21, kind: join, address: "ch 2 §2.5 ¶2",
+     at: "1. Dual behaviour of matter,", reason: "item 1 is a noun phrase completing \"Two important developments … were:\""}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 21, kind: join, address: "ch 2 §2.5 ¶3",
+     at: "2. Heisenberg uncertainty principle.", reason: "item 2 completes the same list"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 23, kind: text, address: "ch 2 §2.5.2 ¶4",
+     transcribed: "One of the important implications of", printed: "Significance of Uncertainty Principle One of the important implications of", reason: "the page prints the side heading \"Significance of Uncertainty Principle\" (BookmanOldStyle-BoldItal) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 24, kind: text, address: "ch 2 §2.5.2 ¶14",
+     transcribed: "One can now understand the reasons for", printed: "Reasons for the Failure of the Bohr Model One can now understand the reasons for", reason: "the page prints the side heading \"Reasons for the Failure of the Bohr Model\" (BookmanOldStyle-BoldItal) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 24, kind: false_positive, address: "ch 2 §2.5.2 ¶11",
+     transcribed: "∆x∆p = h / 4pi or ∆x m∆v = h / 4pi ∆v = h / (4 pi ∆x m)", printed: "∆x∆p = h / 4pi or ∆x m∆v = h/4pi", reason: "Problem 2.15's Solution continues at the top of the right column (∆v = h/4π∆x m, then the numbers); the verifier read only the left column's two lines"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 25, kind: text, address: "ch 2 §2.6 ¶5",
+     transcribed: "When Schrödinger equation is solved for", printed: "Hydrogen Atom and the Schrödinger Equation When Schrödinger equation is solved for", reason: "the page prints the side heading \"Hydrogen Atom and the Schrödinger Equation\" (BookmanOldStyle-BoldItal, two lines) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 26, kind: text, address: "ch 2 §2.6 ¶7",
+     transcribed: "Quantum mechanical model of atom is the", printed: "Important Features of the Quantum Mechanical Model of Atom Quantum mechanical model of atom is the", reason: "the page prints the box title \"Important Features of the Quantum Mechanical Model of Atom\" (BookmanOldStyle-Bold, centred over the box; box-title ruling 2026-09-28) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 29, kind: join, address: "ch 2 §2.6.1 ¶25",
+     at: "(a) n = 2, l = 1, (b) n = 4, l = 0,", reason: "the four quantum-number pairs are the items of Problem 2.18's statement, as the transcriber set Problem 2.5's (a)/(b) inside its statement"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 29, kind: misprint, address: "ch 2 §2.6.1 ¶21",
+     transcribed: "–2, –1, 0, +1+, +2", printed: "–2, –1, 0, +1, +2", reason: "the page prints \"ml = –2, –1, 0, +1+, +2\"; the book's own error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 33, kind: join, address: "ch 2 §2.6.4 ¶3",
+     at: "The word 'aufbau' in German means 'building", reason: "\"Aufbau Principle\" is a side heading (BookmanOldStyle-BoldItal) transcribed as a row of its own; it leads this paragraph (founder, 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 34, kind: text, address: "ch 2 §2.6.4 ¶6",
+     transcribed: "The number of electrons to be filled", printed: "Pauli Exclusion Principle The number of electrons to be filled", reason: "the page prints the side heading \"Pauli Exclusion Principle\" (BookmanOldStyle-BoldItal) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 34, kind: text, address: "ch 2 §2.6.4 ¶7",
+     transcribed: "This rule deals with the filling of electrons", printed: "Hund’s Rule of Maximum Multiplicity This rule deals with the filling of electrons", reason: "the page prints the side heading \"Hund’s Rule of Maximum Multiplicity\" (BookmanOldStyle-BoldItal) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 34, kind: false_positive, address: "ch 2 §2.6.4 ¶6",
+     transcribed: "n, l and m_l", printed: "n, l and m_l,", reason: "the row carries \"n, l and m_l, but must have\" with the comma, as the page prints it; the verifier's quote cut the comma"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 35, kind: join, address: "ch 2 §2.6.5 ¶3",
+     at: "(i) s^a p^b d^c ...... notation", reason: "item (i) is a noun phrase completing \"…represented in two ways. For example :\""}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 35, kind: join, address: "ch 2 §2.6.5 ¶4",
+     at: "(ii) Orbital diagram", reason: "item (ii) completes the same list"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 37, kind: text, address: "ch 2 §2.6.6 ¶2",
+     transcribed: "The completely filled and completely", printed: "Causes of Stability of Completely Filled and Half-filled Subshells The completely filled and completely", reason: "the page prints the box title \"Causes of Stability of Completely Filled and Half-filled Subshells\" (BookmanOldStyle-Bold, centred over the box; box-title ruling 2026-09-28) above this paragraph; the transcriber dropped it"}
+  # chem11-part1 chapter 3
+  - {book: chem11-part1, lang: en, chapter: 3, page: 2, kind: figure_ref, address: "ch 3 §3.2 ¶1",
+     at: "noted that every eighth element had properties similar to the first element (Table 3.2)", add: "Table 3.2", reason: "the paragraph cites \"(Table 3.2)\" for Newlands' octaves; figure_refs carries only Table 3.1"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 3, kind: join, address: "ch 3 §3.2 ¶4",
+     at: "The properties of the elements are a periodic function", reason: "Mendeleev's Periodic Law is set off as a display (bold italic, indented block) that the sentence \"It states as follows :\" runs into; v5, a display belongs to the paragraph whose sentence runs into it"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 3, kind: join, address: "ch 3 §3.2 ¶5",
+     at: "Mendeleev arranged elements in horizontal rows and", reason: "resumes flush at x 60 straight after the displayed law, where this book indents a new paragraph (the indented \"While Dobereiner…\" above): v5, the paragraph continues"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 5, kind: join, address: "ch 3 §3.3 ¶2",
+     at: "The physical and chemical properties of the elements are periodic", reason: "the Modern Periodic Law is set off as a display (bold italic, indented block) that \"…can be stated as :\" runs into; v5, a display belongs to the paragraph whose sentence runs into it (the indented \"The Periodic Law revealed…\" below starts the next)"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 8, kind: misprint, address: "ch 3 §3.5 ¶2",
+     transcribed: "hydrogen (ls^1)", printed: "hydrogen (1s^1)", reason: "the page prints \"(ls1)\" with the letter l (layer \"ls1\"; image shows an upright l, unlike the digit in \"(1s)\" a line above) — the book's own error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 8, kind: misprint, address: "ch 3 §3.5 ¶2",
+     transcribed: "helium (ls^2)", printed: "helium (1s^2)", reason: "the page prints \"(ls2)\" with the letter l, as for hydrogen above — the book's own error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 14, kind: text, address: "ch 3 §3.7.1 ¶5",
+     transcribed: "The removal of an electron from an atom results", printed: "(b) Ionic Radius The removal of an electron from an atom results", reason: "the page prints the side heading \"(b) Ionic Radius\" (bold italic, blue) above this paragraph; the transcriber dropped it — it leads the paragraph (ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 14, kind: text, address: "ch 3 §3.7.1 ¶10",
+     transcribed: "A quantitative measure of the tendency of an element", printed: "(c) Ionization Enthalpy A quantitative measure of the tendency of an element", reason: "the page prints the side heading \"(c) Ionization Enthalpy\" (bold italic, blue) above this paragraph; the transcriber dropped it — it leads the paragraph (ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 15, kind: join, address: "ch 3 §3.7.1 ¶12",
+     at: "In other words, the first ionization enthalpy for an element X", reason: "p15 opens flush with \"In other words, …\", the rest of §3.7.1 ¶10 whose last line closes p14's right column; the footnote under p14's left column sits between, and the load joins a continuation past a footnote"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 16, kind: false_positive, address: "ch 3 §3.7.1 ¶20",
+     transcribed: "(Delta_egH)", printed: "(Delta_(eg)H)", reason: "the page prints ∆egH with the subscript eg (layer); Delta_egH is the same subscript in the prompt's notation"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 17, kind: noise, address: "ch 3 §3.7.1 ¶21",
+     flag: "join", at: "Depending on the element, the process of adding an electron", reason: "the row runs on correctly: p16 ends mid-sentence \"…group 17 elements (the halogens) have very high\" and p17's text resumes \"negative electron gain enthalpies…\" under Table 3.7; the check took the table caption for a new paragraph (a noise ruling on a \"runs onto\" flag names the second page)"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 19, kind: text, address: "ch 3 §3.7.2 ¶2",
+     transcribed: "The valence is the most characteristic property", printed: "(a) Periodicity of Valence or Oxidation States The valence is the most characteristic property", reason: "the page prints the side heading \"(a) Periodicity of Valence or Oxidation States\" (bold italic, blue) above this paragraph; the transcriber dropped it — it leads the paragraph (ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 20, kind: text, address: "ch 3 §3.7.2 ¶8",
+     transcribed: "The first element of each of the groups 1", printed: "(b) Anomalous Properties of Second Period Elements The first element of each of the groups 1", reason: "the page prints the side heading \"(b) Anomalous Properties of Second Period Elements\" (bold italic, blue) above this paragraph; the transcriber dropped it — it leads the paragraph (ruling 2026-09-27)"}
+  # chem11-part1 chapter 4
+  - {book: chem11-part1, lang: en, chapter: 4, page: 5, kind: join, address: "ch 4 §4.1.3 ¶10",
+     at: "Step 1. Count the total number of valence electrons of carbon", reason: "\"Solution\" is Problem 4.1's printed label, transcribed as a row of its own; the label leads its paragraph (prompt: the printed label is the first words of its paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 5, kind: join, address: "ch 4 §4.1.3 ¶16",
+     at: "Step 1. Count the total number of valence electrons of the", reason: "\"Solution\" is Problem 4.2's printed label, transcribed as a row of its own; the label leads its paragraph"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 5, kind: join, address: "ch 4 §4.1.4 ¶2",
+     at: "Formal charge (F.C.) on an atom in", reason: "the boxed formula \"Formal charge (F.C.) on an atom in a Lewis structure = …\" is the display that \"It is expressed as :\" runs into; a display never begins a paragraph (prompt)"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 6, kind: join, address: "ch 4 §4.1.5 ¶3",
+     at: "Li, Be and B have 1, 2 and 3 valence", reason: "\"Li, Be and B have 1, 2 and 3 valence electrons only.\" is set flush after the LiCl/BeH2/BCl3 display; a flush line after a display continues the paragraph (prompt)"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 7, kind: join, address: "ch 4 §4.1.5 ¶9",
+     at: "• It is clear that octet rule is based", reason: "\"Other drawbacks of the octet theory\" is a side heading (BookmanOldStyle-BoldItal) transcribed as a row of its own; it leads the list under it (founder, 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 7, kind: join, address: "ch 4 §4.2 ¶2",
+     at: "• The ease of formation of the positive", reason: "the first bullet is a noun phrase completing \"…would primarily depend upon:\""}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 7, kind: join, address: "ch 4 §4.2 ¶3",
+     at: "• The arrangement of the positive and", reason: "the second bullet completes the same \"depend upon:\" list"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 9, kind: text, address: "ch 4 §4.3.3 ¶1",
+     transcribed: "Delta_a H^V = 435.8", printed: "Delta_a H^⊖ = 435.8", reason: "the page sets the standard-state sign in MathB code F056, which the text layer gives as \"V\"; the transcriber copied the layer — p10 reads the same glyph as ⊖"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 9, kind: text, address: "ch 4 §4.3.3 ¶2",
+     transcribed: "Delta_a H^V = 498", printed: "Delta_a H^⊖ = 498", reason: "the page sets the standard-state sign in MathB code F056, which the text layer gives as \"V\"; the transcriber copied the layer — p10 reads the same glyph as ⊖"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 9, kind: text, address: "ch 4 §4.3.3 ¶2",
+     transcribed: "Delta_a H^V = 946.0", printed: "Delta_a H^⊖ = 946.0", reason: "the page sets the standard-state sign in MathB code F056, which the text layer gives as \"V\"; the transcriber copied the layer — p10 reads the same glyph as ⊖"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 9, kind: text, address: "ch 4 §4.3.3 ¶3",
+     transcribed: "Delta_a H^V = 431.0", printed: "Delta_a H^⊖ = 431.0", reason: "the page sets the standard-state sign in MathB code F056, which the text layer gives as \"V\"; the transcriber copied the layer — p10 reads the same glyph as ⊖"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 9, kind: noise, address: "ch 4 §4.3.1 ¶3",
+     flag: "figure", at: "Some typical average bond lengths for", reason: "p9 prints the caption \"Table 4.2 Average Bond Lengths for Some Single, Double and Triple Bonds\"; the check missed it because ch 4's text layer is Caesar-shifted"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 14, kind: join, address: "ch 4 §4.4 ¶10",
+     at: "Lone pair (lp) – Lone pair (lp) > Lone", reason: "\"Lone pair (lp) – Lone pair (lp) > …\" completes \"The repulsive interaction of electron pairs decrease in the order:\", set flush under it"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 18, kind: join, address: "ch 4 §4.5 ¶5",
+     at: "Attractive forces arise between:", reason: "\"Attractive forces arise between:\" is set flush after \"…begin to operate.\" — in this book a flush line never starts a paragraph (chem12-part1 ruling); it continues \"Consider two hydrogen atoms…\""}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 18, kind: join, address: "ch 4 §4.5 ¶6",
+     at: "(i) nucleus of one atom and its own", reason: "items (i)/(ii) are noun phrases completing \"Attractive forces arise between:\""}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 19, kind: join, address: "ch 4 §4.5 ¶7",
+     at: "Similarly repulsive forces arise between", reason: "\"Similarly repulsive forces arise between\" is set flush after item (ii) at the top of p19; it continues the paragraph"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 19, kind: join, address: "ch 4 §4.5 ¶8",
+     at: "(i) electrons of two atoms like e_A", reason: "item (i) is a noun phrase completing \"Similarly repulsive forces arise between\""}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 19, kind: join, address: "ch 4 §4.5 ¶9",
+     at: "(ii) nuclei of two atoms N_A – N_B.", reason: "item (ii) completes the same list"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 21, kind: join, address: "ch 4 §4.5.4 ¶2",
+     at: "(i) Sigma(sigma) bond, and (ii) pi(pi)", reason: "\"(i) Sigma(σ) bond, and (ii) pi(π) bond\" completes \"…depending upon the types of overlapping:\""}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 22, kind: join, address: "ch 4 §4.6 ¶8",
+     at: "(i) The orbitals present in the valence", reason: "\"Important conditions for hybridisation\" is a side heading (BookmanOldStyle-Bold) transcribed as a row of its own; it leads the list under it (founder, 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 22, kind: join, address: "ch 4 §4.6.1 ¶5",
+     at: "BeCl_2: The ground state electronic", reason: "\"Example of molecule having sp hybridisation\" is a side heading (bold) transcribed as a row of its own; it leads \"BeCl2: …\" (founder, 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 22, kind: noise, address: "ch 4 §4.6 ¶5",
+     flag: "join", at: "3. The hybrid orbitals are more effective", reason: "p21 ends with item \"2. The hybridised orbitals are always equivalent in energy and shape.\" and p22 opens with the numbered item \"3.\"; a numbered item starts its own paragraph (prompt)"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 25, kind: drop, address: "ch 4 §4.6.3 ¶4",
+     at: "sp^3d hybrid orbitals filled by electron", reason: "the italic line under the PCl5 orbital-box diagram is the diagram's label, not running text (prompt: captions are not transcribed)"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 29, kind: false_positive, address: "ch 4 §4.7.4 ¶1",
+     transcribed: "pi*2p_x pi*2p_y", printed: "pi*2p_x pi2p_y", reason: "the page prints \"Antibonding MOs σ∗2s σ∗2pz π∗2px π∗2py\", as the row carries it; the verifier dropped the second star"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 30, kind: join, address: "ch 4 §4.7.5 ¶3",
+     at: "(i) the molecule is stable if N_b is", reason: "item (i) is a clause completing \"Stability of Molecules: If Nb … then\""}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 30, kind: join, address: "ch 4 §4.7.5 ¶4",
+     at: "(ii) the molecule is unstable if N_b", reason: "item (ii) completes the same sentence"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 30, kind: text, address: "ch 4 §4.7.5 ¶6",
+     transcribed: "Bond order (b.o.) is defined as one half", printed: "Bond order Bond order (b.o.) is defined as one half", reason: "the page prints the side heading \"Bond order\" (BookmanOldStyle-BoldItal) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 30, kind: text, address: "ch 4 §4.7.5 ¶8",
+     transcribed: "Integral bond order values of 1, 2 or", printed: "Nature of the bond Integral bond order values of 1, 2 or", reason: "the page prints the side heading \"Nature of the bond\" (BookmanOldStyle-BoldItal) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 30, kind: text, address: "ch 4 §4.7.5 ¶9",
+     transcribed: "The bond order between two atoms in a", printed: "Bond-length The bond order between two atoms in a", reason: "the page prints the side heading \"Bond-length\" (BookmanOldStyle-BoldItal) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 30, kind: text, address: "ch 4 §4.7.5 ¶10",
+     transcribed: "If all the molecular orbitals in a molecule", printed: "Magnetic nature If all the molecular orbitals in a molecule", reason: "the page prints the side heading \"Magnetic nature\" (BookmanOldStyle-BoldItal) above this paragraph; the transcriber dropped it"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 31, kind: misprint, address: "ch 4 §4.8 ¶13",
+     transcribed: "(pi*2p_x^1 ≡ pi *2_y^1)", printed: "(pi*2p_x^1 ≡ pi *2p_y^1)", reason: "the bracketed second configuration of O2 prints \"(π*2p¹x ≡ π*2¹y)\", its p missing; the book's own error, kept (the first configuration prints π*2p¹y, as the row carries it)"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 31, kind: false_positive, address: "ch 4 §4.8 ¶10",
+     transcribed: "molecule it is clear that there are four electrons present in bonding", printed: "molecule it is clear that there are four electrons", reason: "the page prints \"…there are four electrons present in bonding molecular orbitals…\", as the row carries it; the verifier quoted a prefix"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 31, kind: false_positive, address: "ch 4 §4.8 ¶11",
+     transcribed: "(sigma*1s)^2 (sigma * 2s)^2 (pi2p_x^2 = pi2p_y^2)", printed: "(sigma*1s)^2 (sigma * 2s)^2 (sigma*2s)^2 (pi2p_x^2 = pi2p_y^2)", reason: "the page prints C2 : (σ1s)² (σ*1s)² (σ*2s)² (π2px² = π2py²) with one σ*2s term, as the row carries it; the verifier doubled it"}
+  # chem11-part1 chapter 5
+  - {book: chem11-part1, lang: en, chapter: 5, page: 1, kind: join, address: "ch 5 §5 ¶2",
+     at: "How do we determine the energy changes involved", reason: "the three italic questions are set flush at the column margin (x236) straight after \"…through thermodynamics, like:\", which they complete; a flush line continues its paragraph (Chemistry ruling 2026-09-27) and the unboxed italic questions stay running text (v5)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 1, kind: join, address: "ch 5 §5 ¶3",
+     at: "What drives a chemical reaction/process?", reason: "the second of the three questions completing \"…like:\", set flush (x236)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 1, kind: join, address: "ch 5 §5 ¶4",
+     at: "To what extent do the chemical reactions", reason: "the third of the three questions completing \"…like:\", set flush (x236)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 5, kind: join, address: "ch 5 §5.1.4 ¶18",
+     at: "It is commonly stated as the law of conservation", reason: "set flush (x60) after the displayed statement of the first law (\"The energy of an isolated system is constant.\", indented x72), and \"It\" is that law: a flush line after a display continues the paragraph (v5)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 7, kind: join, address: "ch 5 §5.2.1 ¶7",
+     at: "Processes other than reversible processes", reason: "p7 opens flush (x60) in the same bold as p6's definition \"A process or change is said to be reversible…\", whose last line is justified at the full measure (x1 538, gaps 4.45 against the page's 3.71): the bold definition runs on"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 7, kind: misprint, address: "ch 5 §5.2.1 ¶23",
+     transcribed: "log V_f / V_s", printed: "log V_f / V_i", reason: "the page prints log V_f/V_s in Problem 5.4's Solution (the book's error for V_i); the row keeps it"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 8, kind: join, address: "ch 5 §5.2.2 ¶2",
+     at: "We know that the heat absorbed at constant", reason: "the row of its own \"(a) A Useful New State Function\" is the side heading (Bookman-DemiItalic, p8 x61 y166) over this paragraph; it leads it (side-heading ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 8, kind: join, address: "ch 5 §5.2.2 ¶14",
+     at: "Here, ∆n_g refers to the number of moles", reason: "set flush (x306) straight after the display \"p ∆V = ∆ngRT (5.9)\" (the column indents new paragraphs to x324): the sentence defining ∆n_g continues the paragraph (v5, a flush line after a display)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 8, kind: false_positive, address: "ch 5 §5.2.2 ¶8",
+     transcribed: "equation 5.7", printed: "equation (5.7)", reason: "the page prints \"equation 5.7\" without brackets (text layer); the verifier added them"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 8, kind: false_positive, address: "ch 5 §5.2.2 ¶12",
+     transcribed: "equation 5.8", printed: "equation (5.8)", reason: "the page prints \"equation 5.8\" without brackets (text layer); the verifier added them"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 8, kind: false_positive, address: "ch 5 §5.2.2 ¶15",
+     transcribed: "equation 5.9", printed: "equation (5.9)", reason: "the page prints \"equation 5.9\" without brackets (text layer); the verifier added them"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 8, kind: false_positive, address: "ch 5 §5.2.2 ¶15",
+     transcribed: "equation 5.8", printed: "equation (5.8)", reason: "the page prints \"equation 5.8\" without brackets (text layer); the verifier added them"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 8, kind: false_positive, address: "ch 5 §5.2.2 ¶16",
+     transcribed: "equation 5.10", printed: "equation (5.10)", reason: "the page prints \"equation 5.10\" without brackets (text layer); the verifier added them"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 9, kind: text, address: "ch 5 §5.2.2 ¶19",
+     transcribed: "In thermodynamics, a distinction", printed: "(b) Extensive and Intensive Properties In thermodynamics, a distinction", reason: "the page prints the side heading \"(b) Extensive and Intensive Properties\" (BookmanOldStyle-BoldItalic, p9 x60 y309) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 9, kind: text, address: "ch 5 §5.2.2 ¶21",
+     transcribed: "In this sub-section, let us see", printed: "(c) Heat Capacity In this sub-section, let us see", reason: "the page prints the side heading \"(c) Heat Capacity\" (BookmanOldStyle-BoldItalic, p9 x306 y307) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 9, kind: split, address: "ch 5 §5.2.2 ¶22",
+     at: "The magnitude of the coefficient depends", reason: "the page indents \"The magnitude of the coefficient depends…\" (x324; the column margin is x306) after the display \"q = coeff × ∆T\": a new paragraph (v5, an indented line after a display)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 9, kind: noise, address: "ch 5 §5.2.2 ¶17",
+     flag: "join", at: "Problem 5.5 If water vapour is assumed", reason: "p9 opens flush at the box margin (x79) with the rest of Problem 5.5's statement, \"…Calculate the internal energy change, when | 1 mol of water is vapourised at 1 bar pressure and 100°C.\": the row rightly runs on"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 10, kind: join, address: "ch 5 §5.2.2 ¶28",
+     at: "We can write equation for heat, q at constant", reason: "set flush (x61) after \"…Let us find the relationship between the two.\" (the column indents new paragraphs to x79): a flush line never starts a paragraph in this book except under a heading (Chemistry ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 10, kind: join, address: "ch 5 §5.3 ¶2",
+     at: "i) at constant volume, q_V ii) at constant", reason: "the two one-sentence items \"i) at constant volume, q_V ii) at constant pressure, q_p\" complete \"Measurements are made under two different conditions:\" (v5: a one-sentence item stays inside the paragraph that introduces the list)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 10, kind: text, address: "ch 5 §5.2.2 ¶27",
+     transcribed: "At constant volume, the heat capacity,", printed: "(d) The Relationship between C_p and C_V for an Ideal Gas At constant volume, the heat capacity,", reason: "the page prints the side heading \"(d) The Relationship between C_p and C_V for an Ideal Gas\" (BookmanOldStyle-BoldItalic, p10 x61 y201-214) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 10, kind: text, address: "ch 5 §5.3 ¶3",
+     transcribed: "For chemical reactions, heat absorbed", printed: "(a) Delta U Measurements For chemical reactions, heat absorbed", reason: "the page prints the side heading \"(a) Delta U Measurements\" (BookmanOldStyle-BoldItalic, p10 x306 y128) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 11, kind: join, address: "ch 5 §5.3 ¶8",
+     at: "Quantity of heat from the reaction will have", reason: "set flush in Problem 5.6's box (x318) straight after the display \"q = C_V × ∆T\": the Solution runs on (v5, a flush line after a display)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 11, kind: join, address: "ch 5 §5.3 ¶9",
+     at: "(Here, negative sign indicates the exothermic", reason: "set flush in the box (x317) straight after the display \"= – 20.7 kJ\"; the bracketed remark glosses that display"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 11, kind: text, address: "ch 5 §5.3 ¶4",
+     transcribed: "(B) Delta H Measurements", printed: "(b) Delta H Measurements", reason: "the page prints the side heading \"(b) ∆H Measurements\" with a lower-case (b), as its (a)…(f) siblings; the transcriber capitalised it"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 12, kind: text, address: "ch 5 §5.4 ¶4",
+     transcribed: "Enthalpy of a reaction depends", printed: "(a) Standard Enthalpy of Reactions Enthalpy of a reaction depends", reason: "the page prints the side heading \"(a) Standard Enthalpy of Reactions\" (BookmanOldStyle-BoldItalic, p12 x61 y313) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 12, kind: text, address: "ch 5 §5.4 ¶7",
+     transcribed: "Phase transformations also involve", printed: "(b) Enthalpy Changes during Phase Transformations Phase transformations also involve", reason: "the page prints the side heading \"(b) Enthalpy Changes during Phase Transformations\" (BookmanOldStyle-BoldItalic, p12 x306 y197-211) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 12, kind: false_positive, address: "ch 5 §5.4 ¶2",
+     transcribed: "H_m (CO_2, g) + 2H_m (H_2O, l)", printed: "H_m^i (CO_2, g) + 2H_m^i (H_2O, l)", reason: "the text layer, the prompt's character authority, prints [Hm (CO2, g) + 2Hm (H2O, l)] with no i; the stray superscript i over the product H_m's is a drawn artifact, not a character — the row follows the layer"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 13, kind: misprint, address: "ch 5 §5.4 ¶15",
+     transcribed: "H_2O(1) --vaporisation--> H_2O(g)", printed: "H_2O(l) --vaporisation--> H_2O(g)", reason: "the page prints \"H2O(1)\" with the digit 1 in Problem 5.7's reaction (the book's error for (l)); the row keeps it"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 13, kind: false_positive, address: "ch 5 §5.4 ¶15",
+     transcribed: "No. of moles in 18 g H_2O(l) is =", printed: "No. of moles in 18 g H_2O(l) is", reason: "the page prints \"No. of moles in 18 g H2O(l) is\" then the display \"= 18g / 18g mol^-1 = 1 mol\"; the = is the display's own and the verifier cut the span before it"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 14, kind: text, address: "ch 5 §5.4 ¶20",
+     transcribed: "The standard enthalpy change for", printed: "(c) Standard Enthalpy of Formation The standard enthalpy change for", reason: "the page prints the side heading \"(c) Standard Enthalpy of Formation\" (BookmanOldStyle-BoldItalic, p14 x61 y663) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 15, kind: join, address: "ch 5 §5.4 ¶26",
+     at: "Here, we can make use of standard enthalpy", reason: "p15's right column opens flush (x306; its indent is x324) straight after the left column's closing display \"CaCO3(s) → CaO(s) + CO2(g); ∆rH = ?\": the chemical-engineer problem continues"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 15, kind: text, address: "ch 5 §5.4 ¶28",
+     transcribed: "A balanced chemical equation together", printed: "(d) Thermochemical Equations A balanced chemical equation together", reason: "the page prints the side heading \"(d) Thermochemical Equations\" (BookmanOldStyle-BoldItalic, p15 x305 y377) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 15, kind: misprint, address: "ch 5 §5.4 ¶21",
+     transcribed: "CaO(s) + CO_2(g) -> CaCo_3(s)", printed: "CaO(s) + CO_2(g) -> CaCO_3(s)", reason: "the page prints \"CaCo3(s)\" (text layer); the book's error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 15, kind: misprint, address: "ch 5 §5.4 ¶26",
+     transcribed: "Delta_r H^0 = Delta_f H^0 = [CaO(s)]+ Delta_f H^0 [CO_2(g)] – Delta_f H^0 = [CaCO_3(s)]", printed: "Delta_r H^0 = Delta_f H^0 [CaO(s)]+ Delta_f H^0 [CO_2(g)] – Delta_f H^0 [CaCO_3(s)]", reason: "the page prints the stray \"=\" after both Delta_f H^0 (text layer); the book's error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 16, kind: join, address: "ch 5 §5.4 ¶34",
+     at: "Note that the coefficients used in these", reason: "set flush (x61; the column indents to x79) straight after the display \"= –33.3 kJ mol^-1\": the paragraph runs on (v5, a flush line after a display)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 16, kind: join, address: "ch 5 §5.4 ¶40",
+     at: "Although CO(g) is the major product, some", reason: "set flush (x307; the column indents to x324) straight after the display \"C (graphite,s) + 1/2 O2 (g) → CO (g); ∆rH = ?\": the paragraph runs on"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 16, kind: text, address: "ch 5 §5.4 ¶36",
+     transcribed: "We know that enthalpy is a state", printed: "(e) Hess's Law of Constant Heat Summation We know that enthalpy is a state", reason: "the page prints the side heading \"(e) Hess's Law of Constant Heat Summation\" (BookmanOldStyle-BoldItalic, p16 x306 y90-103) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 17, kind: join, address: "ch 5 §5.5 ¶3",
+     at: "Combustion reactions are exothermic in nature.", reason: "the row of its own \"(a) Standard Enthalpy of Combustion (symbol : Delta_c H^0)\" is the side heading (Bookman-DemiItalic, p17 x60 y456-468) over this paragraph; it leads it (side-heading ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 17, kind: misprint, address: "ch 5 §5.5 ¶8",
+     transcribed: "benezene is given by", printed: "benzene is given by", reason: "the page prints \"benezene\" in Problem 5.9's Solution (text layer); the book's error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 18, kind: join, address: "ch 5 §5.5 ¶11",
+     at: "In this case, the enthalpy of atomization", reason: "p18's right column opens flush (x307; its indent is x324/325) after the left column's closing display \"Na(s) → Na(g); ∆aH = 108.4 kJ mol^-1\": \"In this case\" is that reaction, the paragraph runs on"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 18, kind: text, address: "ch 5 §5.5 ¶9",
+     transcribed: "Consider the following example", printed: "(b) Enthalpy of Atomization (symbol: Delta_a H^0) Consider the following example", reason: "the page prints the side heading \"(b) Enthalpy of Atomization (symbol: Delta_a H^0)\" (Bookman-DemiItalic, p18 x61 y415-426) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 18, kind: text, address: "ch 5 §5.5 ¶12",
+     transcribed: "Chemical reactions involve the", printed: "(c) Bond Enthalpy (symbol: Delta_bond H^0) Chemical reactions involve the", reason: "the page prints the side heading \"(c) Bond Enthalpy (symbol: Delta_bond H^0)\" (Bookman-DemiItalic, p18 x307 y125) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 18, kind: false_positive, address: "ch 5 §5.5 ¶8",
+     transcribed: "6CO_2(g) + 3H_2O(l) -> C_6H_6(l) + 15/2 O_2", printed: "6CO_2(g) + 3H_2O(l) -> C_6H_6(l) + 15/2 O_2(g)", reason: "the page prints \"+ 15/2 O2;\" with no (g); the verifier added it"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 19, kind: join, address: "ch 5 §5.5 ¶19",
+     at: "For example in CH_4, Delta_(C–H)H^0 is calculated", reason: "set flush (x60; the column indents to x78) after \"…mean bond enthalpy of C – H bond.\": a flush line never starts a paragraph here except under a heading (Chemistry ruling 2026-09-27); \"For example\" illustrates that sentence"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 20, kind: join, address: "ch 5 §5.5 ¶31",
+     at: "You have learnt about ionization enthalpy", reason: "set at item 4's text indent (x325, every line, no first-line indent) under \"4. Cl(g) + e^-(g) → Cl^-(g) … = – 348.6 kJ mol^-1.\": the block continues item 4"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 20, kind: text, address: "ch 5 §5.5 ¶31",
+     transcribed: "(see the box for justification).", printed: "(see the box for justification). Ionization Energy and Electron Affinity Ionization energy and electron affinity are defined at absolute zero. At any other temperature, heat capacities for the reactants and the products have to be taken into account. Enthalpies of reactions for M(g) -> M^+(g) + e^- (for ionization) M(g) + e^- -> M^-(g) (for electron gain) at temperature, T is Delta_r H^0(T) = Delta_r H^0(0) + integral(0 to T) Delta_r C_p^0 dT The value of C_p for each species in the above reaction is 5/2 R (C_V = 3/2R) So, Delta_r C_p^0 = + 5/2 R (for ionization) Delta_r C_p^0 = – 5/2 R (for electron gain) Therefore, Delta_r H^0 (ionization enthalpy) = E_0 (ionization energy) + 5/2 RT Delta_r H^0 (electron gain enthalpy) = – A( electron affinity) – 5/2 RT", reason: "the tinted box \"Ionization Energy and Electron Affinity\" (x318 y389-643), set after this paragraph and before item 5, was skipped whole; it is the justification the paragraph points to, so it is corpus text (v5 keeps an explanatory box; its title leads it, DECISIONS 2026-09-28) — transcribed from the text layer and the image in the chapter's notation (^0 for the standard-state sign, \"integral(0 to T)\" per v5)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 20, kind: split, address: "ch 5 §5.5 ¶31",
+     at: "Ionization Energy and Electron Affinity Ionization energy", reason: "the box is its own paragraph, after the one that points to it (applies after the text entry above)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 22, kind: join, address: "ch 5 §5.6 ¶4",
+     at: "A spontaneous process is an irreversible", reason: "the bold-italic statement is displayed (x319) under \"…We may summarise it as follows:\", which it completes (v5: a display belongs to the paragraph it follows; cf. p5's first-law statement kept in its paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 22, kind: figure_ref, address: "ch 5 §5.6 ¶5",
+     at: "(a) Is Decrease in Enthalpy a Criterion for Spontaneity ?", remove: "Fig. 5.10(a)", reason: "this paragraph never mentions Fig. 5.10(a); the next one (\"…as shown in Fig. 5.10(a).\") does and carries the label"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 22, kind: false_positive, address: "ch 5 §5.6 ¶5",
+     transcribed: "1/2 N_2(g) + 3/2 H_2(g) = NH_3(g)", printed: "1/2 N_2(g) + 1/2 H_2(g) = NH_3(g)", reason: "the page prints an empty fraction bar before H2, no numerals in the image or the layer; the verifier's 1/2 is its own guess, and the row's 3/2 stays (founder, 2026-09-29: a blank carries nothing to restore)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 23, kind: text, address: "ch 5 §5.6 ¶11",
+     transcribed: "Then, what drives the spontaneous", printed: "(b) Entropy and Spontaneity Then, what drives the spontaneous", reason: "the page prints the side heading \"(b) Entropy and Spontaneity\" (BookmanOldStyle-BoldItalic, p23 x60 y563) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 24, kind: join, address: "ch 5 §5.6 ¶29",
+     at: "(i) After freezing, the molecules attain", reason: "the row of its own \"Solution\" is Problem 5.10's label (bold, p24 x318 y597); a label is the first words of its paragraph (v5) and item (i), one sentence, stays with it"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 26, kind: join, address: "ch 5 §5.6 ¶46",
+     at: "Using equation 5.21, the above equation can", reason: "set flush (x61; the column indents to x79) straight after the display \"– (∆Hsys – T∆Ssys) > 0\": the derivation runs on (v5)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 26, kind: text, address: "ch 5 §5.6 ¶52",
+     transcribed: "We know that for an isolated system", printed: "(d) Entropy and Second Law of Thermodynamics We know that for an isolated system", reason: "the page prints the side heading \"(d) Entropy and Second Law of Thermodynamics\" (BookmanOldStyle-Bold, p26 x306 y151-163) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 26, kind: text, address: "ch 5 §5.6 ¶53",
+     transcribed: "Molecules of a substance may move", printed: "(e) Absolute Entropy and Third Law of Thermodynamics Molecules of a substance may move", reason: "the page prints the side heading \"(e) Absolute Entropy and Third Law of Thermodynamics\" (BookmanOldStyle-Bold, p26 x306 y377-390) above this paragraph; the transcriber dropped it — it leads the paragraph (side-heading ruling, DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 27, kind: join, address: "ch 5 §5.7 ¶2",
+     at: "(i) Prediction of the spontaneity of the", reason: "item (i) completes \"…of a chemical reaction allows:\"; a one-sentence item stays inside the paragraph that introduces it (v5)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 27, kind: join, address: "ch 5 §5.7 ¶3",
+     at: "(ii) Prediction of the useful work that could", reason: "item (ii) completes \"…allows:\", one sentence"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 28, kind: join, address: "ch 5 §5.7 ¶11",
+     at: "(ii) If K is measured directly in the laboratory,", reason: "item (ii) is the second one-sentence item under p27's \"Using equation (5.24),\", whose item (i) the row already carries (v5)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 28, kind: join, address: "ch 5 §5.7 ¶12",
+     at: "Using equation (5.24),", reason: "the page repeats \"Using equation (5.24),\" at item (ii)'s text indent (x83, no first-line indent) with nothing after it before the Problem boxes; set inside item (ii)'s block, it continues it — the row keeps the book's repetition"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 28, kind: join, address: "ch 5 §5.7 ¶20",
+     at: "If N_2O_4 is 50% dissociated, the mole fraction", reason: "set flush in Problem 5.14's box (x319) straight after the Solution's display \"N2O4(g) ⇌ 2NO2(g)\": the Solution runs on (v5)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 28, kind: join, address: "ch 5 §5.7 ¶21",
+     at: "The equilibrium constant K_p is given by", reason: "set flush in the box (x319) straight after the displayed mole fractions and partial pressures"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 28, kind: join, address: "ch 5 §5.7 ¶22",
+     at: "Since Delta_r G^0 = –RT ln K_p Delta_r G^0", reason: "set flush in the box (x318) straight after the display \"= 1.33 atm.\""}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 28, kind: false_positive, address: "ch 5 §5.7 ¶21",
+     transcribed: "K_p = (p_(NO_2))^2 / p_(N_2O_4) = 1.5 / ((1.5)^2 (0.5))", printed: "K_p = (p_(NO_2))^2 / p_(N_2O_4) = (1.5) / ((1.5)^2 (0.5))", reason: "the page prints the numerator 1.5 without brackets; the verifier added them"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 28, kind: noise, address: "ch 5 §5.7 ¶10",
+     flag: "join", at: "Using equation (5.24), (i) It is possible", reason: "p27 ends \"Using equation (5.24),\" and p28's item (i) completes it: the row rightly runs on (item (ii) joins it above)"}
+  # chem11-part1 chapter 6
+  - {book: chem11-part1, lang: en, chapter: 6, page: 3, kind: join, address: "ch 6 §6.1.2 ¶2",
+     at: "However, the rate of increase in pressure", reason: "p3 opens (under the page-wide Fig. 6.1) flush at x60 against the 78 indent, continuing p2's \"The rate of evaporation is constant.\" paragraph about the box; the print runs on"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 4, kind: join, address: "ch 6 §6.1.4 ¶2",
+     at: "We know from our experience that we can dissolve", reason: "the side heading \"Solids in liquids\" (BookmanOldStyle-BoldItal, a row of its own) leads this paragraph (DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 4, kind: join, address: "ch 6 §6.1.4 ¶5",
+     at: "When a soda water bottle is opened, some of the", reason: "the side heading \"Gases in liquids\" (BookmanOldStyle-BoldItal, a row of its own) leads this paragraph (DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 5, kind: text, address: "ch 6 §6.2 ¶6",
+     transcribed: "instead of H_2 and NH_3. After", printed: "instead of H_2 and NH_3. After equilibrium is attained, these two mixtures (H_2, N_2, NH_3 and D_2, N_2, ND_3) are mixed together and left for a while. Later, when this mixture is analysed, it is found that the concentration of ammonia is just the same as before. However, when this mixture is analysed by a mass spectrometer, it is found that ammonia and all deuterium containing forms of ammonia (NH_3, NH_2D, NHD_2 and ND_3) and dihydrogen and its deutrated forms (H_2, HD and D_2) are present. Thus one can conclude that scrambling of H and D atoms in the molecules must result from a continuation of the forward and reverse reactions in the mixture. If the reaction had simply stopped when they reached equilibrium, then there would have been no mixing of isotopes in this way.", reason: "p5 ends \"…instead of H2 and NH3. After\" and the sentence resumes at the top of p7, \"equilibrium is attained, these two mixtures…\"; the p6 activity box between them made the load run p7's text onto the box's last paragraph. The rest of the sentence, as transcribed on p7, moves onto p5's row (as chem12-part2's Example 6.5)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 6, kind: drop, address: "ch 6 §6.2",
+     at: "Equilibrium whether in a physical or in a chemical system", reason: "the tinted box \"Dynamic Equilibrium – A Student's Activity\" asks the students to carry out the activity; v5 leaves it out (founder, 2026-09-29)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 6, kind: drop, address: "ch 6 §6.2",
+     at: "Take two 100mL measuring cylinders", reason: "the tinted box \"Dynamic Equilibrium – A Student's Activity\" asks the students to carry out the activity; v5 leaves it out (founder, 2026-09-29)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 6, kind: drop, address: "ch 6 §6.2",
+     at: "Put one tube in cylinder 1 and second", reason: "the tinted box \"Dynamic Equilibrium – A Student's Activity\" asks the students to carry out the activity; v5 leaves it out (founder, 2026-09-29)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 7, kind: split, address: "ch 6 §6.2 ¶10",
+     at: "equilibrium is attained, these two mixtures", reason: "p7's first paragraph is flagged as continuing p6, whose last paragraph is the activity box; clearing the flag lets the drop below remove it (its text is moved onto p5 by the text correction above)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 7, kind: drop, address: "ch 6 §6.2 ¶10",
+     at: "equilibrium is attained, these two mixtures", reason: "moved onto p5's row by the text correction above"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 6, kind: drop, address: "ch 6 §6.2",
+     at: "If you continue intertransferring coloured solution", reason: "the tinted box \"Dynamic Equilibrium – A Student's Activity\" asks the students to carry out the activity; v5 leaves it out (founder, 2026-09-29)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 7, kind: false_positive, address: "ch 6 §6.2 ¶12",
+     transcribed: "N_2(g) + 3H_2(g) <-> 2NH_3(g) 2NH_3(g) <-> N_2(g) + 3H_2(g)", printed: "N_2(g) + 3H_2(g) <-> 2NH_3(g)", reason: "the page prints both equations, N2(g) + 3H2(g) ⇌ 2NH3(g) at the foot of the left column and 2NH3(g) ⇌ N2(g) + 3H2(g) at the top of the right; the row carries both"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 8, kind: misprint, address: "ch 6 §6.3 ¶2",
+     transcribed: "(6.1) (6.1)", printed: "(6.1)", reason: "the page prints a stray \"(6.1)\" at the start of the line after equation (6.1) (\"(6.1) where Kc is the equilibrium constant\"); the row keeps the book's repeat"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 9, kind: false_positive, address: "ch 6 §6.3 ¶16",
+     transcribed: "K'_c = [H_2] [I_2]", printed: "K_c = [H_2] [I_2]", reason: "the page prints K′c (layer \"K′ c = [H2] [I2] / [HI]2\"); K'_c is the prime as printed"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 9, kind: false_positive, address: "ch 6 §6.3 ¶18",
+     transcribed: "K''_c = [HI]", printed: "K_c = [HI]", reason: "the page prints K″c (layer \"K″c = [HI] / [H2]1/2[I2]1/2\"); K''_c is the double prime as printed"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 10, kind: join, address: "ch 6 §6.4.1 ¶3",
+     at: "Here, p is the pressure in Pa, n is the number of moles", reason: "the where-clause for the display \"pV = nRT ⇒ p = (n/V) RT\", set flush at x306 straight after it; the row before is only its introducing clause and display"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 11, kind: false_positive, address: "ch 6 §6.4.1 ¶7",
+     transcribed: "[H_2(g)]^3 (RT)^3)", printed: "[H_2(g)]^3 (RT)^3", reason: "the closing bracket ends the fraction's denominator \"([N_2(g)]RT.[H_2(g)]^3 (RT)^3)\", which the row opened at \"/ (\"; the page prints the same denominator"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 12, kind: join, address: "ch 6 §6.4.1 ¶18",
+     at: "the value 0.194 should be neglected because it will", reason: "a lower-case row after the display \"x_2 = … = 0.194\" continues the row before (Chemistry ruling 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 12, kind: join, address: "ch 6 §6.4.1 ¶15",
+     at: "Let x mole per litre of each of the product be formed.", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 12, kind: join, address: "ch 6 §6.4.1 ¶16",
+     at: "At equilibrium: (0.1-x) M (0.1-x) M x M x M", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 12, kind: join, address: "ch 6 §6.4.1 ¶17",
+     at: "Hence, equilibrium constant can be written as,", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 12, kind: join, address: "ch 6 §6.4.1 ¶19",
+     at: "Hence the equilibrium concentrations are,", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 12, kind: text, address: "ch 6 §6.4.1 ¶19",
+     transcribed: "[CO_2] = [H_2] = x", printed: "[CO_2] = [H_2-] = x", reason: "the page prints \"[H2-]\" (the book's own garble, read against the page); the transcriber silently corrected it, and the corpus keeps the book's print (founder, 2026-09-29)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 12, kind: false_positive, address: "ch 6 §6.4.1 ¶19",
+     transcribed: "[H_2.] = x", printed: "[H_2] = x", reason: "the row carries \"[CO_2] = [H_2] = x = 0.067 M\"; the verifier invented the \"[H_2.]\" it claims to correct (the page itself prints \"[H2-]\")"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 13, kind: join, address: "ch 6 §6.5 ¶8",
+     at: "N_2O_4(g) <-> 2NO_2 (g), K_c has unit mol/L and K_p has unit bar", reason: "a fragment that completes the sentence introducing the list, joined into it (founder, 2026-09-29: list items by corpus practice — complete-sentence items stay rows)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 16, kind: misprint, address: "ch 6 §6.6.3 ¶8",
+     transcribed: "equilibrium", printed: "equilbrium", reason: "the page prints \"The total pressure at equilbrium was\" (layer p16 R y97); the row keeps the book's misspelling and its later, correct \"equilibrium\""}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 17, kind: join, address: "ch 6 §6.7 ¶2",
+     at: "• ΔG is negative, then the reaction is spontaneous", reason: "a fragment that completes the sentence introducing the list, joined into it (founder, 2026-09-29: list items by corpus practice — complete-sentence items stay rows)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 17, kind: join, address: "ch 6 §6.7 ¶3",
+     at: "• ΔG is positive, then reaction is considered", reason: "a fragment that completes the sentence introducing the list, joined into it (founder, 2026-09-29: list items by corpus practice — complete-sentence items stay rows)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 17, kind: join, address: "ch 6 §6.7 ¶4",
+     at: "• ΔG is 0, reaction has achieved equilibrium;", reason: "a fragment that completes the sentence introducing the list, joined into it (founder, 2026-09-29: list items by corpus practice — complete-sentence items stay rows)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 17, kind: text, address: "ch 6 §6.7 ¶9",
+     transcribed: "e^(–ΔG^⊖/RT) >1", printed: "e–ΔDG^⊖/RT>1", reason: "the page prints \"e–ΔDG⊖/RT>1\", a stray D (the book's own garble, read against the page); the transcriber silently corrected it, and the corpus keeps the book's print (founder, 2026-09-29)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 17, kind: text, address: "ch 6 §6.7 ¶10",
+     transcribed: "e^(–ΔG^⊖/RT) < 1", printed: "e–ΔG^⊖</RT 1", reason: "the page prints \"e–ΔG⊖</RT 1\", the < set inside the exponent (the book's own garble, read against the page); the transcriber silently corrected it, and the corpus keeps the book's print (founder, 2026-09-29)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 17, kind: false_positive, address: "ch 6 §6.7 ¶10",
+     transcribed: "< 1, that is", printed: "K < 1, that is", reason: "the row carries the page's \"e^(–ΔG^⊖/RT) < 1, that is , K < 1\"; the verifier quoted two fragments of the same line"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 18, kind: join, address: "ch 6 §6.8.1 ¶4",
+     at: "\"When the concentration of any of the reactants", reason: "the bullet row ends \"…replenishes the removed substance. or in other words,\" and the quoted statement at the top of the right column completes the sentence"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 19, kind: join, address: "ch 6 §6.8.2 ¶3",
+     at: "Here, 4 mol of gaseous reactants (CO + 3H_2)", reason: "the comment on the display \"CO(g) + 3H2(g) ⇌ CH4(g) + H2O(g)\", set flush at x305 straight after it; the row before is only \"Consider the reaction,\" and the display"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 19, kind: text, address: "ch 6 §6.8.1 ¶9",
+     transcribed: "This can be demonstrated by the following reaction:", printed: "Effect of Concentration – An experiment This can be demonstrated by the following reaction:", reason: "the page prints the side heading \"Effect of Concentration – An experiment\" (BookmanOldStyle-BoldItal) above it; the transcriber dropped it, while keeping p20's twin \"Effect of Temperature – An experiment\" (DECISIONS 2026-09-27)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 20, kind: misprint, address: "ch 6 §6.8.4 ¶8",
+     transcribed: "freesing mixture", printed: "freezing mixture", reason: "the page prints \"freesing mixture\" (layer p20 y412), as p21 does again; the row keeps it"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 24, kind: false_positive, address: "ch 6 §6.10.2 ¶3",
+     transcribed: "NH_4^+ acts as a Bronsted acid while OH^– acted as a Brönsted base", printed: "NH_4^+ acts as a Bronsted acid while OH– acted as a Brönsted base", reason: "the row writes the charge as a superscript, OH^–, the prompt's notation for the page's OH–; both spellings Bronsted/Brönsted are the page's"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 24, kind: false_positive, address: "ch 6 §6.10.2 ¶3",
+     transcribed: "acts as a Bronsted acid while OH– acted as a Brönsted base", printed: "acts as a Bronsted acid", reason: "the page prints the whole sentence \"NH4+ acts as a Bronsted acid while OH– acted as a Brönsted base\" (text layer); the verifier cut it short"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 25, kind: join, address: "ch 6 §6.10.3 ¶5",
+     at: "(a) HO^– (b) F^– (c) H^+ (d) BCl_3", reason: "Problem 6.15's statement ends \"…show how these act as such:\" and the species list completes it on the next line"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 25, kind: join, address: "ch 6 §6.10.3 ¶7",
+     at: "(a) Hydroxyl ion is a Lewis base as it can donate", reason: "the label \"Solution\" (a row of its own) leads the solution, as the prompt sets \"Solution …\" as the first words of its paragraph"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 27, kind: split, address: "ch 6 §6.11.2 ¶6",
+     at: "Note that although K_w may change with temperature", reason: "indented at x78 straight after display (6.29): the print starts a new paragraph (prompt: after a display, an indented line starts the next one)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 29, kind: join, address: "ch 6 §6.11.3 ¶12",
+     at: "(a) Initial concentration, c.", reason: "a fragment that completes the sentence introducing the list, joined into it (founder, 2026-09-29: list items by corpus practice — complete-sentence items stay rows)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 29, kind: join, address: "ch 6 §6.11.3 ¶13",
+     at: "(b) Change in concentration on proceeding", reason: "a fragment that completes the sentence introducing the list, joined into it (founder, 2026-09-29: list items by corpus practice — complete-sentence items stay rows)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 29, kind: join, address: "ch 6 §6.11.3 ¶14",
+     at: "(c) Equilibrium concentration.", reason: "a fragment that completes the sentence introducing the list, joined into it (founder, 2026-09-29: list items by corpus practice — complete-sentence items stay rows)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 29, kind: join, address: "ch 6 §6.11.3 ¶21",
+     at: "Substituting equilibrium concentrations in the equilibrium", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 29, kind: join, address: "ch 6 §6.11.3 ¶22",
+     at: "We obtain the following quadratic equation:", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 29, kind: join, address: "ch 6 §6.11.3 ¶23",
+     at: "The quadratic equation in alpha can be solved", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 29, kind: join, address: "ch 6 §6.11.3 ¶24",
+     at: "The negative root is not acceptable and hence", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 29, kind: join, address: "ch 6 §6.11.3 ¶25",
+     at: "This means that the degree of ionization, alpha = 0.12", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 31, kind: join, address: "ch 6 §6.11.4 ¶9",
+     at: "From the pH we can calculate the hydrogen ion", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 31, kind: join, address: "ch 6 §6.11.4 ¶10",
+     at: "The concentration of the corresponding hydrazinium ion", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 31, kind: join, address: "ch 6 §6.11.4 ¶11",
+     at: "Thus, K_b = [NH_2NH_3^+][OH^-] / [NH_2NH_2]", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 31, kind: join, address: "ch 6 §6.11.4 ¶14",
+     at: "As K_b is small, we can neglect x in comparison", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 31, kind: false_positive, address: "ch 6 §6.11.4 ¶13",
+     transcribed: "K_b = antilog (-pK_b) i.e. K_b = 10^-4.75 = 1.77 × 10^-5 M", printed: "K_b = 10^-4.75 = 1.77 × 10^-5 M", reason: "the page sets \"Kb = antilog (–pKb) i.e.\" at the foot of the left column and \"Kb = 10–4.75 = 1.77 × 10–5 M\" at the top of the right; the row carries both"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 33, kind: split, address: "ch 6 §6.11.7 ¶3",
+     at: "Similarly, H_2S is stronger acid than H_2O.", reason: "indented at x324 straight after the \"Size increases / HF << HCl << HBr << HI / Acid strength increases\" display: a paragraph of its own"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 33, kind: figure_ref, address: "ch 6 §6.11.6 ¶3",
+     at: "Here, K_a1 and K_a2 are called the first and second", add: "Table 6.8", reason: "the paragraph ends \"…are given in Table 6.8.\" and names it; the label was carried by the next row instead"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 33, kind: figure_ref, address: "ch 6 §6.11.6 ¶4",
+     at: "It can be seen that higher order ionization constants", remove: "Table 6.8", reason: "the paragraph never names Table 6.8; the row before it does and now carries it"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 33, kind: false_positive, address: "ch 6 §6.11.6 ¶3",
+     transcribed: "[HX^-]", printed: "[HX-]", reason: "the row writes the charge as a superscript, [HX^-], the prompt's notation for the page's [HX–]"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 34, kind: join, address: "ch 6 §6.11.8 ¶7",
+     at: "On addition of 25 mL of 0.1M HCl solution", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 34, kind: join, address: "ch 6 §6.11.8 ¶8",
+     at: "The resulting 75 mL of solution contains 2.5 mmol", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 34, kind: join, address: "ch 6 §6.11.8 ¶9",
+     at: "The final 75 mL solution after neutralisation", reason: "the worked Solution is set in a tinted box with every line flush, so the print makes no paragraph break inside it; one flowing derivation is one paragraph (ncert_extract v5) (founder, 2026-09-29: a worked Solution set flush in its box is one paragraph)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 34, kind: false_positive, address: "ch 6 §6.11.8 ¶6",
+     transcribed: "7.51 × 10^-12) = 11.12", printed: "7.51 × 10^-12) = 9.24", reason: "the page prints \"pH = –log (7.5 × 10–12) = 11.12\" (text layer), as the row carries it; 9.24 is the next Problem's answer"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 35, kind: join, address: "ch 6 §6.11.9 ¶3",
+     at: "(i) salts of weak acid and strong base e.g., CH_3COONa.", reason: "a fragment that completes the sentence introducing the list, joined into it (founder, 2026-09-29: list items by corpus practice — complete-sentence items stay rows)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 35, kind: join, address: "ch 6 §6.11.9 ¶4",
+     at: "(ii) salts of strong acid and weak base e.g., NH_4Cl, and", reason: "a fragment that completes the sentence introducing the list, joined into it (founder, 2026-09-29: list items by corpus practice — complete-sentence items stay rows)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 35, kind: join, address: "ch 6 §6.11.9 ¶5",
+     at: "(iii) salts of weak acid and weak base, e.g., CH_3COONH_4.", reason: "a fragment that completes the sentence introducing the list, joined into it (founder, 2026-09-29: list items by corpus practice — complete-sentence items stay rows)"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 36, kind: misprint, address: "ch 6 §6.12.1 ¶8",
+     transcribed: "pK_a value for ammonia is s9.25", printed: "pK_a value for ammonia is 9.25", reason: "the page prints \"pKa value for ammonia is s9.25;\" (layer and image); the row keeps the book's stray \"s\""}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 36, kind: false_positive, address: "ch 6 §6.12.1 ¶8",
+     transcribed: "pH of the buffer solution will be same as pK_a for the base.", printed: "pH of the buffer solution will be same as pK_a for the", reason: "the page prints \"…will be same as pKa for the base.\" across two lines; the row carries the whole sentence"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 38, kind: false_positive, address: "ch 6 §6.13.1 ¶8",
+     transcribed: "S^(x + y) S^(x + y) = K_sp / x^x . y^y", printed: "S^(x + y) = K_sp / x^x . y^y", reason: "the page ends one line \"= xx . yy . S(x + y)\" and starts the next \"S(x + y) = Ksp / xx . yy\"; the row carries both"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 38, kind: false_positive, address: "ch 6 §6.13.1 ¶11",
+     transcribed: "A_2X_3 -> 2A^3+ + 3X^2-", printed: "A_2X_3 <-> 2A^3+ + 3X^2-", reason: "the page prints a single arrow, \"A2X3 → 2A3+ + 3X2–\", as the row carries it"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 38, kind: noise, address: "ch 6 §6.13.1 ¶7",
+     flag: "join", at: "A solid salt of the general formula M_x^(p+) X_y^(q-)", reason: "p38 opens indented at x79 against the 61 margin, after p37's display \"S = {Ksp / (3^3 × 4^4)}^(1/7)\"; the print starts a new paragraph there, as the row does"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 38, kind: noise, address: "ch 6 §6.13.1 ¶9",
+     flag: "figure", at: "The term K_sp in equation is given by Q_sp", reason: "the page prints the caption \"Table 6.9 The Solubility Product Constants, Ksp of Some Common Ionic Salts at 298K.\" (right column top); the check missed it"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 39, kind: misprint, address: "ch 6 §6.13.2 ¶5",
+     transcribed: "{[HX] + [H^-]}", printed: "{[HX] + [H^+]}", reason: "the page prints \"[HX] + [H–]\" over [X–] (for [HX] + [X–]); the row keeps the book's error and the verifier corrected it to [H+]"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 39, kind: false_positive, address: "ch 6 §6.13.2 ¶3",
+     transcribed: "increase in turn", printed: "increase", reason: "the page prints \"This in turn increase the solubility of the salt\" in the next paragraph (text layer); the verifier filed a garbled claim under the Solution"}

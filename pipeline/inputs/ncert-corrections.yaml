@@ -1973,3 +1973,67 @@ corrections:
      transcribed: "{[HX] + [H^-]}", printed: "{[HX] + [H^+]}", reason: "the page prints \"[HX] + [H–]\" over [X–] (for [HX] + [X–]); the row keeps the book's error and the verifier corrected it to [H+]"}
   - {book: chem11-part1, lang: en, chapter: 6, page: 39, kind: false_positive, address: "ch 6 §6.13.2 ¶3",
      transcribed: "increase in turn", printed: "increase", reason: "the page prints \"This in turn increase the solubility of the salt\" in the next paragraph (text layer); the verifier filed a garbled claim under the Solution"}
+  # chem11-part1, the re-read of the 82 changed pages (-ncert-verify-6): 30 flags and one misquoted claim, none a
+  # transcription defect — 9 of the book's own errors kept, 21 of the verifier's habits.
+  - {book: chem11-part1, lang: en, chapter: 1, page: 11, kind: false_positive, address: "ch 1 §1.4 ¶4",
+     transcribed: "1.65076373 × 10^6 times", printed: "1.65076373 × 10^6", reason: "the restored box prints \"…defined as 1.65076373 × 10^6 times the wavelength…\" (text layer), as the row carries it; the verifier quoted a prefix"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 12, kind: misprint, address: "ch 1 §1.4.2 ¶7",
+     transcribed: "100 has only one significant figure, but 100 has three significant figures and 100.0 has four significant figures", printed: "100 has only one significant figure, but 100.0 has three significant figures and 100.0 has four significant figures", reason: "the page prints \"but 100 has three significant figures\" (text layer and image), the book's slip for \"100.\"; the row keeps it and the verifier corrected it"}
+  - {book: chem11-part1, lang: en, chapter: 1, page: 22, kind: false_positive, address: "ch 1 §1.10.2 ¶16",
+     transcribed: "N_2 (g) + 3H_2 (g) <-> 2 NH_3 (g)", printed: "N_2 (g) + 3H_2 (g) ⇌ 2 NH_3 (g)", reason: "the page prints ⇌; <-> is the prompt's equilibrium arrow"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 4, kind: false_positive, address: "ch 2 §2.1.4 ¶6",
+     transcribed: "by alpha-particles", printed: "by α-particles", reason: "the page prints α; the prompt writes a Greek letter by name, alpha"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 9, kind: misprint, address: "ch 2 §2.3.1 ¶2",
+     transcribed: "under accelaration, alternating", printed: "under acceleration, alternating", reason: "the page prints \"under accelaration, alternating\" (text layer); the book's own typo, kept"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: false_positive, address: "ch 2 §2.3.2 ¶16",
+     transcribed: "frequency (nu_0) for", printed: "frequency (v_0) for", reason: "the page prints the Greek letter; the prompt writes it by name — the verifier read the glyph literally (ν as v)"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: false_positive, address: "ch 2 §2.3.2 ¶18",
+     transcribed: "energy equal to h nu and", printed: "energy equal to hv and", reason: "the page prints the Greek letter; the prompt writes it by name — the verifier read the glyph literally (ν as v)"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: false_positive, address: "ch 2 §2.3.2 ¶18",
+     transcribed: "eject the electron is h nu_0", printed: "eject the electron is hv_0", reason: "the page prints the Greek letter; the prompt writes it by name — the verifier read the glyph literally (ν as v)"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: false_positive, address: "ch 2 §2.3.2 ¶18",
+     transcribed: "energy (h nu – h nu_0) is transferred", printed: "energy (hv – hv_0) is transferred", reason: "the page prints the Greek letter; the prompt writes it by name — the verifier read the glyph literally (ν as v)"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 14, kind: false_positive, address: "ch 2 §2.3.2 ¶18",
+     transcribed: "h nu = h nu_0 + (1/2) m_e v^2 (2.7)", printed: "hv = hv_0 + (1/2) m_e v^2 (2.7)", reason: "the page prints the Greek letter; the prompt writes it by name — the verifier read the glyph literally (ν as v)"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 18, kind: false_positive, address: "ch 2 §2.4 ¶5",
+     transcribed: "iii) The frequency of radiation absorbed or", printed: "iii) The frequency", reason: "the page prints \"iii) The frequency of radiation absorbed or emitted…\", as the row carries it; the verifier quoted a prefix"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 24, kind: false_positive, address: "ch 2 §2.5.2 ¶11",
+     transcribed: "∆x m∆v = h / 4pi", printed: "∆x m∆v = h/4π", reason: "the page prints π; the prompt writes a Greek letter by name, pi"}
+  - {book: chem11-part1, lang: en, chapter: 2, page: 29, kind: misprint, address: "ch 2 §2.6.1 ¶21",
+     transcribed: "m_l = –2, –1, 0, +1+, +2", printed: "m_l = –2, –1, 0, +1, +2", reason: "the page prints \"ml = –2, –1, 0, +1+, +2\" (the book's own error, ruled on the first read's spans too); the row keeps it"}
+  - {book: chem11-part1, lang: en, chapter: 3, page: 20, kind: false_positive, address: "ch 3 §3.7.2 ¶9",
+     transcribed: "form p_pi – p_pi multiple bonds", printed: "form p_pi – p_pi multiple", reason: "the page prints \"…form pπ – pπ multiple bonds…\", as the row carries it; the verifier quoted a prefix"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 7, kind: false_positive, address: "ch 4 §4.2 ¶7",
+     transcribed: "147.1 kJ mol^-1", printed: "147.1 kJ mol-1", reason: "the page sets the exponent as a superscript; ^ is the prompt's superscript"}
+  - {book: chem11-part1, lang: en, chapter: 4, page: 7, kind: false_positive, address: "ch 4 §4.2 ¶7",
+     transcribed: "NaCl(s) (–788 kJ mol^-1)", printed: "NaCl(s) (–788 kJ mol-1)", reason: "the page sets the exponent as a superscript; ^ is the prompt's superscript"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 11, kind: false_positive, address: "ch 5 §5.3 ¶7",
+     transcribed: "– 20.7 kJK^-1", printed: "– 20.7 kJK–1", reason: "the page sets the exponent as a superscript; ^ is the prompt's superscript"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 12, kind: false_positive, address: "ch 5 §5.4 ¶2",
+     transcribed: "[H_m (CO_2, g) + 2H_m (H_2O, l)]", printed: "[H_m^i (CO_2, g) + 2H_m^i (H_2O, l)]", reason: "the text layer, the prompt's character authority, prints Hm with no i; the stray superscript over the product H_m's is a drawn artifact, not a character (ruled on the first read's spans too)"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 14, kind: false_positive, address: "ch 5 §5.4 ¶19",
+     transcribed: "Delta n_g RT", printed: "Delta ng RT", reason: "the page sets ∆ng with the g as a subscript; n_g is the prompt's subscript"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 15, kind: misprint, address: "ch 5 §5.4 ¶25",
+     transcribed: "Delta_r H^0 = Delta_f H^0 = [CaO(s)]+ Delta_f H^0 [CO_2(g)]", printed: "Delta_r H^0 = [CaO(s)]+ Delta_f H^0 [CO_2(g)]", reason: "the page prints the stray \"=\" after Delta_f H^0 (text layer; ruled on the first read's spans too); the book's error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 15, kind: misprint, address: "ch 5 §5.4 ¶25",
+     transcribed: "– Delta_f H^0 = [CaCO_3(s)]", printed: "– Delta_f H^0 [CaCO_3(s)]", reason: "the page prints the stray \"=\" after Delta_f H^0 (text layer; ruled on the first read's spans too); the book's error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 16, kind: false_positive, address: "ch 5 §5.4 ¶32",
+     transcribed: "Delta_f H_1^0 = 3(–285.83", printed: "Delta_r H_1^0 = 3(–285.83", reason: "the text layer prints \"∆f H1\" at p16 y261, as the row carries it (the first read agreed); the verifier misread the subscript"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 16, kind: false_positive, address: "ch 5 §5.4 ¶32",
+     transcribed: "Delta_f H_2^0 = 3/2", printed: "Delta_r H_2^0 = 3/2", reason: "the text layer prints ∆f for H2 as for H1, as the row carries it (the first read agreed); the verifier misread the subscript"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 17, kind: misprint, address: "ch 5 §5.5 ¶7",
+     transcribed: "Delta_C H^0 = – 285.83 kJ mol^-1... (iv)", printed: "Delta_f H^0 = – 285.83 kJ mol^-1... (iv)", reason: "Problem 5.9's box prints \"∆cH⊖ = – 285.83 kJ mol–1… (iv)\" for the enthalpy of formation of water (image), the book's slip for ∆f; the row keeps it"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 24, kind: misprint, address: "ch 5 §5.6 ¶28",
+     transcribed: "the contituent particles", printed: "the constituent particles", reason: "the page prints \"the contituent particles\" (text layer; the first read's spans matched); the book's own typo, kept"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 27, kind: false_positive, address: "ch 5 §5.7 ¶5",
+     transcribed: "– RT ln K or", printed: "– RT ln K", reason: "the page prints \"∆rG⊖ = – RT ln K\" then \"or ∆rG⊖ = – 2.303 RT log K\" (text layer), as the row carries it"}
+  - {book: chem11-part1, lang: en, chapter: 5, page: 27, kind: false_positive, address: "ch 5 §5.7 ¶5",
+     transcribed: "(5.23)", printed: "5.23", reason: "the page prints \"(5.23)\" with its brackets (text layer), as the row carries it"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 10, kind: false_positive, address: "ch 6 §6.3 ¶19",
+     transcribed: "K_c and K'_c have different", printed: "K_c and K_c have different", reason: "the page prints \"Kc and K′c have different numerical values\" (text layer), as the row carries it"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 12, kind: misprint, address: "ch 6 §6.4.1 ¶13",
+     transcribed: "[CO_2] = [H_2-]", printed: "[CO_2] = [H_2]", reason: "the page prints \"[H2-]\", the book's garble restored as printed (founder, 2026-09-29); the verifier corrected it"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 35, kind: misprint, address: "ch 6 §6.11.9 ¶8",
+     transcribed: "This results in increased of H^+", printed: "This results in increased H^+", reason: "the page prints \"This results in increased of H+\" (the first read's spans matched); the book's own error, kept"}
+  - {book: chem11-part1, lang: en, chapter: 6, page: 34, kind: false_positive, address: "ch 6 §6.11.8 ¶6",
+     transcribed: "[NH_3] exists", printed: "[NH_4OH] ≅ 0.033 M", reason: "the row carries Problem 6.24's Solution as the page prints it; the verifier quoted a transcription the row does not hold (set aside as not carried, so the row went unjudged)"}

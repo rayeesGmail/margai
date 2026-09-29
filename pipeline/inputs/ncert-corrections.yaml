@@ -1364,3 +1364,39 @@ corrections:
      printed: "known as β-pleated sheet", transcribed: "known as beta-pleated sheet", reason: "the prompt writes a Greek letter by name"}
   - {book: chem12-part2, lang: en, chapter: 10, page: 15, kind: false_positive, address: "ch 10 §10.3 ¶1",
      printed: "6H12O6 Glucose", transcribed: "6H_12O_6 (Glucose)", reason: "the page sets the name \"Glucose\" under the formula; the row brackets it inline"}
+  # The re-read of the 52 pages the rulings changed (report 2026-09-29-ncert-verify, ₹55.80): 15 flags on re-read spans, all the
+  # verifier's; the p4/p5 display join; and the one claim it could not place, settled on its exact spans.
+  - {book: chem12-part2, lang: en, chapter: 6, page: 7, kind: false_positive, address: "ch 6 §6.4.2 ¶5",
+     printed: "Example 6.3 Identify all the possible", transcribed: "Identify all the possible", reason: "the row opens with the label \"Example 6.3\" the page sets beside the statement; the verifier quoted it without its words"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 12, kind: false_positive, address: "ch 6 §6.7.1 ¶4",
+     printed: "nitrite ion also represents an ambident nucleophile with two different points of linkage [O—N=O]", transcribed: "nitrite ion also represents an ambident nucleophile with two different points of linkage [^-O— N =O]", reason: "the page prints the nitrite ion with its charge on O, [⁻O—N=O]; ^- is the prompt's superscript"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 21, kind: false_positive, address: "ch 6 §6.7.1 ¶50",
+     printed: "from β-carbon", transcribed: "from beta-carbon", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 6, page: 22, kind: false_positive, address: "ch 6 §6.7.1 ¶54",
+     printed: "CH_3CH_2Br + Mg --(dry ether)--> CH_3CH_2MgBr", transcribed: "CH_3CH_2Br + Mg -> CH_3CH_2MgBr (dry ether)", reason: "the prompt writes a condition over an arrow in brackets; \"dry ether\" is the page's"}
+  - {book: chem12-part2, lang: en, chapter: 7, page: 24, kind: false_positive, address: "ch 7 §7.6.1 ¶9",
+     printed: "CH_3-C(CH_3)_2-Cl", transcribed: "CH_3-C(CH_3)_2-Cl -> CH_3-C(CH_3)_2-OC_2H_5", reason: "the page prints C2H5ONa + CH3–C(CH3)2–Cl → CH3–C(CH3)2–OC2H5 in Example 7.6's statement; the verifier quoted the reactant alone"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 7, kind: false_positive, address: "ch 8 §8.2.3 ¶1",
+     printed: "R' — C — Cl with double bond O below C", transcribed: "R' — C(=O) — Cl", reason: "the page draws the C=O under the C; C(=O) is the same group inline"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 7, kind: false_positive, address: "ch 8 §8.2.3 ¶1",
+     printed: "2 R' — C — R with double bond O below C", transcribed: "2 R' — C(=O) — R", reason: "the page draws the C=O under the C; C(=O) is the same group inline"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 11, kind: false_positive, address: "ch 8 §8.4 ¶12",
+     printed: "give a gem-dialkoxy compound", transcribed: "give a gem-dialkoxy compound known as acetal as shown in the reaction", reason: "the page prints \"known as acetal as shown in the reaction.\" (text layer); the verifier quoted a prefix"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 13, kind: false_positive, address: "ch 8 §8.4 ¶22",
+     printed: "RCOO‾", transcribed: "RCOO^-", reason: "the book marks a negative charge with a bar over O (ŌH, COŌ); ^- and ‾ carry it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 13, kind: false_positive, address: "ch 8 §8.4 ¶23",
+     printed: "RCOO‾", transcribed: "RCOO^-", reason: "the book marks a negative charge with a bar over O (ŌH, COŌ); ^- and ‾ carry it"}
+  - {book: chem12-part2, lang: en, chapter: 8, page: 23, kind: false_positive, address: "ch 8 §8.9.1 ¶1",
+     printed: "2R-COO^-Na^+ + H_2", transcribed: "2R-COO^-Na^+ + H_2 (Sodium carboxylate)", reason: "the page sets \"Sodium carboxylate\" under the product; the row brackets it inline"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 8, kind: false_positive, address: "ch 9 §9.6 ¶2",
+     printed: "R—NH_2 + H X <-> R—NH_3^+ X^-", transcribed: "R—NH_2 + H X <-> R—NH_3^+ X^- (Salt)", reason: "the page prints \"(Salt)\" after the product, as the row carries it"}
+  - {book: chem12-part2, lang: en, chapter: 10, page: 12, kind: false_positive, address: "ch 10 §10.2.2 ¶4",
+     printed: "all other naturally occurring α-amino acids", transcribed: "all other naturally occurring alpha-amino acids", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 10, page: 12, kind: false_positive, address: "ch 10 §10.2.2 ¶4",
+     printed: "since the α-carbon atom", transcribed: "since the alpha-carbon atom", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 10, page: 12, kind: false_positive, address: "ch 10 §10.2.3 ¶1",
+     printed: "polymers of α-amino acids", transcribed: "polymers of alpha-amino acids", reason: "the prompt writes a Greek letter by name"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 8, kind: false_positive, address: "ch 9 §9.6 ¶1",
+     printed: "R <-> H <-> X", transcribed: "R X", reason: "the verifier quoted atoms of the drawn resonance structures, not words of the row; the row carries the page's sentence"}
+  - {book: chem12-part2, lang: en, chapter: 9, page: 5, kind: noise, address: "ch 9 §9.4 ¶3",
+     flag: join, at: "2. Ammonolysis of alkyl halides", reason: "the row runs onto p5 through the display RNH2 -> R2NH -> R3N -> R4N+X- drawn at the top of p5 (joined by ruling); the layer's first text line, \"The free amine can be obtained…\", is the next paragraph"}

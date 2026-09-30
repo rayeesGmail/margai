@@ -187,6 +187,14 @@ class NcertExtractCommand extends NcertBookCommand {
                     String at = "ch " + chapter.no() + " p" + page + " §" + paragraph.section() + " #" + (index + 1);
                     NotationFlags.check(paragraph.text()).forEach(finding -> notationFlags.add(at + ": " + finding));
                 }
+                // The heading's page goes on its checklist whatever the layer: an illegible chapter's
+                // heading is sent unplaced, and its page is the one to read (2026-09-30).
+                boolean headingPage = apparatus.map(boundary -> boundary.page() == page).orElse(false);
+                if (headingPage) {
+                    boundaryPages.add("ch " + chapter.no() + " p" + page + ": "
+                            + read.paragraphs().size() + " paragraph(s) — "
+                            + apparatus.orElseThrow().itsPage());
+                }
                 // The character check and the structural flag, both against the page's own text
                 // layer and both free (FIX 4, FIX 6): they turn the founder's audit from reading
                 // every paragraph into adjudicating the flagged ones.
@@ -206,13 +214,7 @@ class NcertExtractCommand extends NcertBookCommand {
                     PageCoverage.Assessment coverage = PageCoverage.of(pageText, transcribed);
                     String onPage = "ch " + chapter.no() + " p" + page + ": " + coverage.reason();
                     // The heading's page carries the Summary in its layer and must not in its rows,
-                    // so a ratio of the two says nothing; it goes on a checklist of its own instead.
-                    boolean headingPage = apparatus.map(boundary -> boundary.page() == page).orElse(false);
-                    if (headingPage) {
-                        boundaryPages.add("ch " + chapter.no() + " p" + page + ": "
-                                + read.paragraphs().size() + " paragraph(s) — "
-                                + apparatus.orElseThrow().itsPage());
-                    }
+                    // so a ratio of the two says nothing; it is on the checklist above instead.
                     switch (headingPage ? PageCoverage.Verdict.MATCHED : coverage.verdict()) {
                         case TOO_LITTLE_CAME_BACK, TOO_MUCH_CAME_BACK -> structureFlags.add(onPage);
                         // Not a defect list but a checklist, and ordered prose-first at the end of

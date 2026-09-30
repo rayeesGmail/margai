@@ -501,7 +501,10 @@ class NcertExtractCommandTest {
         assertThat(extract.calls).containsExactly("8/1", "8/2", "8/3", "9/1");
         assertThat(extract.pageTexts.subList(0, 3)).containsOnlyNulls();
         assertThat(out.toString()).contains("| 8 | withheld: illegible |")
-                .contains("| 8 | page 3 | SUMMARY | sent: the heading could not be placed on it | 1 |");
+                .contains("| 8 | page 3 | SUMMARY | sent: the heading could not be placed on it | 1 |")
+                // The heading-page checklist needs no layer: chem11-part2 ch 8's first run said "none
+                // called this run" of the p36 it had just called (2026-09-30).
+                .contains("ch 8 p3: 1 paragraph(s) — sent: the heading could not be placed on it");
     }
 
     /** A chapter whose layer carries no apparatus heading sends every page: nothing is skipped on a guess. */

@@ -482,7 +482,29 @@ class NcertExtractCommandTest {
                 .contains("checked: 1 of the 3 page(s) called this run (the rest had no usable text layer)");
     }
 
-    /** A chapter whose text layer cannot be read sends every page: skipping blind would drop teaching. */
+    /**
+     * chem11-part2 ch 8 ({@code kech202.pdf}): its body is shifted, so the layer is withheld, but its
+     * Summary heading is set in a font that is not, and the exercises after it are numbered 8.1, 8.2 —
+     * the shape D14 found read as sections. A shift cannot print an exact heading line, so every page
+     * after it is apparatus whatever the layer is. The heading's own page is still sent: whether
+     * teaching sits above the heading is read from prose, which this layer does not carry (2026-09-30).
+     */
+    @Test
+    void anIllegibleChapterSkipsThePagesAfterAHeadingItPrintsPlainlyAndSendsTheHeadingsPage() throws IOException {
+        store.put("source/ncert/2022-ed/en/phy11-part2/keph201.pdf",
+                pdf(List.of(garbled(), garbled(), garbled("summary"), garbled())), "application/pdf");
+        page(8, 3);
+        page(8, 4);
+
+        assertThat(run()).isZero();
+
+        assertThat(extract.calls).containsExactly("8/1", "8/2", "8/3", "9/1");
+        assertThat(extract.pageTexts.subList(0, 3)).containsOnlyNulls();
+        assertThat(out.toString()).contains("| 8 | withheld: illegible |")
+                .contains("| 8 | page 3 | SUMMARY | sent: the heading could not be placed on it | 1 |");
+    }
+
+    /** A chapter whose layer carries no apparatus heading sends every page: nothing is skipped on a guess. */
     @Test
     void aChapterWithNoDetectableApparatusSendsEveryPage() {
         assertThat(run()).isZero();
@@ -527,10 +549,15 @@ class NcertExtractCommandTest {
      * them are English, which is exactly why {@link PdfTextLayer} scores it near zero.
      */
     private static byte[] garbledPdf(int pages) throws IOException {
-        List<String> page = List.of(
-                "LVRPHULVP DQG WKH VWUXFWXUH RI PDWWHU LQ WKH ILUVW FKDSWHU RI WKLV ERRN",
-                "DQG WKH ZRUGV WKDW DUH SULQWHG KHUH DUH QRW WKH ZRUGV WKH IRQW FODLPV");
-        return pdf(java.util.stream.IntStream.range(0, pages).mapToObj(index -> page).toList());
+        return pdf(java.util.stream.IntStream.range(0, pages).mapToObj(index -> garbled()).toList());
+    }
+
+    /** One page of the shifted text, after any lines of its own the page prints in a font that is not shifted. */
+    private static List<String> garbled(String... plain) {
+        List<String> lines = new ArrayList<>(List.of(plain));
+        lines.add("LVRPHULVP DQG WKH VWUXFWXUH RI PDWWHU LQ WKH ILUVW FKDSWHU RI WKLV ERRN");
+        lines.add("DQG WKH ZRUGV WKDW DUH SULQWHG KHUH DUH QRW WKH ZRUGV WKH IRQW FODLPV");
+        return lines;
     }
 
     private static byte[] pdf(List<List<String>> pages) throws IOException {

@@ -207,14 +207,18 @@ it never was, and whatever was printed above the Summary went with it — prose 
 chapters and 5 of phy11-part1's 7, including a named subsection of §14.6 and chapter 7's Example 7.8
 — with no metric able to see it. Where the heading sits is read from the page's glyph positions, not
 the text layer's line order, which on bio11 ch 14 p11 puts the heading first. Across all ten books,
-53 of the 78 heading pages are sent. The prompt's own rule skips the Summary on the page.
+54 of the 79 heading pages are sent: 53 of the 78 on legible layers, and chem11-part2 ch 8's, which is
+sent unplaced (2026-09-30). The prompt's own rule skips the Summary on the page.
 
 The report's **apparatus table** says, per chapter, where the boundary fell, which heading found it,
 and what happened to its page (`sent: N prose line(s) above the heading`, `not sent: nothing taught
 above the heading`, or `sent: the heading could not be placed on it`). **Read it.** A boundary that
-looks too early means real teaching is being skipped; `—  not found: every page is sent` means the
-text layer was unreadable and nothing was skipped, which is safe but means the model will see the
-exercises for that chapter. The **pages the Summary starts on** section lists each heading page called,
+looks too early means real teaching is being skipped; `—  not found: every page is sent` means no
+heading line was found and nothing was skipped, which is safe but means the model will see the
+exercises for that chapter. A chapter whose layer is withheld as illegible is still searched — a
+shifted layer can hide a heading but not invent one — and its heading page always reads `sent: the
+heading could not be placed on it`, because placing counts prose the layer does not carry
+(`chem11-part2` ch 8: page 36, its three exercise pages skipped; 2026-09-30). The **pages the Summary starts on** section lists each heading page called,
 with its paragraph count: read each against the rendered page — the rows should carry what is above
 the heading and nothing below it. The coverage ratio cannot judge these pages, because the layer
 carries the Summary and the rows must not. A resume picks these pages up by itself: a page an earlier

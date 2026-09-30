@@ -26,7 +26,9 @@ import java.util.Optional;
  *   <li>Chemistry writes {@code Summary} in title case and gives its exercises no heading at all,
  *       which is why the match is case-insensitive and why the Summary is the one that matters;
  *   <li>17.6% of all pages sit at or past the boundary; 53 of the 78 heading pages carry teaching
- *       above the heading and are sent, which leaves 14.2% of all pages never sent (2026-09-24).
+ *       above the heading and are sent, which leaves 14.2% of all pages never sent (2026-09-24);
+ *   <li>{@code kech202.pdf}'s layer is shifted, so its heading page is sent unplaced ({@link #locate})
+ *       and only its three exercise pages are skipped — 243 of 1,690 pages never sent (2026-09-30).
  * </ul>
  *
  * <p>Only the back half is searched: a Physics chapter's first page carries a contents sidebar
@@ -44,14 +46,16 @@ final class ChapterApparatus {
 
     /**
      * The page the chapter's apparatus starts on, or empty when there is none to be found — which
-     * means every page is sent. Empty is the safe answer and is returned whenever the text layer
-     * cannot be trusted ({@code kech202.pdf} is the corpus's one such file): skipping a page we
-     * cannot read would risk dropping real teaching, and the guards downstream exist for that case.
+     * means every page is sent. The layer's legibility is not asked: a heading is an exact line, so a
+     * layer that is not the page's words can hide one but never invent one. {@code kech202.pdf}, the
+     * corpus's one such English file, shifts its body and prints its Summary heading in a font that is
+     * not shifted; while this answered empty for an illegible layer, its exercises — numbered 8.1, 8.2,
+     * the shape D14 found read as sections — were sent (2026-09-30).
      *
      * @param pageTexts the chapter's pages in order, from {@link PdfTextLayer#pages}
      */
     static Optional<Boundary> find(List<String> pageTexts) {
-        if (pageTexts.isEmpty() || !PdfTextLayer.isLegible(pageTexts)) {
+        if (pageTexts.isEmpty()) {
             return Optional.empty();
         }
         for (int index = pageTexts.size() / 2; index < pageTexts.size(); index++) {
@@ -63,6 +67,21 @@ final class ChapterApparatus {
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * The boundary as {@code ncert extract} uses it: found in the text layer and placed on its page by
+     * the glyph positions — but only on a legible layer. Placing counts the prose above the heading,
+     * and prose is recognised by its words, so a shifted layer could count none above a heading that
+     * has teaching over it and withhold the page. Unplaced, the heading's page is sent; the pages
+     * after it are apparatus either way.
+     *
+     * @param pageTexts the chapter's pages in order, from {@link PdfTextLayer#pages}
+     * @param pdf       the chapter PDF those pages were read from
+     */
+    static Optional<Boundary> locate(List<String> pageTexts, byte[] pdf) {
+        Optional<Boundary> found = find(pageTexts);
+        return PdfTextLayer.isLegible(pageTexts) ? found.map(boundary -> boundary.placedIn(pdf)) : found;
     }
 
     /**

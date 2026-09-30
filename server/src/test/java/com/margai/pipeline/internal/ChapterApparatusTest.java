@@ -99,18 +99,40 @@ class ChapterApparatusTest {
     }
 
     /**
-     * The fail-safe direction: a text layer we cannot read must not be used to decide what to skip,
-     * because skipping a page we misread would drop real teaching. One file in the corpus is like
-     * this, and it gets every page sent.
+     * A heading is an exact line, so an illegible layer can hide one — "VXPPDUB" is SUMMARY shifted —
+     * but never invent one. chem11-part2 ch 8 shifts its body and sets its Summary heading in a font
+     * that is not shifted; without the heading its exercises, numbered 8.1, 8.2, were sent (2026-09-30).
      */
     @Test
-    void anIllegibleTextLayerYieldsNoBoundary() {
+    void anIllegibleLayerStillYieldsAHeadingItPrintsPlainly() {
         List<String> garbled = List.of(
                 "LVRPHULVP DQG WKH VWUXFWXUH RI PDWWHU LQ WKH ILUVW FKDSWHU RI WKLV ERRN",
-                "VXPPDUB WKH IROORZLQJ TXHVWLRQV DUH IRU SUDFWLFH DQG UHYLVLRQ RI WKH XQLW",
-                "SUMMARY");
+                "VXPPDUB\nWKH IROORZLQJ TXHVWLRQV DUH IRU SUDFWLFH DQG UHYLVLRQ RI WKH XQLW",
+                "summary\nLQ WKLV XQLW ZH KDYH OHDUQW",
+                "8.1 ZKDW DUH KBEULGLVDWLRQ VWDWHV");
 
-        assertThat(ChapterApparatus.find(garbled)).isEmpty();
+        assertThat(PdfTextLayer.isLegible(garbled)).isFalse();
+        assertThat(ChapterApparatus.find(garbled).orElseThrow().page()).isEqualTo(3);
+    }
+
+    /**
+     * What is taught above the heading is read from prose, and an illegible layer carries none, so
+     * its heading is never placed: the heading's page is sent, the pages after it are not.
+     */
+    @Test
+    void anIllegibleLayersHeadingIsLeftUnplacedSoItsPageIsSent() {
+        List<String> garbled = List.of(
+                "LVRPHULVP DQG WKH VWUXFWXUH RI PDWWHU LQ WKH ILUVW FKDSWHU RI WKLV ERRN",
+                "WKH IROORZLQJ TXHVWLRQV DUH IRU SUDFWLFH DQG UHYLVLRQ RI WKH XQLW",
+                "summary\nLQ WKLV XQLW ZH KDYH OHDUQW",
+                "8.1 ZKDW DUH KBEULGLVDWLRQ VWDWHV");
+
+        // No PDF behind it: an illegible layer's heading is never looked for among the page's glyphs.
+        ChapterApparatus.Boundary boundary = ChapterApparatus.locate(garbled, new byte[0]).orElseThrow();
+
+        assertThat(boundary.proseLinesAbove()).isEqualTo(ChapterApparatus.Boundary.UNPLACED);
+        assertThat(boundary.covers(3)).isFalse();
+        assertThat(boundary.covers(4)).isTrue();
     }
 
     @Test
@@ -125,8 +147,8 @@ class ChapterApparatusTest {
     /**
      * The rule against the books themselves: every chapter file of Physics, Chemistry and Biology.
      * This is the assertion the design rests on — a boundary in every file, none of it in the front
-     * half, the one file whose text layer is garbled correctly refusing to answer, and every heading
-     * placed on its page so the teaching above it is sent.
+     * half, and every heading placed on its page so the teaching above it is sent, except in the one
+     * file whose text layer is garbled, where the heading's page is sent unplaced.
      */
     @Test
     void everyEnglishChapterOfEverySubjectHasABoundaryInItsBackHalf() throws IOException {
@@ -140,6 +162,7 @@ class ChapterApparatusTest {
         List<String> withoutBoundary = new java.util.ArrayList<>();
         List<String> unplaced = new java.util.ArrayList<>();
         List<String> sent = new java.util.ArrayList<>();
+        java.util.Map<String, ChapterApparatus.Boundary> found = new java.util.HashMap<>();
 
         try (var books = Files.list(NCERT)) {
             for (Path book : books.filter(Files::isDirectory).sorted().toList()) {
@@ -151,14 +174,14 @@ class ChapterApparatusTest {
                         byte[] pdf = Files.readAllBytes(chapter);
                         List<String> text = PdfTextLayer.pages(pdf);
                         pages += text.size();
-                        Optional<ChapterApparatus.Boundary> boundary = ChapterApparatus.find(text)
-                                .map(found -> found.placedIn(pdf));
+                        Optional<ChapterApparatus.Boundary> boundary = ChapterApparatus.locate(text, pdf);
                         if (boundary.isEmpty()) {
                             withoutBoundary.add(book.getFileName() + "/" + chapter.getFileName());
                             continue;
                         }
                         withBoundary++;
                         ChapterApparatus.Boundary placed = boundary.orElseThrow();
+                        found.put(book.getFileName() + "/" + chapter.getFileName(), placed);
                         apparatus += (int) java.util.stream.IntStream.rangeClosed(1, text.size())
                                 .filter(placed::covers).count();
                         if (placed.proseLinesAbove() == ChapterApparatus.Boundary.UNPLACED) {
@@ -176,15 +199,19 @@ class ChapterApparatusTest {
         }
 
         assertThat(files).as("every chapter file of all ten books").isEqualTo(79);
-        assertThat(withoutBoundary)
-                .as("only the one file whose text layer is custom-encoded may go undetected")
+        assertThat(withoutBoundary).as("every file, the custom-encoded one included").isEmpty();
+        assertThat(withBoundary).isEqualTo(79);
+        // kech202's body is shifted and its "summary" heading on p36 is not; p37-39 are its exercises.
+        assertThat(found.get("chem11-part2/kech202.pdf").page()).isEqualTo(36);
+        assertThat(unplaced).as("every heading placed, except where the layer carries no prose to place it by")
                 .containsExactly("chem11-part2/kech202.pdf");
-        assertThat(withBoundary).isEqualTo(78);
-        assertThat(unplaced).as("every heading the text layer finds, the glyph positions place").isEmpty();
-        // Measured 2026-09-24: 53 of the 78 heading pages carry teaching above the heading (one of
-        // them, phy12-part2 ch 14 p18, only a figure caption — a wasted call, the safe direction), and
+        // Measured 2026-09-24: 53 of the 78 legible heading pages carry teaching above the heading (one
+        // of them, phy12-part2 ch 14 p18, only a figure caption — a wasted call, the safe direction), and
         // 240 of 1,690 pages (14.2%) are apparatus, down from 17.6% when the heading's page went too.
-        assertThat(sent).hasSize(53);
+        // kech202 adds its unplaced heading page to the sent and its three exercise pages to the
+        // apparatus (2026-09-30).
+        assertThat(sent).hasSize(54);
+        assertThat(apparatus).isEqualTo(243);
         assertThat(100.0 * apparatus / pages).isBetween(13.5, 15.0);
         // The two closed books, where the page-level skip cost real teaching. bio11's fourteen agree
         // with the day log's independent pymupdf count; phy11-part1's five do not — that count saw two,

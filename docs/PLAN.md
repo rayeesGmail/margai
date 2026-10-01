@@ -96,8 +96,11 @@ DLT registration is possible under the Udyam proprietorship (founder, 2026-10-01
   templates (login, parent consent), number entry with OTP auto-read, and email OTP moved behind
   its flag land in the first buffer after F1's DLT templates are approved — and **D60 is the
   decision point**: if the templates are not live by then, the beta runs on the email fallback
-  flag (which needs F10's SES production access). ✅ *A real phone signs in by SMS first try;
-  the email path only with its flag on.*
+  flag (which needs F10's SES production access). The same item builds the phone attach for an
+  account begun on the email fallback (`POST /me/phone/otp/request|verify`, TECH_PLAN §15.1) and
+  gives D27's consent flow its live SMS proof. ✅ *A real phone signs in by SMS first try; the
+  email path only with its flag on; an email-begun account attaches a phone and stays one user,
+  and a number already in use is refused, never merged (CS-2 §10, SPEC §5.7).*
 
 ### PHASE 2 — Content pipeline v1 (Weeks 3–4, Days 13–24) — Module M3
 
@@ -133,7 +136,7 @@ tools; your reviews focus on output quality.)*
   `collective_records` migration and `collective from-pyq` momentum per node (CS-1 §2, §4;
   TECH_PLAN §2.3, §6.3 — added 2026-09-12).
   ✅ *Top-10 weightage chapters match known NEET wisdom (sanity check).* *Added 2026-10-01
-  (CS-4 §3): the `concept_primers` migration and `primers generate` begin for the top-50
+  (CS-4 §3; at risk): the `concept_primers` migration and `primers generate` begin for the top-50
   weightage chapters (TECH_PLAN §15.7), staged on one chapter first.*
 - **D23 —** Anchor-linking questions↔NCERT; seed the eval suite v1 (~60 questions
   across subjects). ✅ *Eval harness runs and reports.*
@@ -146,7 +149,7 @@ tools; your reviews focus on output quality.)*
   review. ✅ *travels with `collective load`, here or in the buffer it slips to: approved
   collective records exist for the top-50 weightage nodes at or above the confidence
   threshold; the review sheet is founder-signed; every record carries `season_version`.*
-  *Added 2026-10-01 (CS-4 §3): primers for the top-50 chapters finish here and `primers sample`
+  *Added 2026-10-01 (CS-4 §3; at risk): primers for the top-50 chapters finish here and `primers sample`
   writes the founder's 30-primer sheet; the remaining topics go to a later buffer before D74.*
 
 ### PHASE 3 — Onboarding & first plan (Week 5, Days 25–30) — Modules M2 + M4(v0)
@@ -162,8 +165,12 @@ tools; your reviews focus on output quality.)*
   *Amended 2026-10-01 (CS-2 §4.2, founder decision): the beta is recruited 18+, so D27 builds DOB
   with an 18+ beta gate (flag on) **and** the parent-consent flow in full on the SMS template,
   switched off by flag for the beta and on at public launch; any time this frees returns to the
-  at-risk days' buffer, not to new scope. ✅ adds: with the beta flag on, an under-18 DOB meets the
-  gate; with the consent flag on, the original ✅ holds.*
+  at-risk days' buffer, not to new scope. An under-18 DOB at the gate stops kindly and deletes the
+  account, number and answers at once (founder ruling 2026-10-01); D60 revisits the 18+ rule. The
+  consent flow is built against the OTP sender port with SMS faked in tests — its live proof comes
+  with the floating phone-OTP item, where the MSG91 adapter lands. ✅ adds: with the beta flag on,
+  an under-18 DOB meets the gate and leaves no row behind; with the consent flag on, the original ✅
+  holds.*
 - **D28 —** Scorecard upload: capture UI with frame guide → AI extraction → confirm/edit
   screen → delete-after-confirm behavior. ✅ *3 real scorecard photos (found samples)
   extract correctly; storage verifiably empty after.*
@@ -199,7 +206,8 @@ tools; your reviews focus on output quality.)*
   way to shift the weight from “students like you” to “you” (SPEC §6.1, CS-1 §5.6 — added
   2026-09-12). ✅ *Diagnostic shifts a seeded user's plan.* *Added 2026-10-01 (CS-2 §4.7, CS-4 §6):
   full NEET 2018–2026 past papers as timed mocks (`kind = mock`, TECH_PLAN §0.5 item 2), out-of-syllabus
-  questions excluded from the score; every mock result captured for the later private percentile.*
+  questions excluded from the score; every mock result captured for the later private percentile.
+  ✅ adds: at least one full past paper runs end to end as a timed mock (CS-2 §10).*
 - **D36 —** Buffer + **Week-6 gate:** practice loop end-to-end incl. offline + diagnostic.
 
 ### PHASE 5 — Doubt solver (Weeks 7–8, Days 37–48) — Module M6 (the hero)
@@ -233,7 +241,8 @@ tools; your reviews focus on output quality.)*
   tonight over the breaker (founder ruling 2026-09-12; TECH_PLAN §4.4, §4.8). The hard
   stop stays free-tier only. ✅ *Limit math correct across day boundary (IST).* *Added 2026-10-01
   (CS-5 §4): the free allowance is also counted per phone (install id), so switching free accounts
-  never multiplies it; Pro on a shared phone is unaffected.*
+  never multiplies it; Pro on a shared phone is unaffected. ✅ adds: switching between free accounts
+  on one phone does not raise that phone's daily free doubts (CS-5 §6.3).*
 - **D45 —** Doubt → student-state write-back (concept weak-signals) with visible effect
   in next plan (“because you asked 3 Optics doubts…”). ✅ *Seeded doubts change
   tomorrow's plan with the reason line.*
@@ -266,7 +275,9 @@ tools; your reviews focus on output quality.)*
 - **D54 —** Buffer + **Week-9 gate:** mistake lifecycle capture→diagnose→resurface→heal
   demonstrated end-to-end. *Added 2026-10-01 (CS-2 §4.7, CS-4 §5.2; at risk): the mock autopsy
   (already scheduled here, TECH_PLAN §0.5 item 2) — summary for Free, full for Pro — and the
-  timing and skip-strategy drills built from it.*
+  timing and skip-strategy drills built from it. ✅ adds: one full past paper runs mock → autopsy end
+  to end (CS-2 §10); a seeded student with a high gamble score gets targeted skip drills, and the
+  drill results appear in the next autopsy's comparison (CS-4 §5.2).*
 - **D55 —** Nightly re-planner: state snapshot assembly + deterministic candidate blocks
   (SRS dues, weak-node practice, backbone next, hours budget); the snapshot reads two
   sources — the approved collective record and the student state — blended per node by
@@ -295,22 +306,31 @@ tools; your reviews focus on output quality.)*
 - **D57 —** Batch execution for all active users + morning notification with plan
   deep-link. ✅ *Two devices, different profiles, different 7 AM plans.* *Added 2026-10-01
   (CS-3 §3.3): tomorrow's plan and its questions prefetched in the background after the nightly
-  run, so Today opens from local data.*
+  run, so Today opens from local data; the prefetched pack is D34's offline pack for tomorrow's
+  own blocks, keys wiped after sync (founder ruling 2026-10-01). ✅ adds: with connectivity at
+  night only, the morning Today opens in airplane mode (CS-3 §4), and D34's "the pack is the only
+  pre-answer carrier" test passes on the prefetch path.*
 - **D58 —** Streaks, weekly trajectory card (humble-early copy), plan negotiation chat
   v1 (reschedule/lighten/swap intents). ✅ *“Wedding this weekend” visibly rebalances
   the week with a trade-off line.* *Added 2026-10-01 (CS-2 §4.5–§4.6, CS-4 §5.1, CS-6 §4; at
   risk): streak repair framing, the Sunday review in the plan chat with its agreed focus, and the
-  weekly fit question.*
+  weekly fit question. ✅ adds: a seeded week of activity produces a review whose every statement
+  traces to the student's data, and next week's plan carries the agreed focus (CS-4 §5.1).*
 - **D59 —** Slump detection rules + light-day behavior + mood chip wiring.
   ✅ *Simulated 3 dark days → gentler plan + right copy.* *Added 2026-10-01 (CS-2 §4.1, §4.5–§4.6;
-  CS-4 §5.2): the **crisis protocol** behaviour and its eval cases (direct, indirect, Hinglish,
+  CS-4 §5.2; at risk): the **crisis protocol** behaviour and its eval cases (direct, indirect, Hinglish,
   Hindi; 100% — a beta blocker), the learning-science guards, and drill placement by the planner.*
 - **D60 —** Buffer + **Week-10 gate:** the full daily loop (plan→do→re-plan) runs
   unattended for 3 consecutive real days on your own test account. *Amended 2026-10-01 (CS-2 §5,
-  CS-6 §5, founder decision): the gate also requires the **14-day planner simulation** to pass
-  (traceable, non-generic reasons; continuity; load converging), and the beta backlog (SPEC §12.1)
-  ships only after it. **DLT decision point:** if F1's DLT templates are not live by D60, the beta
-  switches to email OTP through its flag.*
+  CS-6 §5, founder decision): the gate also requires the **14-day planner simulation** to pass over
+  six archetypes, showing all six CS-6 §5 properties — clearly different plans for different
+  students; every reason traceable and none generic; a reaction within one day to a skip with a
+  reason, a mistake cluster and repeated doubts; continuity with no unexplained swings; load
+  converging on the real completion pace; the first-week ramp's expected mentor notes — and the
+  beta backlog (SPEC §12.1) ships only after it. **DLT decision point:** if F1's DLT templates are
+  not live by D60, the beta switches to email OTP through its flag. **The 18+ rule is revisited
+  here once:** with the consent template live and F9's legal review clear, the consent flag may go
+  on for the later beta waves (founder ruling 2026-10-01).*
 
 ### PHASE 7 — Money & trust (Week 11, Days 61–66) — M9 + M10
 
@@ -321,15 +341,22 @@ tools; your reviews focus on output quality.)*
   trigger fires exactly once per context; “Not now” = 48h silence.*
   *Added 2026-10-01 (CS-2 §2, §4.8; CS-5 §3.1–§3.2; at risk, D61–D63 together): prices as config —
   list/founding rungs, ₹3,999 struck annual, grandfathering by the stored price, the founding
-  switch and GST display as configuration; one active phone per account and the devices screen.*
+  switch and GST display as configuration; one active phone per account and the devices screen.
+  ✅ adds: the founding/list switch and GST display change by configuration with no release (CS-2
+  §10); signing in on phone B signs phone A out, and A's queued offline work syncs when the same
+  account next signs in there; the devices screen lists active phones and signs one out on request
+  (CS-5 §6.3).*
 - **D63 —** Cancel (2 taps, zero retention screens) + 7-day auto-refund + exam-date
   auto-pause rule. ✅ *Cancel→refund runs without human touch in test mode.*
-  *Added 2026-10-01 (CS-5 §3.3; with D64): the account switcher — separate data per account.*
+  *Added 2026-10-01 (CS-5 §3.3; with D64; at risk): the account switcher — separate data per
+  account. ✅ adds: two accounts on one phone keep fully separate data and subscriptions (CS-5 §6.3).*
 - **D64 —** Privacy plumbing: data export (notebook PDF + JSON), account deletion,
   document-deletion verification job, consent texts, legal pages. ✅ *Export a real
   account; delete an account; verify purge schedule.* *Added 2026-10-01 (CS-5 §6.1, CS-2 §4.9,
-  §9): terms (a subscription is personal; the one-active-phone rule in plain words), the WhatsApp
-  click-to-chat link and share sheet, the legal entity name as configuration.*
+  §9; at risk): terms (a subscription is personal; the one-active-phone rule in plain words), the
+  WhatsApp click-to-chat link, the legal entity name as configuration. The share sheet arrives with
+  its first shareable — milestone cards, beta-backlog item 5 — since the committed build has
+  nothing to share (TECH_PLAN §15.13).*
 - **D65 —** Per-user AI budget circuit breaker + daily spend alarms + cost dashboard
   (cache rate, cost/feature, cost/user); the breaker wiring includes the Pro queue path
   (accept + queue, never a refusal — TECH_PLAN §4.8, founder ruling 2026-09-12) and the
@@ -337,7 +364,8 @@ tools; your reviews focus on output quality.)*
   breaker — for a free user a hard stop, for a Pro user a queued solve and honest copy.*
   *Added 2026-10-01 (CS-5 §4–§5, founder decision item 4; at risk): per-phone free limits extended,
   the unusual-use ladder (soft message → re-verify → rate limit, no automatic bans), the per-device
-  daily OTP cap, and SMS/OTP spend on the cost dashboard.*
+  daily OTP cap, and SMS/OTP spend on the cost dashboard. ✅ adds: a fourth free account on one
+  phone is blocked with a friendly message (CS-5 §6.3).*
 - **D66 —** **Week-11 gate:** money loop + trust promises all demonstrably true.
   (F5: marketing site drafted this week, evenings.)
 

@@ -2465,3 +2465,60 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      at: "Why do we get isopropyl benzene on treating benzene", reason: "the restored question is its own indented paragraph in the print"}
   - {book: chem11-part2, lang: en, chapter: 9, page: 29, kind: join, address: "ch 9 §9.5.5 ¶11",
      at: "(a) Generation of the eletrophile", reason: "the three steps (a)–(c) are fragments completing ¶10's \"…supposed to proceed via the following three steps:\"; a fragment joins the sentence that introduces it (DECISIONS 2026-09-29)"}
+  # chem11-part2, the re-read of the 46 pages the rulings changed (report 2026-10-01 -ncert-verify): 24 claims and one join
+  # flag, read against crops and the layer. Two are defects, both on ch 8 p18 and both from the image-only read: a bond dash
+  # read as a superscript minus, and a letter dropped from a garble the book prints. The rest are the book's misprints on new
+  # spans and the verifier's own errors. Simulated with round one from the original rows: 231 entries, no refusal, 534 rows.
+  # chem11-part2 chapter 7
+  - {book: chem11-part2, lang: en, chapter: 7, page: 4, kind: false_positive, address: "ch 7 §7.2 ¶5",
+     transcribed: "2 H^-(g) This", printed: "2 H^-(g)", reason: "Problem 7.2's Solution runs on from the display \"H2 (g) + 2e– → 2 H–(g)\" into \"This splitting…\", one flush box paragraph (2026-09-29 ruling, applied at the reload); the row carries the display and its continuation"}
+  # chem11-part2 chapter 8
+  - {book: chem11-part2, lang: en, chapter: 8, page: 17, kind: false_positive, address: "ch 8 §8.7.1 ¶4",
+     transcribed: "CH_3 — Z -> H_3C:^- + Z^+ electron pair", printed: "CH_3 Z -> H_3C:^- + Z^+ electron pair", reason: "the page draws the bond \"CH3 —— Z\" (crop p17 L y330-385); the row keeps it and the verifier's span dropped it"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 18, kind: text, address: "ch 8 §8.7.2 ¶7",
+     transcribed: "CH_3^-C^+ = O", printed: "CH_3–C^+ = O", reason: "Problem 8.12 prints the acylium ion \"CH3–C+ = O\" with a bond dash (crop p18 R y330-370; the Solution prints the same species \"H3–C+=O\"); the row read the dash as a superscript minus, which makes it a carbanion — a defect of the image-only read, found by the re-read"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 18, kind: text, address: "ch 8 §8.7.2 ¶8",
+     transcribed: "BF_3, C^+H_3–C^+=O", printed: "BF_3, C^+lH_3–C^+=O", reason: "the Solution prints \"Electrophiles: BF3, C+lH3–C+=O, N+O2\" (crop p18 R y440-470), the book's garble of \"Cl+, CH3–C+=O\"; the row dropped the l; a garble the book prints is restored as printed (DECISIONS 2026-09-29) — errata list"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 21, kind: false_positive, address: "ch 8 §8.7.6 ¶11",
+     transcribed: "CH_2=CH-C(=O)-H <-> ^+CH_2-CH=C(-O^-)-H <-> ^-:CH_2-CH=C(-O^+)-H", printed: "CH_2=CH-C(=O)-H <-> ^+CH_2-CH=C(-O^-)-H <-> ^-CH_2-CH=C(-O^+)-H", reason: "structure III carries a bar-minus over the CH2 with its lone pair (⁻:CH2), which the row writes ^-:; the verifier's span dropped the pair (as ruled on the first read's spans)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 31, kind: false_positive, address: "ch 8 §8.10.2 ¶3",
+     transcribed: "P_1V_1", printed: "p_1V_1", reason: "the formula prints a capital P1V1 (\"Volume of nitrogen at STP = P1V1 × 273 / (760 × T1)\", crop p31 R y560-640); only the prose below writes \"p1\" — the row carries each as printed"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 35, kind: misprint, address: "ch 8 §8.10.5 ¶1",
+     transcribed: "ammonium phospho molydate = m_1 g", printed: "ammonium phospho molybdate = m_1 g", reason: "the page prints \"phospho molydate\" (as ruled on the first read's spans); the row keeps the book's spelling — errata"}
+  # chem11-part2 chapter 9
+  - {book: chem11-part2, lang: en, chapter: 9, page: 3, kind: false_positive, address: "ch 9 §9.2.1 ¶5",
+     transcribed: "CH_3 – C(CH_3)(CH_3) – CH_2 – CH_3", printed: "CH_3 – C – CH_2 – CH_3 | CH_3", reason: "the same drawing (two CH3 on vertical bonds) in the corpus's bracket notation (DECISIONS 2026-09-30)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: misprint, address: "ch 9 §9.2.2 ¶2",
+     transcribed: "Ethene Propane (9.1)", printed: "Ethene ... CH_3−CH_3 is Ethane, not Propane", reason: "the page prints \"Ethene … Propane\" under (9.1), the book's own label for ethane (as under (9.2)); the row keeps it — errata"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: misprint, address: "ch 9 §9.2.2 ¶3",
+     transcribed: "CH_3 – C1 + H_2", printed: "CH_3 – Cl + H_2", reason: "the page sets digit 1 for l in (9.4), \"CH3–C1\" (crop at 300 dpi, 2026-09-30) — the book's own typesetting, kept"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: misprint, address: "ch 9 §9.2.2 ¶3",
+     transcribed: "CH_4 + HC1", printed: "CH_4 + HCl", reason: "the page sets digit 1 for l in (9.4), \"HC1\" — the book's own typesetting, kept"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: false_positive, address: "ch 9 §9.2.1 ¶15",
+     transcribed: "C^1 – ^2C(CH_3)(CH_3) – ^3C(C_2H_5) – ^4C – ^5C", printed: "C^1 – ^2C(CH_3)(CH_3) – ^3C – ^4C – ^5C with C_2H_5 at carbon 3", reason: "the same drawing (C2H5 on carbon 3) in the corpus's bracket notation (DECISIONS 2026-09-30)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: noise, address: "ch 9 §9.2.1 ¶15",
+     flag: "join", at: "iii) Attach ethyl group at carbon 3", reason: "p6 opens with step iii) of the four numbered steps, each a complete sentence set with a hanging indent, split back out at the reload (list-item ruling 2026-09-29: complete-sentence items stay rows); the hanging indent reads as a continuation to the check"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 7, kind: false_positive, address: "ch 9 §9.2.2 ¶10",
+     transcribed: "2CH_3–C(=O)–O^- --−2e^-- > 2CH_3–C(=O)–O·", printed: "2CH_3–C(=O)–O^- -2e^- > 2CH_3–C(=O)–O·", reason: "the same step: the page prints −2e− over the arrow, which the row writes as the arrow's condition"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: misprint, address: "ch 9 §9.2.3 ¶21",
+     transcribed: "2-Methylpropane-2-01", printed: "2-Methylpropan-2-ol", reason: "the page prints \"2-Methylpropane-2-01\" (as ruled on the first read's spans) — the book's own typesetting, kept"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: misprint, address: "ch 9 §9.2.3 ¶22",
+     transcribed: "AICI_3/ HCI", printed: "AlCl_3/ HCl", reason: "the page prints \"Anhy, AICI3/ HCI\" with capital I for l (crop at 400 dpi, 2026-09-30), restored as printed at the reload — errata"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: false_positive, address: "ch 9 §9.2.3 ¶23",
+     transcribed: "get dehydrogenated and cyclised to benzene and its homologues. This reaction is known as aromatization or reforming.", printed: "dehydrogenated and cyclised to benzene", reason: "the page prints the whole sentence the row carries; the verifier's span stops mid-sentence"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 17, kind: false_positive, address: "ch 9 §9.3.5 ¶9",
+     transcribed: "H^+,", printed: "H^+", reason: "the page prints \"an electrophile, H+, which\" (layer p17); the row keeps the comma"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 21, kind: false_positive, address: "ch 9 §9.4.3 ¶1",
+     transcribed: "CaCO_3 -> CaO + O_2 (Delta) (9.55)", printed: "CaCO_3 -(Delta)-> CaO + CaO_2", reason: "the page prints \"CaCO3 →(Δ) CaO + O2 (9.55)\", the book's own error for CO2 (as ruled on the first read's spans); the verifier's \"CaO_2\" is its own"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 28, kind: false_positive, address: "ch 9 §9.5.5 ¶5",
+     transcribed: "Chlorobenzene (9.73)", printed: "(9.73)", reason: "the page prints \"Chlorobenzene\" under the product of the drawn chlorination and (9.73) at the margin; the row carries the label with the number, as the first read's verifier read it"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 28, kind: false_positive, address: "ch 9 §9.5.5 ¶5",
+     transcribed: "to yield haloarenes. Chlorobenzene (9.73)", printed: "to yield haloarenes.", reason: "the sentence, then the printed label and number of the drawn scheme that follows it (as above)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 28, kind: false_positive, address: "ch 9 §9.5.5 ¶7",
+     transcribed: "alkylbenene is formed. (9.75) (9.76)", printed: "alkylbenene is formed.", reason: "the page prints (9.75) and (9.76) at the margin under the drawn alkylation schemes, which stay out (D17); the row keeps the numbers, as for (9.26)/(9.28)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 29, kind: misprint, address: "ch 9 §9.5.5 ¶12",
+     transcribed: "elctrophile Cl^+, R^+, RC^+O", printed: "electrophile Cl^+, R^+, RC^+O", reason: "the page prints \"elctrophile\" (the book's misspelling, on the errata list from the first adjudication); the row keeps it"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 29, kind: false_positive, address: "ch 9 §9.5.5 ¶11",
+     transcribed: "S_E (S = substitution; E = electrophilic)", printed: "S_E", reason: "the page prints \"SE (S = substitution; E = electrophilic) reactions are…\" (layer p29 y548); the row carries the gloss"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 29, kind: false_positive, address: "ch 9 §9.5.5 ¶11",
+     transcribed: "are supposed to proceed via the following three steps:", printed: "supposed to proceed via the following three steps:", reason: "the page prints \"…are supposed to proceed via the following three steps:\"; the verifier's span starts one word later"}

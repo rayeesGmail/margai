@@ -2812,7 +2812,7 @@ collective layer may read later.
 - **Low-data images.** Diagrams and cards are stored in two sizes when produced; the app asks for the
   one its width and connection type need.
 - **Testing.** Slow-3G and lossy profiles on the AVD (`-netspeed`, `-netdelay`), driven by
-  `scripts/ui.sh` at D69 and D77; the same scripts on a low-cost Android phone (TRACKER F16).
+  `scripts/ui.sh` at D69 and D77; the same scripts on a low-cost Android phone (TRACKER F15).
 
 ### 15.11 Outcome and reliability metrics (CS-2 §4.10; CS-3 §5; CS-6 §4)
 

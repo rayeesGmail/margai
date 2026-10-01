@@ -2037,3 +2037,431 @@ corrections:
      transcribed: "This results in increased of H^+", printed: "This results in increased H^+", reason: "the page prints \"This results in increased of H+\" (the first read's spans matched); the book's own error, kept"}
   - {book: chem11-part1, lang: en, chapter: 6, page: 34, kind: false_positive, address: "ch 6 §6.11.8 ¶6",
      transcribed: "[NH_3] exists", printed: "[NH_4OH] ≅ 0.033 M", reason: "the row carries Problem 6.24's Solution as the page prints it; the verifier quoted a transcription the row does not hold (set aside as not carried, so the row went unjudged)"}
+  # chem11-part2, the whole book on v5 (reports 2026-09-30 -ncert-extract/-2, -ncert-load-2, -ncert-verify). ch 8's text
+  # layer is Caesar-shifted (85% of its characters) and was withheld, so the model read those pages from the image alone
+  # and no free layout check ran on them: its paragraph starts and page-break joins were judged from the layer's line
+  # geometry, which the shift leaves intact. ch 9's layer is partly shifted (digits, IUPAC names, Symbol σ/β/μ) and went as
+  # the character authority, so its "differs from the layer" flags were read against the decoded layer. The free checks ran
+  # first and were held back from the second read. Every item was read against a page crop and the layer, chapter by
+  # chapter. Rulings under DECISIONS 2026-09-26 to 2026-09-30, and by precedent: a drawn substituent the transcriber wrote in
+  # words or with a "|" is rewritten in condensed bracket notation of what the drawing shows (chem12-part2 ch 7 p26); a bare
+  # "Solution" over an answer that is wholly drawn joins its Problem (labels over drawn reactions, 2026-09-28); ch 9's
+  # C1/HC1/AICI3 and Ä_cH^è are the book's garbles, restored as printed where the transcriber normalised them (2026-09-29).
+  # Every entry was simulated against the loaded rows page by page before the reload: 206 entries, no refusal, 635 rows to 534.
+  # chem11-part2 chapter 7
+  - {book: chem11-part2, lang: en, chapter: 7, page: 2, kind: join, address: "ch 7 §7.1 ¶10",
+     at: "(i) H_2S (g) + Cl_2 (g) -> 2 HCl (g) + S (s) (ii)", reason: "the three reactions (i)-(iii) are the items of Problem 7.1's statement (\"In the reactions given below, identify … :\"); a fragment item completes the sentence that introduces it (DECISIONS 2026-09-29; chem11-part1 Problem 2.5/2.18)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 3, kind: join, address: "ch 7 §7.2 ¶4",
+     at: "Reactions 7.12 to 7.14 suggest that half", reason: "set flush (x≈307) straight after the display \"2 Na(s) + Cl2 (g) → 2 Na+ Cl– (s) or 2 NaCl (s)\", where this book indents a new paragraph (cf. \"Each of the above steps…\" indented after its display): v5, a flush line after a display continues the paragraph (chem11-part1 precedent)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 3, kind: join, address: "ch 7 §7.2 ¶5",
+     at: "Oxidation : Loss of electron(s) by any species.", reason: "the definition \"Oxidation : …\" is a fragment completing \"To summarise, we may mention that\" (no colon, no full stop); a fragment list item joins the sentence that introduces it (DECISIONS 2026-09-29)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 3, kind: join, address: "ch 7 §7.2 ¶6",
+     at: "Reduction : Gain of electron(s) by any species.", reason: "the definition \"Reduction : …\" is a fragment completing \"To summarise, we may mention that\" (no colon, no full stop); a fragment list item joins the sentence that introduces it (DECISIONS 2026-09-29)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 3, kind: join, address: "ch 7 §7.2 ¶7",
+     at: "Oxidising agent : Acceptor of electron(s).", reason: "the definition \"Oxidising agent : …\" is a fragment completing \"To summarise, we may mention that\" (no colon, no full stop); a fragment list item joins the sentence that introduces it (DECISIONS 2026-09-29)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 3, kind: join, address: "ch 7 §7.2 ¶8",
+     at: "Reducing agent : Donor of electron(s).", reason: "the definition \"Reducing agent : …\" is a fragment completing \"To summarise, we may mention that\" (no colon, no full stop); a fragment list item joins the sentence that introduces it (DECISIONS 2026-09-29)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 4, kind: join, address: "ch 7 §7.2 ¶11",
+     at: "This splitting of the reaction under examination", reason: "inside Problem 7.2's tinted box, set flush straight after the display \"H2 (g) + 2e– → 2 H–(g)\"; the Solution is one worked argument set flush (DECISIONS 2026-09-29, box Solution)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 4, kind: join, address: "ch 7 §7.2.1 ¶7",
+     at: "Here, Cu(s) is oxidised to Cu^2+(aq) and Ag^+(aq)", reason: "set flush straight after the display (7.16) where this book indents a new paragraph (\"By way of contrast…\" below is indented): v5, a flush line after a display continues the paragraph"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 4, kind: noise, address: "ch 7 §7.2 ¶10",
+     flag: "join", at: "Solution Since in the above reaction the compound formed is an ionic compound", reason: "p4 opens inside Problem 7.2's box with \"and the other half reaction is:\", lower case, straight after p3's display \"2 Na (s) → 2 Na+(g) + 2e–\"; the Solution runs on as the row does (DECISIONS 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 5, kind: join, address: "ch 7 §7.2.1 ¶9",
+     at: "At equilibrium, chemical tests reveal that both", reason: "p5 opens flush (x61) under Fig. 7.2 straight after p4's closing display (7.17); this book indents a new paragraph at a page or column top, so the print continues p4's \"By way of contrast…\" paragraph (the verify join flag)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 5, kind: join, address: "ch 7 §7.3 ¶3",
+     at: "However, as we shall see later, the charge", reason: "the right column opens flush (x307; this book indents a new paragraph at a column top, e.g. p3 R \"For convenience…\", p4 R \"At this stage…\") after the left column's last line \"consequently H2 is oxidised and O2 is reduced.\" at x289 of 292: the paragraph runs on"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 5, kind: misprint, address: "ch 7 §7.3 ¶4",
+     transcribed: "electonegative atom", printed: "electronegative atom", reason: "the page prints \"to a more electonegative atom.\" (the book's misspelling); the row keeps it"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 7, kind: join, address: "ch 7 §7.3 ¶16",
+     at: "The oxidation number/state of a metal in a", reason: "p6 ends at the full measure (R y707 x305-536 of 537) and p7's text under the group table opens flush where this book indents a new paragraph at a page top: the print continues p6's paragraph (the verify join flag)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 7, kind: join, address: "ch 7 §7.3 ¶20",
+     at: "Oxidation: An increase in the oxidation number of", reason: "the definition \"Oxidation: …\" is one of the five term/definition items completing \"To summarise, we may say that:\"; each opens with a fragment, so the list joins the sentence that introduces it (DECISIONS 2026-09-29), as p3's four definitions do"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 7, kind: join, address: "ch 7 §7.3 ¶21",
+     at: "Reduction : A decrease in the oxidation number of", reason: "the definition \"Reduction: …\" is one of the five term/definition items completing \"To summarise, we may say that:\"; each opens with a fragment, so the list joins the sentence that introduces it (DECISIONS 2026-09-29), as p3's four definitions do"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 7, kind: join, address: "ch 7 §7.3 ¶22",
+     at: "Oxidising agent: A reagent which can increase the", reason: "the definition \"Oxidising agent: …\" is one of the five term/definition items completing \"To summarise, we may say that:\"; each opens with a fragment, so the list joins the sentence that introduces it (DECISIONS 2026-09-29), as p3's four definitions do"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 7, kind: join, address: "ch 7 §7.3 ¶23",
+     at: "Reducing agent: A reagent which lowers the", reason: "the definition \"Reducing agent: …\" is one of the five term/definition items completing \"To summarise, we may say that:\"; each opens with a fragment, so the list joins the sentence that introduces it (DECISIONS 2026-09-29), as p3's four definitions do"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 7, kind: join, address: "ch 7 §7.3 ¶24",
+     at: "Redox reactions: Reactions which involve change", reason: "the definition \"Redox reactions: …\" is one of the five term/definition items completing \"To summarise, we may say that:\"; each opens with a fragment, so the list joins the sentence that introduces it (DECISIONS 2026-09-29), as p3's four definitions do"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 7, kind: false_positive, address: "ch 7 §7.3 ¶26",
+     transcribed: "6Cu(s) + SO_2(g)", printed: "6Cu(s) + SO_2", reason: "the verifier quoted Problem 7.4's statement (¶25), which prints \"6Cu(s) + SO2(g)\"; the Solution's display prints \"6Cu(s) + SO2\" and ¶26 carries exactly that"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 8, kind: join, address: "ch 7 §7.3 ¶27",
+     at: "Further, Cu_2O helps sulphur in Cu_2S to increase", reason: "p8 opens inside Problem 7.4's tinted box, continuing p7's Solution; the box sets every line flush, so the print makes no paragraph break (DECISIONS 2026-09-29, box Solution; the verify join flag)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 8, kind: join, address: "ch 7 §7.3.1 ¶2",
+     at: "Either A and B or both A and B must be in the", reason: "set flush (x61) straight after the display \"A + B → C\", where this book indents a new paragraph: v5, a flush line after a display continues the paragraph"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 8, kind: join, address: "ch 7 §7.3.1 ¶4",
+     at: "It may carefully be noted that there is no change", reason: "set flush (x61) straight after display (7.28), where this book indents a new paragraph: v5, the paragraph continues (it resumes the decomposition examples)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 8, kind: join, address: "ch 7 §7.3.1 ¶6",
+     at: "Displacement reactions fit into two categories:", reason: "set flush (x307) straight after the display \"X + YZ → XZ + Y\", where this book indents a new paragraph: v5, the paragraph continues"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 8, kind: false_positive, address: "ch 7 §7.3.1 ¶2",
+     transcribed: "CH_4(g) + 2O_2(g) -> (Delta) CO_2(g) + 2H_2O (l)", printed: "CH_4(g) + 2O_2(g) -> (Delta) CO_2(g) + 2H_2O (l) (7.27)", reason: "the page numbers (7.24) and (7.25) but prints no number on the methane-combustion line; (7.27) is NaH's decomposition further down, where the row carries it"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 9, kind: false_positive, address: "ch 7 §7.3.1 ¶15",
+     transcribed: "(7.42b)", printed: "(7.42)", reason: "the page prints both: \"(7.42)\" on the KI equation and \"(7.42b)\" on its ionic form (the book pairs it with \"(7.41a)\"); the row carries each where it is printed"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 10, kind: join, address: "ch 7 §7.3.1 ¶22",
+     at: "(It is to be noted with care that fluorine in", reason: "set flush (x307) straight after display (7.49), where this book indents a new paragraph (\"It is of interest…\" above is indented): v5, a flush line after a display continues the paragraph"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 10, kind: text, address: "ch 7 §7.3.1 ¶18",
+     transcribed: "Disproportionation reactions are a special type of redox reactions.", printed: "4. Disproportionation reactions Disproportionation reactions are a special type of redox reactions.", reason: "the page prints the numbered side heading \"4. Disproportionation reactions\" (bold italic) above it; the transcriber dropped it, while its siblings \"1. Combination reactions\", \"2. Decomposition reactions\" and \"3. Displacement reactions\" lead their rows (DECISIONS 2026-09-27, a side heading leads its paragraph)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 10, kind: false_positive, address: "ch 7 §7.3.1 ¶24",
+     transcribed: "6 ClO_2^- -> (hv) 4ClO_3^-", printed: "6 ClO_2^- -(hv)-> 4ClO_3^-", reason: "the same reaction in the prompt's notation: a condition printed over the arrow is written after it in brackets (ncert_extract v5, \"2H_2 + O_2 -> 2H_2O (heat)\")"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 11, kind: text, address: "ch 7 §7.3.1 ¶27",
+     transcribed: "Sometimes, we come across with certain compounds", printed: "The Paradox of Fractional Oxidation Number Sometimes, we come across with certain compounds", reason: "the page prints the box title \"The Paradox of Fractional Oxidation Number\" over the tinted box this row opens; the transcriber dropped it (DECISIONS 2026-09-28, a boxed feature's title leads the box's first paragraph)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 13, kind: misprint, address: "ch 7 §7.3.2 ¶11",
+     transcribed: "Cr(aq)+SO_4^2-(aq)", printed: "Cr^3+(aq)+SO_4^2-(aq)", reason: "Step 2 prints \"→ Cr(aq)+SO4^2–(aq)\" with the oxidation number +3 set above Cr and no ionic charge (Step 1 prints Cr^3+); the row keeps the book's omission"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 14, kind: noise, address: "ch 7 §7.3.2 ¶24",
+     flag: "join", at: "Step 2: Separate the equation into half-reactions:", reason: "p14 opens with the half-reaction method's \"Step 2:\", the next numbered step after p13's Step 1 and (7.50); every Step is a row of its own in this book and the canonical ones (chem11-part1 ch 1, ch 4)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 15, kind: join, address: "ch 7 §7.3.2 ¶39",
+     at: "Now to equalise the number of electrons, we", reason: "inside Problem 7.10's tinted box, set flush straight after Step 5's display \"MnO4–(aq) + 2H2O(l) + 3e– → MnO2(s) + 4OH–(aq)\"; it finishes Step 5 (DECISIONS 2026-09-29, box Solution)"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 16, kind: figure_ref, address: "ch 7 §7.4 ¶2",
+     at: "This is represented by separating the oxidised", remove: "Fig.7.3", reason: "the row carries both \"Fig. 7.3\" and \"Fig.7.3\", two spellings the paragraph prints for one figure (the Daniell cell); one link is kept"}
+  - {book: chem11-part2, lang: en, chapter: 7, page: 16, kind: false_positive, address: "ch 7 §7.4 ¶5",
+     transcribed: "(E^0)", printed: "(E⊖)", reason: "the standard-state sign, which the book sets in MathB and the corpus spells ^0 (PARKED spelling item; chem11-part1 ^0 ×139); the same symbol, spelled"}
+  # chem11-part2 chapter 8
+  - {book: chem11-part2, lang: en, chapter: 8, page: 2, kind: join, address: "ch 8 §8.2.1 ¶4",
+     at: "(a) HC≡CCH=CHCH_3 (b) CH_2=C=CHCH_3", reason: "the items of Problem 8.1's statement, set on their own line in the box, complete its sentence (list items by corpus practice, DECISIONS 2026-09-29; chem12-part2 Example 6.7)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 2, kind: join, address: "ch 8 §8.2.1 ¶6",
+     at: "(a) sigma_(C – C): 4;", reason: "an answer line of Problem 8.1's Solution, set flush in the tinted box: a Solution set flush is one paragraph (DECISIONS 2026-09-29), led by its printed label \"Solution\""}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 2, kind: join, address: "ch 8 §8.2.1 ¶7",
+     at: "(b) sigma_(C – C): 3;", reason: "an answer line of Problem 8.1's Solution, set flush in the tinted box: a Solution set flush is one paragraph (DECISIONS 2026-09-29), led by its printed label \"Solution\""}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 2, kind: join, address: "ch 8 §8.2.1 ¶9",
+     at: "(a) CH_3Cl, (b) (CH_3)_2CO", reason: "the items of Problem 8.2's statement, set on their own line in the box, complete its sentence (list items by corpus practice, DECISIONS 2026-09-29; chem12-part2 Example 6.7)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 2, kind: join, address: "ch 8 §8.2.1 ¶11",
+     at: "(a) sp^3, (b) sp^3, sp^2", reason: "an answer line of Problem 8.2's Solution, set flush in the tinted box: a Solution set flush is one paragraph (DECISIONS 2026-09-29), led by its printed label \"Solution\""}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 2, kind: join, address: "ch 8 §8.2.1 ¶13",
+     at: "(a) H_2C=O, (b) CH_3F", reason: "the items of Problem 8.3's statement, set on their own line in the box, complete its sentence (list items by corpus practice, DECISIONS 2026-09-29; chem12-part2 Example 6.7)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 2, kind: join, address: "ch 8 §8.2.1 ¶15",
+     at: "(a) sp^2 hybridised carbon", reason: "an answer line of Problem 8.3's Solution, set flush in the tinted box: a Solution set flush is one paragraph (DECISIONS 2026-09-29), led by its printed label \"Solution\""}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: join, address: "ch 8 §8.3.1 ¶8",
+     at: "(a) CH_3CH_2COCH_2CH_3", reason: "the items of Problem 8.4's statement, set on their own line in the box, complete its sentence (list items by corpus practice, DECISIONS 2026-09-29; chem12-part2 Example 6.7)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: join, address: "ch 8 §8.3.1 ¶9",
+     at: "(b) CH_3CH=CH(CH_2)_3CH_3", reason: "the items of Problem 8.4's statement, set on their own line in the box, complete its sentence (list items by corpus practice, DECISIONS 2026-09-29; chem12-part2 Example 6.7)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: join, address: "ch 8 §8.3.1 ¶11",
+     at: "Problem 8.5 For each of the following compounds", reason: "step 1 of 3 (net: Problem 8.4's bare \"Solution\" joins its statement): Problem 8.5 joins the \"Solution\" row so that \"Solution Problem 8.5\" is a unique start; the split below restores it"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: join, address: "ch 8 §8.3.1 ¶10",
+     at: "Solution Problem 8.5", reason: "step 2 of 3: Problem 8.4's \"Solution\" heads an entirely drawn answer, which is a figure and stays out; the bare label joins the Problem statement (labels over skipped drawn content join their introducing paragraph, DECISIONS 2026-09-28, as the ch 9 rulings apply it)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: join, address: "ch 8 §8.3.1 ¶12",
+     at: "(a) HOCH_2CH_2CH_2CH(CH_3)CH(CH_3)CH_3", reason: "the items of Problem 8.5's statement, set on their own line in the box, complete its sentence (list items by corpus practice, DECISIONS 2026-09-29; chem12-part2 Example 6.7)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: join, address: "ch 8 §8.3.1 ¶15",
+     at: "(a) HO(CH_2)_3CH(CH_3)CH(CH_3)_2", reason: "an answer line of Problem 8.5's Solution, set flush in the tinted box: a Solution set flush is one paragraph (DECISIONS 2026-09-29), led by its printed label \"Solution\""}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: join, address: "ch 8 §8.3.1 ¶16",
+     at: "(b) HOCH(CN)_2", reason: "an answer line of Problem 8.5's Solution, set flush in the tinted box: a Solution set flush is one paragraph (DECISIONS 2026-09-29), led by its printed label \"Solution\""}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: join, address: "ch 8 §8.3.1 ¶17",
+     at: "Bond-line formula:", reason: "the sub-label \"Bond-line formula:\" over the drawn answers belongs to Problem 8.5's Solution, set flush in the box (DECISIONS 2026-09-29; labels over drawn content join, 2026-09-28)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: join, address: "ch 8 §8.3.1 ¶14",
+     at: "Solution Condensed formula:", reason: "step 1 of 3 (net: Problem 8.6's bare \"Solution\" joins its statement): Problem 8.5's Solution joins the row before it so that Problem 8.6's \"Solution\" is the page's only paragraph starting \"Solution\"; the split below restores it"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: join, address: "ch 8 §8.3.1 ¶19",
+     at: "Solution", reason: "step 2 of 3: Problem 8.6's \"Solution\" heads an entirely drawn answer, which is a figure and stays out; the bare label joins the Problem statement (labels over skipped drawn content join their introducing paragraph, DECISIONS 2026-09-28, as the ch 9 rulings apply it)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: join, address: "ch 8 §8.3.1 ¶13",
+     at: "(b)", reason: "the label \"(b)\" over Problem 8.5's drawn item (b) N≡C–CH(OH)–C≡N; a label over drawn content joins the paragraph that introduces it (DECISIONS 2026-09-28). Placed after the other p4 joins so that it is the only paragraph starting \"(b)\""}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: split, address: "ch 8 §8.3.1 ¶11",
+     at: "Problem 8.5 For each of the following compounds", reason: "step 3 of 3: Problem 8.5 is its own box statement again, as transcribed"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 4, kind: split, address: "ch 8 §8.3.1 ¶14",
+     at: "Solution Condensed formula:", reason: "step 3 of 3: Problem 8.5's Solution is its own paragraph again, as transcribed"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 6, kind: join, address: "ch 8 §8.4 ¶4",
+     at: "(a) Alicyclic compounds", reason: "the italic heading \"II Cyclic or closed chain or ring compounds\" (a row of its own) leads its first item, as \"I. Acyclic or open chain compounds\" leads §8.4 ¶2 (side headings and list labels lead, DECISIONS 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 6, kind: join, address: "ch 8 §8.4 ¶5",
+     at: "Sometimes atoms other than carbon", reason: "set flush at the column margin straight after the display of the drawn cyclopropane, cyclohexane and cyclohexene, where this book indents a new paragraph: v5, a flush line after a display continues the paragraph (chem11-part1 precedent); item (a) runs on"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 6, kind: join, address: "ch 8 §8.4 ¶6",
+     at: "These exhibit some of the properties", reason: "set flush at the column margin straight after the display of the drawn tetrahydrofuran, where this book indents a new paragraph: v5, a flush line after a display continues the paragraph (chem11-part1 precedent); item (a) runs on"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 6, kind: join, address: "ch 8 §8.4 ¶8",
+     at: "Benzenoid aromatic compounds", reason: "the label over the drawn benzene, aniline and naphthalene; labels over drawn content join the paragraph that introduces them (\"…examples of various types of aromatic compounds are:\", DECISIONS 2026-09-28)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 6, kind: join, address: "ch 8 §8.4 ¶9",
+     at: "Non-benzenoid compound", reason: "the label over the drawn tropone; labels over drawn content join the paragraph that introduces them (DECISIONS 2026-09-28)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 6, kind: false_positive, address: "ch 8 §8.4 ¶2",
+     transcribed: "CH_3—CO—H Acetaldehyde", printed: "CH3—C—H with double bond O above C", reason: "the page draws the carbonyl O double-bonded above the C of CH3–C–H; \"CH_3—CO—H\" carries it in condensed form, the same structure"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 6, kind: false_positive, address: "ch 8 §8.4 ¶2",
+     transcribed: "CH_3—CO—OH Acetic acid", printed: "CH3—C—OH with double bond O above C", reason: "the page draws the carbonyl O double-bonded above the C of CH3–C–OH; \"CH_3—CO—OH\" carries it in condensed form"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 8, kind: join, address: "ch 8 §8.5.2 ¶3",
+     at: "In order to name such compounds", reason: "opens the right column flush at x307 straight after the drawn branched chains (a) and (b) that end \"Branched chain hydrocarbons…\", where this book indents a new paragraph (\"Abbreviations are used…\" below at x319): v5, the paragraph continues"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 9, kind: false_positive, address: "ch 8 §8.5.2 ¶12",
+     transcribed: "attaches to the root alkane is numbered 1", printed: "attaches to the root alkane", reason: "the page prints \"…the carbon atom of the branch that attaches to the root alkane is numbered 1 as exemplified below.\"; the verifier's span stops where the bold run ends, the row has the whole sentence"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 11, kind: join, address: "ch 8 §8.5.3 ¶4",
+     at: "The –R, C_6H_5-, halogens", reason: "set flush at the column margin straight after the display the bold order of priority \"-COOH, -SO3H, … –C≡C-\", where this book indents a new paragraph: v5, a flush line after a display continues the paragraph (chem11-part1 precedent)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 11, kind: text, address: "ch 8 §8.5.3 ¶8",
+     transcribed: "CH_3–CH_2–CH–CH_2–CH_2–CH–CH_2–CH_3 with OH on C-3 and CH_3 on C-6", printed: "CH_3–CH_2–CH(OH)–CH_2–CH_2–CH(CH_3)–CH_2–CH_3", reason: "the page draws OH under C-3 and CH3 under C-6; the row described them in words, which v5 forbids (\"Do not describe what a figure shows\"); written in the bracket notation this chapter's rows already use for drawn substituents (§8.4 ¶2 \"CH_3—CH(CH_3)—CH_3\", §8.6.1 ¶2 \"CH_3–C(CH_3)(CH_3)–CH_3\", ¶3 \"CH_3–CH(OH)-CH_3\"), as chem12-part2 ch 7 p26 restored a drawn CH3"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 13, kind: join, address: "ch 8 §8.5.3 ¶20",
+     at: "(i) 'hexane' indicates", reason: "the row of its own \"Solution\" is Problem 8.9's label; a label is the first words of its paragraph (v5) and item (i) stays with it (chem11-part1 Problem 5.10 precedent); items (ii)–(v) are complete sentences and stay rows"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 15, kind: join, address: "ch 8 §8.5.4 ¶8",
+     at: "Solution (a) (b) (c) (d)", reason: "Problem 8.10's \"Solution\" heads an entirely drawn answer, which is a figure and stays out; the bare label joins the Problem statement (labels over skipped drawn content join their introducing paragraph, DECISIONS 2026-09-28, as the ch 9 rulings apply it); the labels (a)–(d) stay with it"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 15, kind: text, address: "ch 8 §8.6.1 ¶2",
+     transcribed: "CH_3–CHCH_2CH_3 with CH_3 Isopentane", printed: "CH_3–CH(CH_3)CH_2CH_3 Isopentane", reason: "the page draws CH3 under the CH of CH3–CHCH2CH3 (isopentane); the row's \"with CH_3\" describes the drawing (v5 forbids it); written in the bracket notation of the same row's neopentane"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 15, kind: false_positive, address: "ch 8 §8.6.1 ¶2",
+     transcribed: "CH_3–C(CH_3)(CH_3)–CH_3", printed: "CH_3—C(CH_3)—CH_3 with CH_3 above", reason: "the page draws neopentane with CH3 above and below the central C; \"CH_3–C(CH_3)(CH_3)–CH_3\" carries both, in the chapter's bracket notation"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 16, kind: join, address: "ch 8 §8.7 ¶2",
+     at: "The general reaction is depicted as follows", reason: "flush at x61 after \"…and finally product(s)\" (the book prints no full stop), where this book indents a new paragraph (\"Substrate is that reactant…\" below at x79): the paragraph runs on into the drawn scheme"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 17, kind: join, address: "ch 8 §8.7.1 ¶5",
+     at: "The heterolytic cleavage can also give", reason: "flush at x60 under the caption of Fig. 8.3(a); this book resumes a paragraph flush after a figure (p25, p27, p33 mid-sentence) and indents a new one (p23 after Fig. 8.4(b), p31 after Fig. 8.14): the paragraph runs on"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 17, kind: join, address: "ch 8 §8.7.1 ¶6",
+     at: "Carbanions are also unstable", reason: "flush at x60 under the caption of Fig. 8.3(b); a new paragraph after a figure is indented in this book (p23, p31): the paragraph runs on"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 17, kind: join, address: "ch 8 §8.7.2 ¶2",
+     at: "(i) CH_2 = CH_2 + Br_2", reason: "the displayed example (i) completes \"…depends on molecule under observation. Example:\"; an equation on its own line belongs to the paragraph it follows (v5; chem12-part2 precedent)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 17, kind: join, address: "ch 8 §8.7.2 ¶3",
+     at: "(ii) (Substrate) + CH_3Cl", reason: "the displayed example (ii), after (i), under the same \"Example:\"; a display belongs to the paragraph it follows (v5)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 17, kind: join, address: "ch 8 §8.7.2 ¶5",
+     at: "Reagents attack the reactive site", reason: "the bold italic side heading \"Nucleophiles and Electrophiles\" (a row of its own) leads the paragraph under it (DECISIONS 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 17, kind: false_positive, address: "ch 8 §8.7.1 ¶8",
+     transcribed: ".CH_3 < .CH_2CH_3 < .CH(CH_3)_2 < .C(CH_3)_3, Methyl free radical Ethyl free radical Isopropyl free radical Tert-butyl free radical", printed: ".CH_3 < .CH_2CH_3 < .CH(CH_3)_2 < .C(CH_3)_3", reason: "the page prints the four names \"Methyl free radical … Tert-butyl free radical\" under the radicals of the stability order; the row carries them after the display, as §8.3.1 ¶2 carries \"Ethane Ethene Ethyne Methanol\""}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 18, kind: join, address: "ch 8 §8.7.2 ¶9",
+     at: "(a) CH_3–SCH_3, (b) CH_3–CN", reason: "the items of Problem 8.11's statement, set on their own line in the box, complete its sentence (list items by corpus practice, DECISIONS 2026-09-29; chem12-part2 Example 6.7)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 18, kind: join, address: "ch 8 §8.7.2 ¶13",
+     at: "Electrophiles: BF_3", reason: "Problem 8.12's Solution runs flush in the box from \"Nucleophiles: …\" into \"Electrophiles: …\": a Solution set flush is one paragraph (DECISIONS 2026-09-29)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 19, kind: join, address: "ch 8 §8.7.3 ¶3",
+     at: "(i) from pi bond to adjacent bond position", reason: "labels (i)–(iii) over the drawn curved-arrow shifts, each a fragment, complete \"Presentation of shifting of electron pair is given below :\" (labels over drawn content join, DECISIONS 2026-09-28; fragments join, 2026-09-29)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 19, kind: join, address: "ch 8 §8.7.3 ¶4",
+     at: "(ii) from pi bond to adjacent atom", reason: "as (i)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 19, kind: join, address: "ch 8 §8.7.3 ¶5",
+     at: "(iii) from atom to adjacent bond position", reason: "as (i)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 19, kind: text, address: "ch 8 §8.7.4 ¶1",
+     transcribed: "cause permanent polarisation", printed: "cause permanent polarlisation", reason: "the page prints \"polarlisation\" (p19 L y593, image and decoded layer); the transcriber silently corrected it; the book's own errors are restored as printed (DECISIONS 2026-09-29) and go to the errata list"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 19, kind: false_positive, address: "ch 8 §8.7.3 ¶6",
+     transcribed: "HO:^- + CH_3-Br: -> CH_3OH + :Br:^-", printed: "HO: + CH_3-Br: -> CH_3OH + :Br:^-", reason: "the page sets a minus over the O of HO: (HÖ:⁻); the corpus writes a charge on an atom as ^-, as the row does"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 21, kind: join, address: "ch 8 §8.7.6 ¶12",
+     at: "[I: Most stable", reason: "Problem 8.17's Solution continues flush in the box after \"Stability: I > II > III\": a Solution set flush is one paragraph (DECISIONS 2026-09-29)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 21, kind: join, address: "ch 8 §8.7.7 ¶5",
+     at: "+R effect: – halogen", reason: "the list lines \"+R effect: …\" and \"– R effect: …\" are fragments completing \"…effects are as follows:\" (list items by corpus practice, DECISIONS 2026-09-29)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 21, kind: join, address: "ch 8 §8.7.7 ¶6",
+     at: "– R effect: – COOH", reason: "as \"+R effect\""}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 21, kind: false_positive, address: "ch 8 §8.7.6 ¶11",
+     transcribed: "<-> ^-:CH_2–CH=C(–O^+)–H", printed: "<-> :CH_2-CH=C(-O:^+)-H", reason: "structure III carries a bar-minus over the CH2 (⁻:CH2), which the row has as ^- and the verifier's span dropped; the O's lone-pair dots are drawn and omitted alike in I–III"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 22, kind: split, address: "ch 8 §8.7.7 ¶6",
+     at: "The presence of alternate single and double bonds", reason: "p22 opens indented at x79 (margin 61): the print starts a new paragraph at the top of the page; the row ran p21's \"– R effect\" list onto it"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 22, kind: false_positive, address: "ch 8 §8.7.9 ¶2",
+     transcribed: "CH_3 C^+H_2", printed: "CH_3 CH_2^+", reason: "the page sets the + over the C of CH2 (\"CH3 C⁺H2\"); the row writes it C^+H_2, as ¶10 writes CH_3C^+H_2"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 23, kind: join, address: "ch 8 §8.7.10 ¶2",
+     at: "You will be studying these reactions", reason: "flush at x305 straight after the indented list (i)–(iv), where this book indents a new paragraph: the paragraph runs on (chem11-part1 ch 1 precedent, a flush resumption after a list)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 24, kind: false_positive, address: "ch 8 §8.8.3 ¶3",
+     transcribed: "higher boiling point condense before the vapours of the liquid with lower boiling", printed: "higher boiling point condense before the vapours of the liquid with lower boiling point", reason: "the row carries \"…the vapours of the liquid with lower boiling point.\" on p24; the verifier's transcribed span stops before \"point\""}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 27, kind: join, address: "ch 8 §8.8.5 ¶3",
+     at: "(a) Adsorption chromatography, and", reason: "items (a), (b) are fragments completing \"…Two of these are:\" (fragments join, DECISIONS 2026-09-29)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 27, kind: join, address: "ch 8 §8.8.5 ¶4",
+     at: "(b) Partition chromatography.", reason: "as (a)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 27, kind: join, address: "ch 8 §8.8.5 ¶6",
+     at: "(a) Column chromatography, and", reason: "items (a), (b) are fragments completing \"Following are two main types of chromatographic techniques based on the principle of differential adsorption.\" (fragments join, DECISIONS 2026-09-29)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 27, kind: join, address: "ch 8 §8.8.5 ¶7",
+     at: "(b) Thin layer chromatography.", reason: "as (a)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 28, kind: join, address: "ch 8 §8.8.5 ¶10",
+     at: "The glass plate is then placed", reason: "opens the right column flush at x306 after the left column's TLC paragraph, where this book indents a new paragraph (\"The spots of coloured compounds…\" below is indented): the paragraph runs on"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 30, kind: join, address: "ch 8 §8.9.2 ¶6",
+     at: "(a) The sodium fusion extract is acidified with acetic acid", reason: "the bold italic heading \"(B) Test for Sulphur\" (a row of its own) leads its first item, as \"(A) Test for Nitrogen\" leads §8.9.2 ¶4 (DECISIONS 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 30, kind: join, address: "ch 8 §8.9.2 ¶11",
+     at: "The sodium fusion extract is acidified with nitric acid", reason: "the heading \"(C) Test for Halogens\" (a row of its own) leads the paragraph under it (DECISIONS 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 30, kind: join, address: "ch 8 §8.9.2 ¶12",
+     at: "If nitrogen or sulphur is also present", reason: "set flush at the column margin straight after the display \"X– + Ag+ → AgX\" and its note \"X represents a halogen – Cl, Br or I.\", where this book indents a new paragraph: v5, a flush line after a display continues the paragraph (chem11-part1 precedent)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 30, kind: join, address: "ch 8 §8.9.2 ¶14",
+     at: "The compound is heated with an oxidising agent", reason: "the heading \"(D) Test for Phosphorus\" (a row of its own) leads the paragraph under it (DECISIONS 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 31, kind: join, address: "ch 8 §8.10.2 ¶4",
+     at: "Let the mass of organic compound = m g", reason: "the derivation block (\"Let the mass …\" and its equations) is set flush straight after the paragraph that introduces the method, where this book indents a new paragraph: v5, an equation on its own line belongs to the paragraph it follows"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 31, kind: join, address: "ch 8 §8.10.2 ¶5",
+     at: "Where p_1 and V_1 are the pressure", reason: "set flush at the column margin straight after the display \"(Let it be V mL)\", where this book indents a new paragraph: v5, a flush line after a display continues the paragraph (chem11-part1 precedent)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 31, kind: split, address: "ch 8 §8.10.1 ¶1",
+     at: "The mass of water produced is determined", reason: "p31's text opens indented at x78 (margin 60) under Fig. 8.14: the print starts a new paragraph; the row ran p30's paragraph and its equation onto it"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 32, kind: join, address: "ch 8 §8.10.2 ¶6",
+     at: "V mL N_2 at STP weighs", reason: "p32's text opens flush at x61 under the Dumas figure with the rest of p31's derivation (\"22400 mL N2 at STP weighs 28 g.\" → \"V mL N2 at STP weighs = …\"): the paragraph runs on across the page"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 33, kind: misprint, address: "ch 8 §8.10.2 ¶9",
+     transcribed: "1.4 × M × 2(V − V/2) / m", printed: "1.4 × M × 2(V − V_1/2) / m", reason: "the page itself prints \"= 1.4 × M × 2(V − V/2) / m\", dropping the subscript it carries one line above (\"2(V − V1/2)\"); the row keeps the book's error — errata"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 33, kind: false_positive, address: "ch 8 §8.10.2 ¶9",
+     transcribed: "V - V_1/2) mL of NH_3 solution of molarity M.", printed: "V_1/2) mL of NH_3 solution of molarity M.", reason: "the page prints \"= 2(V-V1/2) mL of NH3 solution of molarity M.\"; the row's \"V - V_1/2) mL of NH_3 solution\" is that line, and the verifier's span cut the V"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 34, kind: join, address: "ch 8 §8.10.3 ¶2",
+     at: "Let the mass of organic compound taken = m g Mass of AgX", reason: "the derivation block (\"Let the mass …\" and its equations) is set flush straight after the paragraph that introduces the method, where this book indents a new paragraph: v5, an equation on its own line belongs to the paragraph it follows"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 34, kind: join, address: "ch 8 §8.10.4 ¶2",
+     at: "Let the mass of organic compound taken = m g and the mass of barium", reason: "the derivation block (\"Let the mass …\" and its equations) is set flush straight after the paragraph that introduces the method, where this book indents a new paragraph: v5, an equation on its own line belongs to the paragraph it follows"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 35, kind: join, address: "ch 8 §8.10.5 ¶2",
+     at: "Let the mass of organic compound taken = m g and mass of ammonium", reason: "the derivation block (\"Let the mass …\" and its equations) is set flush straight after the paragraph that introduces the method, where this book indents a new paragraph: v5, an equation on its own line belongs to the paragraph it follows"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 35, kind: join, address: "ch 8 §8.10.5 ¶3",
+     at: "If phosphorus is estimated as Mg_2P_2O_7", reason: "set flush at the column margin straight after the display \"Percentage of phosphorus = 31 × m1 × 100 / (1877 × m) %\", where this book indents a new paragraph: v5, a flush line after a display continues the paragraph (chem11-part1 precedent)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 35, kind: join, address: "ch 8 §8.10.5 ¶4",
+     at: "where, 222 u is the molar mass", reason: "a lower-case row after the display that ends ¶3 completes its sentence (Chemistry ruling 2026-09-27); the display itself is cut off in the book (\"= 62 × m1 × 100 / 222 ×\"), kept as printed — errata"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 35, kind: join, address: "ch 8 §8.10.6 ¶4",
+     at: "Thus 88 g carbon dioxide is obtained", reason: "flush at x305 after \"…two moles of carbondioxide.\", where this book indents a new paragraph (\"The percentage of oxygen can be derived…\" below is indented): the paragraph runs on (chem11-part1 ch 1 precedent)"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 35, kind: join, address: "ch 8 §8.10.6 ¶5",
+     at: "Let the mass of organic compound taken be m g", reason: "the derivation block (\"Let the mass …\" and its equations) is set flush straight after the paragraph that introduces the method, where this book indents a new paragraph: v5, an equation on its own line belongs to the paragraph it follows"}
+  - {book: chem11-part2, lang: en, chapter: 8, page: 35, kind: misprint, address: "ch 8 §8.10.5 ¶2",
+     transcribed: "phospho molydate = m_1 g", printed: "phospho molybdate = m_1 g", reason: "the page prints \"phospho molydate\" (p35 L); the row keeps the book's spelling — errata"}
+  # chem11-part2 chapter 9
+  - {book: chem11-part2, lang: en, chapter: 9, page: 2, kind: noise, address: "ch 9 §9.1 ¶1",
+     flag: "join", at: "Hydrocarbons are of different types. Dependin", reason: "p1 ends \"…three main categories – (i) saturated\" mid-list and p2 opens \"(ii) unsaturated and (iii) aromatic hydrocarbons.\" completing the same sentence; the print runs on and the row is right"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 3, kind: text, address: "ch 9 §9.2.1 ¶5",
+     transcribed: "CH_3 – C – CH_2 – CH_3 with CH_3 groups above and below", printed: "CH_3 – C(CH_3)(CH_3) – CH_2 – CH_3", reason: "the drawing sets these substituents on vertical bonds; the row described them in words (v5: do not describe what a figure shows) — rewritten as bracket notation of exactly what is drawn (precedent ch 8 §8.6.1 ¶2, chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 4, kind: join, address: "ch 9 §9.2.1 ¶10",
+     at: "Solution", reason: "Problem 9.2's \"Solution\" heads the box's solution table (structures of –C5H11, corresponding alcohols, names), a table the transcriber rightly skipped; the bare label joins the Problem statement that introduces it (label ruling 2026-09-28, by analogy)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 5, kind: noise, address: "ch 9 §9.2.1 ¶11",
+     flag: "join", at: "Problem 9.3 Write IUPAC names of the followin", reason: "p4 ends with the last row (viii) of Problem 9.2's solution table; p5 opens with Table 9.1 and the Problem 9.3 box, which starts a paragraph. The \"continuing\" line the flag quotes, \"important to write the correct structure\", is the top of p5's right column carrying on ¶13 from p5's own left column"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: join, address: "ch 9 §9.2.1 ¶22",
+     at: "(ii) 7 6 5 4 3 2 1", reason: "Problem 9.5's Solution is set flush in its tinted box, (i) and (ii) under one \"Solution\"; a flush box Solution is one paragraph (2026-09-29), as ¶5, ¶12 and ¶19 carry theirs"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: text, address: "ch 9 §9.2.1 ¶15",
+     transcribed: "C^1 – ^2C – ^3C – ^4C – ^5C (with CH_3 on C2, and CH_3, C_2H_5 substituents)", printed: "C^1 – ^2C(CH_3)(CH_3) – ^3C(C_2H_5) – ^4C – ^5C", reason: "the drawing sets these substituents on vertical bonds; the row described them in words (v5: do not describe what a figure shows) — rewritten as bracket notation of exactly what is drawn (precedent ch 8 §8.6.1 ¶2, chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: text, address: "ch 9 §9.2.1 ¶16",
+     transcribed: "CH_3 – C – CH – CH_2 – CH_3 (with CH_3, CH_3 and C_2H_5 substituents)", printed: "CH_3 – C(CH_3)(CH_3) – CH(C_2H_5) – CH_2 – CH_3", reason: "the drawing sets these substituents on vertical bonds; the row described them in words (v5: do not describe what a figure shows) — rewritten as bracket notation of exactly what is drawn (precedent ch 8 §8.6.1 ¶2, chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: text, address: "ch 9 §9.2.1 ¶19",
+     transcribed: "CH_3 – CH_2 – CH – C – CH – CH_2 – CH_3 (with CH_3, CH_3, CH_3 substituents)", printed: "CH_3 – CH_2 – CH(CH_3) – C(CH_3)(CH_3) – CH(CH_3) – CH_2 – CH_3", reason: "the drawing sets these substituents on vertical bonds; the row described them in words (v5: do not describe what a figure shows) — rewritten as bracket notation of exactly what is drawn (precedent ch 8 §8.6.1 ¶2, chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: text, address: "ch 9 §9.2.1 ¶19",
+     transcribed: "CH_3 – CH – CH_2 – CH_2 – CH – CH_3 (with CH_3 and CH_3 substituents)", printed: "CH_3 – CH(CH_3) – CH_2 – CH_2 – CH(CH_3) – CH_3", reason: "the drawing sets these substituents on vertical bonds; the row described them in words (v5: do not describe what a figure shows) — rewritten as bracket notation of exactly what is drawn (precedent ch 8 §8.6.1 ¶2, chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: text, address: "ch 9 §9.2.1 ¶21",
+     transcribed: "CH_3 – CH – CH_2 – CH_2 – CH_3 (with C_2H_5 substituent)", printed: "CH_3 – CH(C_2H_5) – CH_2 – CH_2 – CH_3", reason: "the drawing sets these substituents on vertical bonds; the row described them in words (v5: do not describe what a figure shows) — rewritten as bracket notation of exactly what is drawn (precedent ch 8 §8.6.1 ¶2, chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: text, address: "ch 9 §9.2.1 ¶22",
+     transcribed: "CH_3–CH_2–CH–CH_2–CH–CH_2–CH_3 (with CH_3 and C_2H_5 substituents)", printed: "CH_3–CH_2–CH(CH_3)–CH_2–CH(C_2H_5)–CH_2–CH_3", reason: "the drawing sets these substituents on vertical bonds; the row described them in words (v5: do not describe what a figure shows) — rewritten as bracket notation of exactly what is drawn (precedent ch 8 §8.6.1 ¶2, chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: split, address: "ch 9 §9.2.1 ¶15",
+     at: "iii) Attach ethyl group at carbon 3 and", reason: "p6 opens with step \"iii)\" of the four numbered steps, each a complete sentence set with a hanging indent; i), ii) and iv) are rows and the continuation flag glued iii) onto ii) (list-item ruling 2026-09-29: complete-sentence items stay rows)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: misprint, address: "ch 9 §9.2.1 ¶18",
+     transcribed: "2,5-Dimethyhexane", printed: "2,5-Dimethylhexane", reason: "the page prints \"(ii) 2,5-Dimethyhexane\" in Problem 9.4 — the book's own error, kept"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: misprint, address: "ch 9 §9.2.2 ¶2",
+     transcribed: "CH_3–CH=CH_2 + H_2 -> CH_3−CH_2CH_3 (Pt/Pd/Ni)
+Propane                Propane", printed: "CH_3–CH=CH_2 + H_2 -> CH_3−CH_2CH_3 (Pt/Pd/Ni)
+Propene                Propane", reason: "the page prints \"Propane\" under the propene of (9.2) (and \"Ethene … Propane\" under (9.1)) — the book's own labels, kept"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 6, kind: misprint, address: "ch 9 §9.2.2 ¶3",
+     transcribed: "CH_3 – C1 + H_2 -> CH_4 + HC1 (Zn,H^+) (9.4)", printed: "CH_3 – Cl + H_2 -> CH_4 + HCl (Zn,H^+) (9.4)", reason: "the page sets digit 1 for l in (9.4): \"CH3–C1 + H2 → CH4 + HC1\" — the book's own typesetting, kept"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 7, kind: join, address: "ch 9 §9.2.2 ¶7",
+     at: "i) Sodium salts of carboxylic acids o", reason: "\"3. From carboxylic acids\" is the numbered side heading (Bookman-DemiItalic, blue) over this item; it leads it, as \"2. From alkyl halides i) Alkyl halides…\" leads ¶3 (side-heading ruling 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 7, kind: join, address: "ch 9 §9.2.3 ¶2",
+     at: "Alkanes are almost non-polar molecules", reason: "\"Physical properties\" is the unnumbered side heading (blue italic) over this paragraph; it leads it (side-heading ruling 2026-09-27), as \"Chemical properties\" leads ¶5"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 7, kind: false_positive, address: "ch 9 §9.2.2 ¶11",
+     transcribed: "2CH_3COO^-Na^+ <-> 2CH_3 – C(=O) – O^- +2Na^+", printed: "2CH_3–C(=O)–O^- <-> 2CH_3 – C(=O) – O^- +2Na^+", reason: "the page prints step i) as \"2CH3COO−Na+ ⇌ 2CH3–C(=O)–O− +2Na+\", as the row carries it; the verifier restated the left side"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 7, kind: false_positive, address: "ch 9 §9.2.2 ¶11",
+     transcribed: "H_2O + e^- -> –OH+H·", printed: "H_2O + e^- -> OH+H·", reason: "the page prints \"H2O + e− →–OH+Ḣ\", the dash before OH included, as the row carries it"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 9, kind: join, address: "ch 9 §9.2.3 ¶11",
+     at: "(i) Initiation : The reaction is initiat", reason: "\"Mechanism\" is the side heading (blue italic) over the three steps; it leads the first (side-heading ruling 2026-09-27; chem12-part2's box title \"Mechanism\" led its box, 2026-09-28)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 9, kind: join, address: "ch 9 §9.2.3 ¶19",
+     at: "Alkanes on heating in the presence of ai", reason: "\"2. Combustion\" is the numbered side heading over this paragraph; it leads it, as \"1. Substitution reactions\" leads ¶6 (side-heading ruling 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 9, kind: text, address: "ch 9 §9.2.3 ¶7",
+     transcribed: "CH_3–CH_3 + Cl_2 --(hv)-> CH_3–CH_2Cl + HCl Chloroethane (9.14)", printed: "CH_3–CH_3 + C1_2 --(hv)-> CH_3–CH_2C1 + HC1 Chloroethane (9.14)", reason: "the page prints this formula with digit 1 (capital I on p10, Ä for Δ on p9) where the row normalised it; a garble the book prints is restored as printed (DECISIONS 2026-09-29) — errata list"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 9, kind: text, address: "ch 9 §9.2.3 ¶11",
+     transcribed: "Cl–Cl --(hv/homolysis)-> + 2 Cl_dot", printed: "C1–C1 --(hv/homolysis)-> + 2 C1_dot", reason: "the page prints this formula with digit 1 (capital I on p10, Ä for Δ on p9) where the row normalised it; a garble the book prints is restored as printed (DECISIONS 2026-09-29) — errata list"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 9, kind: text, address: "ch 9 §9.2.3 ¶12",
+     transcribed: "(a) CH_4 + Cl_dot --(hv)-> C_dot H_3 + H–Cl", printed: "(a) CH_4 + C1_dot --(hv)-> C_dot H_3 + H–C1", reason: "the page prints this formula with digit 1 (capital I on p10, Ä for Δ on p9) where the row normalised it; a garble the book prints is restored as printed (DECISIONS 2026-09-29) — errata list"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 9, kind: text, address: "ch 9 §9.2.3 ¶13",
+     transcribed: "(b) C_dot H_3 + Cl–Cl --(hv)-> CH_3 – Cl + Cl_dot", printed: "(b) C_dot H_3 + C1–C1 --(hv)-> CH_3 – C1 + C1_dot", reason: "the page prints this formula with digit 1 (capital I on p10, Ä for Δ on p9) where the row normalised it; a garble the book prints is restored as printed (DECISIONS 2026-09-29) — errata list"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 9, kind: text, address: "ch 9 §9.2.3 ¶14",
+     transcribed: "CH_3Cl + Cl_dot -> C_dot H_2Cl + HCl C_dot H_2Cl + Cl– Cl -> CH_2Cl_2 + Cl_dot", printed: "CH_3C1 + C1_dot -> C_dot H_2C1 + HC1 C_dot H_2C1 + C1– C1 -> CH_2C1_2 + C1_dot", reason: "the page prints this formula with digit 1 (capital I on p10, Ä for Δ on p9) where the row normalised it; a garble the book prints is restored as printed (DECISIONS 2026-09-29) — errata list"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 9, kind: text, address: "ch 9 §9.2.3 ¶16",
+     transcribed: "(a) Cl_dot + Cl_dot -> Cl–Cl (b) H_3C_dot + C_dot H_3 -> H_3C– CH_3 (c) C_dot H_3 + Cl_dot -> H_3C–Cl", printed: "(a) C1_dot + C1_dot -> C1–C1 (b) H_3C_dot + C_dot H_3 -> H_3C– CH_3 (c) C_dot H_3 + C1_dot -> H_3C–C1", reason: "the page prints this formula with digit 1 (capital I on p10, Ä for Δ on p9) where the row normalised it; a garble the book prints is restored as printed (DECISIONS 2026-09-29) — errata list"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 9, kind: text, address: "ch 9 §9.2.3 ¶19",
+     transcribed: "Delta_c H^è – 890", printed: "Ä_c H^è – 890", reason: "the page prints this formula with digit 1 (capital I on p10, Ä for Δ on p9) where the row normalised it; a garble the book prints is restored as printed (DECISIONS 2026-09-29) — errata list"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 9, kind: text, address: "ch 9 §9.2.3 ¶19",
+     transcribed: "Delta_c H^è = −2875.84", printed: "Ä_c H^è = −2875.84", reason: "the page prints this formula with digit 1 (capital I on p10, Ä for Δ on p9) where the row normalised it; a garble the book prints is restored as printed (DECISIONS 2026-09-29) — errata list"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 9, kind: text, address: "ch 9 §9.2.3 ¶17",
+     transcribed: "Though in (c), CH_3 – Cl the one", printed: "Though in (c), CH_3 – Cl, the one", reason: "the page prints a comma after \"CH3 – Cl\" (\"Though in (c), CH3 – Cl,  the one of the\"); the row dropped it"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 9, kind: misprint, address: "ch 9 §9.2.3 ¶11",
+     transcribed: "Cl–Cl --(hv/homolysis)-> + 2 Cl_dot", printed: "Cl–Cl --(hv/homolysis)-> 2 Cl_dot", reason: "the page prints a stray \"+\" after the arrow: \"C1–C1 →(hv/homolysis) + 2Ċ1\" — the book's own error, kept"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: text, address: "ch 9 §9.2.3 ¶23",
+     transcribed: "Alkanes on heating with a regulated supply", printed: "3. Controlled oxidation Alkanes on heating with a regulated supply", reason: "the page prints the numbered side heading \"3. Controlled oxidation\" (Bookman-DemiItalic, blue) above this paragraph; the transcriber dropped it — it leads the paragraph, as \"1. Substitution reactions\" and \"2. Combustion\" do (side-heading ruling 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: text, address: "ch 9 §9.2.3 ¶25",
+     transcribed: "n-Alkanes on heating in the presence of anhydrous", printed: "4. Isomerisation n-Alkanes on heating in the presence of anhydrous", reason: "the page prints the numbered side heading \"4. Isomerisation\" (Bookman-DemiItalic, blue) above this paragraph; the transcriber dropped it — it leads the paragraph, as \"1. Substitution reactions\" and \"2. Combustion\" do (side-heading ruling 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: text, address: "ch 9 §9.2.3 ¶26",
+     transcribed: "n-Alkanes having six or more carbon atoms", printed: "5. Aromatization n-Alkanes having six or more carbon atoms", reason: "the page prints the numbered side heading \"5. Aromatization\" (Bookman-DemiItalic, blue) above this paragraph; the transcriber dropped it — it leads the paragraph, as \"1. Substitution reactions\" and \"2. Combustion\" do (side-heading ruling 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: text, address: "ch 9 §9.2.3 ¶28",
+     transcribed: "Methane reacts with steam at 1273 K", printed: "6. Reaction with steam Methane reacts with steam at 1273 K", reason: "the page prints the numbered side heading \"6. Reaction with steam\" (Bookman-DemiItalic, blue) above this paragraph; the transcriber dropped it — it leads the paragraph, as \"1. Substitution reactions\" and \"2. Combustion\" do (side-heading ruling 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: text, address: "ch 9 §9.2.3 ¶29",
+     transcribed: "Higher alkanes on heating to higher temperature", printed: "7. Pyrolysis Higher alkanes on heating to higher temperature", reason: "the page prints the numbered side heading \"7. Pyrolysis\" (Bookman-DemiItalic, blue) above this paragraph; the transcriber dropped it — it leads the paragraph, as \"1. Substitution reactions\" and \"2. Combustion\" do (side-heading ruling 2026-09-27)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: text, address: "ch 9 §9.2.3 ¶25",
+     transcribed: "[Anhy. AlCl_3/HCl]", printed: "[Anhy, AICI_3/ HCI]", reason: "the page prints this formula with digit 1 (capital I on p10, Ä for Δ on p9) where the row normalised it; a garble the book prints is restored as printed (DECISIONS 2026-09-29) — errata list"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: text, address: "ch 9 §9.2.3 ¶25",
+     transcribed: "CH_3CH–(CH_2)_2–CH_3 + CH_3CH_2–CH–CH_2–CH_3 with CH_3 and CH_3", printed: "CH_3CH(CH_3)–(CH_2)_2–CH_3 + CH_3CH_2–CH(CH_3)–CH_2–CH_3", reason: "the drawing sets these substituents on vertical bonds; the row described them in words (v5: do not describe what a figure shows) — rewritten as bracket notation of exactly what is drawn (precedent ch 8 §8.6.1 ¶2, chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: misprint, address: "ch 9 §9.2.3 ¶24",
+     transcribed: "2-Methylpropane-2-01", printed: "2-Methylpropane-2-ol", reason: "the page prints \"2-Methylpropane-2-01\" (digit zero-one) — the book's own typesetting, kept"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: misprint, address: "ch 9 §9.2.3 ¶25",
+     transcribed: "CH_3(CH)_2)_4CH_3 -> [Anhy. AlCl_3/HCl]", printed: "CH_3(CH_2)_4CH_3 -> [Anhy. AlCl_3/HCl]", reason: "the page prints \"CH3(CH)2)4CH3\" for n-hexane — the book's own error, kept"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: false_positive, address: "ch 9 §9.2.3 ¶26",
+     transcribed: "presence of oxides of vanadium, molybdenum or chromium supported over alumina get dehydrogenated and cyclised to benzene and its homologues. This reaction is known as aromatization or reforming. (9.26)", printed: "presence of oxides of vanadium, molybdenum or chromium supported over alumina get dehydrogenated and cyclised to benzene and its homologues. This reaction is known as aromatization or reforming.", reason: "the page prints (9.26) at the right margin under the drawn cyclisation scheme, which is a figure and stays out (D17); the row keeps the equation number at the end of what it transcribed, where v5 puts it"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 10, kind: false_positive, address: "ch 9 §9.2.3 ¶29",
+     transcribed: "pyrolysis or cracking. (9.28)", printed: "pyrolysis or cracking.", reason: "the page prints (9.28) at the right margin under the drawn pyrolysis scheme, a figure that stays out (D17); the row keeps the number"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 12, kind: noise, address: "ch 9 §9.2.4 ¶5",
+     flag: "join", at: "Relative stability of conformations: As menti", reason: "p12 opens with the bold-italic run-in heading \"Relative stability of conformations:\", a new paragraph; p11 ends with Fig. 9.3 and its caption after \"…depicted in Fig. 9.3.\""}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 15, kind: join, address: "ch 9 §9.3.3 ¶13",
+     at: "Problem 9.11 Which of the following compounds", reason: "step 1 of 3 (net: Problem 9.10's bare \"Solution\" joins its statement): ¶13 joins the \"Solution\" row so that \"Solution Problem 9.11\" is a unique start; the split below restores ¶13"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 15, kind: join, address: "ch 9 §9.3.3 ¶12",
+     at: "Solution Problem 9.11", reason: "step 2 of 3: Problem 9.10's \"Solution\" heads the drawn cis/trans structures and their names, which are figures and stay out; the bare label joins the Problem statement (label ruling 2026-09-28, by analogy)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 15, kind: split, address: "ch 9 §9.3.3 ¶11",
+     at: "Problem 9.11 Which of the following compounds", reason: "step 3 of 3: Problem 9.11 is its own box statement again, as transcribed"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 16, kind: join, address: "ch 9 §9.3.5 ¶2",
+     at: "Alkenes as a class resemble alkanes in physical properties", reason: "the side heading \"Physical properties\" (¶1, a row of its own) leads this paragraph; the verifier could not find ¶1 alone on the page"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 16, kind: join, address: "ch 9 §9.3.5 ¶4",
+     at: "Alkenes are the rich source of loosely held", reason: "the side heading \"Chemical properties\" (¶3, a row of its own) leads this paragraph; the verifier could not find ¶3 alone on the page"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 17, kind: join, address: "ch 9 §9.3.5 ¶9",
+     at: "Addition reactions of HBr to symmetrical alkenes (similar groups", reason: "the side heading \"Addition reaction of HBr to symmetrical alkenes\" (¶8, a row of its own) leads this paragraph"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 17, kind: join, address: "ch 9 §9.3.5 ¶11",
+     at: "How will H – Br add to propene ?", reason: "the side heading \"Addition reaction of HBr to unsymmetrical alkenes (Markovnikov Rule)\" (¶10, a row of its own) leads this paragraph"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 17, kind: join, address: "ch 9 §9.3.5 ¶14",
+     at: "Hydrogen bromide provides an electrophile", reason: "the side heading \"Mechanism\" (¶13, a row of its own) leads this paragraph, as chem12-part2's \"Mechanism\" rows were joined"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 17, kind: text, address: "ch 9 §9.3.5 ¶16",
+     transcribed: "attacked by Br– ion", printed: "attacked by Br^- ion", reason: "the page prints the bromide ion with a superscript minus (Br⁻); the prompt writes a charge with a caret, as the book's other six such rows do (chem12-part1 ch 3 precedent \"I^-\")"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 17, kind: text, address: "ch 9 §9.3.5 ¶6",
+     transcribed: "CH_2 – CH_2 with Br, Br", printed: "CH_2(Br) – CH_2(Br)", reason: "a substituent drawn on a vertical bond is written in the chapter's bracket notation of exactly what the drawing shows, not described in words (cross-fork ruling; precedent chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 17, kind: text, address: "ch 9 §9.3.5 ¶6",
+     transcribed: "CH_3 – CH – CH_2 with Cl, Cl", printed: "CH_3 – CH(Cl) – CH_2(Cl)", reason: "a substituent drawn on a vertical bond is written in the chapter's bracket notation of exactly what the drawing shows, not described in words (cross-fork ruling; precedent chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 17, kind: text, address: "ch 9 §9.3.5 ¶9",
+     transcribed: "CH_3–CH_2–CHCH_3 with Br", printed: "CH_3–CH_2–CH(Br)CH_3", reason: "a substituent drawn on a vertical bond is written in the chapter's bracket notation of exactly what the drawing shows, not described in words (cross-fork ruling; precedent chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 17, kind: text, address: "ch 9 §9.3.5 ¶11",
+     transcribed: "I CH_3–CH–CH_3 with Br,", printed: "I CH_3–CH(Br)–CH_3,", reason: "a substituent drawn on a vertical bond is written in the chapter's bracket notation of exactly what the drawing shows, not described in words (cross-fork ruling; precedent chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 18, kind: join, address: "ch 9 §9.3.5 ¶21",
+     at: "(i) in the absence of peroxide and", reason: "item (i) is a fragment completing Problem 9.12's question; a fragment joins the sentence that introduces it (founder, DECISIONS 2026-09-29, list items by corpus practice)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 18, kind: join, address: "ch 9 §9.3.5 ¶22",
+     at: "(ii) in the presence of peroxide.", reason: "item (ii) is the rest of the same fragment list"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 18, kind: join, address: "ch 9 §9.3.5 ¶23",
+     at: "Solution", reason: "the label \"Solution\" heads a solution drawn entirely as two reaction schemes, which v5 skips (reactions wait on D17); a label over skipped drawn reactions joins the paragraph that introduces them (founder, DECISIONS 2026-09-28)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 18, kind: text, address: "ch 9 §9.3.5 ¶17",
+     transcribed: "In the presence of peroxide, addition of HBr to unsymmetrical", printed: "Anti Markovnikov addition or peroxide effect or Kharash effect In the presence of peroxide, addition of HBr to unsymmetrical", reason: "the page prints the italic side heading \"Anti Markovnikov addition or peroxide effect or Kharash effect\" above the paragraph; the transcriber dropped it (restored as the 2026-09-27 precedents restored \"Discovery of Neutron\")"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 18, kind: noise, address: "ch 9 §9.3.5 ¶17",
+     flag: "join", at: "Anti Markovnikov addition or peroxide effect or Kharash effect", reason: "p18 opens with the side heading restored above; p17 ends item (ii) \"…to form the product as follows :\" over the drawn 2-bromopropane scheme, so the print starts a new paragraph here"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 19, kind: false_positive, address: "ch 9 §9.3.5 ¶26",
+     transcribed: "273 K) CH_2(OH) – CH_2(OH)", printed: "273 K", reason: "the row writes the arrow's conditions in the prompt's notation, \"-> (dil. KMnO_4 / 273 K) CH_2(OH) – CH_2(OH)\"; the page prints dil. KMnO4 over and 273 K under the arrow"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 19, kind: false_positive, address: "ch 9 §9.3.5 ¶26",
+     transcribed: "(dil. KMnO_4 / 273 K)", printed: "dil. KMnO_4 / 273 K", reason: "the brackets are the prompt's notation for conditions over an arrow, used throughout the corpus (\"-> (Pd/C)\")"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 20, kind: text, address: "ch 9 §9.3.5 ¶29",
+     transcribed: "—(CH–CH_2)—_n | CH_3", printed: "—(CH(CH_3)–CH_2)—_n", reason: "a substituent drawn on a vertical bond is written in the chapter's bracket notation of exactly what the drawing shows, not described in words (cross-fork ruling; precedent chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 20, kind: text, address: "ch 9 §9.4.1 ¶2",
+     transcribed: "H_3C–CH–C≡CH | CH_3", printed: "H_3C–CH(CH_3)–C≡CH", reason: "a substituent drawn on a vertical bond is written in the chapter's bracket notation of exactly what the drawing shows, not described in words (cross-fork ruling; precedent chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 20, kind: noise, address: "ch 9 §9.3.5 ¶29",
+     flag: "join", at: "8. Polymerisation: You are familiar with polythene", reason: "p19 ends \"…The simple compounds from which polymers are made are called\" and p20 runs on \"monomers. Other alkenes…\" mid-sentence; the first line sits at item 8's hanging indent (x120 against the 92 margin), not a paragraph indent"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 21, kind: join, address: "ch 9 §9.4.1 ¶6",
+     at: "Position and chain isomerism shown by different pairs.", reason: "Problem 9.13's Solution is set flush in its tinted box, so a capitalised row after a display inside it is the same paragraph (founder, DECISIONS 2026-09-29)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 21, kind: text, address: "ch 9 §9.4.1 ¶5",
+     transcribed: "HC≡C–CH–CH_2–CH_3 | CH_3", printed: "HC≡C–CH(CH_3)–CH_2–CH_3", reason: "a substituent drawn on a vertical bond is written in the chapter's bracket notation of exactly what the drawing shows, not described in words (cross-fork ruling; precedent chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 21, kind: text, address: "ch 9 §9.4.1 ¶5",
+     transcribed: "HC≡C–CH_2–CH–CH_3 | CH_3", printed: "HC≡C–CH_2–CH(CH_3)–CH_3", reason: "a substituent drawn on a vertical bond is written in the chapter's bracket notation of exactly what the drawing shows, not described in words (cross-fork ruling; precedent chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 21, kind: text, address: "ch 9 §9.4.1 ¶5",
+     transcribed: "CH_3–C≡C–CH–CH_3 | CH_3", printed: "CH_3–C≡C–CH(CH_3)–CH_3", reason: "a substituent drawn on a vertical bond is written in the chapter's bracket notation of exactly what the drawing shows, not described in words (cross-fork ruling; precedent chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 21, kind: text, address: "ch 9 §9.4.1 ¶5",
+     transcribed: "HC≡C–C–CH_3 with CH_3 above and CH_3 below", printed: "HC≡C–C(CH_3)(CH_3)–CH_3", reason: "a substituent drawn on a vertical bond is written in the chapter's bracket notation of exactly what the drawing shows, not described in words (cross-fork ruling; precedent chem12-part2 ch 7 p26)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 21, kind: false_positive, address: "ch 9 §9.4.3 ¶1",
+     transcribed: "CaCO_3 -> CaO + O_2 (Delta) (9.55)", printed: "CaCO_3 -> CaO + CaC_2 ... (Delta) (9.55)", reason: "the page prints \"CaCO3 →(Δ) CaO + O2 (9.55)\" (the book's own error for CO2, kept); the row carries it as printed, and the verifier invented \"CaC_2\""}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 22, kind: join, address: "ch 9 §9.4.4 ¶2",
+     at: "Physical properties of alkynes follow the same", reason: "the side heading \"Physical properties\" (¶1, a row of its own) leads this paragraph"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 22, kind: join, address: "ch 9 §9.4.4 ¶4",
+     at: "Alkynes show acidic nature, addition reactions", reason: "the side heading \"Chemical properties\" (¶3, a row of its own) leads this paragraph"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 22, kind: join, address: "ch 9 §9.4.4 ¶7",
+     at: "i) CH ≡ CH > H_2C –CH_2", reason: "item i) is a formula fragment completing ¶6's \"…follow the following trend in their acidic behaviour :\"; a fragment joins the sentence that introduces it (DECISIONS 2026-09-29)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 22, kind: join, address: "ch 9 §9.4.4 ¶8",
+     at: "ii) HC ≡ CH > CH_3 –C≡ CH", reason: "item ii) is the rest of the same fragment list"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 22, kind: misprint, address: "ch 9 §9.4.4 ¶2",
+     transcribed: "Ethyene has characteristic", printed: "Ethyne has characteristic", reason: "the page prints \"Ethyene has characteristic odour\" — the book's own error, kept"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 23, kind: join, address: "ch 9 §9.4.4 ¶15",
+     at: "CH_3–C≡CH + H–Br -> [CH_3–C(Br) = CH_2]", reason: "the second displayed equation of item (iii), set at the head of the right column after (9.65); an equation printed on its own line belongs to the paragraph it follows (v5)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 23, kind: join, address: "ch 9 §9.4.4 ¶18",
+     at: "(a) Linear polymerisation:", reason: "the standalone label \"(v) Polymerisation\" (¶17, a row of its own) leads its \"(a)\" item (ruling 2026-09-27, by analogy: a standalone numbered label leads its item)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 24, kind: join, address: "ch 9 §9.4.4 ¶21",
+     at: "Solution", reason: "the label \"Solution\" heads a solution drawn entirely as a reaction scheme (skipped, D17); a label over skipped drawn reactions joins the paragraph that introduces them (DECISIONS 2026-09-28)"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 25, kind: noise, address: "ch 9 §9.5.2 ¶1",
+     flag: "join", at: "Benzene was isolated by Michael Faraday", reason: "p25's first printed line is the Kekulé biography box (biographies stay out); ¶1 starts under the heading \"9.5.2 Structure of Benzene\" (p25 L y526), and p24 ends §9.5.1 ¶1 \"…are given below:\" over drawn structures"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 26, kind: text, address: "ch 9 §9.5.2 ¶5",
+     transcribed: "According to Valence Bond Theory, the concept", printed: "Resonance and stability of benzene According to Valence Bond Theory, the concept", reason: "the page prints the italic side heading \"Resonance and stability of benzene\" above the paragraph; the transcriber dropped it"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 26, kind: noise, address: "ch 9 §9.5.2 ¶8",
+     flag: "figure", at: "Structures shown in Fig. 9.7(a) and (b)", reason: "the paragraph names \"Fig. 9.7(a) and (b)\"; the check reads \"(b)\" without its figure number"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 27, kind: figure_ref, address: "ch 9 §9.5.2 ¶9",
+     at: "The six pi electrons are thus delocalised", remove: "Fig. 9.6 (a)", reason: "the page prints \"as shown in Fig. 9.6 (a) or (b)\", a stale number: Fig. 9.6 is p21's ethyne orbital picture, and the localised-pi structures the sentence means are Fig. 9.7(a)/(b) on p26 (precedent: chem12-part1 ch 2 p18, the stale \"Fig. 3.7\")"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 27, kind: figure_ref, address: "ch 9 §9.5.2 ¶9",
+     at: "The six pi electrons are thus delocalised", remove: "Fig. 9.6 (b)", reason: "the page prints \"as shown in Fig. 9.6 (a) or (b)\", a stale number: Fig. 9.6 is p21's ethyne orbital picture, and the localised-pi structures the sentence means are Fig. 9.7(a)/(b) on p26 (precedent: chem12-part1 ch 2 p18, the stale \"Fig. 3.7\")"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 27, kind: figure_ref, address: "ch 9 §9.5.2 ¶9",
+     at: "The six pi electrons are thus delocalised", add: "Fig. 9.7(a)", reason: "links the figures the stale \"Fig. 9.6 (a) or (b)\" means (Kekulé's localised pi bonds, p26), in the spelling ¶8 carries"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 27, kind: figure_ref, address: "ch 9 §9.5.2 ¶9",
+     at: "The six pi electrons are thus delocalised", add: "Fig. 9.7(b)", reason: "links the figures the stale \"Fig. 9.6 (a) or (b)\" means (Kekulé's localised pi bonds, p26), in the spelling ¶8 carries"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 27, kind: false_positive, address: "ch 9 §9.5.3 ¶1",
+     transcribed: "ring, possessing following characteristics. (i) Planarity (ii) Complete delocalisation of the pi electrons in the ring (iii) Presence of (4n + 2) pi electrons in the ring where n is an integer (n = 0, 1, 2, . . .).", printed: "ring, possessing following characteristics.", reason: "the page prints items (i)–(iii) under the sentence; fragments completing the introducing sentence join it (founder, DECISIONS 2026-09-29), so the row carries them after it"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 27, kind: noise, address: "ch 9 §9.5.2 ¶9",
+     flag: "figure", at: "The six pi electrons are thus delocalised", reason: "the text prints the stale \"Fig. 9.6 (a) or (b)\"; the links name Fig. 9.7(a)/(b), which it means"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 28, kind: text, address: "ch 9 §9.5.5 ¶7",
+     transcribed: "alkylbenene is formed. (9.75) (9.76)", printed: "alkylbenene is formed. (9.75) (9.76) Why do we get isopropyl benzene on treating benzene with 1-chloropropane instead of n-propyl benzene?", reason: "the page prints the in-text question \"Why do we get isopropyl benzene on treating benzene with 1-chloropropane instead of n-propyl benzene?\" as an indented paragraph after (9.76); the transcriber skipped it (it kept p15's \"Will propene thus obtained show geometrical isomerism?\"); restored here and split off below"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 28, kind: split, address: "ch 9 §9.5.5 ¶7",
+     at: "Why do we get isopropyl benzene on treating benzene", reason: "the restored question is its own indented paragraph in the print"}
+  - {book: chem11-part2, lang: en, chapter: 9, page: 29, kind: join, address: "ch 9 §9.5.5 ¶11",
+     at: "(a) Generation of the eletrophile", reason: "the three steps (a)–(c) are fragments completing ¶10's \"…supposed to proceed via the following three steps:\"; a fragment joins the sentence that introduces it (DECISIONS 2026-09-29)"}

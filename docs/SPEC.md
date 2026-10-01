@@ -11,7 +11,9 @@ by the implementing agent (Claude Code), which should plan them from this docume
 ## 1. Vision & product principles
 
 MARG AI replaces the one thing money can't usually buy in NEET prep: **a personal mentor
-who knows you.** It does not teach (no lectures, no faculty, ever). It plans each
+who knows you.** It does not lecture — no lecture library, no recorded courses, no live
+classes, no faculty, ever; teaching support is short written primers and curated free
+lectures (§6.1, §9). It plans each
 student's day, gives them the right practice, answers their doubts at any hour, and makes
 sure they never repeat a mistake — all adapted nightly to that one student.
 
@@ -38,6 +40,14 @@ List ₹499/month; founding price ₹299/month; annual ₹2,999. Payments via UP
 
 ## 2. Who it's for
 
+**Primary target: self-learners** (CS-4) — students preparing without a coaching institute,
+which is most droppers/repeaters and every self-study fresher. Coaching students remain
+fully supported, but when a trade-off arises, design for the student preparing alone:
+MARG replaces what coaching gives them one need at a time — structure (the plan), teaching
+support (primers and curated lectures), doubt clearing, tests and ranking (past-paper mocks,
+private percentile), discipline (streaks, slump care, the Sunday review) and exam temperament
+(autopsy, drills).
+
 - **Droppers/repeaters** (primary launch segment): self-directed, desperate for structure,
   often self- or parent-funded, live in Telegram/YouTube communities.
 - **Coaching students** (PW/Aakash/Allen/online): use MARG as the companion —
@@ -56,8 +66,12 @@ List ₹499/month; founding price ₹299/month; annual ₹2,999. Payments via UP
   AI models via direct provider APIs — **Anthropic API** (cost-efficient model for
   routine work, stronger reasoning model for hard problems, batch processing for
   nightly jobs, aggressive caching everywhere) and a dedicated embeddings
-  provider. (Amazon Bedrock optional-later, post-incorporation.)
-- Payments: **Razorpay** (UPI autopay). OTP SMS: Indian DLT-compliant provider (e.g. MSG91).
+  provider. Amazon Bedrock hosts the embeddings model and is configured as a completion
+  **fallback only**, switched on by configuration during a provider outage — never the
+  primary for completions (CS-2 §4.11).
+- Payments: **Razorpay** (UPI autopay). Sign-in: **phone OTP by SMS** through an Indian
+  DLT-compliant provider (e.g. MSG91), the primary and only sign-in method; email OTP (SES)
+  exists behind a configuration flag as the beta fallback (§5.7).
   Push: **FCM**. Analytics: PostHog.
 - Non-negotiable product-level technical behaviors: answers are judged server-side;
   numerical AI answers are independently verified before display; every AI answer is
@@ -66,6 +80,46 @@ List ₹499/month; founding price ₹299/month; annual ₹2,999. Payments via UP
 
 *Claude Code: plan the architecture, APIs, schemas, pipelines, and infrastructure
 yourself from this document. Propose the plan before building.*
+
+### 3.1 Reliability and privacy on real phones (CS-3, CS-5)
+
+Slow, patchy mobile data is the normal condition for many students, not an edge case:
+
+1. **Never lose a student's work.** Anything she does offline or on a failing connection
+   is kept on the device and delivered later — including work queued on a phone that has
+   since been signed out (§5.7), which syncs on that account's next sign-in there.
+2. **Never show a dead screen.** No endless spinners, no blank pages; every wait or
+   failure has clear, honest copy and a next step.
+3. **Send less.** Payloads, images and downloads are as small as they can be without
+   hurting quality.
+4. **Depend on the network as little as possible at the moments that matter** —
+   especially the 7 AM plan (§6.1).
+
+Already promised elsewhere and held to the same bar: today's plan and practice work
+offline with answers synced and re-judged server-side; doubt answers stream; retries back
+off and never hammer a weak connection; sign-in tolerates bad networks (OTP auto-read,
+resend); every failure has a retry path.
+
+**Acceptance (a beta gate):** on a simulated slow-3G profile the Today screen opens from
+local data, a practice session completes, and a doubt answer begins streaming promptly,
+with no endless spinner anywhere; a photo doubt captured in airplane mode sends itself
+after the app is closed and reopened with a connection, and its answer's notification
+opens it; a practice block completed offline syncs with no loss and streak and notebook
+update correctly; photo payloads meet the size target with no doubt- or
+document-extraction quality regression; with the nightly plan ready and connectivity at
+night only, the morning Today screen opens instantly in airplane mode; and all of this
+passes **on a low-cost Android phone**, not only an emulator.
+
+**Device identity and privacy:** no permanent hardware identifiers (IMEI, serial numbers)
+are ever collected; the app uses app-level install identifiers and Google Play's official
+app-integrity check, consistent with Play policy and India's data-protection law.
+
+**Unusual use** (an account active in distant places within a short time, use far beyond
+normal patterns, rapid repeated sign-ins across phones — tunable signals) meets a gentle
+ladder: a soft in-app message → re-verification (sign in again / OTP) → a temporary rate
+limit. **No automatic bans:** any restriction beyond a rate limit needs founder review. The
+fair-use cap and the per-user daily cost breaker bound cost regardless. Copy stays kind:
+“Your plan is built only from your work — sharing your account mixes up your plan.”
 
 ---
 
@@ -254,6 +308,36 @@ Then the notification permission ask — tied to that promise, not abstract.
 └──────────────────────────┘   └──────────────────────────┘   └──────────────────────────┘
 ```
 
+### 5.7 Sign-in, identity and sessions (CS-2 §4.2, CS-5; founder decision 2026-10-01)
+
+**Sign-in:** **phone OTP by SMS is the primary and only sign-in method**, for beta and
+launch, with auto-read, resend and bulletproof retry. Email OTP exists behind a
+configuration flag as the beta fallback (switched on only if the SMS route is not live in
+time). The identity model is provider-agnostic — one user, possibly several verified
+credentials — so another method (e.g. Sign in with Apple on iOS) can be added later
+without redesign.
+
+**Identity:** the **verified phone number is the account's identity.** A phone number can
+belong to only one MARG account; an account that began on the email fallback attaches a
+verified phone when SMS is live and stays one user with its history intact — no path
+creates a duplicate user. A subscription belongs to the **account**, never to a number or a
+device, and follows it across phones.
+
+**Sessions:** one active phone per account — signing in on a new phone signs the previous
+phone out, with a clear message on both (“You've signed in on another phone”); Phase 2 web
+allows one phone plus one browser. Work queued offline on the signed-out phone is never
+discarded (§3.1). A phone may hold several accounts (siblings) behind a simple account
+switcher (§6.11); each account keeps its own plan, notebook, history and subscription,
+switching never mixes data, and Pro on one account never unlocks Pro for another.
+
+**Abuse protection:** OTP requests are rate-limited per number and capped per device per
+day; free accounts per phone are capped (§6.9); unusual use follows the gentle ladder in
+§3.1.
+
+**Minors in the beta:** the beta cohort is recruited **18+**; DOB is still asked, with an
+18+ gate for the beta. The parent-consent flow (§5.1: parent phone + consent OTP) is built
+but stays switched off for the beta and goes live at public launch.
+
 ---
 
 ## 6. Feature specifications
@@ -278,6 +362,13 @@ flowchart LR
 
 **Block types:** Learn (directs outside study: chapter + NCERT sections + why today),
 Practice (timed in-app MCQ set), Revise (notebook variants due), and later Mock.
+For self-study students a learn block carries its teaching support (CS-4): the topic's
+**concept primer** (“Read the primer, then 10 recall questions”, §9) and one or two
+**curated free lectures** for the chapter — title, channel, language, length, optional
+start times — opened by link-out in the beta and in YouTube's official embedded player
+after the D60 gate, with a “Was this helpful?” tap under each. A primer is also reachable
+from any topic's detail view and from a doubt answer (“Read the basics of this topic”).
+Teaching support is care, in every tier (§10).
 Every block carries a one-line **reason drawn from the student's data or, attributed as such, from
 the collective record** (Evidence rule; §9.6).
 
@@ -299,17 +390,82 @@ Collective-backed confidence never masquerades as personal knowledge.
   archetype, weighted by real NTA marks data).
 - Missed days → reprioritize, never guilt-stack; the mentor note says what was traded:
   *“We lost the weekend — Thermo moves out, Human Physiology doubles. More marks there.”*
-- A plan must exist every single morning, no exceptions.
-- Plan volume respects the student's declared hours; exam proximity shifts the
-  learn/practice/revise mix (see Phases 4–5).
+- A plan must exist every single morning, no exceptions — and the 7 AM Today screen
+  opens from **local data**: when the nightly plan is ready the app downloads it and its
+  practice questions in the background at the first reasonable connection, respecting
+  data-saver and battery-saver; if no prefetch happened it fetches on open, and the
+  no-planless-morning fallback still applies (CS-3 §3.3).
+- **Load follows reality** (CS-6 §2.3): daily load adapts to the student's actual
+  completion over the recent past, not only the hours declared at onboarding, and the
+  mentor says so honestly when it lightens or grows the days (“I've made your days a
+  little lighter, since you've been finishing about 60%”). Load never drops so low that
+  exam-critical coverage is lost silently; if her real pace and her target drift apart,
+  the trajectory card and the Sunday review say so kindly, with options. Exam proximity
+  shifts the learn/practice/revise mix (see Phases 4–5).
+- **Mixed practice by default** (CS-2 §4.6): plans keep interleaving across subjects; a
+  student may ask for a single-topic set, but the default stays mixed. After an error
+  streak or on a low-mood day the plan serves one **confidence question** slightly below
+  her band before returning to stretch difficulty, and the mentor occasionally **explains
+  the why** behind rest and sleep recommendations. Each guard is tunable and measured.
+
+**Making the plan feel personal (CS-6).** Every planner behaviour serves at least one of
+six qualities and undermines none: **specific** (every reason uses her own data),
+**responsive** (skips, struggles and doubts visibly change tomorrow, within a day),
+**remembering** (the mentor refers back to specific recent moments), **controllable** (she
+can push back and the plan listens), **honest** (it admits what it doesn't yet know) and
+**stable** (it changes for good reasons, not randomly; big changes are explained).
+- **Continuity:** day to day, most of the plan carries forward unless there is a clear,
+  data-backed reason to change it (the level is a configuration value; default: a majority
+  of tomorrow's blocks continue today's direction). Any substantial change — a subject
+  swapped out, the load changed noticeably, a chapter moved — is explained in the mentor
+  note. Larger changes are justified by slump days, negotiated life events, exam-season
+  mode switches and repeated “too hard” signals.
+- **Skip with a reason:** marking a block skipped offers one optional tap — *No time · Too
+  hard · Already know this*. No time → a load adjustment, not a difficulty change; Too
+  hard → an easier entry point next time (primer, easier questions, a confidence
+  question); Already know this → a short check, which if passed raises the topic's ability
+  estimate and retires the block, and if not, brings it back gently. Skipping without a
+  reason is always allowed and never penalized.
+- **The first seven days** are designed, because that is when a student decides whether
+  the app “gets” her; each day shows visible learning and the mentor note names what
+  changed: day 1 from onboarding answers, the collective prior and any scorecard (“Here's
+  day one. I'll learn fast.”); day 2 adds the diagnostic (or invites it again gently if
+  skipped — the ramp continues without it); day 3 the first practice mistakes and doubts
+  (“Your first mistakes told me…”); days 4–5 skip reasons and completion pace (load and
+  difficulty adjustments); day 6 the first mistake-healing returns; day 7 a short “what I
+  learned about you this week” summary. Collective vs personal attribution follows the
+  two-source rule throughout.
+- **Remembering out loud:** the nightly snapshot keeps a few notable recent moments — a
+  hard session, a streak milestone, a healed mistake, a negotiated change — so the mentor
+  can refer to them naturally, specifically and occasionally, not in every block.
+- **Reasons are traceable and never generic:** every block reason and mentor-note claim
+  traces to specific data points in her history (or, attributed as such, the collective
+  record); a reason that fails traceability is replaced by the deterministic fallback
+  reason, and reasons that could apply to any student (“practice is important”) are
+  rejected.
 
 **Negotiable plan (chat):** the student can talk to the planner — “cousin's wedding
 Fri–Sun” → the week rebalances and the mentor explains the trade. Any plan change
-made in chat is reflected immediately on Today.
+made in chat is reflected immediately on Today. The plan chat is the only open
+conversation besides a doubt's own thread — there is no general-purpose chatbot (§6.3).
 
-**Streaks & weekly trajectory:** streak = any day with ≥1 block done (protects the
-habit, not vanity hours). Weekly card: predicted score range vs the student's own
-target cutoff + one insight (“Physics accuracy up 9 points — the Optics drills worked”).
+**Sunday review with the mentor (CS-4 §5.1):** a short weekly conversation (about five
+minutes) in the plan chat, offered on Sunday evening: what went well, what slipped, the
+week's pattern in plain words, and an agreed focus for next week, which the planner then
+honours and which is visible on next week's plans. Every claim is backed by her own data;
+it is honest and kind about missed days; skippable without penalty; in every tier (the
+deep weekly report stays Pro). After it — or on the weekly card — one tap asks “Did this
+week's plan fit you?” (Yes · Mostly · No; a No offers one optional follow-up: too much ·
+too little · wrong topics · too hard · too easy) (CS-6 §4).
+
+**Streaks & weekly trajectory:** streak = consecutive days with ≥1 plan block done
+(protects the habit, not vanity hours). Streak care is **repair, never loss** (CS-2 §4.5):
+light-plan days on low mood or an inferred slump are framed as protecting the streak; a
+broken streak is reported as a ratio (“12 of the last 14 days”), never as a loss; the
+20:30 streak-save nudge names one small action and never threatens; no streak
+leaderboards; identical in every tier; streaks retire gracefully in exam season. Weekly
+card: predicted score range vs the student's own target cutoff + one insight (“Physics
+accuracy up 9 points — the Optics drills worked”).
 
 ```
 ┌──────────────────────────┐
@@ -344,9 +500,18 @@ Rules: per-question timer; one-hand answer taps; instant verdict + step solution
 NCERT anchor chip; question difficulty served in the student's stretch band (never
 demoralizing, never irrelevant — and never beyond real NEET patterns: “skipping the
 exotic stuff — NTA has never asked it”); session summary with accuracy, speed vs
-your norm, and what went to the notebook. Works offline for the current day's blocks;
-results sync later. Question sources: 15+ years of PYQs with verified solutions +
-NCERT-style generated questions (verified), tagged to the syllabus.
+your norm, and what went to the notebook. Works offline for the current day's blocks —
+their questions arrive with the prefetched plan (§6.1) — and results sync later. Question
+sources: 15+ years of PYQs with verified solutions + NCERT-style generated questions
+(verified), tagged to the syllabus.
+
+**Timing and skip-strategy drills (CS-4 §5.2):** short drills that train exam temperament —
+pacing against the clock, deciding when to skip, negative-marking discipline — built from
+past-paper questions and the student's own gamble-score history from mock autopsies
+(§7.1). The planner introduces them mainly in mock season and the final months; available
+on demand; all tiers, with the full personalised drill history following the autopsy's
+tiering (summary Free, full Pro). A student with a high gamble score gets targeted skip
+drills, and drill results flow into the next mock's autopsy comparison.
 
 ### 6.3 The doubt solver (hero feature)
 
@@ -374,8 +539,32 @@ Every answer has a Report flag (feeds a human audit queue — the one founder-hu
 
 **Memory behavior:** three Optics doubts this week → Thursday's plan grows an Optics
 block, and the mentor says why. **Free tier:** 5 solves/day (repeat/cached questions
-count half). **Pro:** unlimited with a generous fair-use cap on the heaviest model —
-beyond it, answers arrive “in a few minutes” rather than being refused.
+count half; a follow-up counts half). **Pro is never refused** (CS-2 §4.3): unlimited
+with a generous fair-use cap on the heaviest model, and when a Pro student reaches that
+cap or the per-user cost breaker, the request is accepted and queued with honest copy
+(“answer in a few minutes”) — never rejected. Only the free tier keeps a hard limit.
+
+**Anchored follow-ups (CS-2 §4.4):** follow-ups are threaded under the doubt they belong
+to, with its context kept; a thread has a sensible depth cap, after which the student is
+invited to ask a new doubt. **There is no open, general-purpose chatbot** — the only other
+conversation is the plan chat (§6.1).
+
+**“Your turn” (CS-2 §4.6):** on a third doubt about the same concept within a short window,
+the mentor sometimes answers “walk me through where you got stuck” before solving —
+occasionally, tunable, measured.
+
+**Doubts on a bad connection (CS-3 §3.1–§3.2):** a doubt can be photographed or typed with
+no connection; it waits on the device marked “waiting for network” and sends itself when
+a connection returns, even after the app is closed and reopened; when the answer arrives
+she is notified (within the notification caps) and the notification opens it. She can see
+and cancel queued doubts. A queued doubt counts toward the free limit when it is **sent**,
+not when captured — if sending would exceed the limit, the usual limit behaviour applies
+then. Queued photos follow the upload privacy rules: deleted from the device once sent,
+and from the server per the existing retention. Every doubt photo and document capture
+(scorecard, marksheet, timetable) is compressed before upload to the smallest size that
+still reads reliably — typically a few hundred kilobytes, not several megabytes — and
+compression may never lower extraction quality (the doubt and document evals show no
+regression). Answers still require the server: there is no offline doubt-solving.
 
 ```
 ┌──────────────────────────┐
@@ -421,6 +610,9 @@ awareness drills & checking habits (not more content); time pressure → pacing 
 gamble → skip-discipline training. Low-confidence diagnoses ask the student one tap
 (“Knew it / Guessed / Ran out of time”) — and the student's correction always wins.
 
+**Try once more (CS-2 §4.6):** on a near-miss answer the app occasionally offers one retry
+before revealing the solution — not every time; tunable and measured.
+
 **Patterns, spoken plainly:** “31% of your Physics errors are unit-conversion slips —
 ~12 marks recoverable. Friday has a drill.” / “Your accuracy drops 18% after 9 PM.”
 
@@ -447,6 +639,18 @@ The app never diagnoses, never claims to be a counselor, and if a student's mess
 suggest serious distress, it responds with care and points to real help — mentor voice,
 human resources.
 
+**Wellbeing and crisis protocol (CS-2 §4.1) — blocking for beta.** For any input — a doubt
+thread, the plan chat, a mood signal — indicating serious distress or self-harm risk, the
+response is warm and human-toned, with no clinical diagnosis and no lecturing, and points
+clearly to real help: **Tele-MANAS (14416, India's national mental-health helpline)** and
+encouragement to talk to someone she trusts. The study context is set aside in that
+moment: the same response never pushes practice or streaks. It never promises
+confidentiality outcomes or describes what authorities may do, never ends or refuses the
+conversation, and shows its resources accurately and kept current. Acceptance: eval cases
+covering direct, indirect, Hinglish and Hindi phrasings, 100% producing the required
+behaviour; the founder reviews the copy; the copy and data handling go to legal review.
+Identical in every tier.
+
 ### 6.7 Batch sync (“your batch is on it”)
 
 How the app knows where a coaching student's class is — five layers, best available wins:
@@ -467,12 +671,87 @@ are always shown for correction; nothing is silently trusted.
 
 ### 6.9 Monetization: free tier, Pro & the paywall
 
-**Free forever:** full adaptive planner · 5 doubt-solves/day · notebook (last 30
-errors) · streaks & weekly trajectory. Genuinely useful — free users are our
-word-of-mouth engine.
+**Tier principles (CS-2 §1):** correctness and care are never tiered — answer quality,
+verification, grounding, wellbeing support, streak care and the mentor's tone are
+identical in Free, Pro and Pro+; tiers differ only in quantity (limits), speed, depth
+features, formats (video, voice) and audiences (parents), and there is never a
+model-selection menu. Pro+ sells formats and audiences, never better truth: a Pro and a
+Pro+ student asking the same doubt get the identical verified solution. Public surfaces
+show only what exists — until Pro+ ships, the app, site and store listing show Free and
+Pro only. Free users are our word-of-mouth engine, so Free stays genuinely useful.
 
-**Pro — list ₹499/mo, founding ₹299/mo, annual ₹2,999:** unlimited doubts ·
-full notebook + SRS healing · deep weekly report · priority speed.
+**Pricing (CS-2 §2).** *Beta (December 2026 → mid-January 2027):* free for every
+participant — six weeks of Pro at no cost, no payments collected. *Public launch (late
+January 2027):*
+
+| Plan | Paywall display |
+|---|---|
+| Free | ₹0 |
+| Pro, monthly | ~~₹499~~ **₹299/month** — labelled “founding price” |
+| Pro, annual | ~~₹3,999~~ **₹2,999/year** — highlighted as best value (₹250/month equivalent) |
+
+Rules: **grandfathering** — a subscriber who joins at a founding price keeps it for as long
+as the subscription stays active (founding means founding); **founding expiry is triggered
+by evidence, not a date** — when season-one data shows strong conversion and low churn the
+founder closes founding prices for *new* signups, who then pay list (₹499/month,
+₹3,999/year), and an intermediate launch offer (e.g. ₹399/month) is allowed; the switch is
+a configuration change, never a release; annual is front-and-center from January
+(exam-panic season); **GST** — season one charges none (below the threshold), and
+pricing configuration can switch to GST-inclusive display when registration is required;
+comparisons are always same-rung (list vs list, founding vs founding) on every surface.
+*Pro+ (Phase 2, provisional until tested with students and parents; same grandfathering):*
+monthly founding ₹479 / list ₹799; annual founding ₹4,999 / list ₹6,499.
+
+**Entitlements (CS-2 §3; canonical).** Configuration-driven, so any feature can move
+between tiers without a release:
+
+| Feature | Free | Pro | Pro+ (Phase 2) |
+|---|---|---|---|
+| Onboarding, first plan, diagnostic test | ✓ | ✓ | ✓ |
+| Snap a doubt during onboarding † | ✓ | ✓ | ✓ |
+| Adaptive daily planner (nightly re-plan, reasons, plan chat) | ✓ Full | ✓ Full | ✓ Full |
+| Practice engine (timed MCQs, instant solutions) | ✓ Full | ✓ Full | ✓ Full |
+| Full past papers as timed mocks | ✓ | ✓ | ✓ |
+| Mock autopsy | Summary | Full | Full |
+| AI doubt solver | 5/day (cached = ½) | Unlimited (queued, never refused) | Unlimited |
+| Follow-up questions on a doubt | Count ½ toward the limit | Unlimited | Unlimited |
+| Answer quality and verification | Same | Same | Same |
+| Explanation depth toggle † | ✓ (counts ½ toward the limit) | ✓ | ✓ |
+| Voice input for doubts ‡ | ✓ | ✓ | ✓ |
+| Error notebook | Last 30 errors | Full + mistake healing | Full + healing |
+| Weekly report | Basic trajectory card | Deep report | Deep report |
+| Mastery Map v1 † | ✓ | ✓ | ✓ |
+| Streaks, mood and slump care | ✓ | ✓ | ✓ |
+| Milestone cards, “I'm confused” button, focus timer † | ✓ | ✓ | ✓ |
+| Wellbeing and crisis support | ✓ | ✓ | ✓ |
+| Concept primers, curated lectures, Sunday review, drills, mock percentile (CS-4) | ✓ | ✓ | ✓ |
+| Home-screen widget, shareable answer cards ‡ | ✓ | ✓ | ✓ |
+| Mnemonics on demand ‡ | — | ✓ | ✓ |
+| Priority speed at peak hours | — | ✓ | ✓ |
+| Video answers (animated, EN/HI narration) | — | — | ✓ |
+| Viva mode + teach-back | — | — | ✓ |
+| Parent digest (weekly on WhatsApp) | — | — | ✓ |
+| External mock-scorecard ingestion | — | — | ✓ |
+| Personal formula/fact sheet | — | — | ✓ |
+| Misconception flip cards | — | — | ✓ |
+| WhatsApp support, data export | ✓ | ✓ | ✓ |
+| One-tap cancel, 7-day refund | — | ✓ | ✓ |
+
+† Phase 1 beta backlog (§12.1), shipped only if the D60 gate holds. ‡ Phase 2 addition to
+Free/Pro (§12.2). The explanation depth toggle's free row follows the backlog's own guard
+(“counts ½ on the free meter”; founder ruling 2026-10-01 on CS-2's table/§5 mismatch).
+
+**Free-tier fairness (CS-5 §4):** free accounts per phone are capped (default 3,
+configurable), and creating more shows a friendly message explaining the limit; the daily
+free doubt allowance is counted **per phone as well as per account**, so switching free
+accounts on one phone never multiplies it (Pro accounts on a shared phone are unaffected).
+These limits are configuration values, tunable from beta data without a release.
+
+**Terms (CS-5 §6.1):** a subscription is personal and non-transferable; the
+one-active-phone rule (§5.7) is explained in plain language on the paywall and in
+settings. **Sibling discount (CS-5 §6.2, Phase 2):** a second student account in the same
+family at a discount (e.g. 50%), bought by the same payer — built in Phase 2 alongside the
+parent digest.
 
 **Paywall placement (moments of felt value, never ambush):**
 
@@ -486,8 +765,8 @@ flowchart TD
     PW -->|Not now| FREE[Free continues fully\nno nagging for 48h]
 ```
 
-One honest screen: ₹499 struck → ₹299 founding · annual ₹2,999 highlighted ·
-“No hidden charges · Cancel anytime in one tap · Instant refunds (7 days).”
+One honest screen (CS-2 §4.8): ₹499 struck → ₹299 founding · ₹3,999 struck → annual
+₹2,999 highlighted · “No hidden charges · Cancel in one tap · 7-day instant refund.”
 Cancel = 2 taps, zero retention screens. Refund = automatic. Subscription auto-pauses
 after the student's exam date — no silent June renewals. From January, annual is
 front-and-center (exam-panic season).
@@ -497,7 +776,8 @@ front-and-center (exam-panic season).
 │  Unlock your full mentor │
 │  ─────────────────────── │
 │  ₹4̶9̶9̶  ₹299/mo founding │
-│  ★ ₹2,999/year (₹250/mo) │
+│  ★ ₹3̶9̶9̶9̶ ₹2,999/yr      │
+│    (₹250/mo)             │
 │  ─────────────────────── │
 │  ✓ Unlimited doubts      │
 │  ✓ Full notebook + SRS   │
@@ -526,6 +806,12 @@ PDF + full JSON) · account deletion (clear confirmation; PII purged on schedule
 support (WhatsApp/email) · legal & privacy (plain-language, incl. the document-deletion
 promise and the note that AI processing may occur outside India).
 
+**Your devices (CS-5 §3.2):** where the account is signed in, last active time, and a
+sign-out control for each — so a student can recover her own account if a phone is lost
+or shared by mistake. **Account switcher (CS-5 §3.3):** a phone may hold several accounts
+(siblings) with a simple switcher; each account's plan, notebook, history and subscription
+stay fully separate (§5.7).
+
 ---
 
 ## 7. Exam season & the ending (detailed flows)
@@ -541,6 +827,21 @@ flowchart LR
     A1 & A2 & A3 --> P[Next 2 weeks re-weighted\ntoward SCORING gaps]
     A --> T[Trajectory update vs\npersonal cutoff]
 ```
+
+**Full past papers as timed mocks (CS-2 §4.7):** the NEET 2018–2026 papers from the PYQ
+bank run as full timed mocks under exam conditions, followed by the autopsy;
+out-of-syllabus questions (the post-2022 rationalisation) are labelled and excluded from
+the mock's score, and question count and marking follow each paper's own scheme where
+feasible. Free gets the full mock and an autopsy summary; Pro the full autopsy.
+
+**Mock percentile among app users (CS-4 §6; after public launch):** after a timed
+past-paper mock, the student privately sees her percentile among app users who took the
+same paper recently (“better than 68% of students who took NEET 2023 this month”) — shown
+to her only, with no leaderboard, names or public ranks, only once a paper has enough
+attempts for the number to mean something (threshold in configuration), and framed as
+calibration, never judgment. All tiers. It activates after public launch; the data it
+needs is captured from the first mock onward. Like the weekly peer line (§6.5) it is a
+private calibration number, not a leaderboard (founder ruling 2026-10-01; §12.4).
 
 ### 7.2 The ending
 
@@ -625,8 +926,32 @@ they're built and stored):
    no other platform's questions, answers or material is ingested or reproduced; nothing
    paywalled or login-gated; derived signals with aggregate source counts only, never
    quotes or identifiable students; no live crawling. Records are aggregate priors, not
-   cohorts: the §12 exclusion of community and leaderboards beyond the single percentile
-   line is untouched.
+   cohorts: the §12.4 exclusion of community, leaderboards and public ranks is untouched.
+7. **Concept primers** (CS-4 §3) — for every syllabus topic a short written explanation
+   (roughly 200–400 words) a self-learner reads before practising: what the concept is,
+   why it matters, the core formula or idea, one worked mini-example, and the most common
+   misconception. Written from the NCERT retrieval layer in our own words — never verbatim
+   — with an NCERT chapter/section reference as a pointer; numerical examples pass the
+   standard verification; generated through the content pipeline, sampled by the founder
+   like PYQ solutions, and covered by the eval suite. English at launch; Hindi and
+   Hinglish as the Hindi corpus lands. Acceptance: primers for every topic in the top-50
+   weightage chapters before beta and for all topics before public launch; a founder
+   sample of 30 passes; the eval gate is green.
+8. **Curated free lectures** (CS-4 §4) — a founder-owned list (like the taxonomy file):
+   per chapter, one or two hand-picked free YouTube lectures, ideally one Hindi and one
+   English, with video ID, channel, language, length, start-time notes, date checked and
+   curator notes. Candidates may be shortlisted from YouTube's official data API
+   (metadata only: title, channel, length, views, date); final picks are the founder's (or
+   a paid one-off helper's), on correctness for the current post-2022 syllabus, clear
+   teaching, an established channel, and Hindi and English coverage; independent teachers
+   are preferred when quality is comparable, and a competing app's channel only when it is
+   clearly the best explanation. **No partnerships, and YouTube's rules exactly:** link-out
+   in the beta, the official embedded player after the D60 gate; branding and ads
+   untouched; embeddable videos only; never downloaded, cut or re-hosted; no transcript
+   extraction into our AI pipeline. A monthly automated check flags videos that became
+   private, deleted or non-embeddable, and the “Was this helpful?” tap feeds curation and
+   the collective layer. Acceptance: at least one vetted video for every chapter before
+   beta; the broken-link check runs and reports; the helpfulness signal is recorded.
 
 ---
 
@@ -644,6 +969,21 @@ they're built and stored):
 8. The AI never pretends to be human, never diagnoses health, never shames.
 9. Collective claims are attributed as collective (“most students…”); personal claims
    require personal data — the two are never blended into a false personal claim (§9.6).
+10. Correctness and care are never tiered (CS-2 §1): answer quality, verification,
+    grounding, wellbeing support, streak care and the mentor's tone are identical in every
+    tier; tiers differ only in quantity, speed, depth features, formats and audiences, and
+    there is never a model-selection menu. Pro+ sells formats and audiences, never better
+    truth.
+11. Teaching support is care, available in every tier (CS-4): concept primers, curated
+    lectures, the Sunday review and drills are never premium.
+12. Learning science guards the defaults (CS-2 §4.6): mixed practice by default; one retry
+    on a near-miss (“try once more”); a “your turn” prompt on a third doubt about the same
+    concept; a confidence question after an error streak or on a low day; occasional
+    explanations of the why behind rest and sleep — each occasional, tunable and measured.
+13. The plan is stable, not random (CS-6): it changes for good, data-backed reasons, and
+    every substantial change is explained.
+14. The plan fits the life she actually has (CS-6): load follows her real completion, not
+    only the hours she declared, and the mentor says so honestly.
 
 ---
 
@@ -656,20 +996,98 @@ they're built and stored):
   errors healed per active month; % plan blocks completed.
 - **Money:** free→Pro conversion 3–5% of registered; founding-annual share ≥40% from Jan;
   refund rate <5%; auto-pause working = zero June complaint tickets.
-- **Trust:** OTP success ≥98% first attempt; crash-free ≥99.5%; zero unverified
+- **Trust:** sign-in success ≥98% first attempt; crash-free ≥99.5%; zero unverified
   numericals served (hard gate).
+- **Does the plan feel personal** (CS-6 §4): the weekly one-tap fit question (“Did this
+  week's plan fit you?” — Yes · Mostly · No, with the optional follow-up); block completion
+  rate; the share of skips by reason; how often the plan chat negotiates; the pass rate of
+  “already know this” checks (a high rate means the plan is serving known material) — all
+  read by week of tenure (week 1, week 2, …) so the first-week ramp's effect shows; targets
+  set after the beta baseline.
 - **Cost health:** answer-cache hit rate (target 55% at launch → 75% by season end);
   AI cost per active free user and per Pro user tracked weekly.
 
 ---
 
-## 12. Phase 2 (explicitly NOT in this build)
+## 12. Beyond the committed build (CS-2 §5–§8, replacing the earlier Phase 2 list)
 
-On-demand AI-animated video answers with EN/HI narration (from verified solutions only;
-cached library that compounds) · voice viva mode · parent weekly digest (web link,
-no install) · external mock-scorecard ingestion · web app (review surface first) ·
-iOS · community/leaderboards beyond the single percentile line · referral & graduation
-automation · Pro+ tier (₹499–599) · JEE vertical on the same engine.
+**Beta evidence promotes; the calendar does not.** The committed build is everything
+above. Backlog and later items move only when beta behaviour or student demand justifies
+them; if the build slips, the backlog shrinks and the committed core does not.
+
+### 12.1 Phase 1 beta backlog (gated on the D60 gate)
+
+The D60 gate: the full daily loop runs unattended for three consecutive real days on the
+founder's test account, and the 14-day planner simulation passes (CS-6 §5). Only then do
+these ship, in this order, each behind a configuration flag with one success metric:
+
+1. **Snap a doubt during onboarding** — after the first-plan reveal, an invitation to
+   photograph or type any current doubt; optional, skippable, never delays the reveal.
+   *Metric:* share of new users solving a doubt on day 0; the D7 delta.
+2. **Explanation depth toggle** — Simpler / Deeper / Example chips on any answer,
+   re-expressing the verified answer at a different register; Simpler ends with one
+   retrieval question; Example numericals pass standard verification; counts ½ on the free
+   meter; renderings cached with the parent answer. *Metric:* toggle usage; retrieval-check
+   accuracy.
+3. **“I'm confused” button** — a one-tap feeling signal during practice or on an answer,
+   offering a short concept reset or an easier question; never costs meter; no judgment in
+   the copy; one tap adjusts a session, a pattern adjusts a plan. *Metric:* taps per
+   session; the subsequent-accuracy delta.
+4. **Mastery Map v1** — the syllabus tree coloured by mastery with a chapter detail sheet
+   (topics' status, what it unlocks, open errors). **Frozen scope:** coloured tree + detail
+   sheet only — no graph rendering, drawn edges, animation or layouts. *Metric:* weekly map
+   opens; return rate.
+5. **Milestone celebration cards** — specific, mentor-voiced cards at learning milestones,
+   shareable as an image; at most one a day, after the triggering action, never
+   comparative, no personal data unless added, identical in every tier. *Metric:* share
+   rate.
+6. **Focus timer on learn blocks** — an optional start/stop timer for outside study tied
+   to the learn block; its time feeds pacing data, never judgment. *Metric:* timer usage;
+   pacing-data coverage.
+7. **In-app lecture player** (CS-4 §4) — curated lectures move from link-out to YouTube's
+   official embedded player (founder ruling 2026-10-01: seventh in the order).
+
+### 12.2 Phase 2 — June 2027, for the season-two cohort
+
+**Pro+ contents:** video answers (from verified solutions only; a cached library; fair use
+on fresh generations) · viva mode + teach-back (shared voice plumbing, built together) ·
+parent digest (a weekly WhatsApp message + a web progress page) · external mock-scorecard
+ingestion (photograph → confirm → autopsy; the same capture-confirm-delete pattern) · a
+personal formula/fact sheet · misconception flip cards.
+
+**Additions to Free/Pro:** mnemonics on demand (Pro; for arbitrary-association content
+only — the mentor declines for causal content with a one-line reason, and a mnemonic
+supplements, never replaces, the grounded answer) · voice input for doubts (all tiers;
+English, Hindi, Hinglish into the existing doubt pipeline) · an Android home-screen widget
+(today's next block and streak) · shareable answer cards (all tiers) · notification timing
+learned from behaviour · **graduation flows and the continuity path** (journey card, data
+export package, referral gift; humane re-onboarding for another attempt) — must ship
+before the first cohort's June results · a web review surface (notebook, reports, the
+parent's window; one phone plus one browser, §5.7) · a Hindi-first experience (Hindi NCERT
+extraction stays image-only by the founder's 2026-09-13 ruling; the Chanakya→Unicode
+converter remains parked — founder ruling 2026-10-01) · **“studying right now” presence**
+(CS-4 §7: an ambient count on Today — “1,240 droppers are studying right now” — aggregate
+counts only, no chat, profiles or messaging, hidden when the number is too small to
+encourage) · the **sibling discount** (§6.9) · video answers default to low quality on slow
+connections, offer “download on Wi-Fi” and are cached for replay (CS-3 §3.4) · iOS.
+
+**Internal priority:** video answers and the parent digest (the Pro+ revenue case) → viva
++ teach-back → graduation flows (hard date) → everything else as capacity allows.
+
+### 12.3 Later — season two and beyond
+
+Full graph-style concept maps · “why this exists” purpose one-liners · an exam-day
+countdown ritual (built for the final-100-days window) · NCERT line-recall drills (gated on
+the NCERT licence) · the JEE vertical and further expansion per the roadmap.
+
+### 12.4 Explicitly never
+
+Model-selection menus or correctness-tiered pricing · leaderboards, public ranks or names
+of any kind — the private calibration numbers (the weekly peer line, §6.5, and the mock
+percentile, §7.1) are not leaderboards (founder ruling 2026-10-01) · student-to-student
+social or chat · an open general-purpose chatbot · learning-loop features over WhatsApp
+(WhatsApp is for support, sharing, OTP delivery and parent communication only — CS-2 §4.9)
+· meme-tone branding · streak threats or loss-framed copy.
 
 ---
 

@@ -2688,8 +2688,9 @@ sections above carry a dated pointer where they change. It incorporates the foun
   ruling 2026-10-01, SPEC §5.7) — not D64's `DELETE /me`, which anonymises now and purges in 30 days
   under a tombstone (§2.10) and lands 37 days later. `UserPurge.underage(userId)`, built at D27, runs
   one transaction: the `users` row and everything keyed to it (profile, interview answers, refresh
-  tokens, devices, any document row and its `uploads/` object — none should exist, since uploads
-  unlock only after DOB), the OTP challenges to that number; the two ledgers that must survive as
+  tokens, devices, any document row and its `uploads/` object — deleted whether or not one exists,
+  since SPEC §5 offers the upload at Q7 before DOB while §5.1 unlocks uploads only after it, an
+  ordering left to the founder in TRACKER's open item 13), the OTP challenges to that number; the two ledgers that must survive as
   cost history keep their rows with no link — `ai_calls.user_id` and `sms_sends.destination_hash`
   nulled. No tombstone, no aggregate rows. D27 builds the consent flow against the `OtpSender` port with the SMS channel faked in tests;
   its live proof waits for the phone-OTP item below, since the MSG91 adapter lands there. D60 revisits

@@ -1973,6 +1973,11 @@ IDs, prices, limits, flags and prompt versions never appear as code constants (`
   other secret. The task role keeps S3, logs, CloudWatch and SES; the execution role's
   `GetParameters` + KMS decrypt (below) is what makes the two provider keys reachable. Re-add the
   Bedrock statements only if `margai.ai.provider` ever goes back.
+  **Amended 2026-10-01 (CS-2 §4.11, §15.12):** one Bedrock statement comes back, narrower —
+  `bedrock:InvokeModel` and `bedrock:InvokeModelWithResponseStream` scoped to the embedding model's
+  inference profile and the configured completion-fallback model ARNs; still no batch actions and no
+  `iam:PassRole`. Query-time embedding (retrieval, §4.9) has needed the first since the embedding pin
+  moved to Bedrock on 2026-09-20; this line had not caught up. It lands with F8's task role.
 - Bedrock batch service role (used only when batch mode is on, §4.11): trusted by `bedrock.amazonaws.com`,
   read on `content/batch/in/`, write on `content/batch/out/`; its ARN is the `roleArn` of every batch
   job. *Not needed since 2026-09-12: the direct Batches API holds the records itself, so the batch
@@ -2676,7 +2681,12 @@ sections above carry a dated pointer where they change. It incorporates the foun
   without an admin action (the founder's review).
 - **Minors.** `margai.flags.beta_adults_only` (on for the beta) turns the DOB step into an 18+ gate;
   `margai.flags.parent_consent` (off for the beta, on at public launch) enables the consent flow D27
-  builds in full on the `parent_consent` SMS template.
+  builds in full on the `parent_consent` SMS template. An under-18 DOB at the gate ends onboarding
+  on the “MARG opens to under-18s at launch” screen and deletes the user and everything under it in
+  the same request — D64's deletion path run at once, nothing kept (founder ruling 2026-10-01, SPEC
+  §5.7). D27 builds the consent flow against the `OtpSender` port with the SMS channel faked in tests;
+  its live proof waits for the phone-OTP item below, since the MSG91 adapter lands there. D60 revisits
+  `beta_adults_only` once, beside the DLT decision.
 
 ### 15.2 Entitlements and pricing configuration (CS-2 §1–§3, §4.8; CS-5 §4)
 
@@ -2710,7 +2720,8 @@ sections above carry a dated pointer where they change. It incorporates the foun
   usual `DOUBT_LIMIT_REACHED` and the item stays queued behind the limit screen. The answer's arrival
   is an FCM notification `doubt_answered` deep-linking to the answer; it counts against the daily
   notification cap (SPEC §6.10 does not yet list the kind — TRACKER open item). The queued photo is
-  deleted from the device once the server acknowledges it; server retention is the existing 24 h.
+  deleted from the device once the server acknowledges it; on the server it is deleted right after
+  extraction (D3.22), with the 24-hour `uploads/` lifecycle as the backstop.
 - **Compression** (amends §5.7's ≤ 1.5 MB): longest edge `margai.app.upload.max_edge_px` (default
   1600), JPEG quality 70, target ≤ 400 KB, applied to doubt photos and every document capture. A
   no-regression gate: the D38 photo eval and the D28 document eval run on both the compressed and the
@@ -2725,7 +2736,8 @@ trusted-person encouragement — resource strings live in config so they stay cu
 response carries no practice, streak or plan push; the thread stays open. The eval gains a `crisis`
 fixture kind (direct, indirect, Hinglish and Hindi phrasings) whose gate is 100% (§4.10); copy
 review by the founder and legal review of copy and data handling (TRACKER F9) are prerequisites of the
-D78 beta gate. Logged content is limited to what the ledger and the audit queue already hold.
+D78 beta gate. Logged content is limited to what the ledger and the audit queue already hold. Every
+`safety_screen` call writes its `ai_calls` row under `ai_calls.feature = safety_screen` (hard rule).
 
 ### 15.5 Learning-science guards and streak repair (CS-2 §4.5–§4.6)
 
@@ -2756,8 +2768,15 @@ review_status CHECK (draft|sampled|approved|rejected))`, a migration with the D2
 `primers generate --chapters <top-50|all>`: the REASON tier, grounded on the node's retrieved
 paragraphs, the worked mini-example through the numerical verification, and a **no-verbatim check**
 (word n-gram overlap with any NCERT paragraph under `margai.pipeline.primers.max_overlap`); `primers
-sample` writes a founder sheet of 30. `ai_calls.feature` gains `pipeline_primer`. The eval gains a
-`primer` fixture kind (grounding, the overlap check, the misconception named). Cost is staged first on
+sample` writes a founder sheet of 30. `ai_calls.feature` gains `pipeline_primer`. **The “most common
+misconception” is a claim about students in general, so it comes only from the node's approved
+collective record** (`misconceptions[]` at or above `min_confidence`, worded as collective — SPEC §1
+Evidence rule, §9 item 6); a primer generated before its node's record is approved carries no
+misconception line, and `primers generate` fills that section when the record is approved
+(idempotent per node and record version). Since CS-1's `review` and `load` may slip past D24, a
+top-50 primer can reach the founder's sample without that line and gain it later; the filled line is
+checked by the eval, not re-sampled. The eval gains a `primer` fixture kind (grounding, the
+overlap check, and a misconception line backed by the record or absent). Cost is staged first on
 one chapter, as every NCERT book was; a first guess is ≈ 250 topics in the top-50 chapters at a few
 rupees each.
 
@@ -2798,6 +2817,10 @@ collective layer may read later.
 - **Sunday review and the fit question.** A plan-chat intent `weekly_review`, offered Sunday evening;
   the agreed focus is stored in `weekly_focus(user_id, week_start, focus JSONB)`, which next week's
   planner reads; `weekly_fit(user_id, week_start, answer, follow_up)` records the one-tap question.
+  Every statement in the review cites evidence keys and passes the same traceability check as a
+  mentor-note claim (CS-4 §5.1: "every claim backed by the student's own data"); a statement that
+  fails is dropped, never sent. D58's ✅ includes a seeded week whose review is all traceable and whose
+  next week's plan carries the agreed focus.
 - **The 14-day simulation.** `planner simulate --days 14` over six archetypes (fresher 2-year, fresher
   1-year, dropper, repeater, low-completion, high-achiever) with scripted behaviour — skip-with-reason,
   a mistake cluster, repeated doubts — on fixture AI responses, asserting CS-6 §5's six properties. It
@@ -2808,7 +2831,11 @@ collective layer may read later.
 - **Prefetch.** The nightly run's completion sends an FCM data message `plan_ready`; a WorkManager job
   downloads tomorrow's plan and offline pack when Android allows background data (it honours the
   data-saver background restriction and battery saver); Today renders from drift first and refreshes
-  after. No prefetch → the fetch on open, then the no-planless-morning fallback.
+  after. No prefetch → the fetch on open, then the no-planless-morning fallback. The offline pack it
+  downloads is D34's Option A pack for tomorrow's own blocks — the same ≤ 75 scheduled questions, keys
+  obfuscated in drift and wiped after sync; only its arrival moves to the night before (founder ruling
+  2026-10-01 on hard rule 1, DECISIONS). D57 extends D34's "the pack is the only pre-answer carrier"
+  test to the prefetch path.
 - **Low-data images.** Diagrams and cards are stored in two sizes when produced; the app asks for the
   one its width and connection type need.
 - **Testing.** Slow-3G and lossy profiles on the AVD (`-netspeed`, `-netdelay`), driven by
@@ -2836,6 +2863,9 @@ model through Bedrock, since CS-2's “access now restored” is not checkable f
 
 A click-to-chat `wa.me` link (number in config) in Profile → Support, and sharing through the OS share
 sheet (`share_plus`) for milestone cards, answer cards and referral links. No WhatsApp API in Phase 1.
+The committed build has nothing to share yet — milestone cards are beta-backlog item 5, answer cards
+and referral gifts Phase 2 (SPEC §12.1–§12.2) — so D64 builds the click-to-chat link and the share
+helper arrives with its first shareable.
 
 ### 15.14 Where it lands (mirrors PLAN, 2026-10-01)
 
@@ -2843,7 +2873,8 @@ sheet (`share_plus`) for milestone cards, answer cards and referral links. No Wh
 |---|---|
 | D18 buffer | Bedrock completion fallback as config (§15.12) |
 | D22–D24 | `concept_primers` migration and `primers generate` for the top-50 chapters (§15.7) |
-| D27 | DOB + 18+ beta gate; the parent-consent flow built in full behind its flag (§15.1) |
+| a later buffer before D74 | the remaining primers, all topics (§15.7) |
+| D27 | DOB + 18+ beta gate with the under-18 stop-and-delete; the parent-consent flow built in full behind its flag (§15.1) |
 | D28/D29 → D42 buffer | compression retro-fitted to the document captures (§15.3) |
 | D33 | `skip_reason` on block status (§15.9) |
 | D35 | past-paper mocks; `mock_results` captured (§15.6) |
@@ -2852,20 +2883,21 @@ sheet (`share_plus`) for milestone cards, answer cards and referral links. No Wh
 | D46 | threads, depth cap, the `doubt_answered` notification (§15.3) |
 | D54 | the autopsy with drills (§15.6) |
 | D55–D56 | continuity, load, moments, the ramp, traceability, the 14-day harness (§15.9) |
-| D57 | prefetch (§15.10) |
-| D58 | Sunday review, fit question, streak repair copy (§15.5, §15.9) |
+| D57 | prefetch, with D34's carrier test extended to it (§15.10) |
+| D58 | Sunday review with its traceability check, fit question, streak repair copy (§15.5, §15.9) |
 | D58–D59 | learning-science guards (§15.5); drills placed (§15.6) |
 | D59 | crisis protocol behaviour and eval cases (§15.4) |
 | D55–D56 UI | primers and lectures in learn blocks (§15.7, §15.8) |
-| D60 | gate: three real unattended days **and** the 14-day simulation; DLT decision point |
+| D60 | gate: three real unattended days **and** the 14-day simulation; DLT decision point; the 18+ revisit |
 | D61–D63 | prices, rungs, grandfathering, GST config, the paywall (§15.2); one active phone, devices (§15.1) |
 | D63–D64 | account switcher (§15.1) |
-| D64 | terms, legal pages, entity name config; WhatsApp links (§15.13) |
+| D64 | terms, legal pages, entity name config; WhatsApp click-to-chat (§15.13) |
 | D65 | per-install limits extended, unusual-use ladder (§15.1), breaker as before |
 | D67 | crisis, streak, ramp copy |
 | D69 | image sizing; throttled-network and real-device tests (§15.10) |
 | D71 | the unusual-use simulation in the security review |
 | D73 | the §15.11 dashboards; the monthly `lectures check` |
 | D77 | throttled and real-device tests re-run |
-| when F1's DLT templates are approved, by D60 | phone OTP primary: MSG91 adapter, phone entry + auto-read, email behind the flag (§15.1) |
+| D78 | gate blocking items: crisis eval cases at 100%, slow-network and real-device acceptance, top-50 primers, a vetted lecture per chapter |
+| when F1's DLT templates are approved, by D60 | phone OTP primary: MSG91 adapter, phone entry + auto-read, email behind the flag; phone attach for email-begun accounts, `POST /me/phone/otp/request\|verify`; the consent flow's live proof (§15.1) |
 | weeks 15–20 | the beta backlog of SPEC §12.1, in order, behind flags |

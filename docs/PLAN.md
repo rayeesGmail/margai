@@ -48,7 +48,10 @@ Founder-only parallel workstreams (not coding hours; do in evenings/Sundays):
 **F1** Razorpay KYC + DLT SMS template (start week 1 — long lead times) ·
 **F2** NCERT licensing letter (week 1) · **F3** Educator review of plan backbone
 (book by week 5, needed week 8) · **F4** Beta recruitment groundwork (weeks 10–13) ·
-**F5** Marketing site copy (week 11).
+**F5** Marketing site copy (week 11). *Later workstreams F6–F11 and, added 2026-10-01 with
+CS-2 to CS-6, F12 (curate chapter videos), F13 (pricing-evidence review), F14 (season-one entity
+realignment) and F15 (a low-cost Android test phone) are tracked in TRACKER's founder table. F1's
+DLT registration is possible under the Udyam proprietorship (founder, 2026-10-01).*
 
 ---
 
@@ -88,6 +91,16 @@ Founder-only parallel workstreams (not coding hours; do in evenings/Sundays):
 - **D11 —** DLT template live check (if F1 approved; else stay sandbox), delivery-rate
   logging, OTP metrics dashboard stub. ✅ *OTP success metric visible.*
 - **D12 —** Buffer + **Week-2 gate:** a stranger's phone can sign in first try.
+- **Floating — phone OTP live** *(founder decision 2026-10-01; placement proposed, to confirm)*:
+  phone OTP by SMS is the only sign-in method (SPEC §5.7). The MSG91 adapter on the two DLT
+  templates (login, parent consent), number entry with OTP auto-read, and email OTP moved behind
+  its flag land in the first buffer after F1's DLT templates are approved — and **D60 is the
+  decision point**: if the templates are not live by then, the beta runs on the email fallback
+  flag (which needs F10's SES production access). The same item builds the phone attach for an
+  account begun on the email fallback (`POST /me/phone/otp/request|verify`, TECH_PLAN §15.1) and
+  gives D27's consent flow its live SMS proof. ✅ *A real phone signs in by SMS first try; the
+  email path only with its flag on; an email-begun account attaches a phone and stays one user,
+  and a number already in use is refused, never merged (CS-2 §10, SPEC §5.7).*
 
 ### PHASE 2 — Content pipeline v1 (Weeks 3–4, Days 13–24) — Module M3
 
@@ -111,7 +124,8 @@ tools; your reviews focus on output quality.)*
   (amended 2026-09-19); the test harness widened to it. ✅ *15 hand-written concept queries
   return the right paragraphs.*
 - **D18 —** Buffer for extraction mess (there will be some). **Week-3 gate:** NCERT
-  layer searchable in both languages.
+  layer searchable in both languages. *Added 2026-10-01 (CS-2 §4.11): Bedrock configured as a
+  completion fallback behind a flag — config only; embeddings stay on Bedrock as their primary.*
 - **D19 —** PYQ ingest: papers loaded, question records created, tagging pass.
   ✅ *Counts per year/subject match official papers.*
 - **D20 —** AI solution generation (batch) for one subject; verification pass wired.
@@ -121,7 +135,9 @@ tools; your reviews focus on output quality.)*
 - **D22 —** Weightage & difficulty statistics computed → syllabus nodes updated; the
   `collective_records` migration and `collective from-pyq` momentum per node (CS-1 §2, §4;
   TECH_PLAN §2.3, §6.3 — added 2026-09-12).
-  ✅ *Top-10 weightage chapters match known NEET wisdom (sanity check).*
+  ✅ *Top-10 weightage chapters match known NEET wisdom (sanity check).* *Added 2026-10-01
+  (CS-4 §3; at risk): the `concept_primers` migration and `primers generate` begin for the top-50
+  weightage chapters (TECH_PLAN §15.7), staged on one chapter first.*
 - **D23 —** Anchor-linking questions↔NCERT; seed the eval suite v1 (~60 questions
   across subjects). ✅ *Eval harness runs and reports.*
 - **D24 —** Buffer + **Week-4 gate:** solved, tagged, anchored PYQ bank + eval suite
@@ -133,6 +149,8 @@ tools; your reviews focus on output quality.)*
   review. ✅ *travels with `collective load`, here or in the buffer it slips to: approved
   collective records exist for the top-50 weightage nodes at or above the confidence
   threshold; the review sheet is founder-signed; every record carries `season_version`.*
+  *Added 2026-10-01 (CS-4 §3; at risk): primers for the top-50 chapters finish here and `primers sample`
+  writes the founder's 30-primer sheet; the remaining topics go to a later buffer before D74.*
 
 ### PHASE 3 — Onboarding & first plan (Week 5, Days 25–30) — Modules M2 + M4(v0)
 
@@ -144,6 +162,16 @@ tools; your reviews focus on output quality.)*
   DOB step; onboarding completes regardless; "parent consent pending" state on Profile with a
   re-prompt at gated moments (TECH_PLAN §0.5 item 8, decided at D3). ✅ *Under-18 path blocks
   photo doubts and document uploads until consent; text features and the first plan work.*
+  *Amended 2026-10-01 (CS-2 §4.2, founder decision): the beta is recruited 18+, so D27 builds DOB
+  with an 18+ beta gate (flag on) **and** the parent-consent flow in full on the SMS template,
+  switched off by flag for the beta and on at public launch; any time this frees returns to the
+  at-risk days' buffer, not to new scope. An under-18 DOB at the gate stops kindly and hard-deletes
+  the account, number and answers at once (founder ruling 2026-10-01) — a purge built here, not D64's
+  anonymise-then-purge (TECH_PLAN §15.1); D60 revisits the 18+ rule. The
+  consent flow is built against the OTP sender port with SMS faked in tests — its live proof comes
+  with the floating phone-OTP item, where the MSG91 adapter lands. ✅ adds: with the beta flag on,
+  an under-18 DOB meets the gate and leaves no row that identifies them (the cost ledgers keep their
+  rows, unlinked); with the consent flag on, the original ✅ holds.*
 - **D28 —** Scorecard upload: capture UI with frame guide → AI extraction → confirm/edit
   screen → delete-after-confirm behavior. ✅ *3 real scorecard photos (found samples)
   extract correctly; storage verifiably empty after.*
@@ -169,13 +197,18 @@ tools; your reviews focus on output quality.)*
 - **D32 —** Practice UI: timer, taps, verdict + solution sheet + NCERT anchor chip.
   ✅ *A 10-question timed set feels smooth on a mid-range phone.*
 - **D33 —** Session summary (accuracy, speed vs your norm, sent-to-notebook list);
-  event stream persisted. ✅ *Events visible in DB with timing data.*
+  event stream persisted. ✅ *Events visible in DB with timing data.* *Added 2026-10-01
+  (CS-6 §2.2): marking a block skipped offers the optional reason (No time · Too hard · Already
+  know this), stored on the block; the planner acts on it at D55.*
 - **D34 —** Offline mode: today's blocks + questions cached; outbox sync for results.
   ✅ *Airplane-mode test: complete a session, land, sync.*
 - **D35 —** Diagnostic test (30-question adaptive flavor) reusing the session engine;
   ability estimates update chapter status; the intro names the diagnostic as the fastest
   way to shift the weight from “students like you” to “you” (SPEC §6.1, CS-1 §5.6 — added
-  2026-09-12). ✅ *Diagnostic shifts a seeded user's plan.*
+  2026-09-12). ✅ *Diagnostic shifts a seeded user's plan.* *Added 2026-10-01 (CS-2 §4.7, CS-4 §6):
+  full NEET 2018–2026 past papers as timed mocks (`kind = mock`, TECH_PLAN §0.5 item 2), out-of-syllabus
+  questions excluded from the score; every mock result captured for the later private percentile.
+  ✅ adds: at least one full past paper runs end to end as a timed mock (CS-2 §10).*
 - **D36 —** Buffer + **Week-6 gate:** practice loop end-to-end incl. offline + diagnostic.
 
 ### PHASE 5 — Doubt solver (Weeks 7–8, Days 37–48) — Module M6 (the hero)
@@ -186,7 +219,9 @@ tools; your reviews focus on output quality.)*
   variable — the two tiers tokenize the same prefix ~50% apart (`.claude/rules/ai-layer.md`;
   measured 2026-09-12). ✅ *10 typed doubts answered with correct anchors.*
 - **D38 —** Photo path: capture UI + vision extraction → same pipeline. ✅ *10 photographed
-  printed questions extracted faithfully.*
+  printed questions extracted faithfully.* *Added 2026-10-01 (CS-3 §3.1–§3.2): the offline doubt
+  queue (captured with no connection, sent automatically later, metered at send) and photo
+  compression before upload with a no-regression eval; if D38 is full, both go to the D42 buffer.*
 - **D39 —** Difficulty router + reasoning tier + numerical verification (independent
   re-solve; mismatch → regenerate once → honest fallback + audit queue). ✅ *Seeded
   wrong-answer test proves unverified numericals never render.*
@@ -196,7 +231,8 @@ tools; your reviews focus on output quality.)*
 - **D41 —** Cache write path (verified only) + semantic near-match; hit metrics.
   ✅ *Same question twice = instant second answer; near-duplicate hits logged.*
 - **D42 —** Buffer + mid-module audit: you review 30 real answers across subjects.
-  **Week-7 gate:** doubt loop works for text+photo with verification.
+  **Week-7 gate:** doubt loop works for text+photo with verification. *Added 2026-10-01 (CS-3
+  §3.2): compression retro-fitted to the D28/D29 document captures; any D38 overflow.*
 - **D43 —** Language behavior: EN/HI/Hinglish answer generation honoring user setting;
   copy pass on solver strings. ✅ *Same doubt in 3 languages reads naturally.*
 - **D44 —** Free-tier limits (5/day, cached=half) + limit meter UI + graceful limit
@@ -204,11 +240,16 @@ tools; your reviews focus on output quality.)*
   degradation path: a Pro user is never refused, so both the fair-use cap and the money
   breaker accept and queue, with honest copy per wait — "a few minutes" over the cap,
   tonight over the breaker (founder ruling 2026-09-12; TECH_PLAN §4.4, §4.8). The hard
-  stop stays free-tier only. ✅ *Limit math correct across day boundary (IST).*
+  stop stays free-tier only. ✅ *Limit math correct across day boundary (IST).* *Added 2026-10-01
+  (CS-5 §4): the free allowance is also counted per phone (install id), so switching free accounts
+  never multiplies it; Pro on a shared phone is unaffected. ✅ adds: switching between free accounts
+  on one phone does not raise that phone's daily free doubts (CS-5 §6.3).*
 - **D45 —** Doubt → student-state write-back (concept weak-signals) with visible effect
   in next plan (“because you asked 3 Optics doubts…”). ✅ *Seeded doubts change
   tomorrow's plan with the reason line.*
 - **D46 —** Doubt history screen + follow-up threading. ✅ *Follow-ups keep context.*
+  *Added 2026-10-01 (CS-2 §4.4, CS-3 §3.1): a thread depth cap that invites a new doubt, no
+  general chatbot anywhere, and the “answer ready” notification for a queued offline doubt.*
 - **D47 —** Eval suite expansion to ~150 questions; wire the eval gate into pre-commit
   for AI-touching changes; the harness gains the `claim` fixture kind — a collective-attributed
   line and the record it must trace to — first populated from the D29 first plan's templated
@@ -233,7 +274,11 @@ tools; your reviews focus on output quality.)*
 - **D53 —** Patterns engine v1: the plain-language weekly insights (“31% unit slips…”).
   ✅ *Insights only fire with sufficient data (evidence rule).*
 - **D54 —** Buffer + **Week-9 gate:** mistake lifecycle capture→diagnose→resurface→heal
-  demonstrated end-to-end.
+  demonstrated end-to-end. *Added 2026-10-01 (CS-2 §4.7, CS-4 §5.2; at risk): the mock autopsy
+  (already scheduled here, TECH_PLAN §0.5 item 2) — summary for Free, full for Pro — and the
+  timing and skip-strategy drills built from it. ✅ adds: one full past paper runs mock → autopsy end
+  to end (CS-2 §10); a seeded student with a high gamble score gets targeted skip drills, and the
+  drill results appear in the next autopsy's comparison (CS-4 §5.2).*
 - **D55 —** Nightly re-planner: state snapshot assembly + deterministic candidate blocks
   (SRS dues, weak-node practice, backbone next, hours budget); the snapshot reads two
   sources — the approved collective record and the student state — blended per node by
@@ -246,23 +291,47 @@ tools; your reviews focus on output quality.)*
   visibly different, collective-informed plans with every block reason backed and
   attributed; the same student with two weeks of synthetic history has individual data
   outweigh the prior on practiced nodes; emptying the records table degrades the day-1
-  plans (CS-1 §7 a–c).*
+  plans (CS-1 §7 a–c).* *Added 2026-10-01 (CS-6 §2.1–§2.3, §2.5, §5; at risk): continuity, the
+  skip-reason responses, load that follows completion, notable moments in the snapshot, and the
+  **14-day simulation harness** over six archetypes (required for the D60 gate).*
 - **D56 —** AI selection/ordering + reason lines + mentor note; JSON-validated output;
   deterministic fallback (a plan must ALWAYS exist); reasons carry an attribution —
   collective lines cite the record, individual lines the student's data, never blended —
   and the season prior softens volume and tone before individual slump signals fire
   (CS-1 §5.4–§5.5; TECH_PLAN §4.5, SPEC §10.9 — added 2026-09-12); the AI reason
   lines join the eval's `claim` fixtures (CS-1 §7). ✅ *Kill the AI
-  mid-run → fallback plan appears; no planless morning possible.*
+  mid-run → fallback plan appears; no planless morning possible.* *Added 2026-10-01 (CS-6 §2.4,
+  §3; CS-4 §3–§4; at risk): the first-seven-days ramp in the mentor note, reason traceability and
+  the generic-phrase check (eval gate here and at D60), and concept primers + curated lectures
+  (link-out) inside learn blocks.*
 - **D57 —** Batch execution for all active users + morning notification with plan
-  deep-link. ✅ *Two devices, different profiles, different 7 AM plans.*
+  deep-link. ✅ *Two devices, different profiles, different 7 AM plans.* *Added 2026-10-01
+  (CS-3 §3.3): tomorrow's plan and its questions prefetched in the background after the nightly
+  run, so Today opens from local data; the prefetched pack is D34's offline pack for tomorrow's
+  own blocks, keys wiped after sync (founder ruling 2026-10-01). ✅ adds: with connectivity at
+  night only, the morning Today opens in airplane mode (CS-3 §4), and D34's "the pack is the only
+  pre-answer carrier" test passes on the prefetch path.*
 - **D58 —** Streaks, weekly trajectory card (humble-early copy), plan negotiation chat
   v1 (reschedule/lighten/swap intents). ✅ *“Wedding this weekend” visibly rebalances
-  the week with a trade-off line.*
+  the week with a trade-off line.* *Added 2026-10-01 (CS-2 §4.5–§4.6, CS-4 §5.1, CS-6 §4; at
+  risk): streak repair framing, the Sunday review in the plan chat with its agreed focus, and the
+  weekly fit question. ✅ adds: a seeded week of activity produces a review whose every statement
+  traces to the student's data, and next week's plan carries the agreed focus (CS-4 §5.1).*
 - **D59 —** Slump detection rules + light-day behavior + mood chip wiring.
-  ✅ *Simulated 3 dark days → gentler plan + right copy.*
+  ✅ *Simulated 3 dark days → gentler plan + right copy.* *Added 2026-10-01 (CS-2 §4.1, §4.5–§4.6;
+  CS-4 §5.2; at risk): the **crisis protocol** behaviour and its eval cases (direct, indirect, Hinglish,
+  Hindi; 100% — a beta blocker), the learning-science guards, and drill placement by the planner.*
 - **D60 —** Buffer + **Week-10 gate:** the full daily loop (plan→do→re-plan) runs
-  unattended for 3 consecutive real days on your own test account.
+  unattended for 3 consecutive real days on your own test account. *Amended 2026-10-01 (CS-2 §5,
+  CS-6 §5, founder decision): the gate also requires the **14-day planner simulation** to pass over
+  six archetypes, showing all six CS-6 §5 properties — clearly different plans for different
+  students; every reason traceable and none generic; a reaction within one day to a skip with a
+  reason, a mistake cluster and repeated doubts; continuity with no unexplained swings; load
+  converging on the real completion pace; the first-week ramp's expected mentor notes — and the
+  beta backlog (SPEC §12.1) ships only after it. **DLT decision point:** if F1's DLT templates are
+  not live by D60, the beta switches to email OTP through its flag. **The 18+ rule is revisited
+  here once:** with the consent template live and F9's legal review clear, the consent flag may go
+  on for the later beta waves (founder ruling 2026-10-01).*
 
 ### PHASE 7 — Money & trust (Week 11, Days 61–66) — M9 + M10
 
@@ -271,36 +340,61 @@ tools; your reviews focus on output quality.)*
 - **D62 —** Paywall triggers (doubt #6, notebook cap, SRS lock, weekly-report teaser)
   + the honest paywall screen (₹499 struck → ₹299 founding, ₹2,999 annual). ✅ *Each
   trigger fires exactly once per context; “Not now” = 48h silence.*
+  *Added 2026-10-01 (CS-2 §2, §4.8; CS-5 §3.1–§3.2; at risk, D61–D63 together): prices as config —
+  list/founding rungs, ₹3,999 struck annual, grandfathering by the stored price, the founding
+  switch and GST display as configuration; one active phone per account and the devices screen.
+  ✅ adds: the founding/list switch and GST display change by configuration with no release (CS-2
+  §10); signing in on phone B signs phone A out, and A's queued offline work syncs when the same
+  account next signs in there; the devices screen lists active phones and signs one out on request
+  (CS-5 §6.3).*
 - **D63 —** Cancel (2 taps, zero retention screens) + 7-day auto-refund + exam-date
   auto-pause rule. ✅ *Cancel→refund runs without human touch in test mode.*
+  *Added 2026-10-01 (CS-5 §3.3; with D64; at risk): the account switcher — separate data per
+  account. ✅ adds: two accounts on one phone keep fully separate data and subscriptions (CS-5 §6.3).*
 - **D64 —** Privacy plumbing: data export (notebook PDF + JSON), account deletion,
   document-deletion verification job, consent texts, legal pages. ✅ *Export a real
-  account; delete an account; verify purge schedule.*
+  account; delete an account; verify purge schedule.* *Added 2026-10-01 (CS-5 §6.1, CS-2 §4.9,
+  §9; at risk): terms (a subscription is personal; the one-active-phone rule in plain words), the
+  WhatsApp click-to-chat link and share sheet, the legal entity name as configuration. What the
+  share sheet shares in the committed build is open (TECH_PLAN §15.13; TRACKER day log).*
 - **D65 —** Per-user AI budget circuit breaker + daily spend alarms + cost dashboard
   (cache rate, cost/feature, cost/user); the breaker wiring includes the Pro queue path
   (accept + queue, never a refusal — TECH_PLAN §4.8, founder ruling 2026-09-12) and the
   re-estimate of §7.7's economics on real ledger data. ✅ *Simulated runaway loop trips the
   breaker — for a free user a hard stop, for a Pro user a queued solve and honest copy.*
+  *Added 2026-10-01 (CS-5 §4–§5, founder decision item 4; at risk): per-phone free limits extended,
+  the unusual-use ladder (soft message → re-verify → rate limit, no automatic bans), the per-device
+  daily OTP cap, and SMS/OTP spend on the cost dashboard. ✅ adds: a fourth free account on one
+  phone is blocked with a friendly message (CS-5 §6.3).*
 - **D66 —** **Week-11 gate:** money loop + trust promises all demonstrably true.
   (F5: marketing site drafted this week, evenings.)
 
 ### PHASE 8 — Hardening & polish (Weeks 12–13, Days 67–78) — M11
 
 - **D67 —** Full Hinglish/Hindi copy pass with a native-speaker read (mentor voice
-  audit — no guilt, no fake-human). ✅ *String review sheet signed off.*
+  audit — no guilt, no fake-human). ✅ *String review sheet signed off.* *Added 2026-10-01 (CS-2
+  §4.1, §4.5; CS-6 §2.4): the crisis-protocol copy (founder review), streak-repair copy and the
+  first-week ramp's mentor notes.*
 - **D68 —** Notification system final: caps (2/day), quiet hours, exam-protocol config.
   ✅ *A day of simulated triggers never exceeds caps.*
 - **D69 —** Performance pass: cold start, Today load, solver latency streaming, low-end
-  device test. ✅ *Spec p95 targets met on the cheap test phone.*
+  device test. ✅ *Spec p95 targets met on the cheap test phone.* *Added 2026-10-01 (CS-3 §3.4,
+  §4): images sized to device and connection; the throttled-network tests (slow 3G, airplane-mode
+  doubt, offline practice, compression, prefetch) on the AVD and on the low-cost phone (F15).*
 - **D70 —** Failure drills: DB restore from backup, AI provider outage behavior (honest
   errors + queue), payment webhook replay. ✅ *Each drill scripted and passing.*
 - **D71 —** Security review checklist (auth, IDOR probes, rate limits, secrets scan,
-  dependency audit). ✅ *Checklist committed with findings fixed.*
+  dependency audit). ✅ *Checklist committed with findings fixed.* *Added 2026-10-01 (CS-5 §5–§6.3):
+  a simulated two-city concurrent session meets the soft message and re-verification, never a ban;
+  no permanent hardware identifier collected.*
 - **D72 —** Buffer + **Week-12 gate:** app is boringly reliable.
 - **D73 —** Analytics funnels (install→plan→doubt→D7; paywall funnel; cache rate) +
   crash reporting triage flow; the CS-1 §7 metrics — day-1→day-7 plan-block completion
   trend, reason lines by attribution, collective-record coverage of served blocks
   (TECH_PLAN §10.2–§10.3 — added 2026-09-12). ✅ *Dashboards live with real test traffic.*
+  *Added 2026-10-01 (CS-2 §4.10, CS-3 §5, CS-6 §4, CS-4 §4): learning-outcome metrics, network
+  reliability metrics, the personal-fit measures by week of tenure, and the monthly curated-lecture
+  check (TECH_PLAN §15.11).*
 - **D74 —** Play Store: listing assets, data-safety form, internal testing track upload.
   ✅ *Installable from the testing track.*
 - **D75 —** Beta tooling: invite codes, founder admin peek (read-only), audit-queue
@@ -308,8 +402,13 @@ tools; your reviews focus on output quality.)*
 - **D76 —** Seed the answer cache: batch-solve the top ~500 predicted common doubts
   (from PYQ concept frequency). ✅ *Cache hit-rate head start measured.*
 - **D77 —** Full dress rehearsal: you live one complete student day on production infra.
-  ✅ *Punch list produced.*
-- **D78 —** Punch-list burn-down + **Week-13 gate:** beta build signed off.
+  ✅ *Punch list produced.* *Added 2026-10-01 (CS-3 §4): the throttled-network and real-device tests
+  re-run.*
+- **D78 —** Punch-list burn-down + **Week-13 gate:** beta build signed off. *Added 2026-10-01
+  (CS-2 §4.1, §10; CS-3 §4; CS-4 §3–§4): blocking items — the crisis protocol passes its eval cases;
+  the slow-network acceptance holds; primers exist for the top-50 chapters and a vetted lecture for
+  every chapter. A primer counts only with its misconception line, which comes from CS-1's approved
+  record (TECH_PLAN §15.7), so CS-1's `review` + `load` for the top-50 nodes must land before here.*
 
 ### PHASE 9 — Beta launch (Week 14, Days 79–84) — M12
 
@@ -320,6 +419,8 @@ tools; your reviews focus on output quality.)*
 - **D82 —** First cohort review: activation %, first-doubt %, answer report rate,
   cache rate, cost/user. Adjust free limits/paywall copy if data says so.
 - **D83 —** Pricing conversations with 10 beta students (₹299 vs ₹499 reaction notes).
+  *(2026-10-01: the beta itself collects no payment — CS-2 §2.1; these notes feed F13's
+  pricing-evidence review.)*
 - **D84 —** **Beta gate & retro:** go/no-go criteria for the 6-week beta period; write
   the weeks 15–20 operating plan (daily 1h ops + 3h fixes/Phase-2 prep).
 
@@ -331,6 +432,11 @@ Daily: 1h operations (audits, support, metrics) + 3h building from the beta back
 Weekly: cohort metrics review vs §11 of the Product Spec; one student call.
 Exit criteria to public launch: D7 ≥ 35% · report rate < 1% · OTP ≥ 98% ·
 crash-free ≥ 99.5% · cache ≥ 55% · at least 15 organic-feeling payments.
+*Amended 2026-10-01 (CS-2 §2.1, §5; founder rulings Q7 and of the same day):* the beta is free
+(six weeks of Pro, no payments collected), so the payments criterion becomes **≥ 15 beta students
+opting into a founding plan to start at launch**, read at F13's pricing-evidence review, and
+“OTP ≥ 98%” reads **sign-in success ≥ 98% first attempt**. The beta backlog is SPEC §12.1, in its
+order, each behind a flag with its metric live, and only after the D60 gate passed.
 
 ---
 

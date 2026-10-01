@@ -149,7 +149,7 @@ The eight questions of §13.4, answered. Each row names where the plan reflects 
 | # | Decision | Where it lands |
 |---|---|---|
 | 1a | `correct_key` reading **accepted**: the key is never sent before that student's answer to the question is recorded server-side; judging is server-side | CLAUDE.md hard rule 1, `server.md`, `endpoint.md`, `spec-auditor.md`, PLAN D31 ✅ reworded at D3 close; §3.1 carriers stand |
-| 1b | Offline verdicts: **Option A**. The pack carries judging data only for that student's own scheduled blocks of the day, obfuscated on device (best effort, not a security boundary), wiped after sync; server re-judging is authoritative for state, notebook and streaks | §5.6; the offline clause is added to the rule at D34 together with the test that the pack is the only pre-answer carrier |
+| 1b | Offline verdicts: **Option A**. The pack carries judging data only for that student's own scheduled blocks of the day, obfuscated on device (best effort, not a security boundary), wiped after sync; server re-judging is authoritative for state, notebook and streaks | §5.6; the offline clause is added to the rule at D34 together with the test that the pack is the only pre-answer carrier. *2026-10-01 (founder ruling, §15.10): the pack for tomorrow's own blocks may arrive the night before by prefetch — same questions, same wipe; D57 extends the test* |
 | 2 | Mocks and autopsy **scheduled**: `kind = mock` on the session engine at D35, the autopsy (per-mark classification, gamble score, pace map) in D54's buffer; slips go to the TRACKER slippage log | §12.2; TRACKER D35, D54 |
 | 3 | Batch sync: self-report at **D25**, timetable photo as a `doc_type` at **D29**; the weekly batch-confirm card **parked** until coaching students are in the beta; the nightly snapshot reads `batch_positions` when present | §2.7, §2.9 V11, §3.7, §12.2 |
 | 4 | Crash reporting via PostHog error tracking **accepted** within the three-SDK rule; revisit at D73; Crashlytics only through an explicit rule amendment | D3.25 confirmed |
@@ -419,6 +419,11 @@ Index: `phone` (unique, partial `WHERE phone IS NOT NULL`); `email` likewise (V6
 an active account has at least one *verified* identifier. The SMS DLT template (TRACKER F1) needs a
 registered company, so login is by email until it exists; a phone can be attached later by phone OTP
 (PARKED). Until D7 the check read `status = 'deleted' OR phone IS NOT NULL`; SPEC §3/§5 stay the target.
+*Amended 2026-10-01 (founder decision; SPEC §5.7; §15.1): phone OTP by SMS is the only sign-in method
+and the verified phone is the account's identity; email stays built behind
+`margai.flags.auth_email_fallback` (the beta fallback); `refresh_tokens` gains `revoked_reason`,
+`user_devices` gains `install_id`, `device_label`, `signed_in_at`, `last_active_at`, and `sms_sends`
+joins the `auth` tables.*
 
 **student_profiles** (1:1 users) — D4; columns marked † are filled by later days but declared now so
 the row shape is stable.
@@ -683,7 +688,9 @@ braces.
 **subscriptions** — D61: `user_id, plan CHECK (free|pro_monthly|pro_annual), provider, provider_sub_id
 UNIQUE, provider_customer_id, status CHECK (pending|active|past_due|paused|cancelled), founding_price
 BOOLEAN, current_period_start, current_period_end, cancel_at, paused_at, auto_pause_after DATE`.
-Partial unique `(user_id) WHERE status IN ('pending','active','past_due')`.
+Partial unique `(user_id) WHERE status IN ('pending','active','past_due')`. *Amended 2026-10-01
+(CS-2 §2, §15.2): gains `price_rung CHECK (list|founding|offer)` and `price_paise`, stamped at purchase —
+grandfathering is that stored price renewing; `plan` later admits `pro_plus_monthly|pro_plus_annual`.*
 **payments** — D61: `subscription_id, provider_payment_id UNIQUE, amount_paise BIGINT, currency
 CHAR(3), status CHECK (captured|refunded|failed), refund_id, refunded_at, refund_deadline
 TIMESTAMPTZ, raw JSONB`.
@@ -810,7 +817,10 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
 - `POST /auth/otp/request` sends a 6-digit code to the identifier given — by email through SES while
   the DLT template (F1) is blocked (D7 ruling, 2026-09-08, DECISIONS), by SMS through MSG91 once
   `margai.auth.otp.channels` includes `sms`; the code is stored hashed with a pepper; 5-minute expiry;
-  5 attempts per challenge; 30-second resend cooldown.
+  5 attempts per challenge; 30-second resend cooldown. *Amended 2026-10-01 (founder decision, §15.1):
+  `sms` becomes the default and only channel once F1's DLT templates are live; `email` stays behind
+  `margai.flags.auth_email_fallback`; a sign-in from a new install revokes the account's other families
+  (`AUTH_SIGNED_OUT_ELSEWHERE` on the old phone's next refresh).*
 - `POST /auth/otp/verify` returns `{access_token, refresh_token, expires_in, is_new_user, user}`.
   Access token: JWT HS256, 15 minutes, claims `sub` (user id), `role`, `lang`, `jti`. Refresh
   token: opaque 256-bit random, 30 days, stored as SHA-256 in `refresh_tokens`, one family per
@@ -865,6 +875,9 @@ app's ARB files own client copy. Both sides use the same code strings.
 
 Implemented as in-process token buckets (Bucket4j) keyed by user id, phone or IP. This assumes one
 API instance, which is the beta topology; the second-instance path is a shared store (§13.3).
+*Amended 2026-10-01 (founder decision item 4, CS-5 §4; §15.1): OTP requests also capped per install id
+per day (`margai.limits.otp.per_install_per_day`, default 10), and free accounts per install capped at
+creation (default 3).*
 
 ### 3.5 Idempotency
 
@@ -1187,7 +1200,16 @@ copy and routing; D65 owns the wiring.
 solves share a smaller one (concurrency 2); when the global breaker or Bedrock throttling bites,
 free solves are queued first and Pro last. It is a scheduling preference, not a different pipeline.
 
+*Amended 2026-10-01 (CS-5 §4, CS-3 §3.1, CS-2 §3; §15.2–§15.3): free solves count per account **and**
+per install id; a queued offline doubt counts when sent; the tier limits read from
+`margai.entitlements.*` rather than the constants above, which become that map's defaults.*
+
 ### 4.5 Nightly re-planner (D55–D59)
+
+*Amended 2026-10-01 (CS-6, CS-4 §5.1, CS-2 §4.5–§4.6): continuity, skip reasons, load that follows
+completion, the first-week ramp, notable moments, traceable and non-generic reasons, the Sunday review,
+the learning-science guards and the 14-day simulation harness are designed in §15.5 and §15.9; the
+steps below stand and gain those inputs and checks.*
 
 Runs under the `nightly` profile for every user with activity in the last 14 days, one transaction
 per user, in this order:
@@ -1429,6 +1451,11 @@ a re-learn block candidate.
 
 ### 4.10 Eval harness (D23, D47)
 
+*Amended 2026-10-01 (CS-2 §4.1, CS-3 §3.2, CS-4 §3, CS-6 §3): new fixture kinds `crisis` (gate 100%,
+§15.4), `primer` (grounding, the no-verbatim overlap, §15.7) and reason traceability/specificity cases
+on the `claim` kind (§15.9); the photo and document evals run on compressed and original images with a
+no-regression gate (§15.3).*
+
 Two layers, one fixture set.
 
 - **Fixtures** `eval/fixtures/<subject>/<id>.json`: `{id, subject, node_code, language, input:
@@ -1460,6 +1487,10 @@ Two layers, one fixture set.
   (~200 fixtures, mostly CHEAP) is a few hundred rupees.
 
 ### 4.11 Provider specifics
+
+*Amended 2026-10-01 (CS-2 §4.11, founder ruling Q4): Anthropic direct stays the completion primary;
+Bedrock is configured as a completion fallback only, behind `margai.flags.ai_fallback`, and stays the
+embeddings primary (§15.12).*
 
 *Retitled and amended 2026-09-12 (DECISIONS): model access is direct, so what used to be Bedrock
 mechanics are now the providers' own. The structured-output and caching designs survive the switch
@@ -1642,7 +1673,9 @@ is sent on `/auth/otp/*` or `/auth/refresh` (the server reads none there, §1.5)
   outbox in order on app resume, on connectivity change and after each new entry; exponential
   backoff; entries never dropped, only surfaced after 20 failures.
 - Doubts require network (`.claude/rules/app.md`); the capture screen shows the offline state and
-  offers to keep the photo locally until online (one item, not a queue).
+  offers to keep the photo locally until online (one item, not a queue). *Superseded 2026-10-01
+  (CS-3 §3.1): a real offline doubt queue sent by WorkManager, metered at send (§15.3); answers still
+  need the server. Also new: tomorrow's plan is prefetched after the nightly run (§15.10).*
 - **Decided at approval (§0.5 item 1b): Option A.**
   - *Option A — offline pack carries judging data for today's own blocks (chosen).* The pack
     includes `correct_key`, solution and anchor for the ≤ 75 questions scheduled for that student
@@ -1652,7 +1685,9 @@ is sent on `/auth/otp/*` or `/auth/refresh` (the server reads none there, §1.5)
     read the keys to their own day's practice before answering. At D34 the rule gains the clause
     "…except inside that student's offline pack for their own scheduled blocks, obfuscated on device
     and wiped after sync; all judging that changes state is server-side", and D34 ships the test that
-    the pack is the only pre-answer carrier.
+    the pack is the only pre-answer carrier. *Amended 2026-10-01 (founder ruling, §15.10): the pack
+    for tomorrow's blocks may be prefetched the night before — the same questions and the same wipe
+    after sync, only the arrival earlier; D57 extends the carrier test to that path.*
   - *Option B — no verdicts offline.* Answers queue with no feedback; verdicts and solutions arrive
     on sync. Keeps the rule word for word; contradicts SPEC §6.2's instant verdict for the train
     scenario the rules themselves describe.
@@ -1674,6 +1709,14 @@ is sent on `/auth/otp/*` or `/auth/refresh` (the server reads none there, §1.5)
 | Answer rendering | `flutter_markdown_plus` (community fork; the Flutter team discontinued `flutter_markdown` in 2025 — confirm the fork's health at D32, `markdown_widget` is the alternative), `flutter_math_fork` (LaTeX) | D32, D40 |
 | Routing, HTTP, state | `go_router`, `dio`, `flutter_riverpod` | D8 |
 | Misc | `intl`, `package_info_plus` (`X-App-Version`, since D8), `url_launcher` (support links) | as needed |
+
+*Amended 2026-10-01 (CS-2, CS-3, CS-4, CS-5; §15): `smart_auth` returns with the SMS channel; the
+capture compression target drops to ≤ 400 KB (longest edge 1600 px); `workmanager` (the offline doubt
+queue and prefetch), `share_plus` (sharing), the Play Integrity API (sign-in) and, after the D60 gate,
+YouTube's official IFrame player (`youtube_player_iframe`) join the table on their days. YouTube
+and Play Integrity are new external services (YouTube for the app and the pipeline, Play Integrity
+for the app and the server) — the `.claude/rules/app.md` list is amended on the day each lands, with
+the founder's sign-off.*
 
 External services stay FCM, Razorpay and PostHog (`.claude/rules/app.md`): `firebase_core` is FCM's
 own dependency, and `smart_auth` talks to the Android platform's SMS Retriever, not to a third-party
@@ -1757,6 +1800,10 @@ JSONL plus Java ingest (two toolchains, and the AI calls would still need the Ja
 Source PDFs, page images, JSONL artefacts and eval snapshots live in the content bucket, not in git.
 
 ### 6.3 Commands, order and natural keys
+
+*Amended 2026-10-01 (CS-4, CS-6): `primers generate|sample` (D22–D24, §15.7), `lectures
+load|shortlist|check` (§15.8) and `planner simulate` (D55, §15.9) join the command set; their rows are
+added to this table on the day each is built.*
 
 | Command | PLAN day | Upsert key | Report the founder spot-checks |
 |---|---|---|---|
@@ -1928,6 +1975,11 @@ IDs, prices, limits, flags and prompt versions never appear as code constants (`
   other secret. The task role keeps S3, logs, CloudWatch and SES; the execution role's
   `GetParameters` + KMS decrypt (below) is what makes the two provider keys reachable. Re-add the
   Bedrock statements only if `margai.ai.provider` ever goes back.
+  **Amended 2026-10-01 (CS-2 §4.11, §15.12):** one Bedrock statement comes back, narrower —
+  `bedrock:InvokeModel` and `bedrock:InvokeModelWithResponseStream` scoped to the embedding model's
+  inference profile and the configured completion-fallback model ARNs; still no batch actions and no
+  `iam:PassRole`. Query-time embedding (retrieval, §4.9) has needed the first since the embedding pin
+  moved to Bedrock on 2026-09-20; this line had not caught up. It lands with F8's task role.
 - Bedrock batch service role (used only when batch mode is on, §4.11): trusted by `bedrock.amazonaws.com`,
   read on `content/batch/in/`, write on `content/batch/out/`; its ARN is the `roleArn` of every batch
   job. *Not needed since 2026-09-12: the direct Batches API holds the records itself, so the batch
@@ -2105,6 +2157,11 @@ server-initiated (SPEC §6.9, DEV_SPEC §8.7).
 
 ### 9.6 Privacy and DPDP
 
+*Amended 2026-10-01 (CS-5 §1.5, CS-2 §4.1, CS-4 §4): no permanent hardware identifier is ever read —
+the app-minted install id and Play Integrity verdicts only (§15.1); crisis-protocol inputs are kept to
+what the ledger and audit queue already hold (§15.4); curated lectures are never transcribed (§15.8).
+The install id joins the PII inventory below as a pseudonymous device identifier.*
+
 - **PII inventory**: phone, email (D7), display name, DOB, parent phone, state, category (optional), confirmed
   scorecard/marksheet fields, doubt text and images, mentor chat. Everything else is behavioural
   data the product needs (SPEC §5 "collect only what powers features"; DEV_SPEC R6).
@@ -2167,6 +2224,9 @@ SPEC §11): `plan.blocks.completion{day_since_start}` (the day-1 → day-7 compl
 `plan.collective.coverage` (the share of served blocks whose node has an approved record).
 
 ### 10.3 Dashboards (D73)
+
+*Amended 2026-10-01 (CS-2 §4.10, CS-3 §5, CS-6 §4): the outcome, reliability and personal-fit metrics
+of §15.11 join these dashboards, and SMS/OTP spend sits beside AI spend on the cost dashboard.*
 
 - **Product funnel** (PostHog): install → OTP success → first plan (< 5 min) → first doubt (48 h) →
   D7 active; paywall shown/dismissed/paid by trigger; cache hit rate as seen by the client; the CS-1
@@ -2254,14 +2314,21 @@ pin, provider keys*, prices, budget, batch, prompts), `margai.limits.*`, `margai
 `margai.notifications.*` (caps, quiet hours), `margai.billing.*` (prices, refund window),
 `margai.flags.*`, and — CS-1 — `margai.planner.collective.*` (the §4.5 weighting, attribution,
 season and momentum constants) and `margai.pipeline.collective.*` (`momentum_dead_band`,
-`full_confidence_sources`; §6.3, §6.5). Environment variables follow Spring's relaxed binding (`MARGAI_AI_TIER_CHEAP`),
+`full_confidence_sources`; §6.3, §6.5), and — CS-2 to CS-6, 2026-10-01 — `margai.entitlements.*`,
+`margai.billing.prices.*` / `.founding_open` / `.gst.*`, `margai.legal.entity_name`,
+`margai.guards.*`, `margai.planner.continuity.*` / `.load.*` / `.generic_blocklist`,
+`margai.mocks.percentile.*`, `margai.integrity.*`, `margai.limits.otp.per_install_per_day`,
+`margai.limits.free_accounts_per_install`, `margai.doubts.thread_max_depth`,
+`margai.ai.fallback_provider` (§15). Environment variables follow Spring's relaxed binding (`MARGAI_AI_TIER_CHEAP`),
 which is what the ECS task definition sets from SSM (§7.3).
 
 ### 11.6 Feature flags
 
 Booleans under `margai.flags.*`, read at request time from the config records: `streaming` (D69),
 `batch_inference`, `diagnostic_offer`, `paywall.<trigger>`, `annual_front_and_center` (January,
-SPEC §6.9). A flag flip is a config change and a task restart; no flag service.
+SPEC §6.9). A flag flip is a config change and a task restart; no flag service. *Added 2026-10-01
+(§15): `auth_email_fallback`, `beta_adults_only`, `parent_consent`, `pro_plus_visible`, `ai_fallback`,
+`mock_percentile`, `lectures_in_app_player`, and one flag per beta-backlog item (SPEC §12.1).*
 
 ### 11.7 Copy
 
@@ -2280,6 +2347,8 @@ spec-silent choices to `docs/DECISIONS.md`; prompt changes to `docs/prompt-chang
 ## 12. PLAN mapping and gaps
 
 ### 12.1 What each PLAN day consumes from this plan
+
+*Amended 2026-10-01: CS-2 to CS-6 add work to many of the days below; §15.14 maps it.*
 
 | PLAN days | Sections that define the work |
 |---|---|
@@ -2554,3 +2623,295 @@ proposed `correct_key` reading (§0.4 #4, which the founder accepts or rejects o
 | D3.26 | A doubt follow-up weighs 0.5 toward the free-tier limit, like a cached hit | SPEC §6.3 is silent; follow-ups reuse context and are usually CHEAP, and charging a full solve for a tap-to-ask chip would punish the answer contract's own affordance | D44 metrics |
 | D3.27 | The anonymous peer percentile is shown only when the cohort has ≥ 30 active students of the same attempt type | Evidence rule at beta scale: a percentile over a handful of users is noise | D58 |
 | D3.28 | Minors: the parent-consent OTP is a step of the onboarding flow; until consent is complete, `CONSENT_REQUIRED` covers photo doubts as well as documents, text features stay available; after consent everything unlocks | founder decision 8 at approval; SPEC §6.8 says "before any upload" and a doubt photo is an upload; DEV_SPEC §8.4's narrower "document upload" reading is overruled | never |
+
+---
+
+## 15. Change specs CS-2 to CS-6 — design (added 2026-10-01)
+
+The founder's change specs CS-2 (tiers, pricing, roadmap), CS-3 (slow networks), CS-4 (self-learner
+mentor), CS-5 (account and subscription integrity) and CS-6 (the personal plan) are stored under
+`docs/changes/`; SPEC carries their product rules since 2cc66dc. This section is the design each build
+day plans from — *proposed, nothing here is built yet*; each day's own plan refines it, and the
+sections above carry a dated pointer where they change. It incorporates the founder's rulings of
+2026-10-01 on the integration's fourteen questions (DECISIONS) and the decision of the same day that
+**phone OTP by SMS is the only sign-in method** (Google Sign-In, which CS-2 §4.2 proposed, is removed).
+
+### 15.1 Sign-in, identity and sessions (CS-2 §4.2 as superseded; CS-5 §2–§3; SPEC §5.7)
+
+- **Channels.** `margai.auth.otp.channels` defaults to `[sms]`; `email` stays built (D7) and is
+  enabled only by `margai.flags.auth_email_fallback` — the beta fallback, switched on if the DLT
+  templates are not live by D60 (TRACKER decision point), which also needs F10's SES production
+  access to reach an unverified inbox. SMS goes out through an `SmsSender` port with an MSG91 adapter
+  (the adapter D11 deferred to F1's day), two DLT templates: `login` and `parent_consent`.
+  `smart_auth` returns for auto-read (§5.7). The login screen goes back to number entry; the email
+  screen stays behind the flag.
+- **Identity.** `users.phone` (E.164, the partial unique index of V-D4) is the account's identity.
+  `users.email` stays a secondary verified credential and the fallback's identifier. The seam for a
+  later method (e.g. Sign in with Apple on iOS) is `auth.internal.CredentialKind` plus one verifier per
+  kind; a new kind that needs storage gets a `user_credentials(user_id, kind, subject, verified_at,
+  UNIQUE (kind, subject))` table at that time — nothing about the current two columns has to move.
+  An account that began on the email fallback attaches a phone through `POST /me/phone/otp/request|
+  verify`; a number already on another account answers `409 PHONE_IN_USE` and nothing is merged —
+  merging two accounts is a founder-reviewed support action, never a code path.
+- **One active phone.** A sign-in (`/auth/otp/verify`) carrying an `X-Install-Id` different from the
+  account's active session revokes every other refresh family with `revoked_reason =
+  signed_in_elsewhere` (`refresh_tokens` gains the column). The old phone's next refresh answers
+  `401 AUTH_SIGNED_OUT_ELSEWHERE`, and the app shows “You've signed in on another phone” instead of a
+  plain login. Its drift outbox is keyed by `user_id` and survives sign-out; it drains only when the
+  same account signs in on that phone again (SPEC §3.1). Phase 2 web: one phone family plus one
+  browser family.
+- **Install identifier and integrity** (SPEC §3.1). The app mints a v4 UUID at first launch, keeps it
+  in secure storage and sends it as `X-Install-Id` on every request. At sign-in the app attaches a
+  Play Integrity token, verified server-side through Google's decode endpoint; in the beta a failure
+  is logged and counted, not blocking (a verdict is a signal for the unusual-use ladder, never a ban).
+  No IMEI, serial or other hardware identifier is read — the Android permission set never includes
+  `READ_PHONE_STATE`.
+- **Devices and the switcher.** `user_devices` (D30) gains `install_id UUID`, `device_label`,
+  `signed_in_at`, `last_active_at`; `GET /me/devices` lists them and `DELETE /me/devices/{id}`
+  revokes that phone's family. On the phone, the account switcher keeps one token set and **one drift
+  database file per account**, so switching swaps the file and data can never mix; an account's Pro
+  status is read from its own `/me`, never cached across accounts.
+- **Abuse protection.** The per-destination OTP caps of §3.4 stay; new: a per-install daily cap
+  (`margai.limits.otp.per_install_per_day`, default 10) and free accounts per install
+  (`margai.limits.free_accounts_per_install`, default 3) checked at account creation. Every SMS is a
+  row in `sms_sends(destination_hash, purpose, provider_msg_id, status, cost_paise, created_at)`, so
+  OTP spend reaches the cost dashboard (§10.3) — the AI ledger stays AI-only.
+- **Unusual use** (SPEC §3.1): signals computed nightly and on sign-in — the same account active from
+  networks far apart within `margai.integrity.travel_window_min`, sign-ins across installs above a rate,
+  usage above `margai.integrity.usage_multiple` × the account's own norm; the ladder `soft_message →
+  reverify → rate_limit` is a per-account state the API reads; nothing beyond a rate limit happens
+  without an admin action (the founder's review).
+- **Minors.** `margai.flags.beta_adults_only` (on for the beta) turns the DOB step into an 18+ gate;
+  `margai.flags.parent_consent` (off for the beta, on at public launch) enables the consent flow D27
+  builds in full on the `parent_consent` SMS template. An under-18 DOB at the gate ends onboarding
+  on the “MARG opens to under-18s at launch” screen and **hard-deletes** in the same request (founder
+  ruling 2026-10-01, SPEC §5.7) — not D64's `DELETE /me`, which anonymises now and purges in 30 days
+  under a tombstone (§2.10) and lands 37 days later. `UserPurge.underage(userId)`, built at D27, runs
+  one transaction: the `users` row and everything keyed to it (profile, interview answers, refresh
+  tokens, devices, any document row and its `uploads/` object — deleted whether or not one exists,
+  since SPEC §5 offers the upload at Q7 before DOB while §5.1 unlocks uploads only after it, an
+  ordering left to the founder in TRACKER's open item 13), the OTP challenges to that number; the two ledgers that must survive as
+  cost history keep their rows with no link — `ai_calls.user_id` and `sms_sends.destination_hash`
+  nulled. No tombstone, no aggregate rows. D27 builds the consent flow against the `OtpSender` port with the SMS channel faked in tests;
+  its live proof waits for the phone-OTP item below, since the MSG91 adapter lands there. D60 revisits
+  `beta_adults_only` once, beside the DLT decision.
+
+### 15.2 Entitlements and pricing configuration (CS-2 §1–§3, §4.8; CS-5 §4)
+
+- **Entitlements** are a config map, `margai.entitlements.<feature>.<tier>` (features:
+  `doubts_per_day`, `followup_weight`, `notebook_cap`, `srs`, `weekly_report`, `autopsy`,
+  `depth_toggle`, `priority_speed`, `mnemonics`, …; tiers `free|pro|pro_plus`), read only through
+  `billing.api.Entitlements.of(user)`. Moving a feature between tiers is a config change and a task
+  restart (§11.6), never a release. `pro_plus` exists in config only and is hidden by
+  `margai.flags.pro_plus_visible = false` until Phase 2.
+- **Prices.** `margai.billing.prices.<plan>.<rung>` for plans `pro_monthly|pro_annual` (later
+  `pro_plus_*`) and rungs `list|founding|offer`; `margai.billing.founding_open` (closing founding for new
+  signups is this flag); `margai.billing.gst.mode` (`none|inclusive`) and `.rate`. `subscriptions`
+  gains `price_rung` and `price_paise`, stamped at purchase; **grandfathering is that stored price
+  renewing while the subscription stays active**. One Razorpay plan per (plan, rung). The paywall
+  renders struck/current pairs from config, and pairs are built only within a rung, so a cross-rung
+  comparison cannot be drawn. The legal entity name is `margai.legal.entity_name`, read only by legal
+  pages and receipts (CS-2 §9).
+- **Free-tier fairness.** `doubt_daily_usage` gains an `install_id` dimension: a free solve is
+  charged to both the account's and the install's row, and the free limit applies to whichever is
+  higher; a Pro account on a shared phone is never counted against the install.
+
+### 15.3 Doubts: follow-ups, metering, the offline queue, compression (CS-2 §4.3–§4.4; CS-3 §3.1–§3.2)
+
+- **Threads.** `doubts.parent_doubt_id` and `thread_depth`; `margai.doubts.thread_max_depth` (default
+  4) after which the app invites a new doubt; a follow-up weighs 0.5 (D3.26). Pro is never refused
+  (§4.4, amended 2026-09-12) — unchanged.
+- **Offline queue** (replaces §5.6's “one item, not a queue”): drift `doubt_queue(id, kind
+  photo|text, local_path, text, client_doubt_id, created_at, status)`, sent by a WorkManager job
+  (`workmanager`) so it goes out after the app is closed; `client_doubt_id` makes the send idempotent.
+  The free meter counts at **send** (the server's `POST /doubts`), so a send over the limit gets the
+  usual `DOUBT_LIMIT_REACHED` and the item stays queued behind the limit screen. The answer's arrival
+  is an FCM notification `doubt_answered` deep-linking to the answer; it counts against the daily
+  notification cap (SPEC §6.10 does not yet list the kind — TRACKER open item). The queued photo is
+  deleted from the device once the server acknowledges it; on the server it is deleted right after
+  extraction (D3.22), with the 24-hour `uploads/` lifecycle as the backstop.
+- **Compression** (amends §5.7's ≤ 1.5 MB): longest edge `margai.app.upload.max_edge_px` (default
+  1600), JPEG quality 70, target ≤ 400 KB, applied to doubt photos and every document capture. A
+  no-regression gate: the D38 photo eval and the D28 document eval run on both the compressed and the
+  original images, and a compressed miss the original passes fails the gate (§4.10).
+
+### 15.4 Wellbeing and crisis protocol (CS-2 §4.1; SPEC §6.6)
+
+A `safety_screen` CHEAP pass over doubt text and plan-chat messages (and the mood/slump signals
+feeding it) returns `crisis | concern | none`. `crisis` short-circuits the feature: the response is
+the founder-reviewed `CrisisResponse` copy in the student's language with Tele-MANAS (14416) and the
+trusted-person encouragement — resource strings live in config so they stay current — and the same
+response carries no practice, streak or plan push; the thread stays open. The eval gains a `crisis`
+fixture kind (direct, indirect, Hinglish and Hindi phrasings) whose gate is 100% (§4.10); copy
+review by the founder and legal review of copy and data handling (TRACKER F9) are prerequisites of the
+D78 beta gate. Logged content is limited to what the ledger and the audit queue already hold. Every
+`safety_screen` call writes its `ai_calls` row under `ai_calls.feature = safety_screen` (hard rule).
+
+### 15.5 Learning-science guards and streak repair (CS-2 §4.5–§4.6)
+
+`margai.guards.*`: `try_once_more.probability` (on a near-miss — a distractor the distractor map marks
+close), `your_turn.window_hours` / `.threshold` (3) / `.probability`, `confidence_question.after_errors`
+(an error streak) and on low mood, `explain_why.frequency`, `practice.mixed_default = true`. Every
+guard firing emits an analytics event so each is measurable. Streak repair reads a 14-day completion
+history (derived from `plan_blocks`) for the ratio copy; exam-season retirement comes from the
+`ModeResolver` (§4.5).
+
+### 15.6 Past-paper mocks, the mock percentile, drills (CS-2 §4.7; CS-4 §5.2, §6)
+
+- **Mocks** stay `kind = mock` sessions (§0.5 item 2) with `paper_year`; the paper's own questions
+  in order, out-of-syllabus questions flagged at PYQ tagging (D19, `questions.out_of_syllabus`) and
+  excluded from the score, marking from the paper's scheme (`pyq_papers.marking`).
+- **Percentile.** `mock_results(user_id, paper_year, score, completed_at)` written from the first
+  mock (D35) on; the percentile is computed over attempts at the same paper in a rolling window
+  (`margai.mocks.percentile.window_days` 30, `.min_attempts` 50) and returned only above the
+  threshold; the response carries her rank band only, never another student's row. Display is
+  flagged off until public launch (`margai.flags.mock_percentile`).
+- **Drills.** `kind = drill` sessions assembled from PYQs against a time budget, with the gamble-score
+  inputs of the autopsy (D54); the planner places them in mock season and the final months (D59).
+
+### 15.7 Concept primers (CS-4 §3; SPEC §9 item 7)
+
+`concept_primers(node_id, lang, version, body_md, ncert_refs JSONB, verified BOOLEAN, ai_call_id,
+review_status CHECK (draft|sampled|approved|rejected))`, a migration with the D22 window. Pipeline
+`primers generate --chapters <top-50|all>`: the REASON tier, grounded on the node's retrieved
+paragraphs, the worked mini-example through the numerical verification, and a **no-verbatim check**
+(word n-gram overlap with any NCERT paragraph under `margai.pipeline.primers.max_overlap`); `primers
+sample` writes a founder sheet of 30. `ai_calls.feature` gains `pipeline_primer`. **The “most common
+misconception” is a claim about students in general, so it comes only from the node's approved
+collective record** (`misconceptions[]` at or above `min_confidence`, worded as collective — SPEC §1
+Evidence rule, §9 item 6); a primer generated before its node's record is approved carries no
+misconception line, and `primers generate` fills that section when the record is approved
+(idempotent per node and record version). Since CS-1's `review` and `load` may slip past D24, a
+top-50 primer can reach the founder's sample without that line and gain it later; the filled line is
+checked by the eval, not re-sampled. SPEC §9 item 7 says every primer names the misconception, so a
+primer counts as **complete** — for D78's "top-50 primers exist" and for launch's "all topics" — only
+with that line, which makes CS-1's `review` + `load` for the top-50 nodes due before D78 (the latest
+buffer they may slip to). The eval gains a `primer` fixture kind (grounding, the
+overlap check, and a misconception line backed by the record or absent). Cost is staged first on
+one chapter, as every NCERT book was; a first guess is ≈ 250 topics in the top-50 chapters at a few
+rupees each.
+
+### 15.8 Curated lectures (CS-4 §4; SPEC §9 item 8)
+
+The founder input `pipeline/inputs/lectures.csv` (chapter code, video id, channel, language, length,
+start-time notes, date checked, curator notes) loads with `lectures load` (natural key chapter + video
+id). `lectures shortlist --chapter <code>` queries the YouTube Data API v3 for metadata only and
+writes a candidate CSV for the founder; its API key follows the provider-key rule (SSM in a deployed
+environment, an untracked local file on a laptop — never in code, config, logs or the repo).
+`lectures check`, monthly, reads each video's `status` (privacy, embeddable) and reports breaks. The
+app opens a lecture with `url_launcher` until the in-app player ships as beta-backlog item 7 (after
+the D60 gate, SPEC §12.1), then with YouTube's official IFrame player
+(`margai.flags.lectures_in_app_player`); nothing is downloaded, cut or transcribed. The
+“Was this helpful?” tap writes `lecture_feedback(user_id, video_id, helpful, created_at)`, which the
+collective layer may read later.
+
+### 15.9 The personal plan and the Sunday review (CS-6; CS-4 §5.1; amends §4.5)
+
+- **Continuity.** `margai.planner.continuity.min_carry` (default 0.6): tomorrow's candidates prefer
+  today's direction unless a reason key justifies the change; a change past
+  `margai.planner.continuity.big_change` thresholds (a subject dropped, load ± 25%, a chapter moved)
+  must produce a mentor-note line keyed `change_explained`, or the validator rejects the plan.
+- **Skip reasons.** `plan_blocks.skip_reason CHECK (no_time|too_hard|already_know)` (the D33 block
+  status gains it): `no_time` feeds load, `too_hard` an easier entry next time, `already_know` a 3–5
+  question `kind = check` session whose pass raises the node's ability estimate and retires the block.
+- **Load follows reality.** A 7-day completion ratio scales the hours budget, bounded below by an
+  exam-coverage floor (`margai.planner.load.coverage_floor`); when the gap between pace and target
+  grows, the trajectory card and the Sunday review say so.
+- **First seven days.** Tenure-day templates for the mentor note (days 1, 2, 3, 4–5, 6, 7) keyed to
+  the evidence that day added; a skipped diagnostic re-invites on day 2.
+- **Remembering.** The snapshot carries `moments` — up to five recent notable events (a hard session,
+  a streak milestone, a healed error, a negotiated change) — that the mentor note may cite.
+- **Traceable, never generic.** Every reason and mentor-note claim must cite evidence keys that
+  resolve to snapshot facts (the CS-1 attribution check extended); a reason that cites no
+  student-specific key, or matches the generic-phrase blocklist (`margai.planner.generic_blocklist`),
+  falls back to the deterministic reason. The eval's `claim` fixtures gain traceability and
+  specificity cases from the simulation (D56/D60).
+- **Sunday review and the fit question.** A plan-chat intent `weekly_review`, offered Sunday evening;
+  the agreed focus is stored in `weekly_focus(user_id, week_start, focus JSONB)`, which next week's
+  planner reads; `weekly_fit(user_id, week_start, answer, follow_up)` records the one-tap question.
+  Every statement in the review cites evidence keys and passes the same traceability check as a
+  mentor-note claim (CS-4 §5.1: "every claim backed by the student's own data"); a statement that
+  fails is dropped, never sent. D58's ✅ includes a seeded week whose review is all traceable and whose
+  next week's plan carries the agreed focus.
+- **The 14-day simulation.** `planner simulate --days 14` over six archetypes (fresher 2-year, fresher
+  1-year, dropper, repeater, low-completion, high-achiever) with scripted behaviour — skip-with-reason,
+  a mistake cluster, repeated doubts — on fixture AI responses, asserting CS-6 §5's six properties. It
+  is built at D55 and passing it is part of the D60 gate.
+
+### 15.10 Slow networks (CS-3; amends §5.6)
+
+- **Prefetch.** The nightly run's completion sends an FCM data message `plan_ready`; a WorkManager job
+  downloads tomorrow's plan and offline pack when Android allows background data (it honours the
+  data-saver background restriction and battery saver); Today renders from drift first and refreshes
+  after. No prefetch → the fetch on open, then the no-planless-morning fallback. The offline pack it
+  downloads is D34's Option A pack for tomorrow's own blocks — the same ≤ 75 scheduled questions, keys
+  obfuscated in drift and wiped after sync; only its arrival moves to the night before (founder ruling
+  2026-10-01 on hard rule 1, DECISIONS). D57 extends D34's "the pack is the only pre-answer carrier"
+  test to the prefetch path.
+- **Low-data images.** Diagrams and cards are stored in two sizes when produced; the app asks for the
+  one its width and connection type need. Phase 2 inherits the same rule for video (CS-3 §3.4): video
+  answers default to low quality on slow connections, offer "download on Wi-Fi", and are cached for
+  replay (PARKED, Phase 2).
+- **Testing.** Slow-3G and lossy profiles on the AVD (`-netspeed`, `-netdelay`), driven by
+  `scripts/ui.sh` at D69 and D77; the same scripts on a low-cost Android phone (TRACKER F15).
+
+### 15.11 Outcome and reliability metrics (CS-2 §4.10; CS-3 §5; CS-6 §4)
+
+Instrumented as each feature lands and read on the D73 dashboards (§10.3): errors healed per active
+week; mock-score change over rolling four-week windows; the relapse rate (doubts on previously healed
+concepts); screen load time and failure rate by network type; the share of doubts sent from the
+offline queue and queue-to-answer time; prefetch success (mornings Today opened from local data);
+upload sizes; the weekly fit answers, skips by reason, negotiation frequency and the already-know pass
+rate, all by week of tenure; SMS/OTP spend beside AI spend.
+
+### 15.12 Provider resilience (CS-2 §4.11 under the 2026-10-01 ruling; amends §4.11)
+
+Completions: `margai.ai.provider = anthropic` stays primary; `margai.ai.fallback_provider = bedrock`
+with `margai.flags.ai_fallback = false` — the switch is the flag and a task restart, exercised by the
+D70 outage drill. Bedrock model ids and prices come from config. Embeddings stay on Bedrock
+(`global.cohere.embed-v4:0`, the D15 pin) as their primary — the fallback-only rule is about
+completions. The fallback is called ready only after a founder-run one-call smoke of an Anthropic
+model through Bedrock, since CS-2's “access now restored” is not checkable from a Claude session.
+
+### 15.13 WhatsApp, zero-API (CS-2 §4.9)
+
+A click-to-chat `wa.me` link (number in config) in Profile → Support, and sharing through the OS share
+sheet (`share_plus`) for milestone cards, answer cards and referral links. No WhatsApp API in Phase 1.
+Both are mapped to D64 (CS-2 §12.3). The committed build has nothing for the share sheet to share yet
+— milestone cards are beta-backlog item 5, answer cards and referral gifts Phase 2 (SPEC §12.1–§12.2)
+— which is open for the founder (TRACKER day log, CS-2 to CS-6).
+
+### 15.14 Where it lands (mirrors PLAN, 2026-10-01)
+
+| Day | CS-2 to CS-6 work |
+|---|---|
+| D18 buffer | Bedrock completion fallback as config (§15.12) |
+| D22–D24 | `concept_primers` migration and `primers generate` for the top-50 chapters (§15.7) |
+| a later buffer before D74 | the remaining primers, all topics (§15.7) |
+| D27 | DOB + 18+ beta gate with the under-18 stop and hard delete (`UserPurge.underage`); the parent-consent flow built in full behind its flag (§15.1) |
+| D28/D29 → D42 buffer | compression retro-fitted to the document captures (§15.3) |
+| D33 | `skip_reason` on block status (§15.9) |
+| D35 | past-paper mocks; `mock_results` captured (§15.6) |
+| D38 (D42 if full) | the offline doubt queue and photo compression (§15.3) |
+| D44 | per-install free counting and the follow-up meter (§15.2, §15.3) |
+| D46 | threads, depth cap, the `doubt_answered` notification (§15.3) |
+| D54 | the autopsy with drills (§15.6) |
+| D55–D56 | continuity, load, moments, the ramp, traceability, the 14-day harness (§15.9) |
+| D57 | prefetch, with D34's carrier test extended to it (§15.10) |
+| D58 | Sunday review with its traceability check, fit question, streak repair copy (§15.5, §15.9) |
+| D58–D59 | learning-science guards (§15.5); drills placed (§15.6) |
+| D59 | crisis protocol behaviour and eval cases (§15.4) |
+| D55–D56 UI | primers and lectures in learn blocks (§15.7, §15.8) |
+| D60 | gate: three real unattended days **and** the 14-day simulation; DLT decision point; the 18+ revisit |
+| D61–D63 | prices, rungs, grandfathering, GST config, the paywall (§15.2); one active phone, devices (§15.1) |
+| D63–D64 | account switcher (§15.1) |
+| D64 | terms, legal pages, entity name config; WhatsApp click-to-chat and the share sheet (§15.13) |
+| D65 | per-install limits extended, unusual-use ladder (§15.1), breaker as before |
+| D67 | crisis, streak, ramp copy |
+| D69 | image sizing; throttled-network and real-device tests (§15.10) |
+| D71 | the unusual-use simulation in the security review |
+| D73 | the §15.11 dashboards; the monthly `lectures check` |
+| D77 | throttled and real-device tests re-run |
+| D78 | gate blocking items: crisis eval cases at 100%, slow-network and real-device acceptance, top-50 primers complete with their misconception lines (CS-1's top-50 records loaded first), a vetted lecture per chapter |
+| when F1's DLT templates are approved, by D60 | phone OTP primary: MSG91 adapter, phone entry + auto-read, email behind the flag; phone attach for email-begun accounts, `POST /me/phone/otp/request\|verify`; the consent flow's live proof (§15.1) |
+| weeks 15–20 | the beta backlog of SPEC §12.1, in order, behind flags |

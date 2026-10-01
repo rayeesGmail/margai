@@ -7,8 +7,9 @@ in your plan. If code and SPEC conflict, say so — do not silently pick one.
 ## Stack (fixed — do not substitute)
 - server/: Java (latest LTS), Spring Boot 4, Maven, Postgres 18 (Flyway migrations), pgvector
 - app/: Flutter (Android target), Riverpod, drift for offline
-- ai: direct provider APIs ONLY via AiClient interface (server/.../ai/) — Anthropic for models,
-  Cohere for embeddings. Model IDs from config. Bedrock is dormant, not deleted.
+- ai: provider APIs ONLY via AiClient interface (server/.../ai/) — Anthropic API direct for models;
+  Cohere embed v4 on Bedrock for embeddings; Bedrock also a config-switched completion fallback,
+  never the primary. Model IDs from config.
 - infra: ap-south-1; secrets via SSM; never write AWS keys or provider API keys anywhere
 
 ## Commands
@@ -40,18 +41,21 @@ When compacting: preserve API contract changes + rationale, migration list,
 open TODOs from the current /week task list, eval gate status. Summarize exploration.
 
 ---
-The block above is DEV_SPEC §13.2 verbatim, except for three approved deviations. Its "SPEC §3–5"
+The block above is DEV_SPEC §13.2 verbatim, except for four approved deviations. Its "SPEC §3–5"
 citations now read "DEV_SPEC" (they were written when the Developer Spec was docs/SPEC.md). Hard
 rule 1 carries the D3 rewording the founder approved on 2026-09-04 (TECH_PLAN §0.4 #4: SPEC §6.2/§6.4
 verdicts show the correct option after an answer is recorded). And four lines carry the provider
 switch the founder approved on 2026-09-12 (DECISIONS, TECH_PLAN §4.11) — the AI stack line, the
 infra line (which now says "or provider API keys"), the ai_calls hard rule and the new API-key
-rule: Bedrock is blocked for this account, so model access is direct. DEV_SPEC §13 keeps its
-original wording as the historical record.
+rule: Bedrock is blocked for this account, so model access is direct. And the AI stack line was
+updated again on 2026-10-01 (ruling Q5 on CS-2 §4.11, DECISIONS): that block is reported lifted
+(CS-2 §4.11; a founder smoke confirms it at D18), embeddings have run on Bedrock since 2026-09-20,
+and Bedrock is now the completion fallback. DEV_SPEC §13 keeps its original
+wording as the historical record.
 
 ## Documents and precedence (read before proposing anything)
 1. docs/SPEC.md — Product Spec v2.0, **the contract**: behaviour, every screen and rule,
-   the Phase-2 exclusion list (§12). Contains no implementation detail by design (§13).
+   the beta backlog, Phase 2, later and never lists (§12). Contains no implementation detail by design (§13).
 2. docs/DEV_SPEC.md — Developer Spec v1.1. §13 (working agreements) is authoritative;
    §2–12 are reference only, confirmed or replaced section by section in TECH_PLAN §0.3.
 3. docs/TECH_PLAN.md — Technical Plan v1.0, approved at D3 (2026-09-04): architecture, data
@@ -73,7 +77,8 @@ When these disagree, say so out loud and cite both — never silently pick one.
 - Claude commits; the human reviews and pushes. `git push`, `aws *`, `.env*` reads and
   WebFetch are denied. FakeAiClient is the default; a live provider needs a human-launched
   `AI_LIVE=1` profile with the cost breaker active (DEV_SPEC §13.7).
-- Phase-2 items (SPEC §12) are out of scope. Where the spec is silent choose the boring,
+- Phase-2, later and never items (SPEC §12.2–§12.4) are out of scope; the beta backlog (§12.1)
+  ships only after the D60 gate. Where the spec is silent choose the boring,
   maintainable option and record it in docs/DECISIONS.md; where it conflicts, surface it.
 - docs/SPEC.md is amended only by the founder, or by Claude on an explicit per-edit instruction in
   that session, each amendment with a DECISIONS.md row citing the finding that forced it. Contract

@@ -165,12 +165,13 @@ tools; your reviews focus on output quality.)*
   *Amended 2026-10-01 (CS-2 §4.2, founder decision): the beta is recruited 18+, so D27 builds DOB
   with an 18+ beta gate (flag on) **and** the parent-consent flow in full on the SMS template,
   switched off by flag for the beta and on at public launch; any time this frees returns to the
-  at-risk days' buffer, not to new scope. An under-18 DOB at the gate stops kindly and deletes the
-  account, number and answers at once (founder ruling 2026-10-01); D60 revisits the 18+ rule. The
+  at-risk days' buffer, not to new scope. An under-18 DOB at the gate stops kindly and hard-deletes
+  the account, number and answers at once (founder ruling 2026-10-01) — a purge built here, not D64's
+  anonymise-then-purge (TECH_PLAN §15.1); D60 revisits the 18+ rule. The
   consent flow is built against the OTP sender port with SMS faked in tests — its live proof comes
   with the floating phone-OTP item, where the MSG91 adapter lands. ✅ adds: with the beta flag on,
-  an under-18 DOB meets the gate and leaves no row behind; with the consent flag on, the original ✅
-  holds.*
+  an under-18 DOB meets the gate and leaves no row that identifies them (the cost ledgers keep their
+  rows, unlinked); with the consent flag on, the original ✅ holds.*
 - **D28 —** Scorecard upload: capture UI with frame guide → AI extraction → confirm/edit
   screen → delete-after-confirm behavior. ✅ *3 real scorecard photos (found samples)
   extract correctly; storage verifiably empty after.*
@@ -354,9 +355,8 @@ tools; your reviews focus on output quality.)*
   document-deletion verification job, consent texts, legal pages. ✅ *Export a real
   account; delete an account; verify purge schedule.* *Added 2026-10-01 (CS-5 §6.1, CS-2 §4.9,
   §9; at risk): terms (a subscription is personal; the one-active-phone rule in plain words), the
-  WhatsApp click-to-chat link, the legal entity name as configuration. The share sheet arrives with
-  its first shareable — milestone cards, beta-backlog item 5 — since the committed build has
-  nothing to share (TECH_PLAN §15.13).*
+  WhatsApp click-to-chat link and share sheet, the legal entity name as configuration. What the
+  share sheet shares in the committed build is open (TECH_PLAN §15.13; TRACKER day log).*
 - **D65 —** Per-user AI budget circuit breaker + daily spend alarms + cost dashboard
   (cache rate, cost/feature, cost/user); the breaker wiring includes the Pro queue path
   (accept + queue, never a refusal — TECH_PLAN §4.8, founder ruling 2026-09-12) and the
@@ -407,7 +407,8 @@ tools; your reviews focus on output quality.)*
 - **D78 —** Punch-list burn-down + **Week-13 gate:** beta build signed off. *Added 2026-10-01
   (CS-2 §4.1, §10; CS-3 §4; CS-4 §3–§4): blocking items — the crisis protocol passes its eval cases;
   the slow-network acceptance holds; primers exist for the top-50 chapters and a vetted lecture for
-  every chapter.*
+  every chapter. A primer counts only with its misconception line, which comes from CS-1's approved
+  record (TECH_PLAN §15.7), so CS-1's `review` + `load` for the top-50 nodes must land before here.*
 
 ### PHASE 9 — Beta launch (Week 14, Days 79–84) — M12
 

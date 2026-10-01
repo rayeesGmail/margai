@@ -124,6 +124,15 @@ class NcertEmbeddings {
                 .executeUpdate();
     }
 
+    /** How many of the book's rows carry a vector; zero for a book this database does not register. */
+    long embeddedIn(String bookCode) {
+        return ((Number) entityManager.createNativeQuery("""
+                        SELECT count(*) FROM ncert_paragraphs p JOIN ncert_books b ON b.id = p.book_id
+                         WHERE b.code = :book AND p.embedding IS NOT NULL""")
+                .setParameter("book", bookCode)
+                .getSingleResult()).longValue();
+    }
+
     /** How many of these rows carry a vector — what a load reports it is about to throw away. */
     long embeddedAmong(Collection<UUID> ids) {
         if (ids.isEmpty()) {

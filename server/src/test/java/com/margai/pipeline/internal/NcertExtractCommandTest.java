@@ -148,6 +148,33 @@ class NcertExtractCommandTest {
         assertThat(written.getFirst().aiCallId()).isNotNull();
     }
 
+    /**
+     * A scratch run — a model trial against the frozen corpus (D16) — keeps its pages in its own
+     * artefact and resumes from that one: the canonical JSONL is neither read nor written.
+     */
+    @Test
+    void aTaggedRunWritesItsOwnArtefactAndLeavesTheCanonicalOneAlone() {
+        assertThat(commandLine.execute("ncert", "extract", "--book", "phy11-part2", "--artefact-tag", "opus55",
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(extract.calls).containsExactly("8/1", "8/2", "9/1");
+        assertThat(store.exists(ContentKeys.extract("phy11-part2", BookLanguage.en))).isFalse();
+        String tagged = ContentKeys.extract("phy11-part2", BookLanguage.en, "opus55");
+        assertThat(tagged).isEqualTo("extract/phy11-part2/en.opus55.jsonl");
+        assertThat(ExtractJsonl.read(tagged, store.get(tagged))).extracting(ExtractedPage::address)
+                .containsExactly("8/1", "8/2", "9/1");
+        assertThat(out.toString()).contains("extract/phy11-part2/en.opus55.jsonl");
+    }
+
+    @Test
+    void anArtefactTagThatCannotBeAKeySegmentIsRefusedBeforeAnyCall() {
+        assertThat(commandLine.execute("ncert", "extract", "--book", "phy11-part2", "--artefact-tag", "../en",
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(extract.calls).isEmpty();
+        assertThat(out.toString()).contains("--artefact-tag must be lowercase letters, digits and hyphens");
+    }
+
     /** §6.3's "the previous page's tail for paragraph continuity". */
     @Test
     void eachPageCarriesThePreviousPagesTailAndEachChapterStartsFresh() {

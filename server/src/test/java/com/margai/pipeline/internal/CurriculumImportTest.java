@@ -488,6 +488,19 @@ class CurriculumImportTest {
         assertThat(imports.paragraphsToEmbed("phy11-part1", List.of(), false)).isEmpty();
     }
 
+    /** What keeps a trial draw out of the canonical corpus (D16): the book's embedded paragraphs, counted. */
+    @Test
+    void theEmbeddedParagraphsOfABookAreCountedAndAnUnregisteredBookHasNone() {
+        assertThat(imports.embeddedParagraphs("phy11-part1")).as("a scratch database may hold nothing yet").isZero();
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        assertThat(imports.embeddedParagraphs("phy11-part1")).isZero();
+
+        embedEverything();
+
+        assertThat(imports.embeddedParagraphs("phy11-part1")).isEqualTo(2);
+    }
+
     @Test
     void embeddingAnUnregisteredBookIsRefused() {
         assertThatThrownBy(() -> imports.paragraphsToEmbed("nosuchbook", List.of(), false))

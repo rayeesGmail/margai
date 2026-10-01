@@ -71,6 +71,13 @@ public interface CurriculumImport {
     NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows);
 
     /**
+     * How many of the book's paragraphs carry an embedding — the mark of the canonical corpus, which
+     * {@code ncert load --artefact-tag} reads to refuse loading a trial draw over it (D16). Zero for a
+     * book that is not registered, since a scratch database may hold nothing yet.
+     */
+    long embeddedParagraphs(String bookCode);
+
+    /**
      * What {@code ncert verify} checks (D15): the rows of the given chapters that carry this
      * edition's text, as the load wrote them — their text, figure references and this edition's
      * provenance, verdict included. Ordered by chapter, then section as printed (7.2 before 7.10),

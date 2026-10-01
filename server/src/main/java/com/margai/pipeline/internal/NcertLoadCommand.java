@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 /**
  * {@code ncert load}: the book's JSONL into {@code ncert_paragraphs} (TECH_PLAN §6.3), upserted
@@ -46,6 +47,11 @@ class NcertLoadCommand extends NcertBookCommand {
 
     private static final Pattern SECTION = Pattern.compile("\\d{1,2}(\\.\\d{1,3})*");
 
+    @Option(names = "--artefact-tag", paramLabel = "TAG",
+            description = "Load extract/{book}/{lang}.TAG.jsonl, a scratch run's draw, as written — no correction is "
+                    + "applied — and only into a database where the book has no embedded paragraph.")
+    String artefactTag;
+
     private final ObjectStore content;
     private final CurriculumImport imports;
 
@@ -58,7 +64,18 @@ class NcertLoadCommand extends NcertBookCommand {
     @Override
     void run(BookDefinition definition, List<BookDefinition.Chapter> selected, Report report) {
         report.line("content store: " + content.describe());
-        String jsonlKey = ContentKeys.extract(definition.code(), language);
+        String jsonlKey = ContentKeys.extract(definition.code(), language, ContentKeys.tag(artefactTag));
+        if (artefactTag != null) {
+            // Every canonical book is embedded and a scratch database never is, so this is what keeps a
+            // trial draw out of the frozen corpus — the database, unlike the artefact, has no tag (D16).
+            long embedded = imports.embeddedParagraphs(definition.code());
+            if (embedded > 0) {
+                throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0, definition.code() + " has "
+                        + embedded + " embedded paragraph(s) in this database: a tagged load belongs in a scratch "
+                        + "database, never over the canonical corpus — point DB_URL at one; nothing was written");
+            }
+            report.line("artefact: " + jsonlKey + " (a scratch run's draw)");
+        }
         if (!content.exists(jsonlKey)) {
             throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
                     "no extraction at " + jsonlKey + " — run `ncert extract` first");
@@ -165,6 +182,11 @@ class NcertLoadCommand extends NcertBookCommand {
      * book still fails this load — the file is one founder-owned input, not one per book.
      */
     private List<NcertCorrection> corrections(BookDefinition definition, Set<Short> chapters, Report report) {
+        if (artefactTag != null) {
+            // The rulings name spans of the canonical draw; a trial is measured as the model wrote it.
+            report.line("corrections: not applied to a scratch run — its draw is loaded as the model wrote it");
+            return List.of();
+        }
         Path file = io.input(NcertCorrectionsYamlReader.FILE);
         if (!Files.isRegularFile(file)) {
             report.line("no " + NcertCorrectionsYamlReader.FILE + " under the inputs: nothing to apply");

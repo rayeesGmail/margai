@@ -54,6 +54,11 @@ class NcertExtractCommand extends NcertBookCommand {
     @Option(names = "--redo", description = "Call again for pages already in the JSONL, replacing them.")
     boolean redo;
 
+    @Option(names = "--artefact-tag", paramLabel = "TAG",
+            description = "Keep this run's pages in extract/{book}/{lang}.TAG.jsonl — for a scratch run such as a "
+                    + "model trial; the canonical JSONL is neither read nor written.")
+    String artefactTag;
+
     private final ObjectStore content;
     private final NcertPageExtractor extract;
     private final AiSpend spend;
@@ -72,16 +77,17 @@ class NcertExtractCommand extends NcertBookCommand {
 
     @Override
     void run(BookDefinition definition, List<BookDefinition.Chapter> selected, Report report) {
+        String jsonlKey = ContentKeys.extract(definition.code(), language, ContentKeys.tag(artefactTag));
         guardLiveClient();
         guardTranscribeModel();
         report.line("content store: " + content.describe());
+        report.line("artefact: " + jsonlKey + (artefactTag == null ? "" : " (a scratch run's own; the canonical JSONL is untouched)"));
         report.line("page tiles: " + properties.pageTiles()
                 + (properties.pageTiles() > 1 ? " (each page sent as overlapping bands, unscaled)" : " (whole page)"));
         String runId = "pipeline-ncert-extract-" + UUID.randomUUID();
         report.line("request id: " + runId);
         AiCallContext ctx = AiCallContext.system(runId);
 
-        String jsonlKey = ContentKeys.extract(definition.code(), language);
         Map<String, ExtractedPage> done = new LinkedHashMap<>();
         if (content.exists(jsonlKey)) {
             ExtractJsonl.read(jsonlKey, content.get(jsonlKey)).forEach(page -> done.put(page.address(), page));

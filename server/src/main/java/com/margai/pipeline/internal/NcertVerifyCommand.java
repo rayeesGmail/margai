@@ -71,9 +71,6 @@ class NcertVerifyCommand extends NcertBookCommand {
      */
     private static final Pattern OMITTED_HEADING = Pattern.compile("\\d{1,2}(\\.\\d{1,2})+\\s+\\p{L}{2,}");
 
-    /** An artefact tag becomes part of an object key. */
-    private static final Pattern TAG = Pattern.compile("[a-z0-9][a-z0-9-]{0,31}");
-
     @Option(names = "--read-pages", description = "Also read every page with the verify tier (spends; resumes).")
     boolean readPages;
 
@@ -134,11 +131,7 @@ class NcertVerifyCommand extends NcertBookCommand {
         List<NcertCorrection> rulings = rulings(definition, chapterNos, report);
         CodeFlags codeFlags = layoutChecks(definition, selected, byChapter, rulings, report);
 
-        if (artefactTag != null && !TAG.matcher(artefactTag).matches()) {
-            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
-                    "--artefact-tag must be lowercase letters, digits and hyphens, at most 32 — it becomes part of an object key");
-        }
-        String key = ContentKeys.verify(definition.code(), language, artefactTag);
+        String key = ContentKeys.verify(definition.code(), language, ContentKeys.tag(artefactTag));
         Map<String, VerifiedPage> done = new TreeMap<>();
         if (content.exists(key)) {
             VerifyJsonl.read(key, content.get(key)).forEach(page -> done.put(page.address(), page));

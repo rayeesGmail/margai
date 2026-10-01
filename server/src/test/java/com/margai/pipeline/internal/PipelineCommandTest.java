@@ -339,6 +339,11 @@ class PipelineCommandTest {
             return renderedPagesAnswer;
         }
 
+        @Override
+        public long embeddedParagraphs(String bookCode) {
+            return 0;
+        }
+
         /** What {@link #paragraphsToEmbed} answers: the rows `ncert embed` still has to read. */
         List<ParagraphToEmbed> toEmbedAnswer = List.of();
         final List<ParagraphEmbedding> storedEmbeddings = new ArrayList<>();

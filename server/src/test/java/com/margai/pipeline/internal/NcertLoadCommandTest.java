@@ -117,6 +117,47 @@ class NcertLoadCommandTest {
         assertThat(straddling.text().substring(24)).isEqualTo("and finishes on the next page.");
     }
 
+    /**
+     * A scratch run's draw (D16, the 5.5 validation) is loaded as the model wrote it: the rulings name
+     * spans of the canonical draw, so none is applied, and the canonical artefact is not read.
+     */
+    @Test
+    void aTaggedLoadReadsItsOwnArtefactAndAppliesNoCorrections() throws IOException {
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 4, kind: text, transcribed: "r_hat",
+                     printed: "r", reason: the page prints the vector}
+                """);
+        jsonl(page(7, 4, "0.95", p("7.3", "The canonical draw.")));
+        store.put(ContentKeys.extract("phy11-part1", BookLanguage.en, "opus55"),
+                ExtractJsonl.write(List.of(page(7, 4, "0.95", p("7.3", "F = - G m_1m_2 / |r|^3 r_hat.")))),
+                "application/jsonl");
+
+        assertThat(commandLine.execute("ncert", "load", "--book", "phy11-part1", "--artefact-tag", "opus55",
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::text).containsExactly("F = - G m_1m_2 / |r|^3 r_hat.");
+        assertThat(out.toString()).contains("extract/phy11-part1/en.opus55.jsonl")
+                .contains("not applied to a scratch run");
+    }
+
+    /**
+     * The guard that keeps a trial out of the frozen corpus: every canonical book is embedded, a
+     * scratch database never is, so a tagged load into a book with an embedded paragraph is refused.
+     */
+    @Test
+    void aTaggedLoadRefusesABookThatHasEmbeddedParagraphs() {
+        imports.embedded = 3;
+        store.put(ContentKeys.extract("phy11-part1", BookLanguage.en, "opus55"),
+                ExtractJsonl.write(List.of(page(7, 4, "0.95", p("7.3", "A trial draw.")))), "application/jsonl");
+
+        assertThat(commandLine.execute("ncert", "load", "--book", "phy11-part1", "--artefact-tag", "opus55",
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(imports.rows).isNull();
+        assertThat(out.toString()).contains("3 embedded paragraph(s)").contains("scratch database");
+    }
+
     /** The founder's adjudication lands in the load: a correction is applied before numbering, and named. */
     @Test
     void theCorrectionsFileIsAppliedAndEveryCorrectionIsReported() throws IOException {
@@ -581,6 +622,12 @@ class NcertLoadCommandTest {
         String book;
         BookLanguage language;
         List<String> orphansAnswer = List.of();
+        long embedded;
+
+        @Override
+        public long embeddedParagraphs(String bookCode) {
+            return embedded;
+        }
 
         @Override
         public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {

@@ -98,6 +98,12 @@ class CurriculumImportService implements CurriculumImport {
 
     @Override
     @Transactional(readOnly = true)
+    public long embeddedParagraphs(String bookCode) {
+        return ncertEmbeddings.embeddedIn(bookCode);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<NcertParagraphRow> paragraphs(String bookCode, BookLanguage language, Collection<Short> chapters) {
         return ncertParagraphs.paragraphs(bookCode, language, chapters);
     }

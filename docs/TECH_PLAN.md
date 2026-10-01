@@ -149,7 +149,7 @@ The eight questions of §13.4, answered. Each row names where the plan reflects 
 | # | Decision | Where it lands |
 |---|---|---|
 | 1a | `correct_key` reading **accepted**: the key is never sent before that student's answer to the question is recorded server-side; judging is server-side | CLAUDE.md hard rule 1, `server.md`, `endpoint.md`, `spec-auditor.md`, PLAN D31 ✅ reworded at D3 close; §3.1 carriers stand |
-| 1b | Offline verdicts: **Option A**. The pack carries judging data only for that student's own scheduled blocks of the day, obfuscated on device (best effort, not a security boundary), wiped after sync; server re-judging is authoritative for state, notebook and streaks | §5.6; the offline clause is added to the rule at D34 together with the test that the pack is the only pre-answer carrier |
+| 1b | Offline verdicts: **Option A**. The pack carries judging data only for that student's own scheduled blocks of the day, obfuscated on device (best effort, not a security boundary), wiped after sync; server re-judging is authoritative for state, notebook and streaks | §5.6; the offline clause is added to the rule at D34 together with the test that the pack is the only pre-answer carrier. *2026-10-01 (founder ruling, §15.10): the pack for tomorrow's own blocks may arrive the night before by prefetch — same questions, same wipe; D57 extends the test* |
 | 2 | Mocks and autopsy **scheduled**: `kind = mock` on the session engine at D35, the autopsy (per-mark classification, gamble score, pace map) in D54's buffer; slips go to the TRACKER slippage log | §12.2; TRACKER D35, D54 |
 | 3 | Batch sync: self-report at **D25**, timetable photo as a `doc_type` at **D29**; the weekly batch-confirm card **parked** until coaching students are in the beta; the nightly snapshot reads `batch_positions` when present | §2.7, §2.9 V11, §3.7, §12.2 |
 | 4 | Crash reporting via PostHog error tracking **accepted** within the three-SDK rule; revisit at D73; Crashlytics only through an explicit rule amendment | D3.25 confirmed |
@@ -1685,7 +1685,9 @@ is sent on `/auth/otp/*` or `/auth/refresh` (the server reads none there, §1.5)
     read the keys to their own day's practice before answering. At D34 the rule gains the clause
     "…except inside that student's offline pack for their own scheduled blocks, obfuscated on device
     and wiped after sync; all judging that changes state is server-side", and D34 ships the test that
-    the pack is the only pre-answer carrier.
+    the pack is the only pre-answer carrier. *Amended 2026-10-01 (founder ruling, §15.10): the pack
+    for tomorrow's blocks may be prefetched the night before — the same questions and the same wipe
+    after sync, only the arrival earlier; D57 extends the carrier test to that path.*
   - *Option B — no verdicts offline.* Answers queue with no feedback; verdicts and solutions arrive
     on sync. Keeps the rule word for word; contradicts SPEC §6.2's instant verdict for the train
     scenario the rules themselves describe.
@@ -2682,9 +2684,14 @@ sections above carry a dated pointer where they change. It incorporates the foun
 - **Minors.** `margai.flags.beta_adults_only` (on for the beta) turns the DOB step into an 18+ gate;
   `margai.flags.parent_consent` (off for the beta, on at public launch) enables the consent flow D27
   builds in full on the `parent_consent` SMS template. An under-18 DOB at the gate ends onboarding
-  on the “MARG opens to under-18s at launch” screen and deletes the user and everything under it in
-  the same request — D64's deletion path run at once, nothing kept (founder ruling 2026-10-01, SPEC
-  §5.7). D27 builds the consent flow against the `OtpSender` port with the SMS channel faked in tests;
+  on the “MARG opens to under-18s at launch” screen and **hard-deletes** in the same request (founder
+  ruling 2026-10-01, SPEC §5.7) — not D64's `DELETE /me`, which anonymises now and purges in 30 days
+  under a tombstone (§2.10) and lands 37 days later. `UserPurge.underage(userId)`, built at D27, runs
+  one transaction: the `users` row and everything keyed to it (profile, interview answers, refresh
+  tokens, devices, any document row and its `uploads/` object — none should exist, since uploads
+  unlock only after DOB), the OTP challenges to that number; the two ledgers that must survive as
+  cost history keep their rows with no link — `ai_calls.user_id` and `sms_sends.destination_hash`
+  nulled. No tombstone, no aggregate rows. D27 builds the consent flow against the `OtpSender` port with the SMS channel faked in tests;
   its live proof waits for the phone-OTP item below, since the MSG91 adapter lands there. D60 revisits
   `beta_adults_only` once, beside the DLT decision.
 
@@ -2775,7 +2782,10 @@ Evidence rule, §9 item 6); a primer generated before its node's record is appro
 misconception line, and `primers generate` fills that section when the record is approved
 (idempotent per node and record version). Since CS-1's `review` and `load` may slip past D24, a
 top-50 primer can reach the founder's sample without that line and gain it later; the filled line is
-checked by the eval, not re-sampled. The eval gains a `primer` fixture kind (grounding, the
+checked by the eval, not re-sampled. SPEC §9 item 7 says every primer names the misconception, so a
+primer counts as **complete** — for D78's "top-50 primers exist" and for launch's "all topics" — only
+with that line, which makes CS-1's `review` + `load` for the top-50 nodes due before D78 (the latest
+buffer they may slip to). The eval gains a `primer` fixture kind (grounding, the
 overlap check, and a misconception line backed by the record or absent). Cost is staged first on
 one chapter, as every NCERT book was; a first guess is ≈ 250 topics in the top-50 chapters at a few
 rupees each.
@@ -2788,8 +2798,9 @@ id). `lectures shortlist --chapter <code>` queries the YouTube Data API v3 for m
 writes a candidate CSV for the founder; its API key follows the provider-key rule (SSM in a deployed
 environment, an untracked local file on a laptop — never in code, config, logs or the repo).
 `lectures check`, monthly, reads each video's `status` (privacy, embeddable) and reports breaks. The
-app opens a lecture with `url_launcher` in the beta and with YouTube's official IFrame player after
-the D60 gate (`margai.flags.lectures_in_app_player`); nothing is downloaded, cut or transcribed. The
+app opens a lecture with `url_launcher` until the in-app player ships as beta-backlog item 7 (after
+the D60 gate, SPEC §12.1), then with YouTube's official IFrame player
+(`margai.flags.lectures_in_app_player`); nothing is downloaded, cut or transcribed. The
 “Was this helpful?” tap writes `lecture_feedback(user_id, video_id, helpful, created_at)`, which the
 collective layer may read later.
 
@@ -2837,7 +2848,9 @@ collective layer may read later.
   2026-10-01 on hard rule 1, DECISIONS). D57 extends D34's "the pack is the only pre-answer carrier"
   test to the prefetch path.
 - **Low-data images.** Diagrams and cards are stored in two sizes when produced; the app asks for the
-  one its width and connection type need.
+  one its width and connection type need. Phase 2 inherits the same rule for video (CS-3 §3.4): video
+  answers default to low quality on slow connections, offer "download on Wi-Fi", and are cached for
+  replay (PARKED, Phase 2).
 - **Testing.** Slow-3G and lossy profiles on the AVD (`-netspeed`, `-netdelay`), driven by
   `scripts/ui.sh` at D69 and D77; the same scripts on a low-cost Android phone (TRACKER F15).
 
@@ -2863,9 +2876,9 @@ model through Bedrock, since CS-2's “access now restored” is not checkable f
 
 A click-to-chat `wa.me` link (number in config) in Profile → Support, and sharing through the OS share
 sheet (`share_plus`) for milestone cards, answer cards and referral links. No WhatsApp API in Phase 1.
-The committed build has nothing to share yet — milestone cards are beta-backlog item 5, answer cards
-and referral gifts Phase 2 (SPEC §12.1–§12.2) — so D64 builds the click-to-chat link and the share
-helper arrives with its first shareable.
+Both are mapped to D64 (CS-2 §12.3). The committed build has nothing for the share sheet to share yet
+— milestone cards are beta-backlog item 5, answer cards and referral gifts Phase 2 (SPEC §12.1–§12.2)
+— which is open for the founder (TRACKER day log, CS-2 to CS-6).
 
 ### 15.14 Where it lands (mirrors PLAN, 2026-10-01)
 
@@ -2874,7 +2887,7 @@ helper arrives with its first shareable.
 | D18 buffer | Bedrock completion fallback as config (§15.12) |
 | D22–D24 | `concept_primers` migration and `primers generate` for the top-50 chapters (§15.7) |
 | a later buffer before D74 | the remaining primers, all topics (§15.7) |
-| D27 | DOB + 18+ beta gate with the under-18 stop-and-delete; the parent-consent flow built in full behind its flag (§15.1) |
+| D27 | DOB + 18+ beta gate with the under-18 stop and hard delete (`UserPurge.underage`); the parent-consent flow built in full behind its flag (§15.1) |
 | D28/D29 → D42 buffer | compression retro-fitted to the document captures (§15.3) |
 | D33 | `skip_reason` on block status (§15.9) |
 | D35 | past-paper mocks; `mock_results` captured (§15.6) |
@@ -2891,13 +2904,13 @@ helper arrives with its first shareable.
 | D60 | gate: three real unattended days **and** the 14-day simulation; DLT decision point; the 18+ revisit |
 | D61–D63 | prices, rungs, grandfathering, GST config, the paywall (§15.2); one active phone, devices (§15.1) |
 | D63–D64 | account switcher (§15.1) |
-| D64 | terms, legal pages, entity name config; WhatsApp click-to-chat (§15.13) |
+| D64 | terms, legal pages, entity name config; WhatsApp click-to-chat and the share sheet (§15.13) |
 | D65 | per-install limits extended, unusual-use ladder (§15.1), breaker as before |
 | D67 | crisis, streak, ramp copy |
 | D69 | image sizing; throttled-network and real-device tests (§15.10) |
 | D71 | the unusual-use simulation in the security review |
 | D73 | the §15.11 dashboards; the monthly `lectures check` |
 | D77 | throttled and real-device tests re-run |
-| D78 | gate blocking items: crisis eval cases at 100%, slow-network and real-device acceptance, top-50 primers, a vetted lecture per chapter |
+| D78 | gate blocking items: crisis eval cases at 100%, slow-network and real-device acceptance, top-50 primers complete with their misconception lines (CS-1's top-50 records loaded first), a vetted lecture per chapter |
 | when F1's DLT templates are approved, by D60 | phone OTP primary: MSG91 adapter, phone entry + auto-read, email behind the flag; phone attach for email-begun accounts, `POST /me/phone/otp/request\|verify`; the consent flow's live proof (§15.1) |
 | weeks 15–20 | the beta backlog of SPEC §12.1, in order, behind flags |

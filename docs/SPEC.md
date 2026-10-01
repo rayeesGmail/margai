@@ -40,8 +40,8 @@ List ₹499/month; founding price ₹299/month; annual ₹2,999. Payments via UP
 
 ## 2. Who it's for
 
-**Primary target: self-learners** (CS-4) — students preparing without a coaching institute,
-which is most droppers/repeaters and every self-study fresher. Coaching students remain
+**Primary target: self-learners** (CS-4) — students preparing without a coaching
+institute. Coaching students remain
 fully supported, but when a trade-off arises, design for the student preparing alone:
 MARG replaces what coaching gives them one need at a time — structure (the plan), teaching
 support (primers and curated lectures), doubt clearing, tests and ranking (past-paper mocks,
@@ -210,7 +210,7 @@ flowchart TD
     Q6 --> Q7{Repeater or dropper\nwith a NEET attempt?}
     Q7 -->|Yes| SC[Offer: NEET scorecard upload\noptional]
     Q7 -->|No| MS[Offer: 12th marksheet upload\noptional, low-weight]
-    SC --> DOB[Age check → if minor:\nparent consent flow]
+    SC --> DOB[Age check → if minor: parent consent flow\nbeta: 18+ gate, §5.7]
     MS --> DOB
     DOB --> PLAN[FIRST PLAN REVEAL\n+ reason + target gap]
     PLAN --> NOTIF[Ask notification permission\n“See you at 7 AM?”]
@@ -336,7 +336,13 @@ day; free accounts per phone are capped (§6.9); unusual use follows the gentle 
 
 **Minors in the beta:** the beta cohort is recruited **18+**; DOB is still asked, with an
 18+ gate for the beta. The parent-consent flow (§5.1: parent phone + consent OTP) is built
-but stays switched off for the beta and goes live at public launch.
+but stays switched off for the beta and goes live at public launch. Someone under 18 who
+reaches the gate is stopped kindly (“MARG opens to under-18s at launch”) and their
+account, phone number and answers are deleted at once — nothing is kept, not even for a
+waitlist. At the D60 gate the 18+ rule is revisited once: if the consent SMS template is
+live and the legal review has cleared parental consent and the rules on monitoring
+children, the consent flow is switched on and under-18s may join the later beta waves
+(founder ruling 2026-10-01).
 
 ---
 
@@ -362,11 +368,12 @@ flowchart LR
 
 **Block types:** Learn (directs outside study: chapter + NCERT sections + why today),
 Practice (timed in-app MCQ set), Revise (notebook variants due), and later Mock.
-For self-study students a learn block carries its teaching support (CS-4): the topic's
-**concept primer** (“Read the primer, then 10 recall questions”, §9) and one or two
-**curated free lectures** for the chapter — title, channel, language, length, optional
-start times — opened by link-out in the beta and in YouTube's official embedded player
-after the D60 gate, with a “Was this helpful?” tap under each. A primer is also reachable
+A learn block carries teaching support (CS-4): for self-study students, the topic's
+**concept primer** (“Read the primer, then 10 recall questions”, §9); for every student,
+one or two **curated free lectures** for the chapter — title, channel, language, length,
+optional start times — opened by link-out until the in-app player ships from the beta
+backlog after the D60 gate (§12.1 item 7), then in YouTube's official embedded player,
+with a “Was this helpful?” tap under each. A primer is also reachable
 from any topic's detail view and from a doubt answer (“Read the basics of this topic”).
 Teaching support is care, in every tier (§10).
 Every block carries a one-line **reason drawn from the student's data or, attributed as such, from
@@ -405,8 +412,8 @@ Collective-backed confidence never masquerades as personal knowledge.
 - **Mixed practice by default** (CS-2 §4.6): plans keep interleaving across subjects; a
   student may ask for a single-topic set, but the default stays mixed. After an error
   streak or on a low-mood day the plan serves one **confidence question** slightly below
-  her band before returning to stretch difficulty, and the mentor occasionally **explains
-  the why** behind rest and sleep recommendations. Each guard is tunable and measured.
+  her band before returning to stretch difficulty. Each guard is tunable and measured
+  (§10 rule 12).
 
 **Making the plan feel personal (CS-6).** Every planner behaviour serves at least one of
 six qualities and undermines none: **specific** (every reason uses her own data),
@@ -446,17 +453,14 @@ can push back and the plan listens), **honest** (it admits what it doesn't yet k
 
 **Negotiable plan (chat):** the student can talk to the planner — “cousin's wedding
 Fri–Sun” → the week rebalances and the mentor explains the trade. Any plan change
-made in chat is reflected immediately on Today. The plan chat is the only open
-conversation besides a doubt's own thread — there is no general-purpose chatbot (§6.3).
+made in chat is reflected immediately on Today.
 
 **Sunday review with the mentor (CS-4 §5.1):** a short weekly conversation (about five
 minutes) in the plan chat, offered on Sunday evening: what went well, what slipped, the
 week's pattern in plain words, and an agreed focus for next week, which the planner then
 honours and which is visible on next week's plans. Every claim is backed by her own data;
 it is honest and kind about missed days; skippable without penalty; in every tier (the
-deep weekly report stays Pro). After it — or on the weekly card — one tap asks “Did this
-week's plan fit you?” (Yes · Mostly · No; a No offers one optional follow-up: too much ·
-too little · wrong topics · too hard · too easy) (CS-6 §4).
+deep weekly report stays Pro).
 
 **Streaks & weekly trajectory:** streak = consecutive days with ≥1 plan block done
 (protects the habit, not vanity hours). Streak care is **repair, never loss** (CS-2 §4.5):
@@ -724,7 +728,7 @@ between tiers without a release:
 | Streaks, mood and slump care | ✓ | ✓ | ✓ |
 | Milestone cards, “I'm confused” button, focus timer † | ✓ | ✓ | ✓ |
 | Wellbeing and crisis support | ✓ | ✓ | ✓ |
-| Concept primers, curated lectures, Sunday review, drills, mock percentile (CS-4) | ✓ | ✓ | ✓ |
+| Concept primers, curated lectures, Sunday review, drills, mock percentile (CS-4) | ✓ (drill history: summary) | ✓ | ✓ |
 | Home-screen widget, shareable answer cards ‡ | ✓ | ✓ | ✓ |
 | Mnemonics on demand ‡ | — | ✓ | ✓ |
 | Priority speed at peak hours | — | ✓ | ✓ |
@@ -946,7 +950,8 @@ they're built and stored):
    teaching, an established channel, and Hindi and English coverage; independent teachers
    are preferred when quality is comparable, and a competing app's channel only when it is
    clearly the best explanation. **No partnerships, and YouTube's rules exactly:** link-out
-   in the beta, the official embedded player after the D60 gate; branding and ads
+   until the in-app player ships from the beta backlog (§12.1 item 7), then the official
+   embedded player; branding and ads
    untouched; embeddable videos only; never downloaded, cut or re-hosted; no transcript
    extraction into our AI pipeline. A monthly automated check flags videos that became
    private, deleted or non-embeddable, and the “Was this helpful?” tap feeds curation and
@@ -964,7 +969,8 @@ they're built and stored):
 4. Plans are negotiable in plain language; the mentor states trade-offs.
 5. Low-energy days get lighter plans; streaks are protected, not weaponized.
 6. Progress is always relative to the student's own target (goal, category, state) —
-   with one optional anonymous peer percentile for belonging.
+   with optional anonymous peer percentiles (the weekly line and, after launch, the mock
+   percentile, §7.1) as private calibration, never a ranking (founder ruling 2026-10-01).
 7. Corrections from the student always override AI judgments and are remembered.
 8. The AI never pretends to be human, never diagnoses health, never shames.
 9. Collective claims are attributed as collective (“most students…”); personal claims
@@ -975,7 +981,8 @@ they're built and stored):
     there is never a model-selection menu. Pro+ sells formats and audiences, never better
     truth.
 11. Teaching support is care, available in every tier (CS-4): concept primers, curated
-    lectures, the Sunday review and drills are never premium.
+    lectures, the Sunday review and drills are never premium (only the full personal
+    drill history follows the mock-autopsy tiering).
 12. Learning science guards the defaults (CS-2 §4.6): mixed practice by default; one retry
     on a near-miss (“try once more”); a “your turn” prompt on a third doubt about the same
     concept; a confidence question after an error streak or on a low day; occasional
@@ -998,8 +1005,10 @@ they're built and stored):
   refund rate <5%; auto-pause working = zero June complaint tickets.
 - **Trust:** sign-in success ≥98% first attempt; crash-free ≥99.5%; zero unverified
   numericals served (hard gate).
-- **Does the plan feel personal** (CS-6 §4): the weekly one-tap fit question (“Did this
-  week's plan fit you?” — Yes · Mostly · No, with the optional follow-up); block completion
+- **Does the plan feel personal** (CS-6 §4): the weekly one-tap fit question, asked after
+  the Sunday review or on the weekly card (“Did this week's plan fit you?” — Yes · Mostly ·
+  No; a No offers one optional follow-up: too much · too little · wrong topics · too hard ·
+  too easy); block completion
   rate; the share of skips by reason; how often the plan chat negotiates; the pass rate of
   “already know this” checks (a high rate means the plan is serving known material) — all
   read by week of tenure (week 1, week 2, …) so the first-week ramp's effect shows; targets
@@ -1011,9 +1020,10 @@ they're built and stored):
 
 ## 12. Beyond the committed build (CS-2 §5–§8, replacing the earlier Phase 2 list)
 
-**Beta evidence promotes; the calendar does not.** The committed build is everything
-above. Backlog and later items move only when beta behaviour or student demand justifies
-them; if the build slips, the backlog shrinks and the committed core does not.
+**Beta evidence promotes; the calendar does not** (CS-2 §1.3–§1.4). Backlog and later
+items move only when beta behaviour or student demand justifies them. The beta backlog
+ships only if the D60 gate passes, in priority order; if the build slips, the backlog
+shrinks and the Phase 1 core does not.
 
 ### 12.1 Phase 1 beta backlog (gated on the D60 gate)
 
@@ -1063,13 +1073,12 @@ English, Hindi, Hinglish into the existing doubt pipeline) · an Android home-sc
 learned from behaviour · **graduation flows and the continuity path** (journey card, data
 export package, referral gift; humane re-onboarding for another attempt) — must ship
 before the first cohort's June results · a web review surface (notebook, reports, the
-parent's window; one phone plus one browser, §5.7) · a Hindi-first experience (Hindi NCERT
+parent's window) · a Hindi-first experience (Hindi NCERT
 extraction stays image-only by the founder's 2026-09-13 ruling; the Chanakya→Unicode
 converter remains parked — founder ruling 2026-10-01) · **“studying right now” presence**
 (CS-4 §7: an ambient count on Today — “1,240 droppers are studying right now” — aggregate
 counts only, no chat, profiles or messaging, hidden when the number is too small to
-encourage) · the **sibling discount** (§6.9) · video answers default to low quality on slow
-connections, offer “download on Wi-Fi” and are cached for replay (CS-3 §3.4) · iOS.
+encourage).
 
 **Internal priority:** video answers and the parent digest (the Pro+ revenue case) → viva
 + teach-back → graduation flows (hard date) → everything else as capacity allows.
@@ -1085,9 +1094,8 @@ the NCERT licence) · the JEE vertical and further expansion per the roadmap.
 Model-selection menus or correctness-tiered pricing · leaderboards, public ranks or names
 of any kind — the private calibration numbers (the weekly peer line, §6.5, and the mock
 percentile, §7.1) are not leaderboards (founder ruling 2026-10-01) · student-to-student
-social or chat · an open general-purpose chatbot · learning-loop features over WhatsApp
-(WhatsApp is for support, sharing, OTP delivery and parent communication only — CS-2 §4.9)
-· meme-tone branding · streak threats or loss-framed copy.
+social or chat · an open general-purpose chatbot · learning-loop features over WhatsApp ·
+meme-tone branding · streak threats or loss-framed copy.
 
 ---
 

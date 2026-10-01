@@ -178,13 +178,13 @@ class PdfPageRendererTest {
     }
 
     /**
-     * Renders the first pages of a chapter. {@code -Drender.pdf=<book/file.pdf>} picks another
+     * Renders the first pages of a chapter. {@code -Drender.pdf=<lang/book/file.pdf>} picks another
      * chapter and {@code -Drender.dump=<path>} writes the last page out, which is how a page is put
      * in front of a human eye when extraction quality is in question (D14–D16).
      */
     @Test
     void rendersARealNcertPageWithItsJpeg2000Figures() throws IOException {
-        Path chapter = NCERT.resolve(System.getProperty("render.pdf", "phy11-part1/keph101.pdf"));
+        Path chapter = NCERT.resolve(System.getProperty("render.pdf", "en/phy11-part1/keph101.pdf"));
         assumeTrue(Files.exists(chapter), "founder's NCERT PDFs not on this machine");
 
         byte[] pdf = Files.readAllBytes(chapter);

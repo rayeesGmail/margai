@@ -240,7 +240,7 @@ class NcertVerifyCommand extends NcertBookCommand {
             }
             // The page the apparatus starts on is compared only as far as its heading: extract sends
             // it for what is taught above, and the Summary below is not text any row owes (D15).
-            List<PdfLayout.PageShape> shapes = ChapterApparatus.find(pageTexts)
+            List<PdfLayout.PageShape> shapes = ChapterApparatus.find(pageTexts, language)
                     .map(boundary -> PdfLayout.pages(pdf, boundary.page(), boundary.heading()))
                     .orElseGet(() -> PdfLayout.pages(pdf));
             LayoutChecks.Result result = LayoutChecks.check(ofChapter, shapes);

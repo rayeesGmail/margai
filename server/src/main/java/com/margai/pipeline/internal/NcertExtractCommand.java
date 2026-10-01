@@ -132,7 +132,7 @@ class NcertExtractCommand extends NcertBookCommand {
             // chapter-numbered exercises from its sections, and it does not have to if it never
             // sees them (D14, ChapterApparatus). The heading's own page is sent when teaching is
             // printed above the heading, and placing it is read from the page's glyphs (D15).
-            Optional<ChapterApparatus.Boundary> apparatus = ChapterApparatus.locate(pageTexts, sourcePdf);
+            Optional<ChapterApparatus.Boundary> apparatus = ChapterApparatus.locate(pageTexts, sourcePdf, language);
             apparatusRows.add(List.of(String.valueOf(chapter.no()),
                     apparatus.map(boundary -> "page " + boundary.page()).orElse("—"),
                     apparatus.map(ChapterApparatus.Boundary::heading).orElse("not found: every page is sent"),

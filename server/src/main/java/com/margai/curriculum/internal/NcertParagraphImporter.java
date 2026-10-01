@@ -96,11 +96,19 @@ class NcertParagraphImporter {
         // fewer paragraphs than the English one (D16 aligns them by section and order), and a row
         // that still carries the other edition's text is that edition's row, not an orphan.
         BookLanguage other = language == BookLanguage.en ? BookLanguage.hi : BookLanguage.en;
-        List<NcertParagraph> orphans = existing.values().stream()
+        List<NcertParagraph> notCarried = existing.values().stream()
                 .filter(paragraph -> perChapter.containsKey(paragraph.getChapterNo()))
                 .filter(paragraph -> !inFile.contains(paragraph.address()))
-                .filter(paragraph -> paragraph.text(other) == null)
                 .sorted(Comparator.comparing(NcertParagraph::address))
+                .toList();
+        List<NcertParagraph> orphans = notCarried.stream()
+                .filter(paragraph -> paragraph.text(other) == null)
+                .toList();
+        // …but the row is kept only for the other edition: this edition's text on it is what the load no
+        // longer produces, so it goes, or a Hindi join would leave the old ¶2 standing beside its English
+        // (D16). An English row losing its words is the same event as an English rewrite for an anchor.
+        List<NcertParagraph> stripped = notCarried.stream()
+                .filter(paragraph -> paragraph.text(other) != null && paragraph.text(language) != null)
                 .toList();
         // Deleted, not kept (DECISIONS 2026-09-14): a re-extraction cuts paragraphs differently and
         // since v3 the loader numbers them, so the rows a run no longer carries are rows no run
@@ -115,20 +123,28 @@ class NcertParagraphImporter {
         // which is every load after D15. Deleting one loses a vector that describes words nobody
         // carries any more — the right outcome. It is counted and named instead, because a load
         // quietly throwing away paid work should be visible in the report.
-        List<String> anchored = orphans.stream()
+        List<String> anchored = java.util.stream.Stream.concat(orphans.stream(),
+                        language == BookLanguage.en ? stripped.stream() : java.util.stream.Stream.empty())
                 .filter(paragraph -> paragraph.getNodeId() != null)
-                .map(NcertParagraph::address).toList();
+                .map(NcertParagraph::address).sorted().toList();
         if (!anchored.isEmpty()) {
             throw new CurriculumImportException(anchored.size() + " paragraph(s) of " + bookCode
-                    + " that this extraction no longer carries are anchored and cannot be deleted by a load: "
+                    + " that this extraction no longer carries are anchored and cannot be deleted, or lose their"
+                    + " English, by a load: "
                     + String.join(", ", anchored) + " — re-extracting an anchored chapter is a corpus event that "
                     + "re-anchors what it moved (D17 guard), not a load; nothing was written");
         }
         long embeddedOrphans = embeddings.embeddedAmong(orphans.stream().map(NcertParagraph::getId).toList());
         paragraphs.deleteAll(orphans);
+        stripped.forEach(paragraph -> paragraph.clear(language));
+        if (language == BookLanguage.en) {
+            stripped.forEach(paragraph -> rewritten.add(paragraph.getId()));
+        }
+        paragraphs.flush();
         int cleared = embeddings.clearFor(rewritten);
         return new NcertLoadReport(inserted, updated, unchanged, perChapter,
-                orphans.stream().map(NcertParagraph::address).toList(), cleared, (int) embeddedOrphans);
+                orphans.stream().map(NcertParagraph::address).toList(), cleared, (int) embeddedOrphans,
+                stripped.stream().map(NcertParagraph::address).toList());
     }
 
     List<NcertParagraphRow> paragraphs(String bookCode, BookLanguage language, Collection<Short> chapters) {

@@ -149,6 +149,85 @@ class CurriculumImportTest {
     }
 
     /**
+     * The English rows are canonical and Hindi follows them (founder, 2026-10-01, D16): a row's figure
+     * references and equation flag were adjudicated on the English edition, so a Hindi load beside it
+     * leaves them alone. Before D16 a Hindi load replaced both, and the next English load put them back.
+     */
+    @Test
+    void aHindiLoadLeavesTheEnglishFigureReferencesAndEquationFlag() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(hindi((short) 2, "W = -G M m / r (चित्र 7.9)।")));
+
+        Map<String, Object> row = jdbc.queryForMap("SELECT text_hi, has_equations, figure_refs::text AS refs"
+                + " FROM ncert_paragraphs WHERE section = '7.9' AND para_no = 2");
+        assertThat(row.get("text_hi")).isEqualTo("W = -G M m / r (चित्र 7.9)।");
+        assertThat(row.get("has_equations")).isEqualTo(true);
+        assertThat((String) row.get("refs")).contains("Fig. 7.9");
+    }
+
+    /** A row only the Hindi edition carries has no English to follow, so it takes the Hindi row's own. */
+    @Test
+    void aHindiOnlyRowTakesItsOwnFigureReferences() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(new NcertParagraphRow((short) 7, "7.9",
+                (short) 3, "चित्र 7.10 देखिए।", true, List.of("Fig. 7.10"),
+                new ParagraphExtraction(List.of(13), new BigDecimal("0.90"), null))));
+
+        Map<String, Object> row = jdbc.queryForMap(
+                "SELECT has_equations, figure_refs::text AS refs FROM ncert_paragraphs WHERE para_no = 3");
+        assertThat(row.get("has_equations")).isEqualTo(true);
+        assertThat((String) row.get("refs")).contains("Fig. 7.10");
+    }
+
+    /**
+     * A row that carries both editions is not this load's to delete, but its text in the edition being
+     * loaded is: a Hindi join that moves ¶2's words into ¶1 must not leave the old ¶2 Hindi standing
+     * beside the English. It is cleared, with its provenance, and named.
+     */
+    @Test
+    void aReloadClearsItsOwnEditionFromARowItNoLongerCarriesAndKeepsTheOther() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(hindi((short) 1, "पहला।"), hindi((short) 2, "दूसरा।")));
+
+        NcertLoadReport report = imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(hindi((short) 1, "पहला। दूसरा।")));
+
+        assertThat(report.cleared()).containsExactly("ch 7 §7.9 ¶2");
+        assertThat(report.orphans()).isEmpty();
+        Map<String, Object> row = jdbc.queryForMap(
+                "SELECT text_en, text_hi, extraction::text AS x FROM ncert_paragraphs WHERE para_no = 2");
+        assertThat(row.get("text_en")).isEqualTo("W = -G M m / r (Fig. 7.9).");
+        assertThat(row.get("text_hi")).isNull();
+        assertThat((String) row.get("x")).doesNotContain("\"hi\"");
+    }
+
+    /** The same for English after Hindi lands: its stale words and the vector describing them both go. */
+    @Test
+    void anEnglishReloadClearsTheEnglishTextAndVectorOfARowOnlyHindiStillCarries() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(hindi((short) 2, "दूसरा।")));
+        embedEverything();
+
+        NcertLoadReport report = imports.loadParagraphs("phy11-part1", BookLanguage.en, List.of(paragraphs().getFirst()));
+
+        assertThat(report.cleared()).containsExactly("ch 7 §7.9 ¶2");
+        Map<String, Object> row = jdbc.queryForMap(
+                "SELECT text_en, text_hi, embedding IS NULL AS unembedded FROM ncert_paragraphs WHERE para_no = 2");
+        assertThat(row.get("text_en")).isNull();
+        assertThat(row.get("text_hi")).isEqualTo("दूसरा।");
+        assertThat(row.get("unembedded")).isEqualTo(true);
+    }
+
+    private static NcertParagraphRow hindi(short paraNo, String text) {
+        return new NcertParagraphRow((short) 7, "7.9", paraNo, text, false, List.of(),
+                new ParagraphExtraction(List.of(12), new BigDecimal("0.90"), null));
+    }
+
+    /**
      * A re-extraction cuts paragraphs differently, and since v3 the loader numbers them, so a
      * one-page redo shifts every number after it. Rows at addresses the extraction no longer
      * carries were kept and reported through D14; by 2026-09-14 the table held 85 rows no run

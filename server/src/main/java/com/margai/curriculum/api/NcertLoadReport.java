@@ -17,6 +17,10 @@ import java.util.TreeMap;
  * {@code embeddedOrphans} counts deleted rows that carried one. Both are re-earned by the next
  * {@code ncert embed} for the price of the paragraphs involved — but silently losing embeddings is
  * exactly the kind of thing a report exists to say out loud.
+ *
+ * <p>{@code cleared} (D16) names the rows this load no longer carried that the other edition still
+ * does: they are kept, and only this edition's text and provenance are removed from them — an English
+ * row losing its words also loses its vector, counted in {@code embeddingsCleared}.
  */
 public record NcertLoadReport(
         int inserted,
@@ -25,11 +29,13 @@ public record NcertLoadReport(
         Map<Short, Integer> perChapter,
         List<String> orphans,
         int embeddingsCleared,
-        int embeddedOrphans) {
+        int embeddedOrphans,
+        List<String> cleared) {
 
     public NcertLoadReport {
         perChapter = perChapter == null ? Map.of() : new TreeMap<>(perChapter);
         orphans = orphans == null ? List.of() : List.copyOf(orphans);
+        cleared = cleared == null ? List.of() : List.copyOf(cleared);
     }
 
     public int total() {

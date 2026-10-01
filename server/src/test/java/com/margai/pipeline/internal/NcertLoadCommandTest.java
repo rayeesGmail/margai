@@ -158,6 +158,19 @@ class NcertLoadCommandTest {
         assertThat(out.toString()).contains("3 embedded paragraph(s)").contains("scratch database");
     }
 
+    /** A row kept for the other edition but stripped of this one's text is named, as a deleted one is. */
+    @Test
+    void theRowsALoadClearsItsEditionFromAreNamed() {
+        imports.clearedAnswer = List.of("ch 7 §7.9 ¶2");
+        jsonl(page(7, 1, "0.95", p("7.9", "One paragraph.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(out.toString())
+                .contains("## rows the other edition still carries — this edition's text cleared from them")
+                .contains("- ch 7 §7.9 ¶2");
+    }
+
     /** The founder's adjudication lands in the load: a correction is applied before numbering, and named. */
     @Test
     void theCorrectionsFileIsAppliedAndEveryCorrectionIsReported() throws IOException {
@@ -622,6 +635,7 @@ class NcertLoadCommandTest {
         String book;
         BookLanguage language;
         List<String> orphansAnswer = List.of();
+        List<String> clearedAnswer = List.of();
         long embedded;
 
         @Override
@@ -636,7 +650,7 @@ class NcertLoadCommandTest {
             this.rows = new ArrayList<>(rows);
             Map<Short, Integer> perChapter = new java.util.TreeMap<>();
             rows.forEach(row -> perChapter.merge(row.chapterNo(), 1, Integer::sum));
-            return new NcertLoadReport(rows.size(), 0, 0, perChapter, orphansAnswer, 0, 0);
+            return new NcertLoadReport(rows.size(), 0, 0, perChapter, orphansAnswer, 0, 0, clearedAnswer);
         }
     }
 }

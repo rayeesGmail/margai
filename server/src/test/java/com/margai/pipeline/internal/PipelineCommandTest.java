@@ -331,7 +331,7 @@ class PipelineCommandTest {
 
         @Override
         public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
-            return new NcertLoadReport(rows.size(), 0, 0, Map.of(), List.of(), 0, 0);
+            return new NcertLoadReport(rows.size(), 0, 0, Map.of(), List.of(), 0, 0, List.of());
         }
 
         @Override

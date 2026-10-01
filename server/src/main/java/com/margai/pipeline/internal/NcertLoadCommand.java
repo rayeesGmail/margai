@@ -174,6 +174,8 @@ class NcertLoadCommand extends NcertBookCommand {
         }
         report.section("addresses in the database this extraction no longer carried — deleted")
                 .list(result.orphans());
+        report.section("rows the other edition still carries — this edition's text cleared from them")
+                .list(result.cleared());
     }
 
     /**

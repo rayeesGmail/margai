@@ -54,7 +54,7 @@ class PageExtractTaskTest {
         assertThat(page.confidence()).isEqualByComparingTo(new BigDecimal("0.96"));
         assertThat(page.paragraphs()).hasSize(2);
         assertThat(page.paragraphs().getFirst().section()).isEqualTo("7.9");
-        assertThat(page.paragraphs().getFirst().paraNo()).isEqualTo(1);
+        assertThat(page.paragraphs().getFirst().continuesPreviousPage()).isFalse();
         assertThat(page.paragraphs().getLast().figureRefs()).containsExactly("Fig. 7.9");
 
         Map<String, Object> row = jdbc.queryForMap(
@@ -68,36 +68,36 @@ class PageExtractTaskTest {
 
     /**
      * The defect the spec-auditor found: with only the tail, a model cannot know the running
-     * paragraph number, so the state handed forward has to carry the address as well.
+     * paragraph number, so the state handed forward carried the address through v2. Since v3 the
+     * loader counts, and the state carries the section and the tail (D15).
      */
     @Test
-    void theStateHandedForwardCarriesTheAddressNotOnlyTheText() {
+    void theStateHandedForwardCarriesTheSectionAndTheTail() {
         NcertPage page = task.read("Physics Part-I, Textbook for Class XI", (short) 7, 12, List.of(image()),
                 "the page's own text layer", PreviousPage.none(),
                 new AiCallContext(null, UUID.randomUUID().toString(), false)).output();
 
         PreviousPage previous = PreviousPage.of(page, PreviousPage.none());
 
-        assertThat(previous.section()).isEqualTo("7.9");
-        assertThat(previous.paraNo()).isEqualTo(2);
-        assertThat(previous.tail()).isEqualTo(page.paragraphs().getLast().text());
+        // The fixture's last paragraph ends "(Fig. 7.9)." — a finished sentence.
+        assertThat(previous).isEqualTo(new PreviousPage("7.9", false));
     }
 
     /**
-     * A text-free page keeps the address and drops the tail: a chapter plate or a full-page figure
-     * mid-section must not send the next page back to paragraph 1 (spec-auditor, D14).
+     * A text-free page keeps the section and drops the tail: a chapter plate or a full-page figure
+     * mid-section must not make the next page guess its section (spec-auditor, D14).
      */
     @Test
-    void aPageWithNoParagraphsCarriesTheAddressAcrossWithoutATail() {
+    void aPageWithNoParagraphsCarriesTheSectionAcrossWithoutATail() {
         NcertPage empty = new NcertPage(List.of(), BigDecimal.ONE);
-        PreviousPage before = new PreviousPage("7.9", 4, "the text of the page before");
+        PreviousPage before = new PreviousPage("7.9", true);
 
         PreviousPage after = PreviousPage.of(empty, before);
 
         assertThat(after.section()).isEqualTo("7.9");
-        assertThat(after.paraNo()).isEqualTo(4);
-        assertThat(after.tail()).isNull();
-        assertThat(empty.tail()).isNull();
+        assertThat(after).isNotNull();
+        assertThat(after).isEqualTo(before);
+        assertThat(empty.paragraphs()).isEmpty();
     }
 
     @Test
@@ -106,12 +106,23 @@ class PageExtractTaskTest {
     }
 
     @Test
-    void aLongTailIsCutToItsEnd() {
-        String paragraph = "x".repeat(NcertPage.TAIL_LENGTH + 200) + "the end.";
+    void aPageHandsForwardItsLastSectionAndWhetherItsLastSentenceIsOpen() {
+        String paragraph = "the end of the page, in section 7.9.";
         NcertPage page = new NcertPage(
-                List.of(new NcertPage.Paragraph("7.9", 1, paragraph, List.of())), BigDecimal.ONE);
+                List.of(new NcertPage.Paragraph("7.9", paragraph, false, List.of())), BigDecimal.ONE);
 
-        assertThat(page.tail()).hasSize(NcertPage.TAIL_LENGTH).endsWith("the end.");
+        assertThat(PreviousPage.of(page, PreviousPage.none())).isEqualTo(new PreviousPage("7.9", false));
+        // Page 4 of chapter 7 ends "The individual forces in vector notation are" — the sentence
+        // is open, and the next page's call is told so, without the words (D15, run 3).
+        NcertPage open = new NcertPage(
+                List.of(new NcertPage.Paragraph("7.3", "The individual forces in vector notation are", false, List.of())),
+                BigDecimal.ONE);
+        assertThat(PreviousPage.of(open, PreviousPage.none())).isEqualTo(new PreviousPage("7.3", true));
+        // A displayed equation number closes a paragraph as far as this fact is concerned.
+        NcertPage equation = new NcertPage(
+                List.of(new NcertPage.Paragraph("7.5", "and hence F = (G m M_E / R_E^3) r (7.10)", false, List.of())),
+                BigDecimal.ONE);
+        assertThat(PreviousPage.of(equation, PreviousPage.none())).isEqualTo(new PreviousPage("7.5", false));
     }
 
     /** {@code <} opens a StringTemplate expression, so the reversible-reaction arrow is escaped. */
@@ -122,12 +133,59 @@ class PageExtractTaskTest {
         assertThat(system).contains("a reversible reaction as \"<->\"").doesNotContain("\\<");
     }
 
-    /** The prompt must tell the model to continue numbering, not restart it (the D14 blocker). */
+    /**
+     * v3 (D15): the model no longer numbers anything, and the prefix must say so rather than
+     * leave the v2 counting rules in place beside a schema that has no number to put them in.
+     * The one addressing decision left with it is the continuation flag.
+     */
     @Test
-    void theSystemPrefixForbidsRestartingTheNumberingOnEveryPage() {
+    void theSystemPrefixLeavesNumberingToThePipelineAndAsksForTheFlag() {
         String system = prompts.systemPrefix("ncert_extract");
 
-        assertThat(system).contains("Numbering runs across pages, not within them");
+        assertThat(system).contains("continues_previous_page")
+                .contains("Paragraph numbering is done for you")
+                .doesNotContain("Numbering runs across pages");
+    }
+
+    /**
+     * No tail travels any more (D15, the first v3 measurement): the cheap model echoed the quoted
+     * ending on two of twelve pages, once verbatim and once as a paraphrase the repair cannot see.
+     * The turn names the section and asks for the flag from this page's own typography.
+     */
+    @Test
+    void theUserTurnNamesTheSectionAndQuotesNoTail() {
+        Map<String, Object> variables = new java.util.LinkedHashMap<>();
+        variables.put("book_title", "Physics Part-I");
+        variables.put("chapter", 6);
+        variables.put("page", 8);
+        variables.put("previous_section", "6.2");
+        variables.put("previous_ended_mid_sentence", true);
+        String open = prompts.render(com.margai.ai.api.PromptRef.named("ncert_extract"), variables).user();
+        assertThat(open).contains("section 6.2")
+                .contains("ended in the middle of a sentence")
+                .contains("top of the left")
+                .contains("continues_previous_page")
+                .contains("first word printed here")
+                .doesNotContain("last words of the previous page")
+                .doesNotContain("previous_tail").doesNotContain("previous_para_no").doesNotContain("plus one");
+        variables.put("previous_ended_mid_sentence", false);
+        String closed = prompts.render(com.margai.ai.api.PromptRef.named("ncert_extract"), variables).user();
+        assertThat(closed).contains("ended with a finished sentence").doesNotContain("ended in the middle of a sentence");
+    }
+
+    /** The two rules the first measurement asked for, both in the cached prefix. */
+    @Test
+    void theSystemPrefixChecksTheHeadingsAndKeepsEachNumberedLawItsOwnParagraph() {
+        String system = prompts.systemPrefix("ncert_extract");
+        assertThat(system).contains("check the headings")
+                .contains("Law of periods")
+                .contains("top of the left")
+                // The Opus full read (D15): a degree sign copied through for τ, a hat added by
+                // analogy, "alpha" for ∝, paragraphs merged across an indent after an equation.
+                .contains("degree sign")
+                .contains("Never add a mark")
+                .contains("proportional to")
+                .doesNotContain("last words of the previous page");
     }
 
     /**
@@ -166,9 +224,10 @@ class PageExtractTaskTest {
                 .map(component -> SNAKE.matcher(component.getName()).replaceAll("_$0").toLowerCase(Locale.ROOT))
                 .collect(java.util.stream.Collectors.toSet());
 
-        assertThat(allowed).contains("section", "para_no", "figure_refs").doesNotContain("has_equations");
+        assertThat(allowed).contains("section", "continues_previous_page", "figure_refs")
+                .doesNotContain("has_equations", "para_no");
         assertThat(system).as("a field named in the prompt but absent from the schema")
-                .doesNotContain("has_equations");
+                .doesNotContain("has_equations").doesNotContain("para_no");
     }
 
     /** camelCase to snake_case, the naming the tool schema is generated with. */

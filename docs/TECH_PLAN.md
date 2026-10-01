@@ -539,6 +539,19 @@ extraction JSONB (page numbers, confidence, ai_call_id), UNIQUE (book_id, chapte
 Indexes: HNSW `embedding vector_cosine_ops`, GIN `tsv`, `node_id`. The unique key is the paragraph
 address that anchors display as "Class 11 Physics, Ch 7, §7.9" (SPEC §6.3).
 
+*Amended 2026-09-14 (D15, DECISIONS "the pair"; no migration — the column's JSON grows, its type does
+not): `extraction` is keyed per edition, `{"en": {…}, "hi": {…}}` (since D14), and each edition's object
+carries `pages`, `pageStarts` (the offset in the text where each page's part begins, written by
+`ncert load`), `confidence`, `aiCallId` and `verification` — the second read's verdict (`matches |
+differs | not_on_page | not_judged`, the differences as page + printed span + transcribed span, the
+SHA-256 of the text it read, the page calls, the verifying model and prompt version), written by
+`ncert verify` from the reads in its artefact — by a `--read-pages` run after it reads, and by a free
+run re-judging the same reads with the current rulings. A load that brings the same text keeps the
+verdict; a changed text drops it, and that page needs a fresh `--read-pages` read. A row that only
+moved down its section — a join or split renumbering the rows below it — takes its verdict back from
+the artefact at no cost: a read is matched to a row by its part's hash, not by the address it had
+when the page was read (2026-09-16).*
+
 **questions** — D19
 ```
 source VARCHAR(16) CHECK (pyq|generated), exam VARCHAR(8), year SMALLINT, paper_code VARCHAR(16),
@@ -723,7 +736,7 @@ Numbers are indicative; the agent takes the next free integer.
 | V5 `ai_calls` | D5 | ai_calls |
 | V6 `auth` | D7 | otp_challenges, refresh_tokens; also `users.email` + `users_email_key` and the identifier check replacing `users_phone_status_check` (D7 ruling, §2.2) |
 | V7 `ncert` | D14 | ncert_books, ncert_paragraphs (embedding column nullable) |
-| V8 `ncert_hnsw` | D17 | HNSW index on `ncert_paragraphs.embedding` (created once rows exist) |
+| V8 `ncert_hnsw` | ~~D17~~ **D15** — *moved 2026-09-19/20 with the founder's re-order (DECISIONS; PLAN D15)* | HNSW index on `ncert_paragraphs.embedding`. ~~(created once rows exist)~~ — *shipped 2026-09-20 on the empty column instead: a migration cannot wait for a pipeline run, HNSW accepts inserts after creation, and at ~900 rows now and ~9,000 at D17 the build-order difference is not measurable* |
 | V9 `questions` | D19 | questions, question_topics |
 | next free `collective_records` — *added 2026-09-12, CS-1* | D22 | collective_records (§2.3); the `ai_calls.feature` CHECK gains `pipeline_collective` (§2.8) |
 | V10 `question_anchors` | D23 | question_anchors; HNSW on `questions.embedding` |
@@ -1096,6 +1109,7 @@ are the task classes in `ai.tasks`, each owning one prompt and one output record
 | `ErrorClassifyTask` | CHEAP | notebook |
 | `VariantGenerateTask` | REASON | SRS variants |
 | `PageExtractTask` | VISION | pipeline `ncert extract` |
+| `PageVerifyTask` | VISION on the `visionsonnet` shape (*added 2026-09-14, D15, DECISIONS "the pair"*) | pipeline `ncert verify --read-pages` (feature `pipeline_verify`, prompt `ncert_verify`, output `PageVerdicts`) |
 | `PyqSolveTask` | REASON | pipeline `pyq solve` |
 | `DistractorMapTask`, `DifficultyEstimateTask`, `TrapNoteTask` | CHEAP | pipeline `pyq distractors`, `stats compute`, `traps mine` |
 | `QuestionGenerateTask` | REASON (generation decision) | pipeline `questions generate` (feature `pipeline_generate`), verified by `NumericalVerifyTask` before save |
@@ -1114,7 +1128,7 @@ model.*
 | Tier | Config key | Used for |
 |---|---|---|
 | CHEAP | `margai.ai.tier.cheap` | routing, answers judged routine, plan selection, mentor notes, classification, translation/rendering, document extraction text |
-| VISION | `margai.ai.tier.vision` | photo doubts, document images, pipeline page extraction (same model family as CHEAP with image input) |
+| VISION | `margai.ai.tier.vision` | photo doubts, document images, pipeline page extraction (same model family as CHEAP with image input); *since 2026-09-14 (D15) pipeline page verification too — the pipeline runs VISION on the `visionopus` shape to transcribe and the `visionsonnet` shape to verify, each a separate process, and `ncert verify` refuses unless the tier is `margai.pipeline.verify-model`* |
 | REASON | `margai.ai.tier.reason` | hard or numerical doubt answers, independent numerical verification, variant generation, pipeline PYQ solutions |
 | EMBED | `margai.ai.embed.model` | paragraphs, questions, doubt normal forms |
 
@@ -1136,7 +1150,7 @@ Orchestrated by `doubts.internal.DoubtSolveService`; each stage is its own class
 | 3 | Cache lookup | `DoubtCacheLookup` | exact `(hash, language)` → hit. Else `embed` (EMBED, ledger) → HNSW cosine within same subject and language, similarity > 0.93 (config) → hit. Exact hash in *another* language → `AnswerRenderTask` (CHEAP) renders the verified canonical answer in the user's language; the rendered `final_answer` must equal the canonical one exactly, else the render is discarded, an `audit_queue(render_mismatch)` row is written and the request continues as a fresh solve from stage 4 in the user's language (SPEC §6.3: always in their language). A matching render is stored in `doubt_cache` under the new language with the canonical `verified` flag and counts as a cache hit | cache rows stay verified; answers always in the user's language |
 | 4 | Limit gate | `DoubtLimitGate` | weight 0.5 for a hit or a follow-up, 1.0 fresh; free tier refuses when `fresh + 0.5·(cached + followup) + weight > 5` → `DOUBT_LIMIT_REACHED` with paywall trigger; Pro: fair-use queue when `reason_fresh_count ≥ 30` (§4.4) | |
 | 5 | Route | `DifficultyRouter` | see §4.2 | REASON only via router |
-| 6 | Retrieve | `ai.retrieval.HybridRetriever` over `curriculum.api.ParagraphRetrievalRepository` | top-8 vector (same subject) ∪ top-8 `websearch_to_tsquery` over `tsv` (both languages) → reciprocal-rank fusion → dedupe by paragraph → cap 2,500 tokens. Evidence set alongside: ≤ 2 verified PYQs from the guessed node (anchor overlap or stem similarity) **and**, once trap mining has run (§12.2), the node's `topic_traps` rows with their `topic_trap_evidence` question ids. Zero paragraphs above the floor → retry without the node filter → still zero → **grounding failure**: honest fallback + `audit_queue(grounding_failed)` | no answer without retrieval grounding |
+| 6 | Retrieve | `ai.retrieval.HybridRetriever` over `curriculum.api.ParagraphRetrievalRepository` | top-8 vector (same subject) ∪ top-8 `websearch_to_tsquery` over `tsv` (both languages) → reciprocal-rank fusion → dedupe by paragraph → cap 2,500 tokens. *Amended 2026-09-20 (D15, DECISIONS): the full-text half **ORs** the query's terms and strips the negation operator first. `websearch_to_tsquery` ANDs bare terms, so a paragraph had to carry every content word of the question — measured over phy11-part1's 894 verified paragraphs, that returned nothing for 13 of the 15 concept queries and found the expected paragraph for 1, against 6 when OR'd, making "hybrid" retrieval vector retrieval with a second query attached. The `!` strip is what keeps the physics query `v - u` (parsed `'v' & !'u'`) from matching every paragraph lacking "u". The four parameters (`k_vector`, `k_text`, `rrf_k`, `similarity_floor`) are `margai.ai.retrieval.*`; the floor applies to vector similarity alone, since every question shares some word with some NCERT paragraph and a keyword coincidence satisfying R2 would make the grounding rule unfalsifiable.* Evidence set alongside: ≤ 2 verified PYQs from the guessed node (anchor overlap or stem similarity) **and**, once trap mining has run (§12.2), the node's `topic_traps` rows with their `topic_trap_evidence` question ids. Zero paragraphs above the floor → retry without the node filter → still zero → **grounding failure**: honest fallback + `audit_queue(grounding_failed)` | no answer without retrieval grounding |
 | 7 | Generate | `DoubtAnswerTask` | prompt `doubt_answer` with the retrieved paragraphs (ids visible), the PYQ set and the trap candidates (ids visible); output `{steps_md, concept_md, anchor_paragraph_id, final_answer: {value, unit}?, nta_trap: {note_md, evidence_question_ids[]}?, followups[2], language}`; the prompt states that a trap note may only restate a provided trap candidate or cite provided PYQ ids | |
 | 8 | Verify | `NumericalVerifier` | when `route.is_numerical` or `answer_type = option`: `NumericalVerifyTask` (REASON, sees the question only, not the solution) → compare: numbers equal within 1% relative tolerance after unit normalisation, options by key. Mismatch → one regeneration with both attempts in context → verify again → mismatch → `status = unverified_fallback` + `audit_queue(verification_failed)` | numerical answers independently verified; never rendered unverified |
 | 9 | Assemble | `AnswerAssembler` | rejects an answer whose `anchor_paragraph_id ∉ retrieved set`; keeps `nta_trap` only if every `evidence_question_ids` entry is a PYQ id from stage 6's evidence set (retrieved PYQs or topic-trap evidence) and the list is non-empty, otherwise drops the note (Evidence rule); those ids become `doubt_evidence` rows; renders the fallback copy for unverified numericals | anchor on every answer; trap only when PYQ-backed |
@@ -1382,6 +1396,16 @@ a re-learn block candidate.
   the `vector(n)` columns equal, and D17's retrieval harness must cover Hindi and Hinglish queries —
   if the v4 line underperforms the v3 one there, the swap happens **before** the D16 corpus
   embedding, while it is still free (founder rider, 2026-09-12).
+  **Amended 2026-09-20 (D15, DECISIONS): the provider is now `bedrock` and the model
+  `global.cohere.embed-v4:0` — the same Cohere v4 line, reached through AWS rather than Cohere's
+  own API.** The direct key is a trial key capped at 1,000 calls a month against a corpus needing
+  ~9,000, and no payment method can be attached to that account. Because it is the same model the
+  pin's meaning is unchanged and D15's measured result stands; because it is Bedrock, embeddings
+  authenticate by **IAM and need no API key at all**, so `MARGAI_AI_COHERE_API_KEY` leaves the live
+  profile. Two facts measured on 2026-09-20: v4 has **no on-demand throughput** and must be invoked
+  through an inference profile, and `output_dimension` is honoured so the answer is 1,024 wide at
+  `embeddings.float[0]`. This is not the Marketplace path §4.11 calls dormant — that 403 was a
+  Marketplace subscription for the Anthropic models; serverless embedding models bill like S3 does.
   **Price confirmed 2026-09-12** on the provider's own pricing page: **0.12 USD per 1M text
   tokens**, identical to the Bedrock figure the table already carried, so nothing was ever
   mispriced. The same model charges **0.47 for image tokens** — irrelevant today, since
@@ -1396,6 +1420,12 @@ a re-learn block candidate.
 - `HybridRetriever` is the one retrieval component (§4.3 stage 6) and is also used by the pipeline
   for anchor linking (D23) and PYQ linking. Its parameters (`k_vector`, `k_text`, `token_cap`,
   `similarity_floor`) are config and part of the eval-gated surface (`.claude/rules/ai-layer.md`).
+  *Amended 2026-09-20 (D15, DECISIONS): a fifth, **`rrf_k`**, joins them — the constant in
+  reciprocal-rank fusion's `1 / (k + rank)`. The two halves score on scales that cannot be compared
+  (cosine similarity in 0..1 against an unbounded `ts_rank`), so they are fused by rank and this
+  decides how sharply rank 1 beats rank 8; 60 is the conventional flat setting. All five live under
+  `margai.ai.retrieval.*` in `application.yml`, which `scripts/precommit-gate.sh` did not match
+  until the same day — so until D15 a change to the retrieval weighting could commit unstamped.*
 
 ### 4.10 Eval harness (D23, D47)
 
@@ -1719,6 +1749,7 @@ JSONL plus Java ingest (two toolchains, and the AI calls would still need the Ja
 | `pipeline/inputs/archetypes.yaml` | tracks with ordered steps `(node_code, phase, target_week)` | `backbone load` (D13; educator review F3 by W8) |
 | `pipeline/inputs/cutoffs.csv` | `year, category, quota_scope, seat_type, qualifying_marks, source` | `cutoffs load` |
 | `pipeline/inputs/books.yaml` | book codes, titles, edition year, S3 keys of the PDFs | `ncert register` (D14) |
+| `pipeline/inputs/ncert-corrections.yaml` | *added 2026-09-14 (D15)*: the founder's rulings on `ncert verify` flags — per entry `book, lang, chapter, page, kind (text \| join \| split \| figure_ref \| drop \| misprint \| false_positive), reason`, the kind's own fields (`transcribed` + `printed`, `at`, or `at` + exactly one of `remove`/`add`) and an optional `address` for the reader; *the kinds that change no text were added 2026-09-15 (D15)* | `ncert load` (applies `text`, `join`, `split`, `figure_ref`, `drop`); `ncert verify` (reads `misprint`, `false_positive`) |
 | `pipeline/inputs/papers/<exam>-<year>.json` | PYQ papers as structured JSON (stem, options, key, paper code) | `pyq load` (D19) |
 | `pipeline/inputs/collective/excerpts/*.md` (ignored by git) + `manifest.md` + `sources.csv` | founder-collected public-discourse and study-advice excerpts (per file: source, date collected, node codes) and the curated source list — CS-1 §3, founder workstream F11. The exception to this table's "committed": third-party text never enters the repo — the excerpt files are ignored like the syllabus PDFs (D13), `manifest.md` commits their names and SHA-256 and `sources.csv` the source list (DECISIONS 2026-09-12); read by the pipeline, never stored, never crawled | `collective from-inputs` (D24 buffer or any later buffer) |
 | `pipeline/inputs/collective/review-<season>.csv` | the founder-edited review sheet: one row per node and field with the approved value and the evidence kept (CS-1 §4) | `collective load` (D24) |
@@ -1733,10 +1764,11 @@ Source PDFs, page images, JSONL artefacts and eval snapshots live in the content
 | `backbone load` · `cutoffs load` | D13 | `archetype_tracks.code` + sequence; cutoff natural key | steps per track, nodes not in any track |
 | `ncert register` | D14 | `ncert_books.code` | — |
 | `ncert render --book --lang` | D14 | page image key `pages/{book}/{lang}/{chapter}/{page}.png` — *the chapter segment added at D14 (DECISIONS): NCERT's sources are chapter-wise PDFs, so page numbers run per chapter* | pages rendered, and `ncert_books.pages_*` written |
-| `ncert extract --book --lang [--chapters] [--pages] [--redo]` | D14–D15 | JSONL `extract/{book}/{lang}.jsonl`, **one line per page** (*D14, DECISIONS: the confidence, the `ai_calls` row and the page number belong to the page, and a page yielding no paragraphs must still be recorded as read*): `{chapter_no, page, confidence, ai_call_id, skipped, paragraphs: [{section, para_no, text, figure_refs}]}`; one VISION call per page carrying where the previous page ended — its section, its last paragraph number and that paragraph's tail — so numbering continues within a section instead of restarting per page. *Amended 2026-09-13 (D14, DECISIONS): the call also carries **the page's own text layer** where the chapter's is legible, authoritative for characters (§6.1 note); `has_equations` has left the model's schema and is computed in Java at load time from the transcription — never ask a model to judge what code can compute; `skipped` records a page deliberately not sent (the end-of-chapter apparatus); the template is `ncert_extract.v2`, the version a frozen corpus names* | pages processed, paragraphs, **characters differing from the page's text layer**, **pages whose paragraph count does not match the page's shape**, low-confidence pages, cost from the ledger |
-| `ncert load --book --lang` | D14–D15 | `(book_id, chapter_no, section, para_no)`; halves of a paragraph straddling a page break are joined, any other collision fails the run | paragraphs upserted; **coverage % per book** against the *rendered* page count (PLAN D15 ✅), plus text yield per chapter |
+| `ncert extract --book --lang [--chapters] [--pages] [--redo]` | D14–D15 | JSONL `extract/{book}/{lang}.jsonl`, **one line per page** (*D14, DECISIONS: the confidence, the `ai_calls` row and the page number belong to the page, and a page yielding no paragraphs must still be recorded as read*): `{chapter_no, page, confidence, ai_call_id, skipped, paragraphs: [{section, para_no, text, figure_refs}]}`; one VISION call per page carrying where the previous page ended — its section, its last paragraph number and that paragraph's tail — so numbering continues within a section instead of restarting per page. *Amended 2026-09-13 (D14, DECISIONS): the call also carries **the page's own text layer** where the chapter's is legible, authoritative for characters (§6.1 note); `has_equations` has left the model's schema and is computed in Java at load time from the transcription — never ask a model to judge what code can compute; `skipped` records a page deliberately not sent (the end-of-chapter apparatus); the template is `ncert_extract.v2`, the version a frozen corpus names.* *Amended 2026-09-14 (D15, DECISIONS): the model no longer numbers paragraphs. The line is `{chapter_no, page, confidence, ai_call_id, skipped, paragraphs: [{section, text, continues_previous_page, figure_refs}]}`; the call carries the previous page's section and, since the same afternoon's third run, one fact — whether its last paragraph ended mid-sentence — and none of its text, because the cheap model echoed a quoted tail; the flag is judged from the page's own typography with the rule that a continuation sits only at the top of the left or only column, and `ncert load` assigns `para_no`. A blank text or a flag on any paragraph but the page's first is refused where the output is decoded and the page re-called. The template is `ncert_extract.v3`; v2 stays on disk as the version phy11-part1's frozen corpus names.* | pages processed, paragraphs, **characters differing from the page's text layer**, **pages whose paragraph count does not match the page's shape**, low-confidence pages, cost from the ledger |
+| `ncert load --book --lang` | D14–D15 | `(book_id, chapter_no, section, para_no)`; *since 2026-09-14 (D15, DECISIONS) `para_no` is assigned here, per section in reading order across pages, so no two paragraphs can share an address;* the halves of a paragraph straddling a page break are joined on the extraction's flag, and a flag that cannot be a continuation — nothing before it, a different section, an absent page between — fails the run by name; *rows of the carried chapters that the extraction no longer produces are deleted and named, unless anchored (the load refuses) or carrying the other edition's text (kept)* | paragraphs upserted; **coverage % per book** against the *rendered* page count (PLAN D15 ✅), plus text yield per chapter; the addresses deleted |
+| `ncert verify --book --lang [--chapters] [--read-pages [--pages] [--redo]]` | D15 (*added 2026-09-14, DECISIONS "the pair"*) | the paragraph address for the verdict on the row; artefact `verify/{book}/{lang}.jsonl`, one line per page read: `{chapter_no, page, ai_call_id, model, prompt_version, items: [{number, address, part_sha256, verdict, differences: [{printed, transcribed}]}], omitted}` — the model's answer as given, so code's judgements and the founder's rulings are applied at report time and a page is re-read only when its parts' text, the prompt version or `--redo` says so. Free without `--read-pages`: `PdfLayout` reads where the print starts paragraphs, and every equation number it carries, from the PDF's glyph positions and `LayoutChecks` holds the rows to it — starts per page (a printed start whose math the layer dropped paired with its row), joins per page break, figure_refs per row, and the page's printed `(n.m)` numbers counted against the numbers its rows carry, flagged only where the print carries one more often (*2026-09-16, D15*). With it: one VISION call per page on the `visionsonnet` shape (`ncert_verify` prompt), the page's bands and never its text layer, every paragraph's part on that page as a numbered item, one fixed question — does this text match the print? — refused before any call on the fake client, on a verify tier that is not `margai.pipeline.verify-model`, when the ledger says the verify tier's model transcribed the rows, and when it cannot name the transcriber of a row; a read or a stored verdict by another model or prompt version is neither reused nor counted, a claimed difference the verifier cannot place leaves the row `not_judged`, and a free run re-judges from the artefact at no cost | the second read's flags (address, printed span, transcribed span) to adjudicate; rows not found on their page; running text no row carries; code's set-asides (spacing and glyph variants only; a span the row does not carry) and the count ruled on in `pipeline/inputs/ncert-corrections.yaml`; the free checks; **clean paragraphs per chapter and per book** — the second read matches and no join or figure flag names the row (PLAN D15 ✅), with the three page-level signals counted beside it (start flags, numbered equations the print carries that the rows do not, passages no row carries); cost from the ledger |
 | `ncert align --book` | D16 | same key | EN↔HI pairs by section and order, embedding-similarity outliers listed for the 20-pair check |
-| `ncert embed --book` | D17 | paragraph id | embedded count; the 15 concept queries from `eval/retrieval-queries.json` run and print top-3 |
+| `ncert embed --book [--chapters] [--redo] [--queries]` | ~~D17~~ **D15** — *moved 2026-09-19/20 with the founder's re-order (DECISIONS; PLAN D15)* | paragraph id | embedded count; the 15 concept queries from `eval/retrieval-queries.json` run and print top-3. *Amended 2026-09-20 (D15, DECISIONS): the run is **scored**, not only printed — hit@1, hit@3 and MRR against the addresses each query was written to reach, with Hindi counted separately, because an unscored run gives D17 nothing to compare its ~9,000-paragraph re-run against and five Hindi misses would hide inside ten English hits. Embeds `text_en` only (§6.4), so `--lang hi` is refused; refuses the fake client, whose fixture vectors on real rows no check could ever see; refuses a missing query file rather than embedding a book and producing no acceptance evidence (`--queries none` to mean it). Resumes on the null-embedding rule, so a re-run re-scores for the price of the query embeddings* |
 | `pyq load --paper` | D19 | `(source, exam, year, paper_code, question_no)` | **counts per year/subject** vs the paper's official count |
 | `pyq solve --year --subject` | D20 | question id; skips `verified = true` | solutions written, cost; 50-question audit sample listed |
 | `pyq verify --year --subject` | D20–D21 | question id | verified vs flagged; flagged → `audit_queue(pipeline_flag)` |
@@ -1759,7 +1791,10 @@ the evidence for that day's ✅ check.
 *Added 2026-09-13 (D14, founder FIX 5 and FIX 6; DECISIONS). **What is trusted, in order.** (1) The
 loader's invariants are the safety net and the only thing that refuses: a section that does not
 belong to its chapter, a section that is not a printed section number, a paragraph number out of
-range, two paragraphs at one address, a page absent from the JSONL. (2) The mechanical checks —
+range, two paragraphs at one address, a page absent from the JSONL — *from 2026-09-14 (D15) the
+number is the loader's own and a collision cannot occur, so the refusals are: a section not of
+its chapter or not a printed number, a blank paragraph, and a continuation flag with nothing
+before it, into a different section, or across an absent page*. (2) The mechanical checks —
 the character diff against the page's text layer, and the paragraph-count shape flag — find what the
 invariants cannot see; they route a human's attention and never block a run. (3) The model's own
 `confidence` sits **below both**: it is a review-routing signal, not a guarantee, and the D14
@@ -1769,6 +1804,18 @@ frozen, not reproduced**: paragraph segmentation legitimately differs between ex
 verified run per book is canonical, a later re-extraction is a corpus event that re-embeds and
 re-anchors what it moved, and D17's guard checks integrity against the frozen run rather than
 stability across runs.*
+
+*Added 2026-09-14 (D15, DECISIONS "the pair"). **The second read and the corrections file take their
+places in that order.** `ncert verify` — a different model's verdict per paragraph and the free
+typography checks beside it — sits with the mechanical checks at (2): it routes a human's attention,
+never changes a row's text and never refuses a load. It does write the verdict into the row's
+`extraction` (§2.3), and it refuses its own run — before any call — on rows loaded without page offsets,
+on the fake client, on a verify tier that is not `margai.pipeline.verify-model`, on a verifier the
+ledger says transcribed the rows, and on rows whose transcriber the ledger cannot name. What changes a canonical row is a founder-approved entry in
+`pipeline/inputs/ncert-corrections.yaml` (§6.2), keyed on the page and a span that must occur on it
+exactly once, applied by `ncert load` after its own page-break repairs and before numbering: `text`,
+`join` and `split` change the frozen run's pages; `misprint` and `false_positive` rule on a flag so it is
+not raised again. The frozen run is corrected on the record rather than re-drawn.*
 
 ### 6.4 Embedding language choice
 

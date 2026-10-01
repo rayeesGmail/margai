@@ -1,0 +1,33 @@
+# A measurement, not a default: the VISION tier on Claude Opus 5.
+#
+#   java -jar server.jar --spring.profiles.active=pipeline,live,visionopus ncert extract …
+#
+# Added 2026-09-14 (D15, DECISIONS) when the founder asked whether a one-time corpus should be
+# cut with the strongest model available. Chapter 7 is run on it once, about ₹85 at $5 in / $25
+# out per million tokens (2.5× Sonnet 5, 5× Haiku 4.5), and read against the same defect list
+# as the Haiku and Sonnet runs. The design decision it informs is the pair — which model
+# transcribes and which verifies in the page-image second read — not a single winner.
+#
+# Request shape (the current API guidance for this model): thinking is adaptive by default and
+# stays on; `disabled` is accepted only at effort `high` or below and can make the model write
+# its tool call as text instead of calling the tool, which on this task is the whole output —
+# so adaptive at `low` effort, which still cuts cost. `temperature` is rejected outright, and an
+# empty value binds to null, which is how "send nothing" is spelled. The cacheable prefix
+# minimum is 1,024 tokens as on the reasoning tier.
+#
+# Measured 2026-09-14 (D15, dry runs 10 and 11): `adaptive` here means "accepted by the API", not
+# "thinking on". Every extraction request forces the tool call (`ToolChoiceTool` in
+# `MessageRequestMapper`), and with the tool forced no thinking block is emitted at any effort —
+# the ledger's output tokens were identical page by page at `low` and at `xhigh`
+# (`MARGAI_AI_TIER_VISION_EFFORT=xhigh` over this profile), the size of the JSON and nothing
+# more. So `effort` has nothing to act on for this task until the request allows tool choice
+# auto (TRACKER PARKED); every Opus row in the D15 table is a no-thinking read.
+margai:
+  ai:
+    tier:
+      vision:
+        id: claude-opus-5
+        temperature:
+        effort: low
+        thinking: adaptive
+        cache-min-tokens: 1024

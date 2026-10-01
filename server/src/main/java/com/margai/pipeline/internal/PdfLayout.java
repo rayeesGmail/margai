@@ -1,0 +1,640 @@
+package com.margai.pipeline.internal;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
+
+/**
+ * Where a page's printed paragraphs start, read from where its text layer puts each glyph (D15).
+ *
+ * <p>{@link PdfTextLayer} and the checks built on it use the layer's <em>characters</em>; this uses
+ * their <em>positions</em>, which survive the symbol fonts and the private-use encoding that garble
+ * the characters. It exists because on a frozen prompt the character layer of an extraction is stable
+ * and its paragraph boundaries are not (DECISIONS 2026-09-14, dry runs 10 and 11): the typography
+ * decides where a paragraph starts, the book sets it plainly, and code can read it.
+ *
+ * <p>The rules were measured on {@code keph107.pdf} (2026-09-14) and each is a guess about print that
+ * the chapter-7 calibration measures, so what this produces routes attention and never refuses a run:
+ *
+ * <ul>
+ * <li>Body text is the page's commonest glyph size; smaller lines (running head, captions, scripts)
+ * are not body text, and a line is prose when most of its tokens are words.</li>
+ * <li>A paragraph's first line is set 12–40 pt in <em>from the line directly below it</em> — 18 pt on
+ * this corpus. Measuring against the next line rather than a page-wide margin is what keeps a boxed
+ * statement, set 24 pt in as a whole, from reading as twenty paragraphs; a column's own commonest
+ * margin decides only for a line with no prose line close beneath it (a sentence before a display).</li>
+ * <li>The first body line after a bold section heading starts a paragraph, flush as it is; so does a
+ * bold "Example 7.4", "Answer" or "Solution" label.</li>
+ * <li>Two columns are told apart by where their lines start, not by the page's centre: a verso page's
+ * right column begins at 319.7 pt of 657, left of the middle.</li>
+ * </ul>
+ */
+final class PdfLayout {
+
+    /** How far in a first line is set from the line below it, in points. */
+    static final double MIN_INDENT = 12;
+    static final double MAX_INDENT = 40;
+
+    /** Glyphs whose baselines differ by at most this much are one line. */
+    private static final double SAME_LINE = 1.5;
+    /** Wider than a word space: where a line may cross the column gutter. */
+    private static final double SEGMENT_GAP = 12;
+    /** Wider than any justified word space: a display's spacing, which splits a line anywhere. */
+    private static final double DISPLAY_GAP = 40;
+    /** How many body lines below the right column's first line the left column's first may begin before something unseen is above it. */
+    private static final double FAR_BELOW_LINES = 3;
+    /** How many prose lines must share a start for it to be a column's margin. */
+    private static final int MARGIN_LINES = 3;
+    /** A line body text sits within this many points of the body size. */
+    private static final double BODY_SIZE_TOLERANCE = 0.9;
+    /** Within this share of the text block's width of its middle, a heading is centred across the page rather than set in a column. */
+    private static final double CENTRED = 0.05;
+    /** Enough glyphs — three or four lines of a column — for the text above a cut to set its own body size. */
+    private static final int MIN_BODY_GLYPHS = 150;
+    /** How many words of a starting line a report quotes. */
+    private static final int QUOTED_WORDS = 6;
+
+    /**
+     * A numbered section heading. The title may be capitals, as Physics sets it ("7.5 ACCELERATION DUE
+     * TO GRAVITY"), or Title Case, as Biology sets its sub-headings ("1.2.2 Genus", "4.1.4 Coelom") —
+     * a difference that cost {@code bio11} its whole start check until 2026-09-23, because no heading
+     * was recognised, so the rule below that a heading's next line starts a paragraph never fired and
+     * a page of five headed paragraphs reported that the print starts none of them. The number and the
+     * bold face are what make it a heading; the case of the title never was.
+     */
+    private static final Pattern HEADING = Pattern.compile("^\\d{1,2}(\\.\\d{1,2})+\\s+\\p{Lu}[\\p{L} ,'’()-]{3,}");
+    /** A heading too long for its line wraps ("14.2.1 Respiratory Volumes and / Capacities"). */
+    private static final int HEADING_WRAP_WORDS = 4;
+    /** A worked example's label, behind at most a box ornament glyph or two ("tExample 7.3"), in any font. */
+    private static final Pattern EXAMPLE = Pattern.compile("^.{0,2}?Example\\s+\\d{1,2}\\.\\d{1,2}\\b");
+    /** Set in bold by the book; in running prose the word would not open a line in bold. */
+    private static final Pattern ANSWER = Pattern.compile("^(Answer|Solution)\\b");
+    /** A numbered law ("3. Law of periods") or an item marker ("(a)", "(ii)") opens its paragraph (prompt v3). */
+    private static final Pattern ITEM = Pattern.compile("^(\\d{1,2}\\.\\s+\\p{Lu}|\\((?:[a-h]|i{1,3}|iv|vi{0,3}|ix|x)\\)\\s)");
+    private static final Pattern WORD = Pattern.compile("(?=[A-Za-z’']{2,})[A-Za-z’']*[AEIOUYaeiouy][A-Za-z’']*");
+    /** A display continued onto a new line or page opens with its operator; a paragraph never does. */
+    private static final Pattern OPENS_WITH_OPERATOR = Pattern.compile("\\s*[=+×÷≈≅≤≥<>−–—]\\s");
+
+    private PdfLayout() {
+    }
+
+    /** One glyph of the text layer: its left edge and baseline from the top-left, its width and size. */
+    record Glyph(double x, double y, double width, double size, String font, String text) {
+    }
+
+    /** Whether the page's first line of running text continues the previous page's paragraph. */
+    enum Top {
+        /** Flush, and neither a heading's first line nor a label: the previous page's paragraph goes on. */
+        continues,
+        /** Indented, after a heading, or a label: a new paragraph. */
+        starts,
+        /** The page opens with something that is not a prose line — a display, a figure — or has no text. */
+        unknown
+    }
+
+    /**
+     * Whether the page's last line of running text closes its paragraph or runs on to the next page.
+     *
+     * <p>A justified paragraph's last line is ragged; every other line is set to the column's measure.
+     * So a last line short of the measure <em>proves</em> the paragraph ended on this page, and that
+     * is the one thing that separates a real page-break join from a false one where the book — as
+     * {@code bio11} does throughout — sets a page's first line flush left whether it continues or not.
+     * Measured across the fifteen join flags of the first whole-book run (2026-09-23): the twelve
+     * false ones end 37–228 pt short of the measure, the three real ones within 0.2 pt of it.
+     *
+     * <p>Only {@link #ends} silences a flag, and it is the verdict that needs the stronger evidence,
+     * so a page this cannot read stays as it was.
+     */
+    enum Bottom {
+        /** The last line stops short of the measure: it is a paragraph's last line. */
+        ends,
+        /** The last line is set to the full measure, which only a line with text after it is. */
+        continues,
+        /** No body text at a column margin to measure, so the page says nothing either way. */
+        unknown
+    }
+
+    /** Within this many points of the column's measure, a line is set to it. */
+    private static final double AT_MEASURE = 2;
+    /** Within this many points of the column's margin, a line starts at it rather than indented. */
+    private static final double AT_MARGIN = 3;
+
+    /** An equation's printed number, "(7.35)" — the layer keeps it where it loses the equation itself. */
+    private static final Pattern EQUATION_NUMBER = Pattern.compile("\\(\\d{1,2}\\.\\d{1,3}\\)");
+
+    /**
+     * @param starts          the opening words of each line that starts a paragraph, in reading order
+     * @param top             how the page's first line of running text begins
+     * @param topLine         that line's opening words, or null when there is none
+     * @param captions        the figure and table labels the page's bold captions carry ("fig 7.3")
+     * @param equationNumbers every printed equation number of the page, in reading order, as often as
+     *                        the page prints it — a displayed equation's label and every reference to it
+     * @param apparatus       where the chapter's apparatus heading sits on this page, when the page was
+     *                        read as the one that carries it; null on every other page
+     */
+    record PageShape(List<String> starts, Top top, String topLine, List<String> captions,
+            List<String> equationNumbers, Bottom bottom, Apparatus apparatus) {
+
+        PageShape {
+            starts = List.copyOf(starts);
+            captions = List.copyOf(captions);
+            equationNumbers = List.copyOf(equationNumbers);
+            bottom = bottom == null ? Bottom.unknown : bottom;
+        }
+
+        PageShape(List<String> starts, Top top, String topLine, List<String> captions,
+                List<String> equationNumbers, Bottom bottom) {
+            this(starts, top, topLine, captions, equationNumbers, bottom, null);
+        }
+
+        PageShape(List<String> starts, Top top, String topLine, List<String> captions) {
+            this(starts, top, topLine, captions, List.of(), Bottom.unknown);
+        }
+
+        PageShape(List<String> starts, Top top, String topLine, List<String> captions,
+                List<String> equationNumbers) {
+            this(starts, top, topLine, captions, equationNumbers, Bottom.unknown);
+        }
+    }
+
+    /**
+     * Where a chapter's apparatus heading sits on the page that carries it (D15, 2026-09-24).
+     *
+     * @param located         whether the heading was found among the page's lines; when it was not,
+     *                        nothing was cut and the count below is not a measurement
+     * @param proseLinesAbove the body-size prose lines before the heading in reading order — the
+     *                        teaching the page carries; the running head and captions are not counted
+     */
+    record Apparatus(boolean located, int proseLinesAbove) {
+    }
+
+    /** Every page of a chapter PDF, in order. */
+    static List<PageShape> pages(byte[] pdf) {
+        return pages(pdf, 0, null);
+    }
+
+    /**
+     * Every page of a chapter PDF, in order, the page carrying the apparatus heading cut at it: its
+     * shape is what was taught on it, so the Summary's paragraphs are not printed starts no row takes.
+     *
+     * @param apparatusPage the 1-based page the heading is on
+     * @param heading       the heading, as {@link ChapterApparatus} found it in the text layer
+     */
+    static List<PageShape> pages(byte[] pdf, int apparatusPage, String heading) {
+        try (PDDocument document = Loader.loadPDF(pdf)) {
+            List<PageShape> shapes = new ArrayList<>();
+            for (int page = 1; page <= document.getNumberOfPages(); page++) {
+                shapes.add(shape(document, page, page == apparatusPage ? heading : null));
+            }
+            return shapes;
+        } catch (IOException e) {
+            throw new UncheckedIOException("cannot read the PDF's text layer", e);
+        }
+    }
+
+    /** One page of a chapter PDF, cut at the apparatus heading it carries. */
+    static PageShape page(byte[] pdf, int page, String heading) {
+        try (PDDocument document = Loader.loadPDF(pdf)) {
+            return shape(document, page, heading);
+        } catch (IOException e) {
+            throw new UncheckedIOException("cannot read the PDF's text layer", e);
+        }
+    }
+
+    private static PageShape shape(PDDocument document, int page, String heading) throws IOException {
+        GlyphCollector collector = new GlyphCollector();
+        collector.setSortByPosition(true);
+        collector.setStartPage(page);
+        collector.setEndPage(page);
+        collector.getText(document);
+        return shape(collector.glyphs, document.getPage(page - 1).getMediaBox().getWidth(), heading);
+    }
+
+    static PageShape shape(List<Glyph> glyphs, double pageWidth) {
+        return shape(glyphs, pageWidth, null);
+    }
+
+    /**
+     * @param apparatusHeading the chapter's apparatus heading when this is the page that carries it,
+     *                         else null
+     */
+    static PageShape shape(List<Glyph> glyphs, double pageWidth, String apparatusHeading) {
+        // Two passes. A first, cautious cut at every gap wider than a word space finds the prose and
+        // so the columns; the second cuts only at the gutter or at a display's spacing, because a
+        // justified line in a narrow column can space two words wider than the first cut allows —
+        // "Since Cavendish's ⟶ experiment, the" on page 6 of chapter 7.
+        List<Line> firstCut = lines(glyphs, (previous, next) -> gap(previous, next) > SEGMENT_GAP);
+        if (firstCut.isEmpty()) {
+            return new PageShape(List.of(), Top.unknown, null, List.of(), List.of(), Bottom.unknown,
+                    apparatusHeading == null ? null : new Apparatus(false, 0));
+        }
+        double rightFrom = columnBoundary(firstCut, pageWidth);
+        Double rightMargin = commonest(prose(firstCut, bodySize(firstCut)).stream()
+                .filter(line -> line.x >= rightFrom).map(line -> line.x).toList());
+        List<Line> printed = lines(glyphs, (previous, next) -> gap(previous, next) > DISPLAY_GAP
+                || (rightMargin != null && gap(previous, next) > SEGMENT_GAP
+                        && next.x >= rightMargin - 2 && previous.x + previous.width < rightMargin - 5));
+        double pageBody = bodySize(printed);
+        // The cut reads columns only where the page has a right column of prose: bio11 sets one column
+        // and centres its Summary heading past where a second would begin (ch 14 p11), and read as a
+        // right-column heading it kept the whole page.
+        double cutFrom = prose(printed, pageBody).stream().filter(line -> line.x >= rightFrom).count() >= MARGIN_LINES
+                ? rightFrom : Double.MAX_VALUE;
+        Line apparatusLine = apparatusHeading == null ? null : find(printed, cutFrom, apparatusHeading);
+        // Physics centres its Summary across both columns (ch 2 p9), and reading order finishes both
+        // columns above it first; read as a left-column heading it dropped the whole right column.
+        // Centred on the printed text block, not on the page: glyph positions are measured from the crop
+        // box and the page width passed in is the media box's, 54 pt wider on that book.
+        Set<Line> pageProse = prose(printed, pageBody);
+        double textLeft = pageProse.stream().mapToDouble(line -> line.x).min().orElse(0);
+        double textRight = pageProse.stream().mapToDouble(line -> line.end).max().orElse(0);
+        boolean centred = apparatusLine != null && textRight > textLeft
+                && Math.abs((apparatusLine.x + apparatusLine.end) / 2 - (textLeft + textRight) / 2)
+                        <= CENTRED * (textRight - textLeft);
+        List<Line> lines = apparatusLine == null ? printed
+                : above(printed, centred ? Double.MAX_VALUE : cutFrom, apparatusLine);
+        // A cut page's body is what is above the cut, when there is enough of it to say: Physics sets
+        // its Summary a point smaller than the text, and on phy11-part1 ch 4 p18 the Summary outnumbers
+        // the teaching above it, so the page's commonest size made that teaching not body text.
+        double body = apparatusLine != null && lines.stream().mapToInt(Line::glyphs).sum() >= MIN_BODY_GLYPHS
+                ? bodySize(lines) : pageBody;
+        // A line's size is its commonest glyph's, which a heading set in SMALL CAPS loses: bio11 sets
+        // "2.4 KINGDOM PLANTAE" with a 13 pt initial and 9 pt capitals, so the modal size is 9 against
+        // a body of 10 and the floor — which is here to drop running heads and captions — dropped the
+        // heading before anything could read it. Its largest glyph is what says it is not small text
+        // (2026-09-24; the three headings of ch 2 p10, and the rows beneath them, were named by the
+        // start check as rows the print does not start).
+        // The bold face is what keeps the running head out: bio11 sets that in small caps too
+        // ("BIOLOGICAL CLASSIFICATION", 7 pt on an 11 pt initial), and admitting it would make the
+        // page's first line something that is neither prose nor a heading, which says nothing.
+        List<Line> readable = lines.stream()
+                .filter(line -> line.size >= body - BODY_SIZE_TOLERANCE || (line.bold && line.largest >= body))
+                .toList();
+        Set<Line> prose = prose(readable, body);
+        Map<Boolean, List<Line>> columns = new HashMap<>();
+        for (Line line : readable) {
+            columns.computeIfAbsent(line.x >= rightFrom, right -> new ArrayList<>()).add(line);
+        }
+
+        List<String> starts = new ArrayList<>();
+        Top top = Top.unknown;
+        String topLine = null;
+        boolean topJudged = false;
+        // Where the right column's text begins, for the one check below on the left column's first line.
+        double rightTop = columns.getOrDefault(true, List.of()).stream()
+                .filter(line -> Math.abs(line.size - body) <= BODY_SIZE_TOLERANCE)
+                .mapToDouble(line -> line.y).min().orElse(Double.MAX_VALUE);
+        for (boolean right : new boolean[] {false, true}) {
+            List<Line> column = new ArrayList<>(columns.getOrDefault(right, List.of()));
+            column.sort(Comparator.comparingDouble((Line line) -> line.y).thenComparingDouble(line -> line.x));
+            Double margin = commonest(column.stream().filter(prose::contains).map(line -> line.x).toList());
+            boolean afterHeading = false;
+            for (Line line : column) {
+                // A left column whose first line in the layer sits far below where the right column's
+                // text begins has something above it the layer cannot see — on chapter 7 page 11, the
+                // displayed equations that finish page 10's paragraph — so it cannot say what it continues.
+                if (!topJudged && !right && line.y - rightTop > FAR_BELOW_LINES * body) {
+                    topJudged = true;
+                }
+                // A heading may run to a second line of capitals, which is still the heading.
+                boolean heading = line.bold && (HEADING.matcher(line.text).find()
+                        || (afterHeading && (line.isCapitals() || line.isHeadingWrap())));
+                boolean isProse = prose.contains(line);
+                boolean start = false;
+                if (isProse && !heading) {
+                    start = afterHeading
+                            || EXAMPLE.matcher(line.text).find()
+                            || (line.bold && ANSWER.matcher(line.text).find())
+                            || ITEM.matcher(line.text).find()
+                            || indented(line, column, prose, margin, body);
+                }
+                if (!topJudged && !column.isEmpty()) {
+                    topJudged = true;
+                    if (isProse && !heading) {
+                        top = start ? Top.starts : Top.continues;
+                        topLine = line.quote();
+                    } else if (heading) {
+                        top = Top.starts;
+                        topLine = line.quote();
+                    }
+                }
+                if (start) {
+                    starts.add(line.quote());
+                }
+                if (heading) {
+                    afterHeading = true;
+                } else if (isProse) {
+                    afterHeading = false;
+                }
+            }
+        }
+
+        // Captions from the whole page, cut or not: a Summary carries no figure, and a figure the
+        // teaching above the heading names can be set anywhere on its page.
+        Set<String> captions = new LinkedHashSet<>();
+        for (Line line : printed) {
+            if (line.bold) {
+                FigureLabels.of(line.text).ifPresent(label -> captions.add(label.base()));
+            }
+        }
+        List<String> equationNumbers = new ArrayList<>();
+        for (Line line : lines) {
+            Matcher number = EQUATION_NUMBER.matcher(line.text);
+            while (number.find()) {
+                equationNumbers.add(number.group());
+            }
+        }
+        Apparatus apparatus = apparatusHeading == null ? null
+                : new Apparatus(apparatusLine != null, apparatusLine == null ? 0 : prose.size());
+        return new PageShape(starts, top, topLine, List.copyOf(captions), equationNumbers,
+                bottom(columns, prose), apparatus);
+    }
+
+    /**
+     * The apparatus heading's line: the first in reading order — the left column top to bottom, then
+     * the right — that reads as the heading once spaces are ignored, because bio11 sets it with a large
+     * initial and small capitals and a gap between the two can read as a space. Null when there is none.
+     */
+    private static Line find(List<Line> lines, double rightFrom, String heading) {
+        String wanted = heading.replace(" ", "");
+        return lines.stream()
+                .sorted(Comparator.comparing((Line line) -> line.x >= rightFrom).thenComparingDouble(line -> line.y))
+                .filter(line -> line.text.replace(" ", "").equalsIgnoreCase(wanted))
+                .findFirst().orElse(null);
+    }
+
+    /**
+     * What reading order reaches before the heading: in its own column, the lines above it; in the left
+     * column when it heads the right, all of them; in the right column when it is in the left, none.
+     */
+    private static List<Line> above(List<Line> lines, double rightFrom, Line heading) {
+        boolean headingRight = heading.x >= rightFrom;
+        return lines.stream()
+                .filter(line -> {
+                    boolean right = line.x >= rightFrom;
+                    return right == headingRight ? line.y < heading.y - SAME_LINE : !right;
+                })
+                .toList();
+    }
+
+    /**
+     * How the page's last paragraph ends, measured on the last line that starts at its column's own
+     * margin. Reading order ends in the right column where there is one; a line set in from the
+     * margin is an indented first line, and a caption or a label sets a margin of its own, so neither
+     * is what the page's last paragraph ends on ({@code bio11} ch 3 p6, whose figure caption sits
+     * below the two lines that matter).
+     */
+    private static Bottom bottom(Map<Boolean, List<Line>> columns, Set<Line> prose) {
+        for (boolean right : new boolean[] {true, false}) {
+            List<Line> column = columns.getOrDefault(right, List.of()).stream().filter(prose::contains).toList();
+            // Reading order ends in the right column, but only where there is one: a handful of lines
+            // reaching across the gutter is not a column, and on bio11 ch 4 p10 two of them outvoted
+            // the twenty-nine that are the page (2026-09-23).
+            if (column.isEmpty() || (right && column.size() < MARGIN_LINES)) {
+                continue;
+            }
+            Double margin = commonest(column.stream().map(line -> line.x).toList());
+            List<Line> atMargin = margin == null ? List.of()
+                    : column.stream().filter(line -> Math.abs(line.x - margin) <= AT_MARGIN).toList();
+            // A stray segment on one side of the gutter is not a column: fall through to the other
+            // rather than calling the page unreadable, which is what a figure page's caption does.
+            if (atMargin.isEmpty()) {
+                continue;
+            }
+            double measure = atMargin.stream().mapToDouble(line -> line.end).max().orElseThrow();
+            Line last = atMargin.stream().max(Comparator.comparingDouble(line -> line.y)).orElseThrow();
+            return measure - last.end > AT_MEASURE ? Bottom.ends : Bottom.continues;
+        }
+        return Bottom.unknown;
+    }
+
+    /**
+     * Set in from the prose line directly beneath it — or, when what follows it is not prose (a
+     * display, a figure, the end of the column), from the column's commonest margin. The fallback
+     * is that narrow on purpose: a box's last line followed by prose at the column's margin is the
+     * box's own margin, not an indent.
+     */
+    private static boolean indented(Line line, List<Line> column, Set<Line> prose, Double margin, double body) {
+        // "Below" and "above" mean a different visual line: an italic symbol's baseline sits a point
+        // or two off its line's and is not the line beneath it.
+        Line next = null;
+        Line previous = null;
+        for (Line candidate : column) {
+            if (candidate.y > line.y + 0.5 * body && next == null) {
+                next = candidate;
+            }
+            if (candidate.y < line.y - 0.5 * body) {
+                previous = candidate;
+            }
+        }
+        double reference;
+        if (next != null && prose.contains(next) && next.y - line.y <= 2 * body) {
+            reference = next.x;
+        } else if (previous != null && prose.contains(previous) && line.y - previous.y <= 2 * body) {
+            // Nothing to compare with close beneath — a display or a figure follows — so the line above:
+            // the previous paragraph's last line sits at the margin this one is set in from, and a
+            // box's own lines share the box's margin.
+            reference = previous.x;
+        } else if (margin != null) {
+            reference = margin;
+        } else {
+            return false;
+        }
+        double inset = line.x - reference;
+        return inset >= MIN_INDENT && inset <= MAX_INDENT;
+    }
+
+    /**
+     * Where the right column begins: the left column's margin is the leftmost start that several prose
+     * lines in the left half share — not the commonest, because a verso page's right column can start
+     * left of the middle and outnumber the left column's flush lines (chapter 7 page 7) — and a line
+     * starting most of the way from it to the middle is the right column's. With no such margin the
+     * page is one column.
+     */
+    private static double columnBoundary(List<Line> lines, double pageWidth) {
+        if (lines.isEmpty()) {
+            return Double.MAX_VALUE;
+        }
+        double body = bodySize(lines);
+        Map<Long, List<Double>> byPoint = new TreeMap<>();
+        prose(lines, body).stream().filter(line -> line.x < pageWidth / 2)
+                .forEach(line -> byPoint.computeIfAbsent(Math.round(line.x), point -> new ArrayList<>()).add(line.x));
+        Double leftMargin = byPoint.values().stream().filter(group -> group.size() >= MARGIN_LINES)
+                .map(List::getFirst).findFirst().orElse(null);
+        return leftMargin == null ? Double.MAX_VALUE : leftMargin + 0.8 * (pageWidth / 2 - leftMargin);
+    }
+
+    /** Body-size lines that are mostly words, by identity: two lines may read the same. */
+    private static Set<Line> prose(List<Line> lines, double body) {
+        Set<Line> prose = Collections.newSetFromMap(new IdentityHashMap<>());
+        lines.stream()
+                .filter(line -> Math.abs(line.size - body) <= BODY_SIZE_TOLERANCE && line.isProse())
+                .forEach(prose::add);
+        return prose;
+    }
+
+    private static double gap(Glyph previous, Glyph next) {
+        return next.x - (previous.x + previous.width);
+    }
+
+    private static List<Line> lines(List<Glyph> glyphs, java.util.function.BiPredicate<Glyph, Glyph> splits) {
+        List<Glyph> sorted = glyphs.stream()
+                .filter(glyph -> glyph.text != null && !glyph.text.isBlank())
+                .sorted(Comparator.comparingDouble(Glyph::y).thenComparingDouble(Glyph::x))
+                .toList();
+        List<List<Glyph>> rows = new ArrayList<>();
+        for (Glyph glyph : sorted) {
+            if (rows.isEmpty() || glyph.y - rows.getLast().getFirst().y > SAME_LINE) {
+                rows.add(new ArrayList<>());
+            }
+            rows.getLast().add(glyph);
+        }
+        List<Line> lines = new ArrayList<>();
+        for (List<Glyph> row : rows) {
+            row.sort(Comparator.comparingDouble(Glyph::x));
+            List<Glyph> segment = new ArrayList<>();
+            for (Glyph glyph : row) {
+                if (!segment.isEmpty()) {
+                    if (splits.test(segment.getLast(), glyph)) {
+                        lines.add(Line.of(segment));
+                        segment = new ArrayList<>();
+                    }
+                }
+                segment.add(glyph);
+            }
+            lines.add(Line.of(segment));
+        }
+        return lines;
+    }
+
+    /** The size most glyphs are set in, to the half point. */
+    private static double bodySize(List<Line> lines) {
+        Map<Double, Integer> counts = new HashMap<>();
+        lines.forEach(line -> counts.merge(Math.round(line.size * 2) / 2.0, line.glyphs, Integer::sum));
+        return counts.entrySet().stream().max(Map.Entry.comparingByValue()).orElseThrow().getKey();
+    }
+
+    /** The most frequent value to the nearest point, or null for too few to call one a margin. */
+    private static Double commonest(List<Double> values) {
+        Map<Long, List<Double>> byPoint = new HashMap<>();
+        values.forEach(value -> byPoint.computeIfAbsent(Math.round(value), point -> new ArrayList<>()).add(value));
+        return byPoint.values().stream()
+                .max(Comparator.comparingInt((List<Double> group) -> group.size())
+                        .thenComparingDouble(group -> -group.getFirst()))
+                .filter(group -> group.size() >= 2)
+                .map(List::getFirst)
+                .orElse(null);
+    }
+
+    /** One run of glyphs on one baseline with no wide gap in it. */
+    /**
+     * @param x   where the line begins, and {@code end} where its last glyph stops — the pair is what
+     *            tells a line set to the column's measure from a paragraph's ragged last one
+     */
+    private record Line(double x, double end, double y, double size, double largest, boolean bold, String text,
+            int glyphs) {
+
+        static Line of(List<Glyph> glyphs) {
+            StringBuilder text = new StringBuilder();
+            Glyph previous = null;
+            Map<Double, Integer> sizes = new HashMap<>();
+            for (Glyph glyph : glyphs) {
+                if (previous != null && glyph.x - (previous.x + previous.width) > 0.15 * glyph.size) {
+                    text.append(' ');
+                }
+                text.append(glyph.text);
+                sizes.merge(Math.round(glyph.size * 2) / 2.0, 1, Integer::sum);
+                previous = glyph;
+            }
+            double size = sizes.entrySet().stream().max(Map.Entry.comparingByValue()).orElseThrow().getKey();
+            Glyph first = glyphs.getFirst();
+            String font = first.font == null ? "" : first.font.toLowerCase(Locale.ROOT);
+            boolean bold = font.contains("bold") || font.contains("demi") || font.contains("black")
+                    || font.contains("heavy");
+            double largest = glyphs.stream().mapToDouble(Glyph::size).max().orElse(size);
+            return new Line(first.x, previous.x + previous.width, first.y, size, largest, bold,
+                    text.toString().replaceAll("\\s+", " ").strip(), glyphs.size());
+        }
+
+        /**
+         * Mostly words: three or more, and at least half of the line's tokens. A word has a vowel, so
+         * a display's symbol runs — "mV GmM mV" — are not words however many letters they carry.
+         */
+        boolean isProse() {
+            // A display carried onto the next line or the next page opens with its operator, and no
+            // paragraph does. Chapter 6 page 27 begins "= 2π × angular speed in rev/s", the tail of a
+            // definition started on page 26: prose enough by the count below, 35.7 pt in, and read as a
+            // paragraph start until this line was added (2026-09-19).
+            if (OPENS_WITH_OPERATOR.matcher(text).lookingAt()) {
+                return false;
+            }
+            List<String> tokens = Arrays.stream(text.split(" "))
+                    .map(token -> token.replaceAll("^[^A-Za-z]+|[^A-Za-z]+$", ""))
+                    .toList();
+            long words = tokens.stream().filter(token -> WORD.matcher(token).matches()).count();
+            // What is left of a symbol the layer could not carry does not count against the words.
+            // PDFBox drops a subscript and strands its letter, so chapter 6 page 17's "Here K₁, K₂ and
+            // K₃ are constants; Lx, Ly and" arrives as "Here K , K  and K  are constants; L , L  and" —
+            // five words among fifteen tokens, which failed this test and left the line unable to start
+            // a paragraph, hiding a printed start no report has ever named (2026-09-19). One character
+            // is never a word of the line; it is the arithmetic the layer lost.
+            long counted = tokens.stream().filter(token -> token.length() >= 2).count();
+            return words >= 3 && words * 2 >= counted;
+        }
+
+        /** Every letter a capital, and enough of them to be words. */
+        boolean isCapitals() {
+            String letters = text.replaceAll("[^\\p{L}]", "");
+            return letters.length() >= 3 && letters.equals(letters.toUpperCase(Locale.ROOT));
+        }
+
+        /**
+         * The rest of a Title-Case heading that did not fit its line: a few bold words, no sentence.
+         * The word count is what keeps a run-in label out — "Tidal Volume (TV): Volume of air inspired
+         * or" is bold and Title Case at its head, and it opens a paragraph rather than closing a
+         * heading.
+         */
+        boolean isHeadingWrap() {
+            return !text.isEmpty() && Character.isUpperCase(text.charAt(0))
+                    && text.split(" ").length <= HEADING_WRAP_WORDS
+                    && text.chars().noneMatch(character -> ".:;?!".indexOf(character) >= 0);
+        }
+
+        String quote() {
+            String[] tokens = text.split(" ");
+            return String.join(" ", Arrays.copyOf(tokens, Math.min(tokens.length, QUOTED_WORDS)));
+        }
+    }
+
+    /** The glyphs of one page as PDFBox positions them, private-use codepoints decoded. */
+    private static final class GlyphCollector extends PDFTextStripper {
+
+        private final List<Glyph> glyphs = new ArrayList<>();
+
+        @Override
+        protected void writeString(String text, List<TextPosition> positions) {
+            for (TextPosition position : positions) {
+                String font = position.getFont() == null ? "" : position.getFont().getName();
+                glyphs.add(new Glyph(position.getXDirAdj(), position.getYDirAdj(), position.getWidthDirAdj(),
+                        position.getFontSizeInPt(), font, PdfTextLayer.decodePrivateUse(position.getUnicode())));
+            }
+        }
+    }
+}

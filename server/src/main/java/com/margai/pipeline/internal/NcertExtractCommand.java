@@ -1,6 +1,7 @@
 package com.margai.pipeline.internal;
 
 import com.margai.ai.api.AiCallContext;
+import com.margai.ai.api.AiClientInfo;
 import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.AiSpend;
 import com.margai.ai.api.ImagePart;
@@ -11,9 +12,11 @@ import com.margai.storage.api.ObjectStore;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -54,19 +57,23 @@ class NcertExtractCommand extends NcertBookCommand {
     private final ObjectStore content;
     private final NcertPageExtractor extract;
     private final AiSpend spend;
+    private final AiClientInfo client;
     private final PipelineProperties properties;
 
-    NcertExtractCommand(ObjectStore content, NcertPageExtractor extract, AiSpend spend,
+    NcertExtractCommand(ObjectStore content, NcertPageExtractor extract, AiSpend spend, AiClientInfo client,
             PipelineProperties properties, Reports reports) {
         super(reports);
         this.content = content;
         this.extract = extract;
         this.spend = spend;
+        this.client = client;
         this.properties = properties;
     }
 
     @Override
     void run(BookDefinition definition, List<BookDefinition.Chapter> selected, Report report) {
+        guardLiveClient();
+        guardTranscribeModel();
         report.line("content store: " + content.describe());
         report.line("page tiles: " + properties.pageTiles()
                 + (properties.pageTiles() > 1 ? " (each page sent as overlapping bands, unscaled)" : " (whole page)"));
@@ -85,7 +92,11 @@ class NcertExtractCommand extends NcertBookCommand {
         List<List<String>> apparatusRows = new ArrayList<>();
         List<List<String>> textLayerRows = new ArrayList<>();
         List<String> diffFlags = new ArrayList<>();
+        List<String> notationFlags = new ArrayList<>();
         List<String> structureFlags = new ArrayList<>();
+        List<EmptyPage> emptyPages = new ArrayList<>();
+        List<String> notJudged = new ArrayList<>();
+        List<String> boundaryPages = new ArrayList<>();
         List<String> lowConfidence = new ArrayList<>();
         int called = 0;
         int skipped = 0;
@@ -101,7 +112,8 @@ class NcertExtractCommand extends NcertBookCommand {
             // The chapter's own text layer, read once and used twice: to find where the chapter
             // stops teaching, and — when it can be trusted — as the character-level authority sent
             // alongside each page image (DECISIONS 2026-09-13, the §6.1 reversal).
-            List<String> pageTexts = PdfTextLayer.pages(content.get(definition.sourceKey(language, chapter)));
+            byte[] sourcePdf = content.get(definition.sourceKey(language, chapter));
+            List<String> pageTexts = PdfTextLayer.pages(sourcePdf);
             // Trust is judged per chapter, not per page: a page dense with equations scores low on
             // English words by construction, and gating per page would withhold the text layer from
             // exactly the pages it exists to fix.
@@ -112,11 +124,13 @@ class NcertExtractCommand extends NcertBookCommand {
 
             // Pages past the boundary are never sent: the model cannot reliably tell NCERT's
             // chapter-numbered exercises from its sections, and it does not have to if it never
-            // sees them (D14, ChapterApparatus).
-            Optional<ChapterApparatus.Boundary> apparatus = ChapterApparatus.find(pageTexts);
+            // sees them (D14, ChapterApparatus). The heading's own page is sent when teaching is
+            // printed above the heading, and placing it is read from the page's glyphs (D15).
+            Optional<ChapterApparatus.Boundary> apparatus = ChapterApparatus.locate(pageTexts, sourcePdf);
             apparatusRows.add(List.of(String.valueOf(chapter.no()),
-                    apparatus.map(boundary -> "page " + boundary.firstPage()).orElse("—"),
+                    apparatus.map(boundary -> "page " + boundary.page()).orElse("—"),
                     apparatus.map(ChapterApparatus.Boundary::heading).orElse("not found: every page is sent"),
+                    apparatus.map(ChapterApparatus.Boundary::itsPage).orElse("—"),
                     String.valueOf(apparatus.map(boundary -> pageKeys.stream()
                             .filter(key -> boundary.covers(ContentKeys.pageNumber(key))).count()).orElse(0L))));
 
@@ -133,11 +147,17 @@ class NcertExtractCommand extends NcertBookCommand {
                     continue;
                 }
                 ExtractedPage existing = done.get(chapter.no() + "/" + page);
-                // A page this run is not calling for still advances the address, when we know it:
-                // otherwise `--pages 3` would call page 3 with no previous address, the model would
-                // restart numbering, and the collision the founder was re-extracting to fix would
-                // come straight back — the remedy printed by the load's refusal could never work
-                // (spec-auditor, D14).
+                // Recorded as apparatus by a run whose boundary covered it, and sent now: the record
+                // is not a read, so the page is not done. This is how a plain resume re-extracts
+                // exactly the boundary pages the page-level skip discarded before 2026-09-24.
+                if (existing != null && existing.wasSkipped()) {
+                    existing = null;
+                }
+                // A page this run is not calling for still advances the state, when we know it:
+                // otherwise `--pages 3` would call page 3 with no previous section and no tail, the
+                // model would guess the section and could not judge a continuation, and the remedy
+                // printed by the load's refusal could never work (spec-auditor, D14; the state was
+                // the address through v2 and is the section and tail since v3).
                 if (pages != null && !pages.isEmpty() && !pages.contains(page)) {
                     previous = existing == null ? null : previousOf(existing, previous);
                     continue;
@@ -159,20 +179,51 @@ class NcertExtractCommand extends NcertBookCommand {
                 called++;
                 chapterCalled++;
                 chapterParagraphs += read.paragraphs().size();
+                // The notation check needs no layer: a degree sign not after a number is the
+                // layer's Greek letter copied through, whichever source the page came with (D15).
+                List<NcertPage.Paragraph> transcribedParagraphs = response.output().paragraphs();
+                for (int index = 0; index < transcribedParagraphs.size(); index++) {
+                    NcertPage.Paragraph paragraph = transcribedParagraphs.get(index);
+                    String at = "ch " + chapter.no() + " p" + page + " §" + paragraph.section() + " #" + (index + 1);
+                    NotationFlags.check(paragraph.text()).forEach(finding -> notationFlags.add(at + ": " + finding));
+                }
+                // The heading's page goes on its checklist whatever the layer: an illegible chapter's
+                // heading is sent unplaced, and its page is the one to read (2026-09-30).
+                boolean headingPage = apparatus.map(boundary -> boundary.page() == page).orElse(false);
+                if (headingPage) {
+                    boundaryPages.add("ch " + chapter.no() + " p" + page + ": "
+                            + read.paragraphs().size() + " paragraph(s) — "
+                            + apparatus.orElseThrow().itsPage());
+                }
                 // The character check and the structural flag, both against the page's own text
                 // layer and both free (FIX 4, FIX 6): they turn the founder's audit from reading
                 // every paragraph into adjudicating the flagged ones.
                 if (pageText != null) {
                     pagesChecked++;
-                    for (NcertPage.Paragraph paragraph : response.output().paragraphs()) {
+                    // Named by position on the page — "#3" — because the paragraph number does
+                    // not exist yet: since v3 `ncert load` assigns it (D15).
+                    List<NcertPage.Paragraph> readParagraphs = response.output().paragraphs();
+                    for (int index = 0; index < readParagraphs.size(); index++) {
+                        NcertPage.Paragraph paragraph = readParagraphs.get(index);
+                        String at = "ch " + chapter.no() + " p" + page + " §" + paragraph.section() + " #" + (index + 1);
                         TranscriptionDiff.check(pageText, paragraph.text()).forEach(finding ->
-                                diffFlags.add("ch " + chapter.no() + " p" + page + " §" + paragraph.section()
-                                        + " ¶" + paragraph.paraNo() + ": " + finding));
+                                diffFlags.add(at + ": " + finding));
                     }
                     String transcribed = response.output().paragraphs().stream()
                             .map(NcertPage.Paragraph::text).collect(java.util.stream.Collectors.joining(" "));
-                    PageCoverage.check(pageText, transcribed)
-                            .ifPresent(reason -> structureFlags.add("ch " + chapter.no() + " p" + page + ": " + reason));
+                    PageCoverage.Assessment coverage = PageCoverage.of(pageText, transcribed);
+                    String onPage = "ch " + chapter.no() + " p" + page + ": " + coverage.reason();
+                    // The heading's page carries the Summary in its layer and must not in its rows,
+                    // so a ratio of the two says nothing; it is on the checklist above instead.
+                    switch (headingPage ? PageCoverage.Verdict.MATCHED : coverage.verdict()) {
+                        case TOO_LITTLE_CAME_BACK, TOO_MUCH_CAME_BACK -> structureFlags.add(onPage);
+                        // Not a defect list but a checklist, and ordered prose-first at the end of
+                        // the run: a page whose layer reads as sentences and returned nothing is
+                        // the one to look at (D15, 2026-09-23).
+                        case NOTHING_CAME_BACK -> emptyPages.add(new EmptyPage(onPage, coverage.sentenceRuns()));
+                        case NOT_JUDGED -> notJudged.add(onPage);
+                        case MATCHED -> { }
+                    }
                 }
                 previous = PreviousPage.of(response.output(), previous);
                 if (read.confidence() != null && read.confidence().compareTo(LOW_CONFIDENCE) < 0) {
@@ -192,8 +243,8 @@ class NcertExtractCommand extends NcertBookCommand {
         int paragraphs = done.values().stream().mapToInt(page -> page.paragraphs().size()).sum();
         report.section("text layer (authoritative for characters where it is legible)")
                 .table(List.of("chapter", "disposition", "legibility"), textLayerRows);
-        report.section("end-of-chapter apparatus (never sent to the model)")
-                .table(List.of("chapter", "starts at", "heading", "pages not sent"), apparatusRows);
+        report.section("end-of-chapter apparatus (every page after the heading is never sent to the model)")
+                .table(List.of("chapter", "starts at", "heading", "its own page", "pages not sent"), apparatusRows);
         report.section("pages per chapter")
                 .table(List.of("chapter", "pages", "called", "paragraphs"), perChapter);
         report.section("total").table(
@@ -209,9 +260,25 @@ class NcertExtractCommand extends NcertBookCommand {
         report.section("characters that differ from the page's text layer — adjudicate these")
                 .line("checked: " + checked)
                 .list(diffFlags, pagesChecked == 0 ? "nothing was checked" : "none on the pages checked");
-        report.section("pages whose text is not all there — or is there twice")
+        Report coverage = report.section("pages whose text is not all there — or is there twice")
                 .line("checked: " + checked)
                 .list(structureFlags, pagesChecked == 0 ? "nothing was checked" : "none on the pages checked");
+        // Named rather than passed over: the floor is right — a ratio against 200 characters means
+        // nothing — but its silence hid three pages of bio11, one of them a biography (D15).
+        if (!notJudged.isEmpty()) {
+            coverage.line("").line("and " + notJudged.size() + " page(s) the ratio could not judge:").list(notJudged);
+        }
+        report.section("pages the Summary starts on — confirm the rows carry what is above the heading and nothing below it")
+                .line("the coverage ratio cannot judge these: the layer carries the Summary, the rows must not")
+                .list(boundaryPages, "none called this run");
+        report.section("pages that returned no running text — confirm each is a plate, a biography or a table")
+                .line("checked: " + checked)
+                .list(emptyPages.stream().sorted(Comparator.comparingInt(EmptyPage::sentenceRuns).reversed())
+                        .map(EmptyPage::line).toList(),
+                        pagesChecked == 0 ? "nothing was checked" : "every page checked returned something");
+        report.section("notation to adjudicate — a glyph the layer garbled and the model copied")
+                .line("checked: every paragraph of the " + called + " page(s) called this run")
+                .list(notationFlags, called == 0 ? "nothing was checked" : "none");
         report.section("low-confidence pages (below " + LOW_CONFIDENCE
                 + ") — a routing signal, not a guarantee").list(lowConfidence);
 
@@ -225,6 +292,47 @@ class NcertExtractCommand extends NcertBookCommand {
         report.line("jsonl: " + jsonlKey + " (" + done.size() + " pages, " + alreadyDone + " of them from earlier runs)");
     }
 
+    /**
+     * A real provider, or the run does not start — checked before the model, because a fixture is
+     * not a cheaper transcription but a different kind of thing altogether.
+     *
+     * <p>The damage is specific to this command and quieter than a wrong model. Fixture text would
+     * be written to {@code extract/{book}/{lang}.jsonl}, which is the book's canonical artefact and
+     * the one every later stage reads. And because {@code ncert extract} <em>resumes</em> — the
+     * JSONL is read first and a page already in it is never called for again — the fabricated pages
+     * would survive the next real run untouched, with nothing downstream able to tell a fixture
+     * from a page of NCERT. A run that fails costs nothing; this one costs the book.
+     */
+    private void guardLiveClient() {
+        if (!client.isLive()) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "the AI client is the fake (" + client + "): fixture text would be written to the book's "
+                            + "canonical JSONL, and a later run resumes past those pages rather than calling for "
+                            + "them — run with AI_LIVE=1 and the live profile");
+        }
+    }
+
+    /**
+     * The transcriber is the ruling's, or the run does not start (DECISIONS 2026-09-14 "the pair").
+     *
+     * <p>This is the mirror of {@code ncert verify --read-pages}'s guard and it was missing until
+     * 2026-09-22, which is not a symmetry point but a real hole: the VISION tier's default is
+     * {@code claude-haiku-4-5}, the D15 dry runs put that model out of transcription after three
+     * runs and three different layout failures on the two-column page, and the {@code visionopus}
+     * profile is the only thing that selects Opus. So a forgotten profile did not fail — it
+     * transcribed a whole book on the rejected model, wrote it to the canonical JSONL, and said so
+     * nowhere but the ledger. It has to refuse before the first call, because every page after the
+     * first is money spent on an artefact that has to be thrown away.
+     */
+    private void guardTranscribeModel() {
+        if (!Objects.equals(extract.model(), properties.transcribeModel())) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "the vision tier is " + extract.model() + ", not " + properties.transcribeModel()
+                            + " (margai.pipeline.transcribe-model, DECISIONS 2026-09-14 \"the pair\") — run with "
+                            + "`--spring.profiles.active=pipeline,live,visionopus`");
+        }
+    }
+
     /** Written in page order, so the file reads like the book however the run was interrupted. */
     private void flush(String key, Map<String, ExtractedPage> done) {
         List<ExtractedPage> ordered = new ArrayList<>(done.values());
@@ -234,8 +342,15 @@ class NcertExtractCommand extends NcertBookCommand {
         content.put(key, ExtractJsonl.write(ordered), "application/jsonl");
     }
 
-    /** Where a page already in the JSONL left off, so a resumed run continues the numbering too. */
+    /** Where a page already in the JSONL left off, so a resumed run carries its section and tail forward too. */
     private static PreviousPage previousOf(ExtractedPage page, PreviousPage before) {
         return PreviousPage.of(new NcertPage(page.paragraphs(), page.confidence()), before);
+    }
+
+    /**
+     * A page the model returned nothing for, held until the report can order them: the ones whose
+     * layer reads as running text first, because those are the ones worth opening.
+     */
+    private record EmptyPage(String line, int sentenceRuns) {
     }
 }

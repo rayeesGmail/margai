@@ -25,4 +25,11 @@ public interface NcertPageExtractor {
      */
     AiResponse<NcertPage> read(String bookTitle, short chapter, int page, List<ImagePart> images,
             String pageText, PreviousPage previous, AiCallContext ctx);
+
+    /**
+     * The model the VISION tier is configured with, for the guard that it is the transcriber. The
+     * mirror of {@link NcertPageVerifier#model()}, and for the same reason: which model reads the
+     * page is a profile away from being wrong, and only one of the two commands could say so.
+     */
+    String model();
 }

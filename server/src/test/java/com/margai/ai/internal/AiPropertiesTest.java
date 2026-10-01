@@ -44,9 +44,13 @@ class AiPropertiesTest {
             assertThat(properties.batchMinRecords()).isEqualTo(100);
             assertThat(properties.maxOutputTokens()).isEqualTo(1024);
             assertThat(properties.callTimeout()).isEqualTo(java.time.Duration.ofSeconds(20));
-            // v2 is the version a frozen corpus names (D14, DECISIONS 2026-09-13): v1 was amended
-            // between exploratory runs, so a paragraph row tracing to "v1" traces to nothing.
-            assertThat(properties.promptVersions()).containsEntry("smoke", 1).containsEntry("ncert_extract", 2);
+            // The active version is the one a frozen corpus names (D14, DECISIONS 2026-09-13): v1
+            // was amended between exploratory runs, so a row tracing to "v1" traces to nothing;
+            // v2 is phy11-part1's first canonical corpus; v3 moves paragraph numbering to the
+            // loader and is what both canonical books were transcribed on; v4 adds the unit-opener
+            // rule for the eight books still to come (D15, 2026-09-23); v5 keeps an unboxed italic
+            // activity or question as running text (D15, 2026-09-26).
+            assertThat(properties.promptVersions()).containsEntry("smoke", 1).containsEntry("ncert_extract", 5);
             assertThat(properties.anthropic().apiKey()).isEmpty();
             assertThat(properties.cohere().apiKey()).isEmpty();
             assertThat(properties.cohere().baseUrl()).startsWith("https://");

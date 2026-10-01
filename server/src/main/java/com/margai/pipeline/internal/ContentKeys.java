@@ -11,6 +11,7 @@ import com.margai.curriculum.api.BookLanguage;
  * source/ncert/2022-ed/{lang}/{book}/{file}.pdf   the founder's upload, mirroring the local tree
  * pages/{book}/{lang}/{chapter}/{page}.png        `ncert render`
  * extract/{book}/{lang}.jsonl                     `ncert extract`
+ * verify/{book}/{lang}.jsonl                      `ncert verify --read-pages`
  * </pre>
  */
 final class ContentKeys {
@@ -31,6 +32,19 @@ final class ContentKeys {
 
     static String extract(String book, BookLanguage language) {
         return "extract/" + book + "/" + language + ".jsonl";
+    }
+
+    /** {@code ncert verify --read-pages}' artefact: one line per page read (D15). */
+    static String verify(String book, BookLanguage language) {
+        return verify(book, language, null);
+    }
+
+    /**
+     * The same, under a tag for a scratch run — the seeded recall run reads a copy of the database and
+     * must never write into the real artefact (DECISIONS 2026-09-15): {@code verify/{book}/{lang}.{tag}.jsonl}.
+     */
+    static String verify(String book, BookLanguage language, String tag) {
+        return "verify/" + book + "/" + language + (tag == null ? "" : "." + tag) + ".jsonl";
     }
 
     /**

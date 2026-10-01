@@ -3,6 +3,7 @@ package com.margai.pipeline.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.ai.api.AiCallContext;
+import com.margai.ai.api.AiClientInfo;
 import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.AiSpend;
 import com.margai.ai.api.ImagePart;
@@ -45,6 +46,7 @@ class NcertExtractCommandTest {
     private final NcertRenderCommandTest.RecordingStore store = new NcertRenderCommandTest.RecordingStore();
     private final RecordingExtract extract = new RecordingExtract();
     private final StubSpend spend = new StubSpend();
+    private AiClientInfo client = new AiClientInfo("anthropic", List.of("ledger", "breaker"));
     private CommandLine commandLine;
 
     @BeforeEach
@@ -76,21 +78,62 @@ class NcertExtractCommandTest {
         page(8, 2);
         page(9, 1);
 
+        build();
+    }
+
+    /** Wiring the command, so a test that changes {@link #client} can rebuild before it runs. */
+    private void build() {
         Reports writer = new Reports(ReportTest.CLOCK);
-        PipelineProperties properties = new PipelineProperties(72, 2, 1);
+        PipelineProperties properties = new PipelineProperties(72, 2, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40);
         CommandLine.IFactory siblings =
                 PipelineCommandTest.siblingFactory(new PipelineCommandTest.RecordingImport(), writer);
         CommandLine.IFactory factory = new CommandLine.IFactory() {
             @Override
             public <K> K create(Class<K> cls) throws Exception {
                 if (cls == NcertExtractCommand.class) {
-                    return cls.cast(new NcertExtractCommand(store, extract, spend, properties, writer));
+                    return cls.cast(new NcertExtractCommand(store, extract, spend, client, properties, writer));
                 }
                 return siblings.create(cls);
             }
         };
         PrintWriter printer = new PrintWriter(out, true);
         commandLine = PipelineRunner.commandLine(factory).setOut(printer).setErr(printer);
+    }
+
+    /**
+     * The mirror of {@code ncert verify --read-pages}'s guard, and the one this command went
+     * without until 2026-09-22. The VISION default is Haiku, which the D15 dry runs put out of
+     * transcription; only the {@code visionopus} profile selects Opus. A forgotten profile has to
+     * fail before the first call, because the alternative is a book transcribed by the rejected
+     * model with nothing but the ledger to say so.
+     */
+    /**
+     * Fixture text written to the book's canonical JSONL is worse than a failed run, because the
+     * command resumes: a later real run reads the artefact first and calls for nothing it already
+     * holds, so the fabricated pages would never be re-read and nothing downstream could tell.
+     */
+    @Test
+    void refusesTheFakeClient() {
+        client = new AiClientInfo(AiClientInfo.FAKE, List.of("ledger"));
+        build();
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(extract.calls).isEmpty();
+        assertThat(store.exists(ContentKeys.extract("phy11-part2", BookLanguage.en))).isFalse();
+        assertThat(out.toString()).contains("the AI client is the fake").contains("AI_LIVE=1");
+    }
+
+    @Test
+    void refusesAVisionTierThatIsNotTheRulingsTranscriber() {
+        extract.model = "claude-haiku-4-5";
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(extract.calls).isEmpty();
+        assertThat(store.exists(ContentKeys.extract("phy11-part2", BookLanguage.en))).isFalse();
+        assertThat(out.toString()).contains("the vision tier is claude-haiku-4-5, not claude-opus-5")
+                .contains("visionopus");
     }
 
     @Test
@@ -110,24 +153,26 @@ class NcertExtractCommandTest {
     void eachPageCarriesThePreviousPagesTailAndEachChapterStartsFresh() {
         run();
 
-        assertThat(extract.tails).containsExactly(null, "text of 8/1", null);
+        assertThat(extract.addresses).containsExactly(null, "7.9", null);
     }
 
     /**
-     * The D14 blocker: the tail alone cannot tell a model what paragraph number to continue from,
-     * so the address travels with it and a new chapter starts from nothing.
+     * The section travels with the tail so a page with no heading keeps its section, and a new
+     * chapter starts from nothing. Through v2 the paragraph number travelled too; since v3 the
+     * loader counts, so there is no number to carry (D15).
      */
     @Test
-    void eachPageAlsoCarriesTheAddressThePreviousPageEndedAt() {
+    void eachPageAlsoCarriesTheSectionThePreviousPageEndedIn() {
         run();
 
-        assertThat(extract.addresses).containsExactly(null, "7.9 ¶1", null);
+        assertThat(extract.addresses).containsExactly(null, "7.9", null);
     }
 
     /**
-     * A figure page must not reset the address: it has no text of its own, so it carries the
-     * running section and paragraph number across and drops only the tail. Without this the next
-     * page restarts at 1 — the original blocker, reintroduced by its own first fix.
+     * A figure page must not reset the state: it has no text of its own, so it carries the
+     * running section across and drops only the tail. Without this the next page would have to
+     * guess its section — through v2 it also restarted the numbering, the original blocker,
+     * reintroduced by its own first fix.
      */
     @Test
     void aTextFreePageCarriesTheAddressAcrossAndDropsOnlyTheTail() {
@@ -137,11 +182,10 @@ class NcertExtractCommandTest {
         assertThat(run()).isZero();
 
         assertThat(extract.calls).containsExactly("8/1", "8/2", "8/3", "9/1");
-        assertThat(extract.addresses).containsExactly(null, "7.9 ¶1", "7.9 ¶1", null);
-        assertThat(extract.tails).containsExactly(null, "text of 8/1", null, null);
+        assertThat(extract.addresses).containsExactly(null, "7.9", "7.9", null);
     }
 
-    /** A resumed run must continue the numbering too, not restart it at the first uncalled page. */
+    /** A resumed run must carry the section and tail forward too, not start the first uncalled page cold. */
     @Test
     void aResumedRunCarriesTheAddressFromThePageAlreadyInTheJsonl() {
         commandLine.execute("ncert", "extract", "--book", "phy11-part2", "--chapters", "8", "--pages", "1",
@@ -151,7 +195,7 @@ class NcertExtractCommandTest {
         run();
 
         assertThat(extract.calls).contains("8/2");
-        assertThat(extract.addresses).containsExactly("7.9 ¶1", null);
+        assertThat(extract.addresses).containsExactly("7.9", null);
     }
 
     @Test
@@ -167,8 +211,8 @@ class NcertExtractCommandTest {
 
     /**
      * The remedy a load refusal prints is `--redo --chapters C --pages N`. If a `--pages`-filtered
-     * page did not advance the address, that command would call page N with nothing to continue
-     * from, the model would restart at 1, and the founder would pay to reproduce the same collision
+     * page did not advance the state, that command would call page N with no section and no tail,
+     * the model would guess, and the founder would pay to reproduce the same refusal
      * (spec-auditor, D14).
      */
     @Test
@@ -182,7 +226,7 @@ class NcertExtractCommandTest {
                 "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
 
         assertThat(extract.calls).containsExactly("8/2");
-        assertThat(extract.addresses).containsExactly("7.9 ¶1");
+        assertThat(extract.addresses).containsExactly("7.9");
     }
 
     @Test
@@ -194,6 +238,18 @@ class NcertExtractCommandTest {
                 "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
 
         assertThat(extract.calls).containsExactly("8/1", "8/2", "9/1");
+    }
+
+    /** A degree sign not after a number is the text layer's τ copied through; the report names it whether or not a layer was fed. */
+    @Test
+    void aStrayDegreeSignIsFlaggedInTheReport() {
+        extract.degree.add("8/2");
+
+        run();
+
+        assertThat(out.toString())
+                .contains("## notation to adjudicate")
+                .contains("ch 8 p2 §7.9 #1: a degree sign not after a number");
     }
 
     @Test
@@ -209,6 +265,50 @@ class NcertExtractCommandTest {
                 store.get(ContentKeys.extract("phy11-part2", BookLanguage.en)));
         assertThat(written).extracting(ExtractedPage::address).containsExactly("8/1", "8/2", "9/1");
         assertThat(written.get(1).paragraphs()).isEmpty();
+    }
+
+    /**
+     * A page that returned nothing is not a ratio and is not a defect. Eleven of {@code bio11}'s
+     * fourteen coverage flags were this — five unit openers, five biographies and the plates, every
+     * one a page the prompt tells the model to return nothing for — so they are a checklist of
+     * their own, ordered prose-first: the layer's sentences are what tells a biography from a
+     * plate, and their character counts are not (recalibration, 2026-09-23).
+     */
+    @Test
+    void pagesThatReturnedNothingAreAChecklistOfTheirOwnOrderedProseFirst() throws IOException {
+        store.put("source/ncert/2022-ed/en/phy11-part2/keph201.pdf",
+                pdf(List.of(List.of("Fig. 3.1 Algae : (a) Volvox (b) Ulothrix (c) Fucus"),
+                        List.of("Katherine Esau was born in Ukraine in the year 1898 and she studied there.",
+                                "She received the degree in the year 1931 and she taught there until 1963.",
+                                "The book that she wrote in the year 1953 is the one that is read today."))),
+                "application/pdf");
+        extract.empty.add("8/1");
+        extract.empty.add("8/2");
+
+        assertThat(run()).isZero();
+
+        String report = out.toString();
+        assertThat(report).contains("## pages that returned no running text");
+        assertThat(report).contains("ch 8 p1: nothing came back; the layer holds")
+                .contains("and no sentence-length run")
+                .contains("in 3 sentence-length runs");
+        assertThat(report.indexOf("ch 8 p2: nothing came back"))
+                .isLessThan(report.indexOf("ch 8 p1: nothing came back"));
+        assertThat(report).doesNotContain("ch 8 p1: only 0% of the page's characters came back");
+    }
+
+    /**
+     * The 400-character floor is right — a ratio against a plate's caption means nothing — but it
+     * was silent, and its silence hid three pages of {@code bio11} including a biography nobody
+     * would have found except by hand. The fixture's pages are all under it.
+     */
+    @Test
+    void aPageTheRatioCannotJudgeIsNamedRatherThanPassedOverInSilence() {
+        assertThat(run()).isZero();
+
+        assertThat(out.toString()).contains("and 3 page(s) the ratio could not judge:")
+                .contains("ch 8 p1: the layer holds")
+                .contains("characters, too few to measure a ratio against");
     }
 
     @Test
@@ -264,14 +364,88 @@ class NcertExtractCommandTest {
 
         assertThat(extract.calls).containsExactly("8/1", "8/2", "9/1");
         assertThat(out.toString())
-                .contains("## end-of-chapter apparatus (never sent to the model)")
-                .contains("| 8 | page 3 | SUMMARY | 2 |");
+                .contains("## end-of-chapter apparatus (every page after the heading is never sent to the model)")
+                .contains("| 8 | page 3 | SUMMARY | not sent: nothing taught above the heading | 2 |");
 
         List<ExtractedPage> written = ExtractJsonl.read(ContentKeys.extract("phy11-part2", BookLanguage.en),
                 store.get(ContentKeys.extract("phy11-part2", BookLanguage.en)));
         assertThat(written).extracting(ExtractedPage::address).contains("8/3", "8/4");
         assertThat(written.stream().filter(ExtractedPage::wasSkipped)).hasSize(2)
                 .allSatisfy(page -> assertThat(page.skipped()).isEqualTo("apparatus from SUMMARY"));
+    }
+
+    /**
+     * The heading's page is sent when teaching is printed above the heading — before 2026-09-24 it
+     * never was, and bio11 lost prose in 14 of its 19 chapters to that. Its whole layer goes with it,
+     * because the layer's line order is not the page's (bio11 ch 14 p11 carries the heading first),
+     * and the coverage ratio does not judge it: the layer carries the Summary and the rows must not.
+     */
+    @Test
+    void theHeadingsPageIsSentWhenTeachingIsPrintedAboveIt() throws IOException {
+        store.put("source/ncert/2022-ed/en/phy11-part2/keph201.pdf", pdf(List.of(
+                filled("7.1 the first section of the chapter as we have written it here"),
+                filled("7.2 the second section of the chapter as it is printed on the page"),
+                List.of("When fats are used in respiration the quotient is less than one,",
+                        "and when proteins are used the ratio would be about nine tenths.",
+                        "SUMMARY",
+                        "This is the text of the page and it is written in the words that we use,",
+                        "with the same of and to in a that as it for on by an which be are this."),
+                filled("7.1 Answer the following questions that are set for the student to do"))),
+                "application/pdf");
+        page(8, 3);
+        page(8, 4);
+
+        assertThat(run()).isZero();
+
+        assertThat(extract.calls).containsExactly("8/1", "8/2", "8/3", "9/1");
+        assertThat(extract.pageTexts.get(2)).contains("When fats are used").contains("SUMMARY");
+        assertThat(out.toString())
+                .contains("| 8 | page 3 | SUMMARY | sent: 2 prose line(s) above the heading | 1 |")
+                .contains("ch 8 p3: 1 paragraph(s) — sent: 2 prose line(s) above the heading");
+        // Named on the heading-page checklist and nowhere else: no coverage flag, no empty-page entry.
+        assertThat(out.toString().split("ch 8 p3:", -1)).hasSize(2);
+    }
+
+    /**
+     * An artefact written before 2026-09-24 records the heading's page as apparatus. A plain resume
+     * must read it now, or re-extracting the pages the old skip discarded would need a `--redo` per
+     * chapter — and a single-page call costs twice what a page in a long run does.
+     */
+    @Test
+    void aResumeReadsAHeadingPageAnEarlierRunRecordedAsApparatus() throws IOException {
+        store.put("source/ncert/2022-ed/en/phy11-part2/keph201.pdf", pdf(List.of(
+                filled("7.1 the first section of the chapter as we have written it here"),
+                filled("7.2 the second section of the chapter as it is printed on the page"),
+                List.of("When fats are used in respiration the quotient is less than one,",
+                        "and when proteins are used the ratio would be about nine tenths.",
+                        "SUMMARY",
+                        "This is the text of the page and it is written in the words that we use,",
+                        "with the same of and to in a that as it for on by an which be are this."),
+                filled("7.1 Answer the following questions that are set for the student to do"))),
+                "application/pdf");
+        page(8, 3);
+        page(8, 4);
+        String key = ContentKeys.extract("phy11-part2", BookLanguage.en);
+        store.put(key, ExtractJsonl.write(List.of(
+                ExtractedPage.of((short) 8, 1, new NcertPage(List.of(
+                        new NcertPage.Paragraph("7.1", "text of 8/1", false, List.of())), BigDecimal.ONE), null),
+                ExtractedPage.of((short) 8, 2, new NcertPage(List.of(
+                        new NcertPage.Paragraph("7.2", "text of 8/2", false, List.of())), BigDecimal.ONE), null),
+                ExtractedPage.skipped((short) 8, 3, "apparatus from SUMMARY"),
+                ExtractedPage.skipped((short) 8, 4, "apparatus from SUMMARY"),
+                ExtractedPage.of((short) 9, 1, new NcertPage(List.of(
+                        new NcertPage.Paragraph("8.1", "text of 9/1", false, List.of())), BigDecimal.ONE), null))),
+                "application/x-ndjson");
+
+        assertThat(run()).isZero();
+
+        assertThat(extract.calls).containsExactly("8/3");
+        assertThat(extract.addresses).containsExactly("7.2");
+        List<ExtractedPage> written = ExtractJsonl.read(key, store.get(key));
+        assertThat(written).filteredOn(page -> page.address().equals("8/3")).singleElement()
+                .satisfies(page -> assertThat(page.wasSkipped()).isFalse());
+        assertThat(written).filteredOn(page -> page.address().equals("8/4")).singleElement()
+                .satisfies(page -> assertThat(page.skipped()).isEqualTo("apparatus from SUMMARY"));
     }
 
     /**
@@ -308,7 +482,32 @@ class NcertExtractCommandTest {
                 .contains("checked: 1 of the 3 page(s) called this run (the rest had no usable text layer)");
     }
 
-    /** A chapter whose text layer cannot be read sends every page: skipping blind would drop teaching. */
+    /**
+     * chem11-part2 ch 8 ({@code kech202.pdf}): its body is shifted, so the layer is withheld, but its
+     * Summary heading is set in a font that is not, and the exercises after it are numbered 8.1, 8.2 —
+     * the shape D14 found read as sections. A shift cannot print an exact heading line, so every page
+     * after it is apparatus whatever the layer is. The heading's own page is still sent: whether
+     * teaching sits above the heading is read from prose, which this layer does not carry (2026-09-30).
+     */
+    @Test
+    void anIllegibleChapterSkipsThePagesAfterAHeadingItPrintsPlainlyAndSendsTheHeadingsPage() throws IOException {
+        store.put("source/ncert/2022-ed/en/phy11-part2/keph201.pdf",
+                pdf(List.of(garbled(), garbled(), garbled("summary"), garbled())), "application/pdf");
+        page(8, 3);
+        page(8, 4);
+
+        assertThat(run()).isZero();
+
+        assertThat(extract.calls).containsExactly("8/1", "8/2", "8/3", "9/1");
+        assertThat(extract.pageTexts.subList(0, 3)).containsOnlyNulls();
+        assertThat(out.toString()).contains("| 8 | withheld: illegible |")
+                .contains("| 8 | page 3 | SUMMARY | sent: the heading could not be placed on it | 1 |")
+                // The heading-page checklist needs no layer: chem11-part2 ch 8's first run said "none
+                // called this run" of the p36 it had just called (2026-09-30).
+                .contains("ch 8 p3: 1 paragraph(s) — sent: the heading could not be placed on it");
+    }
+
+    /** A chapter whose layer carries no apparatus heading sends every page: nothing is skipped on a guess. */
     @Test
     void aChapterWithNoDetectableApparatusSendsEveryPage() {
         assertThat(run()).isZero();
@@ -337,11 +536,14 @@ class NcertExtractCommandTest {
      * argument is one page; the filler makes the page legible English by the measured standard.
      */
     private static byte[] pdfWithText(String... pageTexts) throws IOException {
-        return pdf(java.util.Arrays.stream(pageTexts)
-                .map(text -> List.of(text,
-                        "This is the text of the page and it is written in the words that we use,",
-                        "with the same of and to in a that as it for on by an which be are this."))
-                .toList());
+        return pdf(java.util.Arrays.stream(pageTexts).map(NcertExtractCommandTest::filled).toList());
+    }
+
+    /** One page's lines: the given first line, then the filler that makes it legible. */
+    private static List<String> filled(String first) {
+        return List.of(first,
+                "This is the text of the page and it is written in the words that we use,",
+                "with the same of and to in a that as it for on by an which be are this.");
     }
 
     /**
@@ -350,10 +552,15 @@ class NcertExtractCommandTest {
      * them are English, which is exactly why {@link PdfTextLayer} scores it near zero.
      */
     private static byte[] garbledPdf(int pages) throws IOException {
-        List<String> page = List.of(
-                "LVRPHULVP DQG WKH VWUXFWXUH RI PDWWHU LQ WKH ILUVW FKDSWHU RI WKLV ERRN",
-                "DQG WKH ZRUGV WKDW DUH SULQWHG KHUH DUH QRW WKH ZRUGV WKH IRQW FODLPV");
-        return pdf(java.util.stream.IntStream.range(0, pages).mapToObj(index -> page).toList());
+        return pdf(java.util.stream.IntStream.range(0, pages).mapToObj(index -> garbled()).toList());
+    }
+
+    /** One page of the shifted text, after any lines of its own the page prints in a font that is not shifted. */
+    private static List<String> garbled(String... plain) {
+        List<String> lines = new ArrayList<>(List.of(plain));
+        lines.add("LVRPHULVP DQG WKH VWUXFWXUH RI PDWWHU LQ WKH ILUVW FKDSWHU RI WKLV ERRN");
+        lines.add("DQG WKH ZRUGV WKDW DUH SULQWHG KHUH DUH QRW WKH ZRUGV WKH IRQW FODLPV");
+        return lines;
     }
 
     private static byte[] pdf(List<List<String>> pages) throws IOException {
@@ -391,12 +598,20 @@ class NcertExtractCommandTest {
     static final class RecordingExtract implements NcertPageExtractor {
 
         final List<String> calls = new ArrayList<>();
-        final List<String> tails = new ArrayList<>();
         final List<String> addresses = new ArrayList<>();
         final List<Integer> imageCounts = new ArrayList<>();
         final List<String> pageTexts = new ArrayList<>();
         final List<String> empty = new ArrayList<>();
+        final List<String> degree = new ArrayList<>();
         final List<String> lowConfidence = new ArrayList<>();
+
+        /** The VISION tier as the run finds it configured; the ruling's transcriber unless a test says otherwise. */
+        String model = "claude-opus-5";
+
+        @Override
+        public String model() {
+            return model;
+        }
 
         @Override
         public AiResponse<NcertPage> read(String bookTitle, short chapter, int page, List<ImagePart> images,
@@ -405,10 +620,10 @@ class NcertExtractCommandTest {
             calls.add(address);
             imageCounts.add(images.size());
             pageTexts.add(pageText);
-            tails.add(previous == null ? null : previous.tail());
-            addresses.add(previous == null ? null : previous.section() + " ¶" + previous.paraNo());
+            addresses.add(previous == null ? null : previous.section());
+            String text = degree.contains(address) ? "Where ° is the restoring couple of " + address : "text of " + address;
             List<NcertPage.Paragraph> paragraphs = empty.contains(address) ? List.of()
-                    : List.of(new NcertPage.Paragraph("7.9", 1, "text of " + address, List.of()));
+                    : List.of(new NcertPage.Paragraph("7.9", text, false, List.of()));
             BigDecimal confidence = lowConfidence.contains(address) ? new BigDecimal("0.40") : new BigDecimal("0.95");
             return new AiResponse<>(new NcertPage(paragraphs, confidence), Usage.none(), "fake",
                     Duration.ZERO, UUID.randomUUID());

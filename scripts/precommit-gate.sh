@@ -24,7 +24,11 @@ trap 'echo "precommit-gate: internal error at line $LINENO — failing closed" >
 ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 cd "$ROOT"
 
-AI_PATHS='^server/src/main/resources/prompts/|^server/.*/ai/|^(server|eval)/([^/]*/)*[^/]*([Rr]outer|[Rr]outing|[Rr]etriev)[^/]*(/|$)|^eval/fixtures/.+\.(json|jsonl|ya?ml|csv)$'
+#   6. server/src/main/resources/application*.yml carries margai.ai.* — the tier routing shapes and,
+#      since D15, margai.ai.retrieval's k-vector/k-text/rrf-k/similarity-floor. Those are named as
+#      eval-gated by .claude/rules/ai-layer.md but lived in a file no alternative below matched, so
+#      changing the retrieval weighting would have committed unstamped (spec-auditor, D15).
+AI_PATHS='^server/src/main/resources/prompts/|^server/.*/ai/|^(server|eval)/([^/]*/)*[^/]*([Rr]outer|[Rr]outing|[Rr]etriev)[^/]*(/|$)|^eval/fixtures/.+\.(json|jsonl|ya?ml|csv)$|^server/src/main/resources/application[^/]*\.ya?ml$'
 CODE_EXT='\.(java|kt|kts|dart|py|sh|sql|ya?ml|json|xml|properties|gradle|st|stg|toml|arb|ts|js)$'
 
 sha256() { if command -v sha256sum >/dev/null 2>&1; then sha256sum; else shasum -a 256; fi; }

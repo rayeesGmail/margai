@@ -29,8 +29,12 @@ final class SplitSentences {
     /** How a finished paragraph ends. A closing bracket counts: "... (3.30a)" is finished. */
     private static final Pattern FINISHED = Pattern.compile("[.?!:)\\]]\\s*$");
 
-    /** A lower-case English word, as opposed to a symbol like {@code a(t)} or {@code v_x}. */
-    private static final Pattern OPENS_LOWERCASE_WORD = Pattern.compile("^[a-z]{2,}[\\s,]");
+    /**
+     * A lower-case English word, as opposed to a symbol like {@code a(t)} or {@code v_x}. The word
+     * may be the whole of what was cut off, so it may end the sentence itself: "…nigrum and" +
+     * "melongena. Human beings…" (bio11 §1.2.1, D15).
+     */
+    private static final Pattern OPENS_LOWERCASE_WORD = Pattern.compile("^[a-z]{2,}[\\s,.;:]");
 
     private SplitSentences() {
     }

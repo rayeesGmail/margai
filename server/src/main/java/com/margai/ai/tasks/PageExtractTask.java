@@ -8,6 +8,7 @@ import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.ImagePart;
 import com.margai.ai.api.PromptRef;
 import com.margai.ai.api.Tier;
+import com.margai.ai.internal.AiProperties;
 import com.margai.ai.internal.PromptRegistry;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,10 +20,11 @@ import org.springframework.stereotype.Component;
  * on the VISION tier: NCERT's two-column layout, its equations and the legacy Hindi fonts defeat
  * text extractors, so the model reads the rendered page.
  *
- * <p>Where the previous page ended travels with the call — its section, its last paragraph number
- * and the tail of that paragraph's text — so a paragraph broken across a page boundary is
- * completed rather than duplicated, and paragraph numbering continues within a section instead of
- * restarting at every page (§6.3; {@link PreviousPage}).
+ * <p>The section the previous page ended in travels with the call, so a page with no heading
+ * keeps its section (§6.3; {@link PreviousPage}). Nothing else does: the paragraph number is the
+ * loader's since v3, and the previous page's text stopped travelling the same day, because the
+ * model echoed it (D15). Whether the page's first paragraph continues the previous one is
+ * judged from this page's own typography.
  *
  * <p>The chapter number is passed in, never asked of the model: it comes from the
  * founder-reviewed {@code books.yaml}, because a Part-II file's printed chapter differs from its
@@ -33,9 +35,11 @@ public class PageExtractTask implements NcertPageExtractor {
 
     private final AiClient ai;
     private final PromptRef prompt;
+    private final AiProperties properties;
 
-    PageExtractTask(AiClient ai, PromptRegistry prompts) {
+    PageExtractTask(AiClient ai, PromptRegistry prompts, AiProperties properties) {
         this.ai = ai;
+        this.properties = properties;
         this.prompt = prompts.require("ncert_extract");
     }
 
@@ -54,10 +58,16 @@ public class PageExtractTask implements NcertPageExtractor {
         // beside them, at any size, cost every prime on chapter 7 (PageTiles, D14).
         variables.put("tiles", images.size() > 1 ? images.size() : null);
         variables.put("previous_section", previous == null ? null : previous.section());
-        variables.put("previous_para_no", previous == null ? null : previous.paraNo());
-        variables.put("previous_tail", previous == null ? null : previous.tail());
+        // A fact, never words: whether the page before stopped mid-sentence. Words were echoed;
+        // without any hint the model took the wrong column for a continuation (D15, runs 1–3).
+        variables.put("previous_ended_mid_sentence", previous != null && previous.endedMidSentence());
         return ai.complete(AiRequest.of(AiFeature.pipeline_extract, Tier.vision, prompt, variables,
                         NcertPage.class, ctx)
                 .withImages(images));
+    }
+
+    @Override
+    public String model() {
+        return properties.modelFor(Tier.vision);
     }
 }

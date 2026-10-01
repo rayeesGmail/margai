@@ -2,6 +2,7 @@ package com.margai.pipeline.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.margai.ai.api.AiClientInfo;
 import com.margai.common.api.AttemptType;
 import com.margai.curriculum.api.ArchetypeTrackRow;
 import com.margai.curriculum.api.BackboneLoadReport;
@@ -14,6 +15,9 @@ import com.margai.curriculum.api.NcertBookRow;
 import com.margai.curriculum.api.NcertLoadReport;
 import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.NcertRegisterReport;
+import com.margai.curriculum.api.NcertVerificationRow;
+import com.margai.curriculum.api.ParagraphEmbedding;
+import com.margai.curriculum.api.ParagraphToEmbed;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
 import com.margai.curriculum.api.SyllabusNodeRow;
@@ -24,6 +28,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -238,16 +243,30 @@ class PipelineCommandTest {
                 }
                 if (cls == NcertRenderCommand.class) {
                     return cls.cast(new NcertRenderCommand(new NcertRenderCommandTest.RecordingStore(), imports,
-                            new PipelineProperties(72, 10, 1), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
                 }
                 if (cls == NcertExtractCommand.class) {
                     return cls.cast(new NcertExtractCommand(new NcertRenderCommandTest.RecordingStore(),
                             new NcertExtractCommandTest.RecordingExtract(), new NcertExtractCommandTest.StubSpend(),
-                            new PipelineProperties(72, 10, 1), writer));
+                            new AiClientInfo("anthropic", List.of("ledger")),
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
                 }
                 if (cls == NcertLoadCommand.class) {
                     return cls.cast(new NcertLoadCommand(new NcertRenderCommandTest.RecordingStore(),
                             imports, writer));
+                }
+                if (cls == NcertVerifyCommand.class) {
+                    return cls.cast(new NcertVerifyCommand(new NcertRenderCommandTest.RecordingStore(), imports,
+                            new NcertVerifyCommandTest.StubVerifier(), ids -> Map.of(),
+                            new NcertExtractCommandTest.StubSpend(),
+                            new com.margai.ai.api.AiClientInfo("anthropic", List.of("ledger")),
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
+                }
+                if (cls == NcertEmbedCommand.class) {
+                    return cls.cast(new NcertEmbedCommand(imports, new NcertEmbedCommandTest.StubEmbeddings(),
+                            NcertEmbedCommandTest.noRetriever(), new NcertExtractCommandTest.StubSpend(),
+                            new com.margai.ai.api.AiClientInfo("cohere", List.of("ledger")),
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
                 }
                 return CommandLine.defaultFactory().create(cls);
             }
@@ -312,12 +331,58 @@ class PipelineCommandTest {
 
         @Override
         public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
-            return new NcertLoadReport(rows.size(), 0, 0, Map.of(), List.of());
+            return new NcertLoadReport(rows.size(), 0, 0, Map.of(), List.of(), 0, 0);
         }
 
         @Override
         public Integer renderedPages(String bookCode, BookLanguage language) {
             return renderedPagesAnswer;
+        }
+
+        /** What {@link #paragraphsToEmbed} answers: the rows `ncert embed` still has to read. */
+        List<ParagraphToEmbed> toEmbedAnswer = List.of();
+        final List<ParagraphEmbedding> storedEmbeddings = new ArrayList<>();
+
+        @Override
+        public List<ParagraphToEmbed> paragraphsToEmbed(String bookCode, Collection<Short> chapters, boolean redo) {
+            return toEmbedAnswer;
+        }
+
+        @Override
+        public int storeEmbeddings(String bookCode, List<ParagraphEmbedding> embeddings) {
+            storedEmbeddings.addAll(embeddings);
+            return embeddings.size();
+        }
+
+        /** Ids whose vectors a run dropped, so a fragment leaves the index rather than lingering. */
+        final List<java.util.UUID> clearedEmbeddings = new ArrayList<>();
+
+        @Override
+        public int clearEmbeddings(String bookCode, Collection<java.util.UUID> paragraphIds) {
+            clearedEmbeddings.addAll(paragraphIds);
+            return paragraphIds.size();
+        }
+
+        /** What {@link #paragraphs} answers: the rows `ncert verify` reads. */
+        List<NcertParagraphRow> paragraphsAnswer = List.of();
+        final List<NcertVerificationRow> verifications = new ArrayList<>();
+
+        @Override
+        public List<NcertParagraphRow> paragraphs(String bookCode, BookLanguage language, Collection<Short> chapters) {
+            return paragraphsAnswer.stream().filter(row -> chapters.contains(row.chapterNo())).toList();
+        }
+
+        /** When set, {@link #recordVerifications} refuses as the real door does on a changed text. */
+        boolean refuseVerifications;
+
+        @Override
+        public int recordVerifications(String bookCode, BookLanguage language, List<NcertVerificationRow> verdicts) {
+            if (refuseVerifications) {
+                throw new CurriculumImportException("1 verdict(s) cannot be recorded, nothing was written:\n  "
+                        + "ch 7 §7.2 ¶1: the text has changed since it was verified");
+            }
+            verifications.addAll(verdicts);
+            return verdicts.size();
         }
     }
 }

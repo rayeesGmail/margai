@@ -12,8 +12,8 @@
 | Field | Value |
 |---|---|
 | Current phase | **PHASE 2 — Content pipeline v1 (Weeks 3–4, D13–D24, M3)**, D13 done 2026-09-12, D14 next (the NCERT extraction pilot, the first live VISION day — F8's two D14 prerequisites landed 2026-09-12, the non-root identity and the content bucket; the third, model access, was resolved on 2026-09-12 by leaving Bedrock for the providers' own APIs, and now needs two funded provider accounts and their keys in SSM rather than an AWS ticket); PHASE 1 — Auth & identity (Week 2, D7–D12) closed at the Week-2 gate 2026-09-09, running on **email OTP** until the DLT template (F1) exists (founder ruling 2026-09-08, DECISIONS) |
-| Current day | **D14 built 2026-09-12 on `d14-ncert-extraction`, fixed against its own defect table 2026-09-13, ✅ acceptance pending the founder's re-run** — the founder's five live runs on ch 7 (~₹95) produced a full defect audit, one ruling and six fixes, all now implemented: the page's text layer travels with the image and is authoritative for characters (the §6.1 reversal), the notation gaps are closed in prompt **v2**, `has_equations` moves from the model's schema into Java, every paragraph is diffed against the page's own text layer with an independent paragraph-count flag beside it, confidence is demoted to a routing signal, and **one verified run per book is canonical and frozen** — reproducibility was the wrong target. The reasoning-model track is closed (2.2× the cost, neither run loadable, its own confidence silent about both). A spec-auditor pass on the finished work returned FAIL with two blockers, both fixed — the prompt still asked for the field FIX 3 had removed from the schema, and the retired field made the JSONL already in the bucket unreadable — and its sharpest finding rebuilt the character check against a *real* NCERT text layer rather than an imagined one. **Evening: seven live runs on phy11-part1 (≈₹262), the book loaded at 100% coverage / 966 paragraphs with a written known-defect list, and the structural diagnosis that every remaining defect is per-page segmentation decided by the model from a text tail** — fixed tomorrow by code-assigned numbering (prompt v3) and whole-page-plus-bands imaging, each proved on chapter 7 before any book (day log). 562 server tests, verify green, eval PASS (placeholder); fourteen DECISIONS rows dated 2026-09-13. **D14 ruled PARTIAL 2026-09-13 23:30** — addresses 20/20, text 19/20 with the defect fixed at source and proved on its page; the tick comes with D15. Next: a chapter-7 dry run on the final prompt, phy11-part1 re-extracted as the corpus event, bio11, then the eight remaining books, with code-assigned numbering built and proved on chapter 7 first · earlier: 7 task commits + docs — V7 `ncert`, the `storage` module, `books.yaml`, `ncert register|render|extract|load`; `ncert register` proved for real on a fresh `margai_d14`, while `render`, `extract` and `load` need `AWS_PROFILE=margai` and the human-launched `AI_LIVE=1` (DEV_SPEC §13.7) per `docs/runbooks/ncert-ingest.md` · previously: D13 done · 2026-09-12 (built 2026-09-10 → 12 on `d13-taxonomy`: the four founder inputs drafted from the NEET (UG) 2026 syllabus and reviewed by the founder in full — all seven checklist items closed 2026-09-11 — 516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-off rows; then the `pipeline` module in six task commits: picocli commands under the `pipeline` profile, `CurriculumImport` in `curriculum.api`, strict readers, run reports with the input's SHA-256; **acceptance PASS** run literally against a fresh database `margai_d13` in the compose container: `taxonomy load`, `taxonomy prerequisites`, `backbone load`, `cutoffs load` all exit 0 with 516 / 104 / 744 / 40 rows, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path over psql, an idempotent re-run changes nothing; reports committed under `pipeline/reports/`; server tests 356 (was 319), app untouched; spec-auditor on the build: see the day log) · next: D14 — NCERT extraction pilot, 2 books EN (✅ 20-paragraph spot check): TECH_PLAN §6.1 VISION extraction over page images, §6.3 `ncert register|render|extract|load`, `books.yaml` (§6.2), the S3 content home — **settled 2026-09-12**: `margai-beta-content`, prefixes at the root, sources under `source/` (DECISIONS F8) — the Bedrock 403 (Blockers) and the D3 text-extraction escape hatch, the PUA decoding for `keph107.pdf` (PARKED), the D4 seed decision (PARKED) · 2026-09-12 after the D13 close: change spec **CS-1 (Collective Intelligence Layer)** integrated into SPEC, TECH_PLAN, PLAN and this tracker (day log "CS-1"); it adds scope to D22, D24, D29, D35, D47, D49, D55, D56, D73 and founder workstream F11, and changes nothing before D22; the founder's three rulings of 2026-09-12 (SPEC §6.1 sentence, the D29 read with graceful degradation, the momentum/strategy consumers) are applied |
-| Days completed / total | 13 / 84 |
+| Current day | **D15 DONE on `d15-ncert-books`, 2026-10-01: TEN BOOKS OF TEN CANONICAL — chem11-part2 534 of 534 (100.0%, embedded) for ₹636.39, ₹6.84 a rendered page; 7,658 paragraphs over the ten books, each 100.0% clean on a whole-book verify, all embedded; retrieval hit@3 10/15, MRR 0.593.** Its ch 8 (kech202) is 85% Caesar-shifted, so the layer was withheld and the model read images alone: digits, Greek and words came back clean against the decoded layer, and the re-read found the only two character defects (an acylium charge, a garble's lost l). `ChapterApparatus` now finds a heading an illegible layer prints plainly (345cfe6; DECISIONS 2026-09-30), so ch 8's exercises were never sent. Four forks adjudicated; 206 + 25 entries simulated before each reload, which matched row for row. Applied by analogy (DECISIONS 2026-09-30): drawn branches in bracket notation, bare "Solution" labels join their Problem; ch 9's printed C1/HC1/AICI3 restored as printed. D14 ticked with it (founder, 2026-10-01). **Next: the founder pushes and opens the D15 PR; then D16, Hindi** (day log HOW TO RESUME) · earlier, 2026-09-29 evening: **NINE BOOKS OF TEN CANONICAL — chem11-part1 1,331 of 1,331 (100.0%, embedded) for ₹1,444.81, ₹6.57 a rendered page.** Ch 5 was staged for the standard-state sign (176 in MathB, blank in the layer): carried 142 of 152 on transcribed pages; Greek clean (ν 27 of 27, 658 of 714 Unicode Greek, the rest in figures and tables). New classes: ch 4's text layer is Caesar-shifted in 28% of its body yet passed legibility at 0.317 and went to the model as authority (the transcriber read the image; nothing copied); `decodePrivateUse` turns MathB codes into Latin letters (F030 → "0", hence the book's `^0`; F056 → "V", ch 4 p9's four `H^V`, the second read's only transcription defect); three explanatory boxes skipped whole. Four chapter forks adjudicated every finding against page images and layers; 279 entries simulated page by page (1,454 → 1,331) before a reload that matched row for row. **Founder rulings (DECISIONS 2026-09-29): list items by corpus practice; a box Solution set flush is one paragraph (v5); skipped explanatory boxes restored from the layer, the student activity dropped; the book's garbles restored as printed, a printed blank keeps its fill.** Retrieval holds on nine books (hit@3 10/15, MRR 0.593). **Next: chem11-part2, the last book** (day log HOW TO RESUME) · earlier, 2026-09-29 morning: **EIGHT BOOKS OF TEN CANONICAL — chem12-part2 582 of 582 (100.0%, embedded) for ₹881.77, ₹6.12 a rendered page, the first organic book.** Greek clean (0 of 76 downgraded). The new class is reactions: the book draws every one, so the layer holds none; v5 skips drawn schemes by habit and formula-only reactions by chance, and a `--redo` of 15 pages lost as much as it gained (restored from the first draw by `text`). **Founder rulings (DECISIONS 2026-09-28/29): no reaction rule on v5, the equation gap waits on D17; labels over skipped drawn reactions join their introducing paragraph; a box title leads the box; a sentence naming the reaction just drawn joins its item; ArMgBr stays.** The free checks found 66 fixes (49 heading-only rows, 9 dropped headings, the motto) and the second read named 3 of them; its one defect was ch 7 p26's lost CH3. Retrieval holds on eight books (hit@3 10/15, MRR 0.593). **Next: chem11-part1, then chem11-part2** (day log HOW TO RESUME) · earlier, 2026-09-27 evening: SEVEN BOOKS OF TEN CANONICAL — chem12-part1 657 of 657 (100.0%, embedded) for ₹784.33, ₹5.60 a rendered page, the first Chemistry book.** The Λ question is measured: none of the 78 Symbol-font Λ the layer gives as L reached a row as L. The new class is the compositor: chapter 2 sets every line after a display at the paragraph indent, mid-sentence or not, so geometry proves no split there and the transcriber cut three sentences. **Founder rulings (DECISIONS 2026-09-27): in Chemistry a lower-case row after a display joins the row before; a chapter's opening motto is not corpus text.** The second read flagged none of the free checks' findings; its rulings: 2 text fixes (one restoring the book's "Cr^V1" the transcriber had corrected), 8 of the book's own errors kept, 25 verifier errors; plus 18 joins, a split, 2 motto drops and 3 restored side headings from the free checks. Retrieval holds on seven books (hit@3 10/15, MRR 0.593). **Next: chem12-part2** (day log HOW TO RESUME) · earlier, 2026-09-27 midday: SIX BOOKS OF TEN CANONICAL — phy12-part2 500 of 500 (100.0%, embedded) for ₹623.72, ₹5.07 a rendered page, the cheapest Physics book.** A new free check — Greek letters the print sets against Greek letters the rows name, per page — found two transcription defects the second read missed and greek.py cannot see: ch 10 p6's "frequency ν (= v/λ)" read off the image as "v", and ch 11 p4's "microammeter (μA)" as "(mA)", the layer's m glued to a unit. The verifier missed both and a dropped item label, and itself reads ν as v. Rulings: 3 text fixes, 15 splits by line geometry, 14 noise, 3 of the book's own errors kept ("balanced band", "micrometer", "needle"), 12 verifier errors. **Founder ruling: an unnumbered side heading leads the paragraph under it** (DECISIONS 2026-09-27; this book's five came out three ways). A local render of all 720 remaining pages finds no undrawn glyph. Retrieval holds on six books (hit@3 10/15, MRR 0.593). **Next: chem12-part1, ch 2 (Λ ×78) staged first** (day log HOW TO RESUME) · earlier, night of 2026-09-26/27: FIVE BOOKS OF TEN CANONICAL — phy12-part1 1,042 of 1,042 (100.0%, embedded) for ₹1,147.25, ₹5.36 a rendered page; the pipeline cap is ₹10,000 per IST day (founder, ee3a873).** The render's "No glyph for code 136" found five unit-vector hats the PDF sets over the p of ch 1's dipole equations (1.13a)–(1.17) that its embedded font cannot draw — transcriber and verifier both saw a bare p — restored as `p_hat` by text corrections (founder; DECISIONS 2026-09-27). Chapter 1, staged first, carries 252 of the book's 814 Symbol-font Greek letters; the Greek check found none of 661 downgraded, so the prompt's lone-letter rule held on the heaviest chapter. The second read's rulings: 5 splits and 4 joins by line geometry, 7 figure_ref fixes, 34 verifier errors, one misprint kept. Retrieval holds on five books (hit@3 10/15, MRR 0.594). **Next: phy12-part2** (123 pages; read its render log for undrawn glyphs), then Chemistry (day log HOW TO RESUME) · earlier, 2026-09-26 evening: **FOUR BOOKS OF TEN CANONICAL — phy11-part2 682 of 682 (100.0%, embedded) for ₹767.43, the day ₹1,937.63 by the ledger, ₹62 under the pipeline's ₹2,000 cap.** Its second read found one transcription defect (a dropped bar over a vector v), four swallowed paragraph starts and two split rows by line geometry, ten of the book's own errors kept, and nineteen verifier errors; the stale pre-2023 "Table 9.1" in ch 8 now links the Table 8.1 it means (DECISIONS). Verify now lets a ruling settle a claim the verifier files under the wrong row (3759813, tests 866). Parked: enforcing "flush after a display runs on" on both Physics books. **Next: phy12-part1** (808 Symbol-font Greek letters, ten times this book's — stage ch 1 and run the Greek check first), then phy12-part2, then the Chemistry Λ ruling (day log HOW TO RESUME) · earlier 2026-09-26: THREE BOOKS OF TEN CANONICAL — bio12 673 of 673 (100.0%, embedded) joins phy11-part1 909 and bio11 748, ₹1,170.20 for the day.** Prompt v5 keeps an unboxed italic activity as running text (founder ruling IN): v4 left the case undecided and the model dropped some at random, among them bio12's only statement of pollen/nectar robbers; bio11's two such pages re-read and it is canonical again. bio12's second read found 9 real segmentation defects in 673 rows, all corrected. Transcriber stays Opus 5 (Opus 5.5 PARKED). **Next: the seven remaining books** (day log HOW TO RESUME) · 2026-09-25: TWO BOOKS OF TEN CANONICAL — bio11 746 of 746 and phy11-part1 909 of 909, 100.0%, both embedded, ₹110.07 for the day.** The apparatus boundary is fixed (95e6d46, dd37c00): the Summary heading's page is sent when teaching is above it, placed by glyph position, and 19 re-extracted pages brought back 67 rows of NEET material that no metric could see was missing — Viroids/Prions/Lichens, three disorders sections, the RQ of fats and proteins, Examples 2.7 and 7.8. The second read found the transcriber stops at every heading unaided, so no prompt rule. Retrieval holds (MRR 0.618 → 0.629). **Next: push (134 commits ahead), then the eight remaining books** (day log HOW TO RESUME) · 2026-09-23/24 — **the free checks are recalibrated on both books' evidence, bio11's 202 free flags are all adjudicated, and prompt v4 carries the unit-opener rule; ₹0 spent** (day log). The session's finding: **both layout checks were calibrated on Physics typography**, so on Biology they produced 199 structural false positives and 3 real segmentation defects. `PageCoverage.TOO_LITTLE` moves 0.60 → 0.30 on a measurement across **301 pages of both books** whose distributions turn out identical (phy11-part1 0.31–1.16, bio11 0.32–0.99) — a table or a tint box makes a ratio low, not a figure-dense subject — with a page that returned nothing taken out of the ratio into its own prose-first checklist and the 400-character floor made to speak instead of hiding three pages. `HEADING` now accepts a **Title-Case** title (bio11 sets "1.2.2 Genus"; the old rule demanded capitals, so no heading was recognised and a page of five headed paragraphs reported *the print starts 0 paragraphs* — 262 of 357 named rows), and the join check consults the **previous page's last line against its column measure**, the only signal that separates a real page-break join from a book that sets every page's first line flush left. bio11 reloaded at **694 paragraphs, 100.0%**; start flags 171 → 129 pages, join flags 15 → 0 after rulings, figure flags 16 raised → 0 raised, equations and passages-no-row-carries both 0. Server tests 829 → 848, the last two on the **small-caps heading** fix of 2026-09-24: bio11 sets its top-level headings with a large initial and small capitals, so a line's modal glyph size fell below the body floor and the heading was discarded before the heading test — printed paragraph starts over the book go **954 → 1047**. The number-only heading rule reported as the cause was built, measured, and reverted for changing nothing; the diagnosis came from pymupdf, whose span sizes are not PDFBox's per-glyph sizes. **The second read is run and bio11 closes at 694 of 694, 100.0%** (₹188.32 + ₹12.58 of rulings, one page redo and three follow-up reads; ₹200.90 for the day) — but **`ChapterApparatus` discards the whole page the SUMMARY starts on**, which costs bio11 prose in 14 of its 19 chapters and phy11-part1 in 2 of 7, including ch 14's named "Occupational Respiratory Disorders" subsection, which reaches no row. Coverage counts pages *extracted* and the second read only reads pages that were *sent*, so neither number can see it: **100.0% is 100% of what the pipeline sent, and neither book is canonical until the boundary is fixed.** **114 commits are ahead of `main` and pushing is overdue** · earlier, 2026-09-22: **bio11 is extracted, loaded at 100.0% coverage and ruled on: 697 paragraphs for ₹914.00 all in, the second book of ten** (day log; commits 7eae735, 05fa915). 208 of its 252 pages called on Opus and prompt v3, every call `status ok`, per-call falling ₹5.00 → ₹4.36 as the cached prefix amortised — which is why it came in under the ≈₹1,040 projection. The load wrote 668 new rows, updated the 30 stale early-v2 chapter-1 rows **in place** and deleted nothing, so the orphan question open since 2026-09-14 closes with no orphan; zero page-break repairs, zero mid-sentence joins across 200 pages. **All 13 coverage flags were adjudicated at ₹0 and not one is a transcription defect**: 4 unit-opener essays, 3 biographies, 3 full-page figures and a full-page table, and 3 partials (ch 3 p6, ch 4 p15, ch 11 p14) that are **figure and table interiors the prompt says to skip** — so `PageCoverage.TOO_LITTLE = 0.60` is what wants recalibrating, having been measured across twelve *physics* pages at 0.76–1.14, not Biology's figure density. **The founder's ruling of 2026-09-22: a unit-opener essay is not corpus text** — five structurally identical pages (same 40 pt `UNIT n` banner, same drawing, the banner in every text layer) produced two different answers because the prompt has no rule for the page, so it was dice; ruled OUT on the prompt's own biography test, applied as a `kind: drop` correction rather than a prompt edit so the freeze at debb920 holds, bio11 698 → 697 at ₹0, **and the prompt rule is still owed before the eight remaining books**. Two findings to carry: **`PageCoverage` judges nothing under 400 characters**, which hid three bio11 pages including a *fifth* biography (Alfonso Corti, 376 chars) — all three resolved by hand, the biography rule in fact held 5 of 5, but nothing would have shown if it had not; and **`ncert extract` had neither guard `ncert verify --read-pages` has** — so the runbook's `pipeline,live` (corrected to `pipeline,live,visionopus`, 7f78a7d) would have spent a book's budget on the ruled-out Haiku and said so nowhere but the ledger. **Both guards are now built, ₹0, test-first** (7940456, 5e5128a; tests 827 → 829): the transcriber guard on a new `margai.pipeline.transcribe-model`, and — found while building it — **the fake-client guard, the quieter and worse hole**, because without `AI_LIVE=1` the command wrote *fixture text into the book's canonical JSONL*, and since extract resumes those fabricated pages would have survived the next real run untouched with nothing downstream able to tell a fixture from a page of NCERT. Also settled: extract's 794 paragraphs against the load's 698 is the cross-page continuation merge, at phy11-part1's own rate (0.44/page vs 0.48). **108 commits are ahead of `main` and pushing is overdue** · earlier, 2026-09-20: **the render pre-flight now covers all ten books and every one passes: 79 chapters, 1,690 pages, every page drawn, no decoder gap, at ₹0** (DECISIONS; commit 1bdacd2). It had swept only the two pilot books, so the eight never rendered — 1,295 pages with ≈₹6,500 of render-and-extract behind them — had never been checked against the D14 failure where PDFBox draws a page *without* an image it cannot decode and still reports `result: ok`. It now reads `books.yaml` (so it sweeps exactly what `ncert render` will render, and catches a chapter named in the yaml but missing from disk), asserts the pages drawn **equal** the document's page count, collects every failure instead of stopping at the first, and refuses an unknown book code rather than sweeping nothing. Opt-in by `-Dncert.preflight`: unset = the two pilots at 78 s, because `./mvnw verify` runs before every commit and all ten is 7m15s. Tests 823 → 827, verify green, no AI path so no eval stamp. **So the render for all nine remaining books is safe to launch, and bio11 on the frozen v3 prompt is next.** One correction to carry into planning: the "~₹700 each" figure for the nine (≈₹6,300) is page-weighted **≈₹7,700** against the only real measurement (₹712 for 143 pages ≈ ₹5/page). **100 commits are ahead of `main` (PR #16 merged 2026-09-14; `origin/d15-ncert-books` is a stale ref, not the branch state) and want pushing before the nine books enlarge the review** · earlier the same day: **the retrieval spike is RUN, the pin is settled and now re-validated on Bedrock — 894 of 894 paragraphs embedded, a Hindi query reaches an English paragraph, and the same model through AWS reproduces the direct API's score to the decimal (8/15 · 10/15 · MRR 0.618)** (PLAN D15's second ✅ met; DECISIONS). The corpus carries no `text_hi` at all, so the cross-lingual space did it unaided: जड़त्व → §4.4 ¶2/¶8 at ranks 1–2, गुरुत्वीय त्वरण below the surface → §7.6 ¶11 at rank 1, बंदूक का पीछे हटना → §4.7 ¶1 at rank 2. **cohere / embed-v4.0 / 1024 stands, nothing is re-embedded, and the nine remaining books are extracted on this pin** — §4.9's swap rider of 2026-09-12 closes without a swap. Scored hit@1 7/15, hit@3 9/15, MRR 0.576 as first reported, with the text half firing on 10 of 15 against the 1 of 15 the AND semantics gave. **That number understated the retriever and the fault was the answer key's, which is mine** — q08's rank-1 and q06's rank-3 are better answers than the addresses it named — so on the founder's instruction the key was corrected the same day by reading §4.10 and §6.9 cold: two passages added, two lead-ins removed as keyed in error, and one that ranked *first* refused because it answers nothing. **The set now reads hit@1 8/15 (53%), hit@3 10/15 (67%), MRR 0.618** (english 6/10, 7/10, 0.677; hindi unchanged 2/5, 3/5, 0.500), confirmed by a ₹0.15 re-run at 12:36 that embedded nothing. **The book's whole retrieval cost is ₹9.24 across 925 calls.** Real weaknesses, separated from that artefact: q12 is the one grounding failure (nothing above the 0.30 floor), q09 misses outright, q07 and q03 return the right neighbourhood and not the paragraph. Built at ₹0 in six commits before the run: V8's HNSW index, the embedding column whose null vector is the whole state machine (resumability and staleness in one mechanism), `EmbeddingService` in `ai.tasks`, `ncert embed --book` (refusing the fake client and a `--lang hi` pass), the §1.3 split of `curriculum.api.ParagraphRetrievalRepository` and `ai.retrieval.HybridRetriever` fusing by rank rather than score, and `eval/retrieval-queries.json` — 15 queries over all seven chapters, 5 of them Hindi, each carrying the addresses it was written to reach, scored hit@1/hit@3/MRR with Hindi counted separately. Server tests 747 → 804, verify green, eval PASS (placeholder); the spec-auditor's FAIL fixed, two of its four MAJORs real bugs on the paid path (day log). **Building it paid for itself before a rupee was spent**: measured against the real 894 paragraphs, the full-text half as TECH_PLAN specifies it — `websearch_to_tsquery`, which ANDs a query's terms — returned **nothing at all for 13 of the 15 queries** and found the expected paragraph for **1**, so "hybrid" retrieval was vector retrieval with a second query attached; the founder's decision of 2026-09-20 switches it to OR (with the negation stripped, because `v - u` parses as `'v' & !'u'`), which puts the expected paragraph at rank 1–2 for **6 of the 10 English queries**. **And the Hindi half is zero either way for an unrelated reason: the corpus holds no `text_hi` until D16**, so all five Hindi queries rest entirely on the cross-lingual embedding — which makes D15's Hindi acceptance a clean test of the pin and nothing else. **Embeddings moved to Bedrock's `global.cohere.embed-v4:0` on 2026-09-20** (DECISIONS): the Cohere direct key is a trial key capped at 1,000 calls/month, hit exactly, with no payment method attachable — Bedrock is the same model, bills through the AWS account that already pays for S3 and SES, and authenticates by IAM, so `MARGAI_AI_COHERE_API_KEY` leaves the live profile entirely. **Note the ledger over-reports embedding ~11×** by a deliberate one-paisa floor per call: the book's true embedding spend is ≈₹0.84, not the ₹9.09 the ledger shows. Next: the chunk A/B on the settled provider, then **bio11 and the eight remaining books** (day log HOW TO RESUME) · **phy11-part1 remains closed at 894 of 894 paragraphs, 100.0%**: every chapter at 100.0%, zero differs, zero join or figure flags, every row carrying a verdict, for ≈₹712 all in (₹584 extraction, ₹128 reading). The last twelve came off the share by a new `noise` correction kind that lets a ruling reach a free check, and the start check's blind spot — a line the layer strips of its subscripts could not count as prose, so a printed start it hid was named by no report — is closed test-first (tests 741 → 747). The fix cost one row on its first real run, a display continued onto ch 6 p27 read as a first line, which is fixed and fenced. **The 86 page-level start flags are adjudicated at ₹0 and not one is a real segmentation defect**: the claim set was diffed against 2026-09-18's, leaving 13 new items to judge, all noise, the only one with a true first-line-indent signature read on its page. The book carries no unscored signal into bio11. **Next session, by the founder's decision of 2026-09-19: embed this book and test hybrid retrieval on it before the other nine are extracted** — the embedding pin re-embeds the whole corpus if it moves, so 894 verified paragraphs is the last cheap moment to find the pin, the chunk or the hybrid weighting wrong (day log HOW TO RESUME; the Cohere client and the 1024-wide column already exist, `ncert embed`, V8's HNSW index and the query → top-passages harness do not) · the day before, at 882 of 894, 98.7%: **every chapter at 100% matches and zero rows without a verdict** (ch 1 84/84, ch 2 53/53, ch 3 103/103, ch 4 139/139, ch 5 126/126, ch 6 283/283, ch 7 106/106). The first paid read of chapters 1–6 cost ₹116.88 for 96 pages and returned twenty flags, **not one of them a transcription defect** — three are the book's own errors kept as `misprint` (a stale "section 4.2" cross-reference, a Law of cosines printed `v_b^2 + v_b^2`, "diretions") and seventeen are the verifier repairing the book or losing a glyph, including a new class that will recur: **the book sets ± as a plus over a separate rule, so the layer and the image-reader both drop the bar**. The 85 start-flag pages — 275 named rows and 92 printed starts — were adjudicated by the page's own line geometry rather than by eye, calibrated first against chapter 7's settled rulings, and **all of it is noise**; the same geometry run as an independent sweep found **four paragraphs a row had swallowed, one of them (ch 6 p17) named by no flag in any report**, plus two rows that split where the print runs on. Twenty-nine rulings, a ₹0 reload to 894 paragraphs at 100.0% coverage, ₹10.71 of re-reads. **The remaining twelve are the join flags, all ruled noise and all still counted against the share**, because no correction kind can record a ruling on a free-check flag — so the number understates the corpus by twelve rows, and that choice plus the start check's blind spot are the first two items of the day log's HOW TO RESUME. **D15's ✅ is a coverage report per book across the remaining EN books: one book down, bio11 and eight others to go** · earlier, 2026-09-17/18: **the phy11-part1 corpus event: the book extracted on Opus (₹584) and loaded at 100.0% coverage, 143 of 143 pages, 892 paragraphs**, with chapter 7 holding at 106 of 106 matches / 100.0% clean through two reloads. Chapter 1 was staged alone first because `ncert extract` resumes, so a checkpoint costs nothing extra — and it paid for itself four times over, because chapter 7 has neither tables nor footnotes. **Four code defects found and fixed at ₹0 before a rupee of the paid read was spent** (d9a0e74, tests 720 → 741): `PageBreakRepairs` silently destroying 124 characters of real prose where the book repeated a phrase across a page break; footnotes stealing the next page's continuation (8 paragraphs damaged); plural figure labels (`Figs. 3.15(a) to (d)`) dropped as non-references; and the book's own degree sign for a zero exponent, `[M° L3 T°]` in running text against `[M0 L3 T0]` in the displayed equations five lines below. Nine founder rulings on the Greek letters the model ran into their neighbours and on υ, the book's glyph for speed (7b5faf0). Verified in the database after the reload: the coplanar sentence restored word for word, all nine footnotes back on one page, zero residual defect tokens in 892 paragraphs. **Next: the first paid read of chapters 1–6 (~₹250), then the 85 page-level start flags adjudicated against the pages → the book's clean share, which is PLAN D15's ✅** (day log HOW TO RESUME). Open for the founder, none of it blocking: the boxed derivation at ch 6 p16, tables as a corpus-wide scope question, and chemistry's Λ rendered as a plain L (22 times in `chem12-part1` ch 2, caught by no check) before that book is extracted · earlier, 2026-09-14: **`ncert verify [--read-pages]` built** (the pair's second read: Sonnet 5 per page with the free layout checks beside it, and `pipeline/inputs/ncert-corrections.yaml` applied by `ncert load`), seven task commits plus five fixes; the spec-auditor's FAIL (a BLOCKER — the prompt carried chapter 7's answers — and four MAJORs) fixed, the re-audit's remaining MAJOR (a bracket rule contradicting v3's conventions) fixed by narrowing it, which leaves `G Mm / d^2 L` uncaught (confirmed by the founder 2026-09-15; day log); server tests 690, verify green, eval PASS (placeholder), ₹0. Next: the founder's chapter-7 calibration (three one-line commands, ~₹14) against the bar set in advance, then the phy11-part1 corpus event (day log HOW TO RESUME) · earlier the same day: the morning ran the HOW TO RESUME order: chapter 7 on the final v2 prompt PASS on every gate (₹14), then phy11-part1 re-extracted as the corpus event (₹118 + two ₹2 redos: a phantom empty paragraph at ch 4 p2, a fabricated lead-in at ch 6 p8 that reproduced word for word), the book's stale rows deleted by hand, loaded at 100% / 1,023 rows, and the D14 ✅ re-run on last night's twenty pages against the rendered pages: **text 20/20, address 20/20**, the radical fixed; phy's half of the D14 tick is earned on v2 and the box waits for bio11 on the same final prompt. bio11 turned out to have been extracted yesterday afternoon on the early v2 (ledger: ₹240 between 14:00 and 16:00); its chapter 1 loaded for ₹0 and read 31/33 exact with a biography page transcribed against the rule and one word lost at a page break. **Founder reorder ~10:05: build prompt v3 before any whole-book bio11 run** — every defect that cost money was the model counting from a quoted tail. v3 built 11:15–13:00 in four commits: numbering moves to `ncert load` (section + text + one continues flag from the model, ¶n assigned per section across pages, collisions impossible), a blank text or misplaced flag refused where the output is decoded and re-called, repairs that move a flag or cut a repeated tail, the load deleting the orphans it names (anchored → refuse, other edition's text → keep), reports numbered per run, the split check's regex, the prompt with item markers, printed parentheses and a biography-page rule; `application-visionsonnet.yml` restored because **RULING 1 is reopened for one measurement**: v3's chapter-7 and bio11-chapter-1 dry runs on both Haiku 4.5 and Sonnet 5. Tests 562 → 578, verify green, eval PASS (placeholder), spec-auditor FAIL → fixed (day log). **Afternoon and evening: eleven v3 dry runs on chapter 7 (₹362), every row read against the rendered pages** — Haiku out (three runs, three different layout failures on the two-column page), Sonnet structurally wrong in two full runs of three, Opus clean on both full runs; five notation rules added after the Opus full read, then **the prompt frozen at debb920 (founder, ~18:50)** on "why does every run create a new issue?" — nine runs had carried nine prompts on models that refuse a temperature; three draws of pages 4/6/8 on the frozen prompt changed zero characters and moved five, then zero, boundaries; the xhigh-effort question answered by the ledger (a forced tool call emits no thinking at any effort — PARKED). **RULING ~21:25: Opus 5 transcribes, Sonnet 5 verifies** (DECISIONS; RULING 1 superseded). Server tests 585, verify green, eval PASS (placeholder). Next: build `ncert verify --read-pages` (Sonnet per paragraph against its band, code checks for paragraph counts and joins, a corrections file under `pipeline/inputs/` applied by the load), prove it on chapter 7 — it must flag the vector r and little else — then the phy11-part1 corpus event on Opus, bio11, the eight books (HOW TO RESUME in the day log) · previously: **D14 built 2026-09-12 on `d14-ncert-extraction`, fixed against its own defect table 2026-09-13, ✅ acceptance pending the founder's re-run** — the founder's five live runs on ch 7 (~₹95) produced a full defect audit, one ruling and six fixes, all now implemented: the page's text layer travels with the image and is authoritative for characters (the §6.1 reversal), the notation gaps are closed in prompt **v2**, `has_equations` moves from the model's schema into Java, every paragraph is diffed against the page's own text layer with an independent paragraph-count flag beside it, confidence is demoted to a routing signal, and **one verified run per book is canonical and frozen** — reproducibility was the wrong target. The reasoning-model track is closed (2.2× the cost, neither run loadable, its own confidence silent about both). A spec-auditor pass on the finished work returned FAIL with two blockers, both fixed — the prompt still asked for the field FIX 3 had removed from the schema, and the retired field made the JSONL already in the bucket unreadable — and its sharpest finding rebuilt the character check against a *real* NCERT text layer rather than an imagined one. **Evening: seven live runs on phy11-part1 (≈₹262), the book loaded at 100% coverage / 966 paragraphs with a written known-defect list, and the structural diagnosis that every remaining defect is per-page segmentation decided by the model from a text tail** — fixed tomorrow by code-assigned numbering (prompt v3) and whole-page-plus-bands imaging, each proved on chapter 7 before any book (day log). 562 server tests, verify green, eval PASS (placeholder); fourteen DECISIONS rows dated 2026-09-13. **D14 ruled PARTIAL 2026-09-13 23:30** — addresses 20/20, text 19/20 with the defect fixed at source and proved on its page; the tick comes with D15. Next: a chapter-7 dry run on the final prompt, phy11-part1 re-extracted as the corpus event, bio11, then the eight remaining books, with code-assigned numbering built and proved on chapter 7 first · earlier: 7 task commits + docs — V7 `ncert`, the `storage` module, `books.yaml`, `ncert register|render|extract|load`; `ncert register` proved for real on a fresh `margai_d14`, while `render`, `extract` and `load` need `AWS_PROFILE=margai` and the human-launched `AI_LIVE=1` (DEV_SPEC §13.7) per `docs/runbooks/ncert-ingest.md` · previously: D13 done · 2026-09-12 (built 2026-09-10 → 12 on `d13-taxonomy`: the four founder inputs drafted from the NEET (UG) 2026 syllabus and reviewed by the founder in full — all seven checklist items closed 2026-09-11 — 516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-off rows; then the `pipeline` module in six task commits: picocli commands under the `pipeline` profile, `CurriculumImport` in `curriculum.api`, strict readers, run reports with the input's SHA-256; **acceptance PASS** run literally against a fresh database `margai_d13` in the compose container: `taxonomy load`, `taxonomy prerequisites`, `backbone load`, `cutoffs load` all exit 0 with 516 / 104 / 744 / 40 rows, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path over psql, an idempotent re-run changes nothing; reports committed under `pipeline/reports/`; server tests 356 (was 319), app untouched; spec-auditor on the build: see the day log) · next: D14 — NCERT extraction pilot, 2 books EN (✅ 20-paragraph spot check): TECH_PLAN §6.1 VISION extraction over page images, §6.3 `ncert register|render|extract|load`, `books.yaml` (§6.2), the S3 content home — **settled 2026-09-12**: `margai-beta-content`, prefixes at the root, sources under `source/` (DECISIONS F8) — the Bedrock 403 (Blockers) and the D3 text-extraction escape hatch, the PUA decoding for `keph107.pdf` (PARKED), the D4 seed decision (PARKED) · 2026-09-12 after the D13 close: change spec **CS-1 (Collective Intelligence Layer)** integrated into SPEC, TECH_PLAN, PLAN and this tracker (day log "CS-1"); it adds scope to D22, D24, D29, D35, D47, D49, D55, D56, D73 and founder workstream F11, and changes nothing before D22; the founder's three rulings of 2026-09-12 (SPEC §6.1 sentence, the D29 read with graceful degradation, the momentum/strategy consumers) are applied |
+| Days completed / total | 15 / 84 (D14 and D15 ticked 2026-10-01) |
 | Schedule delta | on track (the build); one founder item slipped — F10's SES production access was due "before D12" and is still open (slippage log) |
 | Last week's gate | **Week-2 🚩 PASS** 2026-09-09 — a stranger's email signs in first try on the AVD (fresh install of the `db98a49` build, one code typed once, Today, reopen still signed in, `first_attempt_rate=1.000`) and the D9 runbook's ten rows re-run clean on the same build (transcript in the D12 day log, table in the runbook); carried, not failed: the phone channel (F1), mobile data (F8), an unverified stranger's inbox (F10 production access). Week-1 🚩 PASS 2026-09-08 stands (D6 day log) |
 | Eval suite pass rate | placeholder PASS with 0 fixtures (suite arrives D23; gate ≥97%) |
@@ -45,8 +45,8 @@
 ## PHASE 2 — Content pipeline v1 (Weeks 3–4) · M3
 
 - [x] **D13** Taxonomy CSV loaded + prerequisite graph + archetype drafts · ✅ no cycles — done 2026-09-12, merged as PR #13 (9e0e930) (drafted 2026-09-10 from the syllabus PDFs, founder review complete 2026-09-11 with all seven checklist items closed, built 2026-09-12): `pipeline/inputs/` (516 nodes, 104 edges, 4 tracks / 744 steps, 40 cut-offs), the `pipeline` module with `taxonomy load|prerequisites`, `backbone load`, `cutoffs load` under the `pipeline` profile and `CurriculumImport` in `curriculum.api`; **acceptance PASS** on a fresh database — all four commands exit 0, no cycle by the loader's Kahn check and by an independent SQL walk, the tree queryable by code and path, idempotent re-run; reports in `pipeline/reports/2026-09-12-*.md`; server tests 356 (day log); branch `d13-taxonomy`, PR pending the founder's review and push
-- [ ] **D14** NCERT extraction pilot (2 books, EN) · ✅ 20-paragraph spot check — **PARTIAL, ruled by the founder 2026-09-13 23:30**: phy11-part1 canonical at 100% coverage / 1,017 paragraphs, the ✅ read against rendered pages at 20/20 addresses and 19/20 text, the one text defect (a radical the text layer cannot carry) fixed in the prompt and proved on its page — but 142 of 143 pages were extracted before that rule, and bio11 is not yet extracted; the tick comes with D15's re-extraction on the final prompt and bio11 on the same. Built 2026-09-12, fixed through 2026-09-13 (day log); PR #15 merged by the founder 2026-09-13 (merge commit c1e7e37) after one CI fix — four tests guarded on a directory that exists in CI because its manifest is committed, now guarded on a PDF (branch `d14-ncert-extraction`, 7 task commits + docs): V7 `ncert` migration, the `storage` module opened with the `ObjectStore` port (TECH_PLAN §1.3, designed at D3 and unbuilt until now), `pipeline/inputs/books.yaml` (10 books / 79 chapters, both editions), and `ncert register|render|extract|load` — VISION extraction over page images per §6.1, the `ncert_extract` prompt with the previous page's tail for continuity, a resumable JSONL per page, and the run's cost read back from the `ai_calls` ledger through the new `AiSpend` port (closing the PARKED cost-lines item). Seven DECISIONS rows dated today record the shapes TECH_PLAN left open or that the real inputs contradicted — chiefly that a book's `subject` admits `biology`, that `s3_key_*` is a source *prefix* because NCERT publishes chapter-wise PDFs, and that page keys carry the chapter. Server tests 456, `./mvnw verify` green, eval gate PASS (placeholder). `ncert register` run for real on a fresh `margai_d14` (10 books, idempotent re-run, report committed); `render`, `extract` and `load` are founder-run — `AI_LIVE=1` is human-launched by DEV_SPEC §13.7 and the bucket needs `AWS_PROFILE=margai` — per `docs/runbooks/ncert-ingest.md`
-- [ ] **D15** All EN books extracted · ✅ coverage report/book
+- [x] **D14** NCERT extraction pilot (2 books, EN) · ✅ 20-paragraph spot check — **DONE, ticked 2026-10-01 on the founder's word ("yes, tick D14 too")**: the condition the PARTIAL below set holds — phy11-part1 (909) and bio11 (748) are canonical on the final prompts and 100.0% clean on whole-book verifies (2026-09-25, 2026-10-01), with D15. The record: **PARTIAL, ruled by the founder 2026-09-13 23:30**: phy11-part1 canonical at 100% coverage / 1,017 paragraphs, the ✅ read against rendered pages at 20/20 addresses and 19/20 text, the one text defect (a radical the text layer cannot carry) fixed in the prompt and proved on its page — but 142 of 143 pages were extracted before that rule, and bio11 is not yet extracted; the tick comes with D15's re-extraction on the final prompt and bio11 on the same. Built 2026-09-12, fixed through 2026-09-13 (day log); PR #15 merged by the founder 2026-09-13 (merge commit c1e7e37) after one CI fix — four tests guarded on a directory that exists in CI because its manifest is committed, now guarded on a PDF (branch `d14-ncert-extraction`, 7 task commits + docs): V7 `ncert` migration, the `storage` module opened with the `ObjectStore` port (TECH_PLAN §1.3, designed at D3 and unbuilt until now), `pipeline/inputs/books.yaml` (10 books / 79 chapters, both editions), and `ncert register|render|extract|load` — VISION extraction over page images per §6.1, the `ncert_extract` prompt with the previous page's tail for continuity, a resumable JSONL per page, and the run's cost read back from the `ai_calls` ledger through the new `AiSpend` port (closing the PARKED cost-lines item). Seven DECISIONS rows dated today record the shapes TECH_PLAN left open or that the real inputs contradicted — chiefly that a book's `subject` admits `biology`, that `s3_key_*` is a source *prefix* because NCERT publishes chapter-wise PDFs, and that page keys carry the chapter. Server tests 456, `./mvnw verify` green, eval gate PASS (placeholder). `ncert register` run for real on a fresh `margai_d14` (10 books, idempotent re-run, report committed); `render`, `extract` and `load` are founder-run — `AI_LIVE=1` is human-launched by DEV_SPEC §13.7 and the bucket needs `AWS_PROFILE=margai` — per `docs/runbooks/ncert-ingest.md`
+- [x] **D15** All EN books extracted · ✅ coverage report/book **+ a query → top-passages run on the first book, including a Hindi query reaching an English paragraph** (PLAN amended 2026-09-19 on the founder's instruction; DECISIONS) — **DONE 2026-10-01: ten books of ten canonical, 7,658 paragraphs, every book 100.0% clean on a whole-book verify that matches its row count (phy11-part1 909, phy11-part2 682, phy12-part1 1,042, phy12-part2 500, bio11 748, bio12 673, chem11-part1 1,331, chem11-part2 534, chem12-part1 657, chem12-part2 582), coverage 100.0% of rendered pages, every paragraph embedded; retrieval on the ten-book corpus hit@1 7/15, hit@3 10/15, MRR 0.593, three of the five Hindi queries landing their English paragraph in the top three with no `text_hi` in the corpus (day log 2026-09-30 → 10-01); branch `d15-ncert-books`, PR pending the founder's push.** The history below is the record of how it got there — **the render pre-flight for all ten books is DONE and CLEAR, 2026-09-20, ₹0**: `PdfPageRendererTest` had swept only the two pilot books, leaving the eight never rendered (1,295 pages, ≈₹6,500 of render-and-extract behind them) unswept against the D14 failure where PDFBox draws a page *without* an image it cannot decode and reports `result: ok`; widened to read `books.yaml` and run over all ten it returns **79 chapters, 1,690 pages, every page drawn, no decoder gap**, so nothing in the nine remaining books carries a JPEG2000/JBIG2 surprise and their renders are safe to launch. Opt-in by `-Dncert.preflight` (`all` or a code list; unset = the two pilots, 78 s, since `verify` runs before every commit and all ten is 7m15s); it now asserts pages drawn **equal** the document page count, collects every failure rather than stopping at the first, and refuses an unknown book code instead of sweeping nothing. Tests 823 → 827, commit 1bdacd2, runbook §2 and DECISIONS updated — **the retrieval half of the ✅ is MET 2026-09-20**: phy11-part1 embedded 894/894 for ₹9.09 and three of the five Hindi queries land their English paragraph in the top two with no `text_hi` in the corpus at all, so the pin (cohere / embed-v4.0 / 1024) is settled and the nine remaining books run on it. **2 books of 10 extracted, and NEITHER is canonical** — `ChapterApparatus` discards the whole page the SUMMARY starts on and every printed line above it, costing phy11-part1 prose in **2 of its 7 chapters** and bio11 in **14 of 19**, a defect no number here can see because coverage counts pages *extracted* and the second read only reads pages that were *sent* (2026-09-24, day log; the fix is owed before the eight others). `phy11-part1` read 2026-09-19 at **894 of 894 paragraphs, 100.0% clean of what was sent**, every chapter at 100.0%, zero differs, zero join or figure flags, every row carrying a verdict, and its 86 page-level start flags adjudicated at ₹0 with no real defect among them (≈₹712 all in: ₹584 extraction, ₹128 reading). `bio11` was re-extracted on the frozen v3 prompt 2026-09-21/22 and loaded for ₹914.00, its 13 coverage flags adjudicated at ₹0 with no transcription defect among them, and after the unit-opener drop and three page-break joins it stands at **694 paragraphs, 100.0% coverage**. **Its second read ran 2026-09-24** — 193 pages, ₹188.32, 694 verdicts — and it closes at **694 of 694, 100.0% clean**, with exactly one real defect in 694 rows (a lost reversible arrow, fixed by ruling), one misprint kept and seven verifier errors disproved against the page. **Still owed on it: `ncert embed --book bio11`** (≈₹1), without which it is not in the retrieval corpus at all. The eight others are untouched. **What the retrieval half is built from** (2026-09-20; the run itself is the MET line above): V8's HNSW index, the embedding column's read/write/staleness, `EmbeddingService`, `ncert embed --book`, `ParagraphRetrievalRepository` + `HybridRetriever`, and `eval/retrieval-queries.json` — 15 scored queries over all seven chapters, 5 of them Hindi. Building it found, at ₹0 against the real 894 paragraphs, that the full-text half as specified answered 13 of 15 queries with nothing at all; the founder's switch to OR takes it to 6 of 10 English queries at rank 1–2 (day log). Then the nine books
 - [ ] **D16** Hindi ingest + EN↔HI alignment · ✅ 20 aligned pairs checked
 - [ ] **D17** Embeddings + hybrid retrieval harness · ✅ 15 concept queries hit right paragraphs
 - [ ] **D18** Buffer (extraction mess) · **🚩 WEEK-3 GATE:** NCERT searchable EN+HI
@@ -175,6 +175,2247 @@
 ---
 
 ## 📝 Day log (append newest on top)
+
+```
+D15 · 2026-09-30 → 10-01 · chem11-part2 closes canonical at 534/534 — TEN BOOKS OF TEN, D15 DONE, ₹636.39
+Commits 345cfe6 → 01397ef on `d15-ncert-books`. Code, two fixes, tests first, verify green (868): 345cfe6 `ChapterApparatus` searches the
+  apparatus heading on every layer and the new `locate` places it only on a legible one — kech202 (ch 8) shifts 85% of its characters but
+  sets "summary" unshifted on p36, so its exercises (p37–39, numbered 8.1, 8.2, the D14 failure shape) were going to the model; now the
+  heading page goes unplaced and the three exercise pages do not (DECISIONS 2026-09-30 amends the D14 row in place; the 79 English files
+  find 79/79 boundaries, 243 of 1,690 pages unsent; the 79 Hindi files match no heading line); 2b558cb the "pages the Summary starts on"
+  checklist no longer needs a layer. **Spend ₹636.39** (ledger): extract ₹469.55 (ch 8 staged ₹180.97, ch 7 + 9 ₹288.58, ₹5.59 a called
+  page), second read ₹161.35 (₹99.93 whole book, ₹58.46 the 46 pages the rulings changed, ₹2.96 the p18 re-read), embed ₹5.34 at the
+  ledger's floor, re-score ₹0.15; ₹6.84 a rendered page. bio11's whole-book free verify ₹0.
+PROFILE (₹0, local PDFs): ch 7 clean (6 MathB standard-state signs, `^0` as in chem11-part1); ch 8 85% Caesar-shifted, legibility 0.023,
+  withheld — the first English chapter read from images alone; ch 9 legible (0.275) but 11% of its digits shifted (p8's Table 9.2) and its
+  Symbol letters shifted too (V=σ, E=β, P=μ, S=π, G=δ), fed as the character authority. MathB F078/F079 are bond strokes in drawings.
+CH 8, IMAGE-ONLY: the shifted layer decodes by +29 per span (scratchpad ch8check.py), an independent witness — every multi-digit number and
+  decimal in the rows is in the layer, Greek 43 of 43 by glyph or name, 35 row-only words over 34 pages and none a misread. Its two real
+  character defects surfaced on the re-read: Problem 8.12's acylium ion written CH_3^-C^+ (a bond dash read as a superscript minus, a
+  carbanion) and an l dropped from a garble the book prints; plus two drawn branches described in words and one silent correction
+  ("polarlisation"). No layout check runs on a withheld layer, so its 56 joins and 2 splits came from the fork's own geometry pass.
+ADJUDICATION: free checks first, held back; second read ₹99.93, 588/635 (92.6%). Four forks (ch 7, ch 8, ch 9 p1–15, ch 9 p16–31) read every
+  finding against crops and layers; the cross-fork review aligned three treatments: a bare "Solution" over a drawn answer joins its Problem
+  (2026-09-28 label ruling), a drawn branch written in words or with "|" goes to bracket notation (chem12-part2 ch 7 p26 precedent; DECISIONS
+  2026-09-30 records both as applied by analogy), and ch 9's printed C1/HC1/AICI3/Ä_cH^è are restored as printed where the transcriber
+  normalised them (2026-09-29 garble ruling; at 300 dpi the formulas show a digit 1 with its flag, prose a true Cl). 206 entries (108 joins,
+  42 text, 7 splits, 5 figure_refs, 44 that change no text) simulated against the rows (635 → 534, no refusal), written into
+  ncert-corrections.yaml by Edit and diffed byte-identical to the generated block; the reload matched the simulation on text, pages and
+  sections for all 534 rows (three figure_ref differences were the simulator's: it reads links from a row's first page part only). Re-read:
+  46 pages, 513/534 (96.1%), 24 claims + 1 join flag → 2 text fixes (ch 8 p18), 7 misprints, 15 verifier errors, 1 noise; reload and a
+  one-page re-read → **534/534, 100.0%**. Real defects fixed: 11 dropped side headings and box titles, a skipped in-text question, a dropped
+  comma, Br– → Br^-, the acylium charge, the garble's l, 10 word/pipe branch descriptions. Book errors kept: PARKED errata.
+D15 ✅ (a coverage report per book; the retrieval half on the first book, a Hindi query included, MET 2026-09-20): each book's latest
+  whole-book verify, every one matching the database row count —
+    phy11-part1 909/909 · phy11-part2 682/682 · phy12-part1 1,042/1,042 · phy12-part2 500/500 · bio11 748/748 · bio12 673/673 ·
+    chem11-part1 1,331/1,331 · chem11-part2 534/534 · chem12-part1 657/657 · chem12-part2 582/582
+  all 100.0% clean, coverage 100.0% of rendered pages, 7,658 paragraphs, every one embedded. bio11's figure got its whole-book run today
+  (-ncert-verify-3, ₹0): the last one counted 746, before ch 11's two restored prompts (2026-09-26). Retrieval on the ten-book corpus: hit@1
+  7/15, hit@3 10/15, MRR 0.593 (english 0.639, hindi 0.500), unchanged from nine books. Outside every clean share, by rule: page-level start
+  flags, tables, captions, drawn schemes and their labels, mottoes, biographies; the organic equation gap waits on D17.
+HOW TO RESUME (supersedes every earlier list):
+  1. **The founder pushes `d15-ncert-books` and opens the D15 PR** (282 commits ahead of `main` before the close, 17 of origin). D14 is
+     ticked too (founder, 2026-10-01: "yes, tick D14 too"): its 2026-09-13 PARTIAL said "the tick comes with D15's re-extraction on the
+     final prompt and bio11 on the same", and both hold (phy11-part1 and bio11 canonical, 100.0% on whole-book verifies).
+  2. **D16 — Hindi ingest + EN↔HI alignment** (✅ 20 aligned pairs spot-checked): 10 books / 1,720 chapter pages, none started. Every Hindi
+     layer is withheld (Walkman-Chanakya), so extraction is image-only; this book's ch 8 is the first English evidence that an image-only
+     read holds (digits, Greek and words clean; its defects were segmentation and two notation slips). The apparatus heading is Devanagari
+     and `ChapterApparatus` matches none (the 79-file scan, 2026-09-30), so a Hindi boundary is D16's first build item (PARKED "the Hindi
+     apparatus boundary"); `ncert align` is unbuilt; verify has never run on hi. Stage one chapter to price it before any book.
+  3. Open for the founder, unchanged: the G/Ḡ floral-formula convention, the 0.30 similarity floor, the `global.` inference profile before
+     D37, q09's wording; the CS2–CS6 change specs in docs/changes/ (untracked, untouched).
+Scratchpad tools (session 496e81b8): ch8check.py (+29 decode; numbers/words/greek against rows), shiftprofile.py, spanshift.py,
+  digitshift.py, symctx2.py, Heads.java (PDFBox apparatus-heading scan), rulings-ch7/ch8/ch9a/ch9b/reread.json, gen.py (BOOK chem11-part2),
+  sim.py, c11p2-rows*.json; pymupdf and pyyaml reinstalled into its py/ after macOS cleared the 09-26 session's /tmp install.
+
+D15 · 2026-09-29 (afternoon/evening) · chem11-part1 closes canonical at 1,331/1,331 — nine books of ten, ₹1,444.81
+Commits 98813bf → 5e7b14c on `d15-ncert-books` (reports; f87f80d + 2eb8fa5 rulings; c3c1f24 DECISIONS). No code change,
+  so no verify or eval stamp (NcertCorrectionsTest's committed-file parse run for both rulings commits). **Spend ₹1,444.81**
+  (ledger): extract ₹1,104.58 (ch 5 staged ₹176.65, the rest ₹927.93, ₹5.91 a called page), second read ₹326.77 (₹145.62
+  in a run that stopped at ch 5 p12 on a schema failure, ₹73.17 to finish, ₹102.82 re-reading the 82 pages the rulings
+  changed, ₹5.16 three one-page redos), embed ₹13.31 at the ledger's floor (a first run stopped at 746 of 1,331 when the
+  Mac slept; the re-run under caffeinate -i finished), re-score ₹0.15; ₹6.57 a rendered page.
+STAGED CH 5 FOR THE STANDARD-STATE SIGN: 176 printed in MathB, which the layer gives as a blank code, so only the image
+  carries it. 142 of the 152 on transcribed pages reached rows (the rest in Fig. 5.9, a skipped box, dropped headings).
+  Spelled `^0` ×139, ⊖ ×32, `^o` ×1 across the book (PARKED spelling item). Greek clean: greek.py and greekdeficit.py 55 of 61;
+  a new greekuni.py (Unicode Greek per page) 658 of 714 with ν 27 of 27 — every shortfall a figure, caption, table, Objectives.
+NEW CLASSES. (1) Ch 4's layer is Caesar-shifted in 27.7% of its body (c→F, p→S, digits to control codes), mixed with clean
+  lines, so its mean legibility 0.317 passed and the layer went as character authority; the rows carry nothing copied
+  (searched), and ch 4's "differs from the layer" and start flags are noise. (2) `decodePrivateUse` shifts every U+F0xx
+  code to ASCII, right for Symbol, wrong for MathB: F030 reaches the model as "0" (the book's `^0`) and F056 as "V" — ch 4
+  p9's four `Delta_a H^V`, the second read's one transcription defect, fixed by text. (3) Three explanatory boxes skipped
+  whole (ch 1 p11 "Reference Standard", ch 2 p19 the negative-energy box, ch 5 p20 "Ionization Energy and Electron
+  Affinity"), restored from the layer; the re-read passed all three. (4) Silent corrections of the book's garbles (ch 2
+  (2.10), ch 6 p12 "[H2-]", ch 6 p17 twice), restored as printed.
+ADJUDICATION: four forks, one per chapter group, read every finding against page images and layers (≈600K tokens each on the
+  Claude Code budget, not the API); the parent reviewed their rulings, replaced ch 3 p14/p15's move-and-drop with a join
+  (the loader skips a footnote when it joins a continuation), and asked the founder the four cross-chapter questions.
+  **Founder (DECISIONS 2026-09-29, each the recommended option): list items by corpus practice — fragments join their
+  introducing sentence, complete-sentence items stay rows; a box Solution set flush is one paragraph (v5); skipped
+  explanatory boxes restored, ch 6 p6's student activity dropped; garbles restored as printed, ch 5 p22's blank keeps 3/2.**
+  279 entries (126 joins, 51 text, 9 splits, 6 drops, 4 figure_refs, 83 rulings), simulated page by page against the loaded
+  rows (scratchpad sim.py mirrors NcertCorrections and NcertLoadCommand.number) before the reload, which matched row for
+  row. The re-read raised 30 flags, none a defect (9 misprints on new spans, 21 verifier habits: ν as v, ⇌, mol-1).
+Closing: 1,331/1,331 after three one-page redos cleared the verifier's wrong not-on-page verdicts; 43 passages no row carries
+  (tables, captions, labels, biographies, mottoes, Summary, three the verifier missed in rows). Retrieval on nine books:
+  hit@1 7/15, hit@3 10/15, MRR 0.593, unchanged; no chem11-part1 passage in any top three.
+HOW TO RESUME (supersedes every earlier list):
+  1. **One book left: chem11-part2, 93 pages** (ch 7 redox kech201, ch 8 organic basics kech202 — its layer is the D14
+     survey's fully shifted file, so it goes withheld and the model reads images alone — ch 9 hydrocarbons kech203), ≈₹600.
+     render → profile (chemfonts.py; ch 7 has 6 MathB standard-state signs) and stage the riskiest → the Greek checks with
+     greekuni.py → whole book under `caffeinate -i` → load → the free checks (italics2, afterdisplay, sideheads2 plus the
+     two-column heads scan, stdsign, delta) → verify `--read-pages` → adjudicate (forks per chapter worked; give them the
+     loader's footnote rule) → gen.py + sim.py per page → reload → re-read → one-page redos for not-on-page rows → free
+     verify → embed under `caffeinate -i` → re-score (`ncert embed --book phy11-part1`).
+  2. Rulings to apply without re-asking: every Chemistry ruling of 2026-09-27, 09-28 and 09-29; organic reactions stay
+     out until D17. Snapshot the rows before any redo; never `--redo` to recover omissions.
+  3. Open for the founder, unchanged: the G/Ḡ floral-formula convention, the 0.30 similarity floor, the `global.` inference
+     profile before D37, q09's wording; PARKED adds the MathB decoding, the shifted-layer detector, v5's list-item rule on
+     the canonical books. 264 commits ahead of `main`, 43 of `origin/d15-ncert-books` (this one included), unpushed.
+Scratchpad tools (session 32dc70c4): sim.py (the corrections pass, per page), gen.py (rulings JSON → YAML block), assemble.py,
+  stdsign.py, delta.py, greekuni.py, c11p1-rows.json (the pre-ruling snapshot), rulings-*.json; pymupdf and pyyaml from session
+  c9e9a91e's `py/` and `pylib/`.
+
+D15 · 2026-09-28/29 · chem12-part2 closes canonical at 582/582 — eight books of ten, ₹881.77
+Commits 6ba0872 → 767f74e on `d15-ncert-books` (reports; f40ce94 + b82054f DECISIONS; 56e5e3d + d291ea8 rulings). No
+  code change, so no verify or eval stamp. **Spend ₹881.77** (ledger): extract ₹675.43 (ch 8 + 10 staged ₹215.59, the
+  three-page repeat ₹18.21, two whole-book rounds ₹372.33, the 15-page re-run ₹69.30), second read ₹200.52 (₹133.46
+  whole book, ₹11.26 the re-run pages, ₹55.80 the 52 pages the rulings changed), embed ₹5.82, re-score ₹0.15; ₹6.12 a
+  rendered page. Round one of the whole book stalled 7 h on a sleeping Mac (08:26 → an I/O error at 15:03; 4 called
+  pages re-paid); every long run since is under `caffeinate -i`. Three runs failed on expired SSO, each kept as evidence.
+GREEK: none of 76 Symbol letters downgraded (greek.py, greekdeficit.py); every shortfall is a table, box, drawn Δ,
+  label, caption, margin note or Summary. ch 8 p15's heading "Reactions due to a-hydrogen" is the book's own a (its
+  bold font has no α), kept.
+REACTIONS, THE NEW CLASS. The book draws every reaction, so the text layer carries none and the free checks cannot see
+  them. v5's two rules pull opposite ways ("an equation on its own line is transcribed"; "organic schemes drawn as
+  figures are figures"). The repeat of ch 8 pp6/16/22 showed formula-only lines are dice (DIBAL-H skipped, then
+  transcribed) and ring-drawn schemes habit (p16 skipped twice, p22's Solution transcribed twice with "ArMgBr"). The
+  follow-up `--redo` of 15 pages was dice both ways: +1 reaction, −4 reactions, −2 headings, +2 wrong splits and Greek
+  glyphs on ch 8 p15 — restored word for word from the first draw (which the second read had passed) by `text`.
+  **Founder: no v5 rule; the equation gap (about a dozen named reactions explained without one: Aldol, Cannizzaro, Etard,
+  Rosenmund, Reimer-Tiemann…) waits on D17** (DECISIONS 2026-09-28/29, PARKED "A reaction pass for the organic
+  chapters").
+FREE CHECKS FIRST, held back from the second read: 66 findings — the ch 8 motto, 49 heading-only rows (this compositor
+  sets side headings and list labels as rows of their own), 9 dropped headings, 5 displays/items in rows of their own.
+  The second read named 3 of them. Its own find: ch 7 p26's CH3 drawn above a CH2, dropped. Rulings, 158 in all: 63 joins,
+  24 text, 2 drops, 10 noise, 59 false positives; box titles and naming sentences by the founder's 2026-09-28 rulings;
+  Example 6.5's box-interrupted sentence mended by moving p13's rest onto p12's row. Book errors kept: "rduction",
+  "chararcter", "a-hydrogen", and ch 9 p5's (C2H5)3N+Cl− for (C2H5)4N+Cl− (PARKED "A book-errata list").
+  Closing: 582/582 after a ₹0 free verify; the 137 omitted passages are drawn schemes, questions, margin notes, labels,
+  the moved sentence and the skipped reactions. Retrieval on eight books: hit@1 7/15, hit@3 10/15, MRR 0.593, unchanged.
+HOW TO RESUME (supersedes every earlier list):
+  1. **Two books left, 313 pages** (chem11-part1 220, ch 1–6, physical/inorganic; chem11-part2 93, ch 7 redox + ch 8–9
+     organic), ≈₹1,900 at ₹6 a rendered page. **chem11-part1 next**: render → profile the chapters (chemfonts.py) and
+     stage the riskiest → both Greek checks → whole book (under `caffeinate -i`) → load → italic sweep → afterdisplay.py,
+     sideheads2.py, the motto on each p1 → verify `--read-pages` on the uncorrected rows → starts2.py/pagebreak.py →
+     rulings generated from the rows and **simulated per page before the reload** → reload → re-read → free verify →
+     embed → re-score.
+  2. Snapshot the book's rows before any `--redo`; don't redo pages to recover omitted equations (memory
+     redo-is-dice-both-ways). Rulings to apply without re-asking: every Chemistry ruling of 2026-09-27 plus the three of
+     2026-09-28 (labels over skipped drawn reactions, box titles, naming sentences).
+  3. Open for the founder, unchanged: the G/Ḡ floral-formula convention, the 0.30 similarity floor, the `global.`
+     inference profile before D37, q09's wording; PARKED adds the reaction pass (D17), the errata list, margin notes and
+     tables, reaction-condition spellings. 247 commits ahead of `main`, 26 of `origin/d15-ncert-books` (this one included), unpushed.
+Scratchpad tools (session c6aa0440): `c12p2-rulings.py` (rulings generated from rows, found by text), `formulae.py`,
+  `arrows.py`, beside copies of every earlier tool; pymupdf and pyyaml from session c9e9a91e's `py/` and `pylib/`.
+
+D15 · 2026-09-27 (evening) · chem12-part1 closes canonical at 657/657 — seven books of ten, ₹784.33
+Commits 1ffb978 → 064e92c on `d15-ncert-books` (reports, d356832 + 072dc1d DECISIONS, eaba0c5 + 2aecd89 rulings). No
+  code change, so no verify or eval stamp. **Spend ₹784.33** (ledger): extract ₹622.92 (ch 2 staged ₹145.46, then 96
+  pages ₹477.46, ₹4.97 a called page), second read ₹154.69 (₹131.15 whole book, ₹23.54 the 20 changed pages), embed
+  ₹6.57, re-score ₹0.15; ₹5.60 a rendered page. The IST day ₹1,551.95 against the ₹10,000 cap.
+THE Λ MEASUREMENT: none of 78 downgraded. The staged ch 2 carries the book's 78 Symbol-font Λ, which the layer gives as a
+  plain L; every one reached the rows as Λ or Lambda, and greek.py and greekdeficit.py find no downgrade in the book
+  (each deficit a table header, a figure label, an Intext Question, a Summary line, or a Π kept as a glyph). Spellings
+  vary — Lambda° (pp17–18), Λ° (p19), Lambda^o (p20): the ° and ^o follow the book's own glyph change, p19's glyph
+  against the prompt's names is the PARKED spelling item. E° is `E^o` all 51 times; cell bars and arrows came through.
+CHEMISTRY'S COMPOSITOR, THE NEW CLASS. Ch 2 (and ch 3 p11) set every line after a display at the 18 pt paragraph
+  indent, mid-sentence or not, with the next-line return a first-line indent has — so geometry proves no split after a
+  display in this book, and the rule of 2026-09-19 reads a continuation as a start. The transcriber, told an indented
+  line starts a paragraph, split three sentences in ch 2 (p6 ×2, p23) and three where-clauses in ch 3; the load's
+  mid-sentence check named one, because a reaction ends in "(s)" or "(aq)" and it reads ")" as a finished sentence.
+  **Founder ruling (DECISIONS 2026-09-27): in Chemistry a lower-case row after a display joins the row before**, found
+  by `afterdisplay.py`. What geometry still proves here: a flush line never starts a paragraph (only under a heading),
+  so the flush page tops joined (ch 1 p15, ch 3 p9).
+CHAPTER MOTTOES (founder, DECISIONS 2026-09-27): each chapter's italic motto under the title band was kept in ch 1–2 and
+  skipped in ch 3–5 (v5 says both "an epigraph takes the chapter's number" and "skip a margin quotation"). Out, by drop.
+SIDE HEADINGS, by the morning's ruling: 8 heading-only rows joined forward (ch 4's "Potassium dichromate K2Cr2O7" among
+  them), 3 dropped ones restored ("Effect of Temperature", "Quantitative Aspects of Electrolysis", "Faraday's Laws of
+  Electrolysis"), and ch 4's standalone list labels "1. In acid solutions:" and "2. In neutral …" joined into their (a)
+  items by analogy. The old sideheads.py is noise on this book (margin section heads, table headers); `sideheads2.py`
+  reads only in-column bold and italic lines.
+THE SECOND READ, on the uncorrected rows: 628/676 → rulings → 657/657; it flagged none of the free checks' findings. Its
+  35 flags: 2 text fixes (ch 5 p13's "[CoF_6.]" for the book's dash; ch 4 p9's "Cr^VI" restored to the printed "Cr^V1"
+  — the first transcriber repair undone, the prompt forbidding correction), 8 of the book's own errors kept (stale
+  "(2.8)" and "(2.28)", "cm^3" for cm^2, "1.90 × 0^-4", "V^v", "E^e", "La(II)", "A1(CH3)3"), 25 verifier errors (prefix
+  quotes, Π against the prompt's Pi, arrow and charge spellings). Page breaks: 2 joins, the list item "(c)" split from
+  (b), 10 noise. Three stale pre-2023 labels ("Fig.3.3", "Fig. 3.7", "Table 3.4") linked to what they mean (DECISIONS
+  2026-09-26). The re-read of 20 pages: 3 verifier errors and the book's stray dash kept. Retrieval on seven books holds
+  (hit@3 10/15, MRR 0.593) and no chem12-part1 passage reaches a query's top three.
+HOW TO RESUME (supersedes every earlier list):
+  1. **Three books left, 457 pages** (chem12-part2 144, chem11-part1 220, chem11-part2 93), ≈₹2,560 at ₹5.60 a rendered
+     page. **chem12-part2 next** (organic: reaction schemes as figures, structural formulae): render → stage one
+     chapter → both Greek checks → whole book → load → italic sweep → **afterdisplay.py, sideheads2.py and the motto on
+     each p1** → verify `--read-pages` on the uncorrected rows → starts2.py → rulings (checkrulings.py) → reload →
+     re-read the changed pages → free verify → embed → re-score.
+  2. Chemistry rulings to apply without re-asking: a lower-case row after a display joins; a motto drops; a side heading
+     (or a numbered list label standing alone) leads the paragraph below; a stale pre-2023 label links to what it
+     means; a transcriber's repair of the book is undone by `text`. No geometry-only split after a display; flush page
+     tops join.
+  3. Open for the founder, unchanged: the G/Ḡ floral-formula convention, the 0.30 similarity floor, the `global.`
+     inference profile before D37, q09's wording; PARKED: after-display enforcement on Physics, bracketed figure labels,
+     render-log glyphs in the report, Greek name/glyph spellings (now also Λ°/Lambda°, Π/Pi, DeltaG), side headings in
+     the five canonical books, the caption collector's misses, and SplitSentences' ")" blind spot on Chemistry (a fix
+     would let the load name these joins itself).
+Scratchpad tools (session c9e9a91e): `afterdisplay.py`, `sideheads2.py`, `prose.py`, `lay.py`, `clip.py`,
+  `genrulings.py`, `chemfonts.py`, `symctx.py`, beside copies of the older tools; pymupdf via `py/`, pyyaml in `pylib/`.
+
+D15 · 2026-09-27 (morning) · phy12-part2 closes canonical at 500/500 — six books of ten, ₹623.72
+Commits 9a29265 → 0f96e59 on `d15-ncert-books` (reports, afe8ea7 + 4d0805b rulings, 59faaf7 DECISIONS). No code
+  change, so no verify or eval stamp. **Spend ₹623.72** (ledger): extract ₹500.89 (ch 9 + 11 staged ₹193.09, then
+  62 pages ₹307.80, ₹4.96 a called page), second read ₹117.68 (₹102.34 whole book, ₹15.34 the 13 changed pages),
+  embed ₹5.00, re-score ₹0.15. The IST day ₹767.62 against the ₹10,000 cap.
+FREE CHECKS FIRST. A local PDFBox render of all 720 remaining pages (this book and the four Chemistry books) logs no
+  "No glyph for code", so phy12-part1's undrawn-hat class is absent everywhere left; the render console agreed.
+  Ch 11 was staged beside ch 9 for its 46 Symbol-font ν.
+THE NEW CHECK, and what it found. greek.py counts only a Latin letter STANDING ALONE where the print sets the Symbol
+  letter, so it cannot see a downgrade glued to a neighbour or a look-alike read off the image. `greekdeficit.py`
+  (scratchpad) counts, per page and letter, the Symbol letters printed against the letter's name or Unicode glyph in
+  the page's rows; calibrated on phy12-part1 (632 of 661 carried, every shortfall a caption, a figure label or
+  Summary text). On this book it found **ch 10 p6 "the frequency ν (= v/λ)" transcribed "frequency v"** (the
+  sentence then reads v = v/λ) and **ch 11 p4 "microammeter (μA)" transcribed "(mA)"**. The italic sweep found the
+  third: **ch 14 p9's label "(ii) p-type semiconductor" dropped** where ¶7 keeps "(i) n-type semiconductor". Run over
+  the five canonical books the deficit check finds nothing: bio11 ch 8's μm are figure labels, phy12-part1's "1 microF"
+  spells the prefix.
+THE SECOND READ ran on the uncorrected rows, as a free calibration: it flagged **none** of the three, and read a
+  printed ν as v on three rows itself. 458/487 → rulings → 500/500. Rulings (51 + 1): the 3 text fixes; **15 splits**,
+  each a line indented 18 pt after a display or at a page top (ch 9 pp 10, 17 ×2, 19 ×3, 20 ×4; ch 10 pp 5, 9, 10,
+  16; ch 12 p12) — ch 9 p20's "Equation (9.34) gives" named by no flag, split with its neighbours, and the free check
+  still names it because it reads the display "δ = D_m, i = e which implies r_1 = r_2" as prose (rendered: it is a
+  display); 2 join flags and 12 figure flags ruled noise (every "no caption prints" label is printed — the caption
+  collector missed 12 captions in this book); 1 figure_ref added; the book's own errors kept: "the balanced band"
+  (valence), "a micrometer is used" (microammeter), "vibrating needle"; 12 verifier errors. Lists: the prompt keeps a
+  one-sentence item inside its paragraph, so α/β/γ-decay and elemental/compound semiconductors stay in one row.
+SIDE HEADINGS (founder, DECISIONS 2026-09-27): the prompt is silent on an unnumbered heading, and this book's five
+  came out as a heading-only row, a lead-in, or dropped. Ruled: the heading leads the paragraph under it. Applied as 2
+  joins + 2 text fixes. The five canonical books are not checked for the same variance (PARKED).
+HOW TO RESUME (supersedes every earlier list):
+  1. **Four books left, 597 pages** (chem12-part1 140, chem12-part2 144, chem11-part1 220, chem11-part2 93), ≈₹3,000
+     at ₹5.07 a rendered page. **chem12-part1 next**: render → **stage ch 2** (Electrochemistry: Λ ×78, κ ×26, λ ×26 —
+     the Λ-as-L measurement) → greek.py AND greekdeficit.py on it → whole book → load → italic sweep → verify
+     `--read-pages` → starts2.py → rulings checked row by row (checkrulings.py) → reload → re-read changed pages →
+     free verify → embed → re-score.
+  2. Per book from now on: **greekdeficit.py beside greek.py** — the second read does not catch a Greek downgrade.
+     chem11-part1 carries almost no Symbol-font Greek (64 letters), so its Greek is likely in a text font the layer
+     reads truly; chem11-part2's kech202 is the Caesar-shifted layer (Σ, Γ, σ) where only the image can say.
+  3. Open for the founder, unchanged: the G/Ḡ floral-formula convention, the 0.30 similarity floor, the `global.`
+     inference profile before D37, q09's wording; PARKED: after-display enforcement, the bracketed figure labels,
+     render-log glyphs in the report, spellings of Greek names and unit prefixes (μA is "muA" in this book, "μF" and
+     "microF" in phy12-part1), **side headings in the five canonical books**, **the caption collector's misses**.
+Scratchpad tools (session e52ce02d): `greekdeficit.py`, `deficitctx.py`, `RenderScan.java` (PDFBox render log per
+  page), `sideheads.py`, `lines.py`, `checkrulings.py <book>`; starts2.py/pagebreak.py/rowctx.py in session df2781e4,
+  greek.py/italics2.py and pymupdf in d9c33cd4.
+
+D15 · night of 2026-09-26/27 · phy12-part1 closes canonical at 1,042/1,042 — five books of ten, ₹1,147.25
+Commits ee3a873 → 7f80a9f on `d15-ncert-books` (the cap, reports, 5b15c99 + 7453c37 + 594f9d0 + 6212c87 rulings,
+  4d97ca0 DECISIONS). Server tests 874, `./mvnw verify` green and eval PASS (placeholder) stamped before ee3a873.
+  **Spend ₹1,147.25** (ledger): extract ₹927.03 (ch 1 staged ₹198.22, then 144 pages ₹728.81, ₹5.06 a called
+  page), second read ₹209.65 (₹198.64 whole book, ₹11.01 the 8 changed pages), embed ₹10.42, re-score ₹0.15.
+THE CAP (founder, ~22:30): `global-daily-paise` 200000 → 1000000 in the pipeline profile, so the six books can run
+  back to back (DECISIONS 2026-09-26). The console workspace limit stays the other backstop.
+THE RENDER'S WARNING WAS THE FINDING. 214/214 clean, but PDFBox logged "No glyph for code 136 in Bookman-Light"
+  twice. Code 136 is the book's circumflex: on ch 1 pp 23–24 five of them sit exactly over the bold p of the
+  dipole-field equations (1.13a), (1.13b), both forms of (1.14), (1.17), and that font subset has no outline for
+  the code — PDFBox and pymupdf both draw a bare p, and the layer gives U+0088. The transcriber wrote `p` there and
+  `p_hat` wherever the hat renders; the verifier, reading the same image, could not see it; no check would have.
+  Without the hat the equations are dimensionally wrong. Founder: restore (DECISIONS 2026-09-27). Contrast ch 2
+  p16's (2.32), drawn as outlines with no minus in the gap: the book's own error, kept.
+THE BOOK, 214 pages / 8 chapters: ch 1 staged first (44 pages, 252 of 814 Symbol letters — the heaviest). Greek
+  check over the book: 661 Symbol letters on transcribed pages, none downgraded (ch 7 p14's μF is a Unicode μ);
+  italic sweep 75 runs, none missed. Loaded 1,041 at 100.0% coverage, no page-break repair.
+THE SECOND READ, 997/1041 → 1042/1042. Start flags by line geometry with the line-below test: this book indents
+  18 pt, page tops too, so a page-top line flush with the line below continues the page before; Example blocks are
+  indented whole; items hang their lines 18 pt, so an item's last line is not a start. **5 splits** (indented after
+  a display: ch 2 p10, ch 3 p17, ch 4 p4, p9, ch 7 p19) and **4 joins** (ch 1 p36 an item's hanging lines running
+  onto the next page; ch 2 p15 and ch 3 p10 page breaks whose last line is stretched; ch 2 p31 a display ending
+  "Eq (2.72) shows that"). 52 rows start flush after a display and stay (DECISIONS 2026-09-26). Figure flags: 8
+  caption-collector misses, 2 cross-references, 3 labels added, 1 wrong one removed. Verifier: 34 errors (mostly
+  prefix quotes, re-quoted differently on the re-read), 1 misprint kept (the printed "magnituOde").
+MY TWO ERRORS, both caught by the load's guard: a figure_ref entry named p16 for a label that lives on the p17
+  part — figure_refs belong to the extraction's per-page paragraphs, not the row; and I assumed a split moves no
+  label when it moves one the second half alone names — except "Fig. (3.14)", which `FigureLabels` cannot read.
+HOW TO RESUME (supersedes every earlier list):
+  1. **Five books left, 720 pages** (1,690 − 970), ≈₹3,900–4,150 at ₹5.36–5.77 a rendered page; the ₹10,000 cap
+     holds them in a day. **phy12-part2 next** (123 pages, 320 Symbol letters, SymbolPS codes on leph201 p24):
+     render → **read the render log for "No glyph for code"** → stage ch 1 → greek.py → whole book → load → italic
+     sweep → verify `--read-pages` → starts2.py (the line-below test) → rulings checked row by row → reload →
+     re-read the changed pages → free verify → embed → re-score.
+  2. **Chemistry**: the Λ-as-L question is a measurement now, not a rule — five books and 661 letters in phy12-part1
+     show the lone-letter rule holding; stage chem12-part1 ch 2 (Λ°m ×22) and run greek.py before its book.
+     chem11-part2's kech202 is the Caesar-shifted layer (withheld as the character authority) and carries ~150
+     unmapped Symbol codes: its render log decides what the image can show.
+  3. Open for the founder, unchanged: the G/Ḡ floral-formula convention, the 0.30 similarity floor, the `global.`
+     inference profile before D37, q09's wording; PARKED: after-display enforcement (+52 rows here), the bracketed
+     figure labels, render-log glyphs in the report, spellings of Greek names and unit prefixes.
+Scratchpad tools (session df2781e4): `starts2.py` (starts.py plus the line-below test), `pagebreak.py` (previous
+  page's last lines with word-gap stretch), `crop.py` (render bands of a page by needle), `rowctx.py` (rows and
+  layer side by side), `symmap.py` (Symbol letters per chapter); greek.py/italics2.py in session d9c33cd4.
+
+D15 · 2026-09-26 (evening) · phy11-part2 closes canonical at 682/682 — four books of ten, ₹767.43
+Commits 0e47db4 → 81219d9 on `d15-ncert-books` (reports, 3 rulings commits, 3759813 the verify fix, 745ca8a
+  DECISIONS). Server tests 866, `./mvnw verify` green before the code commit; no AI path, no eval stamp.
+  **Spend ₹767.43** (ledger): extract ₹622.18 (ch 8 staged ₹61.76, then 94 pages ₹560.42), second read
+  ₹138.43 (₹122.07 whole book, ₹6.47 redo of 4 pages, ₹9.89 the 7 corrected pages), embed ₹6.82. **The day is
+  ₹1,937.63 by the ledger, ₹62 under the pipeline profile's ₹2,000 cap: no book starts before the IST day turns.**
+  ₹5.96 a called page against bio12's ₹4.45 — a physics page returns ≈1,330 output tokens; ≈₹5.77 per rendered
+  page all in.
+FREE CHECKS BEFORE ANY SPEND. A font sweep of the four Physics books: their Symbol font carries Greek letters
+  whose private-use codes the pipeline's own reader turns into Latin letters (`PdfTextLayer.decodePrivateUse`,
+  so `` reaches the model as `w` for ω) — the same mechanism as chemistry's Λ → L, held off only by
+  the prompt's "a lone letter is the layer's noise" rule. A new scratchpad check (rows against the print, per
+  page and letter) found **no downgrade** in phy11-part1, bio11, bio12 or this book (121 Symbol letters, one
+  flag, noise). **phy12-part1 has 808 of them, ten times this book's**: its staged chapter is the checkpoint.
+  (I told the founder at first that PDFBox *drops* an unmapped glyph; the pipeline's reader keeps its code.)
+THE BOOK, 133 pages / 7 chapters (8–14): render clean; extract 133/133 with no low-confidence page; the three
+  Summary pages with teaching above the heading (ch 9, 10, 11) stop at it, and the other three put the heading
+  at the page top. Italic sweep: 128 runs, the 105 no row carries all captions, a table footnote, box text.
+THE SECOND READ, 640/680 → 682/682. Every flag read against its page, by the layer or a render:
+  - **one transcription defect**: ch 13 p8 dropped the bar over a bold v (prompt spells it `_bar`);
+  - **ten of the book's own errors kept** (`misprint`): stale "Eq. (9.4)", 9.4 vs 9.0 × 10^4 N in Example 8.4,
+    "m s²" printed without its minus twice, "small q" set in the body font where θ is meant, γ = 9/7 R,
+    (11.25)'s unbracketed 1/γ−1, (12.28)'s dU/dT = 3/2 RT, three grammar slips; and the η that ch 9 p13's
+    equation draws as a sans "h" — the transcriber wrote `eta`, the verifier accepted it;
+  - **nineteen verifier errors** (`false_positive`): quoted prefixes, dropped bars, the prompt's Greek names;
+  - **the free checks**: the 76 start flags adjudicated by line geometry (a scratchpad classifier, the indent
+    judged against the line *below* per DECISIONS 2026-09-19) — **4 swallowed paragraph starts split** (ch 9
+    p8, p13; ch 12 p5, p7) and **2 split rows joined** (the two the load's mid-sentence check named); two
+    labels printed without a space re-added; ch 8's stale "Table 9.1/9.2" links pointed at the Table 8.1/8.2
+    they mean, the text kept (founder, DECISIONS); three join flags ruled noise.
+  One row stayed "not judged" through three reads: the verifier files ch 12 p10's ¶2 claim under ¶1, and verify
+  tested "does the row carry this?" before consulting rulings. **Fixed test-first (3759813)**: a ruling on the
+  exact spans settles a claim wherever it was filed. 55 phy11-part2 entries in the corrections file, every one
+  checked against the individual rows on its page before its load.
+THE AFTER-DISPLAY RULE, surfaced: DECISIONS 2026-09-19 and prompt v5 say a line flush after a display runs on,
+  but phy11-part1 joined only its two mid-sentence cases and kept dozens of rows that start there. Founder:
+  keep the practice for both books (DECISIONS 2026-09-26), enforcement PARKED with counts.
+HOW TO RESUME (supersedes every earlier list):
+  1. **Six books left, 934 pages** (the "≈815 for seven" of this morning was wrong: 1,690 − 756 done), ≈₹5,400
+     at this book's ₹5.77 a rendered page. **phy12-part1 next** (214 pages, ≈₹1,235 — fits one day under the
+     cap): render → stage ch 1 → **greek.py on it before the whole book** (808 Symbol letters) → extract →
+     load → italic sweep → verify `--read-pages` → rulings checked row by row → reload → re-score → embed.
+     Then phy12-part2 (123 pages). Chemistry waits for the Λ-as-L ruling, which today's finding sharpens: the
+     pipeline's reader itself produces the Latin letter.
+  2. **Retrieval on the four-book corpus (₹0.15, report -ncert-embed-4): hit@3 holds at 10/15, hit@1 8 → 7/15,
+     MRR 0.629 → 0.592.** No top-3 answer lost: q08 fell 1 → 2 under its own section's opening (§6.9 ¶1), q03
+     7 → 11 (already a miss). The trend to watch: **in 3 of 15 queries a phy11-part2 passage now takes rank 2
+     from the full-text half alone** (q02 → "fluids in motion", q07 → a thermodynamic process, q11 → thermal
+     conductivity), the OR semantics of 2026-09-20 matching common words across a larger corpus. Re-score after
+     each book (`ncert embed --book phy11-part1`); revisit the text half's weight or a per-subject filter if a
+     top-3 answer is lost.
+  3. Open for the founder, unchanged: the G/Ḡ floral-formula convention, the 0.30 similarity floor, the
+     `global.` inference profile before D37, q09's wording; and the PARKED after-display enforcement.
+Scratchpad tools worth keeping (session d9c33cd4): `greek.py` (Symbol-font Greek against the rows),
+  `italics2.py` (the italic sweep for any book), `starts.py` (start flags by line geometry), `checkrulings.py`
+  (every correction against its page's rows). Not committed; PARKED is the place to decide that.
+
+D15 · 2026-09-26 · bio12 closes canonical at 673/673 on prompt v5, and v5 reopens bio11 for two pages —
+  three books of ten, ₹1,170.20
+About 30 commits on `d15-ncert-books` (3e4334e prompt v5; f0e05cc → ade3c95 bio12's rulings; the reports).
+  Server tests 873, `./mvnw verify` green and eval PASS (placeholder) stamped before the prompt commit.
+  **Spend ₹1,170.20**: bio12 ₹1,149.30 (extract ₹948.41 over 207 pages incl. the ch 1 checkpoint and a
+  3-page v5 redo; second read ₹194.16; embed ₹6.73), bio11's v5 repair ₹20.90. The branch was pushed.
+THE TRANSCRIBER STAYS OPUS 5 (founder, ~07:45). Opus 5.5 is 20% cheaper per token but rejects a forced
+  tool_choice, so the switch needs `auto` + `strict`, which turns thinking on and may eat the saving, plus
+  the chapter-7 + bio11-ch-1 re-proof. PARKED with the numbers.
+PROMPT v5 — AN UNBOXED ITALIC ACTIVITY IS RUNNING TEXT (founder ruling IN; DECISIONS 2026-09-26). Found on
+  bio12's staged chapter 1 by a free sweep of every italic run against the rows: v4 lists "a question posed
+  to the reader mid-chapter" under *boxed material*, Biology's are unboxed, so the model rolled for each —
+  it kept p19's "Split open some seeds…" and dropped p20's "Soak a few seeds…" on the facing page, and
+  dropped p15's pollinator activity, **the book's only statement of pollen/nectar robbers**. bio11, canonical,
+  had dropped 2 of 46 (ch 11 p12, p17). One rule, quoting none of its proving pages. Proved: bio12 ch 1's
+  three activities return with a sentence diff adding exactly them; bio11 ch 11 re-read (p12, p17), the two
+  prompts back plus a one-line question the 60-character sweep missed (floor → 25), reloaded, second read
+  79/79, re-embedded — **bio11 canonical again at 748/748**. v4's unit-opener rule held on every page it met:
+  bio12's five openers and five biographies (units VI–X) all returned nothing.
+bio12, 228 pages / 13 chapters, rendered at ₹0 (the `EI` inline-image warning is lebo106 p7's 7,118 tiles —
+  checked against an independent render, nothing missing). Extract clean: no differing character, no
+  low-confidence page; its 17 report flags all correct skips (two chapters print EXERCISES above SUMMARY,
+  so "prose above the heading" there is numbered questions). Load 679 → 673 after rulings, 100.0% coverage.
+  The italic sweep over the whole book found **no** loss on v5 (109 runs; every miss a contents list, a
+  heading, a table cell or a caption).
+THE SECOND READ, 649/679 → 673/673 (100.0%). Every flag read against its page: **9 real defects** — five
+  paragraphs split where the print runs on (ch 2 p9, ch 3 p7, ch 6 p5, ch 6 p16, ch 11 p7), one run on where
+  the print indents (ch 4 p11), the DNA-fingerprinting steps (iv)/(v) swapped *and* split over three rows
+  (ch 5 p28), and two labels the book prints without a space (Table11.1, Figure13.2) that the load drops.
+  The rest: 16 verifier false positives (mostly a quoted prefix; α → alpha and → → -> are the prompt's own
+  conventions), one book misprint kept (ch 7 p5 "P. malaria"), 8 free-check noise. Griffith's four flow
+  lines on ch 5 p6 ruled **OUT** (graphics with no text layer, restating the sentences around them).
+  Method, new and worth keeping: **a page-break join is decided by the stretch of the last line's word
+  gaps** — a full-measure line whose spaces exceed the page's natural ~2.3 pt is justified, so the paragraph
+  runs on (3.32, 3.26, 2.75 pt against ch 10 p5's 2.33 on a known paragraph end).
+MY TWO ERRORS, both caught by the load's own guard: two rulings were built from a chapter's rows concatenated
+  into one string, which hides row boundaries — a "split" where a row already started (ch 5 p6) and a text
+  swap across three rows (ch 5 p28). Every entry is now checked against the individual rows on its page
+  before the load; 36/36 matched. And a `noise` ruling on a "runs from p1 onto p2" join flag must name p2.
+Findings to carry (none blocking): the figure-caption collector still misses plainly printed captions
+  (Figure 2.12, 4.10, 5.15, 7.11 — bio11 showed the same, a font gate); a label printed without a space is
+  dropped at load rather than normalised; the verifier's "passages no row carries" re-lists items a join
+  merged, because it reads by band.
+HOW TO RESUME (supersedes every earlier list):
+  1. **Seven books left**, ≈815 pages, ≈₹4,400 at today's ₹4.45 extract + ₹0.98 second read per page. Per
+     book: render → stage ch 1 → whole book → load → italic sweep (25-char floor) → verify `--read-pages` →
+     rulings checked row by row before the load → reload → re-score → embed. Chemistry before extraction:
+     the Λ-as-L question on chem12-part1 ch 2 is still open.
+  2. Open for the founder, unchanged: the G/Ḡ floral-formula convention, the 0.30 similarity floor, the
+     `global.` inference profile before D37, q09's wording.
+
+D15 · 2026-09-25 · the apparatus boundary moves inside its page, and both books close canonical —
+  bio11 746/746, phy11-part1 909/909, ₹110.07
+Two commits on `d15-ncert-books` (95e6d46 the fix, 0accae5 DECISIONS + runbook). Server tests
+  848 → 863, `./mvnw verify` green before the commit. No AI path touched, so no eval stamp.
+  **Spend: ₹0.**
+THE FIX. Every page after the Summary heading's page is still never sent; the heading's own page is
+  sent when any prose is printed above the heading (or the heading cannot be placed). Where the
+  heading sits is read from glyph positions (`PdfLayout`), **not** the text layer's order — bio11
+  ch 14 p11's layer carries SUMMARY on line 1 and "Occupational Respiratory Disorders" after it, so a
+  layer cut would have lost the very case that found the defect. Two layout facts learned on real
+  pages and pinned by tests: bio11 centres the heading on a one-column page (read as a right-column
+  heading, the first attempt kept the whole Summary), and Physics sets its Summary a point smaller
+  than its text, so on ch 4 p18 the page's commonest size made the teaching "not body text".
+  A resume now re-reads a page an earlier run recorded as apparatus, so **no `--redo` is needed**.
+  Verify's layout checks stop at the heading; extract's coverage ratio skips a heading page and
+  lists it on its own checklist instead.
+THE MEASUREMENT, all ten books: every one of 78 headings placed; **53 heading pages sent**. bio11
+  **14 of 19** (agrees with the pymupdf count); **phy11-part1 5 of 7, not 2** — the earlier count
+  could not read ch 7's private-use layer, so it missed **Example 7.8 and its answer** above ch 7's
+  Summary, and it missed ch 6 p32's rotating-chair passage. One known false positive (phy12-part2
+  ch 14 p18, a figure caption). Apparatus share 17.6% → 14.2% of pages.
+NO PROMPT CHANGE, deliberately (freeze ruling): v4's standing rule skips the Summary; the second
+  read judges whether the model stops at the heading on these pages. v4 still says "the pages of a
+  chapter's end matter never reach you", which is now only half true — if the model returns nothing
+  for a heading page with prose above, that is the evidence for a rule, not before.
+THE RUNS, same day, founder-launched — **both books CANONICAL: bio11 746 of 746, phy11-part1 909 of
+  909, 100.0%, both embedded. ₹110.07 all in** (extract ₹80.86, second read ₹21.41, embed ₹7.80 —
+  the last the ledger's one-paisa floor per call, not Cohere's charge).
+  - **Extract**: a plain resume called exactly the heading pages, 14 of 252 and 5 of 143, every one
+    returning paragraphs. phy11-part1 cost ₹4.14/page with no cache write (prefix still warm).
+  - **Load**: bio11 694 → 746 (52 in, 9 continuation merges, 0 deleted); phy11-part1 894 → 909 (15
+    in, 4 merges, 0 deleted). Every new row read in the database against its page. **Recovered NEET
+    material, all of it absent before**: bio11 Viroids / Prions / Lichens (§2.6), the Solanaceae
+    floral characters (§5.9), co-factors (§9.8.6), the RQ of fats and proteins (§12.7),
+    Occupational Respiratory Disorders (§14.6), and three whole disorders sections (§15.6, §16.8,
+    §17.5); phy11-part1 **Example 2.7 (reaction time)** statement and answer, the stopping-distance
+    discussion, the free-body close of §4.11, collisions in §5.11.3, and **Example 7.8** with its
+    answer.
+  - **Second read** on the 19 pages: no `differs`, no row missing from its page. **Every passage it
+    listed as "no row carries" on a heading page is printed below the heading** (placed by position
+    on each page) — the verifier listing Summary text against its own prompt. **So v4 stops at the
+    heading unaided; no prompt rule is due**, and the freeze holds. One figure flag each: bio11's
+    Figure 7.4 is printed on p5 (ruled `noise`, as 7.3 is); phy11-part1's Fig. 2.8 exposed **a bug
+    in the cut** — the heading is centred across two columns and was read as a left-column one,
+    dropping the right column from the free check (never the rows). Fixed test-first (dd37c00),
+    judged against the printed text block because this book's crop box sits 27 pt inside its media
+    box; corpus measurement unchanged (53 sent).
+  - **Embed**: bio11 746 of 746, first time; phy11-part1 exactly the 19 changed rows. Retrieval on
+    the grown corpus: hit@1 8/15, hit@3 10/15 unchanged, **MRR 0.618 → 0.629** (q06 3 → 2), no
+    query worse; the recovered acrobat row ranks second for the skater query.
+  - Tests 848 → 865, `./mvnw verify` green before both code commits. PARKED: label-only rows
+    ("Floral Characters", "Vegetative Characters") are a pre-existing convention the new rows follow.
+HOW TO RESUME (supersedes every earlier list):
+  1. **Push `d15-ncert-books` — 134 commits ahead of `main`.** Overdue; every book adds to it.
+  2. **The eight remaining books**, ≈1,043 pages, ≈₹4,500: stage one chapter of the first book,
+     then whole books, each on `pipeline,live,visionopus`, each followed by load → verify
+     `--read-pages` → embed. The boundary fix and v4's unit-opener rule are both in their path; read
+     each extract report's "pages the Summary starts on" list.
+  3. Open for the founder, unchanged: the G/Ḡ floral-formula convention, the 0.30 similarity floor,
+     the `global.` inference profile before D37, q09's wording.
+
+D15 · 2026-09-23/24 · the free checks recalibrated on two books' evidence, bio11's 202 free flags
+  adjudicated, prompt v4 — ₹0 spent, and bio11 still not canonical
+Five commits on `d15-ncert-books` (a6050a1 the coverage recalibration, a558986 prompt v4, 093483d
+  the rulings + the verify report, 2909759 the two layout checks, af92cfa the gutter fix + two more
+  rulings). Server tests 829 → 846, `./mvnw verify` green before every commit, eval gate PASS
+  (placeholder) stamped before the prompt commit. **Spend: ₹0.** Everything below is code, rulings
+  and free runs.
+**WHAT IS STILL OWED, AND IT IS THE ONE THING THAT MATTERS: the paid second read never ran.**
+  `verify/bio11/en.jsonl` does not exist, every one of the 694 rows has no verdict, and the clean
+  share — which is PLAN D15's ✅ — cannot be computed. ≈₹190 at phy11-part1's ₹0.90/page over the
+  193 pages that carry rows. Everything else about bio11 is now ready for it.
+THE COVERAGE CHECK, recalibrated on a measurement rather than one chapter (a6050a1). `TOO_LITTLE`
+  was 0.60, measured across the twelve taught pages of chapter 7 alone. Re-measured across **every
+  page of both books — 301 that were sent to the model and returned paragraphs** — the two subjects
+  have the *same* distribution: phy11-part1 0.31–1.16, median 0.95; bio11 0.32–0.99, median 0.90.
+  **So a figure-dense subject is not what makes a ratio low — a table or a tint box is, and Physics
+  has those too**, which kills the framing of open item (b). All eight pages below 0.60 across both
+  books were adjudicated correct skips (Table 1.1, two tint boxes, Table 6.1, Table 4.2's cells, two
+  figure interiors), and nothing in either book falls below 0.31, so **the floor is 0.30** and the
+  check is a tripwire for real loss instead of a table detector. Two things it treated as ratios are
+  not ratios: **a page that returned nothing** scored 0 and read "text is missing" — eleven of
+  bio11's fourteen flags, every one a page the prompt tells the model to skip — and now has its own
+  verdict and its own report section, a checklist ordered prose-first, because the layer's
+  sentence-length runs are what tell a biography from a plate and their character counts are not
+  (Corti 376, the cell-diagram plate 466); and **the 400-character floor** stays, a ratio against 200
+  characters meaning nothing, but stops being *silent* — it hid three bio11 pages including the fifth
+  biography. Method note for anyone re-measuring: PDFBox decodes `keph107.pdf`'s private-use glyphs
+  and pymupdf does not, so an offline measurement must apply the same decode or chapter 7 looks like
+  six blank pages.
+PROMPT v4 — the unit-opener rule, the first deliberate revision since the freeze (a558986). The
+  freeze of 2026-09-14 ran "until the page-image second read exists and shows a defect it cannot
+  catch" and **both halves are now true**, so this is the revision the ruling of 2026-09-22 said the
+  rule belonged in, taken before the eight books rather than after. Exactly one rule added, nothing
+  else moved. **The two canonical books are untouched and unrepriced**: extract resumes on a page's
+  presence in the JSONL, never on the prompt version, and both keep naming v3 through
+  `ai_calls.prompt_version`. Inert on Physics and Chemistry, whose chapter PDFs carry no such page.
+  **The proving run is the next Biology book's staged chapter 1** — the checkpoint we pay for anyway.
+THE FREE RUN ON bio11, 202 flags, every one adjudicated at ₹0 (report `-ncert-verify.md`). It found
+  **3 real segmentation defects and 199 structural false positives**, and the diagnosis of the 199 is
+  the session's main finding: **both checks were calibrated on Physics typography.**
+  - **171 start flags → 357 named rows, 262 of them (73%) a section's first paragraph.** bio11 sets
+    its sub-headings in **Title Case** ("1.2.2 Genus", "4.1.4 Coelom") where Physics sets
+    "7.5 ACCELERATION DUE TO GRAVITY", and `HEADING` demanded capitals — so no heading was ever
+    recognised, the rule that a heading's next line starts a paragraph never fired, and ch 1 p7, a
+    page of five headed paragraphs, reported that **the print starts 0 paragraphs**. Most of the
+    other 95 are NCERT's flush-left run-in label paragraphs ("Residual Volume (RV):", "Metaphase I:").
+  - **15 join flags → 3 real.** The check judged a page break on the *next* page's first line alone,
+    and **bio11 sets every page's first line flush left whether it continues or not** (ch 4 p5 is a
+    new paragraph at 0.0 pt of indent, proved by p4 closing 40.6 pt short). Each was re-judged on the
+    signal the check never had — the previous page's last line against its column measure, a
+    justified paragraph's last line being the only ragged one. Real: **ch 3 §3.2 ¶2** (p6's last line
+    at 533.8 of a 534.0 measure, the text running on past Figure 3.2 — my first eyeball call was
+    "noise" and the measurement reversed it), **ch 4 §4.1.3 ¶2** (diploblastic and triploblastic are
+    one printed paragraph) and **ch 12 §12.2 ¶5** (the three fates of pyruvate continue that
+    sentence). The twelve false ones end 37–228 pt short. One, ch 11 §11.10 ¶1, has a full-measure
+    last line **by coincidence** but opens a new section — which is why "at the measure" is only
+    suggestive while "short" is proof.
+  - **16 figure flags, all noise, every row faithful.** Each flagged label is in its chapter's layer
+    on the row's own page; five are sub-figure letters the running text really prints ("(Figure
+    14.2a)" against a caption reading "Figure 14.2 … (a) inspiration"). The caption collector is
+    gated on the first glyph's font name carrying bold or demi, and **bio11 mixes caption faces** —
+    ch 17 p6's is plain `Bookman` — so those captions are never collected.
+  - **Silent where it counts**: 0 numbered equations the print carries that the rows do not, 0
+    passages no row carries, 0 rows the verifier could not find. The checks aimed at *lost text* all
+    say nothing, which is the result that matters before a book is read.
+BOTH CHECKS FIXED, test-first (2909759, af92cfa; tests 835 → 846). `HEADING` takes a Title-Case
+  title, and a heading wrapping to a second line is read as part of it, bounded by a word count so a
+  run-in label still opens a paragraph. `PageShape` gains `bottom`, measured on the last line that
+  starts at its column's own margin — so a caption below the text does not answer for the paragraph
+  (ch 3 p6) — and **only `ends` silences a flag**, the verdict needing the stronger evidence, and
+  only in the direction where the next page's flush top was the whole case. The opposite direction, a
+  row running across a break into a page that opens a paragraph, is never silenced: there a page that
+  ended its paragraph *corroborates* the flag.
+  **Then the first real run found the fix's own defect**, which is why it was worth running before
+  the eight books: 15 flags → 3, and all three survivors were flags already ruled noise. bio11 ch 4
+  p10 is a figure page with 29 prose lines in one column and **two lines reaching across the notional
+  gutter**; reading order ends in the right column, so the two-line bucket outvoted the page. The
+  right column now has to be a column — the three lines a margin already needs. The last two,
+  ch 11 §11.4 ¶1 and ch 18 §18.1 ¶1, are not the columns: the paragraph's true last line ("in a
+  synchronised fashion.") is not what the layer calls prose, three words being the floor, so the
+  lowest prose line is an earlier one at the full measure. Recorded as `noise` rulings with the
+  print's own numbers instead of chased further.
+THE RELOAD AND THE SECOND FREE RUN, both ₹0 (`-ncert-load.md`, `-ncert-verify-2.md`). The load named
+  all four corrections, **694 paragraphs at 100.0% coverage**, 0 inserted / 5 updated / 689
+  unchanged, zero page-break repairs, zero mid-sentence starts; the three deletions are exactly the
+  renumbering tails the merges leave (`§3.2 ¶4`, `§4.1.3 ¶2`, `§12.2 ¶5`, each section's last number
+  vanishing as its rows shift up one). The re-verify then measured the fixes against the real pages:
+  **start flags 171 → 129 pages, join flags 15 → 3 → 0 once the two rulings apply, figure flags 16
+  raised → 0 raised** with all sixteen listed under the founder's rulings so those rows count clean,
+  equations and passages still 0.
+THE THIRD CAUSE OF THE START FLAGS — **built on the founder's instruction, and the diagnosis I gave
+  first was wrong** (383ab65). I reported that the layer splits a heading's number from its title, so
+  the line reads "2.4" and matches no pattern, and proposed a number-only heading rule. That is what
+  **pymupdf** shows; it is not what the pipeline reads. The rule was built, measured against ch 2 p10,
+  **changed nothing, and was reverted.** What PDFBox actually hands over is the line
+  `2.4 KINGDOM PLANTAE`, bold, at the column margin, matching `HEADING` on the nose — and it is
+  dropped one step earlier: **a line's size is its commonest glyph's, the heading is set in SMALL CAPS
+  with a 13 pt initial and 9 pt capitals, so its modal size is 9 against a body of 10**, and
+  `readable` keeps only lines within 0.9 pt of the body — a floor that exists to drop running heads
+  and captions. The heading never reached the heading test. **A line's largest glyph is what says it
+  is not small text**, and the bold face is what keeps the running head out, which bio11 also sets in
+  small caps ("BIOLOGICAL CLASSIFICATION", 7 pt on an 11 pt initial) and which would otherwise become
+  the page's first line and say nothing about what it continues. **Measured over bio11's 252 pages:
+  printed paragraph starts 954 → 1047, so 93 paragraphs the check could not see are now pairable**;
+  on ch 2 p10 that is all three of §2.4 ¶1, §2.5 ¶1 and §2.6 ¶1, and the page's top goes from
+  `continues` to `starts`. **Carry the method note**: pymupdf's span sizes are not PDFBox's per-glyph
+  sizes, this bug lives exactly in the gap between them, and an offline estimate of it reads zero —
+  measure this class in Java. The next free verify run is where the 129 becomes a real number.
+**THE SECOND READ, 2026-09-24: bio11 closes at 694 of 694 paragraphs, 100.0% — PLAN D15's ✅ line
+  computes and is met** (reports `-ncert-verify.md` … `-4.md`). The read itself: 193 pages, ₹188.32,
+  694 verdicts, **685 clean at first pass (98.7%)**; then the rulings, one ₹8.99 page redo and three
+  follow-up reads totalling ₹3.59 took it to 100.0% — ch 9 p12 re-read with **no flags**, which is
+  the check on the `text` ruling's own `printed` span, and ch 11 p9 found on the second draw
+  (77 of 77), so the verifier's one miss was a bad draw and not a blind spot. **Spend for the day:
+  ₹200.90.** Two mechanics worth carrying: the resume matches a read to the page's **words**, so the
+  redone p11 kept its verdicts and was not re-read — which is also how we know that redo changed no
+  text at all; and a single-page call costs ₹9 against a long run's ₹4.36, because it pays the whole
+  11,025-token prefix as a cache *write* with nothing to amortise it. Nine flags on 694 rows:
+  **one real defect** (ch 9 §9.8.3 ¶2 lost the reversible arrow, so "E + S <-> ES" read "E + S ES" —
+  fixed by a `text` ruling, the prompt's own notation block fixing `<->`), **one misprint kept** (the
+  layer prints "aqueduct passess through": the row is faithful and the verifier corrected NCERT), and
+  **seven verifier errors** — three quoting a prefix of the print and calling the remainder an
+  addition, two the Greek-letter convention of the shared notation block ("alpha type" for α type),
+  one the same block's rule that a condition above an arrow is written after it in brackets (the
+  carbonic-anhydrase row did exactly that), one a symbol misread (the page prints ⚥ for bisexual and
+  ♂ for male, read at 300 dpi because the layer carries no symbol there). Also one `not_on_page`
+  claim that is a verifier miss — the row's 226 characters sit at the foot of ch 11 p9 verbatim — and
+  **no ruling can answer it**, because `ruledOn` is consulted only for a `differs` span; that page
+  has to be read again. The free checks, re-judged with this session's three fixes: **start flags
+  129 → 84 pages, join flags 3 → 0, figure flags 0 raised of 16** (all ruled, the rows counting
+  clean), equations 0. The two join `noise` entries never fired — the small-caps fix made those
+  pages' headings visible, so `top` became `starts` and the flags went at source.
+**AND THEN THE FINDING THAT MATTERS MORE THAN ANY OF IT — `ChapterApparatus` DISCARDS TEACHING.**
+  Chasing the one "passage no row carries" that was not a question or a figure interior: ch 12
+  §12.7 ¶3 ends *"as shown in the equation below :"* and the equation is not in the corpus. A ₹8.99
+  redo of that page reproduced the same output, which is the "repeat before change" rule earning its
+  keep — it proved the skip is a rule, not dice. The reason is not the transcriber at all: **the
+  equation is at the top of p12, and `ChapterApparatus.find` returns the first page carrying a line
+  equal to SUMMARY and `covers(page) = page >= firstPage`, so the whole page is never sent** — with
+  everything printed above the heading on it. Page 12 opens with the glucose-oxidation equation, its
+  RQ = 1.0, then *"When fats are used in respiration, the RQ is less than 1…"*, the tripalmitin
+  equation, RQ = 0.7, and *"When proteins are respiratory substrates the ratio would be about 0.9"*.
+  **Measured across both closed books** (prose lines only, running-head zone excluded, ≥100
+  characters): **bio11 loses prose above the boundary in 14 of its 19 chapters, ≈12,850 characters;
+  phy11-part1 in 2 of 7, ≈2,310.** Verified by hand in two: ch 12's RQ values for fats and proteins,
+  and **ch 14 p11's "Occupational Respiratory Disorders"** — a named subsection of §14.6 on dust,
+  fibrosis and silicosis, which appears in **zero rows**. Both are NEET material.
+  **This is invisible to every number we have**: coverage counts pages *extracted*, and an
+  apparatus-skipped page counts as legitimately skipped, so "100.0% coverage" and "98.7% clean" are
+  both true and neither can see it. The second read cannot see it either — it only reads pages that
+  were sent. **So neither book is canonical yet**, and the fix belongs before the eight others, not
+  after. The shape of it: `ChapterApparatus` returns the boundary's position *within* its page, and
+  extract sends that page while still skipping every page after it — the prompt already carries the
+  rule to skip Summary and Exercises, and the reason the page-level skip exists (NCERT numbers its
+  exercises like section numbers, so the model mis-addressed them) is then confined to one page per
+  chapter, with the second read and the start check watching it. Note the re-extraction is not free
+  and not cheap per page: 16 boundary pages as single-page calls is ≈₹9 each, because a lone call
+  pays the whole 11,025-token prefix as a cache *write* with nothing to amortise it — the ₹4.36 a
+  long run gets does not apply. Batching per chapter is the cheaper shape.
+HOW TO RESUME:
+  1. ~~The paid second read~~ — **run 2026-09-24, ₹188.32, 685 of 694 clean**; its nine flags and
+     the one `not_on_page` miss are all adjudicated and ruled. What is left of it: re-read ch 9 p12
+     and ch 12 p11 (the pages the rulings changed — a plain `--read-pages` resumes into exactly
+     those, ≈₹2) and `--redo --chapters 11 --pages 9` for the verifier's one miss (≈₹1).
+  1b. **THEN THE APPARATUS BOUNDARY, before the eight books and before either book is called
+     canonical** (above): `ChapterApparatus` discards the whole page the SUMMARY starts on, which
+     costs bio11 prose in 14 of 19 chapters and phy11-part1 in 2 of 7 — including a named §14.6
+     subsection that reaches no row. Code first, then re-extract the 16 boundary pages, then reload
+     and re-verify those pages. Founder's call on the shape; the recommendation is in the day log.
+  2. ~~The number-only heading line~~ — **built as the small-caps fix instead** (above); the free
+     verify is what turns 93 recovered starts into a new flag count, and it is ₹0, so run it with
+     step 1.
+  3. **Then the eight remaining books**, ≈1,043 pages, ≈₹4,500 at bio11's ₹4.36/call plus the second
+     read. Every one needs `visionopus` on the command line; all ten are render-pre-flight clean; and
+     v4 means no book after this one needs a `drop` entry for its unit openers.
+  4. **114 commits are ahead of `main` and pushing is overdue** — PR #16 merged 2026-09-14 and every
+     day of D15 since is unreviewed. The review grows with every book.
+OPEN FOR THE FOUNDER, none of it blocking: (a) the floral-formula G/Ḡ notation convention; (b) ~~the
+  `PageCoverage` recalibration~~ — **done this session, on 301 pages**; (c) the 0.30 similarity floor,
+  still worth revisiting on a second book's evidence; (d) the `global.` inference profile routing
+  outside India, wanted **before D37**; (e) q09 and how a real student words a query; (f) ~~the
+  number-only heading line~~ — built as the small-caps fix, 2026-09-24.
+```
+
+```
+D15 · 2026-09-21/22 · bio11 extracted, loaded at 100.0% and ruled on — the second book of ten,
+  ₹914.00 all in
+Founder-run from `server/` on `d15-ncert-books`, `margai_d15`. Two commits (7eae735 the reports,
+  05fa915 the ruling). Server tests 827, `./mvnw verify` green before the commit. No AI path in
+  either change set, so no eval stamp was due.
+THE RUN, in the HOW TO RESUME order of 2026-09-20:
+  - **render `--redo`, 252 of 252 redrawn, ₹0.** The pages had been written on 2026-09-13, behind
+    both decoder fixes, and the first run of the night reported `0 rendered | 252 skipped` — the
+    plain command skips a page already in the bucket, so it confirms presence and re-renders
+    nothing. `--redo` is the flag. Worth the two minutes on this book in particular: bio11 carries
+    **451 JPEG2000 streams across its 20 PDFs**, 159 in kebo115 alone, so it is exactly the book
+    where a pre-decoder render would have arrived blank. Page counts per chapter identical to the
+    2026-09-13 run.
+  - **extract, 208 pages called of 252, 794 paragraphs, ₹914.00 for the book** (₹39.96 for the
+    chapter-1 checkpoint on 2026-09-21, ₹874.04 for the remaining 200 on 2026-09-22). All 200 calls
+    `status ok`, all `claude-opus-5`, all prompt v3. **Per-call fell ₹5.00 → ₹4.36** as the cached
+    prompt prefix amortised over a long run, which is why the book came in under the ≈₹1,040
+    projection and well under the ≈₹1,260 the page-weighted planning line implied. 44 pages are
+    end-of-chapter apparatus, found by `SUMMARY` in all 19 chapters and never sent.
+  - **load, 698 paragraphs at 100.0% coverage**: 668 inserted, 30 updated, 0 unchanged, **nothing
+    deleted**. The 30 stale early-v2 chapter-1 rows were overwritten in place at the same
+    addresses — `unchanged 0` proves no row kept v2 text — so the orphan question that had been
+    open since 2026-09-14 closes with no orphan. Zero page-break repairs, zero paragraphs starting
+    mid-sentence, zero figure_ref drops, zero degree-sign fixes.
+THE 13 COVERAGE FLAGS, all adjudicated against the PDFs at ₹0, and **not one a transcription
+  defect**. Read this before the eight remaining books, because most of it will recur:
+  - **4 unit-opener essays** (ch 5, 8, 11, 14 p1) — the ruling, below.
+  - **3 biographies** (Esau ch 5 p2, G.N. Ramachandran ch 8 p2, Calvin ch 11 p2), correct skips by
+    the v3 biography rule.
+  - **3 full-page figures and 1 full-page table** — ch 8 p8 (the cell diagram, 81 images), ch 9 p4
+    (biomolecule structures), ch 11 p18 (`TABLE 11.1 Fill in the Columns`, an exercise). Correct.
+  - **3 partials — ch 3 p6 at 45%, ch 4 p15 at 32%, ch 11 p14 at 49% — are figure and table
+    interiors, which the prompt says to skip.** ch 4 p15's missing 68% is Table 4.2's cells; the
+    other two are Figure 3.2's and Figure 11.8's label soup. **So `PageCoverage.TOO_LITTLE = 0.60`
+    is the thing that is wrong, not the pages**: its own javadoc records it as measured across
+    twelve *physics* pages running 0.76–1.14, and Biology is figure-dense enough to fire it on
+    correct pages. Worth recalibrating on this book's evidence rather than tuned on one subject.
+  - **2 character diffs, both resolved.** ch 14 p10 `anhydrase` 3× vs 2× is a false positive: the
+    page prints "Carbonic anhydrase" on both sides of the reversible reaction and the layer
+    truncates the second to `Carbonic anhydra`, so the model read the image correctly. ch 5 p13
+    `underline` is real and a **good catch by the model** — NCERT's floral formula distinguishes
+    **G** (superior ovary) from **Ḡ** (inferior) by a line under or over the letter, which no text
+    layer can carry, and the model spelled the distinction out instead of flattening both to "G".
+    **This wants a notation convention the way `sqrt` and `i_hat` got one in physics, and it is a
+    real NEET distinction** — open for the founder, not blocking.
+THE BLIND SPOT, worth carrying forward: **`PageCoverage` judges nothing below 400 characters**, so
+  a page under that floor is named by no report whether it came back right or empty. Three pages of
+  bio11 sit there — the **fifth** biography (Alfonso Corti, ch 14 p2, 376 characters; the scan that
+  predicted "three biographies" missed both him and Ramachandran) and ch 3 p3 and p9, two full-page
+  figure plates. All three were resolved by hand: no row matches `corti` as a name or `basilar`, so
+  **the biography rule in fact held 5 of 5**, and the plates are correctly empty. Nothing was
+  hiding, but nothing would have shown if it were. Same shape as the start-check blind spot closed
+  on 2026-09-19.
+ONE NUMBER THAT LOOKS LIKE LOSS AND IS NOT: extract reported **794** paragraphs, the load wrote
+  **698**. The 96 are cross-page continuation merges — phy11-part1 ran 942 → 894, 0.44 merges per
+  page, against bio11's 0.48. Same mechanism, same rate, and the load reported zero flag repairs
+  across 200 pages.
+**THE FOUNDER'S RULING, 2026-09-22 — a unit-opener essay is not corpus text** (DECISIONS; commit
+  05fa915). NCERT opens each of Biology's five units with a page of framing prose facing the unit's
+  biography page. The transcriber returned nothing for four of them and transcribed the fifth
+  (ch 1 p1, 1,321 characters), on five pages that are **structurally identical** — same 40 pt
+  `UNIT n` banner, same single drawing, the banner carried in every page's own text layer, the only
+  difference being whether it sorts before or after the body text. The prompt has no rule for the
+  page at all (its biography rule covers the facing page only), so the two answers are **dice, not
+  a rule applied inconsistently**, and the corpus held one page type in once and out four times.
+  Ruled OUT on the test the prompt already applies to a biography — a student sent there has been
+  sent nowhere — and because the page, being topically dense in generic subject vocabulary,
+  competes with real teaching paragraphs for exactly the broad queries a student asks. **Applied as
+  a `kind: drop` correction, not a prompt edit**: the prompt stays frozen at debb920, four of the
+  five pages already behaved as ruled, and one entry settled the book at ₹0 with no re-extraction —
+  bio11 ch 1 30 → 29 paragraphs, `ch 1 §1 ¶2` deleted by the renumbering, the book **698 → 697**,
+  and the corpus now opens on the chapter's own first sentence. **The prompt rule is still owed at
+  the next deliberate revision, before the eight remaining books**, since every NCERT title opens
+  its units this way and the next book reproduces the same coin flip.
+ALSO FIXED: the runbook's §3 and chapter-7 extract commands said `--spring.profiles.active=pipeline,live`,
+  which is **the model ruled out of this job**. The VISION default in `application.yml` is
+  `claude-haiku-4-5`, `visionopus` is the only thing that selects Opus, and unlike
+  `ncert verify --read-pages` — which refuses to start unless the tier is the verify-model —
+  **`ncert extract` had no transcriber guard**, so the profile left off spent a book's budget on
+  Haiku and said so nowhere but the ledger. Both commands corrected (7f78a7d).
+**AND THEN BOTH GUARDS BUILT, ₹0, test-first** (7940456, 5e5128a; tests 827 → 829, verify green,
+  eval stamped before each — the change set touches `ai/` and an `application*.yml`, both AI paths).
+  `ncert extract` now refuses on the same two grounds `ncert verify --read-pages` has since D15:
+  - **the transcriber guard.** `margai.pipeline.transcribe-model: claude-opus-5` beside the existing
+    `verify-model`, `NcertPageExtractor.model()` mirroring `NcertPageVerifier.model()`, and a refusal
+    naming the profile: *the vision tier is claude-haiku-4-5, not claude-opus-5 … run with
+    `--spring.profiles.active=pipeline,live,visionopus`*.
+  - **the fake-client guard, which was the quieter and worse hole and was found while building the
+    first.** Without `AI_LIVE=1` the command did not fail — it wrote **fixture text into the book's
+    canonical JSONL**. And because extract *resumes*, the fabricated pages would have survived the
+    next real run untouched: the artefact is read first and a page already in it is never called for
+    again. A wrong model is at least detectable — the ledger names it on every row and the second
+    read would find the layout damage — but nothing downstream distinguishes a fixture from a page
+    of NCERT. Checked **before** the model guard: a fixture is not a cheaper transcription but a
+    different kind of thing.
+  Both refuse before page one, because every page after the first is money spent on an artefact that
+  has to be thrown away; both tests assert the JSONL was never created, so a refused run cannot leave
+  a partial artefact for the next run to resume from. Each was watched failing first — the RED in
+  both cases was the defect itself, the run exiting 0 having transcribed the book.
+HOW TO RESUME:
+  1. **bio11 is not canonical yet.** `ncert verify` (the free layout checks) then
+     `--read-pages` (the Sonnet second read, ~₹175 at phy11-part1's ₹128/143 pages scaled to 208),
+     then adjudicate, then `ncert embed --book bio11`. Only then is the book done the way
+     phy11-part1 is.
+  2. **Then the eight remaining books** — ≈1,043 pages, ≈₹4,500 at bio11's ₹4.36/call, plus the
+     second read. Every one of them will need `visionopus` on the command line, will flag its unit
+     openers and biographies, and will want its `drop` entry until the prompt rule lands.
+  3. ~~The ₹0 safety commit: give `ncert extract` the transcriber guard~~ — **done this session**,
+     and the fake-client guard with it. The eight books run behind both.
+  4. **Still owed, and cheap**: the `PageCoverage` recalibration (a), below. Doing it before the
+     eight books means their flag lists are worth reading rather than mostly figure interiors —
+     bio11 produced 13 flags of which 12 were noise, and that ratio will hold for every Biology
+     and Chemistry book.
+OPEN FOR THE FOUNDER, none of it blocking: (a) the floral-formula G/Ḡ notation convention; (b)
+  `PageCoverage.TOO_LITTLE` recalibrated for figure-dense subjects, and its 400-character floor;
+  (c) the 0.30 similarity floor, still worth revisiting on a second book's evidence; (d) the
+  `global.` inference profile routing outside India, wanted **before D37**; (e) q09 and how a real
+  student words a query.
+SESSION CLOSED 2026-09-22, tree clean. Seven commits: 7eae735 the reports, 05fa915 the ruling,
+  7f78a7d the runbook, e4d5310 + 21b658a the close and its count correction, 7940456 + 5e5128a the
+  two guards. **108 commits on `d15-ncert-books` are ahead of `main`** (07e56a3 2026-09-14 →
+  5e5128a today, 109 counting this close); PR #16 was merged 2026-09-14 and `main`/`origin/main`
+  both sit at that merge (451adb3), so every day of D15 since is unreviewed and unpushed, and
+  `origin/d15-ncert-books` is a stale ref at d0cfc39. **Pushing is now overdue** — the review grows
+  with every book. Server tests 827 → 829, `./mvnw verify` green, eval gate PASS (placeholder) and
+  stamped before each AI-path commit. **D15 is not ticked**: its ✅ is a coverage report per book
+  and this is **two books of ten**. **Spend this session: ₹914.00** — every rupee of it bio11's
+  extraction; the ruling, both guards and all thirteen adjudications cost nothing.
+```
+
+```
+D15 · 2026-09-20 (second session) · the decoder pre-flight widened to all ten books — ₹0, and the
+  eight never-rendered books come back clear
+Built on `d15-ncert-books`, one commit (1bdacd2). Server tests 823 → 827, `./mvnw verify` green.
+  No AI path in the change set — checked against `AI_PATHS` in `scripts/precommit-gate.sh` rather
+  than assumed — so no eval stamp was required.
+WHY IT WAS THE FIRST THING, ahead of any book: `ncert render`'s whole guarantee is that a page
+  PDFBox cannot draw completely **fails** instead of arriving blank. PDFBox's own answer to a
+  missing decoder is to log, draw the page without the image and report `result: ok` — which at
+  D14 would have sent 21 of 30 chapter files to the VISION tier with their figures silently blank,
+  and nothing downstream could have told. The guard written for it, `PdfPageRendererTest`, swept
+  **only the two pilot books**. The eight never rendered — 1,295 pages with roughly ₹6,500 of
+  render-and-extract behind them — had never been swept at all, and the sweep is free.
+**THE RESULT, over all ten at ₹0: 79 chapters, 1,690 pages, every page drawn, no decoder gap.**
+  phy11-part1 143 · phy11-part2 133 · phy12-part1 214 · phy12-part2 123 · chem11-part1 220 ·
+  chem11-part2 93 · chem12-part1 140 · chem12-part2 144 · bio11 252 · bio12 228 — every count
+  matching the PDFs and `ncert/2022-ed/en/manifest.md`. **So no book of the nine carries a
+  JPEG2000/JBIG2 surprise and the render for all of them is safe to launch**, which is the one
+  thing about the nine that could be known for nothing before spending anything.
+WHAT THE TEST NOW DOES, three decisions, each the boring one (DECISIONS):
+  - **It reads `books.yaml`** through the existing package-private `BooksYamlReader` instead of
+    listing a directory, so it sweeps exactly the chapters `ncert render` will render. A pass on an
+    appendix nobody renders proves nothing — and it now also catches a chapter **named in the yaml
+    but missing from disk**, which today would fail mid-run on a founder-run command that spends.
+    That took 246 pages of prelims and answers out of the sweep, which is why the default got
+    *faster* rather than slower.
+  - **It asserts the pages drawn equal the document's page count**, where it had asserted only that
+    some were drawn — the weaker form passes on a document that lost pages. `render` already
+    returned the count, so the stronger assertion was free.
+  - **It collects every failure and reports them together**, under a per-book page table. At ten
+    books the sweep runs for minutes, so failing on the first bad file would have meant one run per
+    bad book.
+**OPT-IN, NOT DEFAULT, WHICH IS THE ONLY REAL TRADE HERE.** All ten is 7m15s, the two pilots are
+  78 seconds, and `./mvnw verify` runs before every commit. So `-Dncert.preflight` takes `all` or a
+  comma-separated list of book codes and **unset means the two pilots** — the regression tripwire
+  stays on the commit gate and the full sweep becomes a deliberate act before a render. A code
+  `books.yaml` does not carry **fails the run** rather than quietly sweeping nothing: that is the
+  same inert-selector failure `--chapters` cost one paid run four days ago, so the refusal was
+  written in rather than left to be discovered the same way twice.
+MEASURED, NOT ESTIMATED: default 78 s over 395 pages (it was ~90 s, and it is faster now only
+  because the prelims and answers left the sweep); all ten 7m15s wall, 433 s of that in the sweep.
+THE RUNBOOK §2 now carries the command, the flag, the expected per-book counts and this result, so
+  the guard needs re-running only when the source PDFs or the decoder dependencies change.
+WHAT IT DOES NOT BUY, said plainly so the green is not over-read: 72 DPI proves **decoders**, not
+  quality. A page that draws completely can still be wrong, and a decoder that exists but decodes
+  badly passes. The guarantee is exactly "PDFBox could draw every page with every image" — the D14
+  failure and nothing beyond it.
+
+HOW TO RESUME — this morning's list, with the pre-flight struck off:
+  1. **bio11**, on the frozen v3 prompt: its 30 chapter-1 rows are still the early v2, and it
+     carries D14's tick. Then the eight others — extract, verify, load, embed, all on the settled
+     Bedrock pin. **The render pre-flight for all nine is done and clear.**
+  2. **The planning cost line needs correcting before it is used again.** This tracker has said
+     "~₹700 each" for the nine, i.e. ~₹6,300. Page-weighted against the only real measurement
+     (₹712 for phy11-part1's 143 pages ≈ ₹5/page), the nine average 172 pages and come to
+     **≈₹7,700**. Embedding on top is noise (~₹10 true, ~₹100 ledger at the one-paisa floor).
+OPEN FOR THE FOUNDER, unchanged and none of it blocking the nine books: (a) the 0.30 similarity
+  floor, worth revisiting on a second book's evidence rather than tuned on one; (c) the `global.`
+  inference profile routing outside India, which wants a ruling **before D37** and not before the
+  books; (d) q09 and how a real student words a query. (b), the chunk, was answered and rejected
+  this morning.
+SESSION CLOSED 2026-09-20, tree clean. **100 commits on `d15-ncert-books` are ahead of `main`**
+  (07e56a3 2026-09-14 → 1bdacd2 today) — PR #16 was merged on 2026-09-14 and `main`/`origin/main`
+  both sit at that merge (451adb3), so every day of D15 since is unreviewed and unpushed. The
+  remote-tracking ref `origin/d15-ncert-books` is stale at d0cfc39 and should not be read as the
+  branch's state. **Worth pushing before the nine books make the review pass larger.**
+  Server tests 827, `./mvnw verify` green. **D15 is not ticked**: its ✅ is a coverage report per
+  book and this is still one book of ten. **Spend this session: ₹0.**
+```
+
+```
+D15 · 2026-09-20 · the retrieval spike built and ready to run — ₹0 spent, and one finding that
+  would have wasted the paid run
+Built on `d15-ncert-books`, six commits (58b9f3f → the audit-fix commit). Server tests 747 → 804,
+  `./mvnw verify` green through every commit gate, eval gate PASS (placeholder) and stamped before
+  each `ai/`, `eval/` or `Retriev*` commit. **Nothing paid has run: `ncert embed` is founder-launched.**
+WHAT WAS BUILT, in the order the HOW TO RESUME of 2026-09-19 asked for it:
+  - **V8**, the HNSW cosine index (m = 16, ef_construction = 64), pulled from D17 to D15 with the
+    re-order. Built on an empty column rather than after the load — a migration cannot wait for a
+    pipeline run, and at ~900 rows now and ~9,000 at D17 the build-order difference is not measurable.
+  - **The embedding column's read, write and staleness.** A null embedding is the whole state
+    machine: a new paragraph inserts with one, a reloaded paragraph whose English text *changed*
+    has its vector cleared, a deleted paragraph takes its vector with it. So resumability and
+    staleness are one mechanism and a re-run over an embedded book costs nothing. Only a rewritten
+    text clears — a load that moves a figure reference re-embeds nothing. The column stays unmapped
+    in the entity and is reached by parameterised native SQL (§8): the vector search has no JPQL
+    spelling regardless, so Hibernate's vector module would be a dependency bought for nothing.
+  - **`EmbeddingService` in `ai.tasks` and `ncert embed --book`.** Two named methods, document and
+    query, rather than a boolean: the pinned model embeds a stored passage and a student's question
+    from different sides of one space, and the wrong side costs accuracy no test failure points at.
+    The command refuses the fake client — a fixture vector on a real row is invisible, every
+    retrieval over it is wrong, and it reads as a bad pin rather than as a run that never reached a
+    provider — and refuses `--lang hi`, which would silently do nothing (§6.4).
+  - **`ParagraphRetrievalRepository` + `HybridRetriever`**, the §1.3 split: SQL with the table,
+    fusion in the ai module. Fused by **rank**, not score, because cosine similarity lives in 0..1
+    and `ts_rank` is unbounded and summing them would let the text half's scale decide the order by
+    itself. The floor applies to vector matches only — every question shares some word with some
+    NCERT paragraph, so a keyword coincidence satisfying R2 would make the grounding rule
+    unfalsifiable — and grounding is judged *before* the token cap, since the corpus either holds
+    the answer or it does not and what fits one prompt is a later question.
+  - **`eval/retrieval-queries.json`**, the path §6.3 already names, and §6.3 also makes the query
+    run part of `ncert embed`'s own report rather than a separate command — which works because
+    embed resumes: a re-run embeds nothing and just re-scores. 15 queries over all seven chapters,
+    5 of them Hindi, each carrying the addresses it was written to reach, scored hit@1 / hit@3 / MRR
+    with **Hindi scored separately**: folded into one average, five Hindi misses would hide inside
+    ten English hits, the exact failure the cross-lingual pin was chosen to avoid.
+HOW THE QUERY SET WAS WRITTEN, recorded in each query's own `note`: the question first, from the
+  concept in a student's words, and the address found only afterwards — otherwise the set quietly
+  flatters the keyword half with the paragraph's own vocabulary. Two questions were written for
+  concepts the rationalised edition no longer carries in body text (weightlessness, the lawn
+  roller) and were changed to other concepts in the same chapter rather than dropped. q08 is the
+  case the corpus rulings were made for: the υ → v ruling of 2026-09-17 exists so that "1/2 mv²"
+  can reach ch 6 §6.9 at all, and if that query misses, the ruling bought nothing.
+**THE FINDING, measured on the real 894 paragraphs at ₹0 before any embedding was paid for: the
+  full-text half of "hybrid" retrieval was almost entirely dead.** `websearch_to_tsquery` ANDs a
+  query's terms — "why do I get thrown backwards when a bus suddenly starts moving" parses to seven
+  stems joined by `&`, all of which a paragraph must carry. Against the corpus that returned
+  **nothing at all for 13 of the 15 queries** and found the expected paragraph for **1**. OR'd, the
+  expected paragraph is at rank 1 or 2 of the text half for **6 of the 10 English queries**
+  (q04, q05, q06, q08 at rank 1; q02, q10 at rank 2). **Founder decision 2026-09-20: switch to OR**
+  (DECISIONS; TECH_PLAN §4.3 stage 6 amended inline). The negation strip that goes with it is not
+  cosmetic — a hyphen between tokens parses as NOT, so the physics query `v - u` becomes
+  `'v' & !'u'` and OR-ing it unchanged would match every paragraph lacking "u", nearly the whole
+  book; quoted phrases survive, since `<->` carries no `&`.
+**THE HINDI HALF IS ZERO EITHER WAY, for an unrelated reason worth stating before the run:** the
+  corpus holds 894 English paragraphs and **no `text_hi` at all** — D16 has not run — so the Hindi
+  side of the generated `tsv` is empty and all five Hindi queries rest **entirely** on the
+  cross-lingual embedding. That is what §6.4 predicted, now measured rather than assumed, and it
+  makes D15's Hindi acceptance a clean test of the pin and nothing else.
+
+THE SPEC-AUDITOR RETURNED **FAIL** on the finished work, and two of its four MAJORs were real bugs
+  on the paid path. All fixed, tests 792 → 804:
+  - **`--chapters` was silently inert.** Inherited from `NcertBookCommand` and advertised as "only
+    these chapter numbers", it reached the report's per-chapter table but not the query — so
+    `ncert embed --book phy11-part1 --chapters 1` would have **embedded and paid for all 894
+    paragraphs while reporting one chapter's count**. The exact silent no-op this command refuses
+    the fake client and `--lang hi` to prevent; the two loud refusals were written deliberately and
+    the quiet one was inherited without being looked at. Now narrows the query, and is tested.
+  - **`RetrievalRun` — the class that computes hit@1, hit@3 and MRR — had no test.** Its only
+    exercise was an empty corpus where every rank is 0, so the ranking logic never ran against a
+    hit. The numbers are the whole deliverable and an arithmetic slip in them fails nothing, it
+    just reports a different number. Nine tests now, including the Hindi-scored-separately case.
+  - **The eval gate did not cover `application.yml`**, where `margai.ai.retrieval` lives — so
+    changing `similarity-floor`, `k-vector`, `k-text` or `rrf-k`, the four values this spike exists
+    to move, would have committed unstamped. `AI_PATHS` now matches the config file (DECISIONS).
+  - **TECH_PLAN §2.9 and §6.3 still dated V8 and `ncert embed` at D17** while PLAN put them at D15,
+    so the governing document scheduled the work that had just shipped for a later day. Both cells
+    amended inline and dated, §6.3's row rewritten to carry the scoring and the three refusals, and
+    §4.9's parameter list given the fifth parameter (`rrf_k`) this change set introduced.
+  - MINORs also fixed: a missing query file now **refuses** rather than embedding a book and
+    producing no acceptance evidence (`--queries none` to mean it), the "which half fired" table
+    carries its own caveat (counted post-token-cap, so it under-reports rather than over-reports),
+    and the runbook gains an `embed` section — it had said "five `ncert` commands" and omitted
+    `MARGAI_AI_COHERE_API_KEY` entirely, so a founder following it would have launched without the
+    key. Left as noted, not fixed: `HybridRetriever`'s public constructor takes `AiProperties`
+    (an `internal` type in an exposed signature, which Modulith does not check), the OR'd query is
+    less selective for the GIN index at D17 scale, and `ncert embed` makes one provider call per
+    paragraph where `.claude/rules/pipeline.md` speaks of batching — `AiClient` has no batch path
+    for `embed`, and adding one is a contract change for a saving of minutes on ten runs.
+
+THE RUN, founder 11:06 and 12:01 — **894 of 894 embedded, ₹9.09 all in, and the pin holds.**
+  The first attempt died on call 101 (the trial key's 100/minute cap, ₹1.00, 100 vectors kept);
+  the paced re-run took the remaining 794 in 8 minutes for ₹8.09 and scored the queries.
+  Report `2026-09-20-ncert-embed-2.md`. 910 ledger rows at feature `embed`.
+**THE PIN IS SETTLED, WHICH IS THE WHOLE POINT OF THE SPIKE: a Hindi query reaches an English
+  paragraph.** PLAN D15's second ✅ is met and met plainly — q13 (जड़त्व) lands §4.4 ¶2 and ¶8 at
+  ranks 1 and 2, q15 (गुरुत्वीय त्वरण below the surface) lands §7.6 ¶11 at rank 1, q14 (बंदूक का
+  पीछे हटना) lands §4.7 ¶1 at rank 2. None of those paragraphs carries a word of Hindi — the corpus
+  has no `text_hi` at all — so the cross-lingual space is doing all of it. **cohere / embed-v4.0 /
+  1024 stands; no corpus re-embedding, and the other nine books can be extracted on it.**
+THE SCORE AS REPORTED: all 15 — hit@1 7/15 (47%), hit@3 9/15 (60%), MRR 0.576; english 5/10, 6/10,
+  0.613; hindi 2/5, 3/5, 0.500. The text half fired on **10 of 15** against the 1 of 15 the AND
+  semantics would have given, so the OR ruling of the morning paid for itself.
+**THE SCORE UNDERSTATES THE RETRIEVER, AND THE FAULT IS THE TEST SET'S — MINE.** Two queries are
+  scored as misses whose rank-1 or rank-3 result is a better answer than the address I listed:
+  q08's top hit is ch 6 §6.9 ¶2, "The total kinetic energy K of the body is then given by the sum
+  of the kinetic energies of individual particles", which is exactly what the query asked and which
+  my `expect` list omitted in favour of the lead-in ¶1; and q06's rank 3 is ch 4 §4.10 ¶18, "On an
+  unbanked road, frictional force alone can provide the centripetal force needed… without
+  slipping", against my ¶9/¶2. Widening those two lists alone would read ~8/15 hit@1 and ~11/15
+  hit@3. **The lists must be widened before this number is used as D17's baseline**, and the lesson
+  is the one the query set's own notes were written to guard against: writing the question first
+  protects against cribbing the paragraph's words, and does nothing to make the answer key complete.
+THE REAL WEAKNESSES, separated from the artefacts: **q12 is a grounding failure** — the Hindi
+  dimensional-analysis query returned nothing above the 0.30 floor at all, the only query of the
+  fifteen to do so; **q09 misses outright**, its top hits at 0.27–0.31 in the wrong chapter, and it
+  is the most obliquely worded query in the set ("how hard is it to start something spinning",
+  naming neither moment of inertia nor rotation in either language); **q07 at rank 11 and q03 at
+  rank 7** are genuine — the right *neighbourhood* comes back (§5.3's other zero-work cases, §3.7.1
+  on a curved path) and the exact paragraph does not. The similarity numbers cluster 0.27–0.60
+  across the whole run, so the 0.30 floor sits almost exactly where noise begins: it is doing real
+  work on q12 and has no headroom under it.
+
+THE KEY IS CORRECTED, founder's instruction, ₹0 — by reading §4.10 and §6.9 cold rather than by
+  looking at what ranked. **Added** §4.10 ¶18 and §6.9 ¶2 + ¶4; **removed** §4.10 ¶2 (defines
+  centripetal force with a stone on a string, says nothing about a car or skidding) and §6.9 ¶1
+  (poses the question, does not answer it) — both keyed in error. **Not added although it ranked
+  first:** §4.10 ¶3, a lead-in that answers nothing; the discipline has to cut both ways.
+  **RE-SCORED FOR REAL, founder 12:36, ₹0.15** (report `-ncert-embed-3.md`): 0 paragraphs embedded —
+  the resume rule held, so it paid only for the 15 query embeddings — and the score is
+  **hit@1 8/15 (53%), hit@3 10/15 (67%), MRR 0.618**, english 6/10 (60%), 7/10 (70%), 0.677, hindi
+  unchanged at 2/5, 3/5, 0.500. That matches the projection computed from the previous run's top-3
+  listing to the decimal, q06 landing at rank 3 on §4.10 ¶18 and q08 at rank 1 on §6.9 ¶2 as
+  predicted. **The book's whole retrieval cost is ₹9.24 across 925 calls.**
+  One caveat for treating this as D17's baseline: the similarities moved in the third decimal
+  between the two runs (q06's ¶18 0.366 → 0.366 against §4.9.1 ¶16's 0.364, q15's ¶11 0.431 → 0.433),
+  so a query embedding is not bit-identical run to run and ranks separated by ~0.002 can swap.
+  hit@1 and MRR are stable at this margin; an individual rank 2-versus-3 is not.
+
+THE BEDROCK SWITCH IS VALIDATED, founder 16:14 — **894 of 894 re-embedded through
+  `global.cohere.embed-v4:0`, and the score is identical to the Cohere-direct baseline**: 8/15
+  hit@1, 10/15 hit@3, MRR 0.618; english 6/10, 7/10, 0.677; hindi 2/5, 3/5, 0.500. Every per-query
+  rank matches and similarities differ only in the third decimal. **The pin is settled on Bedrock
+  and the nine remaining books run on it.** D15's Hindi acceptance now stands earned twice, on two
+  routes to one model. The two open questions closed with it: the token-count header **is** present
+  (77,641 tokens over 909 calls, no estimate warnings, so §4.8 holds) and `output_dimension` is
+  honoured end to end.
+  Three failures preceded it, none of them the code: the Cohere trial key's 1,000-call monthly cap,
+  a missing `MARGAI_AI_ANTHROPIC_API_KEY` in a fresh shell, and **an expired `AWS_BEARER_TOKEN_BEDROCK`
+  in the sourced local environment shadowing the SSO profile** — which reported itself as
+  "Bearer Token has expired" and survived an `aws sso login`, because the SDK prefers that variable
+  over SSO for Bedrock. Each run stopped cleanly, kept what was paid for and named the cost; the
+  refusal message now matches the remedy to the refusal rather than naming the rate limit for
+  everything.
+**THE LEDGER OVER-REPORTS EMBEDDING BY ~11×, by design.** `CostCalculator` ceilings every call to a
+  minimum of one paisa (2026-09-08, so sub-paisa calls cannot accumulate past the breaker unseen).
+  An embedding call is 85 tokens ≈ **0.092 paise**, so each bills the floor: the book's ledger cost
+  reads ₹9.09 where the true spend is about **₹0.84**, and ten books would read ~₹90 against a true
+  ~₹8. Right for a breaker, wrong for planning — **every embedding rupee figure in this day log is
+  the ledger's, not the bill's.** Recorded rather than changed (DECISIONS).
+
+THE CHUNK A/B IS RUN AND **REJECTED** on its pre-set gate, founder 16:35, ₹8.95 ledger
+  (≈₹0.80 true). Unpaced, so 880 paragraphs took five minutes rather than ten.
+  - The gate was q07 into the top three with nothing already there dropping out. **Both halves
+    failed**: q07 moved 11 → 9 and never reached the top three, while **q06 fell 3 → 8, q11 fell
+    1 → 3, q01 fell 5 → 10**. The set: hit@3 10/15 → 9/15, MRR 0.618 → 0.591; english 6/10 → 5/10
+    hit@1 and MRR 0.677 → 0.587.
+  - **The mechanism is visible in the passages, not inferred.** In every degraded query the top
+    three fills with *other paragraphs of the same section*: q06's becomes §4.10 ¶17 and ¶15 where
+    the expected ¶18 had been, q01's stays wholly inside §1.3, q11's inside §7.8. A section title
+    repeated across every paragraph of a section is a term they now all share, so it lifts them
+    together and flattens the within-section distinction — which is the distinction that matters,
+    because these queries were already landing in the right section.
+  - **Hindi moved the other way, for the same reason**: 2/5 → 3/5 hit@1, MRR 0.500 → 0.600. A Hindi
+    query's difficulty is reaching the right section across the language gap, and an English
+    section title is exactly that anchor. It gains where English loses, from one cause. Five
+    queries is not enough to act on, and it is the first thing to re-test if Hindi retrieval ever
+    becomes the binding problem.
+  - **So the chunk stays `text_en`, §6.4 is unamended, and retrieval is not touched again until
+    D17** — the rule set with the gate. The `--context section` flag and its code stay in the tree,
+    switched off: they cost nothing there and the fragment half was never measured alone (the run
+    bundled the prefix with dropping 14 fragments, deliberately, to spend one run instead of two —
+    so the prefix is convicted and the fragments are merely un-acquitted).
+  - **Reverted, founder 16:48**: 894 of 894 back on the bare chunk, all 14 fragments carrying
+    vectors again, and the score back at 8/15 · 10/15 · MRR 0.618 — **the third identical
+    reproduction of the day**, down to the same 909 calls and the same 77,641 tokens. So the
+    pipeline is deterministic run to run and the baseline the nine books inherit is trustworthy.
+DAY'S EMBEDDING SPEND, ledger against truth: 3,716 calls and 325,362 tokens across both routes —
+  **ledger ₹37.11, true ≈₹3.52**, the gap being the one-paisa floor per call. The book is embedded
+  once and the ten re-runs are what a spike costs.
+
+
+HOW TO RESUME — the spike is done; what it leaves open, in order:
+  1. **bio11**, on the frozen prompt: its 30 chapter-1 rows are still the early v2, and it carries
+     D14's tick. Then the eight remaining books, all on the settled pin — extract, verify, load,
+     embed. The nine are ~₹700 each on the 2026-09-19 measurement, and about ten minutes of
+     embedding each at the paced rate.
+  2. ~~Get a production embedding key before D17.~~ **Done differently, 2026-09-20**: the route
+     moved to Bedrock instead, which has no trial cap at all, so this is closed.
+OPEN FOR THE FOUNDER, none of it blocking the nine books:
+  (a) **The floor.** Similarities ran 0.27–0.60 across the whole run, so `similarity-floor` 0.30
+      sits almost exactly where noise begins — it is doing real work on q12, the one grounding
+      failure, and has no headroom beneath it. Worth revisiting on a second book's evidence rather
+      than tuned on one.
+  (b) ~~**The chunk.**~~ **Answered the same day and rejected** (DECISIONS): prefixing the section
+      title was measured against a pre-set gate and failed it — it helps find the right section and
+      hurts finding the right paragraph inside it, which is the distinction that matters once a
+      query is already in the right neighbourhood. q07 and q03 still return the neighbourhood and
+      not the paragraph; what that wants is not more context per chunk.
+  (c) **The `global.` inference profile routes outside India.** Everything else here is
+      deliberately ap-south-1 (TECH_PLAN §7). Public NCERT text is hard to object to, but
+      `HybridRetriever` embeds the **query** too, and from D37 that is a student's own words and
+      from D38 can include a photo they took. It wants a ruling — accepted with a reason, or an
+      `apac.`-scoped profile if one appears — **before D37**, not before the nine books.
+  (d) **q09 and how a query is worded.** It misses outright and is the most obliquely worded in the
+      set, naming neither moment of inertia nor rotation in either language. Whether that is a
+      retrieval weakness or an unfair query is a judgement about what a real student types.
+SESSION CLOSED 2026-09-20, tree clean, **20 commits on `d15-ncert-books` awaiting the founder's
+  review and push** (58b9f3f → 335243f). Server tests 747 → 823, `./mvnw verify` green through
+  every commit gate, eval gate PASS (placeholder) and stamped, matching HEAD. **D15 is not ticked**:
+  its ✅ is a coverage report per book across the remaining EN books, and this is one book of ten —
+  but **the retrieval half of the ✅ is met and settled**, which is what the day was for.
+  Spend: **ledger ₹37.11, true ≈₹3.52** (the one-paisa floor; 3,716 embedding calls across two
+  routes, a book embedded once and re-run nine times because a spike is re-runs).
+  What the day actually settled, in one line each: the pin is Bedrock's `global.cohere.embed-v4:0`
+  and needs no API key; a Hindi query reaches an English paragraph with no `text_hi` in the corpus
+  at all; the full-text half ANDs its terms and had to be told not to; the chunk stays `text_en`
+  because a section prefix helps find the section and hurts finding the paragraph; and the ledger
+  over-reports small calls ~11× by design, so no plan should read it as a bill.
+```
+
+```
+D15 · 2026-09-19 · the free-check ruling gap and the start check's blind spot, both closed — ₹0
+Built test-first on `d15-ncert-books`; server tests 741 → 746, `./mvnw verify` green, no AI path
+  touched so no eval stamp needed. Nothing was run against the corpus: the ₹0 re-verify is the founder's.
+THE CHARACTERISATION TEST CAME FIRST and immediately corrected the record. Run against the real
+  `keph106` pages, it **failed on p17 and passed on p23** — so the start check had named three of the
+  four swallowed paragraphs (each appears in a printed-start list) and missed only ch 6 p17. The claim
+  written last night, and repeated to the founder twice, that two were invisible was wrong; the yaml,
+  the day log below, DECISIONS and the dashboard are corrected.
+THE CAUSE, dumped from PDFBox rather than argued: it reads the line as `Here K , K  and K  are
+  constants; L , L  and` — the subscripts dropped and their letters stranded, five words among fifteen
+  tokens. `isProse` wants words to be at least half a line's tokens, which is what keeps a display's
+  symbol runs out; this line failed it, could not be prose, and so could never start a paragraph.
+  **Fix:** one-character residue counts neither as a word nor against the words. The `words >= 3` gate
+  still keeps displays out, since a display rarely carries three real words. 21 PdfLayout tests green,
+  including the p23 guard that the fix must not cost.
+THE `noise` KIND, for a ruling on a free check: `flag: join|figure` plus the words the paragraph starts
+  with, keyed like every other entry on page and words and never on an address, which a join or split
+  moves. Only those two checks may be ruled — they are the two that enter the clean share — and every
+  ruled flag is listed under `free-check flags set aside by the founder's rulings` with its reason,
+  never dropped silently.
+THE TWELVE ENTRIES, one per join flag, each with its own evidence rather than one blanket reason. Nine
+  are "the row before ends on a complete sentence, so nothing is cut, and a flush column top is not
+  evidence of continuation" — ch 5 p4 is the proof, opening flush with a bold new definition whose
+  predecessor ends "…as shown in Fig. 5.2.". Three are their own: ch 3 p9 and ch 5 p14 open after a
+  **heading**, and the first paragraph after a heading is flush; ch 6 p23's first line is indented
+  17.7 pt, so the print does start there and the row merely carries p22's "Answer" label with it. And
+  **ch 5 p10 was nearly mis-ruled**: it is the other direction, a row running on where the page opens a
+  new paragraph, which last night's "nothing is cut mid-sentence" test never addressed. Read again, p10
+  opens with the display `v_B = sqrt(3gL)` — this row's own tail — and the line the check quotes,
+  "(iii) The ratio of the kinetic", is the paragraph after it. Noise, but for a reason the blanket one
+  would have got wrong. All twelve checked to match exactly one row, and the row each names.
+THE ₹0 RUN, founder 07:51 — **893 of 894, 99.9%**, not the 894 predicted. All twelve rulings landed and
+  are listed under the new section with their reasons; chapters 1–5 and 7 are at 100.0%. The fix also did
+  its other half, pairing printed starts the check had been blind to: ch 1 p6's Example 1.2, ch 5 p7
+  §5.6 ¶3, ch 6 p16 §6.7.2 ¶8 and ch 6 p29 §6.11 ¶15 all stopped being flagged as rows the print does not
+  start.
+THE MISSING ROW WAS MY OWN REGRESSION, not a real flag. Chapter 6 page 27 opens with
+  `= 2π × angular speed in rev/s`, the tail of a definition begun on p26, set 35.7 pt in. Three words
+  among seven tokens had kept it out of prose; counting only tokens of two characters or more let it in,
+  and the indent band then read it as a paragraph start — which flagged §6.10 ¶13 as a row running across
+  a page that opens a new paragraph. Caught on the first real run, diagnosed from the page's own line
+  geometry, and fixed test-first: **a display carried onto a new line or page opens with its operator, and
+  a paragraph never does.** Tests 746 → 747, pipeline suite 341 green. The right lesson is the one the plan
+  named before the work started — the old rule got 219 of 275 right and relaxing it risks them — so the
+  relaxation is now fenced on both sides.
+THE CLOSING RUN, founder 08:03, ₹0 (report `-ncert-verify-6.md`): **894 of 894, 100.0%** — every
+  chapter at 100.0%, zero join flags, zero figure flags, zero differs, every row with a verdict. The
+  book is closed at the standard chapter 7 set. Total spend on phy11-part1 ≈ **₹712** (₹584 extraction,
+  ₹128 reading) for 143 pages and 894 paragraphs.
+WHAT THE RELAXATION STILL COSTS, named rather than buried: **86 page-level start flags, not 85.** The
+  operator guard removed ch 6 p27's `= 2π ×`, but a display whose line opens with a word is still read
+  as prose — ch 4 p7 now claims a printed start at "Impulse = Force × time duration", and ch 6 p17 at
+  "a particle whose position vector is". These are page-level, outside the clean share, and cost the
+  number nothing; they are unadjudicated all the same. The trade is honest and worth restating: the
+  relaxation bought one real defect that was invisible to the check (ch 6 p17's swallowed paragraph)
+  and a handful of new false page-level claims.
+THE 86 ARE ADJUDICATED, ₹0, and **not one is a real segmentation defect.** The 86 pages carry 267
+  named rows and 92 printed starts. Rather than re-score what was scored on 2026-09-18, the claim sets
+  were diffed against that night's report: **13 printed-start claims are new and 0 row claims are**, so
+  13 items needed judging and the rest stand as scored.
+  - All 13 are noise, each on its own evidence: displays now read as prose (ch 4 p7 "Impulse = Force ×
+    time duration", ch 4 p9, ch 4 p13, ch 3 p8, ch 7 p5), mid-sentence continuations (ch 1 p9's "(b)"
+    read as an item marker, ch 3 p14, ch 6 p17, ch 6 p22, ch 7 p4), the "Answer" label class (ch 5 p6,
+    which §5.5 ¶6 carries behind its label), and one duplicate printed start the page prints twice
+    (ch 6 p11). The thirteenth, ch 7 p9's "so that once again W_12 = …", was the only one with a true
+    first-line-indent signature and was read on the page: the line above it, "valid for r > R ,", sits
+    at the same indent, so the two are an indented block qualifying the display, not a paragraph.
+  - The independent whole-book sweep, re-run, now finds **2** candidates against the earlier 5 — both
+    mid-sentence continuations already ruled noise. The four it found on 2026-09-18 are all corrected.
+WHAT THE FIX DID TO THE NOISE, measured rather than assumed: row claims 275 → 267 and printed-start
+  claims 90 → 92. Eight row claims and eleven printed starts resolved (three by the splits, two by the
+  joins, the rest by the check finally pairing math-opening starts), and thirteen new false ones
+  appeared. **So the total noise is roughly unchanged and its composition improved** — the check now
+  sees the class that hid a real defect, at the cost of reading some display lines as starts. The
+  honest summary of the relaxation is one invisible real defect bought for a wash in false page-level
+  claims.
+  A further tightening is available and not done: `PdfLayout.indented` compares a line with the one
+  *below* it, and adding the line-*above* test the sweep uses (a first line is indented against both,
+  a block shares its indent with the line above) would kill several of the thirteen. It is a change to
+  a rule that got 219 of 275 right, so it wants its own task and its own real-page tests.
+FOUNDER DECISION, 2026-09-19: **embed phy11-part1 and test retrieval before the other nine books.**
+  The reason is the embedding pin (`application.yml` §4.9): provider, model and width move together,
+  so changing any of them re-embeds the whole corpus — a cheap decision across 894 paragraphs and an
+  expensive one across ~9,000. Proving hybrid retrieval on one book whose every paragraph has been
+  read against the page is the last cheap moment to find out that the pin, the chunk (a paragraph),
+  or the hybrid weighting is wrong. It re-orders PLAN (D17's embedding slice ahead of D15's remaining
+  books and all of D16) and takes nothing off the schedule; the nine books still have to happen.
+
+HOW TO RESUME — the retrieval spike, in this order:
+  1. **What already exists**, checked 2026-09-19 so the next session does not rebuild it: the AI layer
+     is ready — `AiClient.embed(EmbedRequest)`, `ai/internal/cohere/CohereEmbeddingClient`,
+     `CohereConfiguration`, the ledger/breaker/retry chain around it, and `EmbeddingDimensionTest`,
+     which already holds every `vector(n)` column to `margai.ai.embed.dimensions`. The pin is set:
+     **cohere / embed-v4.0 / 1024**. `ncert_paragraphs` already carries `embedding vector(1024)` and a
+     generated `tsv`, and pgvector and pg_trgm are installed by V1.
+  2. **What has to be built**: (a) the `ncert embed` pipeline command — it does not exist; (b) **V8**,
+     the HNSW index, which V7's own comment says is added "once rows exist" (§2.9); (c) the D17
+     harness, query → top passages, over both columns, since hybrid is the point and either half alone
+     has a known failure mode (embeddings miss "Eq. (7.35)", keywords miss "pushed outward on a turn").
+  3. **What it needs to run**: `MARGAI_AI_COHERE_API_KEY` — a *second* provider key, and per
+     docs/runbooks/ai-provider-keys.md the `live` profile **refuses to start without it**. Sourced,
+     never inline. Founder-launched like every paid run; 894 paragraphs of embeddings is small.
+  4. **What the test is**: real NEET-shaped questions in a student's words against the 894 paragraphs,
+     scored on whether the right paragraph comes back — including the cases the corpus rulings were
+     made for, e.g. "1/2 mv²" reaching ch 6 §6.9 (the υ → v ruling of 2026-09-17 exists precisely
+     because it would not have), and a Hindi query reaching an English paragraph, which is the whole
+     reason the pin is cross-lingual (§6.4).
+Then: **bio11** (still on the early v2, and it carries D14's tick) and the eight remaining books.
+  D15's ✅ is a coverage report per book: one book of ten, at ≈₹712 each.
+PLAN AMENDED, founder's instruction 2026-09-19, in the inline dated style CS-1 used on 2026-09-12:
+  D15 carries the spike and a second ✅ (the query → top-passages run on the first book, the Hindi
+  query included, since cross-lingual is what the pin is chosen for); D17 reads "over the whole corpus,
+  on the pin settled at D15". No day added or removed, D16 untouched, the Week-3 gate unchanged.
+SESSION CLOSED 2026-09-20, tree clean, 9 commits on `d15-ncert-books` awaiting the founder's review and
+  push (dded5db → 57add63). **D15 is not ticked**: its ✅ is per book across the remaining EN books and
+  this is one of ten, with the new retrieval half not yet run. Server tests 747, `./mvnw verify` green
+  through the commit gate, eval gate untouched (no AI path changed). Spend for the session: **₹127.59**,
+  all of it the first paid read and its two re-reads; every other run ₹0.
+```
+
+```
+D15 · 2026-09-18/19 · phy11-part1 closed at 882 of 894, 98.7% clean — the first paid read of
+  chapters 1–6, and not one transcription defect in it
+Founder-run from `server/` on `d15-ncert-books`, `margai_d15`. Spend ₹127.59 for the night
+  (₹116.88 the book's read, ₹2.85 one redo, ₹7.86 the five rewritten pages), ₹0 for everything else.
+THE PAID READ, 96 pages on Sonnet 5 (12 of chapter 7 resumed free), one schema repair: 894 verdicts,
+  20 flags. **Every one adjudicated against the page — the text layer where it carries the characters,
+  the page rendered at 4.5–6× where only the image can — and not one is a transcription defect.**
+  - THREE ARE THE BOOK'S OWN, kept as `misprint`: ch 3 §3.4 ¶1 "As mentioned in section 4.2" (the
+    cross-reference the rationalised edition left behind — that material is now §3.4); ch 3 §3.6 ¶11's
+    Law of cosines printed `R = sqrt(v_b^2 + v_b^2 + 2 v_b v_c cos 120)`, which its own next line
+    substitutes as 25^2 + 10^2; and ch 6 §6.8 ¶15 "opposite diretions", in the layer itself.
+  - SEVENTEEN ARE THE VERIFIER, ruled `false_positive`: a dropped ×, two dropped degree signs, the
+    convention's spelled-out Greek, `p` where the book itself drops the subscript, the hats the book
+    omits on one line of ch 6 p12 while hatting every line above it, and the two spacing rulings of
+    2026-09-17 quoted back against the print. **The ± class is new and will recur: the book sets ± as
+    a plus over a separate rule, so the layer reads "+" and an image-reader reads "+" — three flags on
+    ch 1 p6 where the row's ± is right.**
+  - THE BOOK CONTRADICTS ITSELF in Example 6.4 (ch 6 p12): the stem prints b = (−2i + j + **3**k) and
+    its own answer prints (−2i + j − **3**k) = −25. Both rows are faithful; a student following the
+    worked example cannot reproduce it. For an errata note at D23.
+THE FREE CHECKS, all adjudicated: 5 passages no row carries → noise (three unnumbered run-in
+  sub-headings, a box heading, a figure label; the fifth is carried in §5.6 ¶1). 3 figure flags → all
+  real, all the model omitting a reference its own paragraph names (`Fig. 3.17`, `Table 6.1`,
+  `Figure 6.30`); `FigureLabels` reads all three today, so the omission is the transcriber's.
+  12 join flags → **noise, every one**: not one has a previous row ending mid-sentence, and ch 5 p4
+  shows why typography cannot settle it — page 4 opens flush with a bold new definition whose
+  predecessor ends "…as shown in Fig. 5.2.", so a flush page-top is not evidence of continuation.
+THE 85 START FLAGS ARE 85 PAGES = **275 named rows and 92 printed starts**, adjudicated not by eye but
+  by the page's own line geometry (pymupdf, per-claim): 219 of the 275 carry positive evidence the print
+  starts a paragraph where the row does — an indent, an item marker, a heading above, a ragged line —
+  and the rest resolve the same way once markers and after-display starts are allowed for. **All noise.**
+  Calibrated first on chapter 7, where it reproduced the founder's 2026-09-15 rulings item for item.
+THE SWEEP THE CHECK CANNOT DO — every first-line indent in the book derived independently and tested
+  against the rows — found **four paragraphs a row had swallowed**, each confirmed on its rendered page:
+  ch 3 §3.7.1 ¶15 ("where t is in seconds…", Example 3.1's box), ch 3 §3.10 ¶3 ("Let the angle between
+  position vectors…"), ch 6 §6.7.2 ¶20 ("Here K_1, K_2 and K_3…", after (6.29 b)) and ch 6 §6.9 ¶1
+  ("where m_i is the mass…"). Three of the four are named in the report's printed-start lists; **the
+  ch 6 p17 one is named nowhere**, because the start check never saw that printed start, so it
+  under-reports as well as over-reports. (Corrected 2026-09-19 by the characterisation test, which
+  passed on ch 6 p23 and failed only on p17: the claim first written here, that two were invisible,
+  was wrong and the reports disprove it.) And the reverse rule — flush after a
+  display is the paragraph running on — made two `join`s of ch 5 §5.9 ¶19 and ¶20, both already named
+  by the load's own mid-sentence check.
+THE LOAD, ₹0: all 22 text-changing corrections applied and named, 894 paragraphs (four splits in, two
+  joins out), coverage 100.0%, chapter 7 untouched at 106, the two retired addresses named as deleted.
+  Its mid-sentence check now names three: ch 1 §1.6.2 ¶4 and the two splits just made, all three a
+  "where …" paragraph indented after an *unnumbered* display — which is why chapter 7's four splits
+  never appear there, each following a numbered display the check reads as a sentence end.
+THE FINAL READS: five rewritten pages paid for (₹7.86) and one redo of ch 4 p17 (₹2.85, for the row the
+  verifier's unplaceable quote had left without a verdict — read again it drops the × a third time).
+  Then ₹0: **882 of 894, 98.7%** — ch 1 84/84, ch 2 53/53, ch 3 103/103, ch 4 139/139, ch 5 126/126,
+  ch 6 283/283, ch 7 106/106. **Zero differs book-wide, zero rows without a verdict, zero figure flags.**
+WHAT THE 12 ARE: the twelve join flags, all ruled noise, all still counted against the share because the
+  clean share marks a row unclean when a join flag names it and the corrections file has no kind that
+  records a ruling on a free-check flag. **So 98.7% understates the corpus by twelve rows.** The founder's
+  ruling 6 ("out of the way of the clean share") cannot reach the number without a small code change.
+Commits dded5db, 90feeda, 92c3389. Reports 2026-09-18-ncert-verify, 2026-09-19-ncert-load,
+  -ncert-verify(-2)(-3). Server untouched, so tests stand at 741.
+
+HOW TO RESUME:
+  1. **The founder's open choice**, put on 2026-09-19 and not yet answered: record 98.7% and name the
+     twelve, or give the corrections file a kind that rules a free-check flag — an address rather than a
+     span — after which a ₹0 re-verify reports 894 of 894. Recommended: the second, because join flags at
+     page tops recur in every book and the drag is permanent otherwise; the safeguard is that a dismissal
+     is a named, reasoned entry in a file the founder approves, exactly like the twenty-two false positives.
+  2. **The start check's blind spot**, its own task: it missed two of tonight's four real splits. The fix
+     is the geometry this adjudication used — a first-line indent is a line indented relative to the line
+     *below* it, and flush after a display is a continuation — and it is the same area of the code as (1),
+     so the two are cheaper done together.
+  3. Then **bio11** (whose ch 1 is still on the early v2 and carries D14's tick with it) and the eight
+     remaining books. D15's ✅ is a coverage report **per book** across the remaining EN books, so it is
+     one book down and nine to go, not done.
+OPEN FOR THE FOUNDER, none of it blocking: (a) should `figure_refs` be **derived** by the load from the
+  paragraph's own words, with the model's list as a cross-check? All three of tonight's misses were plainly
+  in the text and the parser reads them. (b) the heading set-aside recognises numbered headings and
+  Fig./Table captions only, so unnumbered run-in sub-headings surface as "passages no row carries" — three
+  of tonight's five. (c) Example 6.4's self-contradiction, for an errata note at D23. (d) still standing
+  from 2026-09-17: the boxed derivation at ch 6 p16, tables as a corpus-wide scope question, and
+  chemistry's Λ rendered as a plain L before `chem12-part1` is extracted.
+```
+
+```
+D15 · 2026-09-17/18 · the phy11-part1 corpus event — the book extracted and loaded at 100% coverage,
+  four code defects found and fixed at ₹0 before a rupee of the paid read was spent
+Founder-run from `server/` on `d15-ncert-books`, `margai_d15`. Bedrock opened the day and was set aside:
+  access is unblocked, but the way back is `margai.ai.provider=bedrock` and it is a *comparison* for F9,
+  not a rebuild; `BedrockAiClient.toolInput` still has no `max_tokens` stop check (the PARKED row's carry),
+  which would restore silent truncation into a corpus; prices are at parity; and chapter 7 is frozen as
+  Opus run 11 with the ledger naming its transcriber. Nothing about it changes D15's ✅, so: note the
+  unblock, finish the books, run the comparison as its own scoped work with the five-line fix first.
+THE STAGING RUN, chapter 1 alone before the book, because `ncert extract` resumes and so a checkpoint costs
+  nothing extra (recommended, approved): 9 pages called, ₹60.89, 89 paragraphs. It earned its keep at once —
+  chapter 7 has neither tables nor footnotes, and chapter 1 has both.
+  - ch 1 p2 at 31% of the page's characters is NOT a defect: two thirds of the page is Table 1.1, and the
+    frozen prompt says a table's rows and columns are never transcribed. The coverage check measures against
+    a layer that includes the table, so every table-heavy page trips it.
+  - The seven `M°`/`T°` flags ARE a defect, and the book's own: page 7 prints the same quantity twice — the
+    running text of §1.5 holds `[M° L3 T°]` (U+00B0) and the displayed equations five lines below hold
+    `[M0 L3 T0]`. The transcription is faithful to the layer, as §6.1 requires, so it carried the
+    inconsistency into a high-yield topic where it would never match `M^0` at retrieval.
+THE BOOK, 87 pages called on Opus, ₹523.18 (report `-ncert-extract-2.md`): 143 pages in the JSONL,
+  942 page-level paragraphs, chapters 1 and 7 resumed free. Legibility 0.379–0.470 per chapter. The
+  character diff against each page's text layer found 11 flags in one class, and three of them were false
+  (`pir` was matching inside "empirically", "empirical" and "inspired"). The six real ones are the model
+  running a spelled-out Greek letter into its neighbour — `2piRnu`, `2pinu`, `Fdx`, `cosphi_1`, `sinalpha_1`,
+  `r_1F_1` — which the prompt requires by name and shows spaced but never says to separate. Three coverage
+  flags, all explained: ch 4 p3 and ch 6 p16 are tint boxes, ch 6 p25 is Table 6.1.
+THE FIRST LOAD, ₹0: **coverage 100.0%, 143 of 143 pages, 892 paragraphs**, 786 inserted / 106 unchanged —
+  chapter 7 preserved exactly, so ruling 5 held. The dimensional rule fired on its first outing: 7 rewrites,
+  all ch 1 p7, each named.
+NINE RULINGS, founder 2026-09-17, "approved as written, recommended option per ruling" — five `text` for the
+  Greek spacing, one `false_positive` (`taus` is the faithful plural of the page's `τs`), and three for υ:
+  the book sets a typographic variant of v whose meaning is speed, and ch 5 §5.6 already wrote `(1/2) m v^2`
+  where ch 6 §6.9 wrote `(1/2) m upsilon^2` — the corpus disagreeing with itself on kinetic energy.
+FOUR CODE DEFECTS, each found by reading the reports against the rendered pages and the real rows, each
+  fixed test-first (d9a0e74; 720 → 741 tests, verify green, ₹0):
+  1. **`PageBreakRepairs` destroyed real prose.** It matched a repeat of the previous page's tail *anywhere*
+     in the next page's opening and dropped everything in front of it. Ch 6 page 18 broke mid-sentence on
+     "to be satisfied for mechanical" and page 19 printed that wording again two sentences later, so the
+     match landed on the book's own repetition and **124 characters of the coplanar-forces case were cut** —
+     silently but for one line of the load report. RULING (founder): drop the lead-in only where the repeat
+     stands at the head of the page; further in than the span is long, leave the page whole and name it.
+  2. **A footnote took the next page's continuation.** It sits at the page foot, so it is the last
+     paragraph, but it is not what the next page continues. **Four of nine footnotes had absorbed the
+     following page's opening words, two paragraphs damaged each** — the footnote polluted, the body
+     truncated. Chapter 5's definition of potential energy read "* The variation of g with height is
+     discussed in Chapter 7 on Gravitation. energy V(x) is defined if…". A footnote is no longer the anchor.
+  3. **Plural figure labels were dropped**: `Figs. 3.15(a) to (d)`, `Figures 4.8(b)` — the rule took only
+     the singular, losing four real references, which `ncert verify` then reported independently as
+     paragraphs mentioning a figure they do not carry.
+  4. **The zero exponent set as a degree sign**, fixed narrowly in code rather than by prompt or by hand:
+     only a bracket whose whole content is a dimensional formula, because chemistry's `Λ°m` is a Greek
+     letter to recover and an angle keeps its degree sign. `VerdictSpans` makes the same rewrite before
+     spacing is squashed, so code's own change is not read back as the corpus's difference.
+THE RELOAD, ₹0, every predicted number met: 0 inserted, **11 updated**, 881 unchanged, 892 paragraphs,
+  coverage 100.0%, dropped figure_refs 6 → 2 (only `4.8(c)`, a bare fragment, and `Eq. (7.5)`, correctly not
+  a figure). Checked in the database: the coplanar sentence restored word for word against page 19; all nine
+  footnotes back on a single page; §5.7 ¶3 whole again; all three figure references recovered; **zero
+  residual defect tokens** (`upsilon`, `2pinu`, `2piRnu`, `sinalpha`, `cosphi`, `Fdx`, `M°`, `T°`) in 892
+  paragraphs; chapter 7 still 106 rows.
+THE FREE VERIFY, ₹0 (report `2026-09-17-ncert-verify.md`): **chapter 7 held at 106 of 106, 106 matches,
+  100.0% clean** through two reloads, with 4 flags set aside by the rulings. Chapters 1–6 carry **no
+  verdicts** — they have never been paid-read, which is what the book's clean share waits on. Beside it:
+  85 page-level start flags, 12 join flags, 5 figure flags, **0 equation flags**, 8 starts paired.
+Spend: **₹584**, all of it extraction. Server tests 741, verify green, eval PASS (placeholder).
+
+HOW TO RESUME — the last two steps to the book's clean share, which is PLAN D15's ✅:
+  1. `ncert verify --book phy11-part1 --lang en --read-pages` on `pipeline,live,visionsonnet` (~₹250, the
+     first paid read of chapters 1–6; the key sourced, never inline). Expect figure flags 5 → 4: the four
+     that remain are the model omitting a reference outright, which no parser fix reaches.
+  2. Claude adjudicates the 85 page-level start flags against the rendered pages — chapter 7's calibration
+     settled at 5, all noise (boxed statements, indented lines, an "Answer Given k…" label), and the six
+     other chapters have never been scored. Then the rulings, a ₹0 reload, a re-verify, and the clean share.
+  Then bio11 (whose ch 1 is still on the early v2 and carries D14's tick with it) and the eight books.
+OPEN FOR THE FOUNDER, none of it blocking: (a) **the boxed derivation** — ch 6 p16 is a tint box like ch 4
+  p3's discussion box, but its content is a derivation ("Applying the product rule for differentiation…"),
+  and the prompt skips boxed material while transcribing derivations in prose: transcribe or skip, for every
+  chapter that has one? (b) **tables** — Table 1.1 (the SI base-unit definitions) and Table 6.1 (moments of
+  inertia) are heavily examined and absent from the corpus entirely, by the prompt's design; a scope question
+  bigger than D15. (c) **chemistry's Λ → L** — `chem12-part1` chapter 2 prints Λ°m 22 times and the layer
+  renders the Lambda as a plain L, so the model will faithfully write `L°m`; a Greek letter silently
+  downgraded to a Latin one has no check today, and chemistry has not been extracted yet.
+```
+
+```
+D15 · 2026-09-15 · the verifier's chapter-7 calibration — run, scored against the rendered pages;
+  the pass mark's must-find turns out not to be a defect (rulings needed)
+Founder-run from `server/` on `d15-ncert-books`, `margai_d15`. (a) `ncert load --chapters 7` 07:41 failed on
+  an expired SSO session (report `-load.md`, nothing written); after the login, 07:42: 102
+  updated, 0 inserted, 0 deleted, corrections none, all 102 rows now carry pageStarts (checked in the
+  database). (b) free `ncert verify` 07:49: 7 start flags, 1 figure flag, 0 join — the ₹0 preview exactly.
+  (c) `--read-pages` on `pipeline,live,visionsonnet`, in four runs, each stopped or finished on evidence:
+  - 07:51, stopped after 2 pages: every page's first answer failed the schema ("/items: string found") and
+    was repaired — ₹5.90 for two pages, neither kept (the artefact flushed every 10). Nothing logged the
+    rejected output, so 6a311e3 excerpts it for pipeline features; 08:00 `--pages 1` (₹3.59) showed the
+    cause: Sonnet sent its whole, correct answer as a string inside `items`, the output's first field —
+    named after a JSON-Schema keyword. Fixed at root in 59e41ca (`verdicts`, and a test that no pipeline
+    output field is a schema keyword); 330a547 writes the artefact after every page.
+  - 08:09, stopped at page 4: page 2 decoded clean (the rename confirmed); pages 3–4 returned `differs` with
+    identical printed and transcribed spans, which the record refused into a repair — fixed in 2b8eb9d
+    (accepted, set aside by code, listed).
+  - 08:16, finished: 9 pages, ₹15.37 (cache write 7,251 — the prefix on Sonnet's tokenizer; 1 repair, page 4,
+    a stringified `verdicts` array: 1 page in 9). 102 of 102 rows with a verdict: 96 matches, 6 differs,
+    7 flags, 1 omitted passage, 8 identical/glyph set-asides, no misquotes. Total spend on the calibration
+    ≈ ₹25.
+THE MUST-FIND IS NOT A DEFECT. Page 4 rendered at 300 DPI prints the third form of Eq. (7.5) as
+  −G m₁m₂/|r|³ r̂ — with the hat, the book's own physics error, in all three forms. Opus's `|r|^3 r_hat` is
+  the print and Sonnet's `matches` is right. The 2026-09-14 full read and the pair ruling's evidence
+  ("Sonnet the one read to see the vector r") had it backwards: Sonnet run 9's plain `r` corrected the book.
+THE SECOND READ, all 8 signals read against the pages: 8 wrong, 0 real.
+  - p9 §7.7 ¶12 `−4√2 G m / l` vs `sqrt(2)` — the convention; p11 §7.9 ¶8 ×2 `10^-11` vs `10^(-11)` — the
+    convention (bracketed exponent) and spacing.
+  - p10 §7.8 ¶13 and ¶14 — the verifier dropped a full stop the page prints after each display.
+  - p10 §7.8 ¶10 `R_E` vs `r_E` — the page prints r_E; the verifier corrected the book.
+  - p12 §7.10 ¶4 "total energy of a satellite" — invented; the page prints "an circularly orbiting".
+  - omitted p8 "7.7 GRAVITATIONAL POTENTIAL ENERGY" — a heading, which the prompt says is never omitted.
+  By the page, run 11 has no character defect left for the verifier to find (E ( ) on page 9 stays as the
+  2026-09-14 read ruled it), so this run measures false flags and cannot measure recall.
+THE FREE CHECKS, every item read against the pages: 5 real, ~10 noise.
+  - real, by v3's own rule (a line indented after a display starts a paragraph): p3 §7.2 ¶7 swallows
+    "where v is the velocity…"; p7 §7.6 ¶3 swallows "For h/R_E << 1, using binomial expression,"; p8 §7.6 ¶7
+    swallows "Substituting for M_s from above, we get"; p11 §7.9 ¶4 swallows "where we have used the
+    relation…". And §7.3 ¶9 (Example 7.2's stem) carries `Fig. 7.5`, which only ¶11 mentions.
+  - noise: page 5's boxed law statements (1)/(2) and §7.4 ¶1 after its heading, and two false printed starts
+    there; page 3's Example box line "equal times to traverse BAC and"; page 11's indented "Which is
+    approximately 85 minutes."; page 12's "Answer Given k…" label; page 4's flush law statement (ruled
+    defensible on 2026-09-14) and "The total force on m₁ is" set under Fig. 7.4 (running text or caption —
+    undecided).
+  - the corrections file cannot yet say two of these: no kind removes a figure_ref, and none drops a row.
+RULINGS, founder: "approved as written, recommended option per ruling" — (1) the pass mark is void and the
+  vector-r claim is corrected in place (d0398fd: the 2026-09-14 day log, the pair ruling, the visionsonnet
+  header); (2) recall is measured on seeded defects, after code sets aside `√x`/`sqrt(x)`, a single-token
+  `^-n`/`^(-n)` and a trailing full stop (a47be53), under its own artefact tag (655f3ac); (3) `figure_ref`
+  and `drop` correction kinds (ba80219); (4) the four split corrections, each span checked once on its page
+  (89605db) — they apply at chapter 7's next load of `margai_d15`, which waits for the recall result.
+THE SEEDED COPY: `margai_d15_seeded`, created from `margai_d15` (template copy: rows, pageStarts, the Opus
+  ledger rows the guard needs), with twelve defects injected by SQL from the session scratchpad, each into a
+  single-page row where its span occurred once, each confirmed to change one row; the real database checked
+  untouched. The key to score against — page: row — class (the seeded text):
+  - p2: §7.1 ¶3 — word changed ("hailing from Sweden" for Denmark)
+  - p4: §7.3 ¶6 — hat added ("along - r_hat.")
+  - p5: §7.3 ¶14 — prime dropped ("F_GB = F_GB" for F'_GB)
+  - p7: §7.5 ¶5 — subscript case ("G M_e m"); §7.6 ¶3 — approximation flattened ("g(h) = g"); §7.5 ¶6 —
+    equation number changed ("(7.21)" for (7.12))
+  - p9: §7.7 ¶12 — leading minus lost ("= 4 sqrt(2)")
+  - p10: §7.8 ¶4 — bracket around a sum lost ("GmM_E / h + R_E")
+  - p11: §7.9 ¶5 — digit changed ("6300 km"); §7.8 ¶16 — sentence dropped ("The calculation of this speed is
+    left as an exercise to the students."); §7.9 ¶3 — displayed equation dropped ("V^2 = G M_E / (R_E + h)
+    (7.35)")
+  - p12: §7.9 ¶11 — exponent changed ("3.84×10^6")
+  None is of a class code now sets aside. Recall = seeds named by a flag at the right row (the dropped
+  sentence and equation may surface as `omitted` on their page instead); every other signal is scored
+  against the page as before.
+THE SEEDED RECALL RUN, founder, 22:44 — `margai_d15_seeded`, `--artefact-tag seeded`, 12 pages read fresh, no
+  repair call, ₹17.85 (report `-ncert-verify-4.md`). Scored against the key:
+  - FOUND 9 of 12, each a flag at the seeded row naming the seeded span: word (p2 "Sweden"), hat added (p4
+    "- r_hat"), subscript case (p7 "M_e"), equation number (p7 "(7.21)"), leading minus lost (p9), bracket
+    around a sum lost (p10 "/ h + R_E"), digit (p11 "6300"), sentence dropped (p11 §7.8 ¶16, as a
+    difference), exponent (p12 "10^6").
+  - MISSED 3: the dropped prime (p5 §7.3 ¶14 "F_GB = F_GB"), the approximation flattened (p7 §7.6 ¶3
+    "g(h) = g"), the displayed equation dropped (p11 §7.9 ¶3 — no flag, and not under `omitted`). These are
+    the classes the whole D14/D15 audit turned on — the glyph a downscaled page loses, a physics error
+    that reads plausibly, and run 9's lost equations — and the prompt names all three.
+  - WRONG 6: p7 §7.6 ¶6 "to be cube" — the book's misprint, which the verifier corrected; p3 §7.2 ¶8 a "?"
+    the page prints, dropped; `omitted` ×4 — the captions of Figs. 7.3 and 7.4 and the headings 7.4 and
+    7.5, which the prompt says are never running text.
+  - The code set-asides worked as ruled: the full stops after E_i and E_N, `V_f.`, and the book's `r_E`
+    and "an circularly" came back as identical or equal spans and were set aside, not flagged.
+  One run of twelve pages is a small sample on a model that samples at its default temperature; whether the
+  three misses are habit or dice needs a repeat of those pages (DECISIONS 2026-09-14, repeat before change).
+RULINGS on the seeded result, founder: "approved as written, recommended option per ruling" (DECISIONS
+  2026-09-15) — (1) repeat the three missed pages; (2) code sets aside omitted headings and captions and a
+  trailing ? or ! (fa6b7d7); (3) the paid second read is kept, its blind spots named if the misses repeat.
+THE REPEAT, founder, 23:04 — pages 5, 7, 11 with `--redo` under the seeded tag, ₹7.22 (one repair: page 7's
+  `verdicts` again sent as a string — 2 calls of 24 so far); report `-ncert-verify-5.md`.
+  - The three misses are HABIT, missed twice each: the prime (page 5 — the verifier quoted §7.3 ¶14's
+    `F'_GA …` as identical and did not see `F_GB = F_GB` lost its prime); ≅ flattened (page 7 — its rejected
+    first answer quoted the page as `g(h) = g`: it reads the printed ≅ as =); the displayed equation dropped
+    (page 11 — neither flagged nor omitted).
+  - The other seeds on those pages found again: subscript case and equation number (p7), digit (p11); the
+    dropped sentence found again, this time as omitted text rather than a difference.
+  - Wrong signals on the three pages: none — the heading 7.4 set aside by the new code, "to be cube" not
+    raised this draw.
+  CONCLUSION by ruling 3: the paid second read is kept; its blind spots — a dropped prime, an approximation
+  sign read as =, a dropped displayed equation — are named in the runbook, and the founder's spot reads aim
+  at them. The free checks cannot see the first two either (the symbol fonts leave primes and ≅ unmapped in
+  the layer); a numbered displayed equation leaves its number in the layer, which a free check could hold
+  the rows to (open for the founder).
+THE RELOAD, founder, 23:10 — `ncert load --chapters 7` into `margai_d15`, ₹0 (report `-ncert-load-3.md`): all
+  four split corrections applied and named; 4 inserted, 26 updated, 76 unchanged, 0 deleted; 106 rows; no
+  page-break repair, no mid-sentence start. Checked in the database: each new row starts at its `at` span
+  (§7.2 ¶8, §7.6 ¶4, §7.6 ¶9, §7.9 ¶5). The 30 inserted or updated rows carry no verdict now — by design a load
+  drops a verdict whose address holds other text — but only the 4 split rows' texts changed: the other 26
+  moved one number down their section with the same text. The artefact matches a read to a row by address
+  and part hash, so a `--read-pages` would re-read pages 3, 7, 8, 11 and 12, page 12 only for renumbering, and
+  every fresh draw can raise new wrong signals on rows already adjudicated. §7.3 ¶9's `Fig. 7.5` (a real
+  defect of the calibration) has no correction entry yet — ruling 4 named the four splits only.
+THE FREE VERIFY AFTER THE RELOAD, founder, 2026-09-16 07:07 — ₹0 (report `2026-09-16-ncert-verify.md`):
+  start flags 7 → 6, join 0, figure 1; 76 of 106 rows with a verdict, 74 matches, 2 differs, 0 not judged;
+  the clean share is not computed while 30 rows have none.
+  - The splits are confirmed by the print itself: p8's flag is gone, p3's and p11's split lines are matched,
+    and p7 now counts 10 rows against 10 printed paragraphs.
+  - p7 still flags, and the flag is an artefact: the text layer drops the symbol-font glyphs, so the printed
+    line reads "For , using binomial expression," against the row's "For h/R_E << 1, using binomial
+    expression," and the 12-letter opening comparison (`ParagraphParts.sameOpening`) misses. The layer's
+    opening is a subsequence of the row's — a fallback pass could pair them (open for the founder).
+  - The other five start flags are the noise the calibration already scored: p3's Example-box line, p4's
+    flush law statement and the line under Fig. 7.4, p5's boxed (1)/(2) and §7.4 ¶1, p11's indented "Which is
+    approximately 85 minutes.", p12's "Answer Given k…".
+  - The second read is down to its two known-wrong signals (p10 §7.8 ¶10 `r_E`, p12 §7.10 ¶4 the invented
+    "total energy of a satellite"): the other six of the calibration's eight are now set aside by code, with
+    the p8 heading under omitted text. Two `false_positive` entries would clear them and turn both rows to
+    `matches`; they need no reload, since `ncert verify` reads the rulings file itself.
+THE FIVE RULINGS, founder 2026-09-16, "approved as written, recommended option per ruling" — all five built
+  the same morning, 720 server tests, verify green, ₹0 (DECISIONS 2026-09-16):
+  1. Three more entries in `ncert-corrections.yaml` (6b19d2c): `figure_ref` removing `Fig. 7.5` from §7.3 ¶9
+     (applies at the next load), and `false_positive` on the two remaining second-read signals (p10 `r_E`,
+     p12 the invented "total energy of a satellite") — these need no reload. A test now reads the committed
+     file, so its YAML and its keys fail here rather than on the founder's machine; a mistyped span still
+     fails only at the load, by name.
+  2. A read is matched to a row by its part's hash, not the address the row had when the page was read
+     (541dba4, corrected after the audit): a read made of exactly the page's parts is mapped item by item,
+     which is right however the rows have been renumbered and right where a page prints the same words
+     twice; where the page's parts have changed, a part whose words appear once in the read keeps its
+     verdict and an ambiguous one is left without any, rather than guessing by an address that has moved.
+     Renumbering alone no longer costs a paid re-read or a fresh draw.
+  3. A printed start whose math the layer dropped is paired with its row (bfb2542): leftovers on both sides
+     are matched once more where the layer's letters all appear, in order and close together, at the row's
+     opening. Only the layer may be missing letters. Every pairing is named in its own report section — it
+     is a guess, and a page it quiets would otherwise leave no trace (added after the audit).
+  4. The free equation-number check (d926a30): each page's printed `(7.n)` numbers counted against the
+     numbers its rows carry, flagged only where the print carries one more often.
+  5. Chapter 7 stays Opus run 11 through the book's corpus event: extract without `--redo`, which resumes
+     over its pages, and copy the JSONL aside rather than move it (runbook §3).
+THE AUDIT of the five-ruling build (spec-auditor, FAIL → fixed): the resume block's "76 rows with a verdict"
+  was the pre-ruling-2 number (corrected below); the pairing of ruling 3 claimed a safeguard — "the counts
+  agreeing" — that the code does not implement and that is not a safeguard at all, since a pairing removes
+  one from each side and leaves any mismatch standing (DECISIONS corrected: the real guards are that only
+  leftovers are paired, that the letters agree from the first and run in order, and that every pairing is
+  named); the pairing left no trace in the report (now its own section); the same-words tie-break by address
+  was unsound after a renumbering (now mapped in order, ambiguity left unjudged, with a test); the equation
+  flag named one cause for a signal with several (reworded); four doc lines overstated or miscounted.
+  THE RE-AUDIT returned FAIL again on two: the runbook still told a person the address decides a tie the
+  fix had deleted (rewritten to what the code does), and the branch that recovers those 22 rows had no test
+  — every test reached the other branch (now `onAPageASplitChangedTheUntouchedPartKeepsItsVerdictAndThe
+  SplitHalvesDoNot`, which fails without it). With them: a part is matched only where its words appear once
+  on both sides; the pairing's safety argument has its own test (two leftover rows against one leftover
+  printed start — the second row is still flagged); and the summary table counts `starts paired` per
+  chapter, so a book-sized run has a number to watch rather than only a list.
+THE ₹0 PREVIEW of rulings 3 and 4 over the real rows (a throwaway JUnit test on `margai_d15` and
+  `margai_d15_seeded` with the real PDF, deleted after): start flags 6 → 5 — page 7's cleared, exactly the
+  one ruling 3 was for — and equation flags 0 on the corrected chapter, while on the seeded copy the check
+  names the dropped (7.35) on p11 (the blind spot the paid read missed on both draws) and the altered (7.12)
+  on p7. Two true positives, no false ones.
+THE RULINGS PROVED, founder 22:46 and 22:47 — two ₹0 runs on `margai_d15`, every predicted number met
+  (reports `-load-2.md`, `-verify-2.md`; the 22:45 load failed on an expired SSO session and wrote nothing).
+  The load: all five text-changing corrections named, the `Fig. 7.5` removal among them, 0 inserted, 1
+  updated, 105 unchanged, and "rulings on verifier flags that change no text: 2". The free verify: start
+  flags 5, join 0, **figure 0**, **equation 0**, **starts paired 1** (p7, named in its own section), the
+  second read's flags **none** with the two rulings set aside, and **98 of 106 rows with a verdict, all 98
+  `matches`**. Ruling 2 is what earned the 22: the two exponent set-asides now listed at p11 §7.9 ¶9 are
+  spans of rows that had no verdict this morning — the recovered-by-words branch, working on the real
+  artefact. The 8 rows left are exactly the four split halves and their four new siblings.
+THE PAID RE-READ, founder 22:52 — `--read-pages --pages 3,7,8,11`, 4 pages, ₹6.99, no repair call (the
+  stringified `verdicts` array did not recur: 2 in 28 calls now); report `-ncert-verify-3.md`. **106 of 106
+  rows with a verdict, 104 matches, 2 differs, clean 98.1%**; the free checks unchanged on a fresh draw —
+  equation flags 0, the p7 pairing named again, joins 0, figure 0.
+  Both new flags are THE BOOK'S OWN MISPRINTS, read against the pages rendered at 3× (scratchpad pymupdf;
+  page 8 is a private-use-encoded page, so only the image can be read):
+  - p7 §7.6 ¶7: the page prints "Since mass of a sphere is proportional **to be** cube of its radius." The
+    verifier quoted it as "to the cube" — the same span it corrected in the seeded run, so this is habit.
+  - p8 §7.6 ¶11: the page prints "the acceleration **due gravity** decreases by a factor". The verifier
+    quoted it as "due to gravity".
+  This is the verifier's third and fourth silent repair of the book's grammar (with `r_E` → `R_E` and the
+  invented "total energy of a satellite"): it reads the page as it should be written, not as it is. Two
+  `misprint` entries would take chapter 7 to 106 matches; drafted, awaiting the founder's word.
+CHAPTER 7 IS CLOSED, founder 23:03 — the two `misprint` entries committed (d7fd697) and a ₹0 verify run:
+  the second read's flags **none**, rulings set aside **4**, **106 of 106 rows, 106 matches, clean 100.0%**
+  (report `-ncert-verify-4.md`). What stands beside the number, all of it scored against the pages already:
+  5 page-level start flags (p3's Example-box line, p4's flush law statement and the line under Fig. 7.4,
+  p5's boxed (1)/(2) and §7.4 ¶1, p11's indented "Which is approximately 85 minutes.", p12's "Answer Given
+  k…"), 0 equation flags, 0 passages no row carries, 1 named pairing on p7. Chapter 7 cost ₹6.99 today and
+  about ₹32 across the whole calibration.
+DATABASE STATE at the close: `margai_d15` holds phy11-part1 ch 7 (106 rows) and bio11 ch 1 (30 rows) only —
+  the v2 corpus of 1,056 rows is in `margai_d14`. So the corpus event's load writes phy11-part1's other
+  **6** chapters fresh and updates ch 7 (books.yaml: the rationalised 2022 edition is 7 chapters,
+  keph101–107, 143 pages — the "14" this line carried until 2026-09-17 was phy11 part 1 + part 2
+  counted together, which is not what `--book phy11-part1` loads); nothing of v2 is in the way, and
+  `ncert load` without `--chapters` will report no deletions.
+HOW TO RESUME — the phy11-part1 corpus event, in this order: (1) `aws sso login --profile margai` (the 22:45
+  failure was an expired session); (2) copy the artefact aside, never move it:
+  `aws s3 cp s3://margai-beta-content/extract/phy11-part1/en.jsonl s3://margai-beta-content/extract/phy11-part1/en.run11-backup.jsonl --profile margai`;
+  (3) `ncert extract --book phy11-part1 --lang en` on `pipeline,live,visionopus` (~₹750, resumes over ch 7's
+  12 pages, which stay Opus run 11 — ruling 5); (4) `ncert load --book phy11-part1 --lang en`; (5) free
+  `ncert verify`, then `--read-pages` (~₹250 on Sonnet); (6) adjudicate the flags against the rendered pages,
+  write the rulings, reload, re-verify → the book's clean share, which is PLAN D15's ✅. Then bio11 and the
+  eight remaining books.
+Reports 2026-09-15-ncert-load(-2), -ncert-verify (free), -2 (`--pages 1`), -3 (the finished read) committed;
+  the two stopped runs wrote none. Server tests 697, verify green, eval PASS (placeholder) before each
+  AI-path commit.
+```
+
+```
+D15 · 2026-09-14 (late evening) · HOW TO RESUME step 1 — `ncert verify [--read-pages]` built; not yet
+  calibrated
+The plan (seven tasks, eight spec-silent choices, five closing questions) was approved with "ok, let's
+  implement it"; the recommended option was taken on every question: (1) one call per page — the
+  page's bands and every paragraph's part on it as a numbered item — over one call per paragraph, at
+  ~₹1.05 a page (chapter 7 ≈ ₹14, phy11-part1 ≈ ₹190, ten books ≈ ₹2,000, against ≈ ₹80 / ₹770 /
+  ₹8,000); (2) the page call also asks for running text no paragraph carries; (3) brackets are the
+  prompt's judgement, code normalises only spacing and the named glyph variants; (4) `join` and
+  `split` corrections now; (5) the calibration bar: the vector r in §7.3 ¶5 flagged and no more than 10
+  flags on the 102 rows wrong against the page. DECISIONS rows dated 2026-09-14 carry each.
+THE BUILD, test-first, one commit per task through the gate (full verify each time):
+  - a056a20 curriculum — `extraction` gains `pageStarts` and `verification` (JSONB, no migration; TECH_PLAN
+    §2.3 amended); a reload with the same text keeps a verdict, a changed text drops it; `CurriculumImport`
+    reads an edition's rows back and records verdicts by address under a SHA-256 guard.
+  - a5728ce `ncert load` applies `pipeline/inputs/ncert-corrections.yaml` (committed empty) after its
+    page-break repairs and before numbering — text / join / split change the frozen run, misprint /
+    false_positive rule on a flag — keyed on page + span, refused by name unless the span is on its page
+    exactly once; rows record page offsets.
+  - 2761b28 `PdfLayout` — where printed paragraphs start, from PDFBox glyph positions; 589932f fixed two
+    misreads a ₹0 preview found on the real chapter (below).
+  - cad2ec5 `LayoutChecks` + `ParagraphParts` — starts per page, joins per page break, figure_refs per row.
+  - 68ad677 `ncert_verify` v1, `PageVerdicts`, `PageVerifyTask` (VISION, `pipeline_verify`),
+    `AiCallModels`; `ncert_extract` v3 untouched (0-line diff against debb920, checked).
+  - 7ba35ac `ncert verify [--read-pages] [--pages] [--redo]` with the `verify/{book}/{lang}.jsonl` artefact.
+THE ₹0 PREVIEW — the free checks on `margai_d15`'s 102 Opus rows against the real keph107.pdf
+  (a throwaway test, deleted), read against pages 7 and 11 rendered: page 7 read as one column (a verso
+  right column that starts left of the middle and outnumbers the left column's flush lines) and page 11
+  raised a false join (the equations topping its left column carry no text layer). Both fixed with a
+  test each (589932f), plus openings compared without the transcription's subscripts. After: 7 page-level
+  start flags, 1 figure flag, no join flag. Two look like real run-11 defects — §7.9 ¶4 swallows
+  "where we have used the relation…", which page 11 indents after a display, and `Fig. 7.5` sits on
+  Example 7.2's stem; the calibration reads them all.
+SPEC-AUDITOR on the whole change set: FAIL — 1 BLOCKER, 4 MAJOR, 14 MINOR. The BLOCKER was right
+  and would have voided step 2: the prompt's worked examples were chapter 7's own defects with their
+  expected spans (the vector r, page 5's primes, `g(h) ≅`, `4p/3`, the lost equations), so a calibration
+  pass would have proved nothing. Fixed in ea1fd2a: every example invented, a test keeps the must-finds
+  out, the bracket rule made one rule (the "not a difference" line had contradicted it), v3's two
+  spellings of an arrow vector declared equivalent (PARKED), refusal messages stripped of instructions to
+  the model. MAJORs fixed in 63a2d64: `--read-pages` refuses the fake client and any verify tier but the
+  pinned `margai.pipeline.verify-model` (claude-sonnet-5), reads and stored verdicts by another model or
+  prompt are neither reused nor counted, a misquoted difference leaves the row `not_judged` instead of
+  `matches`, every run re-judges from the artefact so a ruling takes effect at ₹0 as the runbook says;
+  and MINORs with it — cost line before anything that can refuse, `--pages`/`--redo` refused without
+  `--read-pages`, corrections matched on single-spaced text, the book's clean line only when every
+  chapter has rows, the page-level signals counted beside it. MINORs in the docs commit: TECH_PLAN §4.1 /
+  §4.2 rows and the "what is trusted" wording, the runbook's key sourcing (no key on the command line),
+  `pageStarts`, the bucket prefix lists, DECISIONS rows for the batch exception, the clean-share
+  definition and the calibration's integrity, and an annotation on the pair ruling, whose premise ("one
+  paragraph and one band") plan question 1 changed. Checked by hand for the auditor's unverifiables:
+  v3 unchanged; all 102 chapter-7 rows' `ai_calls` rows are claude-opus-5 in `margai_d15`, so the guard
+  has what it needs; `PdfLayoutTest` ran 17 of 17 with the PDF present.
+RE-AUDIT: FAIL again, on one MAJOR and seven MINORs — the BLOCKER and the four MAJORs confirmed fixed.
+  The MAJOR was right: the "factor after a fraction" bracket rule contradicted its own mv²/2r example and
+  the frozen v3 conventions (`G M m / r^2`, `Gm(2m) / 1 j_hat`), so the verifier would have flagged
+  convention-following rows corpus-wide. Fixed in a9e5c41: a bracket is a difference only where it changes
+  what a sum or difference, an exponent or a function covers. **Consequence, confirmed by the founder 2026-09-15:
+  the second read will not catch the PARKED `G Mm / d^2 L` case** — which, by the freeze row, makes it
+  v3's first real amendment candidate (DECISIONS, the brackets row, annotated). MINORs fixed in a290328
+  and the docs commit: the guard now refuses rows whose transcriber the ledger cannot name (the bucket
+  holds a Sonnet run too), tests for three branches that had none, the Javadoc / TECH_PLAN §2.3 / runbook
+  say the free run writes re-judged verdicts and a corrected page needs a fresh paid read, the runbook no
+  longer claims a vector-r find is the verifier's unaided reach (the prompt teaches the class), a DECISIONS
+  row records why `NcertPage`'s repair wording stays under the frozen prompt, the changelog names its
+  commits. Not re-audited a third time: the remaining changes are the ones the re-audit itself specified.
+Server tests 585 → 690 (6 skipped, as before), verify green through the gate on every commit, eval PASS
+  (placeholder) stamped before each AI-path commit. No model was called today by this build: ₹0.
+
+HOW TO RESUME (supersedes step 1 and 2 of the block of 2026-09-14 below; steps 3–4 stand):
+  1. Founder, from `server/` on this branch, jar rebuilt (`./mvnw -q -DskipTests package`), provider key
+     sourced into the shell per docs/runbooks/ai-provider-keys.md — three one-line commands, in the
+     runbook's "The verifier's chapter-7 calibration": (a) `ncert load --book phy11-part1 --lang en
+     --chapters 7` against `margai_d15` (₹0; expect 102 updated, 0 inserted, nothing deleted, and the corrections
+     section `none` — the committed file is empty); (b) `ncert verify … --chapters 7` (₹0; the
+     free checks should match the preview: 7 start flags, 1 figure flag, 0 join); (c) the same with
+     `--read-pages` on `pipeline,live,visionsonnet` (~₹14).
+  2. Claude reads every flag of (c) against the rendered pages and scores it: the vector r found or not,
+     false flags counted against the bar of 10, the two suspected run-11 defects confirmed or not, the
+     `omitted` list checked against page 5. Drafts `ncert-corrections.yaml` entries for the founder's
+     approval. After the re-load, rulings (misprint, false_positive) take effect on a free re-verify at ₹0,
+     but every page a text/join/split correction touched needs `--read-pages` again (≈ ₹1 a page, the rest
+     resume) before chapter 7's clean share is computed.
+  3. If the bar is met: the phy11-part1 corpus event on Opus as the block below says, then verify it
+     (~₹190), adjudicate, load. If the vector r is missed: one paragraph per call, a build change first.
+```
+
+```
+D15 · 2026-09-14 · step 1 of the HOW TO RESUME order — the chapter-7 dry run on the final v2 prompt: PASS
+Run by the founder at 08:05 from `d15-ncert-books`, fast-forwarded to the merged main (451adb3); the jar
+  built 2026-09-13 23:58 carries the committed prompt byte for byte, so nothing was rebuilt.
+  `ncert extract --book phy11-part1 --lang en --chapters 7 --redo`: 12 pages called, ₹14.08 from the
+  ledger — ₹1.17 per billed page, 7% above the canonical run's ₹1.09, which moves the bio11 estimate
+  from ₹220 to about ₹235 — text layer fed at legibility 0.389, cache write 6,448 / cache read 70,928,
+  apparatus from page 13 (SUMMARY, 5 of 17 not sent), character diff none over 12 pages checked,
+  paragraph-count flag none, 120 paragraphs. `ncert load … --chapters 7`: exit 0, no refusal, 0
+  page-break repairs, 120 updated; 20 addresses of earlier runs reported as no longer carried.
+  The block's gates, each read on the rows of today's calls only (joined through
+  `extraction->'en'->>'aiCallId'` to `ai_calls`, because of the finding below):
+  - primes present: `F'_GB = F_GB and F'_GC = F_GC` at §7.3 ¶18, `F'_R = F'_GA + F'_GB + F'_GC` at
+    ¶19; 20 rows in the chapter carry a prime;
+  - §7.3 ¶10 `Example 7.2` → ¶11 `Answer` → ¶12 `F_GA = Gm(2m) / 1 j_hat`, the order the block asks
+    for at the numbers it names;
+  - splits 3, at the threshold: §7.3 ¶21 "cases, a simple law…" is a genuine band split inside page 5;
+    §7.5 ¶5 "hence F = …" and §7.9 ¶11 "where R_MS…" are page-break continuations the model did not
+    flag, the second the defensible flush-left class after a displayed equation;
+  - the glyph table of the 2026-09-13 day log (items 1–8 and 10–14; the log named ten defects but
+    recorded no query, so it was rebuilt as a fourteen-row SQL over wrong/right patterns): every wrong
+    pattern 0 hits — `Gm(2m) / 1` ×3, both primed lines, `= − (2 G m^2 / l)(2 + 1 / √2)` with its minus
+    and its radical (the glyph, as printed), `i_hat`/`j_hat` ×6, `g(h) ≅`, `M_E` ×26 and no `M_e`,
+    `× 10^` ×11 and no ASCII `x`, `10^8`, `R_m^2 / R_E^2` beside `g ∝ R_E^-2`, `r_21`,
+    `T_M = (1.52)^(3/2) × 365`, `L_P = m_P r_P v_P` in the case the page prints. The one flag was the
+    check's own: the length `l` closing `− 5.41 G m^2 / l` at §7.7 ¶13 matched the stray-letter
+    pattern. Confidence 0.92 on every page, as uniform as ever.
+  Both chapter-7 reports are committed with this entry, before step 2's whole-book run overwrites
+  the day's files (the PARKED report-overwrite item, worked around by commit order today).
+FINDING, before the corpus event: `ncert load` reports orphans and never deletes them, so
+  `ncert_paragraphs` held 1,102 phy11-part1 rows against the canonical run's 1,017 — 85 rows left by
+  the ten earlier runs, 26 of them in chapter 7 (20 after today's load). A random twenty over the
+  table can land on a row no run carries, and D17's embed would embed them. Proposed for step 2:
+  delete the book's rows between the full extraction and its load, by hand and on the founder's
+  say, so the table equals the run — a DECISIONS row if agreed; a `--prune` on `ncert load` for
+  corpus events is PARKED. Also PARKED: under `--redo` the extract report's closing `jsonl:` line
+  counts the redone pages as "from earlier runs".
+Next: step 2 — archive the canonical JSONL rather than delete it, extract phy11-part1 in full on
+  this prompt (~₹125), delete the book's rows, load, then the ✅ on the same twenty pages as
+  2026-09-13 (a seed cannot reproduce a sample across a reload; the pages are the constant) —
+  20/20 text is the D14 tick.
+STEP 2, 08:31–09:17 — the corpus event on the final v2 prompt. The canonical JSONL was archived
+  beside the live key (`extract/phy11-part1/en.2026-09-13-canonical.jsonl`; the command reads its
+  key exactly, so a sibling is invisible to it). Whole-book extract 08:31–09:04: 108 billed pages,
+  ₹118.36 (₹1.10 each), every chapter fed (legibility 0.379–0.470), every apparatus boundary at
+  SUMMARY, 1,044 paragraphs; character diff 23 flags, 21 of them on one row, ch 6 p8 §6.2 ¶47
+  (below); the same four low-coverage pages as every run — rendered and read: Table 1.1 (ch 1
+  p2), the Ancient Indian Science box (ch 4 p3), the bicycle-rim experiment box (ch 6 p16),
+  Table 6.1 (ch 6 p25) — all skipped by the prompt's own rules (tables, activity boxes,
+  historical asides): content the run was told to leave, not text lost; the PARKED item closes.
+  Whether Table 6.1's moments of inertia should ever be anchorable content is a founder policy
+  question, not a defect.
+  The first load REFUSED, writing nothing: `ch 4 page 2: §4.1 ¶5 has no text`. Page 2 opens at
+  the 4.2 heading with no §4.1 text above it — a phantom continuation object with empty text,
+  emitted for a paragraph that does not continue; all 108 calls `ok`, nothing retried, because
+  the paragraph schema does not forbid a blank text. Redone for ₹1.77 (`--redo --chapters 4
+  --pages 2`: 8 paragraphs, was 9; that one-page run's report overwrote the whole-book extract
+  report on disk — the numbers above are from the founder's pasted transcript). Then the book's
+  1,102 rows deleted by hand (founder-run, the ruling on the morning's finding — DECISIONS) and
+  the load run clean: **coverage 100%, 1,023 rows inserted, zero refused, no orphans**, one
+  page-break repair (ch 6 §6.7.4 p18's Answer — last night's known merge — transcribed with its
+  label this time and renumbered), 32 splits listed, about half the "where…/and…" class.
+THE D14 ✅, RE-RUN BY CLAUDE 09:20–09:45 ON THE SAME TWENTY PAGES AS 2026-09-13 (a seed cannot
+  reproduce a sample across a reload; the page and the section are the constants, the row is the
+  one at last night's address where it still exists and the named paragraph where the numbering
+  moved). Every row read against the page rendered from the PDF at 130 dpi, never the text layer.
+  Text exact / address right / figure refs right:
+  | # | 2026-09-13 row | today's row | pages | verdict |
+  |---|---|---|---|---|
+  | 1 | §5.1.1 ¶8 | §5.1.1 ¶8 | 2 | ✓ ✓ — · the unit-vector identities are one paragraph now (¶7); ¶8 joins "Given two vectors" across the column break |
+  | 2 | §5.11.2 ¶5 | §5.11.2 ¶5 | 14 | ✓ ✓ — · (5.26), (5.27) exact |
+  | 3 | §5.4 ¶5 | §5.4 ¶5 | 5 | ✓ ✓ — · **`v_f = sqrt(2 × 100 J / 0.05 kg) = 63.2 m s^-1` — last night's ✗ is fixed in the corpus**; "The speed is reduced by approximately 68% (not 90%)." is ¶6 |
+  | 4 | §5.11 ¶3 | §5.11 ¶3 | 13 | ✓ ✓ — |
+  | 5 | §7.2 ¶1 | §7.2 ¶1 | 2 | ✓ ✓ — |
+  | 6 | §6.8.2 ¶6 | §6.8.2 ¶6 | 22 | ✓ ✓ — · still begins "free space." (the gravity-/free page-break split, same address) |
+  | 7 | §1.3 ¶3 | §1.3 ¶3 | 3–4 | ✓ ✓ — · "(1) For example…", "All these numbers…" and the five bullet rules of page 4 in one row, joined across the page, every word on the pages |
+  | 8 | §6.10 ¶14 | §6.10 ¶14 | 27 | ✓ ✓ — · `α = (ω − ω_0) / t = 4π rad/s^2` |
+  | 9 | §6.4 ¶8 | §6.4 ¶8 | 9–10 | ✓ ✓ — · **last night's split is joined**: "…may have complicated trajectories…" is one row across the page |
+  | 10 | §6.7.3 ¶7 | §6.7.3 ¶6 | 17 | ✓ ✓ — · equation numbers written `[6.28 b]`, `[6.17]` where the page prints parentheses; τ as `tau` |
+  | 11 | §4.7 ¶4 | §4.7 ¶4 | 10 | ✓ ✓ — · p'_A, p'_B primes present |
+  | 12 | §5.1.1 ¶13 | §5.1.1 ¶11 | 2 | ✓ ✓ — · Example 5.1 with its label; `(3 i_hat + 4 j_hat - 5 k_hat)` |
+  | 13 | §3.10 ¶15 | §3.10 ¶15 | 16 | ✓ ✓ — · ν and π by name, (3.47) and (3.48) kept |
+  | 14 | §2.4 ¶18 | §2.4 ¶18 | 6 | ✓ ✓ — · Example 2.3 with its label |
+  | 15 | §6.9 ¶9 | §6.9 ¶8 | 24 | ✓ ✓ ✓ · Fig. 6.28; "of length of length l" reproduced; **the hanging item labels "(a)" (¶7) and "(b)" (¶8) are not transcribed** — the only omission in the twenty; "(1)", "(i)", "(ii)" are kept elsewhere in the book, so a drift, not a policy |
+  | 16 | §1.6.2 ¶10 | §1.6.2 ¶10 | 9 | ✓ ✓ — |
+  | 17 | §5.6 ¶7 | §5.6 ¶8 | 7 | ✓ ✓ — · Example 5.6, `F_r = -k/x`, the range |
+  | 18 | §7.2 ¶5 | §7.2 ¶5 | 3 | ✓ ✓ — · has_equations false |
+  | 19 | §6.12 ¶12 | §6.12 ¶12 | 30 | ✓ ✓ — · `L = L_z + L_perp (6.42c)`; ¶13 carries (6.42d) with ω k_hat |
+  | 20 | §1.2 ¶10 | §1.2 ¶10 | 3 | ✓ ✓ — |
+  **Text exact 20/20, address right 20/20, figure refs 1/1.** Fifteen of the twenty sit at last
+  night's address unchanged. Two notes for prompt v3, neither a wrong word: a hanging item label
+  is part of its paragraph's text (row 15), and an equation number keeps the page's parentheses
+  (row 10). The founder rules whether row 15's dropped "(b)" counts against "text exact".
+BUT ONE FABRICATION OUTSIDE THE SAMPLE, caught by the character diff and read on both pages:
+  `ch 6 §6.2 ¶47` (p8). Page 7 ends mid-sentence "…Suppose, the three squares that make up the L
+  shaped lamina" and page 8 opens "of Fig. 6.11 had different masses. How will you then determine
+  the centre of mass of the lamina?". The stored ¶47 reads "are made of the same material and have
+  the same thickness, then the centre of mass of the L-shape lies on the line OD. We could have
+  guessed this without calculations. Can you tell why? Suppose, the three squares that make up the
+  L shaped lamina of Fig. 6.11 had different masses. How will you…" — an invented clause to make
+  the quoted tail grammatical, then the whole tail repeated, then the page's real fragment. The
+  prompt says never to repeat the quoted tail; the model repaired it instead. `PageBreakRepairs`'
+  repeated-tail rule did not fire because the invented clause precedes the repeat. FIX 4 did its
+  job — 21 words "0x on the page" is exactly this shape. **The tick waits on a ₹2 redo of that
+  page**; if it recurs, the page joins the known-defect list by name, and v3's
+  continues-previous-page boolean is the structural answer (a paragraph that merely continues
+  carries no tail to "complete").
+RULING, ~10:05 (founder, on Claude's recommendation after the founder asked why v3 was not being
+  built instead of patching pages): the HOW TO RESUME order of 2026-09-13 is superseded. Every
+  defect that cost money this morning is one defect — continuation and numbering decided by the
+  model from a quoted text tail — and a whole-book bio11 run on v2 (~₹235) would build a corpus
+  meant to be superseded. New order: (1) redo ch 6 p8 (₹2) so the v2 corpus is a clean baseline
+  and the D14 tick is claimable on v2 if v3 disappoints; (2) bio11 chapter 1 on v2 (₹13) BEFORE
+  writing v3, because Biology's conventions — scientific names, genus capitalisation, "Figure
+  10.2 b" labels — are untested on any prompt and belong in v3; (3) build v3: section + text + one
+  continues-previous-page boolean from the model, ¶n assigned by the loader, a blank text rejected
+  where the output is parsed, hanging item labels and equation parentheses as rules, the biology
+  conventions from (2); verify, eval gate, spec-auditor; (4) chapter 7 on v3 (₹14) against today's
+  chapter-7 result and the whole-book defect list; (5) if v3 proves better, bio11 and the eight
+  books on v3 and phy11-part1 re-run on v3 as a corpus event; if not, bio11 on v2. Cost of the
+  reorder: two to three hours of build before any book runs; saving: one whole-book extraction and
+  a single-prompt corpus.
+CH 6 P8 REDONE AT 09:50 (₹1.99): the character diff returned the same 21 flags, word for word —
+  the fabrication is deterministic for this page, as ch 6 p18's missing label was last night. No
+  further re-rolls. **KNOWN DEFECTS IN phy11-part1 AS LOADED ON v2 (1,023 rows, 100% coverage):
+  `ch 6 §6.2 ¶47` carries an invented lead-in clause and a repeat of page 7's tail before the
+  page's real fragment (deterministic, 2 of 2 calls); ~16 genuine mid-sentence splits among the
+  32 listed; hanging item labels "(a)"/"(b)" dropped at §6.9 ¶7–8; equation numbers in square
+  brackets in §6.7.3.** phy11-part1's half of the D14 tick is earned on v2 — 20/20 text, 20/20
+  address, 100% coverage — but the box stays unticked, per last night's ruling, until bio11 is on
+  the same final prompt, which the reorder makes v3 if chapter 7 proves it. Spend on phy11-part1
+  today ₹136 over five runs.
+STEP 2 OF THE NEW ORDER, 09:54–10:15 — bio11 chapter 1, and a correction to the record. The
+  extract called nothing: `extract/bio11/en.jsonl` already held all 252 pages (846 paragraphs).
+  The ledger dates it — 291 extract calls for ₹240 between 14:00 and 16:00 on 2026-09-13 beyond
+  the phy runs the day log accounts for — so bio11 WAS extracted yesterday afternoon, on the
+  early v2 before the label rule, the notation fixes, bands-only and the radical rule; last
+  night's "bio11 not yet extracted" was wrong. Chapter 1 loaded from it for ₹0: 9 pages, 33
+  rows, apparatus at page 9 (Summary, 1 page), no splits, no repairs. Every row read against the
+  nine pages rendered from kebo101.pdf:
+  - text exact on 31 of 33 rows; address 33/33 (§1 for the pre-section text, §1.1, §1.2,
+    §1.2.1–§1.2.7 all right); figure refs `Figure 1.1` ×2 and `Table 1.1` exact, Biology's
+    "Figure" kept; every binomial with the genus capitalised and the epithet not — Mangifera
+    indica, Solanum tuberosum, Panthera leo, P. pardus, P. tigris, Homo sapiens — italics
+    flattened to plain text as expected; Table 1.1, the Figure 1.1 hierarchy diagram, the
+    contents sidebar and the QR code all skipped; the unit opener's prose (p1) stored as §1 ¶1;
+  - **the Ernst Mayr biography (p2) transcribed as §1 ¶2** — the prompt already says a biography
+    is skipped; the model kept a full-page portrait-and-life-story anyway (confidence 0.92, the
+    only row below 0.95). bio11 has five unit openers with one each → v3 names the page shape;
+  - **a word lost at a page break**: page 5 ends "…systematic arrangement of organisms. Linnaeus"
+    and page 6 opens "used Systema Naturae as the title of his publication"; ¶15 ends at
+    "organisms." and ¶16 begins "used Systema…" — "Linnaeus" is gone and the sentence has no
+    subject. Invisible to all three checks: the diff looks for words here that are not on the
+    page, never the reverse; coverage is a ratio; the split check needs an unfinished left half;
+  - the p6→p7 continuation "…nigrum and" / "melongena. Human beings…" unjoined (the known class)
+    and **missed by the split check**: `OPENS_LOWERCASE_WORD` wants a space or comma after the
+    first word, and a one-word completion ends in a full stop. One character in a regex, with a
+    test — goes in with v3;
+  - list markers: "1." "2." "3." on p4 rewritten as "(1)" "(2)" "(3)", and "4." on p5 dropped —
+    the phy "(a)/(b)" drift again. v3: the printed marker, exactly.
+  The ₹8 redo of chapter 1 on the final v2 is skipped: the later v2 rules were physics-glyph
+  rules, and v3 re-runs this chapter anyway as its biology dry run, beside chapter 7 as its
+  physics one. Before any v3 run the bio11 JSONL is moved aside like phy's.
+THE v3 BUILD, 11:15–12:45 — plan approved with the recommended option on each of its five
+  decisions (the short tail as context only; the load prunes; a misplaced flag refuses; a run
+  ordinal per report; the two small fixes first) and, after the founder asked whether Sonnet 5
+  should carry v3, RULING 1 reopened for one measurement: both dry runs on both models, read
+  against the same defect list (DECISIONS). Tasks 3–5 of the plan landed as one commit, not
+  three: removing the paragraph number from the record cannot compile without the loader moving
+  with it, and a schema shipped without its prompt is the blocker the auditor caught at D14.
+  Four commits in all:
+  - `Reports`: a same-day re-run writes `-2.md`, `-3.md`; nothing overwrites an earlier run's
+    file (the PARKED overwrite item closes; it bit twice this morning);
+  - `SplitSentences`: the opening word may end in a full stop ("melongena.");
+  - the contract: `NcertPage.Paragraph(section, text, continuesPreviousPage, figureRefs)` — a
+    blank text or a flag on any paragraph but the first is refused where the output is decoded
+    and repaired once, both attempts on the ledger; `PreviousPage(section, tail)` with the tail
+    at 200 characters; `ExtractJsonl` refuses a v2 line naming `para_no` and says to move the
+    file aside; `PageBreakRepairs` clears the flag under a printed label and cuts a repeated
+    tail — including anything the model wrote in front of it, which cannot be on the page — and
+    flags what remains as continuing (the ch 6 p8 case is the test, 63 invented characters and
+    a 190-character repeat); `NcertLoadCommand.number` assigns ¶n per (chapter, section) in
+    reading order across pages, a resumed section keeps counting, a continuation joins the
+    nearest text-bearing page, and a flag with nothing before it, into a different section or
+    across an absent page is refused by name with one `--redo` per chapter; the collision refusal
+    is deleted, because a collision cannot occur; `NcertParagraphImporter` deletes the orphans
+    of the carried chapters and names them, refuses the whole load if any is anchored, and spares
+    a row that holds the other edition's text — that last rule fell out of the existing Hindi
+    test, which a naive prune failed; `ncert_extract.v3.stg` with version 3: numbering rules
+    out, the flag in, the tail quoted as context that is "never part of this page's output",
+    item markers kept as printed, equation numbers in their printed parentheses, a unit-opener
+    biography page returns no paragraphs, the four worked examples rewritten; v2 stays on disk
+    as the version the frozen phy corpus names; `application-visionsonnet.yml` restored for the
+    measurement; extract-time flags name a paragraph `ch 6 p8 §6.2 #1` by page position;
+  - docs: TECH_PLAN §6.3 amendment notes, the runbook, `.claude/rules/pipeline.md`, five
+    DECISIONS rows, this log.
+  Tests 562 → 576 (`./mvnw verify` green, 6 skipped are the live smokes), eval gate PASS
+  (placeholder), stamp written.
+  Spec-auditor on the change: FAIL, one MAJOR and seven MINOR, all but one fixed before the
+  commit. The MAJOR was the working agreement itself — a new template with no
+  `docs/prompt-changelog.md` line, which nothing mechanical checks — and the sharpest MINOR was
+  a real gap: a v3 JSONL line that the page record rejects (a blank paragraph, a flag off the
+  first paragraph, neither producible by this build but both by an older or hand-edited
+  artefact) surfaced as the *version-mismatch* refusal with the wrong remedy, and a misplaced
+  flag in an artefact was not refused at all. Both now refuse by page with the `--redo`
+  (`ExtractJsonl` walks Jackson's cause chain for the record's own objection; `ExtractedPage`
+  applies the same first-paragraph rule as `NcertPage`). Also fixed: the prompt's opening
+  sentence read as if the flag were emitted on the first paragraph only; five stale v2 comments
+  in code and tests; one runbook sentence still calling v2 the shipped template; the anchored
+  refusal test now sends a changed row and proves the update rolled back. Left as is, with the
+  reason: the "no field the schema forbids" test still enumerates the two known bad names
+  rather than scanning the prefix for every snake_case identifier, because the prefix
+  legitimately carries dozens of them — `i_hat`, `v_bar`, `L_perp`, `H_2SO_4` — and a scan
+  would need an allowlist longer than the check. Tests 576 → 578.
+v3 DRY RUN 1 — phy11-part1 chapter 7 on Haiku 4.5, 14:50, into a fresh `margai_d15` (₹13.81,
+  12 pages, cache write 6,940 so the v3 prefix clears the floor; the report landed as
+  `-2.md`). 100 paragraphs → 90 rows: ten continuations flagged and joined, against v2's three
+  splits this morning; one split left (§7.3 ¶15, the band split inside page 5, same as v2);
+  the repair fired once (page 7 repeated 59 characters of page 6, dropped, joined). §7.3 order
+  right; the glyph table clean but for two items; no ASCII `x`; `≅` kept; equation numbers now
+  in parentheses where v2 wrote `[7.10]`. Read against pages 4–8 rendered:
+  - **REGRESSION, primes**: page 5's `F'_GA … F'_GB = F_GB and F'_GC = F_GC, F'_R = F'_GA +
+    F'_GB + F'_GC` came back with every prime gone — `F_GB = F_GB and F_GC = F_GC` — the D14
+    item-2 defect, which v2 kept on three bands-only runs today (v2 dropped only the first
+    F'_GA). One run; variance or cause is unknown until a second run;
+  - **the tail echo persists in a form the repair cannot see**: page 8's first paragraph opens
+    "M_s is proportional to the cube of its radius." — a paraphrase of page 7's last sentence
+    ("Since mass of a sphere is proportional to be cube of its radius."), not on page 8 at all,
+    caught only by the character diff ('proportional', 'cube' 0x on the page). Page 7 had
+    echoed page 6 verbatim (repaired). Two of twelve pages echoed the quoted tail; v2's same
+    twelve pages echoed nothing today;
+  - both v2 and v3 correct NCERT's own "neigbouring" typo on page 6, and both paraphrase the
+    book's misprinted (7.10) — neither is a v3 change;
+  - segmentation is coarser and, where checked, right: the (b) part of Example 7.2 is one
+    paragraph with its displayed equations, as the rule says, where v2 cut it into three rows;
+    §7.7's two printed paragraphs on page 8 stay two.
+  Verdict on this run: structurally the better pipeline (joins, parentheses, no collisions
+  possible), with one regression to explain (the primes) and one problem the tail creates
+  rather than solves. Recommendation put to the founder: drop the tail from the call
+  altogether — the flag is a judgement about this page's typography and the previous section
+  still travels — and re-run; the Sonnet chapter 7 on the same prompt first, as the other
+  data point on both questions.
+v3 DRY RUN 2 — phy11-part1 chapter 7 on Sonnet 5 (`visionsonnet`), 15:09, same prompt, same
+  bands, same layer (₹31.22, 2.26× Haiku; cache write 9,399 on its tokenizer). 92 paragraphs →
+  81 rows, zero splits, zero repairs, zero character-diff flags — and one coverage flag, **page
+  3 at 59%**, which on reading is the whole finding. Sonnet skipped the top of page 3's right
+  column: the heading "7.3 UNIVERSAL LAW OF GRAVITATION", the "Legend has it that observing an
+  apple…" paragraph, Eq. (7.3) and "where V is the speed of the moon…" — none of it in any
+  row, where v2 and Haiku-v3 both have it as §7.3 ¶1. Having never seen the heading, it carried
+  §7.2 forward across pages 4 and 5: **fourteen paragraphs of §7.3 filed as §7.2 ¶9–22**, which
+  no loader invariant can see (7.2 is a printed section of chapter 7) and which the load
+  reported only as the deletion of Haiku's sixteen §7.3 rows. Two continuation flags were also
+  wrong: page 3's "3. Law of periods" joined onto page 2's "2. Law of areas", and page 4's
+  first §7.3 paragraph ("This clearly shows that the force due to earth's gravity decreases…")
+  joined onto the Example 7.1 Answer it does not belong to. On the other side of the ledger:
+  every prime on page 5 kept — `F'_GA = G2m.2m/1 j_hat … F'_GB = F_GB and F'_GC = F_GC, F'_R =
+  F'_GA + F'_GB + F'_GC` — which is better than v2 and far better than Haiku-v3; no tail echo
+  on pages 7 or 8 (page 8 opens "Thus the force on the point mass is", exactly as printed, and
+  the (7.10) join reads clean); the (b) part of Example 7.2 one paragraph as the rule says;
+  and its confidence *dipped* to 0.88 on precisely the mis-addressed pages, where Haiku's sits
+  at 0.92 everywhere — the first time the model's confidence has pointed at a real defect.
+  Two Sonnet runs now, on two prompt versions, each unloadable or wrongly addressed on
+  chapter 7 for a different structural reason (D14: numbering restarted in a band, "Example
+  7.1" as a section; D15: a heading and a paragraph skipped, a section carried too far). Its
+  strengths are glyphs and restraint, which is the shape of a verifier, not a transcriber.
+  Recommendation to the founder: RULING 1 stands — Haiku transcribes — and the page-image
+  second read, when it is built, is where Sonnet earns its price. On the tail: Haiku echoed it
+  on two of twelve pages and Sonnet on none; the recommendation to drop it stands. Haiku's
+  lost primes remain unexplained until a second Haiku run, which the no-tail re-run gives for
+  the same ₹14.
+RULING, ~15:40 (founder): improve the prompt and measure both models again rather than choose
+  on one run each. Three changes, one commit, all in v3 (no corpus has been cut on it): **no
+  text of the previous page travels with the call** — `PreviousPage(section)` only, `tail()` and
+  `TAIL_LENGTH` gone from the page record, the user turn asks for the flag from this page's own
+  typography (a first line mid-sentence, or flush left where the page's paragraphs are
+  indented) and says never to write the words that ended the page before; **a headings
+  self-check** in the prefix and the pitfalls — every numbered heading printed on the page must
+  appear as a section change, its first paragraph transcribed, headings counted against section
+  changes — because Sonnet's whole failure was one skipped heading; **a numbered law or rule set
+  as its own paragraph stays one**, because "3. Law of periods" onto "2. Law of areas" was
+  arguably what the one-sentence-item rule said. The three worked examples that mentioned a
+  quoted tail rewritten. The repeated-tail repair stays: it reads the JSONL, not the call.
+  Tests updated first (the task test names the section and quotes no tail; the prefix test asks
+  for the headings check and the law rule), verify green, eval gate PASS (placeholder). Next:
+  both models on chapter 7 and bio11 chapter 1 — two runs each on v3 is the minimum to tell
+  variance from cause for Haiku's primes and Sonnet's skip.
+v3 DRY RUN 3 — chapter 7 on Haiku, amended prompt, 15:35 (₹13.64; cache write 7,351). 102
+  paragraphs → 91 rows, **zero splits, zero repairs, no tail echo anywhere** — the echo is
+  gone with the tail. And a new failure, worse than the last: **page 5 read in the wrong order
+  with its left column's top lost.** The model took the top of the RIGHT column, "cases, a
+  simple law results when you do that :", as the continuation of the Example 7.2 Answer from
+  page 4 — it is flush left and mid-sentence, exactly the cue the no-tail rule names — and
+  never transcribed the left column's F_GA / F_GB / F_GC equations, F_R, "Alternatively…",
+  "(b) Now if the mass at vertex A is doubled" or the primed lines. The left column's last
+  paragraph ("For the gravitational force between an extended object… For two special") came
+  out under §7.4, after §7.4's opening, and page 6's first paragraph was then flagged as
+  continuing it: "For two special The bar AB has two small lead spheres". No check saw it: the
+  coverage ratio held above 60% because what was lost is symbol-font mathematics that barely
+  registers in the layer; the split check does not pair "…do that :" with "(1) The force…";
+  the diff sees only words that are present. The glyph table saw it indirectly — 0 hits for
+  `Gm(2m) / 1`, `i_hat`, the primes — which is how it was found. "3. Law of periods" joined
+  onto "2. Law of areas" again despite the new rule. The primes question is unanswerable on
+  this run: the line was never transcribed.
+  Diagnosis: v2's three runs and v3's first all read page 5 correctly, with the tail. The tail
+  told the model *what* the continuation was — equations — and where; the typography rule told
+  it only "mid-sentence, flush left", and on a two-column page whose left column opens with
+  displayed equations the right column's top fits that description better. The cue is right
+  on a one-column page and wrong on this one. Proposed, not yet done: (1) the rule that a
+  continuation of the previous page can only be at the top of the LEFT (or only) column —
+  the right column's top continues the left column's bottom of the same page, never the
+  previous page; (2) the call carries one fact about the previous page and no text —
+  whether its last paragraph ended without terminal punctuation — so the model knows a
+  sentence is open without being given words to complete; (3) a third Haiku run.
+  Founder: go, ~15:50. Done as one commit: `PreviousPage(section, endedMidSentence)` — the fact
+  computed in Java from the previous page's last paragraph by the split check's own
+  finished-sentence signature — and `previous_ended_mid_sentence` in the call; the prefix
+  states the left-column rule with the page-5 case as its example; the user turn says either
+  "ended in the middle of a sentence — the rest is the first thing printed on this page, at the
+  top of the left or only column, prose or displayed equation" or "ended with a finished
+  sentence — usually a new paragraph", and in both cases that the right column's top continues
+  this page's left column, never the previous page. Tests first, verify green, eval gate PASS
+  (placeholder). Spend on v3 dry runs so far ₹58.67 (three chapter-7 runs: Haiku ₹13.81 and
+  ₹13.64, Sonnet ₹31.22).
+v3 DRY RUN 4 — chapter 7 on Haiku, with the open-sentence fact and the left-column rule, 15:52
+  (₹13.97; cache write 7,577). 105 paragraphs → 95 rows, zero splits, zero repairs, no echo.
+  Page 5's content is back — F_GA / F_GB / F_GC, F_R, "Alternatively…", part (b) with five of
+  its seven primes (`F'_GB = F_GB and F'_GC = F_GC`, `F'_GA + F'_GB + F'_GC`; the first `F'_GA`
+  and `F'_R` unprimed, as v2 had it) — **but in the wrong order, and the same error on a second
+  page.** Page 5: the right column's top "cases, a simple law results…" was again flagged as
+  the Answer's continuation and joined to it ("…in vector notation are cases, a simple law
+  results"), then (1) and (2), then the left column's equations. Page 11 (confidence 0.75):
+  page 10 ends "…= − GM/2R − GM/R or" and the completion is two displayed equations at the top
+  of page 11's left column; the model joined "or" onto the right column's "traverses a distance
+  2π(R_E + h) with speed V", never transcribed the two equations, and filed "A point to note is
+  that the speed of the projectile is zero at N…" under §7.9 although it sits above the 7.9
+  heading. One new side effect of the headings check: "7.4 THE GRAVITATIONAL CONSTANT" was
+  transcribed as the first words of §7.4 ¶1. The (7.10) join on page 7 and page 8's opening
+  are clean.
+  THE PATTERN, four Haiku runs and one Sonnet run on: when the previous page's open sentence
+  runs into displayed equations at the top of the left column, Haiku without the previous
+  page's words takes the right column's prose top for the continuation, drops the equations,
+  and mis-files what follows — on two of twelve pages this run, invisible to every net. With
+  the words (v2 ×3, v3 run 1) it read those pages right and echoed elsewhere. Sonnet read them
+  right without the words. Neither prompt rule moved Haiku on this: the rule says "left column
+  first" and the model still went right. This is a layout failure a prompt cannot fix, only a
+  structure can — column-aware tiling (the left column's bands before the right column's, so
+  reading order is the images' order), or a net that compares the first paragraph's opening
+  words with the layer's top-left line and flags the page. Spend on v3 dry runs ₹72.64.
+v3 DRY RUN 5 — chapter 7 on Sonnet 5, the amended prompt (no tail, the open-sentence fact, the
+  left-column rule, the headings check, one law per paragraph, a heading is never text), 16:06
+  (₹31.63; cache write 10,278). 95 paragraphs → 86 rows; **no diff flag, no coverage flag, no
+  low-confidence page, zero splits, zero repairs** — the cleanest report of the day, and the
+  rows bear it out on every page that failed before. Page 3: "7.3 UNIVERSAL LAW OF GRAVITATION"
+  and "Legend has it…" present as §7.3 ¶1, "This clearly shows…" as §7.3 ¶2 on page 4 and not
+  joined to the Example 7.1 Answer; §7.3 has 15 rows. The three laws are three paragraphs.
+  Page 5: the Answer joins the left column's F_GA / F_GB / F_GC, F_R and the superposition
+  working in reading order; part (b) carries **all seven primes** — `F'_GA = G2m.2m/1 j_hat`,
+  `F'_GB = F_GB and F'_GC = F_GC`, `F'_R = F'_GA + F'_GB + F'_GC`, `F'_R = 2Gm^2 j_hat` — then
+  (1), (2), then §7.4 without the heading's words. Page 11: "or" joins the two displayed
+  equations `v^2 = (2GM/R)(4/5 - 1/2)`, `v = (3GM/5R)^1/2`; "A point to note…" in §7.8; the
+  satellite paragraph whole. Confidence 0.90–0.95. What is left is notation and segmentation,
+  none of it structural: the fractional exponent written `(1.52)^3/2` and `(3GM/5R)^1/2`
+  without brackets (both Sonnet runs; Haiku wrote `^(3/2)`) — a prompt rule; grouping
+  parentheses dropped once, `− 2 G m^2 / l (2 + 1/sqrt(2))`, same value; "Alternatively, one
+  expects…" merged into the Answer where the page indents it; two rows carry line breaks
+  between displayed equations where the rule says single spaces — normalised at load. Five
+  chapter-7 runs on v3: Haiku ×3, each with a structural failure the nets could not see (an
+  echoed tail, a lost column, the wrong column joined); Sonnet ×2, the first with a skipped
+  heading the headings check then closed, the second clean. Spend on v3 dry runs ₹104.27.
+v3 DRY RUN 6 — bio11 chapter 1 on Sonnet 5, 16:49 (₹15.82; 8 pages billed; cache write
+  10,413). 34 paragraphs → 30 rows, zero splits, zero repairs, no diff flag, no low-confidence
+  page; the one coverage flag is page 2 at 0% — **the Ernst Mayr biography returned no
+  paragraphs, as the new rule asks**, and the ratio check cannot know a page was left on
+  purpose. Read against the nine pages rendered this morning: **text exact 30/30, address
+  30/30** — the unit opener as §1 ¶1; "Linnaeus" back at the page-5 break and joined, "…systema'
+  which means systematic arrangement of organisms. Linnaeus used Systema Naturae as the title
+  of his publication"; "…species like nigrum and melongena. Human beings…" joined; the list
+  markers "1." "2." "3." "4." as printed where v2 had "(1)" and a dropped "4."; every binomial
+  with the genus capitalised — Mangifera indica ×4, Solanum tuberosum, Panthera leo ×2, P.
+  pardus, P. tigris, Homo sapiens; `Figure 1.1` ×2 and `Table 1.1` in figure_refs; even "think
+  of a dog ?" with the book's space before the mark. Confidence 0.90–0.97. Every defect the
+  morning's v2 audit listed for this chapter is gone. Spend on v3 dry runs ₹120.09; Sonnet has
+  now read both dry-run chapters clean on the amended prompt.
+v3 DRY RUN 7 — chapter 7 on Claude Opus 5 (`visionopus`: adaptive thinking, low effort), 17:07
+  (₹79.74, 2.5× Sonnet; cache write 10,345). 101 paragraphs → 95 rows, zero splits, zero
+  repairs, no flag of any kind. The glyph table entirely clean for the first time on any run:
+  all seven primes on page 5, `= − (2 G m^2 / l)(2 + 1/sqrt(2))` with its grouping parentheses,
+  `(1.52)^(3/2) × 365` under the new exponent rule, `≅` kept, no ASCII `x`, `m_p r_p v_p`. Page
+  3: the 7.3 heading and "Legend has it…" as §7.3 ¶1, the three laws three paragraphs. Page 5:
+  the Answer joined to the left column's equations, "Alternatively, one expects…" its own
+  paragraph as the page indents it (Sonnet had merged it), part (b) with its primes, (1), (2),
+  §7.4 clean. Page 11: "or" joined to the two equations, "A point to note…" in §7.8, §7.9 cut
+  into 18 rows against Sonnet's 9 — closer to the print, where Sonnet merged. It even keeps
+  NCERT's own "central force ." with the space before the stop, which the other two silently
+  tidied. Confidence 0.90–0.93. Three stray-letter hits are the check's false positives (`l`,
+  the unit `s`). THE TABLE, chapter 7 on v3:
+  | run | model | prompt | structural failure | glyphs | cost |
+  |---|---|---|---|---|---|
+  | 1 | Haiku | tail | page-8 tail paraphrased into the text; primes lost on page 5 | 5 lost | ₹13.81 |
+  | 2 | Sonnet | tail | 7.3 heading skipped, 14 paragraphs under §7.2; two wrong joins | clean | ₹31.22 |
+  | 3 | Haiku | no tail | page 5 read right column first, left column's top lost | unreadable | ₹13.64 |
+  | 4 | Haiku | fact + left-column rule | pages 5 and 11 right column first, equations dropped | 5 of 7 primes | ₹13.97 |
+  | 5 | Sonnet | fact + rule + headings check | none | `^3/2` unbracketed | ₹31.63 |
+  | 6 | Sonnet | bio11 ch 1 | none; 30/30 exact | — | ₹15.82 |
+  | 7 | Opus | + exponent rule | none | clean | ₹79.74 |
+  | 8 | Opus | + five notation rules | none | clean but the vector r | ₹80.62 |
+  | 9 | Sonnet | + five notation rules | page 5 right column first: three equations lost, page 6's §7.4 filed under §7.3 | 13 subscripts dropped | ₹31.98 |
+  | 10 | Opus | frozen; pages 4, 6, 8 redone | none | 0 characters changed, 5 boundaries moved | ₹24.80 |
+  | 11 | Opus | frozen; effort xhigh, pages 4, 6, 8 | none | 0 characters changed, 0 boundaries moved; no thinking emitted | ₹24.79 |
+  Spend on v3 dry runs ₹199.83 (rows 8–11, 18:05, 18:27, 18:56 and 21:07, are read below). Haiku is out for transcription: three runs, three different
+  invisible failures, on the layout NCERT Physics uses on one page in six. Sonnet and Opus both
+  read the chapter clean on the final prompt; Opus reads it closer to the print. The pair
+  decision — who transcribes, who verifies — goes to the founder with this table.
+THE FULL READ OF THE OPUS RUN, 17:20 — every one of the 95 rows against all 12 pages rendered,
+  because the founder asked whether it was issue-free and the checks plus three pages could
+  not say so. Structure clean on every page: joins across pages 1–2, 4–5, 6–7, 8–9, 10–11 and
+  11–12 all right, every heading a section change, no column read out of order. **Three text
+  defects, one of them Opus's alone**: (1) page 6, §7.4 ¶2 — "Where ° is the restoring couple
+  per unit angle of twist. ° can be measured independently": the text layer renders τ as a
+  degree sign and Opus copied the layer's garbage through, twice, where Sonnet and Haiku both
+  wrote τ (the D14 class; the rule "where a span of the layer is garbage, read the image" was
+  not applied); (2) page 4, §7.3 ¶5 — the last term of the vector form of Eq. (7.5) written
+  `− G m_1 m_2 / |r|^3 r_hat` where the book prints the vector r, not r_hat — **all three
+  models made this one** [**corrected 2026-09-15**: page 4 at 300 DPI prints r̂ in all three forms —
+  the book's own error, which the transcription rightly kept; not a defect]; (3) page 4, §7.3 ¶2 — `a_m alpha R_m^(-2)` for ∝, which Sonnet also
+  wrote and Haiku got right as `∝`. Lesser: `"Eq. (7.5)"` placed in figure_refs (Opus only);
+  three merges of printed paragraphs — "Stated Mathematically…" with "Equation (7.5) can be
+  expressed…" on page 4, the three (7.20)–(7.22) paragraphs on page 8, the three escape-speed
+  paragraphs on page 10 — benign for an anchor, against the rule; `30^o` beside `30°` in one
+  row. And the fidelity that no other run showed: the book's own "neighouring", its misprinted
+  `4p/3` in (7.10), its ". ." after W_o, its "central force ." — all kept as printed where the
+  others corrected or paraphrased. By the ✅ standard: text exact 92 of 95, address 95 of 95,
+  figure refs right but for the equation in the list. Sonnet's second run, on the same pages
+  read the same way at the time: `^3/2` unbracketed (since ruled), the same r_hat and alpha,
+  more merges, τ right. So Opus is the best first read of the three and not a clean one; the
+  τ error is exactly what a second model reading the page would catch, and the vector r is
+  what neither would.
+FOUNDER, ~17:35: fix what a prompt can reach before choosing. Done, one commit: five prompt
+  lines (the Greek-letter-as-degree-sign case named; never add a mark the layer lacks and the
+  image does not show; ∝ never "alpha"; one degree sign after its number; the indent decides
+  after a displayed equation; an equation number is never a figure_ref) and two guards in code,
+  tests first: `ncert load` keeps only Fig/Figure/Table labels in figure_refs and names what it
+  dropped; the extract report's new "notation to adjudicate" section flags a degree sign not
+  after a number (`NotationFlags`), run on every paragraph whether or not a layer was fed. The
+  `r_hat`-by-analogy case is the one no rule guarantees; the second read is for it. Next: Opus
+  and Sonnet on chapter 7 again on this prompt, ₹80 + ₹32, both read in full.
+v3 DRY RUN 8 — chapter 7 on Opus again, on the amended prompt, 18:05 (₹80.62; one transient
+  AnthropicIoException retried by the client). 106 paragraphs → 99 rows, zero repairs, no flag,
+  the new notation section empty. The load pruned the two addresses run 7 held that this run
+  does not (§7.3 ¶15, §7.4 ¶5) and dropped `"Eq. (7.5)"` from §7.6 ¶1's figure_refs — the code
+  guard did its job; the prompt line against it did not reach the model. THE FULL READ, 18:20 —
+  all 99 rows against the 12 pages. Run 7's three text defects: τ is now "tau" in every place
+  (page 6, where the PDF itself prints the degree-sign glyph and the rule resolves it), ∝ is `∝`
+  twice (page 4), `30°` once after each number where run 7 had `30^o` — the five rules took. The
+  vector r in the third form of Eq. (7.5) is still `r_hat` — the by-analogy case, as predicted.
+  Run 7's three merges are gone: (7.17)/(7.18), (7.21)–(7.22) and (7.31)–(7.32) each split as
+  the page indents. Two segmentation defects new to this run, neither touching a character:
+  page 6's first line "The bar AB has two small lead spheres…" is indented on the page but was
+  flagged as continuing §7.4 ¶1 from page 5 — page 5 ends "shown in Fig.7.6" with no full stop,
+  so the fact said "mid-sentence" and the model believed the fact over the indent; and page 8's
+  "and hence the acceleration due to gravity…" is flush-left after (7.18) but was cut into its
+  own paragraph. Two nits shared with every run: "where v is the velocity…" (page 3) and "where
+  we have used the relation…" (page 11) are indented on the page and kept in the paragraph
+  before. Newton's law statement on page 4 is flush-left and read as continuing "…Universal Law
+  of Gravitation :" — right by the typography rule, where run 7 gave it its own paragraph.
+  "E ( ) = W_1 + …" on page 9: the print has nothing between the parentheses (the ∞ dropped by
+  the symbol font in the PDF as well as the layer), and the model wrote "E (infinity)" from the
+  sentence before it; page 9's own "Setting r = infinity" is the book's word. Everything else
+  exact: "neighouring", "4p/3", "to be cube", ". .", "central force ." all kept again. By the ✅
+  standard: text exact 98 of 99 (the vector r), address 99 of 99, figure refs right after the
+  guard. Stray-letter hits at §7.7 ¶11, §7.9 ¶5, §7.9 ¶17 are `l`, `s`, `d` — false positives.
+  Spend on v3 dry runs ₹280.45. Sonnet on the same prompt is next (~₹32), then the pair.
+v3 DRY RUN 9 — chapter 7 on Sonnet again, on the same amended prompt, 18:27 (₹31.98). 98
+  paragraphs → 88 rows, no repair, one character flag (page 10, a "GMm" count the layer spaces
+  differently — the text is right). THE FULL READ, 18:40 — all 88 rows against the 12 pages.
+  **Structural failure on page 5, the Haiku failure of runs 3 and 4, now on Sonnet's third run
+  of this chapter**: the right column was read first. Consequences: (1) the three displayed
+  equations F_GA, F_GB, F_GC at the top of the left column are gone — nowhere in the chapter;
+  (2) the right column's opening fragment "cases, a simple law results when you do that :" is
+  glued onto Answer (a) from page 4; (3) the left column's last paragraph "For the gravitational
+  force… For two special" became the page's last paragraph, so the fact told page 6 "§7.3, mid-
+  sentence", and page 6's "The bar AB has two small lead spheres…" was glued onto "For two
+  special" as §7.3 ¶16; (4) the next three paragraphs of page 6 — (7.7), "Observation of θ…",
+  "Since Cavendish's…" — are §7.3 ¶17–19, so §7.4 holds one row. Sonnet's runs 2 and 5 read this
+  page right; the layout NCERT Physics uses on one page in six is a coin Sonnet flips. Text
+  defects besides: the subscripts of h_1, h_2, W_12, W_o, r_1, r_2 written h1, h2, W12, Wo, r1,
+  r2 in §7.7 ¶2–3 — 13 occurrences, while the same row writes W_1 and W(r_2) with the underscore;
+  "4pi/3" where the page misprints "4p/3" (Opus kept the misprint); the grouping of the
+  denominator in (7.40) and (7.42) lost — `Gm M_E / 2(R_E + h)`, which a verifier can read two
+  ways. And one thing Sonnet alone got right: the vector r in the third form of Eq. (7.5),
+  written plain `r` where every other run of every model wrote `r_hat` [**corrected 2026-09-15**: the
+  page prints r̂ there — Sonnet's plain `r` corrected the book, the others kept the print]. Segmentation: two wrong
+  joins across pages where the page after indents and the page before ended with a stop —
+  pages 3→4 "This clearly shows…" and 9→10 "By the principle of energy conservation…"; about
+  twelve indented paragraphs merged into the one before (page 3 "The area SBAC…"; page 8's
+  (7.17)–(7.19) and "Thus, as we go down…" into one row with page 7's last sentence; (7.21),
+  (7.22) and "The work done…" into (7.20)'s row; "where M_E…" and "In place of Eq. (7.21)…"
+  into (7.23)'s; "The neutral point…" into the Answer on page 10; (7.34)–(7.39) into one row on
+  page 11; Answer (ii) into (i)); one split against the page — "Equation (7.5) can be
+  expressed…" on page 4 is flush-left, so it belongs to "Stated Mathematically…" — which also
+  corrects run 7's read above: Opus's join there was right, not a merge. By the ✅ standard:
+  text exact 81 of 88, address 84 of 88, figure refs right but "Fig. 7.1(b)" added to a
+  paragraph that names only 7.1a. Spend on v3 dry runs ₹312.43. THE PAIR, from runs 7–9: Opus
+  twice structurally clean and closer to the print; Sonnet structurally wrong in two runs of
+  three (run 2 the heading, run 9 the column), but the one read to see the vector r [**corrected
+  2026-09-15**: a misreading — the page prints r̂, so this was Sonnet departing from the print]. Opus
+  transcribes, Sonnet verifies — to the founder.
+FOUNDER, ~18:50: "why is every run creating a new issue?" Because no two runs shared a prompt
+  (nine runs, nine prompts), both current models sample at the API default with no temperature
+  setting, the full read only began at run 7, and twelve pages is a small sample. RULING: prompt
+  v3 frozen at debb920 (DECISIONS, prompt-changelog). The next spend is a repeat, not a change —
+  Opus on chapter 7 pages 4, 6 and 8 with `--redo` (~₹20), read against run 8's rows, to tell
+  the rule from the dice on the vector r, the page-6 join and the page-8 split. Then the second
+  read is built against a prompt that does not move under it.
+v3 DRY RUN 10 — the first repeat: Opus on chapter 7 pages 4, 6 and 8 again, frozen prompt,
+  `--redo`, 18:56 (₹24.80 — the cached prefix had lapsed, so a fresh cache write). 29
+  paragraphs where run 8 had 27 on those pages; no flag. THE DIFF against run 8's rows, 19:00:
+  **not one character differs** across the three pages — only spacing and bracket placement
+  ("F (d)" for "F(d)", "(GM_E / R_E^3)" bracketed, "G m_1 m_2" spaced) — and five paragraph
+  boundaries moved. Rule or dice, per question: the vector r is `r_hat` a third time — habit,
+  not dice, and the verifier's job (Sonnet saw it once in four reads). Page 6's "The bar AB…"
+  is its own paragraph this time, from the same stored page 5 and the same "mid-sentence" fact
+  — dice, one in two; the fact is not the cause by itself. Page 8's "and hence…" is cut off
+  again — habit, two in two — while (7.17) and (7.18) are now one paragraph where run 8 had two
+  (the page indents "Substituting…", so run 8 was right there) — dice. Two boundaries moved
+  that nobody asked about: Newton's law statement is its own paragraph again (run 7's reading;
+  the page sets it flush-left, either is defensible), and Example 7.2 is now three rows — the
+  stem, (a), (b) — where runs 7 and 8 gave one. So the repeat says: on a frozen prompt the
+  character layer is stable under the sampling and the segmentation layer is not; the chapter
+  went 99 → 102 rows with the same text. Consequences for the build: the second read compares
+  text and must ignore spacing and bracket placement; paragraph boundaries are checked by code
+  against the layer's indented line starts, not by another prompt line; an inline fraction
+  followed by a factor — "G Mm / d^2 L" for G (Mm/d²) L this time, bracketed in run 8 — is a
+  notation the frozen prompt leaves to the dice (PARKED). Spend on v3 dry runs ₹337.23.
+v3 DRY RUN 11 — the founder's question "what if Opus at xhigh effort?", 21:07: pages 4, 6 and 8
+  again with `MARGAI_AI_TIER_VISION_EFFORT=xhigh` over the `visionopus` profile (₹24.79). THE
+  LEDGER ANSWERED FIRST: output tokens page by page 1,466 / 1,425 / 1,496 against run 10's
+  1,470 / 1,425 / 1,497 — the size of the JSON and nothing more. Output tokens include thinking
+  tokens, so no thinking was emitted at either setting. The cause is the request shape: every
+  extraction call forces the tool (`ToolChoiceTool` in `MessageRequestMapper`), and a forced
+  tool call leaves no thinking channel for effort to spend in. So `visionopus`'s "adaptive at
+  low effort" has been a no-thinking read on every Opus row in this table, and xhigh had nothing
+  to act on; whether thinking would help is untested and needs tool choice auto for this task,
+  a code change (PARKED). The profile's comment is corrected in the same commit. THE THIRD DRAW
+  of the same three pages, 21:15, for what it is worth as dice data: the load inserted 0 and
+  deleted 0 — all 102 boundaries exactly where run 10 put them, where run 8 → 10 had moved five
+  — and the text differs in nothing but glyph variants: `≃` for `≅` at (7.4) (the page prints
+  ≃), `-` for `−` in (7.24), `m_1m_2` unspaced, one bracket dropped in (7.19). The vector r is
+  `r_hat` a fourth time. Confidence moved 0.93 ↔ 0.90 on all three pages, in opposite
+  directions — noise, as ruled at D14. For the verify build the normalisation list grows:
+  spacing, bracket placement, `≅ ≃ ≈` as one, `− -` as one. Spend on v3 dry runs ₹362.02.
+RULING, ~21:25 (founder): **Opus 5 transcribes, Sonnet 5 verifies** — recorded in DECISIONS with
+  the evidence from runs 1–11; RULING 1 of 2026-09-13 is superseded. The eleven-run table above
+  is the day's measurement, ₹362.02, every row of every read against the rendered pages.
+
+HOW TO RESUME (D15 continues; nothing touches a book until the verifier has proved itself on
+  chapter 7):
+  1. Build `ncert verify --read-pages` (plan first): Sonnet 5 on the `visionsonnet` shape reads
+     each loaded paragraph against its band with one fixed question — does this text match the
+     print, ignoring spacing, bracket placement, `≅ ≃ ≈` and `− -`? — and names the printed and
+     transcribed spans where not; code checks beside it: printed paragraph count per page from
+     the layer's indented line starts against the row count, every cross-page join against the
+     indent, figure refs against the labels the page carries; verdicts on the row
+     (`extraction` JSON) and in the report; the corrections file under `pipeline/inputs/`
+     (address, printed span, transcribed span, reason; also verifier false positives and known
+     misprints) applied by `ncert load` after the artefact. TDD, spec-auditor, eval stamp.
+  2. Prove it on chapter 7 in `margai_d15` (the table holds Opus run 11's 102 rows): it must
+     flag the vector r in §7.3 ¶5 and little else; every flag it raises is read against the
+     page and the false-positive rate recorded. ~₹16.
+  3. Then the phy11-part1 corpus event on Opus (`visionopus`, ~₹750; move `en.jsonl` aside
+     first — the bucket holds Opus run 11 as `en.jsonl`, Sonnet run 9 as `en.v3c-sonnet.jsonl`,
+     v2 as `en.v2.jsonl`), verify (~₹190), adjudicate, load; bio11 the same; the eight books.
+  4. The prompt stays frozen (DECISIONS 2026-09-14); a defect the verifier cannot catch is the
+     only reason to amend it. PARKED holds the effort/thinking question (tool choice auto), the
+     fraction-bracket notation, the paragraph-count code check, and the `--redo` report count.
+  Local state: `margai_d15` chapter 7 = Opus run 11 (pages 4, 6, 8 from the xhigh draw, the rest
+  from run 8); scratchpad row dumps exist for every run of the day but do not survive the
+  session — the reports and this log are the record. Reports 2026-09-14-ncert-extract-1…14 and
+  -load-1…12 committed. Server tests 585 (6 skipped), verify green, eval PASS (placeholder).
+```
 
 ```
 D14 (continued) · 2026-09-13 · the extraction is fixed against its own defect table, and the
@@ -1998,9 +4239,38 @@ Tomorrow's first task:
 ## 🅿️ PARKED (Sunday review only)
 
 - _idea · date · one line_
-- **`ncert verify --read-pages`: the page-image second read** · 2026-09-13 (D14) · the only instrument that can verify a formula, since the text layer holds no base–script association for a displayed equation (measured: `22 / fi E / mVmV GmM`) and cannot carry a prime at all (Symbol font, no Unicode map). A comparison task, not a second transcription; on the VISION tier; ~₹1/page over formula pages. A half-built `PageVerifyTask` was removed on 2026-09-13 because a `@Component` requiring an unwritten prompt broke every Spring context — it returns with its prompt. Free checks (word diff, coverage ratio, split sentences, page-break repairs) already landed in `extract` and `load`
+- **`decodePrivateUse` decodes every font's private-use codes as cp1252** · 2026-09-29 (D15) · `PdfTextLayer.decodePrivateUse` subtracts 0xF000 from any U+F0xx code, which is right for the Symbol font (the cp1252-offset encoding it was written for, phy11-part1 ch 7) and wrong for MathB, whose codes are glyph slots: chem11-part1's standard-state sign F030 reaches the model as "0" (why the book spells it `^0`, where chem12-part1 wrote `^o`) and F056 as "V" (ch 4 p9's four `Delta_a H^V`, the book's one transcription defect). Decode only a Symbol-family span, or map MathB's few codes explicitly (F030 → ⊖). Needs font-aware extraction (PDFBox's text stripper loses the font); chem11-part2 carries 6 MathB signs, so it waits unless they misread — it did not (2026-09-30): ch 7's six F030 signs came out `^0` like chem11-part1's, and its other MathB codes (F078/F079) are bond strokes inside drawn structures, never text
+- **A chapter whose text layer is Caesar-shifted only in part passes the legibility gate** · 2026-09-29 (D15) · `PdfTextLayer.isLegible` averages common-word share per chapter; chem11-part1 ch 4 has 27.7% of its body shifted (each character 29 below its code, digits into control codes) mixed with clean lines, scored 0.317 and went to the model as the character authority. The transcriber read the image and copied nothing, but the free checks that read the layer were noise on the whole chapter. Options: judge per span and shift the bad ones back (+29), or withhold a page whose shifted share passes a threshold. chem11-part2 adds both ends (2026-09-30): ch 8 (kech202) is 85% shifted and withheld (0.023), and ch 9 is legible at 0.275 with 11% of its digits shifted and its Symbol letters shifted too (V=σ, E=β, P=μ, S=π, G=δ), fed as authority — the model copied none of it, but every layer-reading free check needed a +29 decode by hand (scratchpad ch8check.py decodes per span: shifted when it carries control codes or reads more like English by bigram rate after the shift). The legibility gate no longer decides where the apparatus starts (345cfe6)
+- **v5's one-sentence list-item rule on the canonical books** · 2026-09-29 (D15, founder: "Corpus practice") · v5 says a one-sentence item stays inside the paragraph that introduces the list; the canonical books keep complete-sentence bullets as rows (phy11-part1 20, chem12-part1 11, chem11-part1's ch 6 29), and chem11-part1 joined only fragments by the founder's ruling. Applying v5's letter means a geometry pass per book, the joins, and re-reads, for every book at once or none
+- **The standard-state sign is spelled three ways** · 2026-09-29 (D15) · chem11-part1 writes it `^0` 139 times, ⊖ 32 and `^o` once (the layer's MathB decode makes `^0` the default; ⊖ where the model read the image), and chem12-part1 wrote E° as `E^o`. No meaning is lost; normalise in code with the other spellings if retrieval or display wants one form. chem11-part2 adds the radical dot three ways: `Cl_dot`/`C_dot H_3` (the model's extension of v5's `_bar`/`_vec` family), `·` and a leading `.` (`.CH_3`)
+- **A reaction pass for the organic chapters, decided at D17** · 2026-09-29 (D15, founder: "accept now, decide at D17") · v5 skips drawn reaction schemes by rule and formula-only reactions by chance, and a `--redo` does not recover them (DECISIONS 2026-09-28); chem12-part2 names and explains about a dozen reactions with no equation in any row (Aldol, Cannizzaro, Etard, Rosenmund, Reimer-Tiemann, Gatterman-Koch, Friedel-Crafts, Wurtz-Fittig, iodoform, Gabriel), 86 of its 582 rows carry one, and chem11-part2's organic chapters will add more. The candidate: one step with its own prompt for drawings, writing reactants, reagents, products and name as records linked to the paragraph, checked by the second read, run once over every organic chapter. Decide when D17's retrieval and answer checks show whether organic questions fail for want of the equation. chem11-part2 (2026-09-30) adds the drawn-structure half: names printed under drawn structures (ch 8 p10, p14; Problem 8.7's "2,5,6-Trimethyloctane [and not 3,4,7-…]") reach no row, while drawn branches the transcriber did write are now in bracket notation (DECISIONS 2026-09-30); ch 9 p29's (9.77)/(9.78) are drawn acylation schemes
+- **A book-errata list the answer layer reads** · 2026-09-29 (D15) · the corpus keeps the book's own errors as printed (`misprint` rulings, "the book's own errors kept"), and nothing carries them to whoever answers from the row. Most are harmless ("rduction", "chararcter", "a-hydrogen" in a heading set in a font with no α), but some are wrong chemistry a grounded answer would repeat: **chem12-part2 ch 9 p5 prints the quaternary salt of Example 9.1 as (C2H5)3N+Cl−, for (C2H5)4N+Cl−**. chem11-part1 adds wrong numbers a student would copy — ch 1 p24 "1250 –75.5" (for 175.5), p23 "= 200 L" (for mL), p12 "100 has three significant figures" (for "100.") — and, by the founder's ruling of 2026-09-29, the garbles restored as printed (ch 2's (2.10) "n = ΔE/h" for ν, ch 6 p12 "[H2-]", ch 6 p17 "e–ΔDG⊖/RT>1" and "e–ΔG⊖</RT 1") beside ch 5 p22's blank fraction the rows fill as 3/2. chem11-part2 adds (2026-09-30): ch 9's chlorine set with a digit 1 or capital I throughout its formulas (p6–p10: "HC1", "C1–C1", "CH_2C1_2", "Anhy, AICI_3/ HCI") and "Ä_cH^è" for Δ_cH⊖ (p9); (9.55) "CaCO3 → CaO + O2" (for CO2); "Propane" labelled under propene and under ethane (p6); "2,5-Dimethyhexane", "2-Methylpropane-2-01", "CH3(CH)2)4CH3" (n-hexane), "Ethyene", "alkylbenene", "elctrophile"/"eletrophile"; ch 8 p18's electrophile list "C+lH3–C+=O" (for Cl+, CH3–C+=O), p19 "polarlisation", p33 "2(V − V/2)" (the subscript dropped one line after it is printed), p35 "molydate" and the cut-off "62 × m1 × 100 / 222 ×"; ch 7 p5 "electonegative" and p13's Step 2 "Cr(aq)" with no charge. A file keyed by paragraph address, collected from every book's `misprint` rulings plus the errors no flag named, read by the doubt solver (D19+) before it quotes a row
+- **Reaction conditions and charges spelled more than one way** · 2026-09-29 (D15) · chem12-part2 writes a condition over an arrow as `-> [HBr]`, `-> (H_3O^+)` and `-(H_3O^+)->`, and the book's barred-O charge as `OH^-`, `‾OH` and `RCOO^-` on the same pages; no content is lost. Normalise in code, as for the Greek spellings above, if retrieval or display ever needs one form
+- **Margin notes and tables are out of every book by rule; some carry exam facts** · 2026-09-29 (D15) · v5 skips margin notes, biographies, captions, tables and Intext Questions in all eight books. chem12-part2's margin notes include "tertiary alcohols are the easiest to dehydrate" and "2,4,6-trinitrophenol is a strong acid…", and its Table 8.1/8.3 are the chapter's common and IUPAC names. Including any of them is a corpus-wide decision, not a per-book fix
+- **A Greek-deficit check in `ncert verify`, not a scratchpad script** · 2026-09-27 (D15) · per page, the Symbol-font Greek letters the print sets against the letter's name or glyph in the rows; on phy12-part2 it found ν read as v (ch 10 p6) and μA as mA (ch 11 p4), which the second read and greek.py both missed. Calibrated on six books; a shortfall is a lead (captions, figure labels and Summary text make most of them), so it would route attention like the other free checks
+- **Unnumbered side headings in the five canonical books** · 2026-09-27 (D15) · DECISIONS 2026-09-27 rules that a side heading leads its paragraph; phy12-part2's came out three ways at random, so phy11-part1, phy11-part2, phy12-part1, bio11 and bio12 likely carry heading-only rows and dropped headings too. `sideheads.py` (scratchpad) lists them per book at ₹0
+- **The verify caption collector misses captions** · 2026-09-27 (D15) · 12 of phy12-part2's figure flags were printed captions it did not collect ("FIGURE 9.9 Lateral shift…", a bare "FIGURE 9.12" line), after phy12-part1's 8; each costs a noise ruling per row
+- **Enforce "flush after a display runs on" on both Physics books** · 2026-09-26 (D15) · DECISIONS 2026-09-19 and `ncert_extract` v5 both say a line flush after a displayed equation continues the paragraph, but the corpus joins only where the load's mid-sentence check names it (DECISIONS 2026-09-26). phy11-part2 keeps about eight clause-continuation rows of the class ("where M is the mass…", "ω is called the angular frequency…", "ν is usually measured in hertz.") plus sentence-initial ones; a line-geometry classifier puts phy11-part1's candidates at ≈65, many of them its own misreads of headings and captions as displays. Enforcing it means a geometry pass per Physics book, the joins, and a re-read of the changed pages (≈₹30–60 for both). Founder: keep the practice for now; decide before Chemistry or at the D23 anchor pass. phy12-part1 adds 52 rows of the class (2026-09-27).
+- **Undrawn glyphs in the render report, not only its console log** · 2026-09-27 (D15) · PDFBox logs "No glyph for code N" when an embedded font has no outline for a code a page sets; phy12-part1's five p̂ hats were found only because the founder pasted the render's console output. `ncert render` could list each (page, font, code, position, the letter under it) in its report, so the check survives a run whose log nobody reads.
+- **`FigureLabels` cannot read a bracketed label** · 2026-09-27 (D15) · "Fig. (3.14)", "Figure (2.4)", "Fig (9.15)": 9 figure_refs over phy11-part1 (2), phy11-part2 (3) and phy12-part1 (4). The pattern wants a digit straight after the word, so the verify figure check is blind to them and a split leaves them with the first half (ch 3 §3.11 ¶19 took two entries). One optional bracket in the pattern, test-first, then the free verify on the three books.
+- **Greek names and unit prefixes spelled more than one way** · 2026-09-27 (D15) · phy12-part1 writes ΔS as `DeltaS` (7 rows) and `Delta S` (11), and the micro prefix as `muC`/`muA`, `microF` and a Unicode `μF`. The meaning holds, but a full-text query matches one spelling. A load-time normalisation like the degree-sign zero would settle it corpus-wide; measure its effect on retrieval first.
+- **Commit the D15 adjudication scripts** · 2026-09-26 (D15) · four pymupdf scripts now run on every book and live only in a session scratchpad: `greek.py` (Symbol-font Greek against the rows), `italics2.py` (the v5 italic sweep), `starts.py` (start flags by line geometry, line-below test) and `checkrulings.py` (each correction against its page's rows before a load). Each session has re-found or rebuilt them; a `pipeline/tools/` home, or folding the Greek and italic checks into `ncert verify` as free checks, would end that. By D15's close the set is about twenty (afterdisplay, sideheads2, greekdeficit, greekuni, stdsign, delta, gen.py, sim.py, ch8check, …), and /tmp is not a home: on 2026-10-01 macOS's cleanup had emptied the 09-26 session's pymupdf install (only its .so files left), which every later session imported through a symlink. `sim.py` also carries a known gap — it reads a row's figure_refs from its first page part only, where the loader keeps every part's (chem11-part2's reload: three rows, the loader right)
+- **Opus 5.5 as the transcriber** · 2026-09-26 (D15) · $4/$20 per MTok against Opus 5's $5/$25 (≈₹900 on the eight books at equal tokens), but it rejects a forced `tool_choice` with a 400, so the request needs `auto` + `strict` first — which turns thinking on (it cannot be disabled) and may eat the saving; needs the chapter-7 + bio11-ch-1 re-proof and a DECISIONS row superseding "Opus 5 transcribes". Founder: stay on Opus 5 for the eight books
+- **thinking is structurally off for every extraction call, so effort cannot be measured** · 2026-09-14 (D15) · the request forces the tool (`ToolChoiceTool`) and the ledger shows output tokens identical page by page at effort `low` and `xhigh` (dry runs 10 and 11) — no thinking block is ever emitted; the `visionopus` profile's `adaptive` is accepted by the API, not acted on. To test whether thinking improves the read, the task needs tool choice `auto` with the prompt asking for the call and the schema check refusing prose — a mapper change per request or per tier — then one chapter at `high`, read in full, against runs 7–11
+- **an inline fraction followed by a factor needs a bracket** · 2026-09-14 (D15) · G (Mm/d²) L = τθ came out `G (Mm / d^2) L` on one Opus run and `G Mm / d^2 L` on the repeat of the same page, and the second reads as d²L in the denominator; the prompt is frozen (DECISIONS 2026-09-14), so this is the first candidate for its next amendment, only if the second read cannot flag it · **2026-09-14 late evening**: `ncert_verify` v1 briefly taught this case as a difference, and the re-audit showed the rule contradicts v3's own conventions (`G M m / r^2`), so the verifier now leaves product and quotient grouping unflagged — **the second read does not catch this case**, which by the freeze row makes it v3's first real amendment candidate: bracket a factor that follows a fraction, and widen the verifier's bracket rule in the same change (DECISIONS 2026-09-14, the brackets row; the narrowing confirmed by the founder 2026-09-15)
+- ~~**paragraph boundaries checked by code against the text layer's indented line starts** · 2026-09-14 (D15) · the repeat on the frozen prompt moved five boundaries on three pages with zero character changes, so segmentation is the layer the sampling moves; the layer knows which lines start indented, so `ncert load` or the second read can count printed paragraphs per page and name a page whose row count differs — the check the Sonnet column failure (run 9, three equations lost) would also trip~~ · **done the same evening** as `ncert verify`'s free checks — `PdfLayout` reads starts from glyph positions (indent, heading, label, item marker) and `LayoutChecks` compares them with the rows by opening words per page, plus joins per page break (DECISIONS 2026-09-14)
+- **a correction that moves a paragraph's section** · 2026-09-14 (D15) · `ncert-corrections.yaml` can replace a span, join and split, but not re-file a paragraph under another section — run 2's defect (a skipped heading filed §7.3's paragraphs under §7.2) has no deterministic remedy but a re-extraction of the page. Add a `section` kind (page + opening words + the printed section) when an adjudication first needs one
+- **what the free checks missed on chapter 7, from the ₹0 preview** · 2026-09-14 (D15) · page 5's boxed law statements "(1)…" and "(2)…" are rows the print's layer does not start (the item marker may not be in the box's text layer); page 11's "Which is approximately 85 minutes.", indented before an Example box, is not seen as a start because the box's first line sits close beneath it; page 3 raises two starts ("where v is the velocity", "equal times to traverse") that look like lines after displays. Read each against the rendered page in the calibration and tune only what the calibration shows twice
+- ~~**`--pages` and `--redo` without `--read-pages` are ignored silently**~~ · **done the same evening** after the spec-auditor named it: refused with the reason · 2026-09-14 (D15)
+- **the verify output's `verdicts` array sometimes arrives as a JSON string** · 2026-09-15 (D15) · after the `items` rename the whole-answer wrap is gone, but 2 page calls in 24 still sent `"verdicts":"[{…}]"` — a correct array, stringified — and each cost a repair call. A decode that parses a string holding exactly the array the schema expects would save the call; it touches `StructuredOutput` for every feature, so it wants its own measured change
+- **no ruling can retire a page-level flag** · 2026-09-16 (D15, spec-auditor) · `ncert-corrections.yaml` rules on a second-read span (`misprint`, `false_positive`), which is per row; a start flag or an equation flag names a page, so a founder who scores one as noise — six start flags on chapter 7 are exactly that — has no way to record it, and the run after adjudication still carries them in the line under the D15 ✅ number. A `page_flag` kind keyed on chapter, page and the flag's own words would let the caveat line fall to what is really unresolved. Decide it on the first whole book, where the count is what a person actually has to carry
+- **`ncert_extract` v3 spells an arrow-marked vector two ways** · 2026-09-14 (D15, spec-auditor) · its notation says a vector "marked by an arrow or by bold keeps its plain symbol" and, three lines on, that a vector arrow "is `_vec`"; the frozen prompt is not edited, and `ncert_verify` v1 declares the two spellings equivalent so neither is flagged. A candidate for v3's next amendment, which needs a defect the second read cannot catch — this one it deliberately does not
+- **verify through the real batch lane** · 2026-09-14 (D15, spec-auditor) · pages are independent, so a whole-book `ncert verify --read-pages` is a natural first `completeBatch` caller at half price once D55's batch lane returns results per request; today it calls page by page so every paid page reaches the artefact (DECISIONS 2026-09-14)
+- ~~**`ncert load --prune` for a corpus event** · 2026-09-14 (D15) · the load reports the addresses a chapter no longer carries and leaves the rows in place, which was right for a subset load into a full book and is wrong for a re-extraction that replaces the book: 85 stale rows sat beside the canonical 1,017 until today, sampleable by the ✅ and embeddable by D17. A flag that deletes the orphans of the chapters this load carries, refused once embeddings or anchors exist unless the D17 migrate path is taken. Until it exists the corpus event deletes by hand before the load (day log 2026-09-14)~~ · **done the same day, without a flag**: the load deletes them, names them, refuses if any is anchored, spares a row holding the other edition's text (DECISIONS 2026-09-14)
+- **the extract report's "from earlier runs" count under `--redo`** · 2026-09-14 (D15) · the closing `jsonl:` line counted all 143 pages as from earlier runs on a run that had just redone 12 of them; the total table above it is right (`called this run 12`, `already done 0`). Cosmetic, one line in `NcertExtractCommand`
+- ~~**`ncert verify --read-pages`: the page-image second read**~~ · **built 2026-09-14 (D15)** on the pair ruling — Sonnet 5 verifies Opus 5, one call per page, bands only, plus free layout checks and the corrections file (DECISIONS 2026-09-14); calibration on chapter 7 next · 2026-09-13 (D14) · the only instrument that can verify a formula, since the text layer holds no base–script association for a displayed equation (measured: `22 / fi E / mVmV GmM`) and cannot carry a prime at all (Symbol font, no Unicode map). A comparison task, not a second transcription; on the VISION tier; ~₹1/page over formula pages. A half-built `PageVerifyTask` was removed on 2026-09-13 because a `@Component` requiring an unwritten prompt broke every Spring context — it returns with its prompt. Free checks (word diff, coverage ratio, split sentences, page-break repairs) already landed in `extract` and `load`
 - **the four phy11-part1 pages under 60% character coverage** · 2026-09-13 (D14) · `ch 1 p2` 21%, `ch 6 p25` 45%, `ch 6 p16` 55%, `ch 4 p3` 58% — flagged by `PageCoverage` on the first full book and not yet looked at; a chapter-opener with a contents sidebar would explain p2, the others need the rendered image. Look before the next phy re-extraction so a real loss is not re-extracted identically
-- **a run report that a second run of the same command cannot overwrite** · 2026-09-13 (D14, spec-auditor) · `Reports` writes `pipeline/reports/<date>-<command>.md` and overwrites it, which was right when a command ran once a day. `ncert extract` ran five times on 2026-09-12/13 and left two files, so the cost comparison that decided RULING 1 is not in the repo — and a resumed run's report, which checks fewer pages than the first, silently replaces the first one's flags. `.claude/rules/pipeline.md` makes the report the day's committed evidence, so this is the evidence rule leaking. Cheapest fix: keep the name, append a run block instead of replacing the file, or suffix a run ordinal when the file exists. Do it before D16, when whole books start being re-run
+- ~~**a run report that a second run of the same command cannot overwrite**~~ · **done 2026-09-14 (D15)**: a same-day re-run writes `-2.md`, `-3.md`; the day it bit — a one-page redo overwrote the whole-book extract report — is in the day log · 2026-09-13 (D14, spec-auditor) · `Reports` writes `pipeline/reports/<date>-<command>.md` and overwrites it, which was right when a command ran once a day. `ncert extract` ran five times on 2026-09-12/13 and left two files, so the cost comparison that decided RULING 1 is not in the repo — and a resumed run's report, which checks fewer pages than the first, silently replaces the first one's flags. `.claude/rules/pipeline.md` makes the report the day's committed evidence, so this is the evidence rule leaking. Cheapest fix: keep the name, append a run block instead of replacing the file, or suffix a run ordinal when the file exists. Do it before D16, when whole books start being re-run
 - **the freeze-and-migrate guard on `ncert load` (D17)** · 2026-09-13 (D14, founder) · paragraph segmentation is not reproducible — 135 / 149 / 124 / 120 / 110 paragraphs over five runs of one chapter — while sections are stable and the student-facing anchor is section-level (SPEC §6.3), so today re-cutting is harmless. From **D17** it is not: embeddings are per paragraph row, and from **D23** `question_anchors` bind a question to a paragraph id, so a silent re-extraction re-points a question at different text under the same heading. `ncert load` must refuse to change a chapter's paragraph set once embeddings or anchors exist for it, unless told to re-migrate — and the migration then has to re-embed and re-anchor what it moved. Build it with D17, before the first dependency exists rather than after (DECISIONS 2026-09-13) · **restated the same day by the founder's freeze policy**: the freeze happens at the first *verified* run, not at the first *dependent* one, so the guard's question is **"is this chapter still the frozen corpus?"** (prompt version, run id, paragraph set) rather than "do two runs agree?", which they never will and need not. Same day, same home — D17 — different check
 - **the Hindi apparatus boundary (D16)** · 2026-09-12 (D14) · `ChapterApparatus` finds where a chapter stops teaching by reading the PDF's text layer, which works for all 79 English files and for **none** of the Hindi ones: all ten Hindi books are Chanakya glyph text with no Unicode map, so there is no heading to match and every Hindi page would be sent — including its exercises, whose chapter-numbered items are exactly what the detector exists to keep out. D16 needs another route: the English edition's boundary expressed as a fraction of the chapter, the Hindi chapter's own page count against it, or a one-off founder-reviewed boundary per chapter in `books.yaml`. Decide before the first Hindi extract, not after
 - **edition versioning for NCERT paragraphs** · 2026-09-12 (D14, spec-auditor MINOR) · SPEC §9 item 2 requires "Editions tracked; the app must always reflect the current edition", but an edition today is a single `edition_year` on a `code`-unique book row: re-registering a new edition overwrites it in place, `ncert load` rewrites the paragraph text at the same addresses, and nothing on a paragraph records which edition it came from. A reprint that renumbers a section would silently move anchors under students who already have them. Needs a real decision (an edition column on the book key, or an edition dimension on the paragraph address) before the first NCERT reprint we ingest — not before the beta corpus, which is one edition throughout

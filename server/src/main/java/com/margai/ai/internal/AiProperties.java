@@ -25,6 +25,9 @@ import org.springframework.validation.annotation.Validated;
  * @param provider        completion provider: {@code anthropic} (default) or {@code bedrock}
  * @param tier            model and request shape per completion tier
  * @param embed           embedding provider, model and dimension — pinned together (§4.9)
+ * @param retrieval       how many candidates each half of hybrid retrieval returns, how the two
+ *                        are fused, and what a passage must clear to count as grounding (§4.9;
+ *                        part of the eval-gated surface, .claude/rules/ai-layer.md)
  * @param pricesJson      {@code {model_id: {input, output, cache_read, cache_write, batch_input,
  *                        batch_output}}} in USD per million tokens
  * @param usdInr          rupees per dollar used for {@code cost_paise}
@@ -44,6 +47,7 @@ public record AiProperties(
         @NotNull Provider provider,
         @NotNull @Valid Tiers tier,
         @NotNull @Valid Embed embed,
+        @NotNull @Valid Retrieval retrieval,
         @NotBlank String pricesJson,
         @NotNull @Positive BigDecimal usdInr,
         @NotNull @Valid Budget budget,
@@ -157,6 +161,33 @@ public record AiProperties(
             @NotBlank String model,
             @Min(1) int dimensions,
             boolean sendOutputDimension) {
+    }
+
+    /**
+     * Hybrid retrieval's parameters (TECH_PLAN §4.9, §4.3 stage 6). These are config and not
+     * constants because settling them is the point of D15's retrieval spike: the corpus is one
+     * verified book, and a wrong weighting is cheap to find there and expensive to find across ten.
+     *
+     * @param kVector        candidates the vector half returns (§4.3 stage 6: 8)
+     * @param kText          candidates the full-text half returns (8)
+     * @param rrfK           the constant in reciprocal-rank fusion's {@code 1 / (k + rank)}. The
+     *                       two halves score on scales that cannot be compared — cosine similarity
+     *                       in 0..1 against an unbounded {@code ts_rank} — so they are fused by
+     *                       rank, and this decides how sharply rank 1 beats rank 8. The usual 60 is
+     *                       flat, treating the halves as near-equals; smaller favours whichever
+     *                       half is confident
+     * @param tokenCap       how much retrieved text may reach a prompt (2,500), estimated at ~4
+     *                       characters per token, the same estimate §4.11's cache tripwire uses
+     * @param similarityFloor cosine similarity a vector match must clear to count as grounding. No
+     *                       passage above it is a grounding failure, never a guess (§4.3 stage 6,
+     *                       the R2 rule)
+     */
+    public record Retrieval(
+            @Min(1) int kVector,
+            @Min(1) int kText,
+            @Min(1) int rrfK,
+            @Min(1) int tokenCap,
+            @NotNull @DecimalMin("0.0") @DecimalMax("1.0") BigDecimal similarityFloor) {
     }
 
     /**

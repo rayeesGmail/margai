@@ -9,7 +9,8 @@ spring:
 margai:
   # The content bucket F8 created on 2026-09-12, with the pipeline's prefixes at its root:
   # source/{ncert,syllabus,pyq}/…, pages/{book}/{lang}/{chapter}/{page}.png,
-  # extract/{book}/{lang}.jsonl (DECISIONS 2026-09-12 F8, D14). Credentials come from the SDK's
+  # extract/{book}/{lang}.jsonl (DECISIONS 2026-09-12 F8, D14), verify/{book}/{lang}.jsonl
+  # (D15, `ncert verify --read-pages`). Credentials come from the SDK's
   # default chain — AWS_PROFILE=margai on the laptop (TECH_PLAN §7.4).
   storage:
     content-bucket: margai-beta-content
@@ -24,6 +25,34 @@ margai:
     # subscript, an exponent, a prime, a minus sign, while the prose around them was perfect.
     # Set to 1 to send whole pages again (the two are directly comparable on the same chapter).
     page-tiles: 2
+    # The pair (DECISIONS 2026-09-14): Opus 5 transcribes, Sonnet 5 verifies. `ncert verify --read-pages`
+    # refuses to run unless the VISION tier is this model — the `visionsonnet` profile sets it — and a
+    # verdict any other model gave is neither reused nor counted.
+    verify-model: claude-sonnet-5
+    # The other half of the same ruling, and the guard that was missing until 2026-09-22: `ncert
+    # extract` refuses unless the VISION tier is this model — the `visionopus` profile sets it. The
+    # VISION default is `claude-haiku-4-5`, which the D15 dry runs put out of transcription after
+    # three runs and three different layout failures on the two-column page, so a forgotten profile
+    # used to spend a whole book on the rejected model and say so nowhere but the ledger.
+    transcribe-model: claude-opus-5
+    # `ncert embed` commits its vectors every this many paragraphs. Embedding a book is cheap
+    # (~900 calls at 0.12 USD/1M tokens) but not free, and a run interrupted late should keep what
+    # it paid for — the next run embeds only rows whose embedding is still null.
+    embed-batch-size: 100
+    # 0 = no pacing (2026-09-20). This existed for the Cohere TRIAL key, which capped calls at 100
+    # a minute AND 1,000 a month — the first live run died on call 101 of 894, and the month's
+    # allowance ran out the same day. Embeddings now go through Bedrock, which has neither cap, so
+    # holding a book to ten minutes is friction with nothing behind it.
+    # Retry still covers a transient throttle the way it covers any 5xx; what it cannot rescue is a
+    # window measured in minutes, which is why pacing exists at all. If Bedrock's own per-account
+    # rate limit ever bites, set a number here rather than lowering the retry's guard — the run
+    # reports what refused it and now names the remedy that fits.
+    embed-calls-per-minute: 0
+    # `ncert embed --context section` only: below this a paragraph is a fragment and is not
+    # embedded. Measured on phy11-part1 — every paragraph under 40 characters is "Answer", a list
+    # stub or a stranded equation, and 42 characters is already "All the non-zero digits are
+    # significant", which a significant-figures question should be able to find.
+    embed-min-characters: 40
   ai:
     # A page transcription is not an answer. The 1,024 default sizes a reasoning answer inside the
     # 20 s budget (§4.11); a full NCERT body page is 400–900 words plus JSON field names, escapes
@@ -38,5 +67,7 @@ margai:
       # A pipeline day is not a student day: extracting two pilot books is ~450 VISION calls in
       # one run, against a global-daily-paise placeholder sized for student traffic (₹500). The
       # console workspace spend limit F8 set on 2026-09-12 is the independent backstop; this is
-      # the ledger-side one, and it still stops a runaway loop dead (founder ruling, D14).
-      global-daily-paise: 200000   # ₹2,000 per IST day for a pipeline run
+      # the ledger-side one, and it still stops a runaway loop dead (founder ruling, D14). Raised
+      # from ₹2,000 at D15 so the six remaining books can run back to back: ₹2,000 held one
+      # Physics book a day, and a loop still meets the cap (founder, DECISIONS 2026-09-26).
+      global-daily-paise: 1000000   # ₹10,000 per IST day for a pipeline run

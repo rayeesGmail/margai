@@ -3,6 +3,7 @@ package com.margai.curriculum.internal;
 import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.ParagraphExtraction;
+import com.margai.curriculum.api.ParagraphVerification;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -107,10 +108,19 @@ public class NcertParagraph {
      * founder's only remedy for a bad page, so the current JSONL has to win outright.
      */
     public boolean apply(NcertParagraphRow row, BookLanguage language) {
+        // The second read's verdict is about the words (D15): a load that brings the same text
+        // keeps it, so reloading a frozen run never costs a re-verification; a load that changes
+        // the text — a correction, a re-extraction — drops it, because it judged other words.
+        ParagraphExtraction incoming = row.extraction();
+        ParagraphExtraction current = extraction.get(language);
+        if (incoming != null && incoming.verification() == null && current != null
+                && current.verification() != null && Objects.equals(text(language), row.text())) {
+            incoming = incoming.withVerification(current.verification());
+        }
         boolean changed = !Objects.equals(text(language), row.text())
                 || hasEquations != row.hasEquations()
                 || !Objects.equals(figureRefs, row.figureRefs())
-                || !Objects.equals(extraction.get(language), row.extraction());
+                || !Objects.equals(current, incoming);
         if (changed) {
             if (language == BookLanguage.en) {
                 this.textEn = row.text();
@@ -120,10 +130,26 @@ public class NcertParagraph {
             this.hasEquations = row.hasEquations();
             this.figureRefs = row.figureRefs();
             Map<BookLanguage, ParagraphExtraction> updated = new EnumMap<>(extraction);
-            updated.put(language, row.extraction());
+            updated.put(language, incoming);
             this.extraction = updated;
         }
         return changed;
+    }
+
+    /**
+     * {@code ncert verify --read-pages} (D15): the verdict onto this edition's provenance. The
+     * caller has already checked that it names this row's current text.
+     */
+    public void recordVerification(BookLanguage language, ParagraphVerification verification) {
+        Map<BookLanguage, ParagraphExtraction> updated = new EnumMap<>(extraction);
+        updated.put(language, extraction.get(language).withVerification(verification));
+        this.extraction = updated;
+    }
+
+    /** This row as one edition's paragraph, the shape the pipeline loaded and reads back. */
+    public NcertParagraphRow row(BookLanguage language) {
+        return new NcertParagraphRow(chapterNo, section, paraNo, text(language), hasEquations, figureRefs,
+                extraction.get(language));
     }
 
     public String text(BookLanguage language) {

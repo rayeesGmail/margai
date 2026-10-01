@@ -58,10 +58,36 @@ margai:
     # means re-embedding the corpus, so the D17 retrieval harness settles Hindi and Hinglish
     # quality before D16 fills the tables (DECISIONS 2026-09-12).
     embed:
-      provider: cohere
-      model: embed-v4.0
+      # Bedrock since 2026-09-20 (DECISIONS): the SAME Cohere model, reached through AWS rather
+      # than Cohere's own API, so the pin's meaning and D15's measured result are unchanged. The
+      # direct key is a trial key capped at 1,000 calls/month and the corpus needs ~9,000, and no
+      # payment method can be attached to that account. Bedrock bills through the AWS account that
+      # already pays for S3 and SES, and authenticates by IAM — so there is no second API key to
+      # hold or rotate. `cohere` and `embed-v4.0` remain a valid pair if the direct account is
+      # ever funded; changing any of provider/model/dimensions re-embeds the corpus (§4.9).
+      provider: bedrock
+      # An INFERENCE PROFILE, not a bare model id: v4 has no on-demand throughput on Bedrock and
+      # refuses with a ValidationException naming the profile (measured 2026-09-20).
+      model: global.cohere.embed-v4:0
       dimensions: 1024
-      send-output-dimension: true   # the v4 line accepts the width; the v3 line errors on it
+      send-output-dimension: true   # v4 answers 1,536 unless asked; the column is vector(1024)
+    # Hybrid retrieval (§4.3 stage 6, §4.9). Eight from each half is what the pipeline stage
+    # specifies; the rest is what D15's spike exists to settle on one verified book, before nine
+    # more are extracted and a change costs a corpus re-embedding.
+    retrieval:
+      k-vector: 8
+      k-text: 8
+      # Reciprocal-rank fusion's constant. The halves score on scales that cannot be compared —
+      # cosine similarity in 0..1 against an unbounded ts_rank — so they are fused by rank. 60 is
+      # the conventional flat setting, which treats the two halves as near-equals.
+      rrf-k: 60
+      token-cap: 2500
+      # Cosine similarity a vector match must clear to count as grounding. No number was ever
+      # specified for this; 0.30 is a deliberately permissive opening bid, because at D15 the cost
+      # of letting a weak passage through is a line in a report, and the cost of a floor set too
+      # high is a grounding failure on a question the corpus can actually answer. The spike's
+      # scored run is what moves it.
+      similarity-floor: 0.30
     # Keys are the auth model for AI now (§9.2): SSM SecureStrings in a deployed environment,
     # an untracked local file on a laptop, blank here, never a value in this repository.
     anthropic:
@@ -87,7 +113,12 @@ margai:
        "claude-sonnet-5":
          {"input": 2.00, "output": 10.00, "cache_read": 0.20, "cache_write": 2.50,
           "batch_input": 1.00, "batch_output": 5.00},
+       "claude-opus-5":
+         {"input": 5.00, "output": 25.00, "cache_read": 0.50, "cache_write": 6.25,
+          "batch_input": 2.50, "batch_output": 12.50},
        "embed-v4.0":
+         {"input": 0.12},
+       "global.cohere.embed-v4:0":
          {"input": 0.12}}
     usd-inr: 90
     budget:
@@ -100,7 +131,9 @@ margai:
       smoke:
         version: 1
       ncert_extract:
-        version: 2
+        version: 5
+      ncert_verify:
+        version: 1
   # Object storage (TECH_PLAN §1.3, §7.6; D14). Blank here on purpose: an unconfigured context
   # gets the in-memory store with a WARN, the way an unconfigured context gets FakeAiClient. The
   # pipeline profile names the content bucket, and a deployed environment gets it from SSM.

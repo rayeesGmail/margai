@@ -38,13 +38,20 @@ import org.junit.jupiter.api.Test;
 class PdfPageRendererTest {
 
     /** The founder's inputs, git-ignored; present on a machine that has them, absent in CI. */
-    private static final Path NCERT = Path.of("..", "ncert", "2022-ed", "en");
+    private static final Path NCERT = Path.of("..", "ncert", "2022-ed");
 
     /** Founder-owned and committed, so it is readable in CI even where the PDFs are not. */
     private static final Path BOOKS_YAML = Path.of("..", "pipeline", "inputs", "books.yaml");
 
     /** Unset = the two pilots, {@code all} = every book, otherwise a comma-separated code list. */
     private static final String PREFLIGHT = "ncert.preflight";
+
+    /**
+     * Which edition the sweep draws: {@code en} (the default) or {@code hi}. The Hindi files were never
+     * swept before D16, and their Walkman-Chanakya fonts are glyphs PDFBox has to draw from the embedded
+     * font program, not from a standard one (2026-10-01).
+     */
+    private static final String PREFLIGHT_LANG = "ncert.preflight.lang";
 
     private static final List<String> PILOTS = List.of("phy11-part1", "bio11");
 
@@ -68,20 +75,22 @@ class PdfPageRendererTest {
      */
     @Test
     void everyPageOfEverySelectedBookRendersWithNoMissingDecoder() {
-        assumeTrue(Files.exists(NCERT.resolve("phy11-part1/keph107.pdf")), "founder's NCERT PDFs not on this machine");
+        assumeTrue(Files.exists(NCERT.resolve("en/phy11-part1/keph107.pdf")), "founder's NCERT PDFs not on this machine");
 
+        BookLanguage language = BookLanguage.valueOf(System.getProperty(PREFLIGHT_LANG, "en"));
         List<BookDefinition> books = selected(BooksYamlReader.read(BOOKS_YAML), System.getProperty(PREFLIGHT, ""));
         List<String> failures = new ArrayList<>();
-        StringBuilder table = new StringBuilder("%nncert pre-flight — %d book(s) of books.yaml, en:%n".formatted(books.size()));
+        StringBuilder table = new StringBuilder("%nncert pre-flight — %d book(s) of books.yaml, %s:%n"
+                .formatted(books.size(), language));
         int swept = 0;
         for (BookDefinition book : books) {
-            if (!book.has(BookLanguage.en)) {
-                table.append("  %-14s  no english edition in books.yaml%n".formatted(book.code()));
+            if (!book.has(language)) {
+                table.append("  %-14s  no %s edition in books.yaml%n".formatted(book.code(), language));
                 continue;
             }
             int pages = 0;
             for (BookDefinition.Chapter chapter : book.chapters()) {
-                pages += sweep(book, chapter, failures);
+                pages += sweep(book, chapter, language, failures);
             }
             swept += pages;
             table.append("  %-14s %2d ch %5d pages%n".formatted(book.code(), book.chapters().size(), pages));
@@ -94,22 +103,23 @@ class PdfPageRendererTest {
     }
 
     /** One chapter drawn at 72 DPI — a decoder sweep, not a quality check; it only has to draw. */
-    private static int sweep(BookDefinition book, BookDefinition.Chapter chapter, List<String> failures) {
-        Path pdf = NCERT.resolve(book.code()).resolve(chapter.fileEn());
+    private static int sweep(BookDefinition book, BookDefinition.Chapter chapter, BookLanguage language,
+            List<String> failures) {
+        String file = chapter.file(language);
+        Path pdf = NCERT.resolve(language.name()).resolve(book.code()).resolve(file);
         if (!Files.exists(pdf)) {
-            failures.add("%s/%s: named by books.yaml, not on this machine".formatted(book.code(), chapter.fileEn()));
+            failures.add("%s/%s: named by books.yaml, not on this machine".formatted(book.code(), file));
             return 0;
         }
         try {
             int[] drawn = {0};
             int count = new PdfPageRenderer(72).render(Files.readAllBytes(pdf), page -> false, (png, page) -> drawn[0]++);
             if (drawn[0] != count) {
-                failures.add("%s/%s: drew %d of its %d pages".formatted(book.code(), chapter.fileEn(), drawn[0], count));
+                failures.add("%s/%s: drew %d of its %d pages".formatted(book.code(), file, drawn[0], count));
             }
             return drawn[0];
         } catch (IOException | RuntimeException e) {
-            failures.add("%s/%s: %s: %s".formatted(book.code(), chapter.fileEn(),
-                    e.getClass().getSimpleName(), e.getMessage()));
+            failures.add("%s/%s: %s: %s".formatted(book.code(), file, e.getClass().getSimpleName(), e.getMessage()));
             return 0;
         }
     }

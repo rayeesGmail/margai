@@ -12,6 +12,7 @@ import com.anthropic.models.messages.TextBlockParam;
 import com.anthropic.models.messages.ThinkingConfigAdaptive;
 import com.anthropic.models.messages.ThinkingConfigDisabled;
 import com.anthropic.models.messages.Tool;
+import com.anthropic.models.messages.ToolChoiceAuto;
 import com.anthropic.models.messages.ToolChoiceTool;
 import com.anthropic.models.messages.ToolResultBlockParam;
 import com.anthropic.models.messages.ToolUseBlockParam;
@@ -32,7 +33,9 @@ import tools.jackson.databind.JsonNode;
 /**
  * Builds the Messages request of TECH_PLAN §4.11: the rendered system template as one cached
  * text block, the user turn with the question and any images, one tool named after the prompt
- * whose input schema is the output record's schema, forced through {@code tool_choice}, and the
+ * whose input schema is the output record's schema, forced through {@code tool_choice} — or, on a
+ * tier configured {@code auto} for the models that refuse a forced choice, a strict tool the user
+ * turn asks for (D16) — and the
  * request shape the tier's model accepts. A repair retry appends the model's rejected tool call
  * and an error tool result so the next answer can fix it. The model-facing fragments (tool
  * description, repair message) come from {@code prompts/_protocol.v<N>.stg}, never from code.
@@ -61,6 +64,10 @@ final class MessageRequestMapper {
 
     MessageCreateParams toRequest(AiProperties.Model model, RenderedPrompt prompt, AiRequest<?> request) {
         String tool = prompt.name();
+        Tool.Builder answerTool = Tool.builder()
+                .name(tool)
+                .description(prompts.renderFragment(PROTOCOL, "tool_description", Map.of("task", tool)))
+                .inputSchema(inputSchema(request.outputType()));
         MessageCreateParams.Builder params = MessageCreateParams.builder()
                 .model(model.id())
                 .maxTokens(maxOutputTokens)
@@ -68,19 +75,20 @@ final class MessageRequestMapper {
                         .text(prompt.system())
                         .cacheControl(CacheControlEphemeral.builder().build())
                         .build()))
-                .messages(messages(prompt, request, tool))
-                .addTool(Tool.builder()
-                        .name(tool)
-                        .description(prompts.renderFragment(PROTOCOL, "tool_description", Map.of("task", tool)))
-                        .inputSchema(inputSchema(request.outputType()))
-                        .build())
-                .toolChoice(ToolChoiceTool.builder().name(tool).build());
+                .messages(messages(prompt, request, tool, !model.forcesTheTool()));
+        if (model.forcesTheTool()) {
+            params.addTool(answerTool.build()).toolChoice(ToolChoiceTool.builder().name(tool).build());
+        } else {
+            params.addTool(answerTool.strict(true).build()).toolChoice(ToolChoiceAuto.builder().build());
+        }
         if (model.temperature() != null) {
             params.temperature(model.temperature());
         }
         switch (model.thinking()) {
             case disabled -> params.thinking(ThinkingConfigDisabled.builder().build());
             case adaptive -> params.thinking(ThinkingConfigAdaptive.builder().build());
+            case between_tools -> params.putAdditionalBodyProperty("thinking",
+                    JsonValue.from(Map.of("type", "between_tools")));
         }
         if (model.effort() != null) {
             params.outputConfig(OutputConfig.builder().effort(effort(model.effort())).build());
@@ -129,7 +137,8 @@ final class MessageRequestMapper {
         return JsonValue.from(codec.toPlain(node));
     }
 
-    private List<MessageParam> messages(RenderedPrompt prompt, AiRequest<?> request, String tool) {
+    private List<MessageParam> messages(RenderedPrompt prompt, AiRequest<?> request, String tool,
+            boolean askForTheTool) {
         List<ContentBlockParam> user = new ArrayList<>();
         user.add(ContentBlockParam.ofText(TextBlockParam.builder().text(prompt.user()).build()));
         for (ImagePart image : request.images()) {
@@ -138,6 +147,11 @@ final class MessageRequestMapper {
                             .mediaType(Base64ImageSource.MediaType.of(image.mediaType()))
                             .data(Base64.getEncoder().encodeToString(image.bytes()))
                             .build())
+                    .build()));
+        }
+        if (askForTheTool) {
+            user.add(ContentBlockParam.ofText(TextBlockParam.builder()
+                    .text(prompts.renderFragment(PROTOCOL, "tool_instruction", Map.of("task", tool)))
                     .build()));
         }
         List<MessageParam> messages = new ArrayList<>();

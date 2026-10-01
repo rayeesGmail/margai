@@ -9,6 +9,14 @@ tool_description(v) ::= <<
 Return the structured result of the <v.task> task.
 >>
 
+// The last block of the user turn on a tier whose tool is not forced (tool-choice auto, D16):
+// the 5.5 models answer a forced tool_choice with a 400, so the call is asked for instead.
+// v.task is the prompt name, which is the tool's name. Added beside the two fragments above,
+// which are unchanged, so every forced tier renders byte-identically.
+tool_instruction(v) ::= <<
+Answer by calling the <v.task> tool exactly once. Do not answer in text.
+>>
+
 // The tool result that follows a rejected tool input on the repair retry; v.errors is the list
 // of validation messages.
 repair(v) ::= <<

@@ -2,6 +2,7 @@ package com.margai.ai.internal.anthropic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.anthropic.core.JsonValue;
 import com.anthropic.models.messages.ContentBlockParam;
 import com.anthropic.models.messages.MessageCreateParams;
 import com.anthropic.models.messages.MessageParam;
@@ -35,9 +36,17 @@ class MessageRequestMapperTest {
     private static final RenderedPrompt PROMPT = new RenderedPrompt("smoke", 1, "SYSTEM PREFIX", "Number 7 please.");
 
     private static final AiProperties.Model CHEAP =
-            new AiProperties.Model("model-x", 0.0, AiProperties.Thinking.disabled, null, 4096);
+            new AiProperties.Model("model-x", 0.0, AiProperties.Thinking.disabled, null, 4096, null);
     private static final AiProperties.Model REASON =
-            new AiProperties.Model("model-r", null, AiProperties.Thinking.adaptive, AiProperties.Effort.medium, 1024);
+            new AiProperties.Model("model-r", null, AiProperties.Thinking.adaptive, AiProperties.Effort.medium, 1024,
+                    null);
+    /** The 5.5 generation's shape: a forced tool_choice is a 400, and thinking cannot be disabled. */
+    private static final AiProperties.Model AUTO =
+            new AiProperties.Model("model-a", null, AiProperties.Thinking.adaptive, AiProperties.Effort.low, 512,
+                    AiProperties.ToolChoice.auto);
+    private static final AiProperties.Model BETWEEN_TOOLS =
+            new AiProperties.Model("model-s", null, AiProperties.Thinking.between_tools, AiProperties.Effort.medium,
+                    512, AiProperties.ToolChoice.auto);
 
     private final MessageRequestMapper mapper = new MessageRequestMapper(new StructuredOutput(),
             PromptRegistry.fromClasspath(new PathMatchingResourcePatternResolver(), Map.of()), 1024);
@@ -81,6 +90,50 @@ class MessageRequestMapperTest {
         assertThat(schema._additionalProperties()).containsKey("additionalProperties");
 
         assertThat(params.toolChoice().orElseThrow().asTool().name()).isEqualTo("smoke");
+        assertThat(tool.strict()).isEmpty();
+    }
+
+    /**
+     * A tier on {@code auto} cannot force the call, so the tool is strict — its arguments match
+     * the schema — and the user turn says, after any images, which tool answers. Whether a call was
+     * made at all is still checked on the response ({@code AnthropicAiClient.toolInput}).
+     */
+    @Test
+    void anAutoToolChoiceTierSendsAStrictToolAndAsksForItAfterTheImages() {
+        AiRequest<SmokeAnswer> withImage = request()
+                .withImages(List.of(new ImagePart(new byte[] {1, 2, 3}, "image/png")));
+
+        MessageCreateParams params = mapper.toRequest(AUTO, PROMPT, withImage);
+
+        assertThat(params.toolChoice().orElseThrow().isAuto()).isTrue();
+        Tool tool = params.tools().orElseThrow().get(0).tool().orElseThrow();
+        assertThat(tool.strict()).hasValue(true);
+        List<ContentBlockParam> content = params.messages().get(0).content().asBlockParams();
+        assertThat(content).hasSize(3);
+        assertThat(content.get(0).text().orElseThrow().text()).isEqualTo("Number 7 please.");
+        assertThat(content.get(1).image()).isPresent();
+        assertThat(content.get(2).text().orElseThrow().text()).contains("smoke");
+    }
+
+    /** A forced tier's user turn is the question and the images, nothing more. */
+    @Test
+    void aForcedTierAddsNoToolInstruction() {
+        MessageCreateParams params = mapper.toRequest(REASON, PROMPT, request());
+
+        assertThat(params.messages().get(0).content().asBlockParams()).hasSize(1);
+    }
+
+    /**
+     * Claude Sonnet 5.5 refuses {@code disabled} and turns thinking off with its own type, which this
+     * SDK version does not model — so it travels as a body property and the typed field stays empty.
+     */
+    @Test
+    void betweenToolsThinkingIsSentAsItsOwnType() {
+        MessageCreateParams params = mapper.toRequest(BETWEEN_TOOLS, PROMPT, request());
+
+        assertThat(params.thinking()).isEmpty();
+        assertThat(params._additionalBodyProperties())
+                .containsEntry("thinking", JsonValue.from(Map.of("type", "between_tools")));
     }
 
     @Test

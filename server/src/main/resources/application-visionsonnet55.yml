@@ -1,0 +1,28 @@
+# A measurement, not a default: the VISION tier on Claude Sonnet 5.5, as the second read.
+#
+#   java -jar server.jar --spring.profiles.active=pipeline,live,visionsonnet55 ncert verify --trial <label> --read-pages …
+#
+# Added 2026-10-01 (D16) beside `visionsonnet`, to read the same uncorrected trial rows Claude Sonnet 5
+# reads, so the two verifiers' recall and precision are measured on one known defect list. Same price
+# as Sonnet 5 ($2 / $10 per million tokens, cache reads $0.20).
+#
+# Request shape (the API reference for this model): a forced `tool_choice` is a 400, so the tool is
+# `auto` + strict and the user turn asks for it; `disabled` thinking is a 400 too, and this model's
+# thinking-off spelling is `between_tools`, accepted only at effort `high` or below — the like-for-like
+# shape of Sonnet 5 under a forced tool, which emits no thinking. Non-default sampling is a 400, so no
+# `temperature`. Its cacheable prefix minimum is 512 tokens.
+#
+# The verifier guard (margai.pipeline.verify-model) moves with the tier here; the ledger guard — the
+# verifier must not be the model that transcribed the rows — is unchanged.
+margai:
+  pipeline:
+    verify-model: claude-sonnet-5-5
+  ai:
+    tier:
+      vision:
+        id: claude-sonnet-5-5
+        temperature:
+        effort: medium
+        thinking: between_tools
+        tool-choice: auto
+        cache-min-tokens: 512

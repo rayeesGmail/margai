@@ -112,6 +112,25 @@ class AiPropertiesTest {
         });
     }
 
+    /**
+     * The 5.5 measurement profiles (D16): the VISION tier leaves the tool to the model — a forced
+     * choice is a 400 on that generation — the model is priced, and the shipped tiers still force it.
+     */
+    @Test
+    void theFivePointFiveProfilesChooseTheToolAutomaticallyAndArePriced() {
+        runner.run(context -> assertThat(context.getBean(AiProperties.class).modelOf(Tier.vision).forcesTheTool())
+                .isTrue());
+        for (String profile : List.of("visionopus55", "visionsonnet55")) {
+            runner.withPropertyValues("spring.profiles.active=" + profile).run(context -> {
+                AiProperties.Model vision = context.getBean(AiProperties.class).modelOf(Tier.vision);
+                assertThat(vision.toolChoice()).as(profile).isEqualTo(AiProperties.ToolChoice.auto);
+                assertThat(vision.temperature()).as(profile).isNull();
+                assertThat(vision.thinking()).as(profile).isNotEqualTo(AiProperties.Thinking.disabled);
+                assertThat(context.getBean(PriceTable.class).modelIds()).as(profile).contains(vision.id());
+            });
+        }
+    }
+
     @Test
     void aTierWithoutItsModelsCacheMinimumDoesNotBoot() {
         runner.withPropertyValues("margai.ai.tier.cheap.cache-min-tokens=0")

@@ -1,0 +1,32 @@
+# A measurement, not a default: the VISION tier on Claude Opus 5.5, as the transcriber.
+#
+#   java -jar server.jar --spring.profiles.active=pipeline,live,visionopus55 ncert extract --trial opus55 …
+#
+# Added 2026-10-01 (D16) when the founder asked to validate the 5.5 generation before the Hindi
+# corpus is cut (TRACKER PARKED "Opus 5.5 as the transcriber", 2026-09-26). The English corpus stays
+# frozen on Claude Opus 5 whatever this measures: switching its transcriber is a re-extraction, a
+# corpus event. What it decides is which model cuts the Hindi corpus.
+#
+# Request shape (the API reference for this model): a forced `tool_choice` is a 400, so the tool is
+# `auto` + strict and the user turn asks for it (MessageRequestMapper); thinking cannot be disabled at
+# any effort, so it is adaptive and `effort` is the only control — `low`, the cheapest thinking, and
+# a sweep at `medium` (`MARGAI_AI_TIER_VISION_EFFORT=medium` over this profile) on the hardest pages.
+# Unlike Claude Opus 5 under a forced tool, this model will think, so its output tokens include the
+# thinking and the ledger is what says whether its 20% lower price survives that. `temperature` is
+# rejected outright; an empty value binds to null, which is how "send nothing" is spelled. Its
+# cacheable prefix minimum is 512 tokens.
+#
+# The transcriber guard (margai.pipeline.transcribe-model) moves with the tier here, so a run without
+# this profile still refuses to transcribe on anything but Claude Opus 5.
+margai:
+  pipeline:
+    transcribe-model: claude-opus-5-5
+  ai:
+    tier:
+      vision:
+        id: claude-opus-5-5
+        temperature:
+        effort: low
+        thinking: adaptive
+        tool-choice: auto
+        cache-min-tokens: 512

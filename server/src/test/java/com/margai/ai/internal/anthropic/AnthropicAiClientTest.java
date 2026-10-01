@@ -13,6 +13,7 @@ import com.anthropic.errors.RateLimitException;
 import com.anthropic.errors.UnauthorizedException;
 import com.anthropic.models.messages.DirectCaller;
 import com.anthropic.models.messages.Message;
+import com.anthropic.models.messages.RefusalStopDetails;
 import com.anthropic.models.messages.StopReason;
 import com.anthropic.models.messages.ToolUseBlock;
 import com.margai.ai.api.AiUnavailableException;
@@ -85,6 +86,27 @@ class AnthropicAiClientTest {
                 .isInstanceOf(InvalidOutputException.class)
                 .hasMessageContaining("cut off at the output-token limit")
                 .hasMessageContaining("margai.ai.max-output-tokens");
+    }
+
+    /**
+     * A safety classifier's refusal is not a malformed answer: asking again sends the same page to
+     * the same classifier, so it is invalid output that is never repaired, and the category it
+     * names is the thing the run report needs (the 5.5 models' bio classifier, D16).
+     */
+    @Test
+    void aRefusalIsInvalidOutputThatIsNotRepairedAndNamesItsCategory() {
+        Message response = message(StopReason.REFUSAL)
+                .stopDetails(RefusalStopDetails.builder()
+                        .category(RefusalStopDetails.Category.BIO)
+                        .explanation(Optional.empty())
+                        .build())
+                .build();
+
+        assertThatThrownBy(() -> AnthropicAiClient.toolInput(response, Usage.none(), "model-x", codec))
+                .isInstanceOfSatisfying(InvalidOutputException.class,
+                        refused -> assertThat(refused.repairable()).isFalse())
+                .hasMessageContaining("refused")
+                .hasMessageContaining("bio");
     }
 
     @Test

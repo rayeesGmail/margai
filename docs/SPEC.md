@@ -86,19 +86,13 @@ yourself from this document. Propose the plan before building.*
 Slow, patchy mobile data is the normal condition for many students, not an edge case:
 
 1. **Never lose a student's work.** Anything she does offline or on a failing connection
-   is kept on the device and delivered later — including work queued on a phone that has
-   since been signed out (§5.7), which syncs on that account's next sign-in there.
+   is kept on the device and delivered later.
 2. **Never show a dead screen.** No endless spinners, no blank pages; every wait or
    failure has clear, honest copy and a next step.
 3. **Send less.** Payloads, images and downloads are as small as they can be without
    hurting quality.
 4. **Depend on the network as little as possible at the moments that matter** —
    especially the 7 AM plan (§6.1).
-
-Already promised elsewhere and held to the same bar: today's plan and practice work
-offline with answers synced and re-judged server-side; doubt answers stream; retries back
-off and never hammer a weak connection; sign-in tolerates bad networks (OTP auto-read,
-resend); every failure has a retry path.
 
 **Acceptance (a beta gate):** on a simulated slow-3G profile the Today screen opens from
 local data, a practice session completes, and a doubt answer begins streaming promptly,
@@ -326,7 +320,7 @@ device, and follows it across phones.
 **Sessions:** one active phone per account — signing in on a new phone signs the previous
 phone out, with a clear message on both (“You've signed in on another phone”); Phase 2 web
 allows one phone plus one browser. Work queued offline on the signed-out phone is never
-discarded (§3.1). A phone may hold several accounts (siblings) behind a simple account
+discarded: it syncs when the same account next signs in on that phone (§3.1). A phone may hold several accounts (siblings) behind a simple account
 switcher (§6.11); each account keeps its own plan, notebook, history and subscription,
 switching never mixes data, and Pro on one account never unlocks Pro for another.
 
@@ -336,10 +330,10 @@ day; free accounts per phone are capped (§6.9); unusual use follows the gentle 
 
 **Minors in the beta:** the beta cohort is recruited **18+**; DOB is still asked, with an
 18+ gate for the beta. The parent-consent flow (§5.1: parent phone + consent OTP) is built
-but stays switched off for the beta and goes live at public launch. Someone under 18 who
-reaches the gate is stopped kindly (“MARG opens to under-18s at launch”) and their
-account, phone number and answers are deleted at once — nothing is kept, not even for a
-waitlist. At the D60 gate the 18+ rule is revisited once: if the consent SMS template is
+but stays switched off for the beta — unless the D60 revisit below switches it on — and
+goes live at public launch. Someone under 18 who reaches the gate is stopped kindly (“MARG
+opens to under-18s at launch”) and their account, phone number and answers are deleted at
+once — nothing that identifies them is kept, not even for a waitlist. At the D60 gate the 18+ rule is revisited once: if the consent SMS template is
 live and the legal review has cleared parental consent and the rules on monitoring
 children, the consent flow is switched on and under-18s may join the later beta waves
 (founder ruling 2026-10-01).

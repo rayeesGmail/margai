@@ -48,8 +48,9 @@ verdicts show the correct option after an answer is recorded). And four lines ca
 switch the founder approved on 2026-09-12 (DECISIONS, TECH_PLAN §4.11) — the AI stack line, the
 infra line (which now says "or provider API keys"), the ai_calls hard rule and the new API-key
 rule: Bedrock is blocked for this account, so model access is direct. And the AI stack line was
-updated again on 2026-10-01 (ruling Q5 on CS-2 §4.11, DECISIONS): embeddings have run on Bedrock
-since 2026-09-20, and Bedrock is now the completion fallback. DEV_SPEC §13 keeps its original
+updated again on 2026-10-01 (ruling Q5 on CS-2 §4.11, DECISIONS): that block is reported lifted
+(CS-2 §4.11; a founder smoke confirms it at D18), embeddings have run on Bedrock since 2026-09-20,
+and Bedrock is now the completion fallback. DEV_SPEC §13 keeps its original
 wording as the historical record.
 
 ## Documents and precedence (read before proposing anything)

@@ -13,7 +13,7 @@ dated 2026-09-10 record the spec-silent choices.
 | `archetypes.yaml` | `archetype_tracks`, `archetype_track_steps` | `backbone load` | 4 tracks, 744 steps |
 | `cutoffs.csv` | `cutoffs` | `cutoffs load` | 40 qualifying rows, 2019–2026 |
 | `books.yaml` | `ncert_books` | `ncert register` (D14) | 10 books, 79 chapters, both editions |
-| `ncert-corrections.yaml` | `ncert_paragraphs`, through the extraction | `ncert load` (D15) | the founder's rulings on `ncert verify` flags; seven entries from chapter 7's adjudication (2026-09-15/16) |
+| `ncert-corrections.yaml` | `ncert_paragraphs`, through the extraction | `ncert load` (D15) | the founder's rulings on `ncert verify` flags for the ten English books (D15), and since D16 the `lang: hi` entries that join and split a Hindi book to its English rows |
 
 ## ncert-corrections.yaml
 
@@ -39,6 +39,9 @@ committed.
   translation of English ¶n, and `defer` moves a footnote the Hindi prints a page before the paragraph the
   English numbers first. Write its spans as the rows show them — the Hindi load puts back a visarga
   written as a colon (`अत:` → `अतः`) before it applies an entry.
+- **A Hindi `text` entry's `printed` span is read off the page image.** The decoded text layer is a check
+  and never a source (SPEC §12.2): a reason may say the layer's line agrees and give its position, and
+  never quotes the layer's text or its glyph codes.
 - Quote every value holding a comma or a colon: in YAML's `{…}` form an unquoted comma starts a new key,
   and the reader refuses the key it does not know.
 

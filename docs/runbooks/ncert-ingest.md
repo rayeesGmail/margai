@@ -346,7 +346,10 @@ back as `अत:`. It runs before the corrections, so a `lang: hi` entry is writ
 rows show. The report names each rewrite under *a visarga the model wrote as a colon*, and under *a word
 glued to a colon that the visarga list does not know* each word it left alone because its list does not
 hold it — read those: a `text` entry if the page means a visarga, nothing if it is a colon. A colon set
-off by a space, or after a vowel sign (`है:`), is never touched.
+off by a space, or after a vowel sign (`है:`), is never touched. Inside a word a visarga follows one of a
+few prefixes (`निःसंदेह`, `दुःख`); any other colon glued on both sides — a ratio, a prefix the list lacks,
+two words that lost their space — is left and named too. `ncert verify` reads a visarga and a colon after
+a Devanagari letter as one glyph, as the print draws them, so the step's rewrite is not flagged.
 
 **A footnote is a paragraph starting with an asterisk**, with or without a space after it (D16): it is
 numbered where its page puts it and is never what the next page continues.

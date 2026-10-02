@@ -177,6 +177,45 @@ class NcertExtractCommandTest {
         assertThat(extract.calls).containsExactly("8/1");
     }
 
+    /**
+     * A Hindi page's rows are held to its decoded layer (SPEC §12.2, DECISIONS 2026-10-02): Phase B's Opus 5
+     * draw wrote दाशिमक on khph101 p2 where the print has दाश्मिक, and the check names it. The layer is still
+     * withheld from the model.
+     */
+    @Test
+    void aHindiPagesRowsAreCheckedAgainstTheDecodedLayer() throws IOException {
+        Path khph101 = Path.of("..", "ncert", "2022-ed", "hi", "phy11-part1", "khph101.pdf");
+        org.junit.jupiter.api.Assumptions.assumeTrue(Files.exists(khph101), "founder's NCERT PDFs not on this machine");
+        Files.writeString(inputs.resolve(NcertRegisterCommand.FILE), """
+                books:
+                  - code: phy11-part1
+                    subject: physics
+                    class_level: 11
+                    part: 1
+                    title_en: "Physics Part-I, Textbook for Class XI"
+                    edition_year: 2022
+                    source:
+                      en: source/ncert/2022-ed/en/phy11-part1/
+                      hi: source/ncert/2022-ed/hi/phy11-part1/
+                    chapters:
+                      - {no: 1, en: keph101.pdf, hi: khph101.pdf}
+                """);
+        store.put("source/ncert/2022-ed/hi/phy11-part1/khph101.pdf", Files.readAllBytes(khph101), "application/pdf");
+        store.put(ContentKeys.page("phy11-part1", BookLanguage.hi, (short) 1, 2),
+                "page image 1/2".getBytes(StandardCharsets.UTF_8), "image/png");
+        extract.model = "claude-opus-5-5";
+        extract.texts.put("1/2", "उदाहरण के लिए 1.28 को दो दाशिमक स्थानों तक निकटित करते हैं।");
+
+        assertThat(commandLine.execute("ncert", "extract", "--book", "phy11-part1", "--lang", "hi",
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(extract.pageTexts).containsOnlyNulls();
+        assertThat(out.toString())
+                .contains("## Hindi rows against the decoded layer — a check only; the layer is never sent or stored")
+                .contains("checked: 1 of the 1 page(s) called this run")
+                .contains("- ch 1 p2: 'दाशिमक' 1x in the rows, 0x on the page");
+    }
+
     @Test
     void callsEveryPageOnceAndWritesTheJsonlInBookOrder() {
         assertThat(run()).isZero();
@@ -672,6 +711,8 @@ class NcertExtractCommandTest {
         final List<String> empty = new ArrayList<>();
         final List<String> degree = new ArrayList<>();
         final List<String> lowConfidence = new ArrayList<>();
+        /** A page's transcription by address, where a test needs real words rather than "text of 8/1". */
+        final java.util.Map<String, String> texts = new java.util.HashMap<>();
 
         /** The VISION tier as the run finds it configured; the ruling's transcriber unless a test says otherwise. */
         String model = "claude-opus-5";
@@ -689,7 +730,8 @@ class NcertExtractCommandTest {
             imageCounts.add(images.size());
             pageTexts.add(pageText);
             addresses.add(previous == null ? null : previous.section());
-            String text = degree.contains(address) ? "Where ° is the restoring couple of " + address : "text of " + address;
+            String text = texts.containsKey(address) ? texts.get(address)
+                    : degree.contains(address) ? "Where ° is the restoring couple of " + address : "text of " + address;
             List<NcertPage.Paragraph> paragraphs = empty.contains(address) ? List.of()
                     : List.of(new NcertPage.Paragraph("7.9", text, false, List.of()));
             BigDecimal confidence = lowConfidence.contains(address) ? new BigDecimal("0.40") : new BigDecimal("0.95");

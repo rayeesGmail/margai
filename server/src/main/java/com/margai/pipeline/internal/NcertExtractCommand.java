@@ -46,6 +46,12 @@ class NcertExtractCommand extends NcertBookCommand {
     /** Below this the page is listed in the report for the founder to look at (§6.3). */
     static final BigDecimal LOW_CONFIDENCE = new BigDecimal("0.80");
 
+    /**
+     * Below this share of a Hindi page's Devanagari words in its rows, the page is listed. An opening value:
+     * khph101's pages ran 0.90–0.99, its table page 0.35 (D16).
+     */
+    static final double HINDI_COVERAGE_FLOOR = 0.6;
+
     private static final Logger log = LoggerFactory.getLogger(NcertExtractCommand.class);
 
     @Option(names = "--pages", paramLabel = "N[,N…]", split = ",",
@@ -99,6 +105,10 @@ class NcertExtractCommand extends NcertBookCommand {
         List<List<String>> apparatusRows = new ArrayList<>();
         List<List<String>> textLayerRows = new ArrayList<>();
         List<String> diffFlags = new ArrayList<>();
+        List<String> hindiWordFlags = new ArrayList<>();
+        List<String> hindiSpanFlags = new ArrayList<>();
+        List<String> hindiCoverageFlags = new ArrayList<>();
+        int hindiPagesChecked = 0;
         List<String> notationFlags = new ArrayList<>();
         List<String> structureFlags = new ArrayList<>();
         List<EmptyPage> emptyPages = new ArrayList<>();
@@ -125,6 +135,9 @@ class NcertExtractCommand extends NcertBookCommand {
             // English words by construction, and gating per page would withhold the text layer from
             // exactly the pages it exists to fix.
             boolean textLayerTrusted = PdfTextLayer.isLegible(pageTexts);
+            // A Hindi layer is Chanakya glyph codes, withheld from the model either way; decoded, it is the
+            // check the rows are held to (SPEC §12.2, DECISIONS 2026-10-02) — read here, never sent or stored.
+            List<HindiLayer.Page> hindiLayer = language == BookLanguage.hi ? HindiLayer.pages(sourcePdf) : List.of();
             textLayerRows.add(List.of(String.valueOf(chapter.no()),
                     textLayerTrusted ? "fed as the character authority" : "withheld: illegible",
                     "%.3f".formatted(PdfTextLayer.meanLegibility(pageTexts))));
@@ -232,6 +245,20 @@ class NcertExtractCommand extends NcertBookCommand {
                         case MATCHED -> { }
                     }
                 }
+                if (page <= hindiLayer.size()) {
+                    hindiPagesChecked++;
+                    String layer = hindiLayer.get(page - 1).devanagari();
+                    String transcribed = response.output().paragraphs().stream()
+                            .map(NcertPage.Paragraph::text).collect(java.util.stream.Collectors.joining(" "));
+                    String at = "ch " + chapter.no() + " p" + page;
+                    HindiChecks.devanagari(layer, transcribed).forEach(finding -> hindiWordFlags.add(at + ": " + finding));
+                    HindiChecks.spans(layer, transcribed).forEach(finding -> hindiSpanFlags.add(at + ": " + finding));
+                    double share = HindiChecks.coverage(layer, transcribed);
+                    if (!headingPage && share < HINDI_COVERAGE_FLOOR) {
+                        hindiCoverageFlags.add(at + ": the rows carry " + Math.round(share * 100)
+                                + "% of the page's Devanagari words");
+                    }
+                }
                 previous = PreviousPage.of(response.output(), previous);
                 if (read.confidence() != null && read.confidence().compareTo(LOW_CONFIDENCE) < 0) {
                     lowConfidence.add("ch " + chapter.no() + " page " + page + " — confidence "
@@ -274,6 +301,21 @@ class NcertExtractCommand extends NcertBookCommand {
         // nothing — but its silence hid three pages of bio11, one of them a biography (D15).
         if (!notJudged.isEmpty()) {
             coverage.line("").line("and " + notJudged.size() + " page(s) the ratio could not judge:").list(notJudged);
+        }
+        if (language == BookLanguage.hi) {
+            String hindiChecked = hindiPagesChecked + " of the " + called + " page(s) called this run";
+            String none = hindiPagesChecked == 0 ? "nothing was checked" : "none on the pages checked";
+            report.section("Hindi rows against the decoded layer — a check only; the layer is never sent or stored")
+                    .line("checked: " + hindiChecked)
+                    .line("")
+                    .line("words the rows carry that the page does not — a misreading or an addition:")
+                    .list(hindiWordFlags, none)
+                    .line("")
+                    .line("symbols the page carries more often, digits and Latin only the rows carry:")
+                    .list(hindiSpanFlags, none)
+                    .line("")
+                    .line("pages whose rows carry little of the page's Devanagari — an omission, a table or a sidebar:")
+                    .list(hindiCoverageFlags, none);
         }
         report.section("pages the Summary starts on — confirm the rows carry what is above the heading and nothing below it")
                 .line("the coverage ratio cannot judge these: the layer carries the Summary, the rows must not")

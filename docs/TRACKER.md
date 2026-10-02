@@ -220,7 +220,20 @@ Code (verify green at each commit): a7e1140 the load keeps a Hindi figure or tab
 HOW TO RESUME (supersedes item 2 of the list below):
   0. 2026-10-03: item 1 is DONE — the founder approved the block as written and allowed all four × (DECISIONS 2026-10-03); the
      block is committed with its approval line. Still open from item 1: whether the frozen English rows come under the
-     side-heading ruling. NEXT is item 2, the founder's reload.
+     side-heading ruling.
+     2026-10-03 00:13: item 2's RELOAD DONE (reports f0ce7ef) — the visarga step rewrote 97 words and named one, the 290 entries
+     applied with no refusal, 827 → 909 rows, and the database matches the scratchpad simulation row for row (text and pages).
+     Align again ₹9.28: 909 pairs; it still proposes 30 reshapes in 12 sections whose counts agree — Claude read every one of
+     those pairs and each is a translation pair, so they are the aligner's false alarms (equation-heavy neighbours score alike).
+     The second read stopped at ch 6 p28 after 80 calls (₹107.12) on a malformed answer; NEXT: the founder resumes it with
+     scratchpad 38d88bed `d16-phy11-hi-verify-resume.sh` (≈35 pages left), then round two.
+     THE ✅ SAMPLE, Claude's read (40 pairs, seed 16, the 2026-10-03 align report): each Hindi row located on its page, its
+     Devanagari diffed against the decoded layer (2,563 words, none differs but a layer artefact) and the paragraph read on a
+     3× crop for digits, symbols, equations and sense against its English partner — 40 of 40 match the print and their
+     partner. The founder's ten (2, 3, 11, 16, 21, 22, 25, 27, 35, 40) are laid out with their page crops in scratchpad
+     `sample/founder10.html`. Round-two items already found by reading: ch 7 p11 Eq. (7.30) `G M M_E` for the printed GmM_E (a
+     misreading, text entry due); ch 3 p5 `19` twice where the layer has 19° and the raster draws no degree sign (the × class —
+     the founder's to rule).
   1. FOUNDER: approve the block (inputs README: rulings are approved before they are committed). The choices in it that are yours:
      the 12 "as printed" spelling entries (the print's own typos put back over the transcriber's repairs); the × the page does
      not draw, which only the layer's Unicode span carries — two text entries write it into a row (ch 7 p4 `3.84 × 10^8m`, p9

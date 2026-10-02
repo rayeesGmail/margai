@@ -29,11 +29,16 @@ committed.
   reader and is never used to apply the entry.
 - **A span must occur exactly once on its page**, or the load refuses by name: not at all means the
   page is not what the entry was written against, twice means the entry does not say which.
-- **`text`, `join`, `split`, `figure_ref` (remove or add one label on the paragraph holding a span) and
-  `drop` (remove a paragraph that is not running text) change the extraction; `misprint` and
-  `false_positive` do not** — they
+- **`text`, `join`, `split`, `figure_ref` (remove or add one label on the paragraph holding a span),
+  `drop` (remove a paragraph that is not running text) and `defer` (number a paragraph after the next one
+  of its section) change the extraction; `misprint` and `false_positive` do not** — they
   rule on a flag (the book's own error kept; the verifier wrong), and `ncert verify` reads them so a
   ruled flag is not raised again.
+- **A `lang: hi` entry aligns the Hindi to the English rows** (D16, DECISIONS 2026-10-01: English is
+  canonical): `join` and `split` reshape the Hindi paragraphs until Hindi ¶n of a section is the
+  translation of English ¶n, and `defer` moves a footnote the Hindi prints a page before the paragraph the
+  English numbers first. Write its spans as the rows show them — the Hindi load puts back a visarga
+  written as a colon (`अत:` → `अतः`) before it applies an entry.
 - Quote every value holding a comma or a colon: in YAML's `{…}` form an unquoted comma starts a new key,
   and the reader refuses the key it does not know.
 

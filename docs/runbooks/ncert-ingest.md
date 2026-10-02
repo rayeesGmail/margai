@@ -326,8 +326,10 @@ Every run's report is its own file: a second run of the same command on the same
 
 **The load applies `pipeline/inputs/ncert-corrections.yaml`** (D15) after its page-break repairs and
 before it numbers: the founder's rulings on what `ncert verify` flagged. `text`, `join`, `split`,
-`figure_ref` (one label removed from or added to the paragraph holding a span) and `drop` (a paragraph
-that is not running text removed) change the frozen run's pages; `misprint`, `false_positive` and
+`figure_ref` (one label removed from or added to the paragraph holding a span), `drop` (a paragraph
+that is not running text removed) and `defer` (D16: the paragraph takes its number after the next one of
+its section — a footnote the other edition prints a page later; no word moves and it stays on its own
+page) change the frozen run's pages; `misprint`, `false_positive` and
 `noise` rule on a flag and change nothing, and `ncert verify` reads those three itself. The first two
 answer the second read, matched on the spans the verifier quoted; `noise` answers one of the **free**
 checks, which quotes no span, so it names the check (`flag: join` or `flag: figure`) and the words the
@@ -337,6 +339,17 @@ once refuses the load by name. The file's own header and `pipeline/inputs/README
 one. Each row now also records where each of its pages' parts begins (`pageStarts` in the row's
 `extraction`), which verify needs — a row loaded before 2026-09-14's build has none, and verify asks for
 the reload.
+
+**A Hindi load first puts back the visargas the transcriber wrote as colons** (D16, `VisargaColons`):
+the Hindi font draws both with one glyph, and about a quarter of the first book's visarga words came
+back as `अत:`. It runs before the corrections, so a `lang: hi` entry is written against the words the
+rows show. The report names each rewrite under *a visarga the model wrote as a colon*, and under *a word
+glued to a colon that the visarga list does not know* each word it left alone because its list does not
+hold it — read those: a `text` entry if the page means a visarga, nothing if it is a colon. A colon set
+off by a space, or after a vowel sign (`है:`), is never touched.
+
+**A footnote is a paragraph starting with an asterisk**, with or without a space after it (D16): it is
+numbered where its page puts it and is never what the next page continues.
 
 ## 5. verify — the second read (D15, DECISIONS 2026-09-14 "the pair")
 

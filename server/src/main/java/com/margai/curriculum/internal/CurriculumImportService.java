@@ -1,5 +1,6 @@
 package com.margai.curriculum.internal;
 
+import com.margai.curriculum.api.AlignmentRow;
 import com.margai.curriculum.api.ArchetypeTrackRow;
 import com.margai.curriculum.api.BackboneLoadReport;
 import com.margai.curriculum.api.BookLanguage;
@@ -19,6 +20,7 @@ import com.margai.curriculum.api.SyllabusNodeRow;
 import com.margai.curriculum.api.TaxonomyLoadReport;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,6 +102,18 @@ class CurriculumImportService implements CurriculumImport {
     @Transactional(readOnly = true)
     public long embeddedParagraphs(String bookCode) {
         return ncertEmbeddings.embeddedIn(bookCode);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AlignmentRow> alignmentRows(String bookCode, Collection<Short> chapters) {
+        return ncertParagraphs.alignmentRows(bookCode, chapters);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, Double> similarityToEnglish(String bookCode, float[] vector, Collection<UUID> paragraphIds) {
+        return ncertEmbeddings.similarityTo(bookCode, vector, paragraphIds);
     }
 
     @Override

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.margai.TestcontainersConfiguration;
 import com.margai.common.api.AttemptType;
 import com.margai.common.api.Category;
+import com.margai.curriculum.api.AlignmentRow;
 import com.margai.curriculum.api.ArchetypeStepRow;
 import com.margai.curriculum.api.ArchetypeTrackRow;
 import com.margai.curriculum.api.BackboneLoadReport;
@@ -565,6 +566,45 @@ class CurriculumImportTest {
                 new ParagraphExtraction(List.of(12), new BigDecimal("0.90"), null))));
 
         assertThat(imports.paragraphsToEmbed("phy11-part1", List.of(), false)).isEmpty();
+    }
+
+    /** `ncert align` (D16): each address with both editions' text and pages, in reading order. */
+    @Test
+    void alignmentRowsCarryBothEditionsTextAndPages() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(new NcertParagraphRow((short) 7, "7.9", (short) 1,
+                "गुरुत्वीय स्थितिज ऊर्जा।", false, List.of(), new ParagraphExtraction(List.of(14), new BigDecimal("0.9"), null))));
+
+        List<AlignmentRow> rows = imports.alignmentRows("phy11-part1", List.of((short) 7));
+
+        assertThat(rows).extracting(AlignmentRow::address).containsExactly("ch 7 §7.9 ¶1", "ch 7 §7.9 ¶2");
+        assertThat(rows.getFirst().textEn()).isEqualTo("The gravitational potential energy of a body.");
+        assertThat(rows.getFirst().textHi()).isEqualTo("गुरुत्वीय स्थितिज ऊर्जा।");
+        assertThat(rows.getFirst().pagesEn()).containsExactly(12);
+        assertThat(rows.getFirst().pagesHi()).containsExactly(14);
+        assertThat(rows.get(1).textHi()).isNull();
+        assertThat(rows.get(1).pagesHi()).isEmpty();
+    }
+
+    /** The Hindi side's vector against the stored English ones, in pgvector: cosine similarity, unembedded rows absent. */
+    @Test
+    void similarityToEnglishIsTheCosineToEachStoredVector() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        List<ParagraphToEmbed> waiting = imports.paragraphsToEmbed("phy11-part1", List.of(), false);
+        imports.storeEmbeddings("phy11-part1", List.of(new ParagraphEmbedding(waiting.getFirst().paragraphId(), vector(0.5f))));
+        float[] orthogonal = new float[1024];
+        orthogonal[1] = 1f;
+
+        Map<UUID, Double> same = imports.similarityToEnglish("phy11-part1", vector(0.25f),
+                waiting.stream().map(ParagraphToEmbed::paragraphId).toList());
+        Map<UUID, Double> other = imports.similarityToEnglish("phy11-part1", orthogonal,
+                List.of(waiting.getFirst().paragraphId()));
+
+        assertThat(same).containsOnlyKeys(waiting.getFirst().paragraphId());
+        assertThat(same.get(waiting.getFirst().paragraphId())).isCloseTo(1.0, org.assertj.core.data.Offset.offset(1e-6));
+        assertThat(other.get(waiting.getFirst().paragraphId())).isCloseTo(0.0, org.assertj.core.data.Offset.offset(1e-6));
     }
 
     /** What keeps a trial draw out of the canonical corpus (D16): the book's embedded paragraphs, counted. */

@@ -1,5 +1,6 @@
 package com.margai.curriculum.internal;
 
+import com.margai.curriculum.api.AlignmentRow;
 import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.CurriculumImportException;
 import com.margai.curriculum.api.NcertLoadReport;
@@ -145,6 +146,21 @@ class NcertParagraphImporter {
         return new NcertLoadReport(inserted, updated, unchanged, perChapter,
                 orphans.stream().map(NcertParagraph::address).toList(), cleared, (int) embeddedOrphans,
                 stripped.stream().map(NcertParagraph::address).toList());
+    }
+
+    List<AlignmentRow> alignmentRows(String bookCode, Collection<Short> chapters) {
+        NcertBook book = book(bookCode);
+        return paragraphs.findByBookId(book.getId()).stream()
+                .filter(paragraph -> chapters.contains(paragraph.getChapterNo()))
+                .sorted(READING_ORDER)
+                .map(paragraph -> new AlignmentRow(paragraph.getId(), paragraph.getChapterNo(), paragraph.getSection(),
+                        paragraph.getParaNo(), paragraph.getTextEn(), paragraph.getTextHi(),
+                        pages(paragraph.getExtraction(BookLanguage.en)), pages(paragraph.getExtraction(BookLanguage.hi))))
+                .toList();
+    }
+
+    private static List<Integer> pages(com.margai.curriculum.api.ParagraphExtraction extraction) {
+        return extraction == null ? List.of() : extraction.pages();
     }
 
     List<NcertParagraphRow> paragraphs(String bookCode, BookLanguage language, Collection<Short> chapters) {

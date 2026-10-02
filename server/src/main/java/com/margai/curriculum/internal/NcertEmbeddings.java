@@ -8,6 +8,7 @@ import jakarta.persistence.Query;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
@@ -122,6 +123,28 @@ class NcertEmbeddings {
                         "UPDATE ncert_paragraphs SET embedding = NULL WHERE id IN (:ids) AND embedding IS NOT NULL")
                 .setParameter("ids", changed)
                 .executeUpdate();
+    }
+
+    /**
+     * One vector's cosine similarity to the stored vector of each of these rows of the book, in pgvector;
+     * a row with no vector is absent (D16, {@code ncert align}).
+     */
+    @SuppressWarnings("unchecked")
+    Map<UUID, Double> similarityTo(String bookCode, float[] vector, Collection<UUID> ids) {
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+        UUID bookId = book(bookCode);
+        List<Object[]> rows = entityManager.createNativeQuery("""
+                        SELECT id, 1 - (embedding <=> CAST(:vector AS vector)) FROM ncert_paragraphs
+                         WHERE book_id = :book AND id IN (:ids) AND embedding IS NOT NULL""")
+                .setParameter("vector", Vectors.literal(vector))
+                .setParameter("book", bookId)
+                .setParameter("ids", ids)
+                .getResultList();
+        Map<UUID, Double> similarities = new java.util.HashMap<>();
+        rows.forEach(row -> similarities.put((UUID) row[0], ((Number) row[1]).doubleValue()));
+        return similarities;
     }
 
     /** How many of the book's rows carry a vector; zero for a book this database does not register. */

@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -342,6 +343,22 @@ class PipelineCommandTest {
         @Override
         public long embeddedParagraphs(String bookCode) {
             return 0;
+        }
+
+        /** What {@link #alignmentRows} answers; and the similarity {@link #similarityToEnglish} gives every pair. */
+        List<com.margai.curriculum.api.AlignmentRow> alignmentAnswer = List.of();
+        java.util.function.BiFunction<float[], UUID, Double> similarity = (vector, id) -> 0.5;
+
+        @Override
+        public List<com.margai.curriculum.api.AlignmentRow> alignmentRows(String bookCode, Collection<Short> chapters) {
+            return alignmentAnswer;
+        }
+
+        @Override
+        public Map<UUID, Double> similarityToEnglish(String bookCode, float[] vector, Collection<UUID> paragraphIds) {
+            Map<UUID, Double> answer = new java.util.HashMap<>();
+            paragraphIds.forEach(id -> answer.put(id, similarity.apply(vector, id)));
+            return answer;
         }
 
         /** What {@link #paragraphsToEmbed} answers: the rows `ncert embed` still has to read. */

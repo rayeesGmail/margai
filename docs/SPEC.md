@@ -1069,7 +1069,8 @@ export package, referral gift; humane re-onboarding for another attempt) — mus
 before the first cohort's June results · a web review surface (notebook, reports, the
 parent's window) · a Hindi-first experience (Hindi NCERT
 extraction stays image-only by the founder's 2026-09-13 ruling; the Chanakya→Unicode
-converter remains parked — founder ruling 2026-10-01) · **“studying right now” presence**
+converter checks the Hindi transcription but never supplies its text — founder rulings
+2026-10-01, 2026-10-02) · **“studying right now” presence**
 (CS-4 §7: an ambient count on Today — “1,240 droppers are studying right now” — aggregate
 counts only, no chat, profiles or messaging, hidden when the number is too small to
 encourage).

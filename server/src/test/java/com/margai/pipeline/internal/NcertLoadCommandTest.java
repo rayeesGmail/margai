@@ -196,6 +196,77 @@ class NcertLoadCommandTest {
                 .contains("rulings on verifier flags that change no text: 1");
     }
 
+    /**
+     * The Hindi Physics Part I prints a footnote of §4.8 at the foot of p10 and Example 4.6 at the top of
+     * p11; the English has both on p10, the footnote last. Numbered in page order the Hindi footnote sat
+     * beside the English Example and the Example beside the footnote (D16). A deferred paragraph waits
+     * for the next one its section starts and takes the number after it — and stays on its own page.
+     */
+    @Test
+    void aDeferredFootnoteIsNumberedAfterTheNextParagraphOfItsSection() throws IOException {
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 10, kind: defer, at: "* Equilibrium of a body",
+                     reason: the other edition numbers the Example first}
+                """);
+        imports.renderedPagesAnswer = 11;
+        jsonl(page(7, 10, "0.95", p("7.8", "Equation (7.11) implies that F = 0."),
+                        p("7.8", "* Equilibrium of a body requires more.")),
+                page(7, 11, "0.95", p("7.8", "Example 7.6 A mass of 6 kg hangs."), p("7.8", "Answer The free-body diagram.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactly(
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.8 ¶1", "Equation (7.11) implies that F = 0."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.8 ¶2", "Example 7.6 A mass of 6 kg hangs."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.8 ¶3", "* Equilibrium of a body requires more."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.8 ¶4", "Answer The free-body diagram."));
+        assertThat(imports.rows.get(2).extraction().pages()).containsExactly(10);
+        assertThat(out.toString()).contains("- ch 7 page 10 §7.8: the paragraph starting \"* Equilibrium of a body\" "
+                + "takes its number after the next paragraph of its section (the other edition numbers the Example first)");
+    }
+
+    /** The body paragraph above a deferred footnote still takes the next page's continuation, and that is not a new paragraph for the footnote to follow. */
+    @Test
+    void aContinuationPassesOverADeferredFootnote() throws IOException {
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 11, kind: defer, at: "* We are not considering",
+                     reason: the other edition numbers the next paragraph first}
+                """);
+        imports.renderedPagesAnswer = 12;
+        jsonl(page(7, 11, "0.95", p("7.9", "The spring force is proportional to the stretch (for small"),
+                        p("7.9", "* We are not considering charged bodies.")),
+                page(7, 12, "0.95", continuing("7.9", "displacements)."), p("7.9", "There are four fundamental forces.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::text).containsExactly(
+                "The spring force is proportional to the stretch (for small displacements).",
+                "There are four fundamental forces.",
+                "* We are not considering charged bodies.");
+    }
+
+    /** With nothing after it in its section there is nothing to follow, and the entry is wrong about the page. */
+    @Test
+    void aDeferredParagraphWithNoLaterParagraphInItsSectionIsRefused() throws IOException {
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 10, kind: defer, at: "* Equilibrium of a body",
+                     reason: the other edition numbers the Example first}
+                """);
+        imports.renderedPagesAnswer = 11;
+        jsonl(page(7, 10, "0.95", p("7.8", "Equation (7.11) implies that F = 0."),
+                        p("7.8", "* Equilibrium of a body requires more.")),
+                page(7, 11, "0.95", p("7.9", "A new section begins.")));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("ch 7 page 10: the deferred paragraph starting \"* Equilibrium of a body requires more.\" "
+                + "has no later paragraph of §7.8 to follow");
+        assertThat(imports.rows).isNull();
+    }
+
     @Test
     void withoutACorrectionsFileTheLoadSaysSo() {
         jsonl(page(7, 1, "0.95", p("7.1", "Text.")));
@@ -343,6 +414,27 @@ class NcertLoadCommandTest {
                 "Mathematically, (for simplicity, in one dimension) the potential energy V(x) is defined "
                         + "if the force F(x) can be written as",
                 "* The variation of g with height is discussed in Chapter 7 on Gravitation.");
+    }
+
+    /**
+     * The print sets some footnote marks against their first word — the Hindi Physics Part I has
+     * "*Delta t->0 सीमा में…" (ch 3 p15) — and a rule that wanted a space after the asterisk took that
+     * footnote for body text: the next page's continuation joined it, and the paragraph it belonged to
+     * was left cut at "अर्थात्" (D16).
+     */
+    @Test
+    void aFootnoteWhoseMarkTouchesItsFirstWordIsStillAFootnote() {
+        imports.renderedPagesAnswer = 16;
+        jsonl(page(7, 15, "0.95",
+                        p("7.7", "समरूप त्रिभुजों की भुजाओं का अनुपात बराबर होगा, अर्थात्"),
+                        p("7.7", "*Delta t->0 सीमा में Delta r, r के लंबवत् हो जाता है ।")),
+                page(7, 16, "0.95", continuing("7.7", "|Delta v| / v = |Delta r| / R")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::text).containsExactly(
+                "समरूप त्रिभुजों की भुजाओं का अनुपात बराबर होगा, अर्थात् |Delta v| / v = |Delta r| / R",
+                "*Delta t->0 सीमा में Delta r, r के लंबवत् हो जाता है ।");
     }
 
     /**

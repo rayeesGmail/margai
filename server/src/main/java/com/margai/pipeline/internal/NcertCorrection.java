@@ -15,8 +15,8 @@ import com.margai.curriculum.api.BookLanguage;
  * @param transcribed the span as the extraction carries it ({@code text}), or as the verifier quoted
  *                    the transcription ({@code misprint}, {@code false_positive})
  * @param printed     the span as the page prints it, in the transcription's notation
- * @param at          the words a paragraph starts with ({@code join}, {@code drop}), where a new one must
- *                    start ({@code split}), or a span naming the paragraph ({@code figure_ref})
+ * @param at          the words a paragraph starts with ({@code join}, {@code drop}, {@code defer}), where a
+ *                    new one must start ({@code split}), or a span naming the paragraph ({@code figure_ref})
  * @param address     where the flag was raised, for a reader of the file; never used to apply it
  * @param removeRef   the figure or table label a {@code figure_ref} entry removes, or null
  * @param addRef      the label a {@code figure_ref} entry adds, or null
@@ -54,6 +54,13 @@ record NcertCorrection(
         figure_ref,
         /** The paragraph starting {@code at} is not running text — a caption, a margin note — and goes (DECISIONS 2026-09-15). */
         drop,
+        /**
+         * The paragraph starting {@code at} takes its number after the next paragraph its section starts
+         * (D16). A footnote is numbered where its page puts it, and the two editions break their pages in
+         * different places; this is what lets the Hindi footnote sit beside the English one. It moves no
+         * word and leaves the paragraph on the page it is printed on.
+         */
+        defer,
         /** The book prints an error and the transcription rightly keeps it: a flag, not a defect. */
         misprint,
         /** The verifier was wrong about this span: a flag, not a defect. */

@@ -32,6 +32,7 @@ final class NcertCorrectionsYamlReader {
             NcertCorrection.Kind.split, Set.of("at"),
             NcertCorrection.Kind.figure_ref, Set.of("at", "remove", "add"),
             NcertCorrection.Kind.drop, Set.of("at"),
+            NcertCorrection.Kind.defer, Set.of("at"),
             NcertCorrection.Kind.misprint, Set.of("transcribed", "printed"),
             NcertCorrection.Kind.false_positive, Set.of("transcribed", "printed"),
             NcertCorrection.Kind.noise, Set.of("at", "flag"));

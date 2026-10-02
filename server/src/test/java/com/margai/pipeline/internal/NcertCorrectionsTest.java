@@ -379,6 +379,89 @@ class NcertCorrectionsTest {
                 .hasMessageContaining("drop correction on ch 7 page 3: page 4 continues the paragraph starting \"Starts here\"");
     }
 
+    /**
+     * A footnote takes its number where its page puts it, after the last paragraph printed above it, and
+     * the two editions break their pages in different places: the Hindi Physics Part I prints a footnote
+     * of §4.8 at the foot of p10 and Example 4.6 on p11, where the English has both on p10 — so the Hindi
+     * footnote was numbered before the Example and each sat beside the other's English (D16). No join or
+     * split reorders two paragraphs; a {@code defer} entry names the one that waits.
+     */
+    @Test
+    void readsADeferEntry() throws IOException {
+        Path file = write("""
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 4, page: 10, kind: defer, at: "* किसी पिण्ड की साम्यावस्था",
+                     reason: "the English numbers Example 4.6 before this footnote"}
+                """);
+
+        List<NcertCorrection> corrections = NcertCorrectionsYamlReader.read(file);
+
+        assertThat(corrections.getFirst().kind()).isEqualTo(NcertCorrection.Kind.defer);
+        assertThat(corrections.getFirst().at()).isEqualTo("* किसी पिण्ड की साम्यावस्था");
+        assertThat(corrections.getFirst().kind().changesText()).isTrue();
+    }
+
+    @Test
+    void aDeferNamesItsParagraphAndChangesNoWord() {
+        List<ExtractedPage> pages = List.of(
+                page(10, p("7.8", "Equation (7.11) implies that F = 0."), p("7.8", "* Equilibrium of a body requires more.")),
+                page(11, p("7.8", "Example 7.6 A mass of 6 kg hangs.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                correction(10, NcertCorrection.Kind.defer, null, null, "* Equilibrium of a body")));
+
+        assertThat(applied.pages()).isEqualTo(pages);
+        assertThat(applied.deferred()).containsExactly(new NcertCorrections.Deferred((short) 7, 10, 1));
+        assertThat(applied.notes()).containsExactly("ch 7 page 10 §7.8: the paragraph starting \"* Equilibrium of a body\" "
+                + "takes its number after the next paragraph of its section (read against the page)");
+    }
+
+    /** The entry names words, not a position: a later split above the paragraph moves it down the page, and the mark with it. */
+    @Test
+    void aDeferFollowsItsParagraphWhenALaterEntryMovesIt() {
+        List<ExtractedPage> pages = List.of(
+                page(10, p("7.8", "Equation (7.11) implies that F = 0. Example 7.5 follows."),
+                        p("7.8", "* Equilibrium of a body requires more.")),
+                page(11, p("7.8", "Example 7.6 A mass of 6 kg hangs.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                correction(10, NcertCorrection.Kind.defer, null, null, "* Equilibrium of a body"),
+                correction(10, NcertCorrection.Kind.split, null, null, "Example 7.5 follows")));
+
+        assertThat(applied.deferred()).containsExactly(new NcertCorrections.Deferred((short) 7, 10, 2));
+    }
+
+    /** Half a paragraph cannot wait while its other half is numbered: that is a join or a split to write first. */
+    @Test
+    void aDeferOfAParagraphThatRunsAcrossAPageBreakIsRefused() {
+        List<ExtractedPage> continuing = List.of(page(3, p("7.3", "Ends mid")),
+                page(4, new NcertPage.Paragraph("7.3", "sentence here.", true, List.of()), p("7.3", "Another.")));
+        assertThatThrownBy(() -> NcertCorrections.apply(continuing, List.of(
+                correction(4, NcertCorrection.Kind.defer, null, null, "sentence here"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("defer correction on ch 7 page 4: \"sentence here\" continues the previous page's paragraph");
+
+        List<ExtractedPage> continued = List.of(page(3, p("7.3", "Starts here and runs")),
+                page(4, new NcertPage.Paragraph("7.3", "on to the next page.", true, List.of()), p("7.3", "Another.")));
+        assertThatThrownBy(() -> NcertCorrections.apply(continued, List.of(
+                correction(3, NcertCorrection.Kind.defer, null, null, "Starts here"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("defer correction on ch 7 page 3: page 4 continues the paragraph starting \"Starts here\"");
+    }
+
+    /** A footnote is never what the next page continues, so one at the foot of a page whose body runs on can wait. */
+    @Test
+    void aFootnoteBelowAParagraphThatRunsOnCanBeDeferred() {
+        List<ExtractedPage> pages = List.of(
+                page(3, p("7.3", "The body starts here and runs"), p("7.3", "* A footnote under it.")),
+                page(4, new NcertPage.Paragraph("7.3", "on to the next page.", true, List.of()), p("7.3", "Another.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                correction(3, NcertCorrection.Kind.defer, null, null, "* A footnote")));
+
+        assertThat(applied.deferred()).containsExactly(new NcertCorrections.Deferred((short) 7, 3, 1));
+    }
+
     /** Rulings on the verifier's flags change no text; verify reads them, the load only counts them. */
     @Test
     void misprintAndFalsePositiveRulingsChangeNothing() {

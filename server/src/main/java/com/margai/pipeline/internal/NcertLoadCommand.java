@@ -102,7 +102,7 @@ class NcertLoadCommand extends NcertBookCommand {
         // sign for a zero exponent, written as the convention has it (D15, 2026-09-17).
         DimensionalBrackets.Applied dimensioned = DimensionalBrackets.apply(pages);
         pages = dimensioned.pages();
-        Numbered numbered = number(pages, jsonlKey);
+        Numbered numbered = number(pages, jsonlKey, corrected.deferred());
         List<NcertParagraphRow> rows = numbered.rows();
         report.section("page-break repairs to the model's continuation flags (deterministic, each one named)")
                 .list(repaired.notes());
@@ -237,15 +237,38 @@ class NcertLoadCommand extends NcertBookCommand {
      * paragraph but never what the next page continues: the body above it is. Before this, four of
      * phy11-part1's nine footnotes had absorbed the following page's opening words — polluting the
      * footnote and truncating the body paragraph, two rows each (D15, 2026-09-17).
+     *
+     * <p>The mark may touch its first word: the Hindi Physics Part I prints "*Delta t->0 सीमा में…",
+     * and asking for a space after the asterisk let that footnote take a continuation (D16). Of the 61
+     * English rows that start with an asterisk one lacks the space, and it is a footnote too (chem12-part1
+     * §2.1, the last row of its section), so no English load changes.
      */
-    private static final Pattern FOOTNOTE = Pattern.compile("^\\*+\\s");
+    private static final Pattern FOOTNOTE = Pattern.compile("^\\*");
 
-    static Numbered number(List<ExtractedPage> pages, String jsonlKey) {
+    /** Whether a paragraph is a footnote: it starts with the mark. */
+    static boolean footnote(String text) {
+        return FOOTNOTE.matcher(text.stripLeading()).find();
+    }
+
+    /** A deferred paragraph until the next one of its section has taken its number. */
+    private record Waiting(ExtractedPage page, NcertPage.Paragraph paragraph) {
+    }
+
+    /**
+     * @param deferred the paragraphs a {@code defer} correction names (D16): each takes its number after
+     *                 the next paragraph its section starts, so a footnote the other edition prints a
+     *                 page earlier still sits beside its own English. It stays on its page, and like a
+     *                 footnote it is never what the next page continues.
+     */
+    static Numbered number(List<ExtractedPage> pages, String jsonlKey, Set<NcertCorrections.Deferred> deferred) {
         List<Joined> rows = new ArrayList<>();
         List<String> refusals = new ArrayList<>();
         Map<Short, TreeSet<Integer>> redo = new LinkedHashMap<>();
         // (chapter, section) → the last number given out; a resumed section continues its count.
         Map<String, Integer> counters = new HashMap<>();
+        // (chapter, section) → the deferred paragraph waiting for that section's next one.
+        Map<String, Waiting> waiting = new LinkedHashMap<>();
+        List<String> unplaced = new ArrayList<>();
         short chapter = -1;
         Joined last = null;
         for (ExtractedPage page : pages) {
@@ -275,15 +298,37 @@ class NcertLoadCommand extends NcertBookCommand {
                     last.add(page, paragraph);
                     continue;
                 }
-                int paraNo = counters.merge(chapter + " " + section, 1, Integer::sum);
+                String counter = chapter + " " + section;
+                if (deferred.contains(new NcertCorrections.Deferred(chapter, page.page(), index))) {
+                    Waiting earlier = waiting.put(counter, new Waiting(page, paragraph));
+                    if (earlier != null) {
+                        unplaced.add(stranded(chapter, section, earlier) + " before the next deferred one");
+                    }
+                    continue;
+                }
+                int paraNo = counters.merge(counter, 1, Integer::sum);
                 Joined joined = new Joined(chapter, section, paraNo, page, paragraph);
                 rows.add(joined);
                 // A footnote is never the paragraph the next page continues, so it never becomes the
                 // anchor: the body above it stays the one a continuation joins to.
-                if (!FOOTNOTE.matcher(paragraph.text().stripLeading()).find()) {
+                if (!footnote(paragraph.text())) {
                     last = joined;
                 }
+                Waiting held = waiting.remove(counter);
+                if (held != null) {
+                    rows.add(new Joined(chapter, section, counters.merge(counter, 1, Integer::sum), held.page(),
+                            held.paragraph()));
+                }
             }
+        }
+        for (Map.Entry<String, Waiting> left : waiting.entrySet()) {
+            String[] key = left.getKey().split(" ");
+            unplaced.add(stranded(Short.parseShort(key[0]), key[1], left.getValue()));
+        }
+        if (!unplaced.isEmpty()) {
+            throw new InputFormatException(Path.of(NcertCorrectionsYamlReader.FILE), 0, unplaced.size()
+                    + " defer correction(s) cannot be placed:\n  " + String.join("\n  ", unplaced)
+                    + "\nFix each entry against the page, or remove it.");
         }
         if (!refusals.isEmpty()) {
             throw new InputFormatException(Path.of(jsonlKey), 0, refusals.size()
@@ -312,6 +357,13 @@ class NcertLoadCommand extends NcertBookCommand {
                     row.hasEquations(), kept, row.extraction()));
         }
         return new Numbered(List.copyOf(result), List.copyOf(dropped));
+    }
+
+    private static String stranded(short chapter, String section, Waiting waiting) {
+        String text = waiting.paragraph().text().strip().replaceAll("\\s+", " ");
+        return "ch " + chapter + " page " + waiting.page().page() + ": the deferred paragraph starting \""
+                + (text.length() > 60 ? text.substring(0, 60) + "…" : text) + "\" has no later paragraph of §"
+                + section + " to follow";
     }
 
     /**

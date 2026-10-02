@@ -6,8 +6,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The founder's corrections applied to an extraction's pages (D15): after {@link PageBreakRepairs},
@@ -27,10 +29,14 @@ final class NcertCorrections {
     }
 
     /**
-     * The corrected pages, one line per change, and how many entries were rulings on verifier
-     * flags that change no text.
+     * The corrected pages, one line per change, how many entries were rulings on verifier flags that
+     * change no text, and the paragraphs a {@code defer} entry makes wait for their number.
      */
-    record Applied(List<ExtractedPage> pages, List<String> notes, int rulings) {
+    record Applied(List<ExtractedPage> pages, List<String> notes, int rulings, Set<Deferred> deferred) {
+    }
+
+    /** A paragraph that takes its number after the next one its section starts: its place on its page. */
+    record Deferred(short chapter, int page, int index) {
     }
 
     /** The entries this load carries: its book, its edition, its chapters. */
@@ -49,6 +55,7 @@ final class NcertCorrections {
             index.put(out.get(at).chapterNo() + "/" + out.get(at).page(), at);
         }
         List<String> notes = new ArrayList<>();
+        List<NcertCorrection> deferrals = new ArrayList<>();
         int rulings = 0;
         for (NcertCorrection written : corrections) {
             if (!written.kind().changesText()) {
@@ -76,13 +83,24 @@ final class NcertCorrections {
                 case split -> split(entry, paragraphs);
                 case figure_ref -> figureRef(entry, paragraphs);
                 case drop -> drop(entry, paragraphs, continuedOnNextPage(out, at));
+                case defer -> {
+                    deferrals.add(entry);
+                    yield defer(entry, paragraphs, continuedOnNextPage(out, at));
+                }
                 default -> throw new IllegalStateException("not a text-changing kind: " + entry.kind());
             };
             out.set(at, new ExtractedPage(page.chapterNo(), page.page(), page.confidence(), page.aiCallId(),
                     paragraphs, page.skipped()));
             notes.add(note);
         }
-        return new Applied(List.copyOf(out), List.copyOf(notes), rulings);
+        // Placed last: an entry names its paragraph by its words, and a later join or split on the page
+        // moves that paragraph up or down it.
+        Set<Deferred> deferred = new LinkedHashSet<>();
+        for (NcertCorrection entry : deferrals) {
+            ExtractedPage page = out.get(index.get(entry.chapter() + "/" + entry.page()));
+            deferred.add(new Deferred(page.chapterNo(), page.page(), onlyStart(entry, page.paragraphs())));
+        }
+        return new Applied(List.copyOf(out), List.copyOf(notes), rulings, Set.copyOf(deferred));
     }
 
     private static String replace(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs) {
@@ -190,6 +208,22 @@ final class NcertCorrections {
         paragraphs.remove(at);
         return entry.where() + " §" + paragraph.section().strip() + ": the paragraph starting \"" + entry.at()
                 + "\" dropped (" + entry.reason() + ")";
+    }
+
+    private static String defer(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs, boolean lastContinued) {
+        int at = onlyStart(entry, paragraphs);
+        NcertPage.Paragraph paragraph = paragraphs.get(at);
+        // Half a paragraph cannot wait while the other half is numbered; a footnote is never the half
+        // the next page continues.
+        if (paragraph.continuesPreviousPage()) {
+            throw refuse(entry, "\"" + entry.at() + "\" continues the previous page's paragraph — join or split it first");
+        }
+        if (at == paragraphs.size() - 1 && lastContinued && !NcertLoadCommand.footnote(paragraph.text())) {
+            throw refuse(entry, "page " + (entry.page() + 1) + " continues the paragraph starting \"" + entry.at()
+                    + "\" — join or split it first");
+        }
+        return entry.where() + " §" + paragraph.section().strip() + ": the paragraph starting \"" + entry.at()
+                + "\" takes its number after the next paragraph of its section (" + entry.reason() + ")";
     }
 
     /** The index of the one paragraph starting with the entry's words, refusing any other count. */

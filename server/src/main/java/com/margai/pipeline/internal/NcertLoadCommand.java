@@ -1,6 +1,7 @@
 package com.margai.pipeline.internal;
 
 import com.margai.ai.tasks.NcertPage;
+import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.NcertLoadReport;
 import com.margai.curriculum.api.NcertParagraphRow;
@@ -94,6 +95,12 @@ class NcertLoadCommand extends NcertBookCommand {
         // refuse a continuation that cannot be one (D14, the first full-book load; D15).
         PageBreakRepairs.Repaired repaired = PageBreakRepairs.apply(pages);
         pages = repaired.pages();
+        // A Hindi load then puts back the visargas the transcriber wrote as colons (D16) — before the
+        // corrections, so an entry is written against the words the rows will show.
+        VisargaColons.Applied visargas = language == BookLanguage.hi ? VisargaColons.apply(pages) : null;
+        if (visargas != null) {
+            pages = visargas.pages();
+        }
         // Then the founder's rulings on what `ncert verify` flagged (D15): the canonical run is
         // frozen, so a defect in it is corrected here, on the record, rather than re-drawn.
         NcertCorrections.Applied corrected = NcertCorrections.apply(pages, corrections(definition, chapters, report));
@@ -106,6 +113,13 @@ class NcertLoadCommand extends NcertBookCommand {
         List<NcertParagraphRow> rows = numbered.rows();
         report.section("page-break repairs to the model's continuation flags (deterministic, each one named)")
                 .list(repaired.notes());
+        if (visargas != null) {
+            report.section("a visarga the model wrote as a colon (deterministic, each one named)")
+                    .list(visargas.notes());
+            report.section("a word glued to a colon that the visarga list does not know — adjudicate")
+                    .line("left as written: a `text` entry if the page means a visarga, nothing if it is a colon")
+                    .list(visargas.undecided());
+        }
         report.section("corrections from " + NcertCorrectionsYamlReader.FILE + " (founder-adjudicated, each one named)")
                 .list(corrected.notes())
                 .line("rulings on verifier flags that change no text: " + corrected.rulings());

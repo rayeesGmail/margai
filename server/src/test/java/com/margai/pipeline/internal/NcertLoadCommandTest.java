@@ -267,6 +267,57 @@ class NcertLoadCommandTest {
         assertThat(imports.rows).isNull();
     }
 
+    /**
+     * A Hindi load puts back the visargas the transcriber wrote as colons before it applies a correction,
+     * so an entry is written against the words the rows will show — and it names every one, and every
+     * glued colon it could not place (D16).
+     */
+    @Test
+    void aHindiLoadPutsBackAVisargaWrittenAsAColonBeforeTheCorrections() throws IOException {
+        Files.writeString(inputs.resolve(NcertRegisterCommand.FILE), """
+                books:
+                  - code: phy11-part1
+                    subject: physics
+                    class_level: 11
+                    part: 1
+                    title_en: "Physics Part-I, Textbook for Class XI"
+                    edition_year: 2022
+                    source:
+                      en: source/ncert/2022-ed/en/phy11-part1/
+                      hi: source/ncert/2022-ed/hi/phy11-part1/
+                    chapters:
+                      - {no: 7, en: keph107.pdf, hi: khph107.pdf}
+                """);
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 4, kind: split, at: "क्रमशः x तथा y",
+                     reason: the English row begins here}
+                """);
+        store.put(ContentKeys.extract("phy11-part1", BookLanguage.hi), ExtractJsonl.write(List.of(page(7, 4, "0.95",
+                p("7.3", "अत: बल F = ma है: क्रमश: x तथा y अक्षों पर।"), p("7.3", "ज्ञात: m = 5 kg")))), "application/jsonl");
+
+        assertThat(commandLine.execute("ncert", "load", "--book", "phy11-part1", "--lang", "hi",
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::text)
+                .containsExactly("अतः बल F = ma है:", "क्रमशः x तथा y अक्षों पर।", "ज्ञात: m = 5 kg");
+        assertThat(out.toString())
+                .contains("## a visarga the model wrote as a colon (deterministic, each one named)")
+                .contains("- ch 7 p4 §7.3: a visarga written as a colon — अतः, क्रमशः")
+                .contains("## a word glued to a colon that the visarga list does not know — adjudicate")
+                .contains("- ch 7 p4 §7.3: ज्ञात:");
+    }
+
+    /** The step is the Hindi edition's: an English load neither runs it nor reports on it. */
+    @Test
+    void anEnglishLoadHasNoVisargaStep() {
+        jsonl(page(7, 4, "0.95", p("7.3", "Note: the force is F = ma.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(out.toString()).doesNotContain("visarga");
+    }
+
     @Test
     void withoutACorrectionsFileTheLoadSaysSo() {
         jsonl(page(7, 1, "0.95", p("7.1", "Text.")));

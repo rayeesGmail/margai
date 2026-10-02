@@ -1,4 +1,5 @@
-# ncert-corrections.yaml — the founder's rulings on what `ncert verify` flagged (D15).
+# ncert-corrections.yaml — the founder's rulings on what `ncert verify` flagged (D15), and since D16 the
+# `lang: hi` entries that join and split a Hindi book's paragraphs to its canonical English rows.
 #
 # `ncert load` applies every entry for the book, edition and chapters it loads, after its own
 # page-break repairs and before it numbers paragraphs, and names each one in its report. An entry
@@ -8,11 +9,18 @@
 # Every entry: book, lang, chapter, page (within the chapter's PDF), kind, reason; address optional,
 # for the reader only. Quote any value that contains a comma, a colon or a leading symbol.
 #
+# A `lang: hi` entry that changes the rows is written against them as the load shows them: the load puts
+# back the visargas the transcriber wrote as colons (अत: → अतः) before it applies an entry (D16). A
+# misprint or false_positive quotes the verifier's spans as its report gave them. A Hindi reason cites
+# the decoded text layer by position only and never quotes it (SPEC §12.2: a check, never stored).
+#
 #   kind: text            transcribed + printed — the span must occur exactly once on the page
 #   kind: join            at — the words a paragraph starts with; it is the rest of the one before
 #   kind: split           at — a span occurring once on the page; a new paragraph starts there
 #   kind: figure_ref      at — a span once on the page naming the paragraph; remove OR add — one label
 #   kind: drop            at — the words a paragraph starts with; it is not running text and goes
+#   kind: defer           at — the words a paragraph starts with; it takes its number after the next
+#                         paragraph of its section (a footnote the other edition prints a page later)
 #   kind: misprint        transcribed + printed as the verifier quoted them — the book's own error, kept
 #   kind: false_positive  transcribed + printed as the verifier quoted them — the verifier was wrong
 #   kind: noise           flag (join or figure) + at — one of the free checks was wrong about the paragraph
@@ -2522,3 +2530,606 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      transcribed: "S_E (S = substitution; E = electrophilic)", printed: "S_E", reason: "the page prints \"SE (S = substitution; E = electrophilic) reactions are…\" (layer p29 y548); the row carries the gloss"}
   - {book: chem11-part2, lang: en, chapter: 9, page: 29, kind: false_positive, address: "ch 9 §9.5.5 ¶11",
      transcribed: "are supposed to proceed via the following three steps:", printed: "supposed to proceed via the following three steps:", reason: "the page prints \"…are supposed to proceed via the following three steps:\"; the verifier's span starts one word later"}
+  # phy11-part1 Hindi (D16, 2026-10-02) — the first Hindi book, transcribed by Claude Opus 5.5 at low and
+  # adjudicated against the canonical English rows (DECISIONS 2026-10-01: English is canonical). 290 entries:
+  # 156 split and 74 join that reshape 827 Hindi rows into the 909 English ones, section by section; 2 defer
+  # (a footnote the Hindi prints a page early); 34 text (a misreading, a dropped bullet, × or side heading, a
+  # colon written as a visarga, and the transcriber's repairs of the book's own spelling undone); and the
+  # second read's 25 flags ruled (17 false_positive, 7 misprint, 1 of the text entries). A span that changes
+  # the rows is written as the load shows them, after the visarga step; a ruling on a flag quotes the
+  # verifier as it read the rows before the reload. Every printed span was read on a crop of the page image;
+  # the decoded layer is cited as a witness by position only and none of its text is kept here (SPEC §12.2).
+  # The exception is a × the raster does not draw, where it leaves a gap and only the layer's Unicode span
+  # carries the sign: two text entries write it into a row (ch 7 p4, p9) and two false_positive rulings
+  # keep one a row already carries (ch 2 p3, ch 6 p27). The founder allowed all four (2026-10-03, DECISIONS).
+  # Simulated against the loaded rows in the scratchpad before the reload: no refusal, every section one to
+  # one. Within a chapter: the alignment first, in page order, then the character entries.
+  # Approved by the founder 2026-10-03, as written — the twelve "as printed" spellings put back over the
+  # transcriber's repairs included.
+  # phy11-part1 Hindi, chapter 1
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 3, kind: split, address: "ch 1 §1.2 ¶6",
+     at: "ध्यान दीजिए, मोल का उपयोग करते समय", reason: "English ¶6 begins here; the row ran from p2 across the footnote onto p3"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 4, kind: split, address: "ch 1 §1.3 ¶4",
+     at: "इन सभी संख्याओं में सार्थक अंकों की संख्या वही", reason: "English ¶4 begins here; the Hindi print runs English ¶4 to ¶6 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 4, kind: split, address: "ch 1 §1.3 ¶5",
+     at: "यह दर्शाता है कि सार्थक अंकों की संख्या निर्धारित करने में", reason: "English ¶5 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 4, kind: split, address: "ch 1 §1.3 ¶6",
+     at: "उपरोक्त उदाहरण से निम्नलिखित नियम", reason: "English ¶6 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 4, kind: split, address: "ch 1 §1.3 ¶7",
+     at: "• सभी शून्येतर अंक सार्थक", reason: "English ¶7, the first rule of the list, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 4, kind: split, address: "ch 1 §1.3 ¶8",
+     at: "• यदि किसी संख्या में दशमलव बिन्दु है, तो", reason: "English ¶8, the second rule of the list, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 4, kind: split, address: "ch 1 §1.3 ¶11",
+     at: "(अतः 123 m = 12300 cm", reason: "English ¶11, the bracketed remark, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 4, kind: split, address: "ch 1 §1.3 ¶18",
+     at: "• एक से बड़ी, बिना दशमलव वाली", reason: "English ¶18, the first rule under (4), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 4, kind: split, address: "ch 1 §1.3 ¶19",
+     at: "• दशमलव वाली संख्या के लिए अनुगामी", reason: "English ¶19, the second rule under (4), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 6, kind: split, address: "ch 1 §1.3.3 ¶6",
+     at: "उदाहरणार्थ, 12.9 g", reason: "English ¶6 begins here; the Hindi print keeps it in ¶5's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 6, kind: join, address: "ch 1 §1.3.3 ¶8",
+     at: "1.02 में आपेक्षिक त्रुटि = (± 0.01/1.02)", reason: "the displayed relative errors belong to English ¶8, which the row before it begins"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 7, kind: split, address: "ch 1 §1.3.3 ¶9",
+     at: "अंत में, याद रखिए कि बहुपदीय", reason: "English ¶9 begins here, at the top of p7; it does not continue p6's displays"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 7, kind: split, address: "ch 1 §1.4 ¶4",
+     at: "बल की विमाएँ [M] [L]/[T]^2", reason: "English ¶4 begins here, after the displayed definition of force"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 8, kind: split, address: "ch 1 §1.6.1 ¶4",
+     at: "प्रत्येक पद के लिए विमीय समीकरण लिखने पर", reason: "English ¶4 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 8, kind: split, address: "ch 1 §1.6.1 ¶8",
+     at: "दक्षिण पक्ष की विमाएँ [M][L T^-2] [L]", reason: "English ¶8 (the RHS) begins here; the Hindi print sets Example 1.3's answer as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 8, kind: split, address: "ch 1 §1.6.1 ¶9",
+     at: "चूँकि, दोनों पक्षों की विमाएँ समान हैं", reason: "English ¶9 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 9, kind: split, address: "ch 1 §1.6.2 ¶4",
+     at: "जहाँ, k एक विमाहीन स्थिरांक है", reason: "English ¶4 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 9, kind: split, address: "ch 1 §1.6.2 ¶5",
+     at: "दोनों ओर की राशियों के विमीय सूत्र लिखने पर", reason: "English ¶5 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 9, kind: split, address: "ch 1 §1.6.2 ¶6",
+     at: "दोनों ओर की विमाएँ समीकृत करने पर", reason: "English ¶6 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 9, kind: split, address: "ch 1 §1.6.2 ¶8",
+     at: "वास्तव में, k = 2pi, अतः", reason: "English ¶8 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 3, kind: false_positive, address: "ch 1 §1.3 ¶3",
+     transcribed: "23080 mu m", printed: "23080 μm", reason: "the page prints 23080 μm (crop p3 y695-725); the row's 'mu m' is the transcriber's spelling of μ"}
+  # phy11-part1 Hindi, chapter 2
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 2, kind: split, address: "ch 2 §2.2 ¶4",
+     at: "अब हम Delta t का मान 2 s से घटाकर 1 s कर देते हैं", reason: "English ¶4 begins here; the Hindi print keeps it in ¶3's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 4, kind: join, address: "ch 2 §2.3 ¶6",
+     at: "यदि क्षण t=0 पर वस्तु का वेग v_0", reason: "the sentence leading to Eq. (2.4) is the end of English ¶6, which the row before it begins"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 5, kind: join, address: "ch 2 §2.4 ¶1",
+     at: "इस समीकरण को चित्र 2.5 में ग्राफ के रूप में", reason: "English ¶1 runs on past Eq. (2.4) to the figure sentence; the Hindi row was cut at the display"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 5, kind: join, address: "ch 2 §2.4 ¶1",
+     at: "इस वक्र के अंतर्गत आने वाला क्षेत्रफल :", reason: "the area under the curve is the end of English ¶1"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 5, kind: join, address: "ch 2 §2.4 ¶2",
+     at: "समीकरण (2.5) को हम निम्न प्रकार भी लिख सकते हैं", reason: "Eqs. (2.7a) and (2.7b) are the end of English ¶2, which the row before it begins"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 5, kind: join, address: "ch 2 §2.4 ¶3",
+     at: "समीकरण (2.4) से t = (v–v_0)/a", reason: "the substitution leading to Eq. (2.8) is the end of English ¶3, which the row before it begins"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 6, kind: join, address: "ch 2 §2.4 ¶4",
+     at: "ये सभी एकसमान त्वरित सरल रेखीय गति के", reason: "the sentence after Eq. (2.9a) is the end of English ¶4; the Hindi row was cut at the display"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 6, kind: join, address: "ch 2 §2.4 ¶7",
+     at: "पुनः v = dx/dt dx = v dt", reason: "the second integration is the end of English ¶7, the first half of Example 2.2's answer"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 6, kind: join, address: "ch 2 §2.4 ¶11",
+     at: "अब, v_o = + 20 m s^-1", reason: "the given values and the working are the rest of English ¶11, Example 2.3's answer (a)"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 7, kind: join, address: "ch 2 §2.4 ¶14",
+     at: "हमें y_0 = 45 m दिया है", reason: "the given values and the substituted equation are the end of English ¶14; the Hindi row was cut at the display"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 7, kind: split, address: "ch 2 §2.4 ¶15",
+     at: "अतः t_2 = 3 s", reason: "English ¶15, the result t_2 = 3 s, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 7, kind: join, address: "ch 2 §2.4 ¶22",
+     at: "वस्तु को y = 0 स्थिति में विरामावस्था से गिराते हैं", reason: "the release from rest and the three equations are the end of English ¶22; the Hindi row was cut at the display"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 8, kind: split, address: "ch 2 §2.4 ¶23",
+     at: "ये समीकरण वस्तु के वेग, और उसके द्वारा चली गई दूरी", reason: "English ¶23 begins here, after the three displayed equations"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 8, kind: split, address: "ch 2 §2.4 ¶26",
+     at: "इस समीकरण की सहायता से हम भिन्न-भिन्न समय अंतरालों", reason: "English ¶26 begins here, after the displayed equation that ends ¶25"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 8, kind: join, address: "ch 2 §2.4 ¶26",
+     at: "इस नियम को सर्वप्रथम गैलीलियो गैलिली", reason: "the sentence on Galileo is the end of English ¶26; the Hindi print sets it as its own paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 9, kind: split, address: "ch 2 §2.4 ¶32",
+     at: "आप स्वयं का प्रतिक्रिया काल एक साधारण प्रयोग द्वारा", reason: "English ¶32 begins here; the Hindi print runs Example 2.7's statement as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 2, kind: text, address: "ch 2 §2.2 ¶2",
+     transcribed: "अनन्त: सूक्ष्म", printed: "अनन्तः सूक्ष्म", reason: "the page means the adverb (infinitesimally small) — a visarga, which the transcriber wrote as a colon (crop p2 x40-300 y205-235); the visarga step does not list this word and left it for a ruling"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 2, kind: misprint, address: "ch 2 §2.2 ¶3",
+     transcribed: "t_2(= t - Delta t/2)", printed: "t_2(= t + Delta t/2)", reason: "the page prints t_2(=t–Δt/2), the same sign as t_1 beside it, where + is meant (crop p2 y480-525; layer y507); the book's own slip, the row carries the print"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 3, kind: false_positive, address: "ch 2 §2.2 ¶7",
+     transcribed: "6.0 × 2.5 = 15 m s^-1", printed: "6.0 × 2.5", reason: "the page prints '= 6.0 2.5 = 15 m s^-1' as one line, with a gap after 6.0: the raster does not draw the × the layer's Unicode span carries there (layer y122; crop p3 y80-140); the row has the whole line and the verifier quoted the first half of it"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 5, kind: text, address: "ch 2 §2.4 ¶1",
+     transcribed: "प्रारंभिक वेग (v_0)", printed: "प्रारंभिक वेग (v_o)", reason: "the page prints a subscript letter o here, '(v_o)', the same glyph as the two v_o the row already carries in the next lines; the right column's v_0 are narrow zeros (crop p5 y610-645 at zoom 7 against y340-365; layer y616, y349). The flag quoted 'v_0)', which occurs six times on the page, so the span is widened"}
+  # phy11-part1 Hindi, chapter 3
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 3, kind: split, address: "ch 3 §3.3 ¶2",
+     at: "उदाहरणस्वरूप, यदि A को 2 से गुणा किया जाए", reason: "English ¶2 begins here; the Hindi print runs English ¶1 to ¶3 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 3, kind: split, address: "ch 3 §3.3 ¶3",
+     at: "सदिश A को यदि एक ऋणात्मक संख्या", reason: "English ¶3 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 4, kind: split, address: "ch 3 §3.4 ¶2",
+     at: "सदिशों का योग साहचर्य नियम का भी पालन", reason: "English ¶2 begins here, after Eq. (3.1); the Hindi row runs English ¶1 to ¶4 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 4, kind: split, address: "ch 3 §3.4 ¶3",
+     at: "दो समान और विपरीत सदिशों को जोड़ने पर", reason: "English ¶3 begins here, after Eq. (3.2)"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 4, kind: split, address: "ch 3 §3.4 ¶4",
+     at: "दरअसल जब हम एक सदिश A को संख्या शून्य", reason: "English ¶4 begins here: the null vector from multiplying by zero, then its properties (3.4)"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 4, kind: split, address: "ch 3 §3.4 ¶7",
+     at: "इसे चित्र 3.5 में दर्शाया गया है", reason: "English ¶7 begins here, after Eq. (3.5); the Hindi print keeps it in ¶6's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 6, kind: join, address: "ch 3 §3.5 ¶2",
+     at: "एकांक सदिश : एकांक सदिश वह सदिश होता है", reason: "English ¶2 runs on through the definition of a unit vector; the Hindi print starts a new paragraph at it"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 6, kind: split, address: "ch 3 §3.5 ¶3",
+     at: "क्योंकि ये सभी एकांक सदिश हैं, इसलिए", reason: "English ¶3, the sentence carrying Eq. (3.9), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 6, kind: join, address: "ch 3 §3.5 ¶4",
+     at: "यदि किसी एकांक सदिश n_hat को एक अदिश", reason: "English ¶4 runs on through Eq. (3.10); the Hindi print breaks it in two"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 6, kind: split, address: "ch 3 §3.5 ¶6",
+     at: "इसे चित्र (3.9c) में दर्शाया गया है", reason: "English ¶6 begins here, after Eq. (3.12); the Hindi print keeps it in ¶5's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 6, kind: join, address: "ch 3 §3.5 ¶6",
+     at: "त्रिकोणमिति का उपयोग करके A_x व A_y को", reason: "English ¶6 runs on through Eq. (3.13) and the sentence after it; the Hindi print starts a new paragraph at the trigonometry sentence"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 6, kind: split, address: "ch 3 §3.5 ¶8",
+     at: "(i) उसके परिमाण A तथा उसके द्वारा", reason: "English ¶8, list item (i), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 6, kind: split, address: "ch 3 §3.5 ¶9",
+     at: "(ii) उसके घटकों A_x तथा A_y द्वारा", reason: "English ¶9, list item (ii), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 7, kind: join, address: "ch 3 §3.5 ¶12",
+     at: "सदिश A का परिमाण A = sqrt(A_x^2", reason: "Eq. (3.16c) belongs to English ¶12, which the row before it begins with Eq. (3.16b)"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 7, kind: join, address: "ch 3 §3.5 ¶12",
+     at: "एक स्थिति सदिश r को निम्नलिखित प्रकार से", reason: "the position vector and Eq. (3.17) close English ¶12"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 7, kind: split, address: "ch 3 §3.6 ¶2",
+     at: "क्योंकि सदिश क्रमविनिमेय तथा साहचर्य नियमों", reason: "English ¶2 begins here, after the sum R = A + B; the Hindi print runs English ¶1 to ¶3 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 7, kind: split, address: "ch 3 §3.6 ¶3",
+     at: "इस प्रकार परिणामी सदिश R का प्रत्येक घटक", reason: "English ¶3 begins here, after Eq. (3.21)"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 7, kind: split, address: "ch 3 §3.6 ¶5",
+     at: "इस विधि को अनेक सदिशों को जोड़ने व घटाने", reason: "English ¶5 begins here, after Eq. (3.22); the Hindi print keeps it in ¶4's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 8, kind: join, address: "ch 3 §3.6 ¶8",
+     at: "समीकरण (3.24a) से परिणामी R का परिमाण", reason: "the closing sentences of the Answer to Example 3.2 belong to English ¶8"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 8, kind: split, address: "ch 3 §3.6 ¶11",
+     at: "कोज्या-नियम का उपयोग करके हम R का परिमाण", reason: "English ¶11 begins here; the Hindi print keeps the magnitude step in ¶10's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 8, kind: join, address: "ch 3 §3.6 ¶11",
+     at: "R की दिशा ज्ञात करने के लिए हम", reason: "the direction step by the Law of sines belongs to English ¶11"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 9, kind: split, address: "ch 3 §3.7.1 ¶5",
+     at: "क्योंकि v_bar = Delta r / Delta t, इसलिए चित्र (3.12)", reason: "English ¶5 begins here; the Hindi print keeps this sentence in ¶4's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 9, kind: join, address: "ch 3 §3.7.1 ¶5",
+     at: "गतिमान वस्तु का वेग (तात्क्षणिक वेग)", reason: "the instantaneous velocity and Eq. (3.28) belong to English ¶5"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 9, kind: split, address: "ch 3 §3.7.1 ¶6",
+     at: "चित्रों 3.13(a) से लेकर 3.13(d) की सहायता", reason: "English ¶6 begins here, after Eq. (3.28)"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 10, kind: join, address: "ch 3 §3.7.1 ¶9",
+     at: "चित्र 3.14 में बिन्दु P पर किसी वेग सदिश", reason: "the Fig. 3.14 sentence closes English ¶9; the Hindi print sets it as its own paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 11, kind: split, address: "ch 3 §3.7.1 ¶16",
+     at: "जहां t सेकंड में व्यक्त किया गया है", reason: "English ¶16 begins here; English ¶15 is the Example 3.4 statement up to the position vector"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 11, kind: join, address: "ch 3 §3.8 ¶1",
+     at: "तब परिभाषा के अनुसार a = (v - v_0)/(t - 0)", reason: "Eqs. (3.33a) and (3.33b) belong to English ¶1; the Hindi print breaks it in two"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 12, kind: join, address: "ch 3 §3.8 ¶2",
+     at: "यह बात आसानी से सत्यापित की जा सकती है", reason: "English ¶2 runs on through Eq. (3.34b); the Hindi print starts a new paragraph after Eq. (3.34a)"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 12, kind: join, address: "ch 3 §3.9 ¶1",
+     at: "सर्वप्रथम गैलीलियो ने अपने लेख", reason: "the Galileo sentence closes English ¶1; the Hindi print sets it as its own paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 13, kind: split, address: "ch 3 §3.9 ¶5",
+     at: "यदि चित्र 3.16 के अनुसार वस्तु की प्रारंभिक स्थिति", reason: "English ¶5 begins here, after Eq. (3.36); the Hindi print keeps it in ¶4's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 13, kind: join, address: "ch 3 §3.9 ¶5",
+     at: "समीकरण (3.33b) का उपयोग करके किसी समय", reason: "English ¶5 runs on through Eq. (3.38) to the maximum-height remark; the Hindi print breaks it after Eq. (3.37)"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 13, kind: split, address: "ch 3 §3.9 ¶7",
+     at: "क्योंकि g, theta_0 तथा v_0 अचर हैं", reason: "English ¶7 begins here; the Hindi-only sentence before it, on Eq. (3.39) being the path's equation, stays with ¶6"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 14, kind: join, address: "ch 3 §3.9 ¶13",
+     at: "अब कोणों (45° + alpha) तथा (45° − alpha)", reason: "the Answer to Example 3.6 is one English row; the Hindi print breaks it after the range formula"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 15, kind: split, address: "ch 3 §3.9 ¶19",
+     at: "(c) फेंकने वाले बिंदु से उस बिंदु की दूरी जहाँ गेंद", reason: "English ¶19, part (c) of the Answer to Example 3.8, begins here at the top of p15; it does not continue part (b) on p14"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 15, kind: split, address: "ch 3 §3.10 ¶4",
+     at: "मान लीजिए r व r' के बीच का कोण", reason: "English ¶4 begins here; English ¶3 is the definition of |a| alone"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 16, kind: join, address: "ch 3 §3.10 ¶4",
+     at: "इस प्रकार किसी R त्रिज्या वाले वृत्तीय पथ", reason: "English ¶4 runs on after Eq. (3.43) to the end of the centripetal-acceleration discussion; the Hindi print starts a new paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 16, kind: split, address: "ch 3 §3.10 ¶8",
+     at: "अभिकेंद्र त्वरण को हम कोणीय चाल के रूप में", reason: "English ¶8 begins here, after Eq. (3.45); the Hindi print runs English ¶7 to ¶9 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 16, kind: split, address: "ch 3 §3.10 ¶9",
+     at: "वृत्त का एक चक्कर लगाने में वस्तु को", reason: "English ¶9 begins here, after Eq. (3.46)"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 16, kind: split, address: "ch 3 §3.10 ¶12",
+     at: "वृत्त के हर बिंदु पर वेग v की दिशा", reason: "English ¶12 begins here; the Hindi print keeps the whole Answer to Example 3.9 in one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 9, kind: join, address: "ch 3 §3.7.1 ¶4",
+     at: "वस्तु के विस्थापन और संगत समय अंतराल के अनुपात", reason: "the side heading वेग leads the paragraph printed under it (DECISIONS 2026-09-27); it loaded as a row of its own"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 14, kind: join, address: "ch 3 §3.9 ¶9",
+     at: "समीकरण (3.37) में t = t_m रखकर", reason: "the side heading प्रक्षेप्य की अधिकतम ऊँचाई leads the paragraph printed under it (DECISIONS 2026-09-27); it loaded as a row of its own"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 14, kind: join, address: "ch 3 §3.9 ¶10",
+     at: "प्रारंभिक स्थिति (x = y = 0) से चलकर", reason: "the side heading प्रक्षेप्य का क्षैतिज परास leads the paragraph printed under it (DECISIONS 2026-09-27); it loaded as a row of its own"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 10, kind: text, address: "ch 3 §3.7.1 ¶10",
+     transcribed: "x-y समतल में गतिमान वस्तु का औसत त्वरण", printed: "त्वरण x-y समतल में गतिमान वस्तु का औसत त्वरण", reason: "the page prints the side heading त्वरण above this paragraph (crop p10 x290-560 y262-318; the layer's line agrees) and the transcription left it out; a side heading leads its paragraph and is never dropped (DECISIONS 2026-09-27)"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 12, kind: false_positive, address: "ch 3 §3.8 ¶3",
+     transcribed: "v_0 + a t) + v_0) / 2) t = v_0 + (1/2) a t^2 अतएव, r = r_0 + v_0 t", printed: "v_0 + a t) + v_0) / 2) t = v_0", reason: "the page prints '= v_0 + (1/2) a t^2' (no t after v_0, the book's own slip, kept) and then 'अतएव, r = r_0 + v_0 t + (1/2) a t^2 (3.34a)' (crop p12 y75-215; layer y146-204); the row carries both lines, the verifier quoted a prefix of the span"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 15, kind: false_positive, address: "ch 3 §3.10 ¶2",
+     transcribed: "औसत त्वरण Delta v (a_bar = Delta v / Delta t)", printed: "a_bar (a_bar = Delta v / Delta t)", reason: "the page prints 'औसत त्वरण Δv (ā = Δv/Δt) के अनुदिश है' across the column break (crops p15 y420-460 left and y75-125 right; layer y445 and y92); the row matches, the verifier's printed span is not what the page carries"}
+  # phy11-part1 Hindi, chapter 4
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 2, kind: split, address: "ch 4 §4.3 ¶4",
+     at: "व्यवहार में गेंद क्षैतिज समतल पर", reason: "English ¶4 begins here; the Hindi print keeps it in ¶3's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 3, kind: split, address: "ch 4 §4.4 ¶3",
+     at: "अब विरामावस्था अथवा एकसमान रैखिक गति दोनों ही में", reason: "English ¶3 begins here; the Hindi print runs English ¶2 to ¶4 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 3, kind: split, address: "ch 4 §4.4 ¶4",
+     at: "व्यवहार में इस नियम के अनुप्रयोग से", reason: "English ¶4 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 5, kind: split, address: "ch 4 §4.5 ¶3",
+     at: "स्पष्ट रूप से संवेग एक सदिश राशि है", reason: "English ¶3 begins here, after the display (4.1) that closes ¶2"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 6, kind: split, address: "ch 4 §4.5 ¶15",
+     at: "1. गति के द्वितीय नियम में F = 0", reason: "English ¶15, point 1 of the list, begins here; the row before it is the lead-in sentence, English ¶14"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 7, kind: split, address: "ch 4 §4.5 ¶21",
+     at: "गति के द्वितीय नियम के द्वारा, मंदन बल", reason: "English ¶21 begins here; the Hindi keeps the whole Answer of Example 4.2 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 7, kind: split, address: "ch 4 §4.5 ¶22",
+     at: "इस प्रकरण में, वास्तविक अवरोधी बल", reason: "English ¶22 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 7, kind: split, address: "ch 4 §4.5 ¶25",
+     at: "अतः दिए गए समीकरण से गुरुत्वीय त्वरण", reason: "English ¶25 begins here; the Hindi keeps it in the Answer of Example 4.3"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 7, kind: join, address: "ch 4 §4.5 ¶26",
+     at: "कभी-कभी हमारा सामना ऐसे दृष्टांतों से", reason: "English ¶26 carries the run-in head Impulse and its paragraph as one row; the Hindi head was loaded as a row of its own"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 8, kind: split, address: "ch 4 §4.6 ¶3",
+     at: "प्रत्येक क्रिया की सदैव समान एवं विपरीत दिशा में", reason: "English ¶3, the statement of the third law, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 8, kind: split, address: "ch 4 §4.6 ¶6",
+     at: "बल सदैव युगलों में पाए जाते हैं", reason: "English ¶6, the restated third law, begins here; the Hindi keeps it in point 1's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 9, kind: join, address: "ch 4 §4.6 ¶8",
+     at: "(A पर B द्वारा बल) = – (B पर A द्वारा बल)", reason: "the line under (4.8) and the two sentences after it belong to English ¶8, point 3, which the last row of p8 begins"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 9, kind: split, address: "ch 4 §4.6 ¶9",
+     at: "फिर भी, यदि आप दो पिण्डों के किसी निकाय", reason: "English ¶9 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 9, kind: join, address: "ch 4 §4.6 ¶12",
+     at: "प्रकरण (a) (p_x)_आरंभिक = mu", reason: "English ¶12 is one row from the method through Case (a) and Case (b); the Hindi has Case (a) as a row of its own"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 9, kind: join, address: "ch 4 §4.6 ¶12",
+     at: "प्रकरण (b) (p_x)_आरंभिक = m u cos 30°", reason: "Case (b) is the rest of English ¶12"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 10, kind: split, address: "ch 4 §4.8 ¶2",
+     at: "यदि किसी कण पर दो बल F_1 तथा F_2 कार्यरत हैं", reason: "English ¶2 begins here; the Hindi print keeps it in ¶1's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 11, kind: split, address: "ch 4 §4.8 ¶8",
+     at: "सर्वप्रथम भार W की साम्यावस्था पर विचार कीजिए", reason: "English ¶8 begins here; the Hindi keeps the whole Answer of Example 4.6 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 11, kind: split, address: "ch 4 §4.8 ¶9",
+     at: "अब तीन बलों - तनाव T_1 तथा T_2", reason: "English ¶9 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 11, kind: split, address: "ch 4 §4.8 ¶10",
+     at: "ध्यान दीजिए, उत्तर न तो डोरी", reason: "English ¶10 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 12, kind: join, address: "ch 4 §4.9.1 ¶2",
+     at: "यदि आरोपित बल F का मान (f_s)_अधिकतम से", reason: "English ¶2 runs on from (4.14) through (4.15) to the end of the passage; the Hindi print starts a new paragraph after (4.14)"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 13, kind: split, address: "ch 4 §4.9.1 ¶9",
+     at: "अतः tan theta_(अधिकतम) = mu_s अथवा", reason: "English ¶9 begins here; the Hindi keeps the whole Answer of Example 4.8 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 13, kind: split, address: "ch 4 §4.9.1 ¶10",
+     at: "theta_(अधिकतम) = 15° के लिए", reason: "English ¶10, the numerical result, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 15, kind: split, address: "ch 4 §4.10 ¶2",
+     at: "जहाँ m पिण्ड की संहति है", reason: "English ¶2 begins here, after the display (4.16) that closes ¶1"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 15, kind: split, address: "ch 4 §4.10 ¶5",
+     at: "(i) कार का भार, mg", reason: "English ¶5, the first force of the list, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 15, kind: split, address: "ch 4 §4.10 ¶6",
+     at: "(ii) अभिलम्ब प्रतिक्रिया, N", reason: "English ¶6, the second force of the list, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 15, kind: split, address: "ch 4 §4.10 ¶7",
+     at: "(iii) घर्षण बल, f", reason: "English ¶7, the third force of the list, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 15, kind: split, address: "ch 4 §4.10 ¶8",
+     at: "क्योंकि यहाँ ऊर्ध्वाधर दिशा में कोई त्वरण नहीं है, अतः", reason: "English ¶8 begins here, after the list"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 16, kind: split, address: "ch 4 §4.10 ¶10",
+     at: "यह संबंध कार की संहति पर निर्भर नहीं करता", reason: "English ¶10 begins here, after the displayed inequalities that close ¶9"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 16, kind: split, address: "ch 4 §4.10 ¶12",
+     at: "N तथा f के घटकों द्वारा अभिकेंद्र बल", reason: "English ¶12 begins here, after (4.19a); the Hindi print runs English ¶11 to ¶15 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 16, kind: split, address: "ch 4 §4.10 ¶13",
+     at: "यहाँ, पहले कि भाँति, f ≤ mu_s N", reason: "English ¶13 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 16, kind: split, address: "ch 4 §4.10 ¶14",
+     at: "v_अधिकतम के लिए हम f = mu_s N लेते हैं", reason: "English ¶14 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 16, kind: split, address: "ch 4 §4.10 ¶15",
+     at: "समीकरण (4.19a) तथा (4.19b) को लिखा जा सकता है", reason: "English ¶15 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 16, kind: join, address: "ch 4 §4.10 ¶15",
+     at: "समीकरण (4.18) से तुलना करने पर", reason: "the comparison with (4.18) is the last sentence of English ¶15; the Hindi print starts a new paragraph with it"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 16, kind: split, address: "ch 4 §4.10 ¶16",
+     at: "समीकरण (4.21) में mu_s = 0 के लिए", reason: "English ¶16 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 16, kind: join, address: "ch 4 §4.10 ¶18",
+     at: "अब, यहाँ इस प्रश्न में R = 3 m", reason: "English ¶18 is the whole Answer of Example 4.10; the Hindi print breaks it after the displayed condition"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 17, kind: join, address: "ch 4 §4.10 ¶20",
+     at: "समीकरण (4.21) द्वारा रेसकार की अधिकतम", reason: "English ¶20 is the whole Answer of Example 4.11; the Hindi print breaks it before the maximum speed"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 17, kind: split, address: "ch 4 §4.11 ¶2",
+     at: "(i) पिण्डों के संयोजन के विभिन्न भागों", reason: "English ¶2, step (i), begins here; the Hindi keeps steps (i) and (ii) in ¶1's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 17, kind: split, address: "ch 4 §4.11 ¶3",
+     at: "(ii) संयोजन के किसी सुविधाजनक भाग को", reason: "English ¶3, step (ii), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 17, kind: split, address: "ch 4 §4.11 ¶10",
+     at: "(a) फर्श पर गुटका विरामावस्था में है", reason: "English ¶10, part (a), begins here; English ¶9 is the word Answer alone, so the Hindi हल stays as its own row"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 18, kind: split, address: "ch 4 §4.11 ¶12",
+     at: "तृतीय नियम के अनुसार फर्श पर निकाय की क्रिया", reason: "English ¶12 begins here; the Hindi keeps it in part (b)'s paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 18, kind: split, address: "ch 4 §4.11 ¶14",
+     at: "(a) के लिए :(i) पृथ्वी द्वारा गुटके पर", reason: "English ¶14, the pairs for (a), begins here; the row before it is the head Action-reaction pairs, English ¶13"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 18, kind: split, address: "ch 4 §4.11 ¶15",
+     at: "(b) के लिए (i) पृथ्वी द्वारा निकाय पर", reason: "English ¶15, the first pair for (b), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 18, kind: split, address: "ch 4 §4.11 ¶16",
+     at: "(ii) निकाय द्वारा फर्श पर आरोपित बल", reason: "English ¶16, the second pair for (b) with the closing remark, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 10, kind: defer, address: "ch 4 §4.8 ¶6",
+     at: "* किसी पिण्ड की साम्यावस्था के लिए", reason: "the Hindi prints this footnote at the foot of p10 and Example 4.6 on p11; the English has both on p10 and numbers the Example first"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 11, kind: defer, address: "ch 4 §4.9 ¶5",
+     at: "* सुगमता के लिए यहाँ हम आवेशित", reason: "the Hindi prints this footnote at the foot of p11 and the paragraph on the four fundamental forces on p12; the English starts that paragraph on p11 and numbers it first"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 16, kind: text, address: "ch 4 §4.10 ¶11",
+     transcribed: "यदि सड़क ढालू है (चित्र 4.14b)", printed: "ढालू सड़क पर कार की गति यदि सड़क ढालू है (चित्र 4.14b)", reason: "the page prints the side heading above this paragraph (p16, left column, under Eq. 4.18; crop; the layer's line agrees) and the transcription left it out; a side heading leads its paragraph (DECISIONS 2026-09-27), as the English row's does"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 5, kind: text, address: "ch 4 §4.5 ¶2",
+     transcribed: "किसी पिण्ड के संवेग को उसकी संहति", printed: "संवेग किसी पिण्ड के संवेग को उसकी संहति", reason: "the page prints the side heading संवेग above this paragraph (crop p5 x40-300 y262-318; the layer's line agrees) and the transcription left it out; a side heading leads its paragraph and is never dropped (DECISIONS 2026-09-27)"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 10, kind: misprint, address: "ch 4 §4.8 ¶3",
+     transcribed: "समीकरण (4-11) से", printed: "समीकरण (4.11) से", reason: "the page prints 'समीकरण (4-11) से' with a hyphen (crop p10 y580-615 at zoom 5; layer y594) against its own equation number (4.11); the row carries the print"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 15, kind: false_positive, address: "ch 4 §4.10 ¶4",
+     transcribed: "f ≤ mu_s N = mv^2 / R", printed: "f ≤ μ_s N = mv^2 / R", reason: "the page prints f ≤ μ_s N = mv^2/R (crop p15 y520-565; layer y547); 'mu_s' is the transcriber's spelling of μ"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 5, kind: text, address: "ch 4 §4.5 ¶3",
+     transcribed: "मान लीजिए एक कम भार का वाहन", printed: "• मान लीजिए एक कम भार का वाहन", reason: "the paragraph opens with a printed list bullet (crop; a Wingdings glyph in the layer), as the English row does"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 5, kind: text, address: "ch 4 §4.5 ¶4",
+     transcribed: "यदि दो पत्थर, एक हलका", printed: "• यदि दो पत्थर, एक हलका", reason: "the paragraph opens with a printed list bullet (crop; a Wingdings glyph in the layer), as the English row does"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 5, kind: text, address: "ch 4 §4.5 ¶5",
+     transcribed: "विचार करने योग्य एक अन्य", printed: "• विचार करने योग्य एक अन्य", reason: "the paragraph opens with a printed list bullet (crop; a Wingdings glyph in the layer), as the English row does"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 5, kind: text, address: "ch 4 §4.5 ¶6",
+     transcribed: "क्रिकेट का कोई अभ्यस्त खिलाड़ी", printed: "• क्रिकेट का कोई अभ्यस्त खिलाड़ी", reason: "the paragraph opens with a printed list bullet (crop; a Wingdings glyph in the layer), as the English row does"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 5, kind: text, address: "ch 4 §4.5 ¶7",
+     transcribed: "एक अत्यंत महत्त्वपूर्ण प्रेक्षण इस तथ्य", printed: "• एक अत्यंत महत्त्वपूर्ण प्रेक्षण इस तथ्य", reason: "the paragraph opens with a printed list bullet (crop; a Wingdings glyph in the layer), as the English row does"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 6, kind: text, address: "ch 4 §4.5 ¶8",
+     transcribed: "पिछले प्रेक्षणों में संवेग का सदिश", printed: "• पिछले प्रेक्षणों में संवेग का सदिश", reason: "the paragraph opens with a printed list bullet (crop; a Wingdings glyph in the layer), as the English row does"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 7, kind: text, address: "ch 4 §4.5 ¶22",
+     transcribed: "परिमित परिवर्तन उत्पन्न", printed: "परिमित परिर्वतन उत्पन्न", reason: "the page sets the reph over va, not ta: the book's own spelling, kept as printed; zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 15, kind: text, address: "ch 4 §4.9.1 ¶14",
+     transcribed: "बाल बेयरिंगों के बीच", printed: "बाल बेयरिगों के बीच", reason: "the page prints no anusvara on ri: the book's own spelling, kept; zoomed crop and the decoded layer's line agree"}
+  # phy11-part1 Hindi, chapter 5
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 2, kind: split, address: "ch 5 §5.1.1 ¶2",
+     at: "समीकरण (5.1a) से हमें निम्नलिखित परिणाम मिलता है", reason: "English ¶2 begins here; the Hindi print keeps it in ¶1's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 2, kind: split, address: "ch 5 §5.1.1 ¶6",
+     at: "(i) A·A = A_xA_x + A_yA_y", reason: "English ¶6, item (i), begins here; the Hindi row runs English ¶5 to ¶7 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 2, kind: split, address: "ch 5 §5.1.1 ¶7",
+     at: "(ii) A·B = 0 यदि", reason: "English ¶7, item (ii), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 3, kind: split, address: "ch 5 §5.2 ¶2",
+     at: "एक बार फिर दोनों पक्षों को m/2 से गुणा करने पर", reason: "English ¶2 begins here; the Hindi print keeps it in ¶1's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 3, kind: split, address: "ch 5 §5.2 ¶7",
+     at: "गुरुत्वाकर्षण बल द्वारा किया गया कार्य W_g = m g h मान लीजिए", reason: "English ¶7, the work done by gravity, begins here; the Hindi row keeps it in the Answer (a) paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 4, kind: split, address: "ch 5 §5.3 ¶2",
+     at: "अतः किसी बल द्वारा किया गया कार्य “बल के विस्थापन", reason: "English ¶2 begins here, at the top of p4; it does not continue p3's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 4, kind: split, address: "ch 5 §5.4 ¶2",
+     at: "गतिज ऊर्जा एक अदिश राशि है।", reason: "English ¶2 begins here, after equation (5.5), and runs on to p5"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 5, kind: split, address: "ch 5 §5.5 ¶3",
+     at: "इसे चित्र 5.3(a) में समझाया गया है", reason: "English ¶3 begins here; the Hindi print keeps it in ¶2's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 6, kind: join, address: "ch 5 §5.5 ¶6",
+     at: "x = 20 m पर F = 50 N(≠ 0) है", reason: "this text is the rest of English ¶6, the Answer paragraph of Example 5.5, which the row before it begins"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 7, kind: split, address: "ch 5 §5.6 ¶5",
+     at: "ध्यान दीजिए कि ln आधार e पर", reason: "English ¶5, the remark on ln, begins here; the Hindi row keeps it in the Answer paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 8, kind: split, address: "ch 5 §5.7 ¶5",
+     at: "किसी संरक्षी बल जैसे गुरुत्वाकर्षण बल द्वारा किया गया कार्य", reason: "English ¶5 begins here, after the displayed integral that ends English ¶3 (¶4 is the p7 footnote)"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 8, kind: split, address: "ch 5 §5.7 ¶7",
+     at: "इस अनुभाग में गिरती हुई गेंद के उदाहरण में", reason: "English ¶7 begins here, after equation (5.9); the Hindi print keeps it in ¶6's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 8, kind: split, address: "ch 5 §5.8 ¶5",
+     at: "• तीसरी परिभाषा के अनुसार, इस बल द्वारा", reason: "English ¶5, the third bullet, begins here; the Hindi row keeps it in the second bullet's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 9, kind: split, address: "ch 5 §5.8 ¶8",
+     at: "गेंद की", reason: "English ¶8 begins here, at the top of p9; it does not continue p8's paragraph (span kept to two words, unique on the page, because the third word is a suspected misreading)"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 9, kind: join, address: "ch 5 §5.8 ¶9",
+     at: "उपरोक्त परिणाम अनुभाग 5.7 में", reason: "this sentence is inside English ¶9 (a result that was obtained in section 5.7), which the row before it begins"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 9, kind: join, address: "ch 5 §5.8 ¶9",
+     at: "इसके अतिरिक्त E_H = E_h", reason: "English ¶9 continues here (Further, E_H = E_h) to equation (5.11 d)"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 9, kind: join, address: "ch 5 §5.8 ¶9",
+     at: "उपरोक्त परिणाम, शुद्धगतिकी का", reason: "this sentence closes English ¶9 (and is a familiar result from kinematics)"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 9, kind: join, address: "ch 5 §5.8 ¶12",
+     at: "यहाँ T_A, बिंदु A पर डोरी का तनाव है", reason: "English ¶12 continues here (where T_A is the tension in the string at A) to T_C becoming zero"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 9, kind: split, address: "ch 5 §5.8 ¶13",
+     at: "अतः बिंदु C पर हमें प्राप्त होता है", reason: "English ¶13 (Thus, at C) begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 9, kind: join, address: "ch 5 §5.8 ¶13",
+     at: "जहाँ v_c बिंदु C पर गोलक की चाल है", reason: "English ¶13 continues here (where v_C is the speed at C) to v_0 = sqrt(5gL) on p10"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 11, kind: split, address: "ch 5 §5.9 ¶3",
+     at: "यदि स्प्रिंग का विस्थापन x_c (<0) से संपीडित", reason: "English ¶3 begins here, after equation (5.16); the Hindi print keeps it in ¶2's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 11, kind: join, address: "ch 5 §5.9 ¶3",
+     at: "यदि गुटके को इसके आरंभिक विस्थापन x_i से", reason: "English ¶3 continues here to equation (5.17)"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 11, kind: split, address: "ch 5 §5.9 ¶4",
+     at: "अतः स्प्रिंग-बल द्वारा किया गया कार्य केवल सिरे के बिंदुओं", reason: "English ¶4 begins here, after equation (5.17)"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 12, kind: split, address: "ch 5 §5.9 ¶8",
+     at: "गतिमान कार की गतिज ऊर्जा : K", reason: "English ¶8 begins here; English ¶7 is the Answer's first sentence alone"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 12, kind: join, address: "ch 5 §5.9 ¶8",
+     at: "अतः V = (1/2) k x_m^2", reason: "the displayed V = (1/2) k x_m^2 = 1.25 × 10^4 J belongs to English ¶8"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 12, kind: join, address: "ch 5 §5.9 ¶8",
+     at: "हल करने पर हम प्राप्त करते हैं कि x_m", reason: "the result x_m = 2.00 m closes English ¶8"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 13, kind: split, address: "ch 5 §5.10 ¶2",
+     at: "किसी बल की औसत शक्ति उस बल द्वारा", reason: "English ¶2 begins here; the Hindi print keeps it in ¶1's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 13, kind: split, address: "ch 5 §5.10 ¶4",
+     at: "जहाँ विस्थापन dr में बल F द्वारा किया गया कार्य", reason: "English ¶4 begins here, after equation (5.20); the Hindi opens it with 'where', as a continuation of the equation"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 13, kind: split, address: "ch 5 §5.10 ¶8",
+     at: "विद्युत-ऊर्जा की खपत के लिए मूल्य", reason: "English ¶8 begins here, after the displayed kilowatt hour sum"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 14, kind: split, address: "ch 5 §5.11 ¶3",
+     at: "संघट्ट के पश्चात् द्रव्यमान m_1 व m_2 विभिन्न दिशाओं", reason: "English ¶3 begins here; the Hindi print keeps it in ¶2's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 14, kind: split, address: "ch 5 §5.11.1 ¶2",
+     at: "यदि बल संघट्ट समय Delta t के दौरान जटिल रूप से", reason: "English ¶2 begins here, after the displayed sum of the momentum changes"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 14, kind: split, address: "ch 5 §5.11.2 ¶2",
+     at: "संघट्ट में गतिज ऊर्जा की क्षतिः Delta K", reason: "English ¶2 begins here, after equation (5.22)"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 14, kind: split, address: "ch 5 §5.11.2 ¶4",
+     at: "इसे समीकरण (5.23) में प्रतिस्थापित करने पर", reason: "English ¶4 begins here, after equation (5.25)"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 15, kind: join, address: "ch 5 §5.11.2 ¶4",
+     at: "तथा v_2f = 2m_1 v_1i", reason: "equation (5.27) at the top of p15 closes English ¶4, begun at the foot of p14"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 15, kind: split, address: "ch 5 §5.11.2 ¶10",
+     at: "क्षयित आंशिक गतिज ऊर्जा है f_1", reason: "English ¶10 begins here; the Hindi row sets the Answer of Example 5.11 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 15, kind: split, address: "ch 5 §5.11.2 ¶11",
+     at: "उपरोक्त परिणाम को समीकरण (5.27) से प्रतिस्थापित करके", reason: "English ¶11 begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 15, kind: join, address: "ch 5 §5.11.3 ¶1",
+     at: "अधिकतर स्थितियों में यह माना जाता है", reason: "English ¶1 continues here, after equation (5.29), to its end"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 15, kind: split, address: "ch 5 §5.11.3 ¶3",
+     at: "यह हमें समीकरण (5.28) व (5.29) के अलावा", reason: "English ¶3 begins here, after equation (5.30), and runs on to p16"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 16, kind: join, address: "ch 5 §5.11.3 ¶5",
+     at: "चूंकि संघट्ट प्रत्यास्थ है और द्रव्यमान m_1 = m_2 है", reason: "English ¶5, the Answer of Example 5.12, continues here from equation (5.31)"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 16, kind: join, address: "ch 5 §5.11.3 ¶5",
+     at: "इससे सिद्ध होता है कि जब समान द्रव्यमान", reason: "the result this proves closes English ¶5"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 16, kind: text, address: "ch 5 §5.11.3 ¶6",
+     transcribed: "गतिज ऊर्जा के संरक्षण, समीकरण (5.31)", printed: "गतिज ऊर्जा के सरंक्षण, समीकरण (5.31)", reason: "the page prints सरंक्षण here, the anusvara over र (crop p16 y455-495 at zoom 5; layer y479), the book's own spelling, which the row normalised to संरक्षण; the page's other संरक्षण (y336) is printed as the row has it"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 14, kind: text, address: "ch 5 §5.11.2 ¶2",
+     transcribed: "गतिज ऊर्जा की क्षतिः Delta K", printed: "गतिज ऊर्जा की क्षति: Delta K", reason: "the line introduces the displayed Delta K: a colon, which the print draws with the visarga's glyph (crop p14 x290-560 y300-345); क्षति takes no visarga"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 4, kind: misprint, address: "ch 5 §5.3 ¶10",
+     transcribed: "द्वारा किया किया कार्य है।", printed: "द्वारा किया गया कार्य है।", reason: "the page prints 'द्वारा किया किया कार्य है।': the doubled word is the book's (crop p4 y285-335; layer y307); the row carries the print"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 6, kind: misprint, address: "ch 5 §5.5 ¶8",
+     transcribed: "घर्षण बल द्वारा किया गया कार्य W_F", printed: "घर्षण बल द्वारा किया गया कार्य W_f", reason: "the prose line prints W with a capital italic F subscript, 'कार्य W_F→आयत AGHI', and the display under it W_f (crop p6 y78-125 at zoom 5; layer y86, y102); the book's own slip, the row carries the print"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 1, kind: text, address: "ch 5 §5.1 ¶1",
+     transcribed: "दूरी वाले धावक को", printed: "दूरी वाले घातक को", reason: "the page prints gha-aa-ta-ka, the book's own error for the word the row wrote; kept as printed; zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 9, kind: text, address: "ch 5 §5.8 ¶6",
+     transcribed: "गेंद की निर्दशित ऊँचाई", printed: "गेंद की निदर्शित ऊँचाई", reason: "the reph sits on shi, not on da; zoomed crop and the decoded layer's line agree"}
+  # phy11-part1 Hindi, chapter 6
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 4, kind: split, address: "ch 6 §6.1.1 ¶7",
+     at: "जब पंखा घूमता है और इसकी अक्ष इधर से उधर", reason: "English ¶7 begins here, at the top of p4; the Hindi row ran on from p3"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 5, kind: split, address: "ch 6 §6.2 ¶6",
+     at: "जहाँ x_1, x_2,....x_n कणों की क्रमशः मूलबिन्दु", reason: "English ¶6, the where-clause after Eq. (6.2), begins here; the Hindi print keeps it in ¶5's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 5, kind: split, address: "ch 6 §6.2 ¶8",
+     at: "समान द्रव्यमान वाले कणों के लिए m = m_1 = m_2 = m_3,", reason: "English ¶8, the equal-mass case after Eqs. (6.3a) and (6.3b), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 5, kind: split, address: "ch 6 §6.2 ¶12",
+     at: "यदि हम स्थिति-सदिश की अवधारणा का उपयोग करें", reason: "English ¶12 begins here; the Hindi print keeps it in ¶11's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 6, kind: text, address: "ch 6 §6.2 ¶25",
+     transcribed: "भुजा की लम्बाई 0.5 m है।", printed: "भुजा की लम्बाई 0.5 m है। हल", reason: "the page prints the label हल under the Example 6.1 statement (p6, right column, above Fig. 6.9; crop; the layer's line agrees) and the transcription left it out"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 6, kind: split, address: "ch 6 §6.2 ¶25",
+     at: "हल", reason: "English ¶25, the Answer to Example 6.1, begins at its label on p6 and runs on to p7"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 9, kind: join, address: "ch 6 §6.4 ¶3",
+     at: "इस समीकरण की समीकरण (6.8) से तुलना करने पर", reason: "the comparison with Eq. (6.8) and Eq. (6.15) are the end of English ¶3, which the row before it begins"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 9, kind: join, address: "ch 6 §6.4 ¶4",
+     at: "समीकरण (6.16) एवं समीकरण (6.11) की तुलना करने पर", reason: "the comparison giving Eq. (6.17) is the middle of English ¶4, which the row before it begins"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 9, kind: join, address: "ch 6 §6.4 ¶4",
+     at: "यह गति के न्यूटन के द्वितीय नियम का कथन है", reason: "the sentence after Eq. (6.17) is the end of English ¶4"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 11, kind: split, address: "ch 6 §6.5 ¶4",
+     at: "(i) जिसका परिमाण c = ab sin theta है", reason: "English ¶4, item (i) of the definition, begins here; the Hindi print runs the three items on in ¶3's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 11, kind: split, address: "ch 6 §6.5 ¶5",
+     at: "(ii) c उस तल के अभिलम्बवत् है", reason: "English ¶5, item (ii), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 11, kind: split, address: "ch 6 §6.5 ¶6",
+     at: "(iii) यदि हम एक दक्षिणावर्त्त पेंच लें", reason: "English ¶6, item (iii), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 11, kind: split, address: "ch 6 §6.5 ¶12",
+     at: "परन्तु, सदिश गुणन क्रमविनियम नियम का पालन नहीं करता", reason: "English ¶12 begins here, after the display a.b = b.a; the Hindi print keeps it in ¶11's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 11, kind: split, address: "ch 6 §6.5 ¶15",
+     at: "अतः परावर्तन से a × b का चिह्न नहीं बदलता", reason: "English ¶15 begins here, after the displayed reflection of a × b"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 12, kind: join, address: "ch 6 §6.5 ¶27",
+     at: "ध्यान दें कि, b × a", reason: "the closing note on b × a is the end of English ¶27, the Answer to Example 6.4"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 13, kind: split, address: "ch 6 §6.6 ¶10",
+     at: "इस सदिश का परिमाण, omega = d theta/dt", reason: "English ¶10 begins here; the Hindi print keeps it in ¶9's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 16, kind: split, address: "ch 6 §6.7.2 ¶4",
+     at: "कोणीय संवेग सदिश की परिमाण है l = r p sin theta", reason: "English ¶4 begins here, after Eq. (6.25a) at the top of p16, which ends ¶3"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 16, kind: split, address: "ch 6 §6.7.2 ¶6",
+     at: "दाईं ओर के व्यंजक पर गुणन के अवकलन का नियम", reason: "English ¶6 begins here, after the displayed derivative that ends ¶5"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 16, kind: split, address: "ch 6 §6.7.2 ¶7",
+     at: "अब, कण का वेग v = dr/dt एवं p = mv लिखें", reason: "English ¶7 begins here, after the displayed product rule that ends ¶6"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 16, kind: split, address: "ch 6 §6.7.2 ¶8",
+     at: "dr/dt × p = v × mv = 0,", reason: "English ¶8 begins with this display; the Hindi runs ¶7 and ¶8 as one sentence, so the split is at the display after the lead-in clause, not at a sentence start"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 16, kind: join, address: "ch 6 §6.7.2 ¶8",
+     at: "क्योंकि दो समान्तर सदिशों का सदिश गुणनफल", reason: "the reason clause and the derivation to Eq. (6.27) are the rest of English ¶8; the Hindi row was cut at the display"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 18, kind: split, address: "ch 6 §6.7.2 ¶28",
+     at: "l की दिशा, r एवं v के तल के अभिलम्बवत्", reason: "English ¶28 begins here, at the top of p18; the Hindi row ran on from p17"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 18, kind: split, address: "ch 6 §6.8 ¶5",
+     at: "यदि पिण्ड पर लगने वाला कुल बल शून्य होगा तो", reason: "English ¶5 begins here, after Eq. (6.30a); the Hindi row keeps it in condition (1)'s paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 18, kind: join, address: "ch 6 §6.8 ¶9",
+     at: "जहाँ F_ix, F_iy एवं F_iz बल F_i के", reason: "English ¶9 runs from the vector equations through Eq. (6.31b) and its where-clause as one row; this is its middle part"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 18, kind: join, address: "ch 6 §6.8 ¶9",
+     at: "जहाँ tau_ix, tau_iy एवं tau_iz क्रमशः", reason: "the where-clause after Eq. (6.31b) closes English ¶9"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 22, kind: join, address: "ch 6 §6.8.2 ¶11",
+     at: "ध्यान दें कि W_1 एवं W ऊर्ध्वाधरतः नीचे", reason: "the note on the directions of W_1, W, R_1 and R_2 is the second sentence of English ¶11, after equation (i)"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 23, kind: split, address: "ch 6 §6.8.2 ¶14",
+     at: "समीकरण (i) में आंकिक मान प्रतिस्थापित करने पर", reason: "English ¶14 (the numerical values inserted) begins here; the Hindi row runs English ¶13 to ¶15 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 23, kind: split, address: "ch 6 §6.8.2 ¶15",
+     at: "अतः क्षुर-धारों के आधारों के प्रतिक्रिया बल हैं", reason: "English ¶15, the closing statement of Example 6.8, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 23, kind: join, address: "ch 6 §6.8.2 ¶17",
+     at: "सीढ़ी AB की लंबाई = 3 m", reason: "English ¶17 is the Answer label and the first paragraph of Example 6.9's answer in one row; the Hindi row before this holds only the label"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 23, kind: split, address: "ch 6 §6.8.2 ¶19",
+     at: "इसी प्रकार क्षैतिज बल लें तो", reason: "English ¶19 (the horizontal forces, equation (ii)) begins here; the Hindi print keeps it in ¶18's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 23, kind: split, address: "ch 6 §6.8.2 ¶21",
+     at: "बल F_2, क्षैतिज से alpha कोण बनाता है", reason: "English ¶21 (the angle of F_2 with the horizontal) begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 24, kind: join, address: "ch 6 §6.9 ¶4",
+     at: "इस परिभाषा के साथ K =", reason: "Eq. (6.35) closes English ¶4, which defines the moment of inertia and gives Eq. (6.34) and (6.35) in one row"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 24, kind: split, address: "ch 6 §6.9 ¶7",
+     at: "यहाँ m पिण्ड का द्रव्यमान और v उसका वेग है", reason: "English ¶7 begins here, after K = (1/2) m v^2; the Hindi print keeps it in ¶6's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 24, kind: join, address: "ch 6 §6.9 ¶9",
+     at: "समीकरण (6.35) से तुलना करने पर", reason: "the comparison with Eq. (6.35) giving I = MR^2 closes English ¶9, case (a)"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 24, kind: join, address: "ch 6 §6.9 ¶10",
+     at: "अतः, द्रव्यमानों के इस जोड़े का", reason: "English ¶10 holds the whole of case (b) and the remark on Table 6.1 in one row"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 26, kind: split, address: "ch 6 §6.9 ¶13",
+     at: "अतः, किसी दृढ़ पिण्ड का जड़त्व आघूर्ण, उसके द्रव्यमान", reason: "English ¶13 begins here, at the top of p26; it does not continue the radius-of-gyration paragraph of p25"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 26, kind: split, address: "ch 6 §6.9 ¶14",
+     at: "समीकरण (6.34), में दी गई परिभाषा के आधार पर", reason: "English ¶14 (dimensions and SI unit of the moment of inertia) begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 26, kind: split, address: "ch 6 §6.10 ¶5",
+     at: "जहाँ x_0 = प्रारंभिक विस्थापन एवं", reason: "English ¶5, the where-clause after equations (a) to (c), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 26, kind: split, address: "ch 6 §6.10 ¶7",
+     at: "जहाँ theta_0 = घूर्णन करते पिण्ड का प्रारंभिक", reason: "English ¶7, the where-clause after Eq. (6.36) to (6.38), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 27, kind: split, address: "ch 6 §6.10 ¶13",
+     at: "(i) ω = ω_0 + alpha t, जहाँ", reason: "English ¶12 is the Answer label alone and ¶13 begins at part (i); the Hindi row sets them together"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 27, kind: split, address: "ch 6 §6.10 ¶14",
+     at: "इंजन का कोणीय त्वरण 4π rad/s^2 है", reason: "English ¶14, the stated result of part (i), begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 28, kind: join, address: "ch 6 §6.11 ¶4",
+     at: "या यूँ कहें कि बलों और स्थिति सदिशों", reason: "this Hindi sentence has no English row of its own (it restates what English ¶3 and ¶4 each end with); kept with item (2), the paragraph it follows"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: split, address: "ch 6 §6.11 ¶9",
+     at: "याद रहे, कि बल आघूर्णो को जन्म देने वाले", reason: "English ¶9 begins here, at the top of p29; it does not continue p28's paragraph ending in dW = (tau_1 + tau_2 + ...) d theta"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: join, address: "ch 6 §6.11 ¶10",
+     at: "से इसकी तुल्यता स्पष्ट ही है", reason: "this finishes the sentence broken at the displayed dW = F ds, the last sentence of English ¶10"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: split, address: "ch 6 §6.11 ¶11",
+     at: "समीकरण (6.39) के दोनों पक्षों को dt से", reason: "English ¶11 (dividing Eq. (6.39) by dt, Eq. (6.40)) begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: split, address: "ch 6 §6.11 ¶20",
+     at: "(a) पहिये के कोणीय त्वरण की गणना", reason: "English ¶20, part (a) of Example 6.12, is its own row; the Hindi print runs the statement and its four parts as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: split, address: "ch 6 §6.11 ¶21",
+     at: "(b) 2 m रस्सी खुलने तक कर्षण बल", reason: "English ¶21, part (b) of Example 6.12, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: split, address: "ch 6 §6.11 ¶22",
+     at: "(c) इस क्षण पर पहिये की गतिज ऊर्जा", reason: "English ¶22, part (c) of Example 6.12, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: split, address: "ch 6 §6.11 ¶23",
+     at: "(d) भाग (b) एवं (c) के उत्तरों", reason: "English ¶23, part (d) of Example 6.12, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: split, address: "ch 6 §6.11 ¶25",
+     at: "(a) इसके लिए I alpha = tau", reason: "English ¶24 is the Answer label alone and ¶25 begins at part (a); the Hindi row sets them together"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 30, kind: join, address: "ch 6 §6.12 ¶4",
+     at: "चित्र (6.17b) देखिए", reason: "English ¶4 runs from l = r × p through l = (OC × mv) + (CP × mv); the Hindi row before this holds only its first line"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 30, kind: split, address: "ch 6 §6.12 ¶5",
+     at: "P पर कण के रेखीय वेग v का परिमाण", reason: "English ¶5 (the magnitude of the linear velocity at P) begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 31, kind: split, address: "ch 6 §6.12 ¶17",
+     at: "अतः अचल अक्ष के परितः घूर्णी पिण्ड का अचल अक्ष के लम्बवत्", reason: "English ¶17 begins here, after Eq. (6.43b); the Hindi print runs English ¶16 to ¶18 as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 31, kind: split, address: "ch 6 §6.12 ¶18",
+     at: "यदि जड़त्व आघूर्ण I समय के साथ परिवर्तित नहीं होता", reason: "English ¶18 begins here, after Eq. (6.43c)"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 17, kind: text, address: "ch 6 §6.7.2 ¶19",
+     transcribed: "यदि tau_ext = 0, तो समीकरण (6.28b) रह जाती है", printed: "कोणीय संवेग का संरक्षण यदि tau_ext = 0, तो समीकरण (6.28b) रह जाती है", reason: "the page prints the side heading कोणीय संवेग का संरक्षण above this paragraph (crop p17 x40-300 y462-520; the layer's line agrees) and the transcription left it out; a side heading leads its paragraph and is never dropped (DECISIONS 2026-09-27)"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 9, kind: false_positive, address: "ch 6 §6.4 ¶5",
+     transcribed: "गुणनफल के बराबर होता है। समीकरण (6.15)", printed: "गुणनफल के बराबर होता है समीकरण (6.15)", reason: "the page prints the danda, 'होता है। समीकरण (6.15)', set tight against है (crop p9 y300-330; layer y314); the row matches"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 16, kind: misprint, address: "ch 6 §6.7.2 ¶8",
+     transcribed: "p = (m_i v_i)", printed: "p_i = (m_i v_i)", reason: "the page prints 'p = (m_i v_i)' with no subscript on p, under its own l_i = r_i × p_i (crop p16 y205-265; layer y242); the book's own slip, the row carries the print"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 17, kind: misprint, address: "ch 6 §6.7.2 ¶23",
+     transcribed: "कोई कण P किसी कण t पर, v वेग से चल", printed: "कोई कण P किसी क्षण t पर, v वेग से चल", reason: "the page prints 'कोई कण P किसी कण t पर', कण where क्षण is meant (crop p17 y425-455 at zoom 5; layer y436); the book's own slip, the row carries the print"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 20, kind: false_positive, address: "ch 6 §6.8 ¶20",
+     transcribed: "स्थिति सदिश क्रमश: r_2 एवं r_1 हैं", printed: "स्थिति सदिश क्रमश: r_1 एवं r_2 हैं", reason: "the page prints 'क्रमश: r_2 एवं r_1 हैं' (crop p20 y520-585; layer y563), in the order of the points B and A it has just named; the row matches, the verifier's order is the English edition's"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 20, kind: false_positive, address: "ch 6 §6.8.1 ¶6",
+     transcribed: "d_1F_1 = d_2 F_2 (6.32a) या, भार", printed: "d_1F_1 = d_2 F_2", reason: "the page prints d_1F_1 = d_2 F_2 (6.32a) and under it 'या, भार × भार की भुजा = प्रयास × प्रयास की भुजा' (crop p20 y655-715; layer y670 and y697); the row carries both, the verifier quoted a prefix of the span"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 24, kind: false_positive, address: "ch 6 §6.9 ¶10",
+     transcribed: "I = MR^2", printed: "I = MR^2 (with superscript 2 as ².)", reason: "the page prints I = MR^2 (crop p24 y675-715; layer y698); the verifier's printed span is the same formula with a remark about the superscript"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 27, kind: false_positive, address: "ch 6 §6.10 ¶10",
+     transcribed: "= 2π × 52 rad/s", printed: "= 2π 52 rad/s", reason: "the page shows a gap between 2π and 52: the raster does not draw the × the layer's Unicode span carries there (layer y692; crop p27 y635-725; × set in the TrueType Bookman subset); the row carries the × and no row changes"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 27, kind: false_positive, address: "ch 6 §6.11 ¶1",
+     transcribed: "कार्य tau dθ होना", printed: "कार्य tau dθ", reason: "the page prints 'कार्य τdθ होना चाहिए' (crop p27 y425-475 at zoom 5; layer y454); the row carries it, the verifier quoted the same span one word short"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 28, kind: false_positive, address: "ch 6 §6.11 ¶7",
+     transcribed: "– dW_1 = F_1. ds_1 = F_1 ds_1 cos phi_1 = F_1(r_1 d theta) sin alpha_1", printed: "dW_1 = F_1 . ds_1 = F_1 ds_1 cos phi_1 = F_1(r_1 d theta) sin alpha_1", reason: "the dash is the page's own: the prose line ends 'किया गया कार्य –' and the display 'dW_1 = F_1. ds_1 = …' follows on the next line (crop p28 y185-260 at zoom 5; layer y226 and y240); the row runs the display in after it, by the transcriber's rule"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: false_positive, address: "ch 6 §6.11 ¶13",
+     transcribed: "I ((2 omega) / 2) d omega / dt", printed: "I (2 omega) / 2) d omega / dt", reason: "the page prints I × (2ω)/2 × dω/dt, (2ω) over 2 as a built fraction (crop p29 y458-515; layer y485-502); the row's outer brackets are the transcriber's fraction notation, the verifier's span has an unbalanced bracket"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 30, kind: misprint, address: "ch 6 §6.12 ¶5",
+     transcribed: "l = (OC × mv) + (OC × mv)", printed: "l = (OC × mv) + (CP × mv)", reason: "the page prints l = (OC × mv) + (OC × mv), OC twice, where its own r = OC + CP calls for CP (crop p30 y110-170 at zoom 5; layer y154); the book's own slip, the row carries the print"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 1, kind: text, address: "ch 6 §6.1 ¶3",
+     transcribed: "परिवर्तित नहीं होतीं।", printed: "परिवर्तित नहीं होती।", reason: "the page prints no anusvara on the last syllable (the anusvara of the word before it is plainly drawn); zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 10, kind: text, address: "ch 6 §6.4 ¶16",
+     transcribed: "रेखा में समागं गति", printed: "रेखा में समांग गति", reason: "the anusvara is on maa, not on ga; zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 13, kind: text, address: "ch 6 §6.6 ¶2",
+     transcribed: "पुनः देखें। जैसा", printed: "पुनः देंखे। जैसा", reason: "the page sets the anusvara on the first syllable: the book's own spelling, kept as printed; zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 26, kind: text, address: "ch 6 §6.10 ¶1",
+     transcribed: "संकेत दिए हैं। उदाहरण के लिए यह", printed: "संकेत दिए हैं। उदारहण के लिए यह", reason: "the page prints ra before ha: the book's own error, kept as printed; zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: text, address: "ch 6 §6.11 ¶9",
+     transcribed: "कि बल आघूर्णो को जन्म", printed: "कि बल आघूर्णों को जन्म", reason: "the page prints the anusvara beside the reph (the reph-and-anusvara glyph); zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: text, address: "ch 6 §6.11 ¶9",
+     transcribed: "प्रत्येक बल आघूर्णो के परिमाणों", printed: "प्रत्येक बल आघूर्णों के परिमाणों", reason: "the page prints the anusvara beside the reph (the reph-and-anusvara glyph); zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: text, address: "ch 6 §6.11 ¶13",
+     transcribed: "बाह्य बल आघूर्णो द्वारा", printed: "बाह्य बल आघूर्णों द्वारा", reason: "the page prints the anusvara beside the reph (the reph-and-anusvara glyph); zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: text, address: "ch 6 §6.11 ¶19",
+     transcribed: "जिसके बियरिंगों में कोई", printed: "जिसके वियरिंगों में कोई", reason: "the page prints va, with no stroke across the loop: the book's own spelling, kept as printed; zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 30, kind: text, address: "ch 6 §6.12 ¶9",
+     transcribed: "L_perp से दर्शाते हैं।", printed: "L_perp से दर्शात हैं।", reason: "the page prints no e-sign on ta: the book's own error, kept as printed; zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 31, kind: text, address: "ch 6 §6.12 ¶16",
+     transcribed: "बाह्य बल आघूर्णो के केवल", printed: "बाह्य बल आघूर्णी के केवल", reason: "the page prints the ii-sign under the reph: the book's own spelling here, kept as printed; zoomed crop and the decoded layer's line agree"}
+  # phy11-part1 Hindi, chapter 7
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 4, kind: split, address: "ch 7 §7.3 ¶2",
+     at: "यह स्पष्ट रूप से इस तथ्य को दर्शाता है कि पृथ्वी के गुरुत्व बल", reason: "English ¶2 begins here; the Hindi print keeps it in ¶1's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 4, kind: join, address: "ch 7 §7.3 ¶5",
+     at: "यहाँ G सार्वत्रिक गुरुत्वीय नियतांक", reason: "the where-clause after the vector form of Eq. (7.5) is the end of English ¶5, which the row before it begins"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 5, kind: split, address: "ch 7 §7.3 ¶8",
+     at: "m_1 पर कुल बल है F_1", reason: "English ¶8, the total force on m_1, begins here at the top of p5; it does not continue p4's ¶7"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 5, kind: split, address: "ch 7 §7.3 ¶10",
+     at: "(a) इस त्रिभुज के केन्द्रक G पर", reason: "English ¶10, part (a) of Example 7.2, begins here; the Hindi print runs the Example statement as one paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 5, kind: split, address: "ch 7 §7.3 ¶11",
+     at: "(b) यदि शीर्ष A पर रखे द्रव्यमान को दो गुना", reason: "English ¶11, part (b) of Example 7.2, begins here"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 6, kind: join, address: "ch 7 §7.3 ¶17",
+     at: "गुणात्मक रूप में, हम फिर से इस परिणाम", reason: "the qualitative explanation belongs to English ¶17, case (2), which the row before it begins"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: split, address: "ch 7 §7.5 ¶6",
+     at: "द्रव्यमान m द्वारा अनुभव किया जाने वाला त्वरण", reason: "English ¶6 begins here; the sentence before it in the Hindi row is the where-clause of Eq. (7.11)"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: join, address: "ch 7 §7.5 ¶5",
+     at: "यहाँ M_E तथा R_E क्रमशः पृथ्वी का द्रव्यमान", reason: "the where-clause for M_E and R_E follows Eq. (7.11) and belongs to English ¶5's paragraph; the English has no such sentence"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 8, kind: split, address: "ch 7 §7.6 ¶4",
+     at: "h / R_E << 1 के लिए द्विपद व्यंजक", reason: "English ¶4, the binomial step to Eq. (7.15), begins here; the Hindi print keeps it in ¶3's paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 9, kind: join, address: "ch 7 §7.7 ¶7",
+     at: "जो कि r > R के लिए वैध है।", reason: "'valid for r > R' follows Eq. (7.25) inside English ¶7"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 9, kind: join, address: "ch 7 §7.7 ¶7",
+     at: "अतः एक बार फिर W_12 = W(r_2)", reason: "'so that once again W_12 = ...' and the rest to the end of the row are still English ¶7"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 10, kind: split, address: "ch 7 §7.7 ¶12",
+     at: "वर्ग के केन्द्र (r = sqrt(2) l/2) पर गुरुत्वीय विभव", reason: "English ¶12, the potential at the centre of the square, begins here; the Hindi print keeps it in the Answer paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 12, kind: join, address: "ch 7 §7.9 ¶2",
+     at: "यहाँ M_E पृथ्वी का द्रव्यमान है।", reason: "the where-clause after Eq. (7.34) is the end of English ¶2"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 12, kind: join, address: "ch 7 §7.9 ¶5",
+     at: "यहाँ हमने समीकरण (7.35) से V का मान", reason: "'on substitution of value of V from Eq. (7.35)' and Eq. (7.38) are inside English ¶5, which the row before it begins"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 12, kind: join, address: "ch 7 §7.9 ¶5",
+     at: "उन भू उपग्रहों के लिए, जो पृथ्वी के पृष्ठ के अति निकट", reason: "the near-surface satellite passage with Eq. (7.39) is the end of English ¶5"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 12, kind: split, address: "ch 7 §7.9 ¶7",
+     at: "जो लगभग 85 मिनट के बराबर", reason: "English ¶7, 'Which is approximately 85 minutes.', is its own row; the Hindi print keeps it in ¶6's sentence"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 3, kind: false_positive, address: "ch 7 §7.2 ¶11",
+     transcribed: "पथ CPB को तय करने की अपेक्षा पथ BAC को तय करने में अधिक समय लेगा", printed: "पथ BAC को तय करने में अधिक समय लेगा", reason: "the page prints 'अतः ग्रह पथ CPB को तय करने की अपेक्षा पथ BAC को तय करने में अधिक समय लेगा।' (crop p3 y640-705; layer y655-670); the row matches, the verifier quoted only the tail of the span"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 11, kind: false_positive, address: "ch 7 §7.8 ¶13",
+     transcribed: "E_i = (1/2) m v^2 – G M m / R – 4 G M m / 5 R", printed: "E_i = (1/2) m v^2", reason: "the page prints E_i = (1/2) m v^2 – G M m / R – 4 G M m / 5 R on one line (crop p11 y290-500; layer y320-333); the row matches, the verifier quoted a prefix of the span"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 11, kind: false_positive, address: "ch 7 §7.8 ¶15",
+     transcribed: "– GM/2R – GM/R", printed: "– GM/R", reason: "the page prints (1/2) v^2 – GM/R – 4GM/5R = – GM/2R – GM/R (crop p11 y290-500; layer y454-471); the row matches, the verifier quoted the last term only"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 12, kind: false_positive, address: "ch 7 §7.9 ¶11",
+     transcribed: "M_m = (4pi^2 / G) (R^3 / T^2) = 4 × (3.14)^2 × (9.4)^3 × 10^18 / (6.67 × 10^(-11) × (459 × 60)^2)", printed: "M_m = 4 × (3.14)^2 × (9.4)^3 × 10^18 / (6.67 × 10^(-11) × (459 × 60)^2)", reason: "the page prints M_m = (4π^2/G)(R^3/T^2) and continues '= 4 × (3.14)^2 × (9.4)^3 × 10^18 / (6.67 × 10^-11 × (459 × 60)^2)' (crop p12 y440-665; layer y541-598); the row matches, the verifier left the middle term out of its printed span"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 4, kind: text, address: "ch 7 §7.3 ¶1",
+     transcribed: "लगभग 3.84 10^8m ज्ञात", printed: "लगभग 3.84 × 10^8m ज्ञात", reason: "the page leaves a gap between 3.84 and 10^8m: the raster does not draw the glyph, and the layer's Unicode span carries × there; the English row reads 3.84 × 10^8 m"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 6, kind: text, address: "ch 7 §7.4 ¶2",
+     transcribed: "केन्द्रों पर संकेन्द्रित मान कर", printed: "केन्द्रों पर संकेंन्द्रित मान कर", reason: "the page prints an anusvara on ke as well as the half na: the book's own spelling, kept; zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 9, kind: text, address: "ch 7 §7.7 ¶5",
+     transcribed: "केन्द्र की ओर निर्देशित होती है", printed: "केन्द्र की ओर निदेशित होती है", reason: "the page prints no reph: the book's own spelling here, kept as printed; zoomed crop and the decoded layer's line agree"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 9, kind: text, address: "ch 7 §7.7 ¶2",
+     transcribed: "W_12 = बल विस्थापन =", printed: "W_12 = बल × विस्थापन =", reason: "the page leaves a wide gap between the two words: the raster does not draw the glyph, and the layer's Unicode span carries × there; the English row reads force × displacement"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 10, kind: text, address: "ch 7 §7.7 ¶12",
+     transcribed: "वर्ग के शीर्षो पर स्थित", printed: "वर्ग के शीर्षों पर स्थित", reason: "the page prints the anusvara beside the reph (the reph-and-anusvara glyph); zoomed crop and the decoded layer's line agree"}

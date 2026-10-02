@@ -218,6 +218,9 @@ Code (verify green at each commit): a7e1140 the load keeps a Hindi figure or tab
   rows, each marked for the founder to overrule; d671414 the decoder reads back a glyph PDFBox folded into its letter (the ृ of
   प्रकृति: HindiChecks' word lines 65 → 38 on this book, measured by a throwaway preview test over the loaded rows).
 HOW TO RESUME (supersedes item 2 of the list below):
+  0. 2026-10-03: item 1 is DONE — the founder approved the block as written and allowed all four × (DECISIONS 2026-10-03); the
+     block is committed with its approval line. Still open from item 1: whether the frozen English rows come under the
+     side-heading ruling. NEXT is item 2, the founder's reload.
   1. FOUNDER: approve the block (inputs README: rulings are approved before they are committed). The choices in it that are yours:
      the 12 "as printed" spelling entries (the print's own typos put back over the transcriber's repairs); the × the page does
      not draw, which only the layer's Unicode span carries — two text entries write it into a row (ch 7 p4 `3.84 × 10^8m`, p9

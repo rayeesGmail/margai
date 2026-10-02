@@ -401,6 +401,42 @@ class NcertVerifyCommandTest {
                 .contains("1 passages no row carries");
     }
 
+    /**
+     * The free pass holds a Hindi book's loaded rows to the decoded layer, page by page, so the rows a
+     * correction changed are re-checked at no cost (SPEC §12.2, DECISIONS 2026-10-02): khph101 p2's
+     * दाशिमक, Phase B's Opus 5 misreading of the printed दाश्मिक, is named.
+     */
+    @Test
+    void theFreePassHoldsAHindiBooksRowsToTheDecodedLayer() throws IOException {
+        Path khph101 = Path.of("..", "ncert", "2022-ed", "hi", "phy11-part1", "khph101.pdf");
+        org.junit.jupiter.api.Assumptions.assumeTrue(Files.exists(khph101), "founder's NCERT PDFs not on this machine");
+        Files.writeString(inputs.resolve(NcertRegisterCommand.FILE), """
+                books:
+                  - code: phy11-part1
+                    subject: physics
+                    class_level: 11
+                    part: 1
+                    title_en: "Physics Part-I, Textbook for Class XI"
+                    edition_year: 2022
+                    source:
+                      en: source/ncert/2022-ed/en/phy11-part1/
+                      hi: source/ncert/2022-ed/hi/phy11-part1/
+                    chapters:
+                      - {no: 1, en: keph101.pdf, hi: khph101.pdf}
+                """);
+        store.put("source/ncert/2022-ed/hi/phy11-part1/khph101.pdf", Files.readAllBytes(khph101), "application/pdf");
+        imports.paragraphsAnswer = List.of(new NcertParagraphRow((short) 1, "1.3", (short) 1,
+                "उदाहरण के लिए 1.28 को दो दाशिमक स्थानों तक निकटित करते हैं।", false, List.of(),
+                new ParagraphExtraction(List.of(2), List.of(0), new BigDecimal("0.9"), TRANSCRIBED_P1, null)));
+
+        assertThat(run("--lang", "hi")).isZero();
+
+        assertThat(verifier.calls).isEmpty();
+        assertThat(out.toString())
+                .contains("## Hindi rows against the decoded layer — a check only; the layer is never sent or stored")
+                .contains("- ch 1 p2: 'दाशिमक' 1x in the rows, 0x on the page");
+    }
+
     @Test
     void thePageLevelSignalsAreCountedBesideTheCleanShare() {
         verifier.omitted.put(2, List.of("v_x = v cos theta"));

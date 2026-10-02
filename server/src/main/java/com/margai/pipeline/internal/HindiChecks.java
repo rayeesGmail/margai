@@ -99,6 +99,44 @@ final class HindiChecks {
         return (double) carried / total;
     }
 
+    /** What one run found, page by page, for the report extract and verify both write. */
+    static final class Findings {
+
+        /** Below this share of a page's Devanagari words in its rows, the page is listed (khph101: 0.90–0.99, its table page 0.35). */
+        static final double COVERAGE_FLOOR = 0.6;
+
+        private final List<String> words = new ArrayList<>();
+        private final List<String> spans = new ArrayList<>();
+        private final List<String> coverage = new ArrayList<>();
+        private int pages;
+
+        /** One page's rows against its layer; the Summary's page is not judged for coverage — its rows must not carry the Summary. */
+        void check(String at, String layer, String rows, boolean summaryPage) {
+            pages++;
+            devanagari(layer, rows).forEach(finding -> words.add(at + ": " + finding));
+            spans(layer, rows).forEach(finding -> spans.add(at + ": " + finding));
+            double share = coverage(layer, rows);
+            if (!summaryPage && share < COVERAGE_FLOOR) {
+                coverage.add(at + ": the rows carry " + Math.round(share * 100) + "% of the page's Devanagari words");
+            }
+        }
+
+        void report(Report report, String checkedOf) {
+            String none = pages == 0 ? "nothing was checked" : "none on the pages checked";
+            report.section("Hindi rows against the decoded layer — a check only; the layer is never sent or stored")
+                    .line("checked: " + pages + checkedOf)
+                    .line("")
+                    .line("words the rows carry that the page does not — a misreading or an addition:")
+                    .list(words, none)
+                    .line("")
+                    .line("symbols the page carries more often, digits and Latin only the rows carry:")
+                    .list(spans, none)
+                    .line("")
+                    .line("pages whose rows carry little of the page's Devanagari — an omission, a table or a sidebar:")
+                    .list(coverage, none);
+        }
+    }
+
     private static Map<String, Integer> counts(Pattern pattern, String text) {
         Map<String, Integer> counts = new LinkedHashMap<>();
         if (text == null) {

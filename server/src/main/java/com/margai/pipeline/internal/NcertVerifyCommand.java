@@ -9,6 +9,7 @@ import com.margai.ai.api.ImagePart;
 import com.margai.ai.tasks.NcertPageVerifier;
 import com.margai.ai.tasks.PageVerdicts;
 import com.margai.ai.tasks.VerifyItem;
+import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.NcertVerificationRow;
@@ -132,6 +133,9 @@ class NcertVerifyCommand extends NcertBookCommand {
 
         List<NcertCorrection> rulings = rulings(definition, chapterNos, report);
         CodeFlags codeFlags = layoutChecks(definition, selected, byChapter, rulings, report);
+        if (language == BookLanguage.hi) {
+            hindiChecks(definition, selected, byChapter, report);
+        }
 
         String key = ContentKeys.verify(definition.code(), language, ContentKeys.tag(artefactTag));
         Map<String, VerifiedPage> done = new TreeMap<>();
@@ -437,6 +441,38 @@ class NcertVerifyCommand extends NcertBookCommand {
         report.line("verifier: " + verifying + " (prompt " + verifier.promptVersion() + "); transcribed by: "
                 + rowsByModel.entrySet().stream()
                         .map(entry -> entry.getKey() + " (" + entry.getValue() + " rows)").collect(Collectors.joining(", ")));
+    }
+
+    /**
+     * The free pass for a Hindi book (SPEC §12.2, DECISIONS 2026-10-02): every page's parts of the loaded rows
+     * held to the decoded layer, as extract holds a page's transcription — so a reload after corrections is
+     * re-checked at no cost. The Summary's page is not judged for coverage: its layer carries the Summary.
+     */
+    private void hindiChecks(BookDefinition definition, List<BookDefinition.Chapter> selected,
+            Map<Short, List<NcertParagraphRow>> byChapter, Report report) {
+        HindiChecks.Findings findings = new HindiChecks.Findings();
+        int pages = 0;
+        for (BookDefinition.Chapter chapter : selected) {
+            List<NcertParagraphRow> ofChapter = byChapter.get(chapter.no());
+            if (ofChapter == null) {
+                continue;
+            }
+            byte[] pdf = content.get(definition.sourceKey(language, chapter));
+            List<HindiLayer.Page> layer = HindiLayer.pages(pdf);
+            int summaryPage = ChapterApparatus.find(PdfTextLayer.pages(pdf), language)
+                    .map(ChapterApparatus.Boundary::page).orElse(0);
+            for (Map.Entry<Integer, List<Placed>> page : partsByPage(ofChapter).entrySet()) {
+                if (page.getKey() > layer.size()) {
+                    continue;
+                }
+                pages++;
+                String rows = page.getValue().stream().map(placed -> placed.part().text())
+                        .collect(Collectors.joining(" "));
+                findings.check("ch " + chapter.no() + " p" + page.getKey(), layer.get(page.getKey() - 1).devanagari(),
+                        rows, page.getKey() == summaryPage);
+            }
+        }
+        findings.report(report, " of the " + pages + " page(s) the loaded rows are on");
     }
 
     /** One row's part on one page. */

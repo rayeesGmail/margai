@@ -38,15 +38,20 @@ class VisargaColonsTest {
         assertThat(applied.undecided()).isEmpty();
     }
 
-    /** A visarga inside a word follows one of a few prefixes; nothing else glued on both sides is touched. */
+    /**
+     * A visarga inside a word follows one of a few prefixes. Any other colon glued on both sides is left as
+     * written and named: it is a ratio (ऊँचाई:आधार), a visarga after a prefix the list does not hold
+     * (मन:स्थिति), or two words that lost their space — and only the page says which.
+     */
     @Test
-    void aVisargaInsideAWordFollowsItsPrefix() {
+    void aVisargaInsideAWordFollowsItsPrefixAndAnyOtherIsNamed() {
         VisargaColons.Applied applied = VisargaColons.apply(List.of(page(4,
-                p("2.3", "नि:संदेह यह दु:खद है; ऊँचाई:आधार का अनुपात।"))));
+                p("2.3", "नि:संदेह यह दु:खद है; ऊँचाई:आधार का अनुपात, मन:स्थिति।"))));
 
         assertThat(applied.pages().getFirst().paragraphs().getFirst().text())
-                .isEqualTo("निःसंदेह यह दुःखद है; ऊँचाई:आधार का अनुपात।");
+                .isEqualTo("निःसंदेह यह दुःखद है; ऊँचाई:आधार का अनुपात, मन:स्थिति।");
         assertThat(applied.notes()).containsExactly("ch 2 p4 §2.3: a visarga written as a colon — निः, दुः");
+        assertThat(applied.undecided()).containsExactly("ch 2 p4 §2.3: ऊँचाई:आधार, मन:स्थिति");
     }
 
     /**

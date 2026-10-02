@@ -7,8 +7,9 @@ import java.util.regex.Pattern;
  * normalisation list): never ask a model to judge what code can compute (.claude/rules/ai-layer.md).
  *
  * <p>Two spans that are equal once spacing is removed and the glyph variants the ruling names are made
- * one — ≅ ≃ ≈ (and the convention's "approx="), the minus and its dashes, the quotation marks, × and · —
- * name no difference, whatever the model said. And a transcribed span the row does not carry, compared
+ * one — ≅ ≃ ≈ (and the convention's "approx="), the minus and its dashes, the quotation marks, × and ·,
+ * a Hindi visarga and the colon the print draws with the same glyph — name no difference, whatever the
+ * model said. And a transcribed span the row does not carry, compared
  * the same way, is the verifier misquoting the transcription: it cannot be found, so it cannot be
  * adjudicated, and it is counted as the verifier's error rather than raised as the corpus's.
  *
@@ -25,6 +26,11 @@ final class VerdictSpans {
     private static final Pattern SINGLE_QUOTE = Pattern.compile("[’‘`]");
     private static final Pattern DOUBLE_QUOTE = Pattern.compile("[“”]");
     private static final Pattern TIMES = Pattern.compile("[·⋅]");
+    /**
+     * A colon straight after a Devanagari letter or sign: the Hindi print draws it and the visarga with one
+     * glyph, and {@link VisargaColons} writes the visarga where the transcriber wrote the colon (D16).
+     */
+    private static final Pattern COLON_AFTER_DEVANAGARI = Pattern.compile("([\\u0900-\\u097F]):");
     /** A radical around one token: √2 and sqrt(2) name one thing; √(l/g) keeps its bracket. */
     private static final Pattern RADICAL_OF_ONE_TOKEN = Pattern.compile("√\\(([A-Za-z0-9_.]+)\\)");
     /** An exponent of one token: 10^-11 and 10^(-11) name one thing; e^(-E/kT) keeps its bracket. */
@@ -46,6 +52,9 @@ final class VerdictSpans {
         squashed = SINGLE_QUOTE.matcher(squashed).replaceAll("'");
         squashed = DOUBLE_QUOTE.matcher(squashed).replaceAll("\"");
         squashed = TIMES.matcher(squashed).replaceAll("×");
+        // The Hindi load's visarga for the transcriber's colon is code's own rewrite too (D16): the image
+        // cannot tell the two apart, so neither can a difference between them be the corpus's.
+        squashed = COLON_AFTER_DEVANAGARI.matcher(squashed).replaceAll("$1ः");
         // The calibration's code-visible false-flag classes (DECISIONS 2026-09-15): the convention's sqrt()
         // for √ and bracketed exponents, and sentence punctuation the verifier dropped at a span's end.
         squashed = RADICAL_OF_ONE_TOKEN.matcher(squashed.replace("sqrt(", "√(")).replaceAll("√$1");

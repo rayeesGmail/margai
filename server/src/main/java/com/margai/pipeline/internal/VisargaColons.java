@@ -22,12 +22,18 @@ import java.util.regex.Pattern;
  * those only a word this list knows is rewritten. The words ending in a visarga are an open class (any
  * adverb in -तः) and a noun ending in त can take a real colon ("ज्ञात: m = 5 kg"), so a glued word the
  * list does not know that ends in a bare consonant is left as written and named for a ruling. A colon
- * after a vowel sign ("है:", "चाहिए:") is a colon.
+ * after a vowel sign ("है:", "चाहिए:") is a colon. Inside a word a visarga follows one of a few prefixes
+ * (निःसंदेह, दुःख); any other colon glued on both sides — a ratio, a prefix the list lacks, a lost space —
+ * is left and named too.
+ *
+ * <p>The verifier reads the image, where the two are one glyph, so {@link VerdictSpans} treats a visarga
+ * and a colon after a Devanagari letter as the same: this step's rewrite must not come back as a
+ * difference at the next paid read.
  */
 final class VisargaColons {
 
-    /** A Devanagari run and the colon glued to it. */
-    private static final Pattern GLUED = Pattern.compile("([\\u0900-\\u097F]+):");
+    /** A Devanagari word — letters and signs, not the danda or the digits — and the colon glued to it. */
+    private static final Pattern GLUED = Pattern.compile("([\\u0900-\\u0963\\u0970-\\u097F]+):");
 
     /** The words, without their visarga, that the books print with one. */
     private static final Set<String> WORDS = Set.of(
@@ -91,11 +97,23 @@ final class VisargaColons {
             if (inside ? PREFIXES.contains(word) : WORDS.contains(word)) {
                 out.setCharAt(colon, 'ः');
                 written.add(word + "ः");
-            } else if (!inside && consonant(word.charAt(word.length() - 1))) {
+            } else if (inside) {
+                // glued on both sides and not a known prefix: a ratio, another prefix, or a lost space
+                int end = matcher.end();
+                while (end < text.length() && wordCharacter(text.charAt(end))) {
+                    end++;
+                }
+                left.add(text.substring(matcher.start(), end));
+            } else if (consonant(word.charAt(word.length() - 1))) {
                 left.add(word + ":");
             }
         }
         return out.toString();
+    }
+
+    /** A letter or a sign of a Devanagari word, as {@link #GLUED} reads one. */
+    private static boolean wordCharacter(char c) {
+        return (c >= 'ऀ' && c <= 'ॣ') || (c >= '॰' && c <= 'ॿ');
     }
 
     /** A Devanagari letter (U+0904–0939, U+0958–0961), as opposed to a sign, a digit or a danda. */

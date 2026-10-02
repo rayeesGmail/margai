@@ -234,6 +234,23 @@ HOW TO RESUME (supersedes item 2 of the list below):
      `sample/founder10.html`. Round-two items already found by reading: ch 7 p11 Eq. (7.30) `G M M_E` for the printed GmM_E (a
      misreading, text entry due); ch 3 p5 `19` twice where the layer has 19° and the raster draws no degree sign (the × class —
      the founder's to rule).
+     2026-10-03 01:05: the SECOND READ FINISHED (report fc2556a) — the founder's resume read the last 13 pages for ₹19.08
+     (verify ₹274.85 over 207 calls on the day): 114 pages read, 895 of 909 rows clean (98.5%), 13 flags, one row not judged,
+     seven passages listed as carried by no row, 7 flags set aside by the first block's rulings.
+     ROUND TWO, adjudicated on page crops, NOT YET IN THE FILE — it waits for the founder's approval (scratchpad `r2gen.py` →
+     `block-r2.yaml`, 17 entries; `r2/` holds the crops): none of the 13 flags is a misreading. Five are the book's own slips
+     the row carries (`(a)` for its observation (2), `(4-11)`, `W_F`, `कण t`, `दर्शात`), eight are the verifier's (a clause it
+     invented on ch 4 p5, short or re-bracketed quotes, `τ` for `tau`), and the not-judged row (ch 3 p8) matches its page. Four
+     of the 14 rulings repeat a first-block ruling the re-read quoted differently; the old entries stay. Three text entries:
+     `G m M_E` and the two degree signs. The seven "no row carries" passages: two are carried (ch 3 p2's sentence, and the side
+     headings संवेग and कोणीय संवेग का संरक्षण open their rows), the rest are a table, a box, a caption and the chapter summary,
+     none of which the English rows carry either. HindiChecks' 23 word lines are all ones b2 read on crops and classed as
+     decoder artefacts. Simulated (hisim, 307 entries): no refusal, 909 rows, exactly three rows change by one character.
+     FOUNDER'S TO RULE before the block is committed — the sign the raster leaves out and only the layer carries, in four new
+     places: a × the row already carries on ch 4 p11 (`6 × 10 = 60N`), the two degree signs on ch 3 p5, and an ω on ch 6 p13
+     that the raster draws half covered and the verifier read as `a`. (ch 6 p21 `r_i × m_ig` is a fifth row-carried × at a
+     raster gap; no flag rests on it.) THEN: Claude writes the block with its approval line and commits; the founder runs
+     scratchpad `d16-phy11-hi-round2.sh` (reload ₹0, align ≈₹9, re-read of ch 3 p5 and ch 7 p11 ≈₹3); expect 909 of 909.
   1. FOUNDER: approve the block (inputs README: rulings are approved before they are committed). The choices in it that are yours:
      the 12 "as printed" spelling entries (the print's own typos put back over the transcriber's repairs); the × the page does
      not draw, which only the layer's Unicode span carries — two text entries write it into a row (ch 7 p4 `3.84 × 10^8m`, p9

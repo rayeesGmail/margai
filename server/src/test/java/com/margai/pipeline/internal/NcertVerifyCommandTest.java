@@ -382,6 +382,25 @@ class NcertVerifyCommandTest {
                 .contains("2 passages no row carries");
     }
 
+    /**
+     * A Hindi heading's second character is often a vowel sign, a combining mark rather than a letter, so
+     * "1.3 सार्थक अंक" read as running text (phy11-part1 ch 1, D16). The Hindi figure and table words count too.
+     */
+    @Test
+    void anOmittedHindiHeadingOrCaptionIsSetAsideByCode() {
+        verifier.omitted.put(2, List.of("1.3 सार्थक अंक", "1.6.1 समीकरणों की विमीय संगति की जाँच",
+                "सारणी 1.1 SI मूल राशियाँ एवं उनके मात्रक", "किसी भौतिक राशि की विमाएँ उन घातों को कहते हैं"));
+
+        run("--read-pages");
+
+        assertThat(out.toString())
+                .contains("## running text the page prints that no row carries\n\n"
+                        + "- ch 7 p2: \"किसी भौतिक राशि की विमाएँ उन घातों को कहते हैं\"\n")
+                .contains("- ch 7 p2: \"1.3 सार्थक अंक\"")
+                .contains("- ch 7 p2: \"सारणी 1.1 SI मूल राशियाँ एवं उनके मात्रक\"")
+                .contains("1 passages no row carries");
+    }
+
     @Test
     void thePageLevelSignalsAreCountedBesideTheCleanShare() {
         verifier.omitted.put(2, List.of("v_x = v cos theta"));

@@ -67,9 +67,11 @@ class NcertVerifyCommand extends NcertBookCommand {
 
     /**
      * A section heading as the verifier quotes one — "7.4 THE GRAVITATIONAL CONSTANT", "5.2.2 Inheritance of
-     * One Gene" — a printed section number and a word; "3.84 × 10^8 m" is not one.
+     * One Gene" — a printed section number and a word; "3.84 × 10^8 m" is not one. A word is a letter and
+     * then letters or combining marks, because a Hindi heading's second character is often a vowel sign
+     * ("1.3 सार्थक अंक", D16).
      */
-    private static final Pattern OMITTED_HEADING = Pattern.compile("\\d{1,2}(\\.\\d{1,2})+\\s+\\p{L}{2,}");
+    private static final Pattern OMITTED_HEADING = Pattern.compile("\\d{1,2}(\\.\\d{1,2})+\\s+\\p{L}[\\p{L}\\p{M}]+");
 
     @Option(names = "--read-pages", description = "Also read every page with the verify tier (spends; resumes).")
     boolean readPages;

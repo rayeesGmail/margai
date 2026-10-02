@@ -19,6 +19,20 @@ class FigureLabelsTest {
                 assertThat(label.base()).isEqualTo("table 7.1"));
     }
 
+    /**
+     * The Hindi edition prints the same labels with its own words — चित्र for a figure, सारणी for a
+     * table — and the load dropped them as "not figure or table labels" (phy11-part1 ch 1, D16).
+     */
+    @Test
+    void theHindiWordsForFigureAndTableNameTheSameLabels() {
+        assertThat(FigureLabels.of("चित्र 1.1(a)")).hasValueSatisfying(label ->
+                assertThat(label).isEqualTo(new FigureLabels.Label("fig", "1.1", "a")));
+        assertThat(FigureLabels.of("सारणी 1.2")).hasValueSatisfying(label ->
+                assertThat(label).isEqualTo(new FigureLabels.Label("table", "1.2", null)));
+        assertThat(FigureLabels.in("इसे चित्र 1.1(b) तथा सारणी 1.1 में दिखाया गया है।")).extracting(Object::toString)
+                .containsExactly("fig 1.1b", "table 1.1");
+    }
+
     @Test
     void anEquationIsNotALabel() {
         assertThat(FigureLabels.of("Eq. (7.5)")).isEmpty();

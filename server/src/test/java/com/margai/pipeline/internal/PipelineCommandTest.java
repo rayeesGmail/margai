@@ -243,13 +243,13 @@ class PipelineCommandTest {
                 }
                 if (cls == NcertRenderCommand.class) {
                     return cls.cast(new NcertRenderCommand(new NcertRenderCommandTest.RecordingStore(), imports,
-                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40), writer));
                 }
                 if (cls == NcertExtractCommand.class) {
                     return cls.cast(new NcertExtractCommand(new NcertRenderCommandTest.RecordingStore(),
                             new NcertExtractCommandTest.RecordingExtract(), new NcertExtractCommandTest.StubSpend(),
                             new AiClientInfo("anthropic", List.of("ledger")),
-                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40), writer));
                 }
                 if (cls == NcertLoadCommand.class) {
                     return cls.cast(new NcertLoadCommand(new NcertRenderCommandTest.RecordingStore(),
@@ -260,13 +260,13 @@ class PipelineCommandTest {
                             new NcertVerifyCommandTest.StubVerifier(), ids -> Map.of(),
                             new NcertExtractCommandTest.StubSpend(),
                             new com.margai.ai.api.AiClientInfo("anthropic", List.of("ledger")),
-                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40), writer));
                 }
                 if (cls == NcertEmbedCommand.class) {
                     return cls.cast(new NcertEmbedCommand(imports, new NcertEmbedCommandTest.StubEmbeddings(),
                             NcertEmbedCommandTest.noRetriever(), new NcertExtractCommandTest.StubSpend(),
                             new com.margai.ai.api.AiClientInfo("cohere", List.of("ledger")),
-                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40), writer));
                 }
                 return CommandLine.defaultFactory().create(cls);
             }

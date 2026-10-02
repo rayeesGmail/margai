@@ -33,8 +33,12 @@ margai:
     # extract` refuses unless the VISION tier is this model — the `visionopus` profile sets it. The
     # VISION default is `claude-haiku-4-5`, which the D15 dry runs put out of transcription after
     # three runs and three different layout failures on the two-column page, so a forgotten profile
-    # used to spend a whole book on the rejected model and say so nowhere but the ledger.
+    # used to spend a whole book on the rejected model and say so nowhere but the ledger. It is the
+    # English edition's, frozen; the Hindi edition is cut on Claude Opus 5.5 at low, set by the
+    # `visionopus55` profile (DECISIONS 2026-10-02, the 5.5 validation), so that profile can never
+    # re-extract English.
     transcribe-model: claude-opus-5
+    transcribe-model-hi: claude-opus-5-5
     # `ncert embed` commits its vectors every this many paragraphs. Embedding a book is cheap
     # (~900 calls at 0.12 USD/1M tokens) but not free, and a run interrupted late should keep what
     # it paid for — the next run embeds only rows whose embedding is still null.

@@ -1,5 +1,6 @@
 package com.margai.pipeline.internal;
 
+import com.margai.curriculum.api.BookLanguage;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -30,7 +31,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *                         after three runs and three layout failures, and only the
  *                         {@code visionopus} profile selects Opus. Without the guard a forgotten
  *                         profile does not fail — it spends a whole book's budget on the rejected
- *                         model and says so nowhere but the ledger.
+ *                         model and says so nowhere but the ledger. It is the English edition's.
+ * @param transcribeModelHi
+ *                         the Hindi edition's first-read model, when it differs (DECISIONS
+ *                         2026-10-02: Opus 5.5 at low cuts the Hindi corpus while the frozen
+ *                         English one stays on Opus 5); blank means the English model. Per edition
+ *                         so that the profile that transcribes Hindi cannot re-extract English.
  * @param embedBatchSize   how many paragraph vectors one {@code ncert embed} transaction writes
  *                         before committing. Embedding is cheap but not free, and a run
  *                         interrupted at paragraph 800 should keep the 800 it paid for rather
@@ -45,7 +51,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "margai.pipeline")
 public record PipelineProperties(int renderDpi, int extractBatchSize, int pageTiles, String verifyModel,
-        String transcribeModel, int embedBatchSize, int embedCallsPerMinute, int embedMinCharacters) {
+        String transcribeModel, String transcribeModelHi, int embedBatchSize, int embedCallsPerMinute,
+        int embedMinCharacters) {
 
     public PipelineProperties {
         renderDpi = renderDpi <= 0 ? 150 : renderDpi;
@@ -53,5 +60,11 @@ public record PipelineProperties(int renderDpi, int extractBatchSize, int pageTi
         pageTiles = pageTiles <= 0 ? 1 : pageTiles;
         embedBatchSize = embedBatchSize <= 0 ? 100 : embedBatchSize;
         embedMinCharacters = embedMinCharacters <= 0 ? 40 : embedMinCharacters;
+    }
+
+    /** The model {@code ncert extract} must run on for this edition. */
+    public String transcribeModel(BookLanguage language) {
+        return language == BookLanguage.hi && transcribeModelHi != null && !transcribeModelHi.isBlank()
+                ? transcribeModelHi : transcribeModel;
     }
 }

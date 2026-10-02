@@ -84,7 +84,7 @@ class NcertExtractCommandTest {
     /** Wiring the command, so a test that changes {@link #client} can rebuild before it runs. */
     private void build() {
         Reports writer = new Reports(ReportTest.CLOCK);
-        PipelineProperties properties = new PipelineProperties(72, 2, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40);
+        PipelineProperties properties = new PipelineProperties(72, 2, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40);
         CommandLine.IFactory siblings =
                 PipelineCommandTest.siblingFactory(new PipelineCommandTest.RecordingImport(), writer);
         CommandLine.IFactory factory = new CommandLine.IFactory() {
@@ -134,6 +134,47 @@ class NcertExtractCommandTest {
         assertThat(store.exists(ContentKeys.extract("phy11-part2", BookLanguage.en))).isFalse();
         assertThat(out.toString()).contains("the vision tier is claude-haiku-4-5, not claude-opus-5")
                 .contains("visionopus");
+    }
+
+    /**
+     * Each edition has its transcriber (DECISIONS 2026-10-02): Hindi is cut on Opus 5.5, while the frozen
+     * English corpus stays on Opus 5 — so the profile that transcribes Hindi cannot re-extract English.
+     */
+    @Test
+    void anEnglishRunOnTheHindiTranscriberIsRefused() {
+        extract.model = "claude-opus-5-5";
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(extract.calls).isEmpty();
+        assertThat(out.toString()).contains("the vision tier is claude-opus-5-5, not claude-opus-5, the en edition's transcriber");
+    }
+
+    @Test
+    void theHindiEditionRunsOnItsOwnTranscriber() throws IOException {
+        Files.writeString(inputs.resolve(NcertRegisterCommand.FILE), """
+                books:
+                  - code: phy11-part2
+                    subject: physics
+                    class_level: 11
+                    part: 2
+                    title_en: "Physics Part-II, Textbook for Class XI"
+                    edition_year: 2023
+                    source:
+                      en: source/ncert/2022-ed/en/phy11-part2/
+                      hi: source/ncert/2022-ed/hi/phy11-part2/
+                    chapters:
+                      - {no: 8, en: keph201.pdf, hi: khph201.pdf}
+                """);
+        store.put("source/ncert/2022-ed/hi/phy11-part2/khph201.pdf", pdfWithText("8.1 the first section"), "application/pdf");
+        store.put(ContentKeys.page("phy11-part2", BookLanguage.hi, (short) 8, 1),
+                "page image 8/1".getBytes(StandardCharsets.UTF_8), "image/png");
+        extract.model = "claude-opus-5-5";
+
+        assertThat(commandLine.execute("ncert", "extract", "--book", "phy11-part2", "--lang", "hi",
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(extract.calls).containsExactly("8/1");
     }
 
     @Test

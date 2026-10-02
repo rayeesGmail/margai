@@ -8,6 +8,7 @@ import com.margai.ai.api.ImagePart;
 import com.margai.ai.tasks.NcertPage;
 import com.margai.ai.tasks.NcertPageExtractor;
 import com.margai.ai.tasks.PreviousPage;
+import com.margai.curriculum.api.BookLanguage;
 import com.margai.storage.api.ObjectStore;
 import java.math.BigDecimal;
 import java.nio.file.Path;
@@ -331,11 +332,14 @@ class NcertExtractCommand extends NcertBookCommand {
      * first is money spent on an artefact that has to be thrown away.
      */
     private void guardTranscribeModel() {
-        if (!Objects.equals(extract.model(), properties.transcribeModel())) {
+        String transcriber = properties.transcribeModel(language);
+        if (!Objects.equals(extract.model(), transcriber)) {
             throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
-                    "the vision tier is " + extract.model() + ", not " + properties.transcribeModel()
-                            + " (margai.pipeline.transcribe-model, DECISIONS 2026-09-14 \"the pair\") — run with "
-                            + "`--spring.profiles.active=pipeline,live,visionopus`");
+                    "the vision tier is " + extract.model() + ", not " + transcriber + ", the " + language
+                            + " edition's transcriber (margai.pipeline.transcribe-model"
+                            + (language == BookLanguage.hi ? "-hi" : "") + "; DECISIONS 2026-09-14 \"the pair\", "
+                            + "2026-10-02) — run with `--spring.profiles.active=pipeline,live,"
+                            + (language == BookLanguage.hi ? "visionopus55" : "visionopus") + "`");
         }
     }
 

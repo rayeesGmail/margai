@@ -219,10 +219,14 @@ Code (verify green at each commit): a7e1140 the load keeps a Hindi figure or tab
   प्रकृति: HindiChecks' word lines 65 → 38 on this book, measured by a throwaway preview test over the loaded rows).
 HOW TO RESUME (supersedes item 2 of the list below):
   1. FOUNDER: approve the block (inputs README: rulings are approved before they are committed). The choices in it that are yours:
-     the 12 "as printed" spelling entries (the print's own typos put back over the transcriber's repairs); the two × the page
-     does not draw, restored on the layer's Unicode span and the English row (ch 7 p4 `3.84 × 10^8m`, p9 `बल × विस्थापन`) — the
-     audit's open MAJOR, a ruling is needed either way; `lim` on ch 3 p16, which the row carries and the page does not draw
-     (kept); the nine rows with literal Greek (kept, D17). Then Claude adds the approval line to the block's header and commits.
+     the 12 "as printed" spelling entries (the print's own typos put back over the transcriber's repairs); the × the page does
+     not draw, which only the layer's Unicode span carries — two text entries write it into a row (ch 7 p4 `3.84 × 10^8m`, p9
+     `बल × विस्थापन`) and two false_positive rulings keep one a row already carries (ch 2 p3, ch 6 p27) — the audit's open
+     MAJOR, a ruling is needed either way; `lim` on ch 3 p16, which the row carries and the page does not draw (kept); the nine
+     rows with literal Greek (kept, D17); and whether phy11-part1's frozen English rows, which lack three side headings the
+     Hindi now carries (extracted before the 2026-09-27 ruling), come under that ruling too. Then Claude adds the approval line
+     to the block's header and commits. The re-audit of the fixes: PASS, six MINOR, each fixed (the header's wording on the ×,
+     the runbook's layer rule, `noise` in the README's kinds, the reverse visarga error recorded).
   2. FOUNDER: from server/, `caffeinate -i zsh <scratchpad 38d88bed>/d16-phy11-hi-reload.sh 2>&1 | tee <log>` on ONE line — a jar
      copy at the day's last code commit; reload (₹0, 827 → 909), align again (≈₹9, expect no proposal), second read of the
      changed pages (≈₹150).

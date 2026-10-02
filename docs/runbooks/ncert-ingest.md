@@ -351,6 +351,12 @@ few prefixes (`निःसंदेह`, `दुःख`); any other colon glued
 two words that lost their space — is left and named too. `ncert verify` reads a visarga and a colon after
 a Devanagari letter as one glyph, as the print draws them, so the step's rewrite is not flagged.
 
+**A Hindi `text` entry takes its `printed` span from the page image**, read on a crop. The decoded text
+layer is a check and never a source (SPEC §12.2): a reason says where the layer's line is and that it
+agrees, and never quotes the layer's text or its glyph codes — the reason is printed in the load report,
+and a quote there would store what the ruling says is never stored. A character only the layer carries,
+where the raster draws nothing, is the founder's to rule on.
+
 **A footnote is a paragraph starting with an asterisk**, with or without a space after it (D16): it is
 numbered where its page puts it and is never what the next page continues.
 

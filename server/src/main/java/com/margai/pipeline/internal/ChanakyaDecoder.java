@@ -92,6 +92,31 @@ final class ChanakyaDecoder {
         KRUTI = Map.copyOf(kruti);
     }
 
+    /**
+     * The combining mark PDFBox makes of a glyph code Unicode calls an accent, back to the glyph (D16). Its
+     * text stripper folds such a glyph into the letter before it when their boxes overlap — the ृ keyed on
+     * the grave accent, the short i with its anusvara keyed on the macron, on any tightened line — and the
+     * decoder then met U+0300 where the glyph had been: प्रकृति came out as प्रव̀फति and the check named 27
+     * words of the first Hindi book as not on their pages. The grave and the circumflex have PDFBox's own
+     * table entries; every other accent it folds through its compatibility decomposition, as here.
+     */
+    private static final Map<Character, Character> FOLDED;
+
+    static {
+        Map<Character, Character> folded = new HashMap<>();
+        for (char glyph : GLYPH.keySet()) {
+            if (Character.getType(glyph) != Character.MODIFIER_SYMBOL) {
+                continue;
+            }
+            String mark = glyph == '`' ? "̀" : glyph == '^' ? "̂"
+                    : Normalizer.normalize(String.valueOf(glyph), Normalizer.Form.NFKC).strip();
+            if (mark.length() == 1 && mark.charAt(0) >= '̀' && mark.charAt(0) <= 'ͯ') {
+                folded.put(mark.charAt(0), glyph);
+            }
+        }
+        FOLDED = Map.copyOf(folded);
+    }
+
     /** The letter the hook glyph makes of the one before it: व → क, प → फ, their half forms, and उ → ऊ. */
     private static final Map<Character, String> HOOK_BASE = Map.of(
             'o', "क", 'i', "फ", 'O', "क्", 'I', "फ्", 'm', "ऊ");
@@ -122,7 +147,7 @@ final class ChanakyaDecoder {
             return text;
         }
         boolean kruti = font.toLowerCase(Locale.ROOT).contains("krutidev");
-        String s = String.join("", glyphs(text, kruti ? KRUTI : GLYPH, !kruti));
+        String s = String.join("", glyphs(unfolded(text), kruti ? KRUTI : GLYPH, !kruti));
         s = s.replace("इ" + REPH, "ई").replace("इ" + REPH_ANUS, "ईं");
         s = MARK_BEFORE_SIGN.matcher(s).replaceAll("$2$1");
         // a reph typed between a half form and its aa-stroke: iznf'Zkr = प्रदर्शित
@@ -142,6 +167,19 @@ final class ChanakyaDecoder {
         s = MARK_BEFORE_SIGN.matcher(s).replaceAll("$2$1");
         s = s.replace("ाे", "ो").replace("ाै", "ौ");
         return Normalizer.normalize(s, Normalizer.Form.NFC);
+    }
+
+    /** The glyph text with every folded accent read back as the glyph code it was. */
+    private static String unfolded(String text) {
+        StringBuilder out = null;
+        for (int at = 0; at < text.length(); at++) {
+            Character glyph = FOLDED.get(text.charAt(at));
+            if (glyph != null) {
+                out = out == null ? new StringBuilder(text) : out;
+                out.setCharAt(at, glyph);
+            }
+        }
+        return out == null ? text : out.toString();
     }
 
     /** Glyph codes into Unicode pieces, each hook resolved onto the letter it changes. */

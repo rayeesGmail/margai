@@ -49,6 +49,21 @@ class ChanakyaDecoderTest {
         assertThat(mismatches(KRUTI_CASES, KRUTI)).isEmpty();
     }
 
+    /**
+     * A few of the fonts' glyph codes are accent characters to Unicode — the ृ is keyed on the grave accent,
+     * the short i with its anusvara on the macron — and PDFBox's text stripper folds an accent that sits
+     * inside the letter before it into that letter as a combining mark. On a tightened line the ृ of प्रकृति
+     * reached the decoder as U+0300, which no glyph map knows, and the check named 27 words of the first
+     * Hindi book as not on their pages (phy11-part1, D16). The mark is read as the glyph it was.
+     */
+    @Test
+    void aGlyphThePdfReaderFoldedIntoACombiningMarkIsReadAsTheGlyph() {
+        assertThat(ChanakyaDecoder.decode("izòQfr", WALKMAN)).isEqualTo("प्रकृति");
+        assertThat(ChanakyaDecoder.decode("ìFoh", WALKMAN)).isEqualTo("पृथ्वी");
+        assertThat(ChanakyaDecoder.decode("̄[kps", WALKMAN)).isEqualTo("खिंचे");
+        assertThat(ChanakyaDecoder.decode("izo`Qfr", WALKMAN)).isEqualTo("प्रकृति");
+    }
+
     /** Bookman, Times and Symbol spans are already Unicode: only the Devanagari fonts are decoded. */
     @Test
     void aLatinFontPassesThroughUntouched() {

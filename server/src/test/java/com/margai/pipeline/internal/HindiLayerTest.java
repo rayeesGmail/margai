@@ -46,6 +46,23 @@ class HindiLayerTest {
         assertThat(pages.get(3).unicode()).doesNotContain("lkjk").as("no Chanakya glyph text among the Unicode runs");
     }
 
+    /**
+     * The ृ of प्रकृति on p2 and p7 sits inside the letter before it, so PDFBox hands it over folded into that
+     * letter as a combining grave; before the decoder read the mark back the page had no प्रकृति at all and
+     * the check named the row's word as not on it (D16, the first Hindi book's 27 such lines).
+     */
+    @Test
+    void aVowelSignThePdfReaderFoldsIntoItsLetterIsStillRead() throws IOException {
+        assumeTrue(Files.exists(KHPH101), "founder's NCERT PDFs not on this machine");
+
+        List<HindiLayer.Page> pages = HindiLayer.pages(Files.readAllBytes(KHPH101));
+
+        assertThat(pages.get(1).devanagari()).contains("प्रकृति");
+        assertThat(pages.get(6).devanagari()).contains("प्रकृति");
+        assertThat(pages).allSatisfy(page -> assertThat(page.devanagari().chars()
+                .filter(c -> c >= 0x0300 && c <= 0x036F).count()).as("combining marks left in a page").isZero());
+    }
+
     /** All 79 Hindi chapter files: no Latin letter is left in a decoded Chanakya run — every glyph is mapped. */
     @Test
     void everyHindiChapterDecodesWithNoGlyphLeftOver() throws IOException {

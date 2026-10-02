@@ -573,6 +573,29 @@ class NcertLoadCommandTest {
                 .contains("ch 7 §7.6 ¶1: \"Eq. (7.5)\"");
     }
 
+    /**
+     * The Hindi edition's labels are चित्र and सारणी, with चित्रों when a sentence names several parts
+     * and the number sometimes inside the brackets. The first Hindi book's load named all 177 of its
+     * real labels as dropped (phy11-part1, D16), which buries the one entry that is not a label.
+     */
+    @Test
+    void aHindiFigureOrTableLabelIsAReferenceAndAHindiEquationNumberIsNot() {
+        jsonl(page(7, 2, "0.95",
+                new NcertPage.Paragraph("7.2", "चित्र 7.1a में दीर्घवृत्त दिखाया गया है; समीकरण (7.5) देखिए।",
+                        false, List.of("चित्र 7.1a", "सारणी 7.1", "चित्रों 2.2 (a), 2.2 (b) तथा 2.2 (c)", "चित्र (3.9b)",
+                                "समीकरण (7.5)", "4.8(c)"))));
+
+        run();
+
+        assertThat(imports.rows.getFirst().figureRefs())
+                .containsExactly("चित्र 7.1a", "सारणी 7.1", "चित्रों 2.2 (a), 2.2 (b) तथा 2.2 (c)", "चित्र (3.9b)");
+        assertThat(out.toString())
+                .contains("ch 7 §7.2 ¶1: \"समीकरण (7.5)\"")
+                .contains("ch 7 §7.2 ¶1: \"4.8(c)\"")
+                .doesNotContain("ch 7 §7.2 ¶1: \"चित्र")
+                .doesNotContain("ch 7 §7.2 ¶1: \"सारणी");
+    }
+
     /** The rows the load deleted are named under their own heading, so a corpus event's losses are on the record. */
     @Test
     void theAddressesTheLoadDeletedAreReported() {

@@ -223,9 +223,14 @@ class NcertLoadCommand extends NcertBookCommand {
      * plural — a sentence naming several parts at once prints "Figs. 3.15(a) to (d)" or
      * "Figures 4.8(b)", and taking only the singular dropped four real references from phy11-part1
      * (D15, 2026-09-17). An equation number a paragraph cites is still not a figure reference.
+     *
+     * <p>The Hindi edition's words are चित्र and सारणी, चित्रों and सारणियों for several; taking only the
+     * English ones named every real label of the first Hindi book as dropped (D16). They are matched
+     * without {@code \b}, which marks no boundary after a Devanagari vowel sign.
      */
-    private static final Pattern FIGURE_REF =
-            Pattern.compile("^(Fig(?:ure)?s?\\.?|Tables?)\\b.*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern FIGURE_REF = Pattern.compile(
+            "^(?:(?:Fig(?:ure)?s?\\.?|Tables?)\\b|(?:चित्र(?:ों)?|सारण(?:ी|ियों))(?![\\p{L}\\p{M}])).*",
+            Pattern.CASE_INSENSITIVE);
 
     /**
      * A footnote, which the books set at the foot of the page under a rule. It is the page's last

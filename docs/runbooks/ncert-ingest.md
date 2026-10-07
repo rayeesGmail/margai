@@ -569,6 +569,63 @@ Also read the extract report's low-confidence list: those pages are the model te
 look, and they should be checked whether or not the random sample lands on them — while remembering
 that at D14 it was silent about every defect that mattered.
 
+## 6. align — the Hindi rows set to the English ones (D16)
+
+```
+AI_LIVE=1 AWS_PROFILE=margai DB_URL=… \
+  java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live \
+  ncert align --book phy11-part1
+```
+
+**English is canonical and the Hindi follows it** (founder, DECISIONS 2026-10-01): a Hindi load puts each
+paragraph at the address of the same place in its section, and the Hindi print keeps two English
+paragraphs in one, or breaks one in two, often enough that the pairs drift inside most sections — the
+first book loaded 827 Hindi rows beside 909 English. `ncert align` embeds each Hindi paragraph (Cohere
+embed v4 on Bedrock, about ₹9 a Physics book; the English rows must be embedded first) and reports, per
+section: where the counts differ, the joins and splits it proposes, pairs weaker than 0.45, the numbers one
+edition of a pair carries and the other does not, and the PLAN D16 ✅ sample — 40 aligned pairs seeded so a
+re-run draws the same, the founder reading the ten most matra- and conjunct-dense. It changes no row and
+stores no vector.
+
+**Its proposals are a map, not entries.** On the first book about half were exact, and once every section
+was one to one it still proposed 30 reshapes in 12 sections whose pairs were all translations (equation-
+heavy neighbours score alike). The entries come from reading:
+
+- Per chapter, every section's English rows beside its Hindi rows, whole texts. The English row boundaries
+  decide — a list item, an Example statement, an Answer, a displayed-equation paragraph gets the same row in
+  Hindi — never the Hindi print's indents. A split goes where the English paragraph's first sentence begins
+  in the Hindi, matched by meaning, numbers, symbols and equation labels; where the translation fuses the
+  boundary inside a sentence, at the nearest sentence start, saying so in the reason.
+- Sections with equal counts are read too: a split and a join cancel in the count and leave the pairs
+  shifted.
+- Hindi-only text is kept, joined to the paragraph it follows; a caption, table, heading or running head
+  the transcriber let through is a `drop`; an English row with no Hindi anywhere is the transcription's
+  omission (if the page prints it) or the edition's (if it does not) — neither is forced with joins.
+- A `lang: hi` entry is written against the rows as the load shows them (after the visarga step, section
+  4). `split`: a span once on its page, a new paragraph from there (at a page's first words, it cuts the row
+  at the page break). `join`: the words a paragraph starts with; it becomes the rest of the one before —
+  across a page break the previous page's last body paragraph, a footnote skipped, same section only.
+  `defer`: a footnote one edition prints a page early. Entries apply in file order, each to the page the
+  earlier ones left; nothing moves text between paragraphs that are not neighbours, or across sections.
+- One fresh reader per chapter (two for a long one), briefed with these rules whole, then a separate pass
+  on characters, then the spec-auditor on the whole block before the founder approves it.
+
+**Simulate before the reload.** Apply the block to the loaded rows offline with the loader's rules and
+compare per section: no refusal, every section one to one, every pair read. The first book's reload matched
+its simulation row for row. Then: approval and commit, the reload (₹0), `ncert align` again (expect the
+counts equal and the proposals only the known false alarms, each pair read), `ncert verify --read-pages`
+on the pages whose rows changed, and its flags adjudicated as section 5 says.
+
+**The second read re-quotes.** A `misprint` or `false_positive` matches the verifier's two spans exactly,
+so a re-read that quotes the same place differently needs a new entry beside the old one, which stays for
+the read that quoted it that way. Once every page has a current read, `ncert verify` without
+`--read-pages` re-judges the stored reads with the rulings as they stand, at no cost.
+
+**The ✅ sample**: each of the 40 Hindi rows located on its page, read on a crop for digits, symbols,
+equations and sense against its English partner, its Devanagari checked against the decoded layer (a
+check, never quoted); the founder reads the ten marked. A book is done when every section is one to one,
+the second read is clean and the sample passes.
+
 ## 7. embed — a vector per paragraph, and the scored concept queries
 
 Runs after a book is canonical (verified, loaded, its clean share read). It embeds `text_en` and

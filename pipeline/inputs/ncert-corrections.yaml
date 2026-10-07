@@ -3181,3 +3181,8 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      transcribed: "W(r) = − 4 G m^2 / l − 2 G m^2 / (sqrt(2) l)", printed: "W(r) = − 4 G m^2 / l − 2 G m^2 / sqrt(2) l", reason: "the page prints 2 G m^2 over a built denominator √2 l (crop p10 x40-290 y580-700; layer y573-600); the row's brackets around sqrt(2) l are the transcriber's fraction notation"}
   - {book: phy11-part1, lang: hi, chapter: 7, page: 11, kind: text, address: "ch 7 §7.8 ¶6",
      transcribed: "= G M M_E / (h + R_E) (7.30)", printed: "= G m M_E / (h + R_E) (7.30)", reason: "the display prints G m M_E over h + R_E, a lower-case italic m after G (crop p11 x40-290 y85-130 at zoom 5; layer y104); the row had a capital M, found on the read of the 40-pair sample; the English row reads GmM_E"}
+  # phy11-part1 Hindi, round three (D16, 2026-10-07). The re-read of ch 3 p5 and ch 7 p11 after round two
+  # (pipeline/reports/2026-10-07-ncert-verify.md: 908 of 909 clean) left one flag, read on a crop of the page
+  # image: the verifier's, not a misreading. Changes no row. Approved by the founder 2026-10-07, as written.
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 11, kind: false_positive, address: "ch 7 §7.8 ¶14",
+     transcribed: "– G M m / 2 R – 4 G M m / 4 R", printed: "– G M m / 2 R – G M m / R", reason: "the page prints E_N = – GMm/2R – 4GMm/4R (crop p11 x290-560 y345-475 at zoom 4); the row matches, and the verifier's printed span is the right-hand side of the next display, – GM/2R – GM/R"}

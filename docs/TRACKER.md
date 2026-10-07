@@ -257,6 +257,14 @@ HOW TO RESUME (supersedes item 2 of the list below):
      most of its helpers to the /tmp purge between 2026-10-03 and 10-07 (hisim, hgen, crop, layer, rows.json, the rulings
      files); the jar copy, the round-two script, r2gen.py, sim-r2.json and the crops survive. Rebuild the helpers from the
      transcript before the next book.
+     2026-10-07 07:52: ROUND TWO RAN (reports e94ea05; align ₹9.28, verify ₹4.02): the 17 entries applied with no refusal and
+     changed exactly the three simulated rows (0 inserted, 3 updated, 906 unchanged); the re-align drew the same 40-pair sample
+     and the same 30 proposals, so Claude's 40-of-40 read stands; the re-read of ch 3 p5 and ch 7 p11 set 19 flags aside by
+     the rulings and left 908 of 909 clean (99.9%). The last flag, ch 7 p11 §7.8 ¶14, is the verifier's: the page prints
+     E_N = – GMm/2R – 4GMm/4R as the row does (crop r2/p11-en.png), and its "printed" span is the next display's right-hand
+     side. One false_positive entry is drafted and waits for the founder's approval; then the founder runs scratchpad
+     `d16-phy11-hi-rejudge.sh` (verify without --read-pages, ₹0) and the book reads 909 of 909. The seven "no row carries"
+     passages are the same seven ruled above. Still the founder's: the ten sample pairs, and the English side headings.
   1. FOUNDER: approve the block (inputs README: rulings are approved before they are committed). The choices in it that are yours:
      the 12 "as printed" spelling entries (the print's own typos put back over the transcriber's repairs); the × the page does
      not draw, which only the layer's Unicode span carries — two text entries write it into a row (ch 7 p4 `3.84 × 10^8m`, p9

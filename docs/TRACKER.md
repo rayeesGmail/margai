@@ -251,6 +251,12 @@ HOW TO RESUME (supersedes item 2 of the list below):
      that the raster draws half covered and the verifier read as `a`. (ch 6 p21 `r_i × m_ig` is a fifth row-carried × at a
      raster gap; no flag rests on it.) THEN: Claude writes the block with its approval line and commits; the founder runs
      scratchpad `d16-phy11-hi-round2.sh` (reload ₹0, align ≈₹9, re-read of ch 3 p5 and ch 7 p11 ≈₹3); expect 909 of 909.
+     2026-10-07: APPROVED as written and all four signs allowed (DECISIONS 2026-10-07); the 17 entries are committed at the end
+     of the corrections file, byte for byte the simulated block (1,392 entries in the file). NEXT: the founder runs
+     `d16-phy11-hi-round2.sh` from server/; then Claude commits its three reports and reads the result. The scratchpad lost
+     most of its helpers to the /tmp purge between 2026-10-03 and 10-07 (hisim, hgen, crop, layer, rows.json, the rulings
+     files); the jar copy, the round-two script, r2gen.py, sim-r2.json and the crops survive. Rebuild the helpers from the
+     transcript before the next book.
   1. FOUNDER: approve the block (inputs README: rulings are approved before they are committed). The choices in it that are yours:
      the 12 "as printed" spelling entries (the print's own typos put back over the transcriber's repairs); the × the page does
      not draw, which only the layer's Unicode span carries — two text entries write it into a row (ch 7 p4 `3.84 × 10^8m`, p9

@@ -3133,3 +3133,51 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      transcribed: "W_12 = बल विस्थापन =", printed: "W_12 = बल × विस्थापन =", reason: "the page leaves a wide gap between the two words: the raster does not draw the glyph, and the layer's Unicode span carries × there; the English row reads force × displacement"}
   - {book: phy11-part1, lang: hi, chapter: 7, page: 10, kind: text, address: "ch 7 §7.7 ¶12",
      transcribed: "वर्ग के शीर्षो पर स्थित", printed: "वर्ग के शीर्षों पर स्थित", reason: "the page prints the anusvara beside the reph (the reph-and-anusvara glyph); zoomed crop and the decoded layer's line agree"}
+  # phy11-part1 Hindi, round two (D16, 2026-10-03). The second read of the reloaded rows
+  # (pipeline/reports/2026-10-03-ncert-verify-2.md: 895 of 909 clean) left 13 flags and one row not judged;
+  # each was read on a crop of the page image, and none is a misreading. Fourteen rulings: nine false_positive
+  # and five misprint. Four of them rule again on words ruled above (ch 4 p10, ch 5 p6, ch 6 p17, ch 6 p29):
+  # a ruling matches the verifier's two spans exactly, the re-read quoted the same place differently, and the
+  # earlier entry stays for the read that quoted it that way. Three text entries: Eq. (7.30)'s lower-case m,
+  # found on the read of the 40-pair sample, and the degree sign of 19° twice on ch 3 p5.
+  # A sign the raster leaves out and only the layer's Unicode span carries is the class the founder allowed
+  # four times on 2026-10-03; ch 7 p4's ruling here is the flag on one of those four. The new places — a × a
+  # row already carries (ch 4 p11), an ω the raster draws half covered (ch 6 p13) and the two degree signs —
+  # were put to the founder one by one and allowed on 2026-10-07 (DECISIONS). The decoded layer is cited by
+  # position only and none of its text is kept here (SPEC §12.2).
+  # Simulated in the scratchpad before the reload: no refusal, three rows change and nothing else moves.
+  # Approved by the founder 2026-10-07, as written.
+  - {book: phy11-part1, lang: hi, chapter: 1, page: 4, kind: misprint, address: "ch 1 §1.3 ¶15",
+     transcribed: "ऊपर प्रेक्षण (a) में उल्लिखित", printed: "ऊपर प्रेक्षण (2) में उल्लिखित", reason: "the page prints 'ऊपर प्रेक्षण (a) में उल्लिखित' (crop p4 x290-540 y270-380; layer y320) although it numbers that observation (2) in the left column; the book's own slip, the row carries the print as the English row's '(a) above' does"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 5, kind: text, address: "ch 3 §3.4 ¶9",
+     transcribed: "tan^-1 (0.343) = 19", printed: "tan^-1 (0.343) = 19°", reason: "the raster does not draw the degree sign after 19 and the layer's Unicode span carries ° there (layer y661; crop p5 x40-290 y650-706 at zoom 5); the English row reads 19°"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 5, kind: text, address: "ch 3 §3.4 ¶10",
+     transcribed: "ऊर्ध्वाधर से 19 का कोण", printed: "ऊर्ध्वाधर से 19° का कोण", reason: "the same angle in the answer's last sentence: the raster does not draw the degree sign and the layer's Unicode span carries ° there (layer y689; crop p5 x40-290 y650-706 at zoom 5); the English row reads 19°"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 8, kind: false_positive, address: "ch 3 §3.6 ¶11",
+     transcribed: "21.8 ≅ 0.397 phi ≅ 23.4°", printed: "21.8 phi ≅ 23.4°", reason: "the page prints '= 10 × sin 120° / 21.8 = 10√3 / (2 × 21.8) ≅ 0.397' and under it 'φ ≅ 23.4°' (crop p8 x290-540 y560-680; layer y620-660); the row carries both lines as printed, and the verifier quoted a span neither the page nor the row has, which left the row not judged"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 5, kind: false_positive, address: "ch 4 §4.5 ¶7",
+     transcribed: "उसे रोकने में अधिक समय लगाता है ।", printed: "उसे रोकने में अधिक समय लगाता है, जिसके लिए अपेक्षाकृत कम बल की आवश्यकता होती है", reason: "the page prints 'उसे रोकने में अधिक समय लगाता है । आपने ध्यान दिया होगा' (crop p5 x290-540 y55-300; layer y241): the sentence ends there, the row matches, and the clause the verifier printed after a comma is not in the paragraph"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 10, kind: misprint, address: "ch 4 §4.8 ¶4",
+     transcribed: "(4-11)", printed: "(4.11)", reason: "the page prints 'समीकरण (4-11) से' with a hyphen (crop p10 x290-540 y560-670; layer y594) against its own equation number (4.11); the row carries the print — the ruling above on the same words, which the re-read quoted shorter"}
+  - {book: phy11-part1, lang: hi, chapter: 4, page: 11, kind: false_positive, address: "ch 4 §4.8 ¶8",
+     transcribed: "T_2 = 6 × 10 = 60N", printed: "T_2 = 6 10 = 60N", reason: "the page shows a gap between 6 and 10: the raster does not draw the × the layer's Unicode span carries there (layer y405; crop p11 x40-290 y395-495); the row carries the ×, as the English row does, and no row changes"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 6, kind: misprint, address: "ch 5 §5.5 ¶8",
+     transcribed: "घर्षण बल द्वारा किया गया कार्य W_F -> आयत AGHI", printed: "घर्षण बल द्वारा किया गया कार्य W_f -> आयत AGHI", reason: "the prose line prints W with a capital italic F subscript before the arrow, 'कार्य W_F→आयत AGHI', and the display under it W_f (crop p6 x395-445 y82-104 at zoom 12; layer y86, y102); the book's own slip, the row carries the print — the ruling above, which the re-read quoted longer"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 13, kind: false_positive, address: "ch 5 §5.11 ¶2",
+     transcribed: "चाल v_1i से", printed: "चाल v_1i", reason: "the page prints 'm_1 चाल v_1i से गतिमान है' (crop p13 x290-540 y680-730; layer y696); the row matches, the verifier quoted the same span one word short"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 13, kind: false_positive, address: "ch 6 §6.6 ¶6",
+     transcribed: "v = omega r = 0", printed: "v = a r = 0", reason: "the page draws the letter between '=' and r cut off at its right edge by the run that follows it (crop p13 x40-130 y536-556 at zoom 12): what shows is the left bowl of ω and no a, and the layer's Symbol span at that place carries ω (layer y537 x67-81); the row's omega is the English row's v = omega r = 0"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 17, kind: misprint, address: "ch 6 §6.7.2 ¶26",
+     transcribed: "कोई कण P किसी कण t पर, v वेग से", printed: "कोई कण P किसी समय t पर, v वेग से", reason: "the page prints 'कोई कण P किसी कण t पर', कण where क्षण is meant (crop p17 x290-540 y440-500; layer y436); the book's own slip, the row carries the print — the ruling above, where the re-read wrote समय for the word"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 21, kind: false_positive, address: "ch 6 §6.8.2 ¶3",
+     transcribed: "tau_i = r_i × m_ig", printed: "τ_i = r_i × m_ig", reason: "the page prints τ_i = r_i [a gap] m_i g (crop p21 x290-540 y405-490; layer y432); 'tau_i' is the transcriber's spelling of τ, and the × both spans carry sits where the raster leaves the gap and the layer's Unicode span has the sign"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: false_positive, address: "ch 6 §6.11 ¶13",
+     transcribed: "I ((2 omega) / 2) d omega / dt", printed: "I (2 omega / 2) d omega / dt", reason: "the page prints I, then (2ω) over 2 as a built fraction, then dω over dt (crop p29 x40-290 y440-530; layer y485-502); the row's outer brackets are the transcriber's fraction notation — the ruling above, which the re-read quoted with the brackets moved"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 30, kind: misprint, address: "ch 6 §6.12 ¶9",
+     transcribed: "L_perp से दर्शात हैं", printed: "L_perp से दर्शाते हैं", reason: "the page prints 'L_⊥ से दर्शात हैं।', दर्शात where दर्शाते is meant (crop p30 x290-540 y545-720; layer y572); the book's own slip, which the text entry above put back, and the row carries the print"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 4, kind: false_positive, address: "ch 7 §7.3 ¶1",
+     transcribed: "3.84 × 10^8m", printed: "3.84 10^8m", reason: "this × is the one the text entry above writes into the row, allowed by the founder on 2026-10-03: the raster leaves a gap between 3.84 and 10^8m and the layer's Unicode span carries × there (layer y294; crop p4 x40-290 y270-315); the verifier reads the raster"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 10, kind: false_positive, address: "ch 7 §7.7 ¶11",
+     transcribed: "W(r) = − 4 G m^2 / l − 2 G m^2 / (sqrt(2) l)", printed: "W(r) = − 4 G m^2 / l − 2 G m^2 / sqrt(2) l", reason: "the page prints 2 G m^2 over a built denominator √2 l (crop p10 x40-290 y580-700; layer y573-600); the row's brackets around sqrt(2) l are the transcriber's fraction notation"}
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 11, kind: text, address: "ch 7 §7.8 ¶6",
+     transcribed: "= G M M_E / (h + R_E) (7.30)", printed: "= G m M_E / (h + R_E) (7.30)", reason: "the display prints G m M_E over h + R_E, a lower-case italic m after G (crop p11 x40-290 y85-130 at zoom 5; layer y104); the row had a capital M, found on the read of the 40-pair sample; the English row reads GmM_E"}

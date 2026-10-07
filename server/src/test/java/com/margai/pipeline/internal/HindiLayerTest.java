@@ -63,6 +63,20 @@ class HindiLayerTest {
                 .filter(c -> c >= 0x0300 && c <= 0x036F).count()).as("combining marks left in a page").isZero());
     }
 
+    /**
+     * ch 3 p1 types पढ़ेंगे's nukta after its vowel sign, and ch 4 p16 sets पट्टियों's ट्ट in ChanakyaThin inside
+     * a Walkman word: both pages once read without the word, which the check then named (D16).
+     */
+    @Test
+    void aWordTypedOutOfOrderOrInASecondFaceIsRead() throws IOException {
+        Path khph103 = HINDI.resolve("phy11-part1/khph103.pdf");
+        Path khph104 = HINDI.resolve("phy11-part1/khph104.pdf");
+        assumeTrue(Files.exists(khph104), "founder's NCERT PDFs not on this machine");
+
+        assertThat(HindiLayer.pages(Files.readAllBytes(khph103)).get(0).devanagari()).contains("पढ़ेंगे");
+        assertThat(HindiLayer.pages(Files.readAllBytes(khph104)).get(15).devanagari()).contains("पट्टियों");
+    }
+
     /** All 79 Hindi chapter files: no Latin letter is left in a decoded Chanakya run — every glyph is mapped. */
     @Test
     void everyHindiChapterDecodesWithNoGlyphLeftOver() throws IOException {

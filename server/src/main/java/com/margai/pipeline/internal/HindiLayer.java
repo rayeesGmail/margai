@@ -119,7 +119,7 @@ final class HindiLayer {
             if (previous != null && glyph.x() - (previous.x() + previous.width()) > 0.15 * glyph.size()) {
                 text.append(' ');
             }
-            text.append(glyph.text());
+            text.append(ChanakyaDecoder.asWalkman(glyph.text(), glyph.font()));
             previous = glyph;
         }
         return text.toString();

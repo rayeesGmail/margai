@@ -132,6 +132,17 @@ final class ChanakyaDecoder {
     private static final Pattern MARK_BEFORE_SIGN = Pattern.compile("([" + MARKS + "])([" + SIGNS + "]+)");
     private static final Pattern DOUBLED_SIGN = Pattern.compile("([ेैुू])\\1");
 
+    /** A nukta or a rakar typed after the vowel sign it comes before in Unicode: i<s+axs = पढ़ेंगे, xszV = ग्रेट. */
+    private static final Pattern SIGN_BEFORE_NUKTA_OR_RAKAR = Pattern.compile("([" + SIGNS + "]+)(़|्र)");
+
+    /**
+     * The plain Chanakya faces — Chanakya, ChanakyaThin, ChanakyaBold, which set a single conjunct inside a
+     * Walkman-Chanakya word — key two conjuncts Walkman does not: ^ is ट्ट (पट्टियों, चट्टान, संघट्ट) and b is
+     * ड्ढ (गड्ढे), each read off the print in every place the 79 chapter files use them (D16). Given here as
+     * the Walkman codes that build them, so a run mixing the faces decodes as one.
+     */
+    private static final Map<Character, String> PLAIN_FACE = Map.of('^', "êV", 'b', "M~<");
+
     private ChanakyaDecoder() {
     }
 
@@ -166,7 +177,23 @@ final class ChanakyaDecoder {
         s = placeReph(s);
         s = MARK_BEFORE_SIGN.matcher(s).replaceAll("$2$1");
         s = s.replace("ाे", "ो").replace("ाै", "ौ");
+        // signs typed in an order Unicode does not allow, which the raster draws as the word (D16): a nukta or
+        // rakar after its vowel sign, a sign typed again round a mark (ksas = ओं, aa = ं) or under the ी flag
+        s = SIGN_BEFORE_NUKTA_OR_RAKAR.matcher(s).replaceAll("$2$1");
+        s = s.replace("ोे", "ो").replace("ओे", "ओ").replace("ंं", "ं").replace("ीे", "ी");
         return Normalizer.normalize(s, Normalizer.Form.NFC);
+    }
+
+    /**
+     * One glyph's code as the Walkman faces key it: a plain Chanakya face's own conjuncts rewritten, any
+     * other glyph as it is. The layer reads a line's Chanakya glyphs as one run in its first glyph's font.
+     */
+    static String asWalkman(String glyph, String font) {
+        String name = font == null ? "" : font.toLowerCase(Locale.ROOT);
+        if (glyph == null || glyph.length() != 1 || !name.contains("chanakya") || name.contains("walkman")) {
+            return glyph;
+        }
+        return PLAIN_FACE.getOrDefault(glyph.charAt(0), glyph);
     }
 
     /** The glyph text with every folded accent read back as the glyph code it was. */

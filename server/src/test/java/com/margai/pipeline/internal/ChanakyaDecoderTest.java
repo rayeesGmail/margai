@@ -64,6 +64,37 @@ class ChanakyaDecoderTest {
         assertThat(ChanakyaDecoder.decode("izo`Qfr", WALKMAN)).isEqualTo("प्रकृति");
     }
 
+    /**
+     * Signs typed in an order Unicode does not allow, which the raster draws as the word: a nukta or a rakar
+     * after its vowel sign, a sign typed again round a mark, a े typed under the ी flag. Each was a word of
+     * the first Hindi book the check named as not on its page (phy11-part1, D16).
+     */
+    @Test
+    void signsTypedOutOfUnicodeOrderPrintAsTheWord() {
+        assertThat(ChanakyaDecoder.decode("i<s+axs", WALKMAN)).isEqualTo("पढ़ेंगे");
+        assertThat(ChanakyaDecoder.decode("xszV", WALKMAN)).isEqualTo("ग्रेट");
+        assertThat(ChanakyaDecoder.decode("f'kjkvksas", WALKMAN)).isEqualTo("शिराओं");
+        assertThat(ChanakyaDecoder.decode("ekuksas", WALKMAN)).isEqualTo("मानों");
+        assertThat(ChanakyaDecoder.decode("v.kqvksaa", WALKMAN)).isEqualTo("अणुओं");
+        assertThat(ChanakyaDecoder.decode("bUghs", WALKMAN)).isEqualTo("इन्ही");
+    }
+
+    /**
+     * The plain Chanakya faces set ट्ट and ड्ढ inside a Walkman word on glyph codes Walkman reads as a quote
+     * and इ; the layer hands each glyph over as Walkman's codes for the conjunct (D16: पट्टियों, गड्ढे).
+     */
+    @Test
+    void aPlainChanakyaFacesConjunctReadsInsideAWalkmanWord() {
+        String thin = "ABCDEF+ChanakyaThin";
+
+        assertThat(ChanakyaDecoder.decode("if" + ChanakyaDecoder.asWalkman("^", thin) + ";ksa", WALKMAN))
+                .isEqualTo("पट्टियों");
+        assertThat(ChanakyaDecoder.decode("x" + ChanakyaDecoder.asWalkman("b", "Chanakya") + "s", WALKMAN))
+                .isEqualTo("गड्ढे");
+        assertThat(ChanakyaDecoder.asWalkman("^", WALKMAN)).isEqualTo("^");
+        assertThat(ChanakyaDecoder.asWalkman("b", "Bookman-Light")).isEqualTo("b");
+    }
+
     /** Bookman, Times and Symbol spans are already Unicode: only the Devanagari fonts are decoded. */
     @Test
     void aLatinFontPassesThroughUntouched() {

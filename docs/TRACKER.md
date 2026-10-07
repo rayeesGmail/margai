@@ -290,6 +290,15 @@ HOW TO RESUME (supersedes item 2 of the list below):
   4. Before the other nine books: fix the six HindiChecks noise classes b2 named (scratchpad b2_fix.py simulates 65 → 16 word lines
      and 212 → 21 symbol lines); widen `Alignment` to 1:N and re-measure against this book's truth (truth.py); write the runbook's
      "6. align" section from BRIEF-align.md; then run the books — ≈₹810 a Physics-sized book all in.
+     2026-10-07 STATUS: the noise fixes are DONE (53ede9d decoder, 49d63ab layer and check), measured at ₹0 on this book's loaded
+     rows and its local PDFs (scratchpad preview/run.sh, javac against target/classes): word lines 23 → 1 (चाल, no space glyph),
+     symbol lines 212 → 17 (tables, captions and the Summary's ×, two caption arrows, six one-offs), coverage unchanged. The
+     runbook's "6. align" is written (ccde668). OPEN, the founder's: (i) `Alignment` 1:N needs real Hindi vectors to calibrate
+     and `ncert align` stores none — Claude recommends PARKING it: the proposals are a map and reading makes the entries;
+     (ii) the scratchpad simulator (hisim.py) mirrored the loader and was lost with the purge; Claude proposes an exact in-repo
+     replacement, `ncert load --dry-run` over a local copy of the extraction JSONL, before the next book's adjudication. The
+     next book can be extracted meanwhile: scratchpad `d16-phy11p2-hi-stage.sh` renders phy11-part2 Hindi and transcribes ch 8
+     (jar copy at 49d63ab; its Hindi PDFs go to the bucket first).
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

@@ -77,6 +77,30 @@ class HindiLayerTest {
         assertThat(HindiLayer.pages(Files.readAllBytes(khph104)).get(15).devanagari()).contains("पट्टियों");
     }
 
+    /**
+     * The noise the first Hindi book's check carried, from the way the layer was read, gone (D16): a decimal
+     * point set in the Chanakya face read inside its number (ch 3 p2's 35.6, once 35 . 6); a condensed line's
+     * space glyphs kept as spaces (ch 5 p11, once one word); the example marker ▶, which PDFBox gives as a
+     * bullet, dropped (ch 4 p4) while Wingdings' list bullets are read as bullets (ch 4 p5's five); the Symbol
+     * face's ∞, which came through as ¥ (ch 7 p9); and dv over dt found in the Latin read by baseline (ch 2 p4).
+     */
+    @Test
+    void theLayerReadsNumbersSpacesMarkersAndSymbolsAsPrinted() throws IOException {
+        assumeTrue(Files.exists(KHPH101), "founder's NCERT PDFs not on this machine");
+        Path book = HINDI.resolve("phy11-part1");
+
+        assertThat(page(book, 3, 2).devanagari()).contains("35.6 °C").doesNotContain("35 . 6");
+        assertThat(page(book, 5, 11).devanagari()).contains("मान लीजिए");
+        assertThat(page(book, 4, 4).devanagari()).doesNotContain("•");
+        assertThat(page(book, 4, 5).unicode().chars().filter(c -> c == '•').count()).isEqualTo(5);
+        assertThat(page(book, 7, 9).devanagari()).contains("∞").doesNotContain("¥");
+        assertThat(page(book, 2, 4).latin()).containsPattern("\\bdv\\b").containsPattern("\\bdt\\b");
+    }
+
+    private static HindiLayer.Page page(Path book, int chapter, int page) throws IOException {
+        return HindiLayer.pages(Files.readAllBytes(book.resolve("khph10" + chapter + ".pdf"))).get(page - 1);
+    }
+
     /** All 79 Hindi chapter files: no Latin letter is left in a decoded Chanakya run — every glyph is mapped. */
     @Test
     void everyHindiChapterDecodesWithNoGlyphLeftOver() throws IOException {

@@ -468,8 +468,8 @@ class NcertVerifyCommand extends NcertBookCommand {
                 pages++;
                 String rows = page.getValue().stream().map(placed -> placed.part().text())
                         .collect(Collectors.joining(" "));
-                findings.check("ch " + chapter.no() + " p" + page.getKey(), layer.get(page.getKey() - 1).devanagari(),
-                        rows, page.getKey() == summaryPage);
+                findings.check("ch " + chapter.no() + " p" + page.getKey(), layer.get(page.getKey() - 1), rows,
+                        page.getKey() == summaryPage);
             }
         }
         findings.report(report, " of the " + pages + " page(s) the loaded rows are on");

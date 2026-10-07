@@ -2,9 +2,12 @@ package com.margai.pipeline.internal;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,39 +41,64 @@ final class HindiChecks {
     /** The tokens that are symbols, whose loss the page-side count catches. */
     private static final Pattern SYMBOL = Pattern.compile("[×÷•≤≥≈≅≃→∞∝]");
 
-    /** The prompt's spellings for what the page prints as a symbol; never a Latin word the page lacks. */
-    private static final java.util.Set<String> NOTATION = java.util.Set.of("pi", "theta", "omega", "rho", "mu",
+    /**
+     * The prompt's spellings for what the page prints as a symbol; never a Latin word the page lacks. "to" is
+     * the rows' range word — integral(a to b), sum(i=1 to n) — never a limit arrow (D16).
+     */
+    private static final Set<String> NOTATION = Set.of("pi", "theta", "omega", "rho", "mu",
             "lambda", "alpha", "beta", "gamma", "delta", "sigma", "phi", "psi", "tau", "nu", "epsilon", "eta",
             "kappa", "chi", "xi", "zeta", "sqrt", "hat", "vec", "bar", "approx", "integral", "sum", "partial",
-            "perp", "par", "infinity");
+            "perp", "par", "infinity", "to");
+
+    /** The rows' arrows: a limit or a map written ->, a vector written _vec, each an → the page draws. */
+    private static final Pattern ARROW = Pattern.compile("->|_vec");
+
+    /** A one-letter subscript run into the next symbol, m_ix_i or A_xB_x, which the page sets apart. */
+    private static final Pattern RUN_ON_SUBSCRIPT = Pattern.compile("(_[A-Za-z0-9])(?=[A-Za-z][_^])");
+
+    /** The joiners a row may write between a visible halant and the next letter (दिक्‌स्थान); the layer has none. */
+    private static final Pattern JOINER = Pattern.compile("[\\u200C\\u200D]");
 
     private HindiChecks() {
     }
 
     /**
      * The Devanagari words the rows carry and the decoded page does not: misreadings and additions. A word the
-     * page carries fewer times is not named — a word the layer splits across lines makes the page one short.
+     * page carries fewer times is not named — a word the layer splits across lines makes the page one short —
+     * and a word the page breaks at a line end with no hyphen (अत्यधि|क) is on it.
      */
     static List<String> devanagari(String page, String rows) {
         Map<String, Integer> onPage = counts(WORD, page);
+        Set<String> brokenAtLineEnds = lineEndJoins(page);
         Map<String, Integer> inRows = counts(WORD, rows);
         List<String> findings = new ArrayList<>();
         inRows.forEach((word, count) -> {
-            if (!onPage.containsKey(word)) {
+            if (!onPage.containsKey(word) && !brokenAtLineEnds.contains(word)) {
                 findings.add("'" + word + "' " + count + "x in the rows, 0x on the page");
             }
         });
         return findings;
     }
 
+    static List<String> spans(String page, String rows) {
+        return spans(page, "", rows);
+    }
+
     /**
      * The page's digits, Latin and symbols against the rows: symbols the page carries more often (lost), then
      * digits and Latin the rows carry and the page does not (misread). The page is its whole text, decoded runs
-     * included — some books set their digits in the Chanakya font, where they decode to themselves.
+     * included — some books set their digits in the Chanakya font, where they decode to themselves. The rows
+     * are read in the page's notation first: their arrows as →, a run-on subscript set apart. A token the rows
+     * carry is also found in the page's Latin read by baseline ({@link HindiLayer.Page#latin()}), or as a
+     * spelled Greek letter with one letter after it (lambdaA), and a ≃, ≈ or ≅ in the ~ the page draws it with.
      */
-    static List<String> spans(String page, String rows) {
+    static List<String> spans(String page, String pageLatin, String rows) {
         Map<String, Integer> onPage = counts(TOKEN, page);
-        Map<String, Integer> inRows = counts(TOKEN, rows);
+        Set<String> alsoOnPage = counts(TOKEN, pageLatin).keySet();
+        String asPrinted = RUN_ON_SUBSCRIPT.matcher(ARROW.matcher(rows == null ? "" : rows).replaceAll(" → "))
+                .replaceAll("$1 ");
+        Map<String, Integer> inRows = counts(TOKEN, asPrinted);
+        boolean tilde = page != null && page.indexOf('~') >= 0;
         List<String> findings = new ArrayList<>();
         onPage.forEach((token, count) -> {
             int carried = inRows.getOrDefault(token, 0);
@@ -79,11 +107,41 @@ final class HindiChecks {
             }
         });
         inRows.forEach((token, count) -> {
-            if (!onPage.containsKey(token) && !NOTATION.contains(token.toLowerCase(java.util.Locale.ROOT))) {
+            boolean found = onPage.containsKey(token) || alsoOnPage.contains(token) || notation(token)
+                    || (tilde && "≃≈≅".contains(token));
+            if (!found) {
                 findings.add("'" + token + "' " + count + "x in the rows, 0x on the page");
             }
         });
         return findings;
+    }
+
+    /** A spelling of the prompt's, alone or with one letter after it — λA written lambdaA. */
+    private static boolean notation(String token) {
+        String lower = token.toLowerCase(Locale.ROOT);
+        return NOTATION.contains(lower) || NOTATION.stream()
+                .anyMatch(name -> lower.startsWith(name) && lower.length() == name.length() + 1);
+    }
+
+    /** Each line's last word joined to the next line's first: a word broken at a line end with no hyphen. */
+    private static Set<String> lineEndJoins(String page) {
+        Set<String> joins = new HashSet<>();
+        if (page == null) {
+            return joins;
+        }
+        String[] lines = page.split("\n");
+        for (int index = 0; index + 1 < lines.length; index++) {
+            Matcher end = WORD.matcher(lines[index]);
+            String last = null;
+            while (end.find()) {
+                last = end.end() == lines[index].length() ? end.group() : null;
+            }
+            Matcher start = WORD.matcher(lines[index + 1]);
+            if (last != null && start.find() && start.start() == 0) {
+                joins.add(Normalizer.normalize(last + start.group(), Normalizer.Form.NFC));
+            }
+        }
+        return joins;
     }
 
     /** The share of the page's Devanagari words the rows carry; an empty page is fully covered. */
@@ -111,11 +169,11 @@ final class HindiChecks {
         private int pages;
 
         /** One page's rows against its layer; the Summary's page is not judged for coverage — its rows must not carry the Summary. */
-        void check(String at, String layer, String rows, boolean summaryPage) {
+        void check(String at, HindiLayer.Page layer, String rows, boolean summaryPage) {
             pages++;
-            devanagari(layer, rows).forEach(finding -> words.add(at + ": " + finding));
-            spans(layer, rows).forEach(finding -> spans.add(at + ": " + finding));
-            double share = coverage(layer, rows);
+            devanagari(layer.devanagari(), rows).forEach(finding -> words.add(at + ": " + finding));
+            spans(layer.devanagari(), layer.latin(), rows).forEach(finding -> spans.add(at + ": " + finding));
+            double share = coverage(layer.devanagari(), rows);
             if (!summaryPage && share < COVERAGE_FLOOR) {
                 coverage.add(at + ": the rows carry " + Math.round(share * 100) + "% of the page's Devanagari words");
             }
@@ -142,7 +200,7 @@ final class HindiChecks {
         if (text == null) {
             return counts;
         }
-        Matcher matcher = pattern.matcher(Normalizer.normalize(text, Normalizer.Form.NFC));
+        Matcher matcher = pattern.matcher(Normalizer.normalize(JOINER.matcher(text).replaceAll(""), Normalizer.Form.NFC));
         while (matcher.find()) {
             counts.merge(matcher.group(), 1, Integer::sum);
         }

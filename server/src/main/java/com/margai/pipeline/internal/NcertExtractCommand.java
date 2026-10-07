@@ -239,8 +239,7 @@ class NcertExtractCommand extends NcertBookCommand {
                 if (page <= hindiLayer.size()) {
                     String transcribed = response.output().paragraphs().stream()
                             .map(NcertPage.Paragraph::text).collect(java.util.stream.Collectors.joining(" "));
-                    hindi.check("ch " + chapter.no() + " p" + page, hindiLayer.get(page - 1).devanagari(),
-                            transcribed, headingPage);
+                    hindi.check("ch " + chapter.no() + " p" + page, hindiLayer.get(page - 1), transcribed, headingPage);
                 }
                 previous = PreviousPage.of(response.output(), previous);
                 if (read.confidence() != null && read.confidence().compareTo(LOW_CONFIDENCE) < 0) {

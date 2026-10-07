@@ -57,6 +57,45 @@ class HindiChecksTest {
         assertThat(HindiChecks.spans("π r √ 2 ± 4", "pi r sqrt(2) ± 4 ±")).isEmpty();
     }
 
+    /**
+     * The first Hindi book's word lines that were not misreadings (D16): a word the page breaks at a line end
+     * with no hyphen, and the zero-width joiner a row writes after a visible halant. A word only broken inside
+     * a line is still named.
+     */
+    @Test
+    void aWordBrokenAtALineEndOrJoinedByAJoinerIsOnThePage() {
+        assertThat(HindiChecks.devanagari("सार्थक अंकों की संख्या अत्यधि\nक (अनन्त) है।", "संख्या अत्यधिक (अनन्त) है।"))
+                .isEmpty();
+        assertThat(HindiChecks.devanagari("दिक्स्थान में", "दिक्‌स्थान में")).isEmpty();
+        assertThat(HindiChecks.devanagari("संख्या अत्यधि क है।", "संख्या अत्यधिक है।"))
+                .containsExactly("'अत्यधिक' 1x in the rows, 0x on the page");
+    }
+
+    /**
+     * The rows' notation read as the page prints it (D16): -> and _vec are arrows, "to" is the range word of an
+     * integral, a one-letter subscript runs into the next symbol in m_ix_i, a spelled Greek letter runs into a
+     * symbol in lambdaA, and the page draws ≃ as a tilde over a bar.
+     */
+    @Test
+    void theRowsNotationIsReadAsThePagePrintsIt() {
+        assertThat(HindiChecks.spans("lim Δt → 0 ∫ 1 0 x A →", "lim(Delta t -> 0) integral(0 to 1) x A_vec")).isEmpty();
+        assertThat(HindiChecks.spans("m x i i", "sum m_ix_i")).isEmpty();
+        assertThat(HindiChecks.spans("λ A", "lambdaA")).isEmpty();
+        assertThat(HindiChecks.spans("1 + x ~ 1", "1 + x ≃ 1")).isEmpty();
+        assertThat(HindiChecks.spans("1 + x = 1", "1 + x ≃ 1")).containsExactly("'≃' 1x in the rows, 0x on the page");
+    }
+
+    /**
+     * A stacked fraction is drawn a glyph at a time, d d v t, so the page's lines never hold dv or dt; its Latin
+     * read by baseline does. That reading only finds a token the rows carry — it never counts one.
+     */
+    @Test
+    void aTokenTheLayerHoldsOnlyByBaselineIsFound() {
+        assertThat(HindiChecks.spans("a = d\nd\nv\nt", "dv\ndt", "a = dv / dt")).isEmpty();
+        assertThat(HindiChecks.spans("a = d\nd\nv\nt", "", "a = dv / dt"))
+                .containsExactly("'dv' 1x in the rows, 0x on the page", "'dt' 1x in the rows, 0x on the page");
+    }
+
     @Test
     void theShareOfThePagesWordsTheRowsCarry() {
         assertThat(HindiChecks.coverage("एक दो तीन चार", "एक दो")).isEqualTo(0.5);

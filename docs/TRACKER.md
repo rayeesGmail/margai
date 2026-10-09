@@ -319,6 +319,16 @@ HOW TO RESUME (supersedes item 2 of the list below):
      अनुदैर्ध्य, an "as printed" entry for the adjudication — and one is the founder's: p3 prints "प्रतिबल α विकृति", α where ∝
      is meant, and the row wrote ∝. The × lines (p8, p9, p11) wait for the loaded rows. Staging PASSED; the full run is scratchpad
      `d16-phy11p2-hi.sh` (extract ch 9–14, load, align, second read; jar copy at 050940f). The decoder gaps are fixed after.
+     2026-10-09 17:35: PHY11-PART2 HINDI LOADED AS WRITTEN (reports 9f36dfc). The first launch (16:03) died at 48 page calls
+     when the Mac restarted (~16:30), which also emptied /tmp — the run script, jar copies and helpers went with the scratchpad
+     and were rebuilt from the session transcript; the relaunch resumed past the last flush (40 pages), 8 pages called twice.
+     Book spend ₹822.55: extract ₹672.31 (incl. ch 8 staging), align ₹6.55, Sonnet 5 second read ₹143.69. 623 Hindi rows
+     beside 682 English, 56 of 97 sections one to one; second read 598 of 623 clean (96.0%), 27 flags; 19 passages "no row
+     carries". The Hindi prints two sections otherwise than the English (ch 8 "8.5.6" for 8.5.5; ch 13 adds "13.8.1" under a
+     Hindi-only 13.8 intro), which no join can mend: new `section` correction kind (3c8324d code, e7bc328 docs + DECISIONS).
+     NEXT: the founder copies extract/phy11-part2/hi.jsonl to the scratchpad (the load printed its sha256 d759e73f…), then one
+     fresh reader per chapter (8–14) on the brief in scratchpad ca91e9fb `BRIEF-align.md` with `dry.sh` (the loader's dry run
+     per chapter) and `pairs.py`, then the characters pass, the spec audit, the founder's approval.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

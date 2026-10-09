@@ -33,10 +33,12 @@ final class NcertCorrectionsYamlReader {
             NcertCorrection.Kind.figure_ref, Set.of("at", "remove", "add"),
             NcertCorrection.Kind.drop, Set.of("at"),
             NcertCorrection.Kind.defer, Set.of("at"),
+            NcertCorrection.Kind.section, Set.of("at", "section"),
             NcertCorrection.Kind.misprint, Set.of("transcribed", "printed"),
             NcertCorrection.Kind.false_positive, Set.of("transcribed", "printed"),
             NcertCorrection.Kind.noise, Set.of("at", "flag"));
-    private static final Set<String> KIND_SPECIFIC = Set.of("transcribed", "printed", "at", "remove", "add", "flag");
+    private static final Set<String> KIND_SPECIFIC = Set.of("transcribed", "printed", "at", "remove", "add", "flag",
+            "section");
     /**
      * The checks a {@code noise} entry may rule on: the two that name a row and so enter the clean share.
      * The page-level start flags are outside it already, and 85 entries a book would bury this file
@@ -116,10 +118,12 @@ final class NcertCorrectionsYamlReader {
                 throw new InputFormatException(file, 0, label + ": flag must be one of " + RULEABLE);
             }
         }
+        short chapter = (short) whole(file, entry, "chapter", 1, 99, label);
+        String section = kind == NcertCorrection.Kind.section ? section(file, entry, language, chapter, label) : null;
         return new NcertCorrection(
                 required(file, entry, "book", label),
                 language,
-                (short) whole(file, entry, "chapter", 1, 99, label),
+                chapter,
                 whole(file, entry, "page", 1, 999, label),
                 kind,
                 spans ? required(file, entry, "transcribed", label) : null,
@@ -129,7 +133,30 @@ final class NcertCorrectionsYamlReader {
                 optional(file, entry, "address", label),
                 remove,
                 add,
-                flag);
+                flag,
+                section);
+    }
+
+    /**
+     * A {@code section} entry's number: Hindi only, since the English sections are canonical and carry the
+     * anchors a student taps; quoted, since YAML reads an unquoted 8.10 as the number 8.1; and a printed
+     * section of the entry's own chapter, as the load requires of every row.
+     */
+    private static String section(Path file, JsonNode entry, BookLanguage language, short chapter, String label) {
+        if (language != BookLanguage.hi) {
+            throw new InputFormatException(file, 0, label + ": only a Hindi entry re-addresses a section — "
+                    + "the English sections are canonical");
+        }
+        JsonNode value = entry.get("section");
+        if (value != null && value.isNumber()) {
+            throw new InputFormatException(file, 0, label + ": 'section' must be quoted — unquoted, 8.10 reads as 8.1");
+        }
+        String section = required(file, entry, "section", label).strip();
+        if (!NcertLoadCommand.SECTION.matcher(section).matches()
+                || !(section + ".").startsWith(chapter + ".")) {
+            throw new InputFormatException(file, 0, label + ": '" + section + "' is not a section of chapter " + chapter);
+        }
+        return section;
     }
 
     /**

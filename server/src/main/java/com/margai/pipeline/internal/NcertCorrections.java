@@ -65,7 +65,7 @@ final class NcertCorrections {
             NcertCorrection entry = new NcertCorrection(written.book(), written.language(), written.chapter(),
                     written.page(), written.kind(), spaced(written.transcribed()), spaced(written.printed()),
                     spaced(written.at()), written.reason(), written.address(), written.removeRef(), written.addRef(),
-                    written.flag());
+                    written.flag(), written.section());
             Integer at = index.get(entry.chapter() + "/" + entry.page());
             if (at == null) {
                 throw refuse(entry, "that page is not in the extraction");
@@ -87,6 +87,7 @@ final class NcertCorrections {
                     deferrals.add(entry);
                     yield defer(entry, paragraphs, continuedOnNextPage(out, at));
                 }
+                case section -> section(entry, paragraphs, out, at);
                 default -> throw new IllegalStateException("not a text-changing kind: " + entry.kind());
             };
             out.set(at, new ExtractedPage(page.chapterNo(), page.page(), page.confidence(), page.aiCallId(),
@@ -224,6 +225,54 @@ final class NcertCorrections {
         }
         return entry.where() + " §" + paragraph.section().strip() + ": the paragraph starting \"" + entry.at()
                 + "\" takes its number after the next paragraph of its section (" + entry.reason() + ")";
+    }
+
+    /**
+     * The section the paragraph starting {@code at} opens takes the English number, on its page and on every
+     * later page of the chapter. The paragraph must be the first of its section — where the heading is — so
+     * an entry can never re-address half a section; the later pages are changed in {@code pages} directly,
+     * their words untouched.
+     */
+    private static String section(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs, List<ExtractedPage> pages,
+            int at) {
+        int first = onlyStart(entry, paragraphs);
+        String from = paragraphs.get(first).section().strip();
+        String to = entry.section();
+        if (from.equals(to)) {
+            throw refuse(entry, "\"" + entry.at() + "\" is in §" + to + " already");
+        }
+        boolean earlier = paragraphs.subList(0, first).stream().anyMatch(paragraph -> paragraph.section().strip().equals(from));
+        for (int before = at - 1; !earlier && before >= 0 && pages.get(before).chapterNo() == entry.chapter(); before--) {
+            earlier = pages.get(before).paragraphs().stream().anyMatch(paragraph -> paragraph.section().strip().equals(from));
+        }
+        if (earlier) {
+            throw refuse(entry, "§" + from + " has a paragraph before \"" + entry.at() + "\" — name the first paragraph under its heading");
+        }
+        int moved = 0;
+        for (int index = first; index < paragraphs.size(); index++) {
+            if (paragraphs.get(index).section().strip().equals(from)) {
+                paragraphs.set(index, inSection(paragraphs.get(index), to));
+                moved++;
+            }
+        }
+        for (int after = at + 1; after < pages.size() && pages.get(after).chapterNo() == entry.chapter(); after++) {
+            ExtractedPage page = pages.get(after);
+            List<NcertPage.Paragraph> later = new ArrayList<>(page.paragraphs());
+            for (int index = 0; index < later.size(); index++) {
+                if (later.get(index).section().strip().equals(from)) {
+                    later.set(index, inSection(later.get(index), to));
+                    moved++;
+                }
+            }
+            pages.set(after, new ExtractedPage(page.chapterNo(), page.page(), page.confidence(), page.aiCallId(), later,
+                    page.skipped()));
+        }
+        return entry.where() + " §" + from + ": the English numbers it §" + to + ", from \"" + entry.at() + "\" on — "
+                + moved + " paragraph(s) (" + entry.reason() + ")";
+    }
+
+    private static NcertPage.Paragraph inSection(NcertPage.Paragraph paragraph, String section) {
+        return new NcertPage.Paragraph(section, paragraph.text(), paragraph.continuesPreviousPage(), paragraph.figureRefs());
     }
 
     /** The index of the one paragraph starting with the entry's words, refusing any other count. */

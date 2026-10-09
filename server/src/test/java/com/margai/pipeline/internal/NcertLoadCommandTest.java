@@ -309,6 +309,46 @@ class NcertLoadCommandTest {
                 .contains("- ch 7 p4 §7.3: ज्ञात:");
     }
 
+    /**
+     * phy11-part2's Hindi prints "8.5.6" where the English prints 8.5.5 (D16): a section entry puts the
+     * section's rows at the English address, across the page break, and numbers them from ¶1 there.
+     */
+    @Test
+    void aHindiSectionTheEnglishNumbersOtherwiseLoadsAtTheEnglishAddress() throws IOException {
+        Files.writeString(inputs.resolve(NcertRegisterCommand.FILE), """
+                books:
+                  - code: phy11-part1
+                    subject: physics
+                    class_level: 11
+                    part: 1
+                    title_en: "Physics Part-I, Textbook for Class XI"
+                    edition_year: 2022
+                    source:
+                      en: source/ncert/2022-ed/en/phy11-part1/
+                      hi: source/ncert/2022-ed/hi/phy11-part1/
+                    chapters:
+                      - {no: 7, en: keph107.pdf, hi: khph107.pdf}
+                """);
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 8, kind: section, at: "जब किसी तार पर",
+                     section: "7.5.5", reason: the Hindi prints 7.5.6 after 7.5.4}
+                """);
+        store.put(ContentKeys.extract("phy11-part1", BookLanguage.hi), ExtractJsonl.write(List.of(
+                page(7, 8, "0.95", p("7.5.4", "पार्श्विक विकृति।"), p("7.5.6", "जब किसी तार पर तनन प्रतिबल")),
+                page(7, 9, "0.95", continuing("7.5.6", "आक्षेपित किया जाता है।"), p("7.5.6", "यह कार्य संग्रहित होता है।")))),
+                "application/jsonl");
+
+        assertThat(commandLine.execute("ncert", "load", "--book", "phy11-part1", "--lang", "hi",
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address).containsExactly(
+                "ch 7 §7.5.4 ¶1", "ch 7 §7.5.5 ¶1", "ch 7 §7.5.5 ¶2");
+        assertThat(imports.rows.get(1).text()).isEqualTo("जब किसी तार पर तनन प्रतिबल आक्षेपित किया जाता है।");
+        assertThat(out.toString()).contains("- ch 7 page 8 §7.5.6: the English numbers it §7.5.5, from \"जब किसी तार पर\" "
+                + "on — 3 paragraph(s) (the Hindi prints 7.5.6 after 7.5.4)");
+    }
+
     /** The step is the Hindi edition's: an English load neither runs it nor reports on it. */
     @Test
     void anEnglishLoadHasNoVisargaStep() {

@@ -48,7 +48,8 @@ class NcertLoadCommand extends NcertBookCommand {
     /** {@code ncert_paragraphs.section} is VARCHAR(16); a printed section is "7" or "7.9.2". */
     static final int SECTION_MAX_LENGTH = 16;
 
-    private static final Pattern SECTION = Pattern.compile("\\d{1,2}(\\.\\d{1,3})*");
+    /** A printed section number; a {@code section} correction is held to it too. */
+    static final Pattern SECTION = Pattern.compile("\\d{1,2}(\\.\\d{1,3})*");
 
     @Option(names = "--artefact-tag", paramLabel = "TAG",
             description = "Load extract/{book}/{lang}.TAG.jsonl, a scratch run's draw, as written — no correction is "

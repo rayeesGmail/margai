@@ -462,6 +462,131 @@ class NcertCorrectionsTest {
         assertThat(applied.deferred()).containsExactly(new NcertCorrections.Deferred((short) 7, 3, 1));
     }
 
+    /**
+     * A section the Hindi print numbers differently from the English (D16): phy11-part2's Hindi goes from
+     * 8.5.4 to "8.5.6" where the English prints 8.5.5, and puts "13.8.1 सरल लोलक" under a 13.8 the English
+     * does not have. The transcription copies the heading, so its rows sit at an address no English row
+     * has, and a join never crosses a section.
+     */
+    @Test
+    void readsASectionEntry() throws IOException {
+        Path file = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 8, page: 8, kind: section, at: "जब किसी तार पर",
+                     section: "8.5.5", reason: "the Hindi prints 8.5.6 after 8.5.4; the English numbers it 8.5.5"}
+                """);
+
+        List<NcertCorrection> corrections = NcertCorrectionsYamlReader.read(file);
+
+        assertThat(corrections).singleElement().satisfies(entry -> {
+            assertThat(entry.kind()).isEqualTo(NcertCorrection.Kind.section);
+            assertThat(entry.at()).isEqualTo("जब किसी तार पर");
+            assertThat(entry.section()).isEqualTo("8.5.5");
+            assertThat(entry.kind().changesText()).isTrue();
+        });
+    }
+
+    /**
+     * The English sections are canonical and their rows carry the vectors and the anchors a student taps,
+     * so only a Hindi entry re-addresses. A section number is quoted: unquoted, YAML reads 8.10 as 8.1.
+     */
+    @Test
+    void aSectionEntryIsForTheHindiEditionAndNamesAPrintedSectionOfItsChapter() throws IOException {
+        Path english = write("""
+                corrections:
+                  - {book: phy11-part2, lang: en, chapter: 8, page: 8, kind: section, at: "When a wire",
+                     section: "8.5.5", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(english))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (section): only a Hindi entry re-addresses a section");
+
+        Path unquoted = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 8, page: 8, kind: section, at: "जब किसी", section: 8.10, reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(unquoted))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (section): 'section' must be quoted");
+
+        Path otherChapter = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 8, page: 8, kind: section, at: "जब किसी", section: "9.5.5", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(otherChapter))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (section): '9.5.5' is not a section of chapter 8");
+
+        Path noSection = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 8, page: 8, kind: section, at: "जब किसी", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(noSection))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (section): 'section' is required");
+
+        Path stray = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 8, page: 8, kind: join, at: "जब किसी", section: "8.5.5", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(stray))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (join): 'section' does not belong to this kind");
+    }
+
+    /** From the paragraph the heading opens, every paragraph of that section in the chapter takes the English number. */
+    @Test
+    void aSectionEntryReaddressesItsSectionFromItsFirstParagraphOn() {
+        List<ExtractedPage> pages = List.of(
+                page(8, p("7.5.4", "The strain perpendicular to the force."), p("7.5.6", "When a wire is put under stress,")),
+                page(9, new NcertPage.Paragraph("7.5.6", "work is done against the forces.", true, List.of()),
+                        p("7.5.6", "This work is stored in the wire."), p("7.6", "Applications of elastic behaviour.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(section(8, "When a wire", "7.5.5")));
+
+        assertThat(applied.pages()).flatExtracting(ExtractedPage::paragraphs).extracting(NcertPage.Paragraph::section)
+                .containsExactly("7.5.4", "7.5.5", "7.5.5", "7.5.5", "7.6");
+        assertThat(applied.pages().get(1).paragraphs().getFirst().continuesPreviousPage()).isTrue();
+        assertThat(applied.notes()).containsExactly("ch 7 page 8 §7.5.6: the English numbers it §7.5.5, from \"When a wire\" "
+                + "on — 3 paragraph(s) (read against the page)");
+    }
+
+    /**
+     * A sub-heading the English does not print: once its paragraphs are back in the section above, the
+     * Hindi-only opening the heading followed can be joined to the paragraph the English starts with —
+     * the entries apply in file order.
+     */
+    @Test
+    void aSubHeadingTheEnglishDoesNotPrintFoldsIntoItsSectionAndThenJoins() {
+        List<ExtractedPage> pages = List.of(page(12,
+                p("7.8", "No physical example is purely simple harmonic."),
+                p("7.8.1", "It is said that Galileo measured the periods."), p("7.8.1", "We shall show that this is SHM.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                section(12, "It is said that Galileo", "7.8"),
+                correction(12, NcertCorrection.Kind.join, null, null, "It is said that Galileo")));
+
+        assertThat(applied.pages().getFirst().paragraphs()).containsExactly(
+                p("7.8", "No physical example is purely simple harmonic. It is said that Galileo measured the periods."),
+                p("7.8", "We shall show that this is SHM."));
+    }
+
+    /** The entry is anchored where the heading is: naming a later paragraph of the section, or its own number, is a mistake. */
+    @Test
+    void aSectionEntryMustNameItsSectionsFirstParagraphAndANewNumber() {
+        List<ExtractedPage> pages = List.of(
+                page(8, p("7.5.6", "When a wire is put under stress.")),
+                page(9, p("7.5.6", "This work is stored in the wire.")));
+
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(section(9, "This work is stored", "7.5.5"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("section correction on ch 7 page 9: §7.5.6 has a paragraph before \"This work is stored\" "
+                        + "— name the first paragraph under its heading");
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(section(8, "When a wire", "7.5.6"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("section correction on ch 7 page 8: \"When a wire\" is in §7.5.6 already");
+    }
+
     /** Rulings on the verifier's flags change no text; verify reads them, the load only counts them. */
     @Test
     void misprintAndFalsePositiveRulingsChangeNothing() {
@@ -521,7 +646,12 @@ class NcertCorrectionsTest {
 
     private static NcertCorrection figureRef(int page, String at, String remove, String add) {
         return new NcertCorrection("phy11-part1", BookLanguage.en, (short) 7, page, NcertCorrection.Kind.figure_ref,
-                null, null, at, "read against the page", null, remove, add, null);
+                null, null, at, "read against the page", null, remove, add, null, null);
+    }
+
+    private static NcertCorrection section(int page, String at, String section) {
+        return new NcertCorrection("phy11-part2", BookLanguage.hi, (short) 7, page, NcertCorrection.Kind.section,
+                null, null, at, "read against the page", null, null, null, null, section);
     }
 
     private static ExtractedPage page(int page, NcertPage.Paragraph... paragraphs) {

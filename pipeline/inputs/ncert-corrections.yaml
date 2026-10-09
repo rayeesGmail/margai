@@ -21,6 +21,9 @@
 #   kind: drop            at — the words a paragraph starts with; it is not running text and goes
 #   kind: defer           at — the words a paragraph starts with; it takes its number after the next
 #                         paragraph of its section (a footnote the other edition prints a page later)
+#   kind: section         at + section — the words the first paragraph under a heading starts with, and the
+#                         section the English numbers it, quoted; that section's paragraphs in the chapter
+#                         all take it (Hindi only: a heading the Hindi print numbers otherwise)
 #   kind: misprint        transcribed + printed as the verifier quoted them — the book's own error, kept
 #   kind: false_positive  transcribed + printed as the verifier quoted them — the verifier was wrong
 #   kind: noise           flag (join or figure) + at — one of the free checks was wrong about the paragraph

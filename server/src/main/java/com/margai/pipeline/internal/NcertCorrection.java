@@ -21,6 +21,7 @@ import com.margai.curriculum.api.BookLanguage;
  * @param removeRef   the figure or table label a {@code figure_ref} entry removes, or null
  * @param addRef      the label a {@code figure_ref} entry adds, or null
  * @param flag        which free check a {@code noise} entry rules on, or null
+ * @param section     the section the English numbers what a {@code section} entry names, or null
  */
 record NcertCorrection(
         String book,
@@ -35,12 +36,13 @@ record NcertCorrection(
         String address,
         String removeRef,
         String addRef,
-        LayoutChecks.Kind flag) {
+        LayoutChecks.Kind flag,
+        String section) {
 
-    /** An entry of any kind but {@code figure_ref} and {@code noise}, which alone name a label or a check. */
+    /** An entry of any kind but {@code figure_ref}, {@code noise} and {@code section}, which name a label, a check, a section. */
     NcertCorrection(String book, BookLanguage language, short chapter, int page, Kind kind, String transcribed,
             String printed, String at, String reason, String address) {
-        this(book, language, chapter, page, kind, transcribed, printed, at, reason, address, null, null, null);
+        this(book, language, chapter, page, kind, transcribed, printed, at, reason, address, null, null, null, null);
     }
 
     enum Kind {
@@ -61,6 +63,14 @@ record NcertCorrection(
          * word and leaves the paragraph on the page it is printed on.
          */
         defer,
+        /**
+         * The section the paragraph starting {@code at} opens is numbered {@code section} in the English, and
+         * so is every later paragraph the transcription put in it (D16). The Hindi print can number a section
+         * differently — phy11-part2 goes from 8.5.4 to "8.5.6", and adds a 13.8.1 the English does not print
+         * — and the transcription copies the heading, leaving rows at an address no English row has, which no
+         * join can mend because a join never crosses a section. Only a Hindi entry: the English is canonical.
+         */
+        section,
         /** The book prints an error and the transcription rightly keeps it: a flag, not a defect. */
         misprint,
         /** The verifier was wrong about this span: a flag, not a defect. */

@@ -360,6 +360,27 @@ where the raster draws nothing, is the founder's to rule on.
 **A footnote is a paragraph starting with an asterisk**, with or without a space after it (D16): it is
 numbered where its page puts it and is never what the next page continues.
 
+**A Hindi load is held to the English rows** (D16): its report lists the *sections whose Hindi rows do not
+number as the English* — English is canonical, so each is a join or split still owed (section 6).
+
+**`--dry-run` loads nothing** (D16): it reads, repairs, corrects and numbers exactly as a load does, runs
+the database write in a transaction of its own that is rolled back — so a row the database would refuse
+refuses it too — and reports what the load would do, under its own name: `<date>-ncert-load-dry-run.md`.
+`--extraction FILE` reads a local copy of the JSONL instead of the content store; the file must carry a page
+of the chapters asked for, in the edition's script, or the run is refused. `--pairs FILE` (a Hindi dry run
+only) writes each address's English and Hindi side by side — whole NCERT text, so it goes to a scratch
+directory, never into the repository. Both belong to the dry run, because a load of record reads the content
+store's artefact. No model and no cost; with `--extraction`, no object store either, so it runs where only
+the database is. Every load prints its input's sha256 (`extraction: … sha256 …`): a dry run rehearsed a
+reload only if the reload prints the same hash, so a local copy taken before a `--redo` shows as stale.
+Don't run one while a load or `ncert embed` of the same book is running: its transaction holds that book's
+rows until it rolls back.
+
+**Which dry runs are evidence** (DECISIONS 2026-10-09): the iterations while a block is being written are
+working runs, pointed at a scratch directory with `--reports` and not committed; **the dry run the founder
+approves a block on is run into `pipeline/reports` and committed with the block**, so the approval and its
+evidence land together.
+
 ## 5. verify — the second read (D15, DECISIONS 2026-09-14 "the pair")
 
 Claude Opus 5 transcribes; Claude Sonnet 5 reads every page again and judges each paragraph with one
@@ -610,11 +631,23 @@ heavy neighbours score alike). The entries come from reading:
 - One fresh reader per chapter (two for a long one), briefed with these rules whole, then a separate pass
   on characters, then the spec-auditor on the whole block before the founder approves it.
 
-**Simulate before the reload.** Apply the block to the loaded rows offline with the loader's rules and
-compare per section: no refusal, every section one to one, every pair read. The first book's reload matched
-its simulation row for row. Then: approval and commit, the reload (₹0), `ncert align` again (expect the
-counts equal and the proposals only the known false alarms, each pair read), `ncert verify --read-pages`
-on the pages whose rows changed, and its flags adjudicated as section 5 says.
+**Simulate before the reload — with the loader itself.** `ncert load --dry-run` (section 4) applies the
+block exactly as the reload will and writes nothing; read its report for refusals and for *sections whose
+Hindi rows do not number as the English*, and its `--pairs` file for the pairs. Claude runs it from a local
+copy of the extraction — the founder copies it once per book, and again after any `--redo`:
+
+```
+aws s3 cp s3://margai-beta-content/extract/<book>/hi.jsonl <scratch dir>/ --profile margai
+DB_URL=… java -jar <jar> --spring.profiles.active=pipeline ncert load --book <book> --lang hi --dry-run \
+  --extraction <scratch dir>/hi.jsonl --pairs <scratch dir>/pairs.jsonl --reports <scratch dir>
+```
+
+The last run before the founder's approval drops `--reports`, so its report lands in `pipeline/reports` and
+is committed with the block (section 4). Every section one to one, no refusal, every pair read; then
+approval and commit, the reload (₹0), whose report must print the dry run's extraction sha256,
+`ncert align` again (expect the counts equal and the proposals only the known false alarms, each pair
+read), `ncert verify --read-pages` on the pages whose rows changed, and its flags adjudicated as section 5
+says. (The first book was simulated with a scratchpad copy of the loader's rules, which `/tmp` later took.)
 
 **The second read re-quotes.** A `misprint` or `false_positive` matches the verifier's two spans exactly,
 so a re-read that quotes the same place differently needs a new entry beside the old one, which stays for

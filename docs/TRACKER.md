@@ -306,6 +306,12 @@ HOW TO RESUME (supersedes item 2 of the list below):
      ruled the reports rule ("Approval run only": the dry run a block is approved on is committed with it, the iterations are
      not). NEXT: the founder copies phy11-part1's hi.jsonl to the scratchpad and Claude proves the dry run end to end — today's
      corrections against it should give 0 inserted, 0 updated, 909 unchanged and every section one to one.
+     2026-10-09 PROVED: Claude ran it on the founder's copy (extraction sha256 2f7d3414…, corrections db7f3a50…), with only the
+     database, at 050940f — result ok, 0 inserted / 0 updated / 909 unchanged, 84 of 84 sections one to one, nothing a load
+     would delete or clear, coverage 100.0%; the pairs file holds 909 pairs, all with both editions; the database's last write
+     is still the 2026-10-07 re-judge. The dry run reproduces the loaded book exactly, so it replaces the lost simulator. Item 4
+     is closed. NEXT: the second Hindi book (scratchpad `d16-phy11p2-hi-stage.sh`, its jar copy predates the dry run — no
+     matter for render and extract), the founder's ten sample pairs, the English side-headings ruling.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

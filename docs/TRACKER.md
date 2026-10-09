@@ -312,6 +312,13 @@ HOW TO RESUME (supersedes item 2 of the list below):
      is still the 2026-10-07 re-judge. The dry run reproduces the loaded book exactly, so it replaces the lost simulator. Item 4
      is closed. NEXT: the second Hindi book (scratchpad `d16-phy11p2-hi-stage.sh`, its jar copy predates the dry run — no
      matter for render and extract), the founder's ten sample pairs, the English side-headings ruling.
+     2026-10-09 09:55: PHY11-PART2 HINDI STAGED (reports 8b83413): 140 pages rendered; ch 8 transcribed for ₹59.87, 55 paragraphs,
+     its 3 apparatus pages not sent. The Hindi layer check named 5 words and 4 symbols; each read on a crop: four are decoder gaps
+     this book's typing shows (रु typed र + hook in विरुद्ध; ह्य typed as the हृ glyph + aa-stroke in बाह्य; an anusvara keyed
+     between स् and प्र in स्प्रिंग; Symbol α), one is real — the page prints अनुदैर्घ्य (घ, at 12×) and the row repaired it to
+     अनुदैर्ध्य, an "as printed" entry for the adjudication — and one is the founder's: p3 prints "प्रतिबल α विकृति", α where ∝
+     is meant, and the row wrote ∝. The × lines (p8, p9, p11) wait for the loaded rows. Staging PASSED; the full run is scratchpad
+     `d16-phy11p2-hi.sh` (extract ch 9–14, load, align, second read; jar copy at 050940f). The decoder gaps are fixed after.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

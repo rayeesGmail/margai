@@ -43,6 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -130,6 +131,88 @@ class CurriculumImportTest {
                 "SELECT text_en FROM ncert_paragraphs WHERE chapter_no = 7 AND section = '7.9' AND para_no = 1",
                 String.class))
                 .isEqualTo("The gravitational potential energy of a body.");
+    }
+
+    /**
+     * {@code ncert load --dry-run} (D16): the load's statements run and are counted, then rolled back —
+     * the Hindi text it reports as an update is not in the row afterwards.
+     */
+    @Test
+    void aPreviewReportsTheLoadAndLeavesTheRowsAsTheyWere() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        NcertLoadReport preview = imports.previewParagraphs("phy11-part1", BookLanguage.hi, List.of(new NcertParagraphRow(
+                (short) 7, "7.9", (short) 1, "गुरुत्वीय स्थितिज ऊर्जा।", false, List.of(),
+                new ParagraphExtraction(List.of(12), new BigDecimal("0.90"), null))));
+
+        assertThat(preview.updated()).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs WHERE text_hi IS NOT NULL", Long.class))
+                .isZero();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(2);
+    }
+
+    /**
+     * The destructive half rolls back too: a preview that rewrites one row, inserts another and leaves the
+     * third address out — which a load deletes — counts all three, and the rows are as they were after it.
+     */
+    @Test
+    void aPreviewsInsertRewriteAndDeleteAreAllRolledBack() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        NcertLoadReport preview = imports.previewParagraphs("phy11-part1", BookLanguage.en, List.of(
+                english((short) 1, "A rewritten first paragraph."), english((short) 3, "A third, new.")));
+
+        assertThat(preview.inserted()).isEqualTo(1);
+        assertThat(preview.updated()).isEqualTo(1);
+        assertThat(preview.orphans()).hasSize(1);
+        assertThat(jdbc.queryForList("SELECT text_en FROM ncert_paragraphs ORDER BY para_no", String.class))
+                .containsExactly("The gravitational potential energy of a body.", paragraphs().get(1).text());
+    }
+
+    /** A row the database refuses — ¶0 fails its CHECK, which no code before it tests — refuses the preview. */
+    @Test
+    void aRowTheDatabaseRefusesRefusesThePreview() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        assertThatThrownBy(() -> imports.previewParagraphs("phy11-part1",
+                BookLanguage.en, List.of(english((short) 0, "Numbered zero."))))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasStackTraceContaining("ncert_paragraphs_para_no_check");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(2);
+    }
+
+    /**
+     * What a dry run on the canonical database must never cost: a paid vector, which a rewrite clears, and
+     * the other edition's text, which a load drops from an address it no longer carries — both counted by
+     * the preview, both still there after it.
+     */
+    @Test
+    void aPreviewLeavesThePaidVectorsAndTheOtherEditionsTextInPlace() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(hindi((short) 1, "पहला।"), hindi((short) 2, "दूसरा।")));
+        String vector = "[" + "0.1,".repeat(1023) + "0.1]";
+        jdbc.update("UPDATE ncert_paragraphs SET embedding = ?::vector WHERE para_no = 1", vector);
+
+        NcertLoadReport rewrite = imports.previewParagraphs("phy11-part1", BookLanguage.en, List.of(
+                english((short) 1, "A rewritten first paragraph."), paragraphs().get(1)));
+        NcertLoadReport hindiShort = imports.previewParagraphs("phy11-part1", BookLanguage.hi,
+                List.of(hindi((short) 1, "पहला।")));
+
+        assertThat(rewrite.embeddingsCleared()).isEqualTo(1);
+        assertThat(hindiShort.cleared()).hasSize(1);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs WHERE embedding IS NOT NULL", Long.class))
+                .isEqualTo(1);
+        assertThat(jdbc.queryForList("SELECT text_hi FROM ncert_paragraphs ORDER BY para_no", String.class))
+                .containsExactly("पहला।", "दूसरा।");
+    }
+
+    private static NcertParagraphRow english(short paraNo, String text) {
+        return new NcertParagraphRow((short) 7, "7.9", paraNo, text, false, List.of(),
+                new ParagraphExtraction(List.of(12), new BigDecimal("0.90"), null));
     }
 
     /** D16's Hindi pass fills the same row rather than making a second one. */

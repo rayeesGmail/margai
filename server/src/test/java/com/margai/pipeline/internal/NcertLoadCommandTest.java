@@ -6,6 +6,7 @@ import com.margai.ai.tasks.NcertPage;
 import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.NcertLoadReport;
 import com.margai.curriculum.api.NcertParagraphRow;
+import com.margai.curriculum.api.ParagraphExtraction;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -316,6 +317,124 @@ class NcertLoadCommandTest {
         assertThat(run()).isZero();
 
         assertThat(out.toString()).doesNotContain("visarga");
+    }
+
+    /**
+     * The dry run (D16) reads a local copy of the extraction, corrects and numbers as a load does, and hands
+     * the rows to the rolled-back preview — never to the load — under a report named for what it is, so a
+     * simulation before a reload is the loader itself rather than a copy of it.
+     */
+    @Test
+    void aDryRunReadsALocalExtractionAndWritesNothing() throws IOException {
+        Path local = inputs.resolve("en.jsonl");
+        Files.write(local, ExtractJsonl.write(List.of(page(7, 1, "0.95", p("7.1", "First."), p("7.1", "Second.")))));
+
+        assertThat(commandLine.execute("ncert", "load", "--book", "phy11-part1", "--dry-run", "--extraction",
+                local.toString(), "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(imports.rows).isNull();
+        assertThat(imports.previewed).extracting(NcertParagraphRow::address)
+                .containsExactly("ch 7 §7.1 ¶1", "ch 7 §7.1 ¶2");
+        assertThat(out.toString()).contains("DRY RUN: nothing is written")
+                .contains("a local file read in place of extract/phy11-part1/en.jsonl, not the content store")
+                .doesNotContain("content store: ");
+        try (var written = Files.list(reports)) {
+            assertThat(written.map(file -> file.getFileName().toString()).toList())
+                    .singleElement().asString().endsWith("-ncert-load-dry-run.md");
+        }
+    }
+
+    /** A load of record reads the content store's artefact: a local file or a pairs file is a dry run's. */
+    @Test
+    void aLocalExtractionOrAPairsFileIsForADryRunOnly() {
+        assertThat(commandLine.execute("ncert", "load", "--book", "phy11-part1", "--extraction", "en.jsonl",
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("--extraction and --pairs belong to --dry-run");
+        assertThat(imports.rows).isNull();
+        assertThat(imports.previewed).isNull();
+    }
+
+    /** Each mode's misuse is refused by name before anything is read, and nothing is loaded or previewed. */
+    @Test
+    void aDryRunsOptionsAreRefusedWhereTheyCannotMeanWhatTheySay() throws IOException {
+        Path local = inputs.resolve("en.jsonl");
+        Files.write(local, ExtractJsonl.write(List.of(page(7, 1, "0.95", p("7.1", "First.")))));
+
+        assertThat(dryRun("--pairs", inputs.resolve("pairs.jsonl").toString())).isEqualTo(InputFileCommand.EXIT_FAILED);
+        assertThat(dryRun("--extraction", local.toString(), "--artefact-tag", "opus55"))
+                .isEqualTo(InputFileCommand.EXIT_FAILED);
+        assertThat(dryRun("--extraction", inputs.resolve("missing.jsonl").toString()))
+                .isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("--pairs sets a Hindi load's rows beside the English ones: give --lang hi")
+                .contains("--artefact-tag names another — give one").contains("no local extraction at");
+        assertThat(imports.rows).isNull();
+        assertThat(imports.previewed).isNull();
+    }
+
+    /**
+     * The JSONL names neither book nor edition, so a local file is held to what it must be: a page of the
+     * chapters asked for, in the edition's script — the English file handed to a Hindi dry run is refused.
+     */
+    @Test
+    void aLocalExtractionMustBeThisEditionsOfTheseChapters() throws IOException {
+        hindiEdition();
+        Path english = inputs.resolve("en.jsonl");
+        Files.write(english, ExtractJsonl.write(List.of(page(7, 4, "0.95", p("7.3", "F = ma.")))));
+        Path otherChapter = inputs.resolve("ch8.jsonl");
+        Files.write(otherChapter, ExtractJsonl.write(List.of(page(8, 1, "0.95", p("8.1", "एक अनुभाग।")))));
+
+        assertThat(dryRun("--lang", "hi", "--extraction", english.toString())).isEqualTo(InputFileCommand.EXIT_FAILED);
+        assertThat(dryRun("--lang", "hi", "--extraction", otherChapter.toString())).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("the local extraction carries no Devanagari — it is not extract/phy11-part1/hi.jsonl")
+                .contains("the local extraction carries no page of chapter(s) [7]");
+        assertThat(imports.previewed).isNull();
+    }
+
+    /** A dry run reports what the load would do, never what it did; a load of record names its input's hash. */
+    @Test
+    void aDryRunSaysWhatALoadWouldDoAndALoadNamesItsInputsHash() throws IOException {
+        imports.orphansAnswer = List.of("ch 7 §7.1 ¶3");
+        Path local = inputs.resolve("en.jsonl");
+        byte[] bytes = ExtractJsonl.write(List.of(page(7, 1, "0.95", p("7.1", "First."))));
+        Files.write(local, bytes);
+        store.put(ContentKeys.extract("phy11-part1", BookLanguage.en), bytes, "application/jsonl");
+
+        assertThat(dryRun("--extraction", local.toString())).isZero();
+        assertThat(out.toString()).contains("no longer carried — a load would delete them")
+                .doesNotContain("no longer carried — deleted")
+                .contains("sha256 " + Report.sha256(bytes) + " — a local file read in place of extract/phy11-part1/en.jsonl");
+
+        assertThat(run()).isZero();
+        assertThat(out.toString()).contains("extraction: extract/phy11-part1/en.jsonl sha256 " + Report.sha256(bytes))
+                .contains("no longer carried — deleted");
+    }
+
+    /**
+     * A Hindi load is held to the English rows section by section (D16: English is canonical), and its dry
+     * run writes the pairs it would leave — an English row with no Hindi beside it shows as such.
+     */
+    @Test
+    void aHindiDryRunNamesTheSectionsOffOneToOneAndWritesThePairs() throws IOException {
+        hindiEdition();
+        imports.paragraphsAnswer = List.of(english("7.3", 1, "F = ma."), english("7.3", 2, "Where m is the mass."),
+                english("7.4", 1, "A new section."));
+        Path local = inputs.resolve("hi.jsonl");
+        Files.write(local, ExtractJsonl.write(List.of(page(7, 4, "0.95",
+                p("7.3", "F = ma है। जहाँ m द्रव्यमान है।"), p("7.4", "एक नया अनुभाग।")))));
+        Path pairs = inputs.resolve("pairs.jsonl");
+
+        assertThat(commandLine.execute("ncert", "load", "--book", "phy11-part1", "--lang", "hi", "--dry-run",
+                "--extraction", local.toString(), "--pairs", pairs.toString(),
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(out.toString()).contains("1 of 2 sections one to one").contains("| 7 | 7.3 | 2 | 1 |")
+                .doesNotContain("| 7 | 7.4 |");
+        assertThat(Files.readAllLines(pairs)).hasSize(3)
+                .first().asString().contains("\"address\":\"ch 7 §7.3 ¶1\"").contains("\"hi\":\"F = ma है।");
+        assertThat(Files.readAllLines(pairs).get(1)).contains("\"en\":\"Where m is the mass.\"").doesNotContain("\"hi\"");
     }
 
     @Test
@@ -776,6 +895,13 @@ class NcertLoadCommandTest {
                 "--inputs", inputs.toString(), "--reports", reports.toString());
     }
 
+    private int dryRun(String... options) {
+        List<String> arguments = new ArrayList<>(List.of("ncert", "load", "--book", "phy11-part1", "--dry-run",
+                "--inputs", inputs.toString(), "--reports", reports.toString()));
+        arguments.addAll(List.of(options));
+        return commandLine.execute(arguments.toArray(String[]::new));
+    }
+
     private void jsonl(ExtractedPage... pages) {
         store.put(ContentKeys.extract("phy11-part1", BookLanguage.en), ExtractJsonl.write(List.of(pages)),
                 "application/jsonl");
@@ -784,6 +910,29 @@ class NcertLoadCommandTest {
     private static ExtractedPage page(int chapter, int page, String confidence, NcertPage.Paragraph... paragraphs) {
         return new ExtractedPage((short) chapter, page, new BigDecimal(confidence), UUID.randomUUID(),
                 List.of(paragraphs), null);
+    }
+
+    /** The test book with a Hindi edition registered beside its English one. */
+    private void hindiEdition() throws IOException {
+        Files.writeString(inputs.resolve(NcertRegisterCommand.FILE), """
+                books:
+                  - code: phy11-part1
+                    subject: physics
+                    class_level: 11
+                    part: 1
+                    title_en: "Physics Part-I, Textbook for Class XI"
+                    edition_year: 2022
+                    source:
+                      en: source/ncert/2022-ed/en/phy11-part1/
+                      hi: source/ncert/2022-ed/hi/phy11-part1/
+                    chapters:
+                      - {no: 7, en: keph107.pdf, hi: khph107.pdf}
+                """);
+    }
+
+    private static NcertParagraphRow english(String section, int paraNo, String text) {
+        return new NcertParagraphRow((short) 7, section, (short) paraNo, text, false, List.of(),
+                new ParagraphExtraction(List.of(4), new BigDecimal("0.95"), null));
     }
 
     private static NcertPage.Paragraph p(String section, String text) {
@@ -814,6 +963,19 @@ class NcertLoadCommandTest {
             this.book = bookCode;
             this.language = language;
             this.rows = new ArrayList<>(rows);
+            return answer(rows);
+        }
+
+        /** A dry run's rows, which a load of record never sees. */
+        List<NcertParagraphRow> previewed;
+
+        @Override
+        public NcertLoadReport previewParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
+            this.previewed = new ArrayList<>(rows);
+            return answer(rows);
+        }
+
+        private NcertLoadReport answer(List<NcertParagraphRow> rows) {
             Map<Short, Integer> perChapter = new java.util.TreeMap<>();
             rows.forEach(row -> perChapter.merge(row.chapterNo(), 1, Integer::sum));
             return new NcertLoadReport(rows.size(), 0, 0, perChapter, orphansAnswer, 0, 0, clearedAnswer);

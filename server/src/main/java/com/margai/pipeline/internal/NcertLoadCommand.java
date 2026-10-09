@@ -7,6 +7,8 @@ import com.margai.curriculum.api.NcertLoadReport;
 import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.ParagraphExtraction;
 import com.margai.storage.api.ObjectStore;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,6 +55,21 @@ class NcertLoadCommand extends NcertBookCommand {
                     + "applied — and only into a database where the book has no embedded paragraph.")
     String artefactTag;
 
+    @Option(names = "--dry-run",
+            description = "Read, repair, correct and number exactly as a load does, and write nothing: the database "
+                    + "write runs inside a transaction that is rolled back, and the report says what the load would do.")
+    boolean dryRun;
+
+    @Option(names = "--extraction", paramLabel = "FILE",
+            description = "With --dry-run: read the extraction from this local copy of extract/{book}/{lang}.jsonl "
+                    + "instead of the content store.")
+    Path extraction;
+
+    @Option(names = "--pairs", paramLabel = "FILE",
+            description = "With --dry-run: write each address's English and Hindi text to this local JSONL, to read "
+                    + "the pairs the load would leave.")
+    Path pairsFile;
+
     private final ObjectStore content;
     private final CurriculumImport imports;
 
@@ -62,10 +79,38 @@ class NcertLoadCommand extends NcertBookCommand {
         this.imports = imports;
     }
 
+    /** A dry run's report is filed under its own name, so it is never taken for a load of record. */
+    @Override
+    String reportTitle() {
+        return dryRun ? super.reportTitle() + " dry-run" : super.reportTitle();
+    }
+
     @Override
     void run(BookDefinition definition, List<BookDefinition.Chapter> selected, Report report) {
-        report.line("content store: " + content.describe());
+        if (!dryRun && (extraction != null || pairsFile != null)) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0, "--extraction and --pairs belong to "
+                    + "--dry-run: a load of record reads the content store's artefact and writes the database");
+        }
+        if (pairsFile != null && language != BookLanguage.hi) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "--pairs sets a Hindi load's rows beside the English ones: give --lang hi");
+        }
+        if (extraction != null && artefactTag != null) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "--extraction is a local copy of the canonical artefact; --artefact-tag names another — give one");
+        }
+        if (dryRun) {
+            report.line("DRY RUN: nothing is written — the database write runs inside a transaction that is rolled "
+                    + "back, so every count below is what this load would do");
+        }
         String jsonlKey = ContentKeys.extract(definition.code(), language, ContentKeys.tag(artefactTag));
+        if (extraction != null && !Files.isRegularFile(extraction)) {
+            throw new InputFormatException(extraction, 0, "no local extraction at "
+                    + extraction.toAbsolutePath().normalize());
+        }
+        if (extraction == null) {
+            report.line("content store: " + content.describe());
+        }
         if (artefactTag != null) {
             // Every canonical book is embedded and a scratch database never is, so this is what keeps a
             // trial draw out of the frozen corpus — the database, unlike the artefact, has no tag (D16).
@@ -77,18 +122,40 @@ class NcertLoadCommand extends NcertBookCommand {
             }
             report.line("artefact: " + jsonlKey + " (a scratch run's draw)");
         }
-        if (!content.exists(jsonlKey)) {
+        if (extraction == null && !content.exists(jsonlKey)) {
             throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
                     "no extraction at " + jsonlKey + " — run `ncert extract` first");
         }
+        String source = extraction == null ? jsonlKey : extraction.normalize().toString();
+        byte[] jsonl = extraction == null ? content.get(jsonlKey) : read(extraction);
+        // The input's own hash on every load: a dry run read from a local file rehearses a reload only if the
+        // load of record later prints the same one for the content store's artefact.
+        // A local file by its name alone: the approved dry run's report is committed, and a committed report
+        // reads the same on every machine — the hash, not the scratch path, is what pins the input.
+        report.line(extraction == null ? "extraction: " + jsonlKey + " sha256 " + Report.sha256(jsonl)
+                : "extraction: " + extraction.getFileName() + " sha256 " + Report.sha256(jsonl) + " — a local file "
+                        + "read in place of " + jsonlKey + ", not the content store; the reload's report prints the "
+                        + "artefact's sha256 to match");
         Set<Short> chapters = new TreeSet<>();
         selected.forEach(chapter -> chapters.add(chapter.no()));
-        List<ExtractedPage> pages = ExtractJsonl.read(jsonlKey, content.get(jsonlKey)).stream()
+        List<ExtractedPage> pages = ExtractJsonl.read(source, jsonl).stream()
                 .filter(page -> chapters.contains(page.chapterNo()))
                 .sorted((left, right) -> left.chapterNo() != right.chapterNo()
                         ? Short.compare(left.chapterNo(), right.chapterNo())
                         : Integer.compare(left.page(), right.page()))
                 .toList();
+        if (extraction != null) {
+            // The JSONL names neither book nor edition, so a local file is held to what it must be.
+            if (pages.isEmpty()) {
+                throw new InputFormatException(extraction, 0, "the local extraction carries no page of chapter(s) "
+                        + chapters + " — it is not " + jsonlKey);
+            }
+            String wrong = wrongEdition(pages, language);
+            if (wrong != null) {
+                throw new InputFormatException(extraction, 0, "the local extraction " + wrong + " — it is not "
+                        + jsonlKey);
+            }
+        }
 
         // Deterministic corrections first, each reported: a re-transcribed tail is cut and a
         // labelled paragraph is never a continuation. Then the numbering and the join, which
@@ -109,7 +176,7 @@ class NcertLoadCommand extends NcertBookCommand {
         // sign for a zero exponent, written as the convention has it (D15, 2026-09-17).
         DimensionalBrackets.Applied dimensioned = DimensionalBrackets.apply(pages);
         pages = dimensioned.pages();
-        Numbered numbered = number(pages, jsonlKey, corrected.deferred());
+        Numbered numbered = number(pages, source, corrected.deferred());
         List<NcertParagraphRow> rows = numbered.rows();
         report.section("page-break repairs to the model's continuation flags (deterministic, each one named)")
                 .list(repaired.notes());
@@ -127,20 +194,40 @@ class NcertLoadCommand extends NcertBookCommand {
                 .list(dimensioned.notes());
         report.section("figure_refs that are not figure or table labels — dropped")
                 .list(numbered.droppedRefs());
-        NcertLoadReport result = imports.loadParagraphs(definition.code(), language, rows);
+        NcertLoadReport result = dryRun ? imports.previewParagraphs(definition.code(), language, rows)
+                : imports.loadParagraphs(definition.code(), language, rows);
 
         report.section("ncert_paragraphs")
                 .table(List.of("inserted", "updated", "unchanged"), List.of(List.of(
                         String.valueOf(result.inserted()), String.valueOf(result.updated()),
                         String.valueOf(result.unchanged()))));
 
+        // English is canonical and the Hindi follows it (D16): the first thing a Hindi load is held to is
+        // whether each section now has as many Hindi rows as English ones.
+        if (language == BookLanguage.hi) {
+            List<NcertParagraphRow> english = imports.paragraphs(definition.code(), BookLanguage.en, chapters);
+            List<EditionPairs.Section> sections = EditionPairs.sections(english, rows);
+            List<List<String>> differing = sections.stream().filter(section -> !section.oneToOne())
+                    .map(section -> List.of(String.valueOf(section.chapter()), section.section(),
+                            String.valueOf(section.english()), String.valueOf(section.hindi())))
+                    .toList();
+            report.section("sections whose Hindi rows do not number as the English (English is canonical)")
+                    .line((sections.size() - differing.size()) + " of " + sections.size() + " sections one to one")
+                    .table(List.of("chapter", "section", "en", "hi"), differing);
+            if (pairsFile != null) {
+                write(pairsFile, EditionPairs.jsonl(english, rows));
+                report.line("pairs: " + pairsFile.getFileName() + " — each address's English and Hindi, to read");
+            }
+        }
+
         // Named rather than left silent (D15): a load that rewrites a paragraph's words throws
         // away the vector that described the old ones, and a load that deletes an embedded row
         // throws away its vector outright. Both are re-earned by `ncert embed` at the price of the
         // paragraphs involved — but a run that quietly destroys paid work should say so.
         if (result.embeddingsCleared() > 0 || result.embeddedOrphans() > 0) {
-            report.section("embeddings this load dropped")
-                    .line("run `ncert embed --book " + definition.code() + "` to earn them back")
+            report.section(dryRun ? "embeddings this load would drop" : "embeddings this load dropped")
+                    .line(dryRun ? "the load of record would leave `ncert embed --book " + definition.code() + "` to earn "
+                            + "them back" : "run `ncert embed --book " + definition.code() + "` to earn them back")
                     .table(List.of("cleared (text rewritten)", "deleted with their paragraph"),
                             List.of(List.of(String.valueOf(result.embeddingsCleared()),
                                     String.valueOf(result.embeddedOrphans()))));
@@ -186,10 +273,53 @@ class NcertLoadCommand extends NcertBookCommand {
             report.line("INCOMPLETE: " + (rendered - pages.size()) + " rendered pages are not in the "
                     + "extraction — run `ncert extract` again before trusting this load");
         }
-        report.section("addresses in the database this extraction no longer carried — deleted")
+        report.section("addresses in the database this extraction no longer carried — "
+                        + (dryRun ? "a load would delete them" : "deleted"))
                 .list(result.orphans());
-        report.section("rows the other edition still carries — this edition's text cleared from them")
+        report.section("rows the other edition still carries — this edition's text "
+                        + (dryRun ? "a load would clear from them" : "cleared from them"))
                 .list(result.cleared());
+    }
+
+    /** Why a local file is not this edition's transcription: a Hindi one is Devanagari, an English one Latin. */
+    private static String wrongEdition(List<ExtractedPage> pages, BookLanguage language) {
+        long devanagari = 0;
+        long latin = 0;
+        for (ExtractedPage page : pages) {
+            for (NcertPage.Paragraph paragraph : page.paragraphs()) {
+                for (char c : paragraph.text().toCharArray()) {
+                    if (c >= 'ऀ' && c <= 'ॿ') {
+                        devanagari++;
+                    } else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+                        latin++;
+                    }
+                }
+            }
+        }
+        if (language == BookLanguage.hi && devanagari == 0) {
+            return "carries no Devanagari";
+        }
+        return language == BookLanguage.en && devanagari > latin ? "is mostly Devanagari" : null;
+    }
+
+    private static byte[] read(Path file) {
+        try {
+            return Files.readAllBytes(file);
+        } catch (IOException e) {
+            throw new UncheckedIOException("cannot read the local extraction " + file.toAbsolutePath().normalize(), e);
+        }
+    }
+
+    private static void write(Path file, byte[] bytes) {
+        try {
+            Path parent = file.toAbsolutePath().getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+            Files.write(file, bytes);
+        } catch (IOException e) {
+            throw new UncheckedIOException("cannot write the pairs to " + file.toAbsolutePath().normalize(), e);
+        }
     }
 
     /**

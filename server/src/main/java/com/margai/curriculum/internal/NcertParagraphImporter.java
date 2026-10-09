@@ -48,6 +48,16 @@ class NcertParagraphImporter {
         this.embeddings = embeddings;
     }
 
+    /**
+     * {@link #load}, its statements sent to the database before the caller's transaction is rolled back — so
+     * a row the database would refuse refuses the dry run too.
+     */
+    NcertLoadReport preview(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
+        NcertLoadReport report = load(bookCode, language, rows);
+        paragraphs.flush();
+        return report;
+    }
+
     NcertLoadReport load(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
         NcertBook book = book(bookCode);
 

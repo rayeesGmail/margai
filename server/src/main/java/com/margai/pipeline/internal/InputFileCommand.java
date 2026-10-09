@@ -46,6 +46,11 @@ abstract class InputFileCommand implements Callable<Integer> {
     /** The command's work over an existing input file, told to the report; throws when the run fails. */
     abstract void run(Path inputFile, Report report);
 
+    /** The report's title, and so its file name: the command's own name unless a mode must show in it. */
+    String reportTitle() {
+        return spec.qualifiedName();
+    }
+
     @Override
     public final Integer call() {
         Path file = io.input(inputFileName());
@@ -54,7 +59,7 @@ abstract class InputFileCommand implements Callable<Integer> {
             log.warn("{}: input file not found: {}", spec.qualifiedName(), file.toAbsolutePath().normalize());
             return EXIT_USAGE;
         }
-        Report report = new Report(spec.qualifiedName(), file);
+        Report report = new Report(reportTitle(), file);
         log.info("{} starting: input {} sha256 {}", spec.qualifiedName(), file.normalize(), report.sha256());
         int exitCode = EXIT_OK;
         RuntimeException unexpected = null;

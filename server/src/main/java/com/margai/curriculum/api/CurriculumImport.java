@@ -72,6 +72,14 @@ public interface CurriculumImport {
     NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows);
 
     /**
+     * {@code ncert load --dry-run} (D16): exactly what {@link #loadParagraphs} would write and report — its
+     * statements run and checked by the database — inside a transaction of its own, whatever the caller
+     * holds, which is then rolled back, so nothing is written. Refused as the load is, and by any constraint
+     * the database would refuse the load on.
+     */
+    NcertLoadReport previewParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows);
+
+    /**
      * {@code ncert align} (D16): every row of the given chapters that carries either edition, with both texts
      * and each edition's pages, in reading order. Refused when the book is not registered.
      */

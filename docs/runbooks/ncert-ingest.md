@@ -626,8 +626,12 @@ heavy neighbours score alike). The entries come from reading:
   4). `split`: a span once on its page, a new paragraph from there (at a page's first words, it cuts the row
   at the page break). `join`: the words a paragraph starts with; it becomes the rest of the one before —
   across a page break the previous page's last body paragraph, a footnote skipped, same section only.
-  `defer`: a footnote one edition prints a page early. Entries apply in file order, each to the page the
-  earlier ones left; nothing moves text between paragraphs that are not neighbours, or across sections.
+  `defer`: a footnote one edition prints a page early. `section`: the words the first paragraph under a
+  heading starts with and the quoted number the English gives that section, where the Hindi print numbers it
+  otherwise or adds a sub-heading (phy11-part2's "8.5.6" for 8.5.5, its 13.8.1) — read the load report's
+  section table for a count of 0 on one side; written first, so the joins after it see the English section.
+  Entries apply in file order, each to the page the earlier ones left; nothing moves text between paragraphs
+  that are not neighbours, or across sections.
 - One fresh reader per chapter (two for a long one), briefed with these rules whole, then a separate pass
   on characters, then the spec-auditor on the whole block before the founder approves it.
 

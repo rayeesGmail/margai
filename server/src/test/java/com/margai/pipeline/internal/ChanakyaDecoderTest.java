@@ -95,6 +95,19 @@ class ChanakyaDecoderTest {
         assertThat(ChanakyaDecoder.asWalkman("b", "Bookman-Light")).isEqualTo("b");
     }
 
+    /**
+     * The second Hindi book's spellings (phy11-part2 ch 8, D16): रु typed as र and the hook (विरुद्ध), an
+     * anusvara keyed inside a cluster (स्प्रिंग; Biology's स्पंजी the same) — and the हृ glyph with the
+     * aa-stroke, which prints ह्य in बाह्य and ह्र + ा in ह्रास, so it stays as typed for the check to read both ways.
+     */
+    @Test
+    void theSecondBooksSpellingsDecodeAsPrinted() {
+        assertThat(ChanakyaDecoder.decode("fojQ¼", WALKMAN)).isEqualTo("विरुद्ध");
+        assertThat(ChanakyaDecoder.decode("fLaizx", WALKMAN)).isEqualTo("स्प्रिंग");
+        assertThat(ChanakyaDecoder.decode("Laith", WALKMAN)).isEqualTo("स्पंजी");
+        assertThat(ChanakyaDecoder.decode("ckâk", WALKMAN)).isEqualTo("बाहृा");
+    }
+
     /** Bookman, Times and Symbol spans are already Unicode: only the Devanagari fonts are decoded. */
     @Test
     void aLatinFontPassesThroughUntouched() {

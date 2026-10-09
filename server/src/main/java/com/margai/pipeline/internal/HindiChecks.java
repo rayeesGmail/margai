@@ -56,6 +56,13 @@ final class HindiChecks {
     /** A one-letter subscript run into the next symbol, m_ix_i or A_xB_x, which the page sets apart. */
     private static final Pattern RUN_ON_SUBSCRIPT = Pattern.compile("(_[A-Za-z0-9])(?=[A-Za-z][_^])");
 
+    /**
+     * The हृ glyph and the aa-stroke, which the books type for two conjuncts the font draws alike: ह्य in बाह्य
+     * (phy11-part2) and ह्र + ा in ह्रास, अपह्रासित (Biology). The glyphs cannot say which, so the decoder keeps
+     * them as typed and a page word holding them stands for either reading (D16).
+     */
+    private static final String HOOKED_HA_AA = "हृा";
+
     /** The joiners a row may write between a visible halant and the next letter (दिक्‌स्थान); the layer has none. */
     private static final Pattern JOINER = Pattern.compile("[\\u200C\\u200D]");
 
@@ -69,11 +76,15 @@ final class HindiChecks {
      */
     static List<String> devanagari(String page, String rows) {
         Map<String, Integer> onPage = counts(WORD, page);
-        Set<String> brokenAtLineEnds = lineEndJoins(page);
+        Set<String> alsoOnPage = lineEndJoins(page);
+        onPage.keySet().stream().filter(word -> word.contains(HOOKED_HA_AA)).forEach(word -> {
+            alsoOnPage.add(word.replace(HOOKED_HA_AA, "ह्य"));
+            alsoOnPage.add(word.replace(HOOKED_HA_AA, "ह्रा"));
+        });
         Map<String, Integer> inRows = counts(WORD, rows);
         List<String> findings = new ArrayList<>();
         inRows.forEach((word, count) -> {
-            if (!onPage.containsKey(word) && !brokenAtLineEnds.contains(word)) {
+            if (!onPage.containsKey(word) && !alsoOnPage.contains(word)) {
                 findings.add("'" + word + "' " + count + "x in the rows, 0x on the page");
             }
         });

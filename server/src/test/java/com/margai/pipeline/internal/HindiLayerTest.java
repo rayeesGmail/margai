@@ -101,6 +101,18 @@ class HindiLayerTest {
         return HindiLayer.pages(Files.readAllBytes(book.resolve("khph10" + chapter + ".pdf"))).get(page - 1);
     }
 
+    /** phy11-part2 ch 8, the second Hindi book's staged chapter: स्प्रिंग on p1 and विरुद्ध on p8 read as printed (D16). */
+    @Test
+    void theSecondBooksStagedChapterReadsItsSpellings() throws IOException {
+        Path khph201 = HINDI.resolve("phy11-part2/khph201.pdf");
+        assumeTrue(Files.exists(khph201), "founder's NCERT PDFs not on this machine");
+
+        List<HindiLayer.Page> pages = HindiLayer.pages(Files.readAllBytes(khph201));
+
+        assertThat(pages.get(0).devanagari()).contains("कुण्डलित स्प्रिंग");
+        assertThat(pages.get(7).devanagari()).contains("विरुद्ध");
+    }
+
     /** All 79 Hindi chapter files: no Latin letter is left in a decoded Chanakya run — every glyph is mapped. */
     @Test
     void everyHindiChapterDecodesWithNoGlyphLeftOver() throws IOException {

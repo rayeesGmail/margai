@@ -117,9 +117,12 @@ final class ChanakyaDecoder {
         FOLDED = Map.copyOf(folded);
     }
 
-    /** The letter the hook glyph makes of the one before it: व → क, प → फ, their half forms, and उ → ऊ. */
+    /**
+     * The letter the hook glyph makes of the one before it: व → क, प → फ, their half forms, उ → ऊ — and र → रु,
+     * which phy11-part2 types once (विरुद्ध, ch 8 p8) where every other book uses the रु glyph (D16).
+     */
     private static final Map<Character, String> HOOK_BASE = Map.of(
-            'o', "क", 'i', "फ", 'O', "क्", 'I', "फ्", 'm', "ऊ");
+            'o', "क", 'i', "फ", 'O', "क्", 'I', "फ्", 'm', "ऊ", 'j', "रु");
 
     /** The glyphs that may sit between a letter and its hook — marks and signs typed in between. */
     private static final String HOOK_SKIP = "sSqwa`¡Zz-˜™W±~+k";
@@ -131,6 +134,13 @@ final class ChanakyaDecoder {
             Pattern.compile("[" + CONSONANT + "]़?(?:्[" + CONSONANT + "]़?)*");
     private static final Pattern MARK_BEFORE_SIGN = Pattern.compile("([" + MARKS + "])([" + SIGNS + "]+)");
     private static final Pattern DOUBLED_SIGN = Pattern.compile("([ेैुू])\\1");
+
+    /**
+     * An anusvara keyed straight after a half form, inside its cluster, belongs after the cluster: fLaizx =
+     * स्प्रिंग, Laith = स्पंजी — the four places in the 79 chapter files, each read off the print (D16).
+     */
+    private static final Pattern ANUSVARA_IN_CLUSTER =
+            Pattern.compile("्ं([" + CONSONANT + "]़?(?:्[" + CONSONANT + "]़?)*)");
 
     /** A nukta or a rakar typed after the vowel sign it comes before in Unicode: i<s+axs = पढ़ेंगे, xszV = ग्रेट. */
     private static final Pattern SIGN_BEFORE_NUKTA_OR_RAKAR = Pattern.compile("([" + SIGNS + "]+)(़|्र)");
@@ -173,6 +183,7 @@ final class ChanakyaDecoder {
                 .replace("एे", "ऐ");
         // a sign typed twice prints once: esas = में
         s = DOUBLED_SIGN.matcher(s).replaceAll("$1");
+        s = ANUSVARA_IN_CLUSTER.matcher(s).replaceAll("्$1ं");
         s = movePreI(s);
         s = placeReph(s);
         s = MARK_BEFORE_SIGN.matcher(s).replaceAll("$2$1");

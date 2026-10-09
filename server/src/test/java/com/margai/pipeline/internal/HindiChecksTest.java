@@ -71,6 +71,14 @@ class HindiChecksTest {
                 .containsExactly("'अत्यधिक' 1x in the rows, 0x on the page");
     }
 
+    /** The हृ glyph with the aa-stroke prints ह्य in बाह्य and ह्र + ा in ह्रास: a page word holding it is either. */
+    @Test
+    void theHookedHaWithTheAaStrokeIsEitherConjunct() {
+        assertThat(HindiChecks.devanagari("कोई बाहृा बल", "कोई बाह्य बल")).isEmpty();
+        assertThat(HindiChecks.devanagari("ऊतक के हृास को", "ऊतक के ह्रास को")).isEmpty();
+        assertThat(HindiChecks.devanagari("कोई बाहृा बल", "कोई बाहर बल")).containsExactly("'बाहर' 1x in the rows, 0x on the page");
+    }
+
     /**
      * The rows' notation read as the page prints it (D16): -> and _vec are arrows, "to" is the range word of an
      * integral, a one-letter subscript runs into the next symbol in m_ix_i, a spelled Greek letter runs into a

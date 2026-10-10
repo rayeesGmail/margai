@@ -30,13 +30,22 @@ final class NcertCorrections {
 
     /**
      * The corrected pages, one line per change, how many entries were rulings on verifier flags that
-     * change no text, and the paragraphs a {@code defer} entry makes wait for their number.
+     * change no text, the paragraphs a {@code defer} entry makes wait for their number, and the rows a
+     * {@code move} entry renumbers, in file order.
      */
-    record Applied(List<ExtractedPage> pages, List<String> notes, int rulings, Set<Deferred> deferred) {
+    record Applied(List<ExtractedPage> pages, List<String> notes, int rulings, Set<Deferred> deferred,
+            List<Moved> moves) {
     }
 
     /** A paragraph that takes its number after the next one its section starts: its place on its page. */
     record Deferred(short chapter, int page, int index) {
+    }
+
+    /**
+     * A row numbered right after another, each named by the place its first paragraph has on its page once
+     * every page-level entry has applied; {@code at} and {@code after} are the entry's words, for a refusal.
+     */
+    record Moved(short chapter, int page, int index, int afterPage, int afterIndex, String at, String after) {
     }
 
     /** The entries this load carries: its book, its edition, its chapters. */
@@ -56,6 +65,7 @@ final class NcertCorrections {
         }
         List<String> notes = new ArrayList<>();
         List<NcertCorrection> deferrals = new ArrayList<>();
+        List<NcertCorrection> moves = new ArrayList<>();
         int rulings = 0;
         for (NcertCorrection written : corrections) {
             if (!written.kind().changesText()) {
@@ -65,7 +75,7 @@ final class NcertCorrections {
             NcertCorrection entry = new NcertCorrection(written.book(), written.language(), written.chapter(),
                     written.page(), written.kind(), spaced(written.transcribed()), spaced(written.printed()),
                     spaced(written.at()), written.reason(), written.address(), written.removeRef(), written.addRef(),
-                    written.flag(), written.section());
+                    written.flag(), written.section(), spaced(written.after()), written.afterPage());
             Integer at = index.get(entry.chapter() + "/" + entry.page());
             if (at == null) {
                 throw refuse(entry, "that page is not in the extraction");
@@ -88,6 +98,10 @@ final class NcertCorrections {
                     yield defer(entry, paragraphs, continuedOnNextPage(out, at));
                 }
                 case section -> section(entry, paragraphs, out, at);
+                case move -> {
+                    moves.add(entry);
+                    yield move(entry, paragraphs, out, index);
+                }
                 default -> throw new IllegalStateException("not a text-changing kind: " + entry.kind());
             };
             out.set(at, new ExtractedPage(page.chapterNo(), page.page(), page.confidence(), page.aiCallId(),
@@ -101,7 +115,43 @@ final class NcertCorrections {
             ExtractedPage page = out.get(index.get(entry.chapter() + "/" + entry.page()));
             deferred.add(new Deferred(page.chapterNo(), page.page(), onlyStart(entry, page.paragraphs())));
         }
-        return new Applied(List.copyOf(out), List.copyOf(notes), rulings, Set.copyOf(deferred));
+        List<Moved> moved = new ArrayList<>();
+        for (NcertCorrection entry : moves) {
+            List<NcertPage.Paragraph> page = singleSpaced(out.get(index.get(entry.chapter() + "/" + entry.page())));
+            List<NcertPage.Paragraph> afterPage = singleSpaced(out.get(index.get(entry.chapter() + "/" + entry.afterPage())));
+            moved.add(new Moved(entry.chapter(), entry.page(), onlyStart(entry, page), entry.afterPage(),
+                    onlyStart(entry, entry.after(), afterPage), entry.at(), entry.after()));
+        }
+        return new Applied(List.copyOf(out), List.copyOf(notes), rulings, Set.copyOf(deferred), List.copyOf(moved));
+    }
+
+    /**
+     * Names the two rows only: the numbering moves the row once the page breaks are joined, so a row that runs
+     * across pages moves whole. Both must start a paragraph — a continuation is the rest of another page's row.
+     */
+    private static String move(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs, List<ExtractedPage> pages,
+            Map<String, Integer> index) {
+        int first = onlyStart(entry, paragraphs);
+        if (first == 0 && paragraphs.getFirst().continuesPreviousPage()) {
+            throw refuse(entry, "\"" + entry.at() + "\" continues the previous page's row — name the row by its first words");
+        }
+        Integer afterAt = index.get(entry.chapter() + "/" + entry.afterPage());
+        if (afterAt == null) {
+            throw refuse(entry, "page " + entry.afterPage() + " is not in the extraction");
+        }
+        // The page as the entries so far left it: this page's own copy when it is the same page.
+        List<NcertPage.Paragraph> afterParagraphs = entry.afterPage() == entry.page() ? paragraphs
+                : singleSpaced(pages.get(afterAt));
+        int after = onlyStart(entry, entry.after(), afterParagraphs);
+        if (after == 0 && afterParagraphs.getFirst().continuesPreviousPage()) {
+            throw refuse(entry, "\"" + entry.after() + "\" continues the previous page's row — name the row by its first words");
+        }
+        if (entry.afterPage() == entry.page() && after == first) {
+            throw refuse(entry, "a row cannot follow itself");
+        }
+        return entry.where() + " §" + paragraphs.get(first).section().strip() + ": the row starting \"" + entry.at()
+                + "\" is numbered after the row starting \"" + entry.after() + "\" (page " + entry.afterPage() + ") ("
+                + entry.reason() + ")";
     }
 
     private static String replace(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs) {
@@ -202,7 +252,8 @@ final class NcertCorrections {
         if (paragraph.continuesPreviousPage()) {
             throw refuse(entry, "\"" + entry.at() + "\" continues the previous page's paragraph — correct its text instead");
         }
-        if (at == paragraphs.size() - 1 && lastContinued) {
+        // The last body paragraph, not the page's last: a footnote below it is never what the next page continues.
+        if (at == lastBody(paragraphs) && lastContinued) {
             throw refuse(entry, "page " + (entry.page() + 1) + " continues the paragraph starting \"" + entry.at()
                     + "\" — correct its text instead");
         }
@@ -214,12 +265,12 @@ final class NcertCorrections {
     private static String defer(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs, boolean lastContinued) {
         int at = onlyStart(entry, paragraphs);
         NcertPage.Paragraph paragraph = paragraphs.get(at);
-        // Half a paragraph cannot wait while the other half is numbered; a footnote is never the half
-        // the next page continues.
+        // Half a paragraph cannot wait while the other half is numbered. The half the next page continues is the
+        // last body paragraph, not the page's last: a footnote below it is never continued.
         if (paragraph.continuesPreviousPage()) {
             throw refuse(entry, "\"" + entry.at() + "\" continues the previous page's paragraph — join or split it first");
         }
-        if (at == paragraphs.size() - 1 && lastContinued && !NcertLoadCommand.footnote(paragraph.text())) {
+        if (at == lastBody(paragraphs) && lastContinued) {
             throw refuse(entry, "page " + (entry.page() + 1) + " continues the paragraph starting \"" + entry.at()
                     + "\" — join or split it first");
         }
@@ -277,16 +328,41 @@ final class NcertCorrections {
 
     /** The index of the one paragraph starting with the entry's words, refusing any other count. */
     private static int onlyStart(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs) {
+        return onlyStart(entry, entry.at(), paragraphs);
+    }
+
+    private static int onlyStart(NcertCorrection entry, String words, List<NcertPage.Paragraph> paragraphs) {
         List<Integer> starting = new ArrayList<>();
         for (int at = 0; at < paragraphs.size(); at++) {
-            if (paragraphs.get(at).text().strip().startsWith(entry.at())) {
+            if (paragraphs.get(at).text().strip().startsWith(words)) {
                 starting.add(at);
             }
         }
         if (starting.size() != 1) {
-            throw refuse(entry, starting.size() + " paragraphs start with \"" + entry.at() + "\" there, not one");
+            throw refuse(entry, starting.size() + " paragraphs start with \"" + words + "\" there, not one");
         }
         return starting.getFirst();
+    }
+
+    /** A page's paragraphs single-spaced as an entry's words are, for matching a page no entry has touched yet. */
+    private static List<NcertPage.Paragraph> singleSpaced(ExtractedPage page) {
+        return page.paragraphs().stream()
+                .map(paragraph -> new NcertPage.Paragraph(paragraph.section(), singleSpaced(paragraph.text()),
+                        paragraph.continuesPreviousPage(), paragraph.figureRefs()))
+                .toList();
+    }
+
+    /**
+     * The index of the page's last paragraph that is not a footnote: the one the next page continues, when it
+     * continues one. A footnote set below it is never that paragraph (NcertLoadCommand's continuation rule).
+     */
+    private static int lastBody(List<NcertPage.Paragraph> paragraphs) {
+        for (int at = paragraphs.size() - 1; at >= 0; at--) {
+            if (!NcertLoadCommand.footnote(paragraphs.get(at).text())) {
+                return at;
+            }
+        }
+        return -1;
     }
 
     /** Whether the next page of the chapter that carries text opens by continuing this page's last paragraph. */

@@ -26,19 +26,20 @@ final class NcertCorrectionsYamlReader {
     static final String FILE = "ncert-corrections.yaml";
 
     private static final Set<String> COMMON_KEYS = Set.of("book", "lang", "chapter", "page", "kind", "reason", "address");
-    private static final Map<NcertCorrection.Kind, Set<String>> KIND_KEYS = Map.of(
-            NcertCorrection.Kind.text, Set.of("transcribed", "printed"),
-            NcertCorrection.Kind.join, Set.of("at"),
-            NcertCorrection.Kind.split, Set.of("at"),
-            NcertCorrection.Kind.figure_ref, Set.of("at", "remove", "add"),
-            NcertCorrection.Kind.drop, Set.of("at"),
-            NcertCorrection.Kind.defer, Set.of("at"),
-            NcertCorrection.Kind.section, Set.of("at", "section"),
-            NcertCorrection.Kind.misprint, Set.of("transcribed", "printed"),
-            NcertCorrection.Kind.false_positive, Set.of("transcribed", "printed"),
-            NcertCorrection.Kind.noise, Set.of("at", "flag"));
+    private static final Map<NcertCorrection.Kind, Set<String>> KIND_KEYS = Map.ofEntries(
+            Map.entry(NcertCorrection.Kind.text, Set.of("transcribed", "printed")),
+            Map.entry(NcertCorrection.Kind.join, Set.of("at")),
+            Map.entry(NcertCorrection.Kind.split, Set.of("at")),
+            Map.entry(NcertCorrection.Kind.figure_ref, Set.of("at", "remove", "add")),
+            Map.entry(NcertCorrection.Kind.drop, Set.of("at")),
+            Map.entry(NcertCorrection.Kind.defer, Set.of("at")),
+            Map.entry(NcertCorrection.Kind.section, Set.of("at", "section")),
+            Map.entry(NcertCorrection.Kind.move, Set.of("at", "after", "after_page")),
+            Map.entry(NcertCorrection.Kind.misprint, Set.of("transcribed", "printed")),
+            Map.entry(NcertCorrection.Kind.false_positive, Set.of("transcribed", "printed")),
+            Map.entry(NcertCorrection.Kind.noise, Set.of("at", "flag")));
     private static final Set<String> KIND_SPECIFIC = Set.of("transcribed", "printed", "at", "remove", "add", "flag",
-            "section");
+            "section", "after", "after_page");
     /**
      * The checks a {@code noise} entry may rule on: the two that name a row and so enter the clean share.
      * The page-level start flags are outside it already, and 85 entries a book would bury this file
@@ -120,6 +121,7 @@ final class NcertCorrectionsYamlReader {
         }
         short chapter = (short) whole(file, entry, "chapter", 1, 99, label);
         String section = kind == NcertCorrection.Kind.section ? section(file, entry, language, chapter, label) : null;
+        boolean move = kind == NcertCorrection.Kind.move;
         return new NcertCorrection(
                 required(file, entry, "book", label),
                 language,
@@ -134,7 +136,9 @@ final class NcertCorrectionsYamlReader {
                 remove,
                 add,
                 flag,
-                section);
+                section,
+                move ? required(file, entry, "after", label) : null,
+                move ? whole(file, entry, "after_page", 1, 999, label) : null);
     }
 
     /**

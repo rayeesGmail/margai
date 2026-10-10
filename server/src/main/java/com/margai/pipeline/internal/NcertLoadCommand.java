@@ -13,8 +13,10 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -177,7 +179,7 @@ class NcertLoadCommand extends NcertBookCommand {
         // sign for a zero exponent, written as the convention has it (D15, 2026-09-17).
         DimensionalBrackets.Applied dimensioned = DimensionalBrackets.apply(pages);
         pages = dimensioned.pages();
-        Numbered numbered = number(pages, source, corrected.deferred());
+        Numbered numbered = number(pages, source, corrected.deferred(), corrected.moves());
         List<NcertParagraphRow> rows = numbered.rows();
         report.section("page-break repairs to the model's continuation flags (deterministic, each one named)")
                 .list(repaired.notes());
@@ -396,7 +398,11 @@ class NcertLoadCommand extends NcertBookCommand {
     }
 
     /** A deferred paragraph until the next one of its section has taken its number. */
-    private record Waiting(ExtractedPage page, NcertPage.Paragraph paragraph) {
+    private record Waiting(ExtractedPage page, int index, NcertPage.Paragraph paragraph) {
+    }
+
+    /** Where a row's first paragraph sits on its page, as a {@code move} entry names it. */
+    private record Start(short chapter, int page, int index) {
     }
 
     /**
@@ -406,7 +412,18 @@ class NcertLoadCommand extends NcertBookCommand {
      *                 footnote it is never what the next page continues.
      */
     static Numbered number(List<ExtractedPage> pages, String jsonlKey, Set<NcertCorrections.Deferred> deferred) {
+        return number(pages, jsonlKey, deferred, List.of());
+    }
+
+    /**
+     * @param moves the rows a {@code move} correction names (D16), in file order: once every page break is
+     *              joined, each row is taken out of its section and numbered right after the row it names, in
+     *              that row's section, and both sections are numbered again from ¶1.
+     */
+    static Numbered number(List<ExtractedPage> pages, String jsonlKey, Set<NcertCorrections.Deferred> deferred,
+            List<NcertCorrections.Moved> moves) {
         List<Joined> rows = new ArrayList<>();
+        Map<Start, Joined> starts = new HashMap<>();
         List<String> refusals = new ArrayList<>();
         Map<Short, TreeSet<Integer>> redo = new LinkedHashMap<>();
         // (chapter, section) → the last number given out; a resumed section continues its count.
@@ -445,7 +462,7 @@ class NcertLoadCommand extends NcertBookCommand {
                 }
                 String counter = chapter + " " + section;
                 if (deferred.contains(new NcertCorrections.Deferred(chapter, page.page(), index))) {
-                    Waiting earlier = waiting.put(counter, new Waiting(page, paragraph));
+                    Waiting earlier = waiting.put(counter, new Waiting(page, index, paragraph));
                     if (earlier != null) {
                         unplaced.add(stranded(chapter, section, earlier) + " before the next deferred one");
                     }
@@ -454,6 +471,7 @@ class NcertLoadCommand extends NcertBookCommand {
                 int paraNo = counters.merge(counter, 1, Integer::sum);
                 Joined joined = new Joined(chapter, section, paraNo, page, paragraph);
                 rows.add(joined);
+                starts.put(new Start(chapter, page.page(), index), joined);
                 // A footnote is never the paragraph the next page continues, so it never becomes the
                 // anchor: the body above it stays the one a continuation joins to.
                 if (!footnote(paragraph.text())) {
@@ -461,8 +479,10 @@ class NcertLoadCommand extends NcertBookCommand {
                 }
                 Waiting held = waiting.remove(counter);
                 if (held != null) {
-                    rows.add(new Joined(chapter, section, counters.merge(counter, 1, Integer::sum), held.page(),
-                            held.paragraph()));
+                    Joined placed = new Joined(chapter, section, counters.merge(counter, 1, Integer::sum), held.page(),
+                            held.paragraph());
+                    rows.add(placed);
+                    starts.put(new Start(chapter, held.page().page(), held.index()), placed);
                 }
             }
         }
@@ -485,6 +505,7 @@ class NcertLoadCommand extends NcertBookCommand {
                                             .collect(java.util.stream.Collectors.joining(",")))
                             .collect(java.util.stream.Collectors.joining("\n  ")));
         }
+        move(rows, starts, moves);
         // A model put "Eq. (7.5)" in figure_refs (D15, the Opus run). A rule can ask; this
         // guarantees, and names what it dropped so a wrong label is never silently discarded.
         List<String> dropped = new ArrayList<>();
@@ -502,6 +523,49 @@ class NcertLoadCommand extends NcertBookCommand {
                     row.hasEquations(), kept, row.extraction()));
         }
         return new Numbered(List.copyOf(result), List.copyOf(dropped));
+    }
+
+    /**
+     * The {@code move} entries, on whole rows: each row leaves its section and is numbered right after the row it
+     * names, in that row's section; every section a move touched is then numbered from ¶1 in its new order. A
+     * row's words, pages and page parts go with it, so nothing a continuation joined is split again.
+     */
+    private static void move(List<Joined> rows, Map<Start, Joined> starts, List<NcertCorrections.Moved> moves) {
+        if (moves.isEmpty()) {
+            return;
+        }
+        Map<String, List<Joined>> sections = new LinkedHashMap<>();
+        rows.stream().sorted(Comparator.comparingInt(row -> row.paraNo))
+                .forEach(row -> sections.computeIfAbsent(row.counter(), key -> new ArrayList<>()).add(row));
+        Set<String> touched = new LinkedHashSet<>();
+        List<String> unplaced = new ArrayList<>();
+        for (NcertCorrections.Moved move : moves) {
+            Joined row = starts.get(new Start(move.chapter(), move.page(), move.index()));
+            Joined after = starts.get(new Start(move.chapter(), move.afterPage(), move.afterIndex()));
+            if (row == null || after == null) {
+                unplaced.add("ch " + move.chapter() + " page " + move.page() + ": the row starting \"" + move.at()
+                        + "\" or the row starting \"" + move.after() + "\" (page " + move.afterPage()
+                        + ") is not a row of its own");
+                continue;
+            }
+            touched.add(row.counter());
+            sections.get(row.counter()).remove(row);
+            List<Joined> target = sections.get(after.counter());
+            target.add(target.indexOf(after) + 1, row);
+            row.section = after.section;
+            touched.add(after.counter());
+        }
+        if (!unplaced.isEmpty()) {
+            throw new InputFormatException(Path.of(NcertCorrectionsYamlReader.FILE), 0, unplaced.size()
+                    + " move correction(s) cannot be placed:\n  " + String.join("\n  ", unplaced)
+                    + "\nFix each entry against the page, or remove it.");
+        }
+        for (String key : touched) {
+            int paraNo = 0;
+            for (Joined row : sections.get(key)) {
+                row.paraNo = ++paraNo;
+            }
+        }
     }
 
     private static String stranded(short chapter, String section, Waiting waiting) {
@@ -597,8 +661,9 @@ class NcertLoadCommand extends NcertBookCommand {
     private static final class Joined {
 
         private final short chapterNo;
-        private final String section;
-        private final int paraNo;
+        // Not final: a move entry gives a row another section and both sections new numbers (D16).
+        private String section;
+        private int paraNo;
         private final StringBuilder text = new StringBuilder();
         private final List<Integer> pages = new ArrayList<>();
         private final List<Integer> pageStarts = new ArrayList<>();
@@ -615,6 +680,11 @@ class NcertLoadCommand extends NcertBookCommand {
 
         private int lastPage() {
             return pages.getLast();
+        }
+
+        /** The (chapter, section) key the numbering counts in. */
+        private String counter() {
+            return chapterNo + " " + section;
         }
 
         private void add(ExtractedPage page, NcertPage.Paragraph paragraph) {

@@ -587,6 +587,99 @@ class NcertCorrectionsTest {
                 .hasMessageContaining("section correction on ch 7 page 8: \"When a wire\" is in §7.5.6 already");
     }
 
+    /**
+     * A row numbered after another (D16): phy11-part2's Hindi prints a footnote a page late and inside the next
+     * section, one eight paragraphs before the English numbers it and one two paragraphs after, and a `defer`
+     * moves a paragraph one place later and no further.
+     */
+    @Test
+    void readsAMoveEntry() throws IOException {
+        Path file = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 9, page: 3, kind: move, at: "* STP का अर्थ",
+                     after: "उदाहरण 9.1 दो पैरों", after_page: 2, reason: "the English numbers the footnote before Example 9.1"}
+                """);
+
+        assertThat(NcertCorrectionsYamlReader.read(file)).singleElement().satisfies(entry -> {
+            assertThat(entry.kind()).isEqualTo(NcertCorrection.Kind.move);
+            assertThat(entry.at()).isEqualTo("* STP का अर्थ");
+            assertThat(entry.after()).isEqualTo("उदाहरण 9.1 दो पैरों");
+            assertThat(entry.afterPage()).isEqualTo(2);
+            assertThat(entry.kind().changesText()).isTrue();
+        });
+
+        Path noPage = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 9, page: 3, kind: move, at: "* STP", after: "उदाहरण 9.1", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(noPage))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (move): 'after_page' must be a whole number");
+    }
+
+    /** The entry changes no word; it names the two rows by where their first paragraphs sit once every page-level entry is applied. */
+    @Test
+    void aMoveNamesBothRowsAndChangesNoWord() {
+        List<ExtractedPage> pages = List.of(
+                page(7, p("7.4", "Answer (a) The period is 2 s."), p("7.4", "(b) The speed at the mean"),
+                        p("7.4", "* The radian is a ratio.")),
+                page(8, new NcertPage.Paragraph("7.4", "position is A omega.", true, List.of())));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                move(7, "* The radian", 7, "Answer (a)")));
+
+        assertThat(applied.pages()).isEqualTo(pages);
+        assertThat(applied.moves()).containsExactly(
+                new NcertCorrections.Moved((short) 7, 7, 2, 7, 0, "* The radian", "Answer (a)"));
+        assertThat(applied.notes()).containsExactly("ch 7 page 7 §7.4: the row starting \"* The radian\" is numbered "
+                + "after the row starting \"Answer (a)\" (page 7) (read against the page)");
+    }
+
+    /** A continuation is the rest of another page's row, so it names no row; and a row cannot follow itself. */
+    @Test
+    void aMoveMustNameTwoRowsByTheirFirstWords() {
+        List<ExtractedPage> pages = List.of(page(7, p("7.4", "(b) The speed at the mean")),
+                page(8, new NcertPage.Paragraph("7.4", "position is A omega.", true, List.of()), p("7.4", "* A note.")));
+
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(move(8, "position is", 7, "(b) The speed"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("move correction on ch 7 page 8: \"position is\" continues the previous page's row");
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(move(8, "* A note", 8, "position is"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("\"position is\" continues the previous page's row");
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(move(8, "* A note", 8, "* A note"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("a row cannot follow itself");
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(move(8, "* A note", 9, "Anything"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("page 9 is not in the extraction");
+    }
+
+    /**
+     * The paragraph the next page continues is the last body paragraph, not the page's last: a footnote set
+     * below it is never continued. Deferring or dropping that paragraph would leave the continuation to join
+     * the paragraph above it.
+     */
+    @Test
+    void theParagraphTheNextPageContinuesIsTheLastBodyParagraphNotTheLast() {
+        List<ExtractedPage> pages = List.of(
+                page(3, p("7.3", "First."), p("7.3", "The body starts here and runs"), p("7.3", "* A footnote under it.")),
+                page(4, new NcertPage.Paragraph("7.3", "on to the next page.", true, List.of())));
+
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(
+                correction(3, NcertCorrection.Kind.defer, null, null, "The body starts"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("page 4 continues the paragraph starting \"The body starts\"");
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(
+                correction(3, NcertCorrection.Kind.drop, null, null, "The body starts"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("page 4 continues the paragraph starting \"The body starts\"");
+        // The footnote itself is not what page 4 continues, so it can go.
+        assertThat(NcertCorrections.apply(pages, List.of(
+                correction(3, NcertCorrection.Kind.drop, null, null, "* A footnote"))).pages().getFirst().paragraphs())
+                .hasSize(2);
+    }
+
     /** Rulings on the verifier's flags change no text; verify reads them, the load only counts them. */
     @Test
     void misprintAndFalsePositiveRulingsChangeNothing() {
@@ -646,12 +739,17 @@ class NcertCorrectionsTest {
 
     private static NcertCorrection figureRef(int page, String at, String remove, String add) {
         return new NcertCorrection("phy11-part1", BookLanguage.en, (short) 7, page, NcertCorrection.Kind.figure_ref,
-                null, null, at, "read against the page", null, remove, add, null, null);
+                null, null, at, "read against the page", null, remove, add, null, null, null, null);
     }
 
     private static NcertCorrection section(int page, String at, String section) {
         return new NcertCorrection("phy11-part2", BookLanguage.hi, (short) 7, page, NcertCorrection.Kind.section,
-                null, null, at, "read against the page", null, null, null, null, section);
+                null, null, at, "read against the page", null, null, null, null, section, null, null);
+    }
+
+    static NcertCorrection move(int page, String at, int afterPage, String after) {
+        return new NcertCorrection("phy11-part2", BookLanguage.hi, (short) 7, page, NcertCorrection.Kind.move,
+                null, null, at, "read against the page", null, null, null, null, null, after, afterPage);
     }
 
     private static ExtractedPage page(int page, NcertPage.Paragraph... paragraphs) {

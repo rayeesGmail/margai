@@ -24,6 +24,9 @@
 #   kind: section         at + section — the words the first paragraph under a heading starts with, and the
 #                         section the English numbers it, quoted; that section's paragraphs in the chapter
 #                         all take it (Hindi only: a heading the Hindi print numbers otherwise)
+#   kind: move            at + after + after_page — the words a row starts with, and the words of the row it is
+#                         numbered right after (which starts on after_page), in that row's section; applied to
+#                         whole rows once page breaks are joined (a footnote or box printed in another place)
 #   kind: misprint        transcribed + printed as the verifier quoted them — the book's own error, kept
 #   kind: false_positive  transcribed + printed as the verifier quoted them — the verifier was wrong
 #   kind: noise           flag (join or figure) + at — one of the free checks was wrong about the paragraph

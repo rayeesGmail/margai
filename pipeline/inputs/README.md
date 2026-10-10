@@ -31,7 +31,8 @@ committed.
   page is not what the entry was written against, twice means the entry does not say which.
 - **`text`, `join`, `split`, `figure_ref` (remove or add one label on the paragraph holding a span),
   `drop` (remove a paragraph that is not running text), `defer` (number a paragraph after the next one
-  of its section) and `section` (give a Hindi section the English number) change the extraction;
+  of its section), `section` (give a Hindi section the English number) and `move` (number a whole row
+  right after another, in that row's section) change the extraction;
   `misprint`, `false_positive` and `noise` do not** — they
   rule on a flag (the book's own error kept; the verifier wrong; a free check wrong about a paragraph),
   and `ncert verify` reads them so a ruled flag is not raised again.
@@ -41,7 +42,10 @@ committed.
   English numbers first. A `section` entry (Hindi only) names the first paragraph under a heading the Hindi
   numbers differently and the quoted section the English gives it — phy11-part2 prints "8.5.6" for the
   English 8.5.5 and adds a 13.8.1 the English does not have — and every paragraph of that section in the
-  chapter moves with it; put it before any join it makes possible. Write its spans as the rows show them —
+  chapter moves with it; put it before any join it makes possible. A `move` names a row by its first
+  words (`at`, on `page`) and the row it follows (`after`, on `after_page`): once page breaks are joined the
+  row is taken out and numbered right after that one, earlier or later, in its section — for a footnote or a
+  box the Hindi prints pages away from where the English numbers it. Write its spans as the rows show them —
   the Hindi load puts back a visarga written as a colon (`अत:` → `अतः`) before it applies an entry.
 - **A Hindi `text` entry's `printed` span is read off the page image.** The decoded text layer is a check
   and never a source (SPEC §12.2): a reason may say the layer's line agrees and give its position, and

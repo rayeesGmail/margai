@@ -22,6 +22,8 @@ import com.margai.curriculum.api.BookLanguage;
  * @param addRef      the label a {@code figure_ref} entry adds, or null
  * @param flag        which free check a {@code noise} entry rules on, or null
  * @param section     the section the English numbers what a {@code section} entry names, or null
+ * @param after       the words the row a {@code move} entry's row follows starts with, or null
+ * @param afterPage   the page that row starts on, or null
  */
 record NcertCorrection(
         String book,
@@ -37,12 +39,15 @@ record NcertCorrection(
         String removeRef,
         String addRef,
         LayoutChecks.Kind flag,
-        String section) {
+        String section,
+        String after,
+        Integer afterPage) {
 
-    /** An entry of any kind but {@code figure_ref}, {@code noise} and {@code section}, which name a label, a check, a section. */
+    /** An entry of any kind but {@code figure_ref}, {@code noise}, {@code section} and {@code move}, which name more. */
     NcertCorrection(String book, BookLanguage language, short chapter, int page, Kind kind, String transcribed,
             String printed, String at, String reason, String address) {
-        this(book, language, chapter, page, kind, transcribed, printed, at, reason, address, null, null, null, null);
+        this(book, language, chapter, page, kind, transcribed, printed, at, reason, address, null, null, null, null,
+                null, null);
     }
 
     enum Kind {
@@ -71,6 +76,15 @@ record NcertCorrection(
          * join can mend because a join never crosses a section. Only a Hindi entry: the English is canonical.
          */
         section,
+        /**
+         * The row starting {@code at} on {@code page} takes its number right after the row starting {@code after}
+         * on {@code afterPage}, in that row's section, earlier or later (D16). Applied to whole rows once the page
+         * breaks are joined, so a row that runs across pages moves whole and no continuation changes. The Hindi
+         * prints footnotes and boxes where its own pages fall: phy11-part2 sets a footnote a page late and in the
+         * next section, one eight paragraphs before the English numbers it, one two after — which {@code defer},
+         * one paragraph later and no further, cannot place.
+         */
+        move,
         /** The book prints an error and the transcription rightly keeps it: a flag, not a defect. */
         misprint,
         /** The verifier was wrong about this span: a flag, not a defect. */

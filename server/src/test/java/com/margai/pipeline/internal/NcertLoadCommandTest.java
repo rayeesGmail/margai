@@ -248,6 +248,57 @@ class NcertLoadCommandTest {
                 "* We are not considering charged bodies.");
     }
 
+    /**
+     * phy11-part2's Hindi starts part (b) of an answer above the radian footnote and runs it onto the next page;
+     * the English numbers the footnote first (D16). The move is made on whole rows, after the page break is
+     * joined, so (b) keeps its second half and the footnote takes the place before it.
+     */
+    @Test
+    void aMovedFootnoteIsNumberedAfterTheRowItNamesAndTheRowItPassedKeepsItsContinuation() throws IOException {
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 7, kind: move, at: "* The radian",
+                     after: "Answer (a)", after_page: 7, reason: the other edition numbers the footnote before (b)}
+                """);
+        imports.renderedPagesAnswer = 8;
+        jsonl(page(7, 7, "0.95", p("7.4", "Answer (a) The period is 2 s."), p("7.4", "(b) The speed at the mean"),
+                        p("7.4", "* The radian is a ratio.")),
+                page(7, 8, "0.95", continuing("7.4", "position is A omega."), p("7.4", "Example 7.5 Next.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactlyInAnyOrder(
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶1", "Answer (a) The period is 2 s."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶2", "* The radian is a ratio."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶3", "(b) The speed at the mean position is A omega."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶4", "Example 7.5 Next."));
+        assertThat(out.toString()).contains("- ch 7 page 7 §7.4: the row starting \"* The radian\" is numbered after the "
+                + "row starting \"Answer (a)\" (page 7) (the other edition numbers the footnote before (b))");
+    }
+
+    /** A footnote one edition prints a page late, under the next heading, goes back to the section of the row it follows. */
+    @Test
+    void aMovedRowTakesTheSectionOfTheRowItFollowsAndBothSectionsAreNumberedAgain() throws IOException {
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: en, chapter: 7, page: 3, kind: move, at: "* STP means",
+                     after: "Pressure is a scalar.", after_page: 2, reason: the other edition prints it on page 2}
+                """);
+        imports.renderedPagesAnswer = 3;
+        jsonl(page(7, 2, "0.95", p("7.2", "Pressure is a scalar."), p("7.2", "Example 7.1 Two thigh bones.")),
+                page(7, 3, "0.95", p("7.2.1", "Pascal's law."), p("7.2.1", "* STP means standard temperature.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactlyInAnyOrder(
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.2 ¶1", "Pressure is a scalar."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.2 ¶2", "* STP means standard temperature."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.2 ¶3", "Example 7.1 Two thigh bones."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.2.1 ¶1", "Pascal's law."));
+        assertThat(imports.rows.stream().filter(row -> row.text().startsWith("* STP")).findFirst().orElseThrow()
+                .extraction().pages()).containsExactly(3);
+    }
+
     /** With nothing after it in its section there is nothing to follow, and the entry is wrong about the page. */
     @Test
     void aDeferredParagraphWithNoLaterParagraphInItsSectionIsRefused() throws IOException {

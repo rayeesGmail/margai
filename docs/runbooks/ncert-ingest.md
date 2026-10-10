@@ -630,6 +630,10 @@ heavy neighbours score alike). The entries come from reading:
   heading starts with and the quoted number the English gives that section, where the Hindi print numbers it
   otherwise or adds a sub-heading (phy11-part2's "8.5.6" for 8.5.5, its 13.8.1) — read the load report's
   section table for a count of 0 on one side; written first, so the joins after it see the English section.
+  `move`: a row's first words (`at`, on `page`) and those of the row it is numbered after (`after`, on
+  `after_page`) — once page breaks are joined, the whole row is renumbered there, earlier or later, in that
+  row's section: a footnote or box the Hindi prints pages away from where the English numbers it, which
+  `defer` (one paragraph later, no further) cannot place.
   Entries apply in file order, each to the page the earlier ones left; nothing moves text between paragraphs
   that are not neighbours, or across sections.
 - One fresh reader per chapter (two for a long one), briefed with these rules whole, then a separate pass

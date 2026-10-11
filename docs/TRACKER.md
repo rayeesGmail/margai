@@ -329,6 +329,18 @@ HOW TO RESUME (supersedes item 2 of the list below):
      NEXT: the founder copies extract/phy11-part2/hi.jsonl to the scratchpad (the load printed its sha256 d759e73f…), then one
      fresh reader per chapter (8–14) on the brief in scratchpad ca91e9fb `BRIEF-align.md` with `dry.sh` (the loader's dry run
      per chapter) and `pairs.py`, then the characters pass, the spec audit, the founder's approval.
+     2026-10-10/11: ADJUDICATION IN SIMULATION, NOT YET IN THE REPO. Seven chapter readers + two character readers (b1 the
+     second read's 27 flags and the 19 omitted passages, b2 the layer check's flags and the colon words) — a network drop
+     killed eight mid-task, all resumed with their context. Their footnotes and boxes printed away from where the English
+     numbers them needed a new `move` kind (19cfcdf, docs 1686910; also defer/drop now refuse the last BODY paragraph a
+     continuation joins). Merged by scratchpad ca91e9fb `merge.py` (b1's two §11.9 heading texts dropped as duplicates of
+     ch11's; the Triple Point title placed before ch10's move) → 221 entries (102 split, 44 join, 45 text, 6 move, 2
+     section, 1 defer, 17 false_positive, 4 misprint), whole-book dry run ok, 94 of 95 sections one to one. Founder rulings
+     (DECISIONS 8a8c054, 5b1c5fd): re-read ch 10 p19 for the omitted Activity 10.4 box (scratchpad `d16-phy11p2-hi-p19.sh`,
+     ≈₹6 — NOT YET RUN), §11.9 mirrors the English heading rows, and the Hindi row writes the meaning where the print states
+     something false (½ as an en dash, α for ∝/=, 8.8 for 9.8, T₂ > T₁ …) — reader b3 is writing those entries.
+     NEXT: b3 → merge → p19 compare + its §10.10 entries → whole-book dry run, every section one to one → spec audit →
+     founder approval of the block → commit with the approval dry run's report → reload → align → re-read changed pages.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

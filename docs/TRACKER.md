@@ -370,8 +370,10 @@ HOW TO RESUME (supersedes item 2 of the list below):
      solution 9.0 against the English 9.4; (12.28), (12.35) and 0.02 × 10^23 in ch 12); ch 12 p7's वर्गीकृत चालों
      ("classified speeds" for the squared speeds) is not written; round two will be large — every meaning entry differs
      from the page on purpose.
-     NEXT: the approval dry run into pipeline/reports → the founder approves the block → commit the block with that report
-     → the founder reloads (₹0), aligns (≈₹7) and re-reads the book (≈₹145) → round two.
+     2026-10-12: APPROVED AS WRITTEN AND COMMITTED (b855d6c, with the approval dry run 2026-10-12-ncert-load-dry-run.md:
+     no refusal, 95 of 95, extraction sha256 51ab7180…; third audit PASS). NEXT: the founder runs scratchpad ca91e9fb
+     `d16-phy11p2-hi-reload.sh` (jar copy at 01c2d52: reload ₹0 — its report must print 51ab7180… — align ≈₹7, second
+     read of the changed pages ≈₹145), then round two on the second read's flags.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

@@ -437,6 +437,24 @@ HOW TO RESUME (supersedes item 2 of the list below):
      own 150 dpi render shows — nothing lost to the model. NEXT: the founder runs scratchpad 92559e62
      `d16-phy12p1-hi.sh` (jar copy server-d16-count.jar = f2f2ec9; ch 2–8 extract ≈₹690, load ₹0, align ≈₹10, Sonnet 5
      second read ≈₹250, then the extraction copied to the scratchpad's dry/ for the dry runs) → Claude adjudicates.
+     2026-10-13 00:09: phy12-part1 Hindi RUN DONE (reports 13778bd): 984 Hindi rows beside 1,042 English, 65 of 116
+     sections one to one as loaded; second read 959 of 984 clean (97.5%), 14 passages no row carries; the run ₹899.29,
+     the book ₹1,087.80 with its staged ch 1; extraction sha256 97cf92b1…. ADJUDICATED IN SIMULATION (scratchpad 92559e62:
+     rulings-ch1..8 / b1 / b2 / b3 → merge.py → readdress.py → finalize.py → `block-final.yaml`; `dry.sh final` is the
+     loader's own dry run): 334 entries — 134 split, 98 text, 77 join, 15 false_positive, 4 move, 3 misprint, 2 defer,
+     1 section — result ok, 114 of 115 sections one to one. Eight chapter readers read every pair of their chapter; b1
+     ruled the second read's 22 flags, the 14 omitted passages and the 11 colon words; b2 the 90 layer-check lines (34
+     silent repairs undone as printed, 16 misreadings, 3 bullets, 3 "[illegible]" markers where the page draws a symbol
+     the English rows leave out too); b3 the readers' own finds (two dropped side labels, §2.9 ¶11's run-in heading, 17
+     meaning entries under the 2026-10-10 ruling: K for kg, सदैव धनात्मक for आकर्षी, AD for AO, the y-z plane, a dropped
+     B, dω/dt for dω/dθ, ≃ not drawn ×3, the square of the field, 0.450 for 0.454 A …). The English row §2.8.3 ¶3's
+     missing minus is the English print's own (leph102 p16). OPEN, the founder's: §3.12 — the Hindi edition does not
+     print English ¶5 and prints ¶3's sentence twice, which no entry can name apart: accept 13 of 15 pairs or build a
+     small "not printed in this edition" entry; and eleven per-place questions (layer-only signs, the hat on ch 1 p29,
+     परिणाम on ch 3 p5, ℐ for the moment of inertia, या/फेस/अंतःधारा as printed or meaning). Then the spec audit, the
+     approval dry run, the founder's approval, the reload. Check-noise classes for a later fix: a letter before a spelled
+     Greek letter (dPhi, kphi; 13 lines), MT-Extra signs decoding to a blank, a decimal point set apart in displays, a
+     zero-width glyph drawn twice, the dot-product glyph counted as a bullet, a run-on subscript before a plain letter.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

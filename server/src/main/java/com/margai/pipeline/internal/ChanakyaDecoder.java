@@ -18,8 +18,10 @@ import java.util.regex.Pattern;
  * real defect in four transcriptions while neither paid second read found one (D16).
  *
  * <p>The glyph map was read off charts rendered from the fonts embedded in the PDFs and confirmed against
- * word contexts across all 79 Hindi chapter files, which it decodes with no unmapped glyph (≈0.03% of words
- * suspect, each a layer artefact — a word cut across lines, a typo in the layer). Typed order is not reading
+ * word contexts across all 79 Hindi chapter files, which it decodes with no unmapped glyph. One code was
+ * misread there: ß, taken for श्व, prints ह्र (D16, 2026-10-12). With that and the second book's typing rules,
+ * 339 of the 625,583 words the layer gives (0.05%) cannot be right as decoded — a sign with no letter, a halant
+ * twice — most of them headings the books overprint for a bold. Typed order is not reading
  * order in these fonts, so beyond the map: the short-i glyph comes before its cluster, the reph after it, a
  * "hook" glyph turns the letter before it into another (व → क, प → फ, उ → ऊ), a half form takes the aa-stroke
  * to become the full letter, and a mark typed before a vowel sign belongs after it.
@@ -32,6 +34,12 @@ final class ChanakyaDecoder {
     private static final char REPH = '';
     private static final char REPH_ANUS = '';
     private static final char HOOK = '';
+
+    /**
+     * The ð glyph is a ट set under the letter before it, with no width of its own: after ट (V) or its half
+     * form (ê) it prints ट्ट — संघट्ट, भट्टी, typed both ways in the same book (D16).
+     */
+    private static final String BELOW_TA = "्ट";
 
     private static final Map<Character, String> GLYPH = Map.ofEntries(
             Map.entry(' ', " "), Map.entry('!', "!"), Map.entry('\"', "ष्"), Map.entry('#', "रु"),
@@ -72,11 +80,11 @@ final class ChanakyaDecoder {
             Map.entry('Ñ', "कृ"), Map.entry('×', "ञ्"), Map.entry('Ø', "क्र"),
             Map.entry('Ù', "त्त्"), Map.entry('Ú', "फ्र"),
             Map.entry('Ü', "श्"), Map.entry('Ý', "फ्"), Map.entry('Þ', "ह्"),
-            Map.entry('ß', "श्व"), Map.entry('à', "ह्व"),
+            Map.entry('ß', "ह्र"), Map.entry('à', "ह्व"),
             Map.entry('á', "ह्य"), Map.entry('â', "हृ"),
             Map.entry('ã', "ह्म"), Map.entry('æ', "द्र"),
             Map.entry('ç', "प्र"), Map.entry('è', "ध्"), Map.entry('ê', "ट्"),
-            Map.entry('í', "द्द"), Map.entry('ï', "ज़"), Map.entry('ð', "ट"),
+            Map.entry('í', "द्द"), Map.entry('ï', "ज़"), Map.entry('ð', BELOW_TA),
             Map.entry('ñ', "॰"), Map.entry('ò', "ठ"), Map.entry('˜', "ु"),
             Map.entry('’', "ष्ठ"), Map.entry('”', "ज़्"),
             Map.entry('•', "ख"), Map.entry('™', "ू"));
@@ -133,7 +141,8 @@ final class ChanakyaDecoder {
     private static final Pattern CLUSTER =
             Pattern.compile("[" + CONSONANT + "]़?(?:्[" + CONSONANT + "]़?)*");
     private static final Pattern MARK_BEFORE_SIGN = Pattern.compile("([" + MARKS + "])([" + SIGNS + "]+)");
-    private static final Pattern DOUBLED_SIGN = Pattern.compile("([ेैुू])\\1");
+    /** A sign typed twice, which the raster draws once on itself: esas = में, o``f¼ = वृद्धि (D16). */
+    private static final Pattern DOUBLED_SIGN = Pattern.compile("([ेैुूृ])\\1");
 
     /**
      * An anusvara keyed straight after a half form, inside its cluster, belongs after the cluster: fLaizx =
@@ -142,16 +151,35 @@ final class ChanakyaDecoder {
     private static final Pattern ANUSVARA_IN_CLUSTER =
             Pattern.compile("्ं([" + CONSONANT + "]़?(?:्[" + CONSONANT + "]़?)*)");
 
-    /** A nukta or a rakar typed after the vowel sign it comes before in Unicode: i<s+axs = पढ़ेंगे, xszV = ग्रेट. */
-    private static final Pattern SIGN_BEFORE_NUKTA_OR_RAKAR = Pattern.compile("([" + SIGNS + "]+)(़|्र)");
+    /**
+     * A nukta or a rakar typed after the vowel sign or mark it comes before in Unicode: i<s+axs = पढ़ेंगे,
+     * xszV = ग्रेट, isazQp = फ्रेंच (D16: the e-sign and the anusvara both before the rakar).
+     */
+    private static final Pattern SIGN_BEFORE_NUKTA_OR_RAKAR = Pattern.compile("([" + SIGNS + MARKS + "]+)(़|्र)");
+
+    /** The below-base ट typed after a vowel sign of its cluster: [kêsð = खट्टे. */
+    private static final Pattern SIGN_BEFORE_BELOW_TA = Pattern.compile("([" + SIGNS + MARKS + "]+)(" + BELOW_TA + ")");
+
+    /**
+     * Blanks after a short-i glyph, which is typed before its cluster and never ends a word: PDFBox folds the ¯
+     * of किंतु into the space glyph before it, and the gap after that glyph reads as a second space (D16).
+     */
+    private static final Pattern BLANK_AFTER_PRE_I = Pattern.compile("([f£¯])\\s+");
+
+    /**
+     * A rakar typed after a short-i glyph belongs to the letter before it, as no cluster has begun: ifzrcy =
+     * प्रतिबल, isfz{kr = प्रेक्षित — the three places in the 79 chapter files (D16).
+     */
+    private static final Pattern RAKAR_AFTER_PRE_I = Pattern.compile("([f£¯])([zª])");
 
     /**
      * The plain Chanakya faces — Chanakya, ChanakyaThin, ChanakyaBold, which set a single conjunct inside a
-     * Walkman-Chanakya word — key two conjuncts Walkman does not: ^ is ट्ट (पट्टियों, चट्टान, संघट्ट) and b is
-     * ड्ढ (गड्ढे), each read off the print in every place the 79 chapter files use them (D16). Given here as
-     * the Walkman codes that build them, so a run mixing the faces decodes as one.
+     * Walkman-Chanakya word — key four glyphs Walkman does not: ^ is ट्ट (पट्टियों, चट्टान, संघट्ट), b is ड्ढ
+     * (गड्ढे), _ is ट्ठ (भट्ठी) and ï the half ज़ the aa-stroke completes (क्वार्ट्ज़), each read off the print in
+     * every place the 79 chapter files use them (D16). Given here as the Walkman codes that build them, so a
+     * run mixing the faces decodes as one.
      */
-    private static final Map<Character, String> PLAIN_FACE = Map.of('^', "êV", 'b', "M~<");
+    private static final Map<Character, String> PLAIN_FACE = Map.of('^', "êV", 'b', "M~<", '_', "êB", 'ï', "”");
 
     private ChanakyaDecoder() {
     }
@@ -168,9 +196,15 @@ final class ChanakyaDecoder {
             return text;
         }
         boolean kruti = font.toLowerCase(Locale.ROOT).contains("krutidev");
-        String s = String.join("", glyphs(unfolded(text), kruti ? KRUTI : GLYPH, !kruti));
+        String typed = anusvaraAfterPreI(RAKAR_AFTER_PRE_I.matcher(
+                BLANK_AFTER_PRE_I.matcher(unfolded(text)).replaceAll("$1")).replaceAll("$2$1"));
+        String s = String.join("", glyphs(typed, kruti ? KRUTI : GLYPH, !kruti));
+        // the below-base ट joins its cluster: after the half ट its halant is already there
+        s = SIGN_BEFORE_BELOW_TA.matcher(s).replaceAll("$2$1").replace("्" + BELOW_TA, BELOW_TA);
         s = s.replace("इ" + REPH, "ई").replace("इ" + REPH_ANUS, "ईं");
         s = MARK_BEFORE_SIGN.matcher(s).replaceAll("$2$1");
+        // before any vowel letter takes a sign into itself, so ,ss = ऐसा keeps none over
+        s = DOUBLED_SIGN.matcher(s).replaceAll("$1");
         // a reph typed between a half form and its aa-stroke: iznf'Zkr = प्रदर्शित
         s = s.replace("्" + REPH + "ा", String.valueOf(REPH));
         // a half form completed by the aa-stroke is the full letter, the nukta first: T+k = ज़
@@ -181,7 +215,6 @@ final class ChanakyaDecoder {
                 .replace("आॅ", "ऑ");
         s = s.replace("ाे", "ो").replace("ाै", "ौ").replace("ाॅ", "ॉ")
                 .replace("एे", "ऐ");
-        // a sign typed twice prints once: esas = में
         s = DOUBLED_SIGN.matcher(s).replaceAll("$1");
         s = ANUSVARA_IN_CLUSTER.matcher(s).replaceAll("्$1ं");
         s = movePreI(s);
@@ -189,9 +222,10 @@ final class ChanakyaDecoder {
         s = MARK_BEFORE_SIGN.matcher(s).replaceAll("$2$1");
         s = s.replace("ाे", "ो").replace("ाै", "ौ");
         // signs typed in an order Unicode does not allow, which the raster draws as the word (D16): a nukta or
-        // rakar after its vowel sign, a sign typed again round a mark (ksas = ओं, aa = ं) or under the ी flag
+        // rakar after its vowel sign, a sign typed again round a mark (ksas = ओं, aa = ं) or under the ी or ै
+        // flag (gSsa = हैं)
         s = SIGN_BEFORE_NUKTA_OR_RAKAR.matcher(s).replaceAll("$2$1");
-        s = s.replace("ोे", "ो").replace("ओे", "ओ").replace("ंं", "ं").replace("ीे", "ी");
+        s = s.replace("ोे", "ो").replace("ओे", "ओ").replace("ंं", "ं").replace("ीे", "ी").replace("ैे", "ै");
         return Normalizer.normalize(s, Normalizer.Form.NFC);
     }
 
@@ -205,6 +239,30 @@ final class ChanakyaDecoder {
             return glyph;
         }
         return PLAIN_FACE.getOrDefault(glyph.charAt(0), glyph);
+    }
+
+    /**
+     * An anusvara typed after a short-i glyph: after a letter it is that letter's, the short i still waiting for
+     * its cluster (vkjfaHkd = आरंभिक, vfare = अंतिम); opening a word the two are the short i with its anusvara
+     * (fatad = जिंक) — every one of the 14 places in the 79 chapter files reads so (D16).
+     */
+    private static String anusvaraAfterPreI(String typed) {
+        StringBuilder out = new StringBuilder(typed);
+        for (int at = out.indexOf("fa"); at >= 0; at = out.indexOf("fa", at + 1)) {
+            if (at > 0 && isLetterCode(out.charAt(at - 1))) {
+                out.setCharAt(at, 'a');
+                out.setCharAt(at + 1, 'f');
+            } else {
+                out.replace(at, at + 2, "¯");
+            }
+        }
+        return out.toString();
+    }
+
+    /** Whether a glyph code prints a letter or sign, rather than a blank, a digit or punctuation. */
+    private static boolean isLetterCode(char code) {
+        String printed = code == 'Q' ? "फ" : GLYPH.getOrDefault(code, "");
+        return printed.chars().anyMatch(c -> c >= 'ऀ' && c <= 'ॿ' && c != '।' && c != '॥' && (c < '०' || c > '९'));
     }
 
     /** The glyph text with every folded accent read back as the glyph code it was. */

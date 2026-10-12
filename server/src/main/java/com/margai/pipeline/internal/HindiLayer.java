@@ -27,6 +27,9 @@ import org.apache.pdfbox.pdmodel.font.encoding.SymbolEncoding;
  */
 final class HindiLayer {
 
+    /** A Chanakya glyph narrower than this, in points, has no width of its own (theirs are 0.04–0.07). */
+    private static final double MARK_WIDTH = 0.5;
+
     /**
      * One page.
      *
@@ -57,7 +60,8 @@ final class HindiLayer {
         }
     }
 
-    private static Page page(List<PdfLayout.Glyph> glyphs) {
+    /** One page from its glyphs in drawing order — package-visible so the layer's rules are tested without a PDF. */
+    static Page page(List<PdfLayout.Glyph> glyphs) {
         StringBuilder all = new StringBuilder();
         StringBuilder unicode = new StringBuilder();
         StringBuilder decoded = new StringBuilder();
@@ -67,7 +71,7 @@ final class HindiLayer {
             for (List<Placed> run : runs(line)) {
                 String font = run.getFirst().glyph().font();
                 boolean devanagariRun = ChanakyaDecoder.isDevanagariFont(font);
-                List<Placed> ordered = devanagariRun ? run : leftToRight(run);
+                List<Placed> ordered = devanagariRun ? reattached(run) : leftToRight(run);
                 if (previous != null && spaced(previous, ordered.getFirst())) {
                     lineText.append(' ');
                 }
@@ -136,6 +140,8 @@ final class HindiLayer {
      * condensed line's word spaces are narrower than the gap rule allows, and ch 5 p11 of the first Hindi book
      * read as one word without them. The example markers are dropped — MathB's ▶, which PDFBox gives as a
      * bullet, and Wingdings3's end mark — so 32 of that book's pages stopped counting a bullet nobody prints.
+     * A mark the Chanakya fonts draw with no width, set a little above its letter — the nukta, 512 places in
+     * the 79 chapter files — stays on its line: it cut फ़िजिओलॉजी into three lines (phy11-part2, D16).
      */
     private static List<List<Placed>> lines(List<PdfLayout.Glyph> glyphs) {
         List<List<Placed>> lines = new ArrayList<>();
@@ -145,7 +151,8 @@ final class HindiLayer {
                 space = true;
                 continue;
             }
-            if (lines.isEmpty() || Math.abs(glyph.y() - lines.getLast().getFirst().glyph().y()) > PdfLayout.SAME_LINE) {
+            double off = lines.isEmpty() ? 0 : Math.abs(glyph.y() - lines.getLast().getFirst().glyph().y());
+            if (lines.isEmpty() || (off > PdfLayout.SAME_LINE && !(isMark(glyph) && off <= 0.5 * glyph.size()))) {
                 lines.add(new ArrayList<>());
                 space = false;
             }
@@ -181,6 +188,28 @@ final class HindiLayer {
     }
 
     /**
+     * A Chanakya run in typed order, but for a mark with no width typed one letter late. A mark draws over the
+     * glyph whose right edge it stands at, normally the one typed before it; one standing at the start of that
+     * glyph instead — the right edge of the glyph before — belongs there: the e-sign of सेकेंड typed after the
+     * व, the ू of न्यून after the न (phy11-part1, D16).
+     */
+    private static List<Placed> reattached(List<Placed> run) {
+        List<Placed> glyphs = new ArrayList<>(run);
+        for (int index = 2; index < glyphs.size(); index++) {
+            PdfLayout.Glyph mark = glyphs.get(index).glyph();
+            PdfLayout.Glyph typedAfter = glyphs.get(index - 1).glyph();
+            PdfLayout.Glyph drawnOn = glyphs.get(index - 2).glyph();
+            if (isMark(mark) && !isMark(typedAfter) && !isMark(drawnOn)
+                    && Math.abs(mark.x() - typedAfter.x()) <= 0.25
+                    && typedAfter.x() + typedAfter.width() - mark.x() > 1
+                    && Math.abs(drawnOn.x() + drawnOn.width() - mark.x()) <= 0.5) {
+                glyphs.add(index - 1, glyphs.remove(index));
+            }
+        }
+        return glyphs;
+    }
+
+    /**
      * A Unicode run as the eye reads it: a display equation is drawn out of order — 0.05 kg as kg05.0 — which
      * no Chanakya glyph is, so only these runs are put back left to right, and only when they need it.
      */
@@ -195,26 +224,52 @@ final class HindiLayer {
     }
 
     /**
+     * A Chanakya glyph drawn with no width of its own — mostly a sign or mark set over or under its letter, though
+     * a half form that the next glyph completes can be one too (the श् of शृंखला).
+     */
+    private static boolean isMark(PdfLayout.Glyph glyph) {
+        return glyph.width() < MARK_WIDTH && ChanakyaDecoder.isDevanagariFont(glyph.font());
+    }
+
+    /**
      * Whether a space separates two glyphs: a space glyph between them, a gap wider than a letter's spacing,
      * or a jump back of more than an em (a caption drawn after its line, to its left). A change of font is not
-     * one: these books set a number's decimal point in the Chanakya face, and 35.6 read as 35 . 6 (D16).
+     * one: these books set a number's decimal point in the Chanakya face, and 35.6 read as 35 . 6 (D16). Nor is
+     * a gap before a glyph with no width, which is drawn wherever its letter needs it: the below-base ट of संघट्ट
+     * sits past the ट's own width (phy11-part2 ch 12 p6, D16).
      */
     private static boolean spaced(Placed previous, Placed next) {
         PdfLayout.Glyph before = previous.glyph();
-        PdfLayout.Glyph glyph = next.glyph();
-        return next.afterSpace() || glyph.x() - (before.x() + before.width()) > 0.15 * glyph.size()
-                || glyph.x() < before.x() - glyph.size();
+        return spaced(before.x(), before.x() + before.width(), next);
     }
 
-    /** A run's text, its glyphs' own text read in their fonts, spaces where {@link #spaced} puts them. */
+    /** {@link #spaced}, the gap measured from a right edge: the glyph before's, or the furthest its word reached. */
+    private static boolean spaced(double previousX, double right, Placed next) {
+        PdfLayout.Glyph glyph = next.glyph();
+        if (isMark(glyph)) {
+            return next.afterSpace();
+        }
+        return next.afterSpace() || glyph.x() - right > 0.15 * glyph.size() || glyph.x() < previousX - glyph.size();
+    }
+
+    /**
+     * A run's text, its glyphs' own text read in their fonts, spaces where {@link #spaced} puts them — inside a
+     * word each gap measured from the furthest right any of its glyphs reached: the rakar of प्रतिबल is drawn
+     * inside the short i before it, and from the rakar the त read as a new word (phy11-part2 ch 8 p5, D16).
+     */
     private static String text(List<Placed> run) {
         StringBuilder text = new StringBuilder();
         Placed previous = null;
+        double right = 0;
         for (Placed placed : run) {
-            if (previous != null && spaced(previous, placed)) {
+            PdfLayout.Glyph glyph = placed.glyph();
+            boolean space = previous != null && spaced(previous.glyph().x(), right, placed);
+            if (space) {
                 text.append(' ');
             }
-            text.append(glyphText(placed.glyph()));
+            text.append(glyphText(glyph));
+            double edge = glyph.x() + glyph.width();
+            right = previous == null || space ? edge : Math.max(right, edge);
             previous = placed;
         }
         return text.toString();

@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Test;
 /**
  * The Hindi books' Walkman-Chanakya (and Chemistry 12's KrutiDev501) glyph text into Devanagari — a check on
  * the Hindi transcription, never a source of its text (SPEC §12.2, DECISIONS 2026-10-02). The cases are the
- * scratchpad decoder's own, each read off a crop of the print when the map was built (D16).
+ * scratchpad decoder's own, each read off a crop of the print when the map was built (D16) — but for ßkl, which
+ * the map took for श्वास and the print shows is ह्रास (corrected 2026-10-12).
  */
 class ChanakyaDecoderTest {
 
@@ -23,7 +24,7 @@ class ChanakyaDecoderTest {
         "mQtkZ", "ऊर्जा", "izn£'kr", "प्रदर्शित", "ifjo£rr", "परिवर्तित", "fu£n\"V", "निर्दिष्ट", "¯cnq", "बिंदु",
         "inkFkks±", "पदार्थों", "b±èku", "ईंधन", "fLFkfr", "स्थिति", "vkWDlhtu", "ऑक्सीजन", "lacaf/r", "संबंधित",
         "dk;Z", "कार्य", "fo|qr~", "विद्युत्", "bysDVªkWu", "इलेक्ट्रॉन", "ukbVªkstu", "नाइट्रोजन", "ÝyDl", "फ्लक्स",
-        "feêðh", "मिट्टी", "Ük`a[kyk", "शृंखला", "ckÞ;", "बाह्य", "fpÉ", "चिह्न", "ßkl", "श्वास", "ân;", "हृदय",
+        "feêðh", "मिट्टी", "Ük`a[kyk", "शृंखला", "ckÞ;", "बाह्य", "fpÉ", "चिह्न", "ßkl", "ह्रास", "ân;", "हृदय",
         "i`’", "पृष्ठ", "lkb”k", "साइज़", "ns•k", "देखा", "fliZQ", "सिर्फ", "fiQj", "फिर", "isQiQM+s", "फेफड़े",
         "14-4-2", "14.4.2", "Hkkstu", "भोजन", "vkSj", "और", ",slk", "ऐसा", "bZ'oj", "ईश्वर", "tgk¡", "जहाँ",
         "fopkj.kh; fo\"k;", "विचारणीय विषय", "vè;;u", "अध्ययन", "O;kolkf;d", "व्यावसायिक", "Øe", "क्रम",
@@ -106,6 +107,52 @@ class ChanakyaDecoderTest {
         assertThat(ChanakyaDecoder.decode("fLaizx", WALKMAN)).isEqualTo("स्प्रिंग");
         assertThat(ChanakyaDecoder.decode("Laith", WALKMAN)).isEqualTo("स्पंजी");
         assertThat(ChanakyaDecoder.decode("ckâk", WALKMAN)).isEqualTo("बाहृा");
+    }
+
+    /**
+     * Words of the second Hindi book its rows print rightly and the check named (phy11-part2, D16), each the
+     * decoder's: ß is ह्र, never श्व — ह्रास, अपह्रासित; श्व is typed 'o, as श्वास नली is on the Biology page that
+     * prints ह्रास three times — ð is a ट set under the letter before it, typed after ट and after its half form
+     * alike; the plain faces' _ is ट्ठ and their ï the half ज़; and a rakar comes after an e-sign and an anusvara.
+     */
+    @Test
+    void theSecondBooksNamedWordsDecodeAsPrinted() {
+        String plain = "Chanakya";
+
+        assertThat(ChanakyaDecoder.decode("vißkflr", WALKMAN)).isEqualTo("अपह्रासित");
+        assertThat(ChanakyaDecoder.decode("'okl", WALKMAN)).isEqualTo("श्वास");
+        assertThat(ChanakyaDecoder.decode("la?kVð", WALKMAN)).isEqualTo("संघट्ट");
+        assertThat(ChanakyaDecoder.decode("la?kêð", WALKMAN)).isEqualTo("संघट्ट");
+        assertThat(ChanakyaDecoder.decode("[kêsð", WALKMAN)).isEqualTo("खट्टे");
+        assertThat(ChanakyaDecoder.decode("Hk" + ChanakyaDecoder.asWalkman("_", plain) + "h", WALKMAN)).isEqualTo("भट्ठी");
+        assertThat(ChanakyaDecoder.decode("DokVZ~" + ChanakyaDecoder.asWalkman("ï", plain) + "k", WALKMAN))
+                .isEqualTo("क्वार्ट्ज़");
+        assertThat(ChanakyaDecoder.decode("isazQp", WALKMAN)).isEqualTo("फ्रेंच");
+    }
+
+    /**
+     * What is typed beside a short-i glyph (D16): a blank after it is none — PDFBox folds the ¯ of किंतु into the
+     * space glyph before it, and the gap after that glyph reads as a second space; a rakar or an anusvara typed
+     * after it is the letter's before it, the short i still waiting for its cluster; opening a word, an anusvara
+     * after it is its own.
+     */
+    @Test
+    void whatIsTypedBesideAShortIIsPlacedAsPrinted() {
+        assertThat(ChanakyaDecoder.decode("gS] ̄ drq", WALKMAN)).isEqualTo("है, किंतु");
+        assertThat(ChanakyaDecoder.decode("ifzrcy", WALKMAN)).isEqualTo("प्रतिबल");
+        assertThat(ChanakyaDecoder.decode("isfz{kr", WALKMAN)).isEqualTo("प्रेक्षित");
+        assertThat(ChanakyaDecoder.decode("vkjfaHkd", WALKMAN)).isEqualTo("आरंभिक");
+        assertThat(ChanakyaDecoder.decode("vfare", WALKMAN)).isEqualTo("अंतिम");
+        assertThat(ChanakyaDecoder.decode("xzafaFk;ksa", WALKMAN)).isEqualTo("ग्रंथियों");
+        assertThat(ChanakyaDecoder.decode("fatad", WALKMAN)).isEqualTo("जिंक");
+    }
+
+    /** A sign typed twice draws once (D16): the e-sign after ए (ऐसा), the ृ (वृत्त), an e-sign under the ै flag (हैं). */
+    @Test
+    void aSignTypedTwiceIsReadOnce() {
+        assertThat(ChanakyaDecoder.decode(",sslk", WALKMAN)).isEqualTo("ऐसा");
+        assertThat(ChanakyaDecoder.decode("o`̀Ùk", WALKMAN)).isEqualTo("वृत्त");
+        assertThat(ChanakyaDecoder.decode("gSsa", WALKMAN)).isEqualTo("हैं");
     }
 
     /** Bookman, Times and Symbol spans are already Unicode: only the Devanagari fonts are decoded. */

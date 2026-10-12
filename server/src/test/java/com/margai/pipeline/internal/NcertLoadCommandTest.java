@@ -1,6 +1,7 @@
 package com.margai.pipeline.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.margai.ai.tasks.NcertPage;
 import com.margai.curriculum.api.BookLanguage;
@@ -16,6 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -255,17 +257,13 @@ class NcertLoadCommandTest {
      */
     @Test
     void aMovedFootnoteIsNumberedAfterTheRowItNamesAndTheRowItPassedKeepsItsContinuation() throws IOException {
-        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+        assertThat(loadHindi("""
                 corrections:
-                  - {book: phy11-part1, lang: en, chapter: 7, page: 7, kind: move, at: "* The radian",
-                     after: "Answer (a)", after_page: 7, reason: the other edition numbers the footnote before (b)}
-                """);
-        imports.renderedPagesAnswer = 8;
-        jsonl(page(7, 7, "0.95", p("7.4", "Answer (a) The period is 2 s."), p("7.4", "(b) The speed at the mean"),
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: move, at: "* The radian",
+                     after: "Answer (a)", after_page: 7, reason: the English numbers the footnote before (b)}
+                """, page(7, 7, "0.95", p("7.4", "Answer (a) The period is 2 s."), p("7.4", "(b) The speed at the mean"),
                         p("7.4", "* The radian is a ratio.")),
-                page(7, 8, "0.95", continuing("7.4", "position is A omega."), p("7.4", "Example 7.5 Next.")));
-
-        assertThat(run()).isZero();
+                page(7, 8, "0.95", continuing("7.4", "position is A omega."), p("7.4", "Example 7.5 Next.")))).isZero();
 
         assertThat(imports.rows).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactlyInAnyOrder(
                 org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶1", "Answer (a) The period is 2 s."),
@@ -273,22 +271,52 @@ class NcertLoadCommandTest {
                 org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶3", "(b) The speed at the mean position is A omega."),
                 org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶4", "Example 7.5 Next."));
         assertThat(out.toString()).contains("- ch 7 page 7 §7.4: the row starting \"* The radian\" is numbered after the "
-                + "row starting \"Answer (a)\" (page 7) (the other edition numbers the footnote before (b))");
+                + "row starting \"Answer (a)\" (page 7) (the English numbers the footnote before (b))");
+    }
+
+    /** A footnote the Hindi prints before rows the English numbers first waits for them: a move is later as well as earlier. */
+    @Test
+    void aMovedFootnoteCanBeNumberedLaterThanItIsPrinted() throws IOException {
+        assertThat(loadHindi("""
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 6, kind: move, at: "* rad may be dropped",
+                     after: "where s(x, t)", after_page: 7, reason: the English numbers it after the next page's rows}
+                """, page(7, 6, "0.95", p("7.3", "omega is the angular frequency."), p("7.3", "* rad may be dropped.")),
+                page(7, 7, "0.95", p("7.3", "nu is measured in hertz."), p("7.3", "where s(x, t) is the displacement."),
+                        p("7.3", "Example 7.2 A wave.")))).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactlyInAnyOrder(
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.3 ¶1", "omega is the angular frequency."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.3 ¶2", "nu is measured in hertz."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.3 ¶3", "where s(x, t) is the displacement."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.3 ¶4", "* rad may be dropped."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.3 ¶5", "Example 7.2 A wave."));
+    }
+
+    /**
+     * The numbering's own net under a move: a row it cannot find — which the corrections step refuses first, by
+     * name, for a continuation — is refused, never skipped.
+     */
+    @Test
+    void aMoveTheNumberingCannotPlaceIsRefused() {
+        List<ExtractedPage> pages = List.of(page(7, 2, "0.95", p("7.2", "Pressure is a scalar.")));
+
+        assertThatThrownBy(() -> NcertLoadCommand.number(pages, "hi.jsonl", Set.of(),
+                List.of(new NcertCorrections.Moved((short) 7, 2, 4, 2, 0, "* Nowhere", "Pressure is"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("1 move correction(s) cannot be placed")
+                .hasMessageContaining("the row starting \"* Nowhere\" or the row starting \"Pressure is\" (page 2) is not a row of its own");
     }
 
     /** A footnote one edition prints a page late, under the next heading, goes back to the section of the row it follows. */
     @Test
     void aMovedRowTakesTheSectionOfTheRowItFollowsAndBothSectionsAreNumberedAgain() throws IOException {
-        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+        assertThat(loadHindi("""
                 corrections:
-                  - {book: phy11-part1, lang: en, chapter: 7, page: 3, kind: move, at: "* STP means",
-                     after: "Pressure is a scalar.", after_page: 2, reason: the other edition prints it on page 2}
-                """);
-        imports.renderedPagesAnswer = 3;
-        jsonl(page(7, 2, "0.95", p("7.2", "Pressure is a scalar."), p("7.2", "Example 7.1 Two thigh bones.")),
-                page(7, 3, "0.95", p("7.2.1", "Pascal's law."), p("7.2.1", "* STP means standard temperature.")));
-
-        assertThat(run()).isZero();
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 3, kind: move, at: "* STP means",
+                     after: "Pressure is a scalar.", after_page: 2, reason: the English prints it on page 2}
+                """, page(7, 2, "0.95", p("7.2", "Pressure is a scalar."), p("7.2", "Example 7.1 Two thigh bones.")),
+                page(7, 3, "0.95", p("7.2.1", "Pascal's law."), p("7.2.1", "* STP means standard temperature.")))).isZero();
 
         assertThat(imports.rows).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactlyInAnyOrder(
                 org.assertj.core.groups.Tuple.tuple("ch 7 §7.2 ¶1", "Pressure is a scalar."),
@@ -996,6 +1024,15 @@ class NcertLoadCommandTest {
     private void jsonl(ExtractedPage... pages) {
         store.put(ContentKeys.extract("phy11-part1", BookLanguage.en), ExtractJsonl.write(List.of(pages)),
                 "application/jsonl");
+    }
+
+    /** A Hindi load of the test book with these corrections and pages: the edition a `section` or `move` entry is for. */
+    private int loadHindi(String corrections, ExtractedPage... pages) throws IOException {
+        hindiEdition();
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), corrections);
+        store.put(ContentKeys.extract("phy11-part1", BookLanguage.hi), ExtractJsonl.write(List.of(pages)), "application/jsonl");
+        return commandLine.execute("ncert", "load", "--book", "phy11-part1", "--lang", "hi",
+                "--inputs", inputs.toString(), "--reports", reports.toString());
     }
 
     private static ExtractedPage page(int chapter, int page, String confidence, NcertPage.Paragraph... paragraphs) {

@@ -14,8 +14,10 @@ import java.util.Set;
 /**
  * The founder's corrections applied to an extraction's pages (D15): after {@link PageBreakRepairs},
  * before {@code ncert load} numbers and joins, so a corrected page is loaded exactly as an extraction
- * that had read it right would have been. Each applied correction is one report line; each that
- * cannot be applied refuses the load by name, and the refusal writes nothing.
+ * that had read it right would have been. A {@code move} entry (D16) is the exception: it is checked here
+ * and named in its place, and the numbering carries it out on whole rows once the page breaks are joined.
+ * Each applied correction is one report line; each that cannot be applied refuses the load by name, and
+ * the refusal writes nothing.
  *
  * <p>A span must be found on its page exactly once. Not at all means the page is not what the entry
  * was written against — a re-extraction, a wrong page number — and twice means the entry does not say

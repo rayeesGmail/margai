@@ -615,6 +615,36 @@ class NcertCorrectionsTest {
         assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(noPage))
                 .isInstanceOf(InputFormatException.class)
                 .hasMessageContaining("correction 1 (move): 'after_page' must be a whole number");
+
+        Path noAfter = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 9, page: 3, kind: move, at: "* STP", after_page: 2, reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(noAfter))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (move): 'after' is required");
+
+        Path stray = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 9, page: 3, kind: join, at: "* STP", after_page: 2, reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(stray))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (join): 'after_page' does not belong to this kind");
+    }
+
+    /** The English rows are canonical — their sections and numbers carry the anchors and the vectors — so no entry moves one (spec-auditor, D16). */
+    @Test
+    void onlyAHindiEntryMovesARow() throws IOException {
+        Path english = write("""
+                corrections:
+                  - {book: phy11-part2, lang: en, chapter: 9, page: 3, kind: move, at: "* STP means",
+                     after: "The density of water", after_page: 2, reason: r}
+                """);
+
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(english))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (move): only a Hindi entry moves a row — the English rows are canonical");
     }
 
     /** The entry changes no word; it names the two rows by where their first paragraphs sit once every page-level entry is applied. */

@@ -327,9 +327,11 @@ Every run's report is its own file: a second run of the same command on the same
 **The load applies `pipeline/inputs/ncert-corrections.yaml`** (D15) after its page-break repairs and
 before it numbers: the founder's rulings on what `ncert verify` flagged. `text`, `join`, `split`,
 `figure_ref` (one label removed from or added to the paragraph holding a span), `drop` (a paragraph
-that is not running text removed) and `defer` (D16: the paragraph takes its number after the next one of
+that is not running text removed), `defer` (D16: the paragraph takes its number after the next one of
 its section — a footnote the other edition prints a page later; no word moves and it stays on its own
-page) change the frozen run's pages; `misprint`, `false_positive` and
+page), `section` (D16, Hindi only: a section the Hindi numbers otherwise takes the English number) and
+`move` (D16, Hindi only: a whole row numbered right after another, carried out by the numbering once page
+breaks are joined) change the frozen run's pages; `misprint`, `false_positive` and
 `noise` rule on a flag and change nothing, and `ncert verify` reads those three itself. The first two
 answer the second read, matched on the spans the verifier quoted; `noise` answers one of the **free**
 checks, which quotes no span, so it names the check (`flag: join` or `flag: figure`) and the words the
@@ -355,7 +357,10 @@ a Devanagari letter as one glyph, as the print draws them, so the step's rewrite
 layer is a check and never a source (SPEC §12.2): a reason says where the layer's line is and that it
 agrees, and never quotes the layer's text or its glyph codes — the reason is printed in the load report,
 and a quote there would store what the ruling says is never stored. A character only the layer carries,
-where the raster draws nothing, is the founder's to rule on.
+where the raster draws nothing, is the founder's to rule on. Where the Hindi print states something false
+(½ set as an en dash, α for ∝, a wrong number, sign, subscript or word), `printed` carries the meaning from
+the English row or the arithmetic, the reason naming the crop and what fixes it (founder, DECISIONS
+2026-10-10); spelling, grammar and edition differences stay as printed.
 
 **A footnote is a paragraph starting with an asterisk**, with or without a space after it (D16): it is
 numbered where its page puts it and is never what the next page continues.
@@ -439,7 +444,8 @@ and a part the read cannot be matched to unambiguously is left without one, to b
 2. **`the second read's flags — adjudicate these against the page`** — one line per difference: the
    address, the page, the span as printed, the span as the row carries it. Render the page (pymupdf
    from the scratchpad) and look. Each real one becomes a `text` entry; a verifier error becomes a
-   `false_positive`; the book's own error, kept, becomes a `misprint`.
+   `false_positive`; the book's own error becomes a `misprint` — kept in the row, or, in a Hindi row where
+   it states something false, written as its meaning by a `text` entry beside it (DECISIONS 2026-10-10).
 3. **`rows the verifier could not find on their page`** and **`running text the page prints that no
    row carries`** — the second is the one check that sees lost text (run 9's three equations on page
    5); a real one is re-extracted or, for a sentence, joined in with a correction.

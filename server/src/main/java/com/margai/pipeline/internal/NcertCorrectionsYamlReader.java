@@ -122,6 +122,11 @@ final class NcertCorrectionsYamlReader {
         short chapter = (short) whole(file, entry, "chapter", 1, 99, label);
         String section = kind == NcertCorrection.Kind.section ? section(file, entry, language, chapter, label) : null;
         boolean move = kind == NcertCorrection.Kind.move;
+        // The English rows are canonical: their sections and numbers carry the anchors and the vectors, so only the
+        // edition set to them may move a row (spec-auditor, D16).
+        if (move && language != BookLanguage.hi) {
+            throw new InputFormatException(file, 0, label + ": only a Hindi entry moves a row — the English rows are canonical");
+        }
         return new NcertCorrection(
                 required(file, entry, "book", label),
                 language,

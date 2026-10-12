@@ -14,9 +14,11 @@ import com.margai.curriculum.api.BookLanguage;
  *
  * @param transcribed the span as the extraction carries it ({@code text}), or as the verifier quoted
  *                    the transcription ({@code misprint}, {@code false_positive})
- * @param printed     the span as the page prints it, in the transcription's notation
- * @param at          the words a paragraph starts with ({@code join}, {@code drop}, {@code defer}), where a
- *                    new one must start ({@code split}), or a span naming the paragraph ({@code figure_ref})
+ * @param printed     the span as the page prints it, in the transcription's notation — or, for a Hindi
+ *                    {@code text} entry where the print states something false, its meaning (DECISIONS 2026-10-10)
+ * @param at          the words a paragraph or row starts with ({@code join}, {@code drop}, {@code defer},
+ *                    {@code section}, {@code move}), where a new one must start ({@code split}), or a span
+ *                    naming the paragraph ({@code figure_ref})
  * @param address     where the flag was raised, for a reader of the file; never used to apply it
  * @param removeRef   the figure or table label a {@code figure_ref} entry removes, or null
  * @param addRef      the label a {@code figure_ref} entry adds, or null
@@ -51,7 +53,10 @@ record NcertCorrection(
     }
 
     enum Kind {
-        /** Replace a transcribed span with what the page prints. */
+        /**
+         * Replace a transcribed span with what the page prints — or, in a Hindi row, with its meaning where the
+         * print states something false (DECISIONS 2026-10-10).
+         */
         text,
         /** The paragraph starting {@code at} is the rest of the one before it. */
         join,
@@ -85,7 +90,11 @@ record NcertCorrection(
          * one paragraph later and no further, cannot place.
          */
         move,
-        /** The book prints an error and the transcription rightly keeps it: a flag, not a defect. */
+        /**
+         * The book prints an error: a flag, not a defect. The row keeps it — or, in a Hindi row where the error
+         * states something false, a {@code text} entry writes the meaning and this rules on the flag (DECISIONS
+         * 2026-10-10).
+         */
         misprint,
         /** The verifier was wrong about this span: a flag, not a defect. */
         false_positive,

@@ -49,7 +49,12 @@ committed.
   the Hindi load puts back a visarga written as a colon (`अत:` → `अतः`) before it applies an entry.
 - **A Hindi `text` entry's `printed` span is read off the page image.** The decoded text layer is a check
   and never a source (SPEC §12.2): a reason may say the layer's line agrees and give its position, and
-  never quotes the layer's text or its glyph codes.
+  never quotes the layer's text or its glyph codes. The one exception to "as the page prints it" (founder,
+  DECISIONS 2026-10-10): where the Hindi print states something false — ½ set as an en dash, α for ∝, a wrong
+  number, sign, subscript or word — `printed` carries the meaning, from the English row or the arithmetic, and
+  the reason names the crop and what fixes the meaning; a second-read flag on such a place is a `misprint`,
+  which then means the book's error the row does not keep. Spelling, grammar and edition differences stay as
+  printed.
 - Quote every value holding a comma or a colon: in YAML's `{…}` form an unquoted comma starts a new key,
   and the reader refuses the key it does not know.
 

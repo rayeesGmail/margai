@@ -46,15 +46,27 @@ class HindiChecksTest {
     }
 
     /**
-     * Measured on the Phase B and C rows of khph101 (D16): the layer's visarga ः is often the rows' colon, a
-     * word the layer splits across lines makes the page one short, and the prompt names Greek letters and
-     * writes √ as sqrt — none of them a defect, so none is named.
+     * Measured on the Phase B and C rows of khph101 (D16): the layer's visarga ः is often the rows' colon, and
+     * the prompt names Greek letters and writes √ as sqrt — neither a defect, so neither is named.
      */
     @Test
     void whatTheLayerAndTheConventionsMakeDifferentIsNotNamed() {
         assertThat(HindiChecks.devanagari("अतः यह प्रायः है", "अत: यह प्राय: है")).isEmpty();
-        assertThat(HindiChecks.devanagari("यह है वह है", "यह है वह है और है")).containsExactly("'और' 1x in the rows, 0x on the page");
         assertThat(HindiChecks.spans("π r √ 2 ± 4", "pi r sqrt(2) ± 4 ±")).isEmpty();
+    }
+
+    /**
+     * Counted, not merely looked for (D16): a word the page prints once and the rows carry twice hid a
+     * misreading wherever the page also printed the right word — phy11-part1 ch 7 p9 prints "किसी कण को
+     * स्थितिज ऊर्जा" beside six of कण की. A word broken at a line end counts once for each break.
+     */
+    @Test
+    void aWordTheRowsCarryMoreOftenThanThePageIsNamed() {
+        assertThat(HindiChecks.devanagari("कण की ऊर्जा और कण को ऊर्जा", "कण की ऊर्जा और कण की ऊर्जा"))
+                .containsExactly("'की' 2x in the rows, 1x on the page");
+        assertThat(HindiChecks.devanagari("अत्यधि\nक है और अत्यधि\nक है", "अत्यधिक है और अत्यधिक है")).isEmpty();
+        assertThat(HindiChecks.devanagari("अत्यधि\nक है और है", "अत्यधिक है और अत्यधिक है"))
+                .containsExactly("'अत्यधिक' 2x in the rows, 1x on the page");
     }
 
     /**

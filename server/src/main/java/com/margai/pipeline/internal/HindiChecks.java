@@ -2,7 +2,7 @@ package com.margai.pipeline.internal;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -19,9 +19,9 @@ import java.util.regex.Pattern;
  * <p>Two of them, because the layer carries two kinds of text. Its Devanagari is decoded Chanakya: a word the
  * rows carry more often than the page is a misreading or an addition (Opus 5's दाशिमक for the printed
  * दाश्मिक). Its digits, Latin and symbols are Unicode already: a symbol the page carries more often than the rows
- * is one the transcription lost (khph101 p5's undrawn ×, p4's seven bullets), and a digit or Latin token the
- * rows carry more often than the page was misread. Digits and Latin only the page carries are not named — a
- * table, a running head or a page number puts them there.
+ * is one the transcription lost (khph101 p5's undrawn ×, p4's seven bullets), and a digit or Latin token only
+ * the rows carry was misread. Digits and Latin only the page carries are not named — a table, a running head
+ * or a page number puts them there.
  */
 final class HindiChecks {
 
@@ -70,22 +70,27 @@ final class HindiChecks {
     }
 
     /**
-     * The Devanagari words the rows carry and the decoded page does not: misreadings and additions. A word the
-     * page carries fewer times is not named — a word the layer splits across lines makes the page one short —
-     * and a word the page breaks at a line end with no hyphen (अत्यधि|क) is on it.
+     * The Devanagari words the rows carry more often than the decoded page: misreadings and additions. A word
+     * the page breaks at a line end with no hyphen (अत्यधि|क) is on it once for each break. Counted, not merely
+     * looked for: a misreading into a word the page prints elsewhere was invisible — phy11-part1 ch 7 p9 prints
+     * कण को where its rows carry कण की, beside six of कण की (D16).
      */
     static List<String> devanagari(String page, String rows) {
         Map<String, Integer> onPage = counts(WORD, page);
-        Set<String> alsoOnPage = lineEndJoins(page);
-        onPage.keySet().stream().filter(word -> word.contains(HOOKED_HA_AA)).forEach(word -> {
-            alsoOnPage.add(word.replace(HOOKED_HA_AA, "ह्य"));
-            alsoOnPage.add(word.replace(HOOKED_HA_AA, "ह्रा"));
+        Map<String, Integer> alsoOnPage = new HashMap<>();
+        lineEndJoins(page).forEach(word -> alsoOnPage.merge(word, 1, Integer::sum));
+        onPage.forEach((word, count) -> {
+            if (word.contains(HOOKED_HA_AA)) {
+                alsoOnPage.merge(word.replace(HOOKED_HA_AA, "ह्य"), count, Integer::sum);
+                alsoOnPage.merge(word.replace(HOOKED_HA_AA, "ह्रा"), count, Integer::sum);
+            }
         });
         Map<String, Integer> inRows = counts(WORD, rows);
         List<String> findings = new ArrayList<>();
         inRows.forEach((word, count) -> {
-            if (!onPage.containsKey(word) && !alsoOnPage.contains(word)) {
-                findings.add("'" + word + "' " + count + "x in the rows, 0x on the page");
+            int printed = onPage.getOrDefault(word, 0) + alsoOnPage.getOrDefault(word, 0);
+            if (count > printed) {
+                findings.add("'" + word + "' " + count + "x in the rows, " + printed + "x on the page");
             }
         });
         return findings;
@@ -135,8 +140,8 @@ final class HindiChecks {
     }
 
     /** Each line's last word joined to the next line's first: a word broken at a line end with no hyphen. */
-    private static Set<String> lineEndJoins(String page) {
-        Set<String> joins = new HashSet<>();
+    private static List<String> lineEndJoins(String page) {
+        List<String> joins = new ArrayList<>();
         if (page == null) {
             return joins;
         }
@@ -195,7 +200,7 @@ final class HindiChecks {
             report.section("Hindi rows against the decoded layer — a check only; the layer is never sent or stored")
                     .line("checked: " + pages + checkedOf)
                     .line("")
-                    .line("words the rows carry that the page does not — a misreading or an addition:")
+                    .line("words the rows carry more often than the page — a misreading or an addition:")
                     .list(words, none)
                     .line("")
                     .line("symbols the page carries more often, digits and Latin only the rows carry:")

@@ -1783,9 +1783,10 @@ digits, Latin and symbols are in Bookman and Symbol and come through as Unicode.
 maps the glyph codes to Devanagari and reorders what the fonts draw out of reading order (the
 pre-placed short i, the reph, half forms), and `HindiLayer` reads each page's decoded layer in drawing
 order. Neither is ever sent to a model or stored (SPEC §12.2): `HindiChecks` holds a Hindi page's rows
-to the layer in `ncert extract` and in `ncert verify`'s free pass — Devanagari words the rows carry and
-the page does not, symbols the page carries more often than the rows, digits and Latin only the rows
-carry, and how much of the page the rows cover — and like the other mechanical checks it routes
+to the layer in `ncert extract` and in `ncert verify`'s free pass — Devanagari words the rows carry more
+often than the page (until 2026-10-12, only those the page did not carry at all; DECISIONS 2026-10-12),
+symbols the page carries more often than the rows, digits and Latin only the rows carry, and how much
+of the page the rows cover — and like the other mechanical checks it routes
 attention and never refuses. The Hindi edition is transcribed by `margai.pipeline.transcribe-model-hi`
 (Claude Opus 5.5 at effort low, chosen by the D16 trial); the English corpus stays frozen on its own
 transcriber, and the extract guard names the edition's.*

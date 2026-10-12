@@ -53,8 +53,9 @@ committed.
   DECISIONS 2026-10-10): where the Hindi print states something false — ½ set as an en dash, α for ∝, a wrong
   number, sign, subscript or word — `printed` carries the meaning, from the English row or the arithmetic, and
   the reason names the crop and what fixes the meaning; a second-read flag on such a place is a `misprint`,
-  which then means the book's error the row does not keep. Spelling, grammar and edition differences stay as
-  printed.
+  which then means the book's error the row does not keep. A flag there that claims some other difference — a
+  span's extent, an ellipsis, a number the page prints — is ruled on what it claims, usually `false_positive`.
+  Spelling, grammar and edition differences stay as printed.
 - Quote every value holding a comma or a colon: in YAML's `{…}` form an unquoted comma starts a new key,
   and the reader refuses the key it does not know.
 

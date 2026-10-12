@@ -380,6 +380,16 @@ HOW TO RESUME (supersedes item 2 of the list below):
      652 of 682 clean (95.6%), 28 flags (most the meaning entries read again → misprint), 1 row "not on its page" (ch 9
      p14 §9.5.1 ¶5, which the same read also lists as omitted), 2 not judged, 16 passages. Book so far ₹943.10. Round two
      (reader r2) and the 40-pair ✅ sample + the proposals (reader s1) in flight in scratchpad ca91e9fb.
+     2026-10-12 ~10:00: ROUND TWO APPROVED AS WRITTEN AND COMMITTED (0e652c6, with 2026-10-12-ncert-load-dry-run-2.md):
+     33 entries — 19 misprint + 11 false_positive on the flags, and 3 meaning `text` entries the ✅ sample read found
+     (ch 10 p19 skin 20°C → 28°C, ch 13 p10 M → m, ch 14 p9 उपेक्षित → अपेक्षित); 95 of 95, three rows change. Spec
+     audit PASS, its four MINOR points fixed before the commit with the founder's OK (a reason's provenance, the
+     "ruled on what it claims" line in pipeline/inputs/README.md, the dry run re-made on the file as committed, the
+     15 passages' outcomes in the block header). ✅ SAMPLE (Claude, reader s1): 40 of 40 pairs aligned; of the 16
+     reshape proposals 14 are false alarms and §14.7's pair stays as is. NEXT: the founder runs scratchpad ca91e9fb
+     `d16-phy11p2-hi-r2.sh` (reload ₹0 on 51ab7180…, align ≈₹7, a one-page re-read each of ch 9 p14, ch 10 p19, ch 13
+     p10 and ch 14 p9 ≈₹6, then the whole-book verify ₹0); then the founder's ten marked pairs (#1, 5, 14, 18, 19,
+     22, 23, 24, 27, 31).
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

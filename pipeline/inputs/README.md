@@ -44,7 +44,7 @@ committed.
   English 8.5.5 and adds a 13.8.1 the English does not have — and every paragraph of that section in the
   chapter moves with it; put it before any join it makes possible. A `move` names a row by its first
   words (`at`, on `page`) and the row it follows (`after`, on `after_page`): once page breaks are joined the
-  row is taken out and numbered right after that one, earlier or later, in its section — for a footnote or a
+  row is taken out and numbered right after that one, earlier or later, in that row's section — for a footnote or a
   box the Hindi prints pages away from where the English numbers it. Write its spans as the rows show them —
   the Hindi load puts back a visarga written as a colon (`अत:` → `अतः`) before it applies an entry.
 - **A Hindi `text` entry's `printed` span is read off the page image.** The decoded text layer is a check

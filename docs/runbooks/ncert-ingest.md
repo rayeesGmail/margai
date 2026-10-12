@@ -640,8 +640,9 @@ heavy neighbours score alike). The entries come from reading:
   `after_page`) — once page breaks are joined, the whole row is renumbered there, earlier or later, in that
   row's section: a footnote or box the Hindi prints pages away from where the English numbers it, which
   `defer` (one paragraph later, no further) cannot place.
-  Entries apply in file order, each to the page the earlier ones left; nothing moves text between paragraphs
-  that are not neighbours, or across sections.
+  Entries apply in file order, each to the page the earlier ones left; no entry moves text between paragraphs
+  that are not neighbours, and only a `move` takes a row across sections — whole, into the section of the row
+  it follows.
 - One fresh reader per chapter (two for a long one), briefed with these rules whole, then a separate pass
   on characters, then the spec-auditor on the whole block before the founder approves it.
 

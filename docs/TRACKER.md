@@ -336,11 +336,42 @@ HOW TO RESUME (supersedes item 2 of the list below):
      continuation joins). Merged by scratchpad ca91e9fb `merge.py` (b1's two §11.9 heading texts dropped as duplicates of
      ch11's; the Triple Point title placed before ch10's move) → 221 entries (102 split, 44 join, 45 text, 6 move, 2
      section, 1 defer, 17 false_positive, 4 misprint), whole-book dry run ok, 94 of 95 sections one to one. Founder rulings
-     (DECISIONS 8a8c054, 5b1c5fd): re-read ch 10 p19 for the omitted Activity 10.4 box (scratchpad `d16-phy11p2-hi-p19.sh`,
-     ≈₹6 — NOT YET RUN), §11.9 mirrors the English heading rows, and the Hindi row writes the meaning where the print states
-     something false (½ as an en dash, α for ∝/=, 8.8 for 9.8, T₂ > T₁ …) — reader b3 is writing those entries.
-     NEXT: b3 → merge → p19 compare + its §10.10 entries → whole-book dry run, every section one to one → spec audit →
-     founder approval of the block → commit with the approval dry run's report → reload → align → re-read changed pages.
+     (DECISIONS 8a8c054, 5b1c5fd): re-read ch 10 p19 for the omitted Activity 10.4 box, §11.9 mirrors the English heading
+     rows, and the Hindi row writes the meaning where the print states something false (½ as an en dash, α for ∝/=, 8.8
+     for 9.8, T₂ > T₁ …).
+     2026-10-11/12: THE BLOCK IS WRITTEN, UNCOMMITTED, AWAITING THE FOUNDER'S APPROVAL. The p19 re-read (₹10.95, 8b755eb)
+     changed only p19 (the other 139 pages of the copy are byte-identical): it splits §10.9.4's first paragraph once more
+     (a join puts it back), writes अतः and T_s where the first read had अत: and T_S — and again leaves out the Activity
+     10.4 box, so it is typed from the page image (founder 2026-10-11, DECISIONS 2bbfca7: 157 Devanagari words and every
+     number alike against the decoded layer, a witness only). Reader b3 wrote the meaning entries (35) and found five
+     more under the same ruling; five of b1's rulings it supersedes were dropped. Two spec audits: the first (FAIL) moved
+     `move` to Hindi-only and made the docs say how the meaning ruling is written (01c2d52), and two founder rulings came
+     of it (Hindi anchors take the English section, a per-edition number PARKED; the meaning ruling does not conflict with
+     SPEC §9.2 — c7e3be5); the second (FAIL, on the block) dropped T_O → T_0 and kept the letter x of (12.15b) — a
+     look-alike glyph that still reads as the same symbol stays as printed, like P_o — and the header now lists the places
+     the row already writes the meaning with no entry. Block: 260 entries (103 split, 45 join, 6 move, 2 section, 1
+     defer, 80 text, 15 false_positive, 8 misprint), byte-identical to scratchpad ca91e9fb `block-final.yaml`, 95 of 95
+     sections one to one on the dry run (extraction sha256 51ab7180…).
+     Dispositions not in the block (the record the first book kept here): HindiChecks' word lines — the transcriber's
+     repairs undone as printed (अनुदैर्घ्य ×15, विचारणीय, भलीभांति, शर्तो, स्त्रोत ×5, उदारहणार्थ, आंतिरक, द्रुत्र, स्टेफॉन-बोल्टसमान, प्रक्षुद्ध,
+     वर्णों, परछाईं, अतिव्याप्ति), परिमाण ×2 kept as the meaning, and noise: ह्रास decoded as श्व (5), फ़ि/किं with a fused matra
+     (ch 9 p5, ch 11 p14), an e-matra + anusvara over ्र (ch 10 p3), ट्ठ unmapped (ch 10 p15), ज़ with a stray ा (ch 14 p4),
+     ट्ट split (ch 12 p3, p6) — and the check flags a word only when the page has none of it (ch 14 p4 hid 7 places), to
+     fix in HindiChecks. Symbol lines — the × deficits are tables and a Summary (ch 8 p8, p9, p11; ch 9 p3 with its ≈;
+     ch 10 p5); the ▶ before every उदाहरण reads as • (ch 13–14, 15 lines); k_BT against the page's k_B T (both editions
+     mix them); arrows and TrueType symbols read as Latin letters; 10^23's superscript split; ∝ ch 10 p3, mol ch 12 p12, ≈
+     ch 10 p6 kept as the meaning. No sign rests on the layer alone. The 19 "no row carries" passages: headings, a caption,
+     three Summaries and the Fig. 14.5 legend rightly left out; ch 11 p7 and p11 headings restored; ch 10 p19's box typed;
+     the rest the verifier's own notes or displays §14.6.1 ¶12–13 carry. Literal Greek left (DECISIONS 2026-10-02): Δ ×24
+     in ch 8, θ ×4 ch 9 p3, μ ×2 in units, λ/π/ν ×17 on ch 14 p14–15, ρ in hρg. Known compromise: §10.8's Triple Point
+     move leaves the whole Activity 10.3 in ¶7 and the box alone in ¶8, where the English splits the activity around the
+     box — the move row's revisit trigger ("a row split between two places"), met once and accepted as the nearest
+     boundary. For the founder's eye: where the English keeps its own slip the two editions of a row differ (Example 8.4's
+     solution 9.0 against the English 9.4; (12.28), (12.35) and 0.02 × 10^23 in ch 12); ch 12 p7's वर्गीकृत चालों
+     ("classified speeds" for the squared speeds) is not written; round two will be large — every meaning entry differs
+     from the page on purpose.
+     NEXT: the approval dry run into pipeline/reports → the founder approves the block → commit the block with that report
+     → the founder reloads (₹0), aligns (≈₹7) and re-reads the book (≈₹145) → round two.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

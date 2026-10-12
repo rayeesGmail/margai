@@ -390,6 +390,12 @@ HOW TO RESUME (supersedes item 2 of the list below):
      `d16-phy11p2-hi-r2.sh` (reload ₹0 on 51ab7180…, align ≈₹7, a one-page re-read each of ch 9 p14, ch 10 p19, ch 13
      p10 and ch 14 p9 ≈₹6, then the whole-book verify ₹0); then the founder's ten marked pairs (#1, 5, 14, 18, 19,
      22, 23, 24, 27, 31).
+     2026-10-12 09:37: RELOADED WITH ROUND TWO (reports 7711360): 3 rows updated on 51ab7180…, align ₹7.15, the four
+     one-page re-reads ₹6.89; ch 9 p14 §9.5.1 ¶5 now found; whole book 679 of 682 (99.6%). Book so far ≈₹957. ROUND
+     THREE APPROVED AS WRITTEN AND COMMITTED (fd57ae1, with 2026-10-12-ncert-load-dry-run-3.md; spec audit PASS, three
+     MINOR fixed before approval): the two new meaning entries read back (misprint) and ch 9 p14 ¶3's "समीकरण (9.18)"
+     (false_positive: the page prints (9.18) alone). No row changes. NEXT: the founder runs scratchpad ca91e9fb
+     `d16-phy11p2-hi-rejudge.sh` (₹0, no reload), expected 682 of 682; then the ten marked pairs.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

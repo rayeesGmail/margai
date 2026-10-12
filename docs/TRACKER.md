@@ -429,6 +429,14 @@ HOW TO RESUME (supersedes item 2 of the list below):
      not be right before today's fixes, 0.05% after; whether it fired is the founder's call, and the check-only ruling is
      untouched. phy12-part1 Hindi STAGED 15:12–15:22 (reports 2c9f222): 211 pages rendered, ch 1 223 paragraphs from 37
      pages, ₹188.51; its check names 4 words and 6 symbol lines — next, Claude reads them, then the full-book run.
+     2026-10-12 late: phy12-part1 ch 1's check lines READ on the print (crops; the extraction is not local yet): p5 and
+     p37 print निदर्शित where the rows write निर्दर्शित / निर्दिशित (misreadings); p8 and p9 print three list bullets
+     the rows drop; p3 prints परिमााण (the aa-stroke twice), the rows परिमाण; p5's ऐम्पियर was decoder noise, gone on
+     f2f2ec9; p18's 1.3 / 1.6 / 2.0 and p24's second × wait for the rows. lhph101's render pre-flight glyph (code 136,
+     Bookman-Light subset, p24): PDFBox warns but draws all four p̂ hats from its fallback, as a crop of the pipeline's
+     own 150 dpi render shows — nothing lost to the model. NEXT: the founder runs scratchpad 92559e62
+     `d16-phy12p1-hi.sh` (jar copy server-d16-count.jar = f2f2ec9; ch 2–8 extract ≈₹690, load ₹0, align ≈₹10, Sonnet 5
+     second read ≈₹250, then the extraction copied to the scratchpad's dry/ for the dry runs) → Claude adjudicates.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

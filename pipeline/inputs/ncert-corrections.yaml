@@ -3844,3 +3844,20 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      transcribed: "v = 330 m s^-1", printed: "v = 300 m s^-1", reason: "the page prints L = 30 cm तथा v = 300 m s^-1 (crop p16 x315-555 y690-715 at zoom 4; the decoded layer's line y699 agrees), where the fundamental of 275 Hz the same sentence gives needs 330 m s^-1 (330/(4 × 0.30 m) = 275 Hz; 300 gives 250 Hz): the book's error, which the row does not keep; round one's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes 330"}
   - {book: phy11-part2, lang: hi, chapter: 14, page: 9, kind: text, address: "ch 14 §14.4.2 ¶1",
      transcribed: "उपेक्षित विमा है", printed: "अपेक्षित विमा है", reason: "the page prints the word with the vowel u, which reads 'neglected' (crop p9 x65-307 y320-360 at zoom 4; the decoded layer's line y334 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the sentence goes on to show that B/rho has the dimension of a velocity squared, [L^2 T^-2], so the word meant is the one with the vowel a, 'required', and the English row has 'has the relevant dimension'"}
+  # phy11-part2 Hindi, round three (D16, 2026-10-12). The reload with round two, a one-page re-read each of ch 9 p14,
+  # ch 10 p19, ch 13 p10 and ch 14 p9, and the whole book judged from the stored reads
+  # (pipeline/reports/2026-10-12-ncert-verify-6.md: 679 of 682 clean) left three flags, each read on a crop of the
+  # page image: two are round two's meaning entries read back (misprint), and one is the verifier's
+  # (false_positive: the page prints ¶3's (9.18) with no word before it). Changes no row. The report's 15 passages
+  # no row carries are the 15 round two's header settles. The approval dry run reads this file as committed, on the
+  # extraction sha256 51ab7180…: no refusal, 95 of 95 sections, 56 rulings on flags, no row changed. Approved by the
+  # founder 2026-10-12, as written (on pipeline/reports/2026-10-12-ncert-load-dry-run-3.md).
+  # phy11-part2 Hindi, chapter 9
+  - {book: phy11-part2, lang: hi, chapter: 9, page: 14, kind: false_positive, address: "ch 9 §9.5.1 ¶3",
+     transcribed: "(9.18)", printed: "समीकरण (9.18)", reason: "the verifier's printed span is not the print at ¶3: the page prints the display v_t = 2a^2 (ρ-σ)g / (9η) with its number (9.18) in the margin and no word before it (crop p14 x80-315 y500-700 at zoom 3; the decoded layer's line y607 agrees), as the row carries it. The words समीकरण (9.20) से are ¶7's, at the top of the right column (crop p14 x315-560 y60-320 at zoom 3; the decoded layer's line y283 agrees), which the row carries as printed (round two's false_positive)"}
+  # phy11-part2 Hindi, chapter 10
+  - {book: phy11-part2, lang: hi, chapter: 10, page: 19, kind: misprint, address: "ch 10 §10.9.4 ¶8",
+     transcribed: "त्वचा का ताप 28°C है", printed: "त्वचा का ताप 20°C है", reason: "the page prints the skin temperature as 20°C (crop p19 x42-280 y580-706 at zoom 3; the decoded layer's line y644 agrees): the book's error, which the row does not keep; round two's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes 28°C, the skin temperature the paragraph's own (301)^4 takes"}
+  # phy11-part2 Hindi, chapter 13
+  - {book: phy11-part2, lang: hi, chapter: 13, page: 10, kind: misprint, address: "ch 13 §13.6 ¶4",
+     transcribed: "m संहति के किसी गुटके", printed: "M संहति के किसी गुटके", reason: "the page prints the block's mass as a capital M (crop p10 x65-307 y90-140 at zoom 4; the decoded layer's line y114 agrees): the book's error, which the row does not keep; round two's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes m, the mass of the example's answer T = 2 pi sqrt(m / 2k)"}

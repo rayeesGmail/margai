@@ -350,7 +350,7 @@ HOW TO RESUME (supersedes item 2 of the list below):
      SPEC §9.2 — c7e3be5); the second (FAIL, on the block) dropped T_O → T_0 and kept the letter x of (12.15b) — a
      look-alike glyph that still reads as the same symbol stays as printed, like P_o — and the header now lists the places
      the row already writes the meaning with no entry. Block: 260 entries (103 split, 45 join, 6 move, 2 section, 1
-     defer, 80 text, 15 false_positive, 8 misprint), byte-identical to scratchpad ca91e9fb `block-final.yaml`, 95 of 95
+     defer, 80 text, 15 false_positive, 8 misprint), its entries byte-identical to scratchpad ca91e9fb `block-final.yaml` (the header comment is the repo's own), 95 of 95
      sections one to one on the dry run (extraction sha256 51ab7180…).
      Dispositions not in the block (the record the first book kept here): HindiChecks' word lines — the transcriber's
      repairs undone as printed (अनुदैर्घ्य ×15, विचारणीय, भलीभांति, शर्तो, स्त्रोत ×5, उदारहणार्थ, आंतिरक, द्रुत्र, स्टेफॉन-बोल्टसमान, प्रक्षुद्ध,

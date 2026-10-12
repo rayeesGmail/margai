@@ -374,6 +374,12 @@ HOW TO RESUME (supersedes item 2 of the list below):
      no refusal, 95 of 95, extraction sha256 51ab7180…; third audit PASS). NEXT: the founder runs scratchpad ca91e9fb
      `d16-phy11p2-hi-reload.sh` (jar copy at 01c2d52: reload ₹0 — its report must print 51ab7180… — align ≈₹7, second
      read of the changed pages ≈₹145), then round two on the second read's flags.
+     2026-10-12 08:32: RELOADED (reports 8b5da3d). Extraction sha256 51ab7180… as approved; 682 Hindi rows beside 682
+     English, 95 of 95 sections; 25 Hindi-only rows the alignment emptied removed. Align ₹7.15, every section's counts
+     equal, 16 reshape proposals left in 8 equal-count sections (to read). Second read of the 74 changed pages ₹102.45:
+     652 of 682 clean (95.6%), 28 flags (most the meaning entries read again → misprint), 1 row "not on its page" (ch 9
+     p14 §9.5.1 ¶5, which the same read also lists as omitted), 2 not judged, 16 passages. Book so far ₹943.10. Round two
+     (reader r2) and the 40-pair ✅ sample + the proposals (reader s1) in flight in scratchpad ca91e9fb.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

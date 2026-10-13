@@ -35,6 +35,8 @@ import picocli.CommandLine.Option;
  * paragraph embedded on the pin, its similarity to every English row of its section read from the stored
  * vectors ({@link CurriculumImport#similarityToEnglish}), and {@link Alignment} proposing the joins and splits
  * that make the pairs one to one. It changes no row and stores no vector; the corrections file does the rest.
+ * An English paragraph the Hindi does not print, whose number an {@code unprinted} entry left, is named and set
+ * aside rather than proposed again.
  *
  * <p>It also names each pair's numbers that one edition carries and the other does not — a misread digit on
  * either side — and draws the ✅ sample (PLAN D16, DECISIONS 2026-10-01): aligned pairs weighted toward the
@@ -124,6 +126,7 @@ class NcertAlignCommand extends NcertBookCommand {
                     + pacer.estimateFor(Math.toIntExact(toEmbed)).toMinutes() + " min for " + toEmbed
                     + " Hindi paragraphs");
         }
+        List<String> unprinted = new ArrayList<>();
         int english = 0;
         int hindi = 0;
         try {
@@ -131,9 +134,12 @@ class NcertAlignCommand extends NcertBookCommand {
                 if (!withHindi.contains(section.getValue().getFirst().chapterNo())) {
                     continue;
                 }
-                List<AlignmentRow> en = section.getValue().stream().filter(row -> row.textEn() != null).toList();
+                List<AlignmentRow> gaps = unprinted(section.getValue());
+                gaps.forEach(row -> unprinted.add(row.address()));
+                List<AlignmentRow> en = section.getValue().stream()
+                        .filter(row -> row.textEn() != null && !gaps.contains(row)).toList();
                 List<AlignmentRow> hi = section.getValue().stream().filter(row -> row.textHi() != null).toList();
-                english += en.size();
+                english += en.size() + gaps.size();
                 hindi += hi.size();
                 List<UUID> englishIds = en.stream().map(AlignmentRow::id).toList();
                 List<Map<UUID, Double>> similarity = new ArrayList<>();
@@ -154,7 +160,7 @@ class NcertAlignCommand extends NcertBookCommand {
                         double alike = similarity.get(step.hi().getFirst() - 1).getOrDefault(enRow.id(), 0.0);
                         pairs.add(new Pair(enRow, hiRow, alike));
                         if (alike < WEAK_PAIR) {
-                            weak.add(where + ": " + step + " — similarity " + "%.2f".formatted(alike)
+                            weak.add(where + ": " + numbered(step, hi, en) + " — similarity " + "%.2f".formatted(alike)
                                     + " — en «" + excerpt(enRow.textEn()) + "» · hi «" + excerpt(hiRow.textHi()) + "»");
                         }
                         String mismatch = numbers(enRow.textEn(), hiRow.textHi());
@@ -163,7 +169,7 @@ class NcertAlignCommand extends NcertBookCommand {
                         }
                     } else {
                         reshaped++;
-                        proposals.add(where + ": " + step);
+                        proposals.add(where + ": " + numbered(step, hi, en));
                     }
                 }
                 if (en.size() != hi.size() || reshaped > 0) {
@@ -185,7 +191,10 @@ class NcertAlignCommand extends NcertBookCommand {
                     + notAligned.stream().map(String::valueOf).collect(Collectors.joining(", ")));
         }
         report.section("sections whose rows do not pair one to one")
+                .line("en counts the English rows aligned: a number an `unprinted` entry left is listed below, not here")
                 .table(List.of("chapter", "section", "en", "hi", "proposals"), sections);
+        report.section("English paragraphs the Hindi does not print — numbers an `unprinted` entry left, not aligned")
+                .list(unprinted);
         report.section("proposed Hindi joins and splits — adjudicate each; nothing is applied")
                 .list(proposals, "none: every section pairs one to one");
         report.section("pairs weaker than " + "%.2f".formatted(WEAK_PAIR) + " — read both against the pages")
@@ -193,6 +202,24 @@ class NcertAlignCommand extends NcertBookCommand {
         report.section("numbers one edition of a pair carries and the other does not")
                 .list(numbers, "none");
         sample(pairs, report);
+    }
+
+    /**
+     * The English rows of a section an {@code unprinted} entry left without Hindi (D16): the load numbers a
+     * section's Hindi from ¶1 with no gap but those, so an English row with no Hindi before the section's last
+     * Hindi row is one of them. It is the founder's ruling, an English paragraph the Hindi does not print, and
+     * not a step to propose; an English row with no Hindi after the last one is still aligned, and proposed.
+     */
+    private static List<AlignmentRow> unprinted(List<AlignmentRow> section) {
+        int lastHindi = section.stream().filter(row -> row.textHi() != null).mapToInt(AlignmentRow::paraNo).max().orElse(0);
+        return section.stream().filter(row -> row.textHi() == null && row.textEn() != null && row.paraNo() < lastHindi)
+                .toList();
+    }
+
+    /** A step as the rows are numbered: the mapping counts places in its lists, which a left number makes differ. */
+    private static String numbered(Alignment.Step step, List<AlignmentRow> hi, List<AlignmentRow> en) {
+        return new Alignment.Step(step.kind(), step.hi().stream().map(at -> (int) hi.get(at - 1).paraNo()).toList(),
+                step.en().stream().map(at -> (int) en.get(at - 1).paraNo()).toList()).toString();
     }
 
     /** The rows grouped by chapter and section, in reading order. */

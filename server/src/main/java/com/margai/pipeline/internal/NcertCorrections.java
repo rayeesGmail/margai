@@ -14,8 +14,9 @@ import java.util.Set;
 /**
  * The founder's corrections applied to an extraction's pages (D15): after {@link PageBreakRepairs},
  * before {@code ncert load} numbers and joins, so a corrected page is loaded exactly as an extraction
- * that had read it right would have been. A {@code move} entry (D16) is the exception: it is checked here
- * and named in its place, and the numbering carries it out on whole rows once the page breaks are joined.
+ * that had read it right would have been. A {@code move} or {@code unprinted} entry (D16) is the exception: it
+ * is checked here and named in its place, and the numbering carries it out on whole rows once the page breaks
+ * are joined.
  * Each applied correction is one report line; each that cannot be applied refuses the load by name, and
  * the refusal writes nothing.
  *
@@ -32,11 +33,12 @@ final class NcertCorrections {
 
     /**
      * The corrected pages, one line per change, how many entries were rulings on verifier flags that
-     * change no text, the paragraphs a {@code defer} entry makes wait for their number, and the rows a
-     * {@code move} entry renumbers, in file order.
+     * change no text, the paragraphs a {@code defer} entry makes wait for their number, the rows a
+     * {@code move} entry renumbers, in file order, and the rows an {@code unprinted} entry numbers one later,
+     * once per entry.
      */
     record Applied(List<ExtractedPage> pages, List<String> notes, int rulings, Set<Deferred> deferred,
-            List<Moved> moves) {
+            List<Moved> moves, List<Unprinted> unprinted) {
     }
 
     /** A paragraph that takes its number after the next one its section starts: its place on its page. */
@@ -48,6 +50,14 @@ final class NcertCorrections {
      * every page-level entry has applied; {@code at} and {@code after} are the entry's words, for a refusal.
      */
     record Moved(short chapter, int page, int index, int afterPage, int afterIndex, String at, String after) {
+    }
+
+    /**
+     * A row that takes the number after the English paragraph its edition does not print, named by the place its
+     * first paragraph has on its page once every page-level entry has applied; {@code at} is the entry's words,
+     * for a refusal.
+     */
+    record Unprinted(short chapter, int page, int index, String at) {
     }
 
     /** The entries this load carries: its book, its edition, its chapters. */
@@ -68,6 +78,7 @@ final class NcertCorrections {
         List<String> notes = new ArrayList<>();
         List<NcertCorrection> deferrals = new ArrayList<>();
         List<NcertCorrection> moves = new ArrayList<>();
+        List<NcertCorrection> gaps = new ArrayList<>();
         int rulings = 0;
         for (NcertCorrection written : corrections) {
             if (!written.kind().changesText()) {
@@ -104,6 +115,10 @@ final class NcertCorrections {
                     moves.add(entry);
                     yield move(entry, paragraphs, out, index);
                 }
+                case unprinted -> {
+                    gaps.add(entry);
+                    yield unprinted(entry, paragraphs);
+                }
                 default -> throw new IllegalStateException("not a text-changing kind: " + entry.kind());
             };
             out.set(at, new ExtractedPage(page.chapterNo(), page.page(), page.confidence(), page.aiCallId(),
@@ -124,7 +139,27 @@ final class NcertCorrections {
             moved.add(new Moved(entry.chapter(), entry.page(), onlyStart(entry, page), entry.afterPage(),
                     onlyStart(entry, entry.after(), afterPage), entry.at(), entry.after()));
         }
-        return new Applied(List.copyOf(out), List.copyOf(notes), rulings, Set.copyOf(deferred), List.copyOf(moved));
+        List<Unprinted> unprinted = new ArrayList<>();
+        for (NcertCorrection entry : gaps) {
+            List<NcertPage.Paragraph> page = singleSpaced(out.get(index.get(entry.chapter() + "/" + entry.page())));
+            unprinted.add(new Unprinted(entry.chapter(), entry.page(), onlyStart(entry, page), entry.at()));
+        }
+        return new Applied(List.copyOf(out), List.copyOf(notes), rulings, Set.copyOf(deferred), List.copyOf(moved),
+                List.copyOf(unprinted));
+    }
+
+    /**
+     * Names the row only: the numbering leaves the number before it once the page breaks are joined. It must start
+     * a paragraph — a continuation is the rest of another page's row.
+     */
+    private static String unprinted(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs) {
+        int at = onlyStart(entry, paragraphs);
+        if (at == 0 && paragraphs.getFirst().continuesPreviousPage()) {
+            throw refuse(entry, "\"" + entry.at() + "\" continues the previous page's row — name the row by its first words");
+        }
+        return entry.where() + " §" + paragraphs.get(at).section().strip() + ": the English paragraph before the row "
+                + "starting \"" + entry.at() + "\" is not printed in this edition — the row takes the number after it ("
+                + entry.reason() + ")";
     }
 
     /**

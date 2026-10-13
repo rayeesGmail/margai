@@ -23,11 +23,24 @@ final class EditionPairs {
     private static final Comparator<Key> ORDER = Comparator.comparing(Key::chapter)
             .thenComparing(Key::section, EditionPairs::compareSections);
 
-    /** One section's row counts in each edition. */
-    record Section(short chapter, String section, int english, int hindi) {
+    /**
+     * One section's row counts in each edition, and the English numbers an {@code unprinted} entry left without
+     * Hindi. The Hindi numbers run from ¶1 with no gap but those, so the section pairs one to one exactly when the
+     * English has a row for every Hindi number and every number left.
+     */
+    record Section(short chapter, String section, int english, int hindi, int unprinted) {
 
         boolean oneToOne() {
-            return english == hindi;
+            return english == hindi + unprinted;
+        }
+    }
+
+    /** An English address an {@code unprinted} entry leaves without Hindi. */
+    record Address(short chapter, String section, int paraNo) {
+
+        @Override
+        public String toString() {
+            return "ch " + chapter + " §" + section + " ¶" + paraNo;
         }
     }
 
@@ -38,20 +51,23 @@ final class EditionPairs {
     }
 
     /** Every section either edition has rows in, in reading order. */
-    static List<Section> sections(List<NcertParagraphRow> english, List<NcertParagraphRow> hindi) {
+    static List<Section> sections(List<NcertParagraphRow> english, List<NcertParagraphRow> hindi, List<Address> unprinted) {
         Map<Key, int[]> counts = new TreeMap<>(ORDER);
-        english.forEach(row -> counts.computeIfAbsent(key(row), key -> new int[2])[0]++);
-        hindi.forEach(row -> counts.computeIfAbsent(key(row), key -> new int[2])[1]++);
+        english.forEach(row -> counts.computeIfAbsent(key(row), key -> new int[3])[0]++);
+        hindi.forEach(row -> counts.computeIfAbsent(key(row), key -> new int[3])[1]++);
+        unprinted.forEach(address -> counts.computeIfAbsent(new Key(address.chapter(), address.section()),
+                key -> new int[3])[2]++);
         List<Section> sections = new ArrayList<>();
-        counts.forEach((key, count) -> sections.add(new Section(key.chapter(), key.section(), count[0], count[1])));
+        counts.forEach((key, count) -> sections.add(new Section(key.chapter(), key.section(), count[0], count[1], count[2])));
         return sections;
     }
 
     /**
      * One JSON line per address either edition has, in reading order: the address, the English text, the Hindi
-     * text and the Hindi row's pages — absent where an edition has no row there.
+     * text and the Hindi row's pages — absent where an edition has no row there — and {@code "unprinted": true}
+     * where an {@code unprinted} entry left the number, so a ruled gap reads apart from a hole.
      */
-    static byte[] jsonl(List<NcertParagraphRow> english, List<NcertParagraphRow> hindi) {
+    static byte[] jsonl(List<NcertParagraphRow> english, List<NcertParagraphRow> hindi, List<Address> unprinted) {
         Map<Key, Map<Short, NcertParagraphRow[]>> byAddress = new TreeMap<>(ORDER);
         english.forEach(row -> at(byAddress, row)[0] = row);
         hindi.forEach(row -> at(byAddress, row)[1] = row);
@@ -62,6 +78,9 @@ final class EditionPairs {
             line.put("chapter", key.chapter());
             line.put("section", key.section());
             line.put("para", paraNo);
+            if (unprinted.contains(new Address(key.chapter(), key.section(), paraNo))) {
+                line.put("unprinted", true);
+            }
             if (pair[0] != null) {
                 line.put("en", pair[0].text());
             }

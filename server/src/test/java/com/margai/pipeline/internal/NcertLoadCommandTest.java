@@ -556,6 +556,146 @@ class NcertLoadCommandTest {
         assertThat(Files.readAllLines(pairs).get(1)).contains("\"en\":\"Where m is the mass.\"").doesNotContain("\"hi\"");
     }
 
+    /**
+     * phy12-part1's Hindi does not print §3.12's English ¶5 (D16). Numbered in order, the row after it sat beside ¶5
+     * and every later row one off; an `unprinted` entry on that row leaves ¶5 to the English, the section is held to
+     * the English as one to one, and the dry run names the address and writes it English-only.
+     */
+    @Test
+    void anUnprintedEntryLeavesItsNumberToTheEnglishAndTheSectionPairsOneToOne() throws IOException {
+        hindiEdition();
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 4, kind: unprinted, at: "नियम (b)",
+                     reason: the Hindi does not print English ¶2}
+                """);
+        imports.paragraphsAnswer = List.of(english("7.3", 1, "Rule (a)."), english("7.3", 2, "It holds at a point too."),
+                english("7.3", 3, "Rule (b)."), english("7.4", 1, "A new section."));
+        Path local = inputs.resolve("hi.jsonl");
+        Files.write(local, ExtractJsonl.write(List.of(page(7, 4, "0.95",
+                p("7.3", "नियम (a)।"), p("7.3", "नियम (b)।"), p("7.4", "एक नया अनुभाग।")))));
+        Path pairs = inputs.resolve("pairs.jsonl");
+
+        assertThat(commandLine.execute("ncert", "load", "--book", "phy11-part1", "--lang", "hi", "--dry-run",
+                "--extraction", local.toString(), "--pairs", pairs.toString(),
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(imports.previewed).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactly(
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.3 ¶1", "नियम (a)।"),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.3 ¶3", "नियम (b)।"),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶1", "एक नया अनुभाग।"));
+        assertThat(out.toString()).contains("2 of 2 sections one to one")
+                .contains("- ch 7 page 4 §7.3: the English paragraph before the row starting \"नियम (b)\" is not printed "
+                        + "in this edition — the row takes the number after it (the Hindi does not print English ¶2)")
+                .contains("left without Hindi by an `unprinted` entry")
+                .contains("- ch 7 §7.3 ¶2");
+        assertThat(Files.readAllLines(pairs).get(1)).contains("\"address\":\"ch 7 §7.3 ¶2\"").contains("\"unprinted\":true")
+                .contains("\"en\":\"It holds at a point too.\"").doesNotContain("\"hi\"");
+        assertThat(Files.readAllLines(pairs).get(2)).contains("\"en\":\"Rule (b).\"").contains("\"hi\":\"नियम (b)।\"")
+                .doesNotContain("\"unprinted\"");
+    }
+
+    /** Two English paragraphs in a row the edition does not print: two entries on the one row leave two numbers. */
+    @Test
+    void twoUnprintedEntriesOnOneRowLeaveTwoNumbers() throws IOException {
+        assertThat(loadHindi("""
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: unprinted, at: "Rule (b)",
+                     reason: the Hindi does not print English ¶2}
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: unprinted, at: "Rule (b)",
+                     reason: nor English ¶3}
+                """, page(7, 7, "0.95", p("7.4", "Rule (a)."), p("7.4", "Rule (b).")))).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address).containsExactly("ch 7 §7.4 ¶1", "ch 7 §7.4 ¶4");
+        assertThat(out.toString()).contains("- ch 7 §7.4 ¶2").contains("- ch 7 §7.4 ¶3");
+    }
+
+    /** The number left belongs to the row's place in the English: a move into another section takes it there. */
+    @Test
+    void aRowMovedToAnotherSectionTakesTheNumberItLeavesWithIt() throws IOException {
+        assertThat(loadHindi("""
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 3, kind: unprinted, at: "* STP means",
+                     reason: the Hindi does not print the English paragraph before the footnote}
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 3, kind: move, at: "* STP means",
+                     after: "Pressure is a scalar.", after_page: 2, reason: the English prints it on page 2}
+                """, page(7, 2, "0.95", p("7.2", "Pressure is a scalar."), p("7.2", "Example 7.1 Two thigh bones.")),
+                page(7, 3, "0.95", p("7.2.1", "Pascal's law."), p("7.2.1", "* STP means standard temperature.")))).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactlyInAnyOrder(
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.2 ¶1", "Pressure is a scalar."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.2 ¶3", "* STP means standard temperature."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.2 ¶4", "Example 7.1 Two thigh bones."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.2.1 ¶1", "Pascal's law."));
+        String report = out.toString();
+        String left = report.substring(report.indexOf("left without Hindi by an `unprinted` entry"));
+        assertThat(left.substring(0, left.indexOf("\n## "))).contains("- ch 7 §7.2 ¶2").doesNotContain("§7.2.1");
+    }
+
+    /** Without the entry the same section is named as off one to one, by its counts and the numbers left: none. */
+    @Test
+    void aSectionMissingAnEnglishParagraphIsNamedWithoutTheEntry() throws IOException {
+        hindiEdition();
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), "corrections: []\n");
+        imports.paragraphsAnswer = List.of(english("7.3", 1, "Rule (a)."), english("7.3", 2, "It holds at a point too."),
+                english("7.3", 3, "Rule (b)."));
+        Path local = inputs.resolve("hi.jsonl");
+        Files.write(local, ExtractJsonl.write(List.of(page(7, 4, "0.95", p("7.3", "नियम (a)।"), p("7.3", "नियम (b)।")))));
+
+        assertThat(commandLine.execute("ncert", "load", "--book", "phy11-part1", "--lang", "hi", "--dry-run",
+                "--extraction", local.toString(), "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(out.toString()).contains("0 of 1 sections one to one").contains("| 7 | 7.3 | 3 | 2 | 0 |");
+    }
+
+    /** A move numbers its sections again from ¶1 and still leaves the number an `unprinted` entry leaves: it goes with its row. */
+    @Test
+    void aMoveKeepsTheNumberAnUnprintedEntryLeaves() throws IOException {
+        assertThat(loadHindi("""
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: unprinted, at: "Rule (b)",
+                     reason: the Hindi does not print English ¶2}
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: move, at: "* A footnote",
+                     after: "Rule (a)", after_page: 7, reason: the English numbers the footnote first}
+                """, page(7, 7, "0.95", p("7.4", "Rule (a)."), p("7.4", "Rule (b)."), p("7.4", "* A footnote.")))).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactlyInAnyOrder(
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶1", "Rule (a)."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶2", "* A footnote."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶4", "Rule (b)."));
+        assertThat(out.toString()).contains("- ch 7 §7.4 ¶3");
+    }
+
+    /** A deferred row an `unprinted` entry names leaves its number when it takes one, after the row it waits for. */
+    @Test
+    void aDeferredRowLeavesTheNumberWhenItIsNumbered() throws IOException {
+        assertThat(loadHindi("""
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: defer, at: "* A footnote",
+                     reason: the English numbers the next paragraph first}
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: unprinted, at: "* A footnote",
+                     reason: the Hindi does not print the English paragraph before the footnote}
+                """, page(7, 7, "0.95", p("7.4", "Rule (a)."), p("7.4", "* A footnote.")),
+                page(7, 8, "0.95", p("7.4", "Rule (b).")))).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactly(
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶1", "Rule (a)."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶2", "Rule (b)."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶4", "* A footnote."));
+    }
+
+    /** The numbering's own net: a row it cannot find is refused, never skipped. */
+    @Test
+    void anUnprintedEntryTheNumberingCannotPlaceIsRefused() {
+        List<ExtractedPage> pages = List.of(page(7, 2, "0.95", p("7.2", "Pressure is a scalar.")));
+
+        assertThatThrownBy(() -> NcertLoadCommand.number(pages, "hi.jsonl", Set.of(), List.of(),
+                List.of(new NcertCorrections.Unprinted((short) 7, 2, 4, "* Nowhere"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("1 unprinted correction(s) cannot be placed")
+                .hasMessageContaining("ch 7 page 2: the row starting \"* Nowhere\" is not a row of its own");
+    }
+
     @Test
     void withoutACorrectionsFileTheLoadSaysSo() {
         jsonl(page(7, 1, "0.95", p("7.1", "Text.")));

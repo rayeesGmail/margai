@@ -17,8 +17,8 @@ import com.margai.curriculum.api.BookLanguage;
  * @param printed     the span as the page prints it, in the transcription's notation — or, for a Hindi
  *                    {@code text} entry where the print states something false, its meaning (DECISIONS 2026-10-10)
  * @param at          the words a paragraph or row starts with ({@code join}, {@code drop}, {@code defer},
- *                    {@code section}, {@code move}), where a new one must start ({@code split}), or a span
- *                    naming the paragraph ({@code figure_ref})
+ *                    {@code section}, {@code move}, {@code unprinted}), where a new one must start
+ *                    ({@code split}), or a span naming the paragraph ({@code figure_ref})
  * @param address     where the flag was raised, for a reader of the file; never used to apply it
  * @param removeRef   the figure or table label a {@code figure_ref} entry removes, or null
  * @param addRef      the label a {@code figure_ref} entry adds, or null
@@ -90,6 +90,15 @@ record NcertCorrection(
          * one paragraph later and no further, cannot place.
          */
         move,
+        /**
+         * The English paragraph before the row starting {@code at} is one this edition does not print: the row takes
+         * the number after it, and that number stays the English row's alone (D16). phy12-part1's Hindi leaves out
+         * §3.12's English ¶5, so numbered in order its next row sat beside ¶5 and every later row of the section one
+         * off; no join or split can mend a paragraph that is not there. Applied to whole rows once the page breaks
+         * are joined, like {@code move}; each entry leaves one number, and two on one row leave two. Only a Hindi
+         * entry: the English is canonical.
+         */
+        unprinted,
         /**
          * The book prints an error: a flag, not a defect. The row keeps it — or, in a Hindi row where the error
          * states something false, a {@code text} entry writes the meaning and this rules on the flag (DECISIONS

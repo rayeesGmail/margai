@@ -162,6 +162,32 @@ class NcertAlignCommandTest {
                 .doesNotContain("§2.1");
     }
 
+    /**
+     * An English paragraph the Hindi does not print, whose number an `unprinted` entry left (D16), is the founder's
+     * ruling: named and set aside, not proposed again. The steps around it name the rows' own numbers.
+     */
+    @Test
+    void anEnglishParagraphAnUnprintedEntryLeftIsSetAsideAndTheStepsNameTheRowsNumbers() {
+        List<AlignmentRow> rows = new ArrayList<>();
+        rows.add(row("1.5", 1, "Rule (a).", "नियम (a)।", 1));
+        rows.add(row("1.5", 2, "It holds at a point too.", null, 0));
+        rows.add(row("1.5", 3, "Its proof.", "इसका प्रमाण, और नियम (b)।", 3));
+        rows.add(row("1.5", 4, "Rule (b).", null, 0));
+        imports.alignmentAnswer = rows;
+        similarities.put("1:1", 0.8);
+        similarities.put("3:3", 0.7);
+        similarities.put("3:4", 0.7);
+
+        assertThat(run()).isZero();
+
+        assertThat(out.toString())
+                .contains("4 English and 2 Hindi row(s)")
+                .contains("## English paragraphs the Hindi does not print — numbers an `unprinted` entry left, not aligned")
+                .contains("- ch 1 §1.5 ¶2")
+                .contains("- ch 1 §1.5: hi ¶3 = en ¶3+¶4 (split hi)")
+                .doesNotContain("en ¶2 has no hindi");
+    }
+
     /** The embedding provider's allowance is the one {@code ncert embed} keeps to. */
     @Test
     void theHindiEmbedsKeepToTheConfiguredPace() {

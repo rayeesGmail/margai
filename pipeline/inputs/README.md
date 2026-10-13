@@ -31,8 +31,9 @@ committed.
   page is not what the entry was written against, twice means the entry does not say which.
 - **`text`, `join`, `split`, `figure_ref` (remove or add one label on the paragraph holding a span),
   `drop` (remove a paragraph that is not running text), `defer` (number a paragraph after the next one
-  of its section), `section` (give a Hindi section the English number) and `move` (number a whole row
-  right after another, in that row's section) change the extraction;
+  of its section), `section` (give a Hindi section the English number), `move` (number a whole row
+  right after another, in that row's section) and `unprinted` (leave an English number without Hindi)
+  change the extraction;
   `misprint`, `false_positive` and `noise` do not** — they
   rule on a flag (the book's own error kept; the verifier wrong; a free check wrong about a paragraph),
   and `ncert verify` reads them so a ruled flag is not raised again.
@@ -45,7 +46,13 @@ committed.
   chapter moves with it; put it before any join it makes possible. A `move` names a row by its first
   words (`at`, on `page`) and the row it follows (`after`, on `after_page`): once page breaks are joined the
   row is taken out and numbered right after that one, earlier or later, in that row's section — for a footnote or a
-  box the Hindi prints pages away from where the English numbers it. Write its spans as the rows show them —
+  box the Hindi prints pages away from where the English numbers it. An `unprinted` entry (Hindi only) names
+  the row after an English paragraph the Hindi edition does not print — phy12-part1's §3.12 ¶5 — and that row
+  takes the number after it, so the English row keeps its number with no Hindi beside it; the load names each
+  such address and counts it when it holds a section to the English, and `ncert align` sets it aside rather
+  than proposing it again. The number left goes with its row: a `move` of that row leaves it right before the
+  row wherever it is numbered. Two English paragraphs not printed in a row take two entries on the one row.
+  Write its spans as the rows show them —
   the Hindi load puts back a visarga written as a colon (`अत:` → `अतः`) before it applies an entry.
 - **A Hindi `text` entry's `printed` span is read off the page image.** The decoded text layer is a check
   and never a source (SPEC §12.2): a reason may say the layer's line agrees and give its position, and

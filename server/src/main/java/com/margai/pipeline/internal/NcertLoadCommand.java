@@ -179,7 +179,7 @@ class NcertLoadCommand extends NcertBookCommand {
         // sign for a zero exponent, written as the convention has it (D15, 2026-09-17).
         DimensionalBrackets.Applied dimensioned = DimensionalBrackets.apply(pages);
         pages = dimensioned.pages();
-        Numbered numbered = number(pages, source, corrected.deferred(), corrected.moves());
+        Numbered numbered = number(pages, source, corrected.deferred(), corrected.moves(), corrected.unprinted());
         List<NcertParagraphRow> rows = numbered.rows();
         report.section("page-break repairs to the model's continuation flags (deterministic, each one named)")
                 .list(repaired.notes());
@@ -209,16 +209,19 @@ class NcertLoadCommand extends NcertBookCommand {
         // whether each section now has as many Hindi rows as English ones.
         if (language == BookLanguage.hi) {
             List<NcertParagraphRow> english = imports.paragraphs(definition.code(), BookLanguage.en, chapters);
-            List<EditionPairs.Section> sections = EditionPairs.sections(english, rows);
+            List<EditionPairs.Section> sections = EditionPairs.sections(english, rows, numbered.unprinted());
             List<List<String>> differing = sections.stream().filter(section -> !section.oneToOne())
                     .map(section -> List.of(String.valueOf(section.chapter()), section.section(),
-                            String.valueOf(section.english()), String.valueOf(section.hindi())))
+                            String.valueOf(section.english()), String.valueOf(section.hindi()),
+                            String.valueOf(section.unprinted())))
                     .toList();
             report.section("sections whose Hindi rows do not number as the English (English is canonical)")
                     .line((sections.size() - differing.size()) + " of " + sections.size() + " sections one to one")
-                    .table(List.of("chapter", "section", "en", "hi"), differing);
+                    .table(List.of("chapter", "section", "en", "hi", "unprinted"), differing);
+            report.section("English paragraphs this edition does not print — left without Hindi by an `unprinted` entry")
+                    .list(numbered.unprinted().stream().map(EditionPairs.Address::toString).toList());
             if (pairsFile != null) {
-                write(pairsFile, EditionPairs.jsonl(english, rows));
+                write(pairsFile, EditionPairs.jsonl(english, rows, numbered.unprinted()));
                 report.line("pairs: " + pairsFile.getFileName() + " — each address's English and Hindi, to read");
             }
         }
@@ -346,23 +349,10 @@ class NcertLoadCommand extends NcertBookCommand {
     }
 
     /**
-     * JSONL pages into numbered paragraph rows. Numbers are assigned here, per chapter and
-     * section, in reading order across pages: a section's first paragraph is ¶1 wherever on the
-     * page it begins, and a section that resumes after another keeps counting rather than
-     * restarting, so no two paragraphs can ever share an address.
-     *
-     * <p>A page's first paragraph flagged as continuing the previous page is joined onto that
-     * page's last paragraph — same address, page order, one space between — and the row then
-     * names every page it came from and carries the lowest confidence of them. Only a genuine
-     * continuation is joined: something must precede it in the chapter, it must be in the section
-     * the previous page ended in, and every page in between must be present and text-free. The
-     * gap matters — a paragraph can run from page 10 to page 12 across a full-page figure, and
-     * requiring strict adjacency refused that legitimate book (spec-auditor, D14). A flag that
-     * fails any of these is refused by name, every one at once, with the pages to re-extract:
-     * nothing is written either way, so there is no reason to withhold the rest of the list.
+     * The numbered rows, the figure_refs entries that were not figure or table labels, and the English addresses
+     * an {@code unprinted} entry left without a row of this edition.
      */
-    /** The numbered rows, and the figure_refs entries that were not figure or table labels. */
-    record Numbered(List<NcertParagraphRow> rows, List<String> droppedRefs) {
+    record Numbered(List<NcertParagraphRow> rows, List<String> droppedRefs, List<EditionPairs.Address> unprinted) {
     }
 
     /**
@@ -401,11 +391,26 @@ class NcertLoadCommand extends NcertBookCommand {
     private record Waiting(ExtractedPage page, int index, NcertPage.Paragraph paragraph) {
     }
 
-    /** Where a row's first paragraph sits on its page, as a {@code move} entry names it. */
+    /** Where a row's first paragraph sits on its page, as a {@code move} or an {@code unprinted} entry names it. */
     private record Start(short chapter, int page, int index) {
     }
 
     /**
+     * JSONL pages into numbered paragraph rows. Numbers are assigned here, per chapter and
+     * section, in reading order across pages: a section's first paragraph is ¶1 wherever on the
+     * page it begins, and a section that resumes after another keeps counting rather than
+     * restarting, so no two paragraphs can ever share an address.
+     *
+     * <p>A page's first paragraph flagged as continuing the previous page is joined onto that
+     * page's last paragraph — same address, page order, one space between — and the row then
+     * names every page it came from and carries the lowest confidence of them. Only a genuine
+     * continuation is joined: something must precede it in the chapter, it must be in the section
+     * the previous page ended in, and every page in between must be present and text-free. The
+     * gap matters — a paragraph can run from page 10 to page 12 across a full-page figure, and
+     * requiring strict adjacency refused that legitimate book (spec-auditor, D14). A flag that
+     * fails any of these is refused by name, every one at once, with the pages to re-extract:
+     * nothing is written either way, so there is no reason to withhold the rest of the list.
+     *
      * @param deferred the paragraphs a {@code defer} correction names (D16): each takes its number after
      *                 the next paragraph its section starts, so a footnote the other edition prints a
      *                 page earlier still sits beside its own English. It stays on its page, and like a
@@ -422,6 +427,18 @@ class NcertLoadCommand extends NcertBookCommand {
      */
     static Numbered number(List<ExtractedPage> pages, String jsonlKey, Set<NcertCorrections.Deferred> deferred,
             List<NcertCorrections.Moved> moves) {
+        return number(pages, jsonlKey, deferred, moves, List.of());
+    }
+
+    /**
+     * @param unprinted the rows an {@code unprinted} correction names (D16), once per entry: each takes the number
+     *                  after the English paragraph its edition does not print, wherever it is numbered — in page
+     *                  order, after a deferral, or again after a move — so that number stays the English row's alone.
+     */
+    static Numbered number(List<ExtractedPage> pages, String jsonlKey, Set<NcertCorrections.Deferred> deferred,
+            List<NcertCorrections.Moved> moves, List<NcertCorrections.Unprinted> unprinted) {
+        Map<Start, Integer> gaps = new LinkedHashMap<>();
+        unprinted.forEach(gap -> gaps.merge(new Start(gap.chapter(), gap.page(), gap.index()), 1, Integer::sum));
         List<Joined> rows = new ArrayList<>();
         Map<Start, Joined> starts = new HashMap<>();
         List<String> refusals = new ArrayList<>();
@@ -468,10 +485,13 @@ class NcertLoadCommand extends NcertBookCommand {
                     }
                     continue;
                 }
-                int paraNo = counters.merge(counter, 1, Integer::sum);
-                Joined joined = new Joined(chapter, section, paraNo, page, paragraph);
+                Start start = new Start(chapter, page.page(), index);
+                int gap = gaps.getOrDefault(start, 0);
+                Joined joined = new Joined(chapter, section, counters.merge(counter, 1 + gap, Integer::sum), page,
+                        paragraph);
+                joined.unprintedBefore = gap;
                 rows.add(joined);
-                starts.put(new Start(chapter, page.page(), index), joined);
+                starts.put(start, joined);
                 // A footnote is never the paragraph the next page continues, so it never becomes the
                 // anchor: the body above it stays the one a continuation joins to.
                 if (!footnote(paragraph.text())) {
@@ -479,10 +499,13 @@ class NcertLoadCommand extends NcertBookCommand {
                 }
                 Waiting held = waiting.remove(counter);
                 if (held != null) {
-                    Joined placed = new Joined(chapter, section, counters.merge(counter, 1, Integer::sum), held.page(),
-                            held.paragraph());
+                    Start heldStart = new Start(chapter, held.page().page(), held.index());
+                    int heldGap = gaps.getOrDefault(heldStart, 0);
+                    Joined placed = new Joined(chapter, section, counters.merge(counter, 1 + heldGap, Integer::sum),
+                            held.page(), held.paragraph());
+                    placed.unprintedBefore = heldGap;
                     rows.add(placed);
-                    starts.put(new Start(chapter, held.page().page(), held.index()), placed);
+                    starts.put(heldStart, placed);
                 }
             }
         }
@@ -505,7 +528,24 @@ class NcertLoadCommand extends NcertBookCommand {
                                             .collect(java.util.stream.Collectors.joining(",")))
                             .collect(java.util.stream.Collectors.joining("\n  ")));
         }
+        // The numbering's own net, as for a move: the corrections step refuses a continuation by name first.
+        List<String> unnumbered = unprinted.stream()
+                .filter(gap -> !starts.containsKey(new Start(gap.chapter(), gap.page(), gap.index())))
+                .map(gap -> "ch " + gap.chapter() + " page " + gap.page() + ": the row starting \"" + gap.at()
+                        + "\" is not a row of its own")
+                .toList();
+        if (!unnumbered.isEmpty()) {
+            throw new InputFormatException(Path.of(NcertCorrectionsYamlReader.FILE), 0, unnumbered.size()
+                    + " unprinted correction(s) cannot be placed:\n  " + String.join("\n  ", unnumbered)
+                    + "\nFix each entry against the page, or remove it.");
+        }
         move(rows, starts, moves);
+        List<EditionPairs.Address> left = new ArrayList<>();
+        for (Joined row : rows) {
+            for (int before = row.unprintedBefore; before > 0; before--) {
+                left.add(new EditionPairs.Address(row.chapterNo, row.section, row.paraNo - before));
+            }
+        }
         // A model put "Eq. (7.5)" in figure_refs (D15, the Opus run). A rule can ask; this
         // guarantees, and names what it dropped so a wrong label is never silently discarded.
         List<String> dropped = new ArrayList<>();
@@ -522,13 +562,14 @@ class NcertLoadCommand extends NcertBookCommand {
             result.add(new NcertParagraphRow(row.chapterNo(), row.section(), row.paraNo(), row.text(),
                     row.hasEquations(), kept, row.extraction()));
         }
-        return new Numbered(List.copyOf(result), List.copyOf(dropped));
+        return new Numbered(List.copyOf(result), List.copyOf(dropped), List.copyOf(left));
     }
 
     /**
      * The {@code move} entries, on whole rows: each row leaves its section and is numbered right after the row it
-     * names, in that row's section; every section a move touched is then numbered from ¶1 in its new order. A
-     * row's words, pages and page parts go with it, so nothing a continuation joined is split again.
+     * names, in that row's section; every section a move touched is then numbered from ¶1 in its new order, still
+     * leaving the numbers an {@code unprinted} entry leaves. A row's words, pages and page parts go with it, so
+     * nothing a continuation joined is split again.
      */
     private static void move(List<Joined> rows, Map<Start, Joined> starts, List<NcertCorrections.Moved> moves) {
         if (moves.isEmpty()) {
@@ -563,7 +604,9 @@ class NcertLoadCommand extends NcertBookCommand {
         for (String key : touched) {
             int paraNo = 0;
             for (Joined row : sections.get(key)) {
-                row.paraNo = ++paraNo;
+                // A row after an English paragraph its edition does not print leaves that number wherever it goes.
+                paraNo += 1 + row.unprintedBefore;
+                row.paraNo = paraNo;
             }
         }
     }
@@ -664,6 +707,8 @@ class NcertLoadCommand extends NcertBookCommand {
         // Not final: a move entry gives a row another section and both sections new numbers (D16).
         private String section;
         private int paraNo;
+        // How many English paragraphs right before this row its edition does not print: numbers it leaves (D16).
+        private int unprintedBefore;
         private final StringBuilder text = new StringBuilder();
         private final List<Integer> pages = new ArrayList<>();
         private final List<Integer> pageStarts = new ArrayList<>();

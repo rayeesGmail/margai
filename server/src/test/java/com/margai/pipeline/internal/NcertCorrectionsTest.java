@@ -686,6 +686,71 @@ class NcertCorrectionsTest {
     }
 
     /**
+     * An English paragraph the Hindi edition does not print (D16): phy12-part1's Hindi leaves out §3.12's ¶5, and
+     * no join or split can mend a paragraph that is not there. The entry names the row after it.
+     */
+    @Test
+    void readsAnUnprintedEntryForTheHindiOnly() throws IOException {
+        Path file = write("""
+                corrections:
+                  - {book: phy12-part1, lang: hi, chapter: 3, page: 18, kind: unprinted, at: "(b) लूप नियम",
+                     reason: "the Hindi does not print English ¶5", address: "ch 3 §3.12 ¶5"}
+                """);
+
+        assertThat(NcertCorrectionsYamlReader.read(file)).singleElement().satisfies(entry -> {
+            assertThat(entry.kind()).isEqualTo(NcertCorrection.Kind.unprinted);
+            assertThat(entry.at()).isEqualTo("(b) लूप नियम");
+            assertThat(entry.kind().changesText()).isTrue();
+        });
+
+        Path english = write("""
+                corrections:
+                  - {book: phy12-part1, lang: en, chapter: 3, page: 18, kind: unprinted, at: "(b) Loop rule", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(english))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (unprinted): only a Hindi entry leaves an English number unfilled — "
+                        + "the English rows are canonical");
+
+        Path stray = write("""
+                corrections:
+                  - {book: phy12-part1, lang: hi, chapter: 3, page: 18, kind: unprinted, at: "(b)", after: "(a)", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(stray))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (unprinted): 'after' does not belong to this kind");
+    }
+
+    /** The entry changes no word; it names the row where its first paragraph sits once every page-level entry is applied. */
+    @Test
+    void anUnprintedEntryNamesItsRowAfterThePageLevelEntries() {
+        List<ExtractedPage> pages = List.of(page(18, p("7.12", "(a) The junction rule. (b) The loop rule.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                correction(18, NcertCorrection.Kind.split, null, null, "(b) The loop"), unprinted(18, "(b) The loop")));
+
+        assertThat(applied.pages().getFirst().paragraphs()).extracting(NcertPage.Paragraph::text)
+                .containsExactly("(a) The junction rule.", "(b) The loop rule.");
+        assertThat(applied.unprinted()).containsExactly(new NcertCorrections.Unprinted((short) 7, 18, 1, "(b) The loop"));
+        assertThat(applied.notes()).last().isEqualTo("ch 7 page 18 §7.12: the English paragraph before the row starting "
+                + "\"(b) The loop\" is not printed in this edition — the row takes the number after it (read against the page)");
+    }
+
+    /** A continuation is the rest of another page's row, so it names no row. */
+    @Test
+    void anUnprintedEntryMustNameARowByItsFirstWords() {
+        List<ExtractedPage> pages = List.of(page(17, p("7.12", "The rule (a) holds")),
+                page(18, new NcertPage.Paragraph("7.12", "at every junction.", true, List.of()), p("7.12", "(b) The loop rule.")));
+
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(unprinted(18, "at every junction"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("unprinted correction on ch 7 page 18: \"at every junction\" continues the previous page's row");
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(unprinted(18, "(c)"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("0 paragraphs start with \"(c)\" there, not one");
+    }
+
+    /**
      * The paragraph the next page continues is the last body paragraph, not the page's last: a footnote set
      * below it is never continued. Deferring or dropping that paragraph would leave the continuation to join
      * the paragraph above it.
@@ -780,6 +845,11 @@ class NcertCorrectionsTest {
     static NcertCorrection move(int page, String at, int afterPage, String after) {
         return new NcertCorrection("phy11-part2", BookLanguage.hi, (short) 7, page, NcertCorrection.Kind.move,
                 null, null, at, "read against the page", null, null, null, null, null, after, afterPage);
+    }
+
+    private static NcertCorrection unprinted(int page, String at) {
+        return new NcertCorrection("phy12-part1", BookLanguage.hi, (short) 7, page, NcertCorrection.Kind.unprinted,
+                null, null, at, "read against the page", null);
     }
 
     private static ExtractedPage page(int page, NcertPage.Paragraph... paragraphs) {

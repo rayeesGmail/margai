@@ -35,6 +35,7 @@ final class NcertCorrectionsYamlReader {
             Map.entry(NcertCorrection.Kind.defer, Set.of("at")),
             Map.entry(NcertCorrection.Kind.section, Set.of("at", "section")),
             Map.entry(NcertCorrection.Kind.move, Set.of("at", "after", "after_page")),
+            Map.entry(NcertCorrection.Kind.unprinted, Set.of("at")),
             Map.entry(NcertCorrection.Kind.misprint, Set.of("transcribed", "printed")),
             Map.entry(NcertCorrection.Kind.false_positive, Set.of("transcribed", "printed")),
             Map.entry(NcertCorrection.Kind.noise, Set.of("at", "flag")));
@@ -126,6 +127,10 @@ final class NcertCorrectionsYamlReader {
         // edition set to them may move a row (spec-auditor, D16).
         if (move && language != BookLanguage.hi) {
             throw new InputFormatException(file, 0, label + ": only a Hindi entry moves a row — the English rows are canonical");
+        }
+        if (kind == NcertCorrection.Kind.unprinted && language != BookLanguage.hi) {
+            throw new InputFormatException(file, 0, label + ": only a Hindi entry leaves an English number unfilled — "
+                    + "the English rows are canonical");
         }
         return new NcertCorrection(
                 required(file, entry, "book", label),

@@ -3861,3 +3861,743 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
   # phy11-part2 Hindi, chapter 13
   - {book: phy11-part2, lang: hi, chapter: 13, page: 10, kind: misprint, address: "ch 13 §13.6 ¶4",
      transcribed: "m संहति के किसी गुटके", printed: "M संहति के किसी गुटके", reason: "the page prints the block's mass as a capital M (crop p10 x65-307 y90-140 at zoom 4; the decoded layer's line y114 agrees): the book's error, which the row does not keep; round two's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes m, the mass of the example's answer T = 2 pi sqrt(m / 2k)"}
+  # phy12-part1 Hindi (D16, 2026-10-13) — the third Hindi book, transcribed by Claude Opus 5.5 at low and
+  # adjudicated against the canonical English rows (DECISIONS 2026-10-01: English is canonical). 339 entries.
+  # 134 split, 77 join, 4 move, 2 defer, 1 section and 1 unprinted reshape the extraction's 984 Hindi rows into
+  # 1,041 beside the 1,042 English ones, every section one to one: `section` gives the English §2.9 to the
+  # electrostatic-shielding text the Hindi heads 2.9.1, `move` and `defer` number six footnotes where the English
+  # does, and `unprinted` leaves §3.12 ¶5 English-only — the Hindi does not print it, and prints ¶3's sentence twice,
+  # the second copy joined to the first on p18 (founder, 2026-10-13). 102 text, in six kinds. (1) The transcriber's
+  # misreadings — among them परिविद्ध for the print's परिवद्ध (ch 4 p12), and the moment of inertia, a script I it
+  # read as a script J, written as a plain I since the rows carry no type style (ch 4 p22, six entries; founder,
+  # 2026-10-13) — and visargas it wrote as colons. (2) Its repairs of the book's own spelling and grammar, undone:
+  # the rows keep them as printed (DECISIONS 2026-10-03) — स्त्रोत, व्यजंक, निदर्शित, प्रबर्धित, निरक्षित …
+  # (3) What the rows left out, put back: two side headings (ch 1 p23, ch 2 p19), a label (ch 6 p3), three list
+  # bullets (ch 1 p8, p9). (4) The three "[illegible]" markers, removed where the page draws a picture the English
+  # rows leave out too (ch 2 p23, ch 6 p7; founder, 2026-10-13). (5) The 23 places where the print states something
+  # false, written as the meaning from the English row or the arithmetic (founder, 2026-10-10; a letter by the
+  # look-alike test, DECISIONS 2026-10-12). Six are words: नाभिक for "positively charged electrons" (ch 3 p2), आकर्षी
+  # for "always positive" (ch 1 p9), आघूर्ण for क्षेत्र where the dimensions are the moment's (ch 4 p21), वाहक बल for
+  # "current force" (ch 6 p5), and the dropped वर्ग के (ch 6 p17) and कम (ch 7 p9). Fourteen are symbols, numbers
+  # and units: r_21 = r_12 for r_n21 = r_n12 (ch 1 p8), kg for K (ch 1 p9), AO for AD (ch 1 p13), E_1A for E_A
+  # (ch 1 p18), r_hat for a bold r said to have magnitude 1 (ch 1 p29; founder, 2026-10-13), the E dropped from
+  # E(r) = 0 (ch 1 p37), p for P (ch 2 p6), C m for cm (ch 2 p17), I_2 = 31.5 I_g for a stray fragment and I_1 for I
+  # (ch 3 p22), the y-z plane for x-y (ch 4 p9), m B sin θ for m sin θ and dω/dθ for dω/dt (ch 4 p22), 0.454 A for
+  # 0.450 A (ch 7 p4; founder, 2026-10-13). Three are ≃ where the page leaves a blank (ch 4 p23, p25; founder,
+  # 2026-10-13) or a hyphen (ch 4 p26). (6) Two signs the raster does not draw but the text layer places, written as
+  # the English rows have them (founder, 2026-10-13, as for phy11-part1's ×): the × of 4π × 10⁻⁷ (ch 4 p8) and the
+  # closed integral and dot of Eq. [4.13(a)] (ch 4 p12), which the same page draws three lines lower; the blanks of
+  # ch 4 p23 and p25 hold such a glyph too. No other sign rests on the layer alone: the ×, ∝ and ≤ it counts beyond
+  # the rows are in a caption (ch 1 p24), the Summary (ch 3 p22) and two tables (ch 5 p6, p12), which the rows
+  # rightly leave out; the layer check's other lines with no entry are its own noise, each read on a crop — a stroke
+  # or matra drawn twice, a letter run into a spelled Greek name, a decimal point set apart, a sign MT-Extra decodes
+  # to a blank, a dot product counted as a bullet, words and digits in displays the layer does not carry. Where the
+  # row already writes the meaning no entry is needed and none is written: परिमाण for the print's परिणाम, a word
+  # that names another quantity (ch 3 p5, founder, 2026-10-13; ch 1 p36, as in phy11-part2), NC^-1 for Ne⁻¹ (ch 2
+  # p16), epsilon_0 for E_o in Eq. (2.37) (ch 2 p22). Kept as printed, the statement still true: ch 3 p2's "ΔQ या
+  # Δt", ch 6 p12's फेस and ch 6 p15's अंतःधारा (founder, 2026-10-13); ch 3 p17's dropped धन, which the clause's own
+  # "both negative ones" supplies, and ch 6 p4's clause printed twice (misprint rulings); ch 7 p3's i²R, i being for
+  # a dc current the current itself. The second read's 22 flags ruled: 15 false_positive, 3 misprint, 4 by the text
+  # entries (ch 1 p29, p37, ch 6 p5, ch 7 p3). The row it could not find on its page (ch 2 p17 §2.8.3 ¶6) needs no
+  # entry: the page and the row both carry it. Of its 14 passages no row carries, five are in rows the verifier did
+  # not match (ch 1 p14, ch 2 p9, ch 3 p20, ch 4 p18, ch 5 p10), two are the restored heading and label (ch 1 p23,
+  # ch 6 p3), one the page does not print as running text (ch 4 p15, read on the page image), and six are the
+  # Summary heading, three biography boxes, the box of Maxwell's equations and a figure's labels (ch 3 p22, ch 4 p2,
+  # p13, ch 8 p6, ch 8 p5, ch 4 p26), which the English rows leave out too. Greek letters the rows carry as
+  # characters stay (DECISIONS 2026-10-02). A span that changes the rows is written as the load shows them, after the
+  # visarga step; a ruling on a flag quotes the verifier as it read the rows before the reload; addresses are the
+  # rows after this block, and the `unprinted` entry's is the English address it leaves without Hindi. Every text
+  # entry's printed span was read on a crop of the page image, or written from the English row or the arithmetic
+  # under the meaning ruling, or for kind (6) as the English row has it, in the gap the page leaves; the decoded
+  # layer is cited as a witness by position only and none of its text is kept here (SPEC §12.2). Entries apply in
+  # file order: within a chapter the alignment entries as each reader wrote them, then the character entries; a
+  # `move` or an `unprinted` entry is checked where it stands and carried out on the numbered rows. Simulated with
+  # `ncert load --dry-run` on the extraction (sha256 97cf92b1…): no refusal, 115 of 115 sections one to one, §3.12 ¶5
+  # English-only. Approved by the founder 2026-10-13, as written (on pipeline/reports/2026-10-13-ncert-load-dry-run.md),
+  # with ch 2 p21's निरक्षित and ch 7 p3's i²R kept as printed.
+  # phy12-part1 Hindi, chapter 1
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 3, kind: join, address: "ch 1 §1.2 ¶7",
+     at: "सभी पदार्थ परमाणुओं और/अथवा अणुओं से बने हैं।", reason: "the atoms-and-molecules text is the rest of English ¶7, whose first sentence (why material bodies acquire charge) the Hindi row carries alone"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 3, kind: defer, address: "ch 1 §1.3 ¶4",
+     at: "* एक तीसरी श्रेणी जिसे अर्धचालक", reason: "the semiconductor footnote is English ¶4, numbered after ¶3 (the comb and the metal rod); the Hindi prints the footnote at the foot of p3 and ¶3 at the top of p4"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 8, kind: split, address: "ch 1 §1.5 ¶9",
+     at: "epsilon_0 को मुक्त आकाश या निर्वात", reason: "English ¶9 (epsilon_0, the permittivity of free space, and its value) begins here, after Eq. (1.2) which ends ¶8"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 8, kind: split, address: "ch 1 §1.5 ¶14",
+     at: "समीकरण (1.3) के संबंध में कुछ टिप्पणियाँ", reason: "English ¶14, 'Some remarks on Eq. (1.3) are relevant', begins here, after Eq. (1.3) which ends ¶13"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 9, kind: join, address: "ch 1 §1.5 ¶19",
+     at: "यहाँ पर ऋणात्मक चिह्न आकर्षण बल", reason: "the sign of F_e and the gravitational force F_G are the rest of English ¶19, solution (a)(i) of Example 1.3; the Hindi row was cut at the display"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 9, kind: join, address: "ch 1 §1.5 ¶19",
+     at: "यहाँ m_p तथा m_e क्रमशः प्रोटॉन", reason: "the masses m_p, m_e and the ratio 2.4 × 10^39 are the end of English ¶19; the Hindi row was cut at the display"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 9, kind: join, address: "ch 1 §1.5 ¶20",
+     at: "तथापि यहाँ यह उल्लेख करना महत्वपूर्ण", reason: "the different signs of the two forces and their values inside a nucleus are the rest of English ¶20, which begins with (ii), the ratio 1.3 × 10^36"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 10, kind: join, address: "ch 1 §1.5 ¶20",
+     at: "(b) एक प्रोटॉन द्वारा एक इलेक्ट्रॉन", reason: "part (b), the force and the electron's acceleration at the top of p10, is the end of English ¶20, which runs from p9 to p10 and carries (ii) and (b) in one row"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 11, kind: join, address: "ch 1 §1.5 ¶23",
+     at: "यहाँ r की तुलना में गोलों A तथा B", reason: "the redistribution of charge and F' = F are the rest of English ¶23, Example 1.4's solution; the Hindi row was cut at the display"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 12, kind: join, address: "ch 1 §1.6 ¶3",
+     at: "इसी प्रकार q_3 के कारण q_1 पर", reason: "the force F_13 on q_1 due to q_3 is the end of English ¶3, which runs from p11 to p12"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 13, kind: join, address: "ch 1 §1.6 ¶9",
+     at: "इस प्रकार A पर स्थित आवेश q के कारण", reason: "the forces F_1, F_2, F_3 on Q and their zero sum are the rest of English ¶9, Example 1.5's solution"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 13, kind: split, address: "ch 1 §1.6 ¶10",
+     at: "सममिति द्वारा भी यह स्पष्ट है कि", reason: "English ¶10 (the zero sum by symmetry, the rotation through 60°) begins here; the Hindi print keeps it in ¶9's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 13, kind: split, address: "ch 1 §1.6 ¶13",
+     at: "आवेशों के प्रत्येक युगल के लिए आकर्षण", reason: "English ¶13 (each pair's force has the same magnitude F) begins here, after F_1 = F r_hat_1 which ends ¶12"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 14, kind: join, address: "ch 1 §1.6 ¶14",
+     at: "इसी प्रकार, C पर स्थित आवेश", reason: "the total force F_3 on -q at C is the end of English ¶14, which begins with F_2 on q at B"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 14, kind: split, address: "ch 1 §1.6 ¶15",
+     at: "यहाँ रोचक बात यह है कि तीनों", reason: "English ¶15 (the sum of the forces on the three charges is zero) begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 14, kind: split, address: "ch 1 §1.6 ¶16",
+     at: "यह परिणाम चौंकाने वाला नहीं है।", reason: "English ¶16 (the result is not surprising; Newton's third law) begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 14, kind: join, address: "ch 1 §1.7 ¶1",
+     at: "किसी बिंदु r पर आवेश Q द्वारा उत्पन्न", reason: "the field E(r) of Eq. (1.6), the word 'field' and the force of Eq. (1.7) are the rest of English ¶1"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 16, kind: split, address: "ch 1 §1.7.1 ¶3",
+     at: "इसी प्रकार r_2 पर स्थित आवेश q_2", reason: "English ¶3 (the field E_2 due to q_2 and the like expressions for E_3 … E_n) begins here, after E_1 which ends ¶2"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 16, kind: split, address: "ch 1 §1.7.1 ¶4",
+     at: "अध्यारोपण सिद्धांत द्वारा आवेशों के निकाय के कारण", reason: "English ¶4 (the superposition principle and Eq. (1.10)) begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 17, kind: split, address: "ch 1 §1.7.2 ¶6",
+     at: "विरामावस्था से आरंभ करके, इलेक्ट्रॉन के", reason: "English ¶6 (starting from rest, the electron's time of fall t_e) begins here, after a_e = eE/m_e which ends ¶5"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 18, kind: join, address: "ch 1 §1.7.2 ¶6",
+     at: "इस प्रकार, समान दूरी गिरने में", reason: "the heavier proton's longer fall and the neglect of gravity are the end of English ¶6, which runs from p17 to p18"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 18, kind: join, address: "ch 1 §1.7.2 ¶8",
+     at: "धनावेश q_1 के कारण B पर", reason: "the fields at B and at C are the rest of English ¶8, Example 1.8's solution, one row from the field at A to the field at C"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 21, kind: split, address: "ch 1 §1.8 ¶10",
+     at: "(ii) किसी आवेश मुक्त क्षेत्र में", reason: "English ¶10, property (ii) of field lines, begins here; the Hindi print runs the four properties on in ¶9's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 21, kind: split, address: "ch 1 §1.8 ¶11",
+     at: "(iii) दो क्षेत्र रेखाएँ एक-दूसरे को", reason: "English ¶11, property (iii) of field lines, begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 21, kind: split, address: "ch 1 §1.8 ¶12",
+     at: "(iv) स्थिरवैद्युत क्षेत्र रेखाएँ बंद", reason: "English ¶12, property (iv) of field lines, begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 21, kind: move, address: "ch 1 §1.9 ¶7",
+     at: "* यह कहना उचित नहीं है कि", after: "अब हम वैद्युत फ्लक्स की परिभाषा", after_page: 22, reason: "the footnote on the number of field lines, printed at the foot of p21, is English ¶7, numbered after ¶6 (the definition of electric flux, Eq. 1.11)"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 23, kind: split, address: "ch 1 §1.10.1 ¶3",
+     at: "यहाँ p_hat द्विध्रुव अक्ष", reason: "English ¶3 (p_hat the unit vector along the dipole axis, and E_(+q) of Eq. 1.13(b)) begins here, after Eq. 1.13(a) which ends ¶2"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 23, kind: split, address: "ch 1 §1.10.1 ¶4",
+     at: "P पर कुल विद्युत क्षेत्र है", reason: "English ¶4 (the total field at P, Eqs. 1.14 and 1.15) begins here, at the last line of p23, after Eq. 1.13(b)"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 24, kind: join, address: "ch 1 §1.10.1 ¶5",
+     at: "दो आवेशों +q तथा −q के कारण विद्युत", reason: "the side heading (ii), points on the equatorial plane, leads English ¶5 as its first words; the Hindi row under it joins onto the heading"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 25, kind: move, address: "ch 1 §1.10.2 ¶3",
+     at: "* धनात्मक बिंदु आवेशों के संग्रह", after: "उदाहरण 1.9 ±10 μC के दो आवेश", after_page: 25, reason: "the footnote on the centre of a collection of charges is English ¶3, numbered after Example 1.9 and before its solution; the Hindi solution starts on p25 above the footnote"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 26, kind: join, address: "ch 1 §1.10.2 ¶4",
+     at: "बिंदु P पर आवेश −10 μC के कारण", reason: "the field at P due to -10 μC is part of English ¶4, solution (a) of Example 1.9, one row from the field at P to the dipole-formula check"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 26, kind: join, address: "ch 1 §1.10.2 ¶4",
+     at: "A तथा B पर स्थित दो आवेशों के कारण P पर", reason: "the resultant field at P, 2.7 × 10^5 N C^-1, is part of English ¶4"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 26, kind: join, address: "ch 1 §1.10.2 ¶4",
+     at: "इस उदाहरण में अनुपात OP/OB", reason: "the ratio OP/OB = 60 and the axial dipole formula are part of English ¶4"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 26, kind: join, address: "ch 1 §1.10.2 ¶4",
+     at: "यहाँ p = 2a q द्विध्रुव आघूर्ण", reason: "p = 2a q, the dipole moment's magnitude, is part of English ¶4; the Hindi row was cut at the display"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 26, kind: join, address: "ch 1 §1.10.2 ¶4",
+     at: "द्विध्रुव अक्ष पर विद्युत क्षेत्र की दिशा सदैव", reason: "the field's direction on the axis and p = 5 × 10^-8 C m are part of English ¶4"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 26, kind: join, address: "ch 1 §1.10.2 ¶4",
+     at: "अतः E = 2 × 5 × 10^(-8) C m", reason: "the field E = 2.6 × 10^5 N C^-1 from the dipole formula is part of English ¶4"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 26, kind: join, address: "ch 1 §1.10.2 ¶4",
+     at: "द्विध्रुव आघूर्ण की दिशा AB के अनुदिश है", reason: "the direction AB and the agreement with the earlier result are the end of English ¶4"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 26, kind: join, address: "ch 1 §1.10.2 ¶5",
+     at: "बिंदु A पर स्थित −10 μC आवेश", reason: "the field at Q due to -10 μC at A is the end of English ¶5, solution (b), which begins with the field due to +10 μC at B"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 26, kind: join, address: "ch 1 §1.10.2 ¶6",
+     at: "(a) की ही भाँति द्विध्रुव के अक्ष", reason: "the check by the equatorial dipole formula is the rest of English ¶6, which begins with the components cancelling along OQ"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 27, kind: join, address: "ch 1 §1.10.2 ¶6",
+     at: "इस प्रकरण में विद्युत क्षेत्र की दिशा आघूर्ण", reason: "the field's direction opposite to the dipole moment and the agreement are the end of English ¶6, which runs from p26 to p27"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 30, kind: split, address: "ch 1 §1.13 ¶5",
+     at: "हम बिना उपपत्ति के गाउस नियम", reason: "English ¶5, Gauss's law stated without proof (Eq. 1.31), begins here; the Hindi print keeps it in ¶4's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 30, kind: split, address: "ch 1 §1.13 ¶9",
+     at: "(i) गाउस नियम प्रत्येक बंद पृष्ठ", reason: "English ¶9, point (i) (any closed surface), begins here; the Hindi print runs it on at the end of ¶8"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 32, kind: split, address: "ch 1 §1.13 ¶20",
+     at: "(a) चित्र में हम यह देखते हैं कि", reason: "English ¶20, part (a) of Example 1.11's solution, begins here; the frozen English carries the label 'Solution' as ¶19, a row of its own, and the Hindi label is left as that row"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 34, kind: split, address: "ch 1 §1.14.1 ¶4",
+     at: "गाउसीय पृष्ठ से गुज़रने वाला फ्लक्स = पृष्ठ", reason: "English ¶4 (the flux through the curved part, Gauss's law and Eq. 1.32) begins at the top of p34; the Hindi row ran ¶3 on across the page break"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 34, kind: join, address: "ch 1 §1.14.1 ¶4",
+     at: "पृष्ठ में lambda l के बराबर आवेश", reason: "the enclosed charge lambda l and E = lambda/(2 pi epsilon_0 r) are part of English ¶4"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 34, kind: join, address: "ch 1 §1.14.1 ¶4",
+     at: "सदिश रूप में किसी भी बिंदु पर विद्युत", reason: "the vector form, Eq. (1.32), and the direction of E are the end of English ¶4"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 35, kind: split, address: "ch 1 §1.14.3 ¶3",
+     at: "यदि q > 0 है तो विद्युत क्षेत्र बहिर्मुखी", reason: "English ¶3 (outward if q > 0; as if the charge were at the centre) begins here, after Eq. (1.34) which ends ¶2"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 36, kind: join, address: "ch 1 §1.14.3 ¶4",
+     at: "अर्थात एकसमान आवेशित पतले गोलीय खोल", reason: "the zero field inside a charged shell and its experimental meaning are the end of English ¶4, which ends after Eq. (1.35) with that sentence"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 36, kind: join, address: "ch 1 §1.14.3 ¶6",
+     at: "नाभिक से r दूरी पर स्थित बिंदु P", reason: "Gauss's law, the spherical symmetry and the two cases r < R and r > R are the rest of English ¶6, Example 1.12's solution"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 37, kind: split, address: "ch 1 §1.14.3 ¶9",
+     at: "यहाँ गाउसीय पृष्ठ द्वारा परिबद्ध आवेश q", reason: "English ¶9 (the enclosed charge q) begins at the top of p37; the Hindi row ran ¶7 on across the page break, past the footnote English numbers ¶8"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 37, kind: split, address: "ch 1 §1.14.3 ¶10",
+     at: "पहले प्राप्त आवेश घनत्व rho का मान", reason: "English ¶10 (substituting rho, and E(r) for r < R) begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 9, kind: false_positive, address: "ch 1 §1.5 ¶20",
+     transcribed: "F_G ~ 1.9 × 10^(-34) N हैं", printed: "F_G ~ 1.9 × 10^(-34) N", reason: "the page prints 'F_G ~ 1.9 × 10^-34 N हैं।' with the verb after the unit (crop p9 x80-395 y668-715 at zoom 4; the decoded layer's line y685 agrees); the row matches the page, the verifier's printed span stops before the verb"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 14, kind: false_positive, address: "ch 1 §1.7 ¶1",
+     transcribed: "E(r) = (1 / 4 pi epsilon_0) (Q / r^2) r_hat = (1 / 4 pi epsilon_0) (Q / r^2) r_hat (1.6)", printed: "E(r) = (1 / 4 pi epsilon_0) (Q / r^2) r_hat (1.6)", reason: "the page prints the display (1.6) with the same fraction twice, E(r) = (1/4 pi epsilon_0)(Q/r^2) r_hat = (1/4 pi epsilon_0)(Q/r^2) r_hat (1.6), as the English row also does (crop p14 x160-525 y400-470 at zoom 4; the decoded layer's lines y424-449 carry both halves); the row matches the page"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 21, kind: false_positive, address: "ch 1 §1.9 ¶1",
+     transcribed: "n_hat dS", printed: "n̂ dS", reason: "the page prints v. n-hat dS (crop p21 x44-332 y508-528 at zoom 4; the decoded layer's line y513 agrees); n_hat is the transcriber's spelling of the hatted n, so the spans differ only in notation"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 37, kind: text, address: "ch 1 §1.14.3 ¶11",
+     transcribed: "अथवा (r) = 0;", printed: "अथवा E (r) = 0;", reason: "the page prints 'E (r) × 4 π r^2 = 0 अथवा (r) = 0;  r > R' with no E before the second (r) (crop p37 x60-400 y292-380 at zoom 4; the decoded layer's line y326 agrees), which reads as r = 0 for points with r > R; by the founder's ruling of 2026-10-10 the row writes the meaning: the English row's 'E (r) × 4 pi r^2 = 0 or E (r) = 0; r > R', the field outside the neutral atom. The row will then differ from the verifier's quote only in writing pi for π"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 14, kind: text, address: "ch 1 §1.7 ¶2",
+     transcribed: "अथवा विलोमत: के", printed: "अथवा विलोमतः के", reason: "Visarga: an adverb in -tah (vice versa), printed with the visarga glyph that this font shares with the colon. Crop p14 x160-525 y590-610 at zoom 4; the decoded layer's line y594 agrees"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 21, kind: text, address: "ch 1 §1.8 ¶9",
+     transcribed: "त्रिज्यत: (अरीय)", printed: "त्रिज्यतः (अरीय)", reason: "Visarga: an adverb in -tah (radially), printed with the visarga glyph that this font shares with the colon. Crop p21 x44-332 y169-203 at zoom 4; the decoded layer's line y172 agrees"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 21, kind: text, address: "ch 1 §1.8 ¶9",
+     transcribed: "त्रिज्यत: अंतर्मुखी", printed: "त्रिज्यतः अंतर्मुखी", reason: "Visarga: an adverb in -tah (radially), printed with the visarga glyph that this font shares with the colon. Crop p21 x44-332 y169-203 at zoom 4; the decoded layer's line y187 agrees"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 3, kind: text, address: "ch 1 §1.3 ¶4",
+     transcribed: "इस अवरोध का परिमाण चालकों", printed: "इस अवरोध का परिमााण चालकों", reason: "the footnote sets the aa-stroke twice in this word (crop p3 x40-300 y700-732 at zoom 5; the decoded layer's line y718 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 5, kind: text, address: "ch 1 §1.4.3 ¶2",
+     transcribed: "रूप से निर्दर्शित किया था", printed: "रूप से निदर्शित किया था", reason: "the page prints no reph over the first syllable; the only reph stands over the third (crop p5 x40-410 y325-360 at zoom 4; the decoded layer's line y343 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 8, kind: text, address: "ch 1 §1.5 ¶15",
+     transcribed: "समीकरण (1.3) q_1 तथा q_2 के किसी", printed: "• समीकरण (1.3) q_1 तथा q_2 के किसी", reason: "the paragraph opens with a printed list bullet (crop p8 x150-525 y596-650; the decoded layer's line y617 carries it), as the English row does"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 9, kind: text, address: "ch 1 §1.5 ¶16",
+     transcribed: "q_2 के कारण q_1 पर आरोपित बल", printed: "• q_2 के कारण q_1 पर आरोपित बल", reason: "the paragraph opens with a printed list bullet (crop p9 x40-410 y96-252; the decoded layer's line y103 carries it), as the English row does"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 9, kind: text, address: "ch 1 §1.5 ¶17",
+     transcribed: "कूलॉम नियम (समीकरण 1.3) से निर्वात", printed: "• कूलॉम नियम (समीकरण 1.3) से निर्वात", reason: "the paragraph opens with a printed list bullet (crop p9 x40-410 y96-252; the decoded layer's line y188 carries it), as the English row does"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 15, kind: text, address: "ch 1 §1.7 ¶7",
+     transcribed: "आवेश Q को किन्हीं अनिर्दिष्ट", printed: "आवेश Q की किन्हीं अनिर्दिष्ट", reason: "the page prints the postposition with the ii-matra on this line, where the line above has the o-matra in the same phrase (crop p15 x40-410 y272-325 at zoom 4; the decoded layer's line y290 agrees): the book's own grammar, kept as printed (DECISIONS 2026-10-03)"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 25, kind: text, address: "ch 1 §1.10.1 ¶9",
+     transcribed: "निर्भर नही है वरन्", printed: "निर्भर नही हैं वरन्", reason: "the page draws an anusvara on the verb (crop p25 x85-175 y130-148 at zoom 10; the decoded layer's line y132 agrees); the negation beside it stays without one, as printed"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 37, kind: text, address: "ch 1 §1.14.3 ¶10",
+     transcribed: "बहिर्मुखी निर्दिशित है", printed: "बहिर्मुखी निदर्शित है", reason: "the page prints the word with a reph over the third syllable and none before it (crop p37 x60-226 y276-293 at zoom 8; the decoded layer's line y278 agrees), the same word as ch 1 p5: the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 8, kind: text, address: "ch 1 §1.5 ¶12",
+     transcribed: "(r_n21 = r_n12)", printed: "(r_21 = r_12)", reason: "the page prints the bracket with a stray n before both subscripts, (r_n21 = r_n12) (crop p8 x150-525 y420-462 at zoom 5; the decoded layer's line y434 agrees), naming two quantities the chapter never defines; the sentence defines r_21 and r_12 as the magnitudes of the vectors r_21 and r_12, and the English row's '(r_12 = r_21)' says they are equal; by the founder's ruling of 2026-10-10 the row writes the meaning, in the Hindi's own order"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 9, kind: text, address: "ch 1 §1.5 ¶18",
+     transcribed: "10^(-27) K, m_e", printed: "10^(-27) kg, m_e", reason: "the page prints the proton's mass as 1.67 × 10^-27 K, a capital K where the unit belongs, while m_e beside it is in kg (crop p9 x60-270 y350-370 at zoom 6; the decoded layer's line y356 agrees); K is the kelvin, a wrong unit for a mass; the English row and this chapter's other proton masses (p10, p18) give 1.67 × 10^-27 kg; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 9, kind: text, address: "ch 1 §1.5 ¶19",
+     transcribed: "(जो सदैव धनात्मक है)", printed: "(जो सदैव आकर्षी है)", reason: "the page prints the gravitational force as '(which is always positive)' just before F_G = −G m_p m_e / r^2 and just after the sentence saying that the negative sign marks an attractive force (crop p9 x60-400 y445-520 at zoom 4; the decoded layer's line y465 agrees); under that sign convention a force that is always positive is repulsive, the opposite of gravity and of the minus sign the formula carries; the English row reads '(always attractive)'; by the founder's ruling of 2026-10-10 the row writes the meaning, in the word the same solution uses for gravity further down this page ('गुरुत्वाकर्षण बल आकर्षी है', §1.5 ¶21)"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 13, kind: text, address: "ch 1 §1.6 ¶9",
+     transcribed: "की दूरी AD = (2/3) AD", printed: "की दूरी AO = (2/3) AD", reason: "the page prints the distance of the centroid from A as AD = (2/3) AD = (1/sqrt(3)) l (crop p13 x55-395 y105-155 at zoom 5; the decoded layer's line y124 agrees), an equation that makes AD zero; the English row reads 'the distance AO of the centroid O from A is (2/3) AD', and the next line of the page continues 'AO = BO = CO'; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 18, kind: text, address: "ch 1 §1.7.2 ¶8",
+     transcribed: "परिमाण E_A के समान है", printed: "परिमाण E_1A के समान है", reason: "the page prints the magnitude of E_2A as equal to E_A, with no subscript 1 (crop p18 x165-510 y660-715 at zoom 5; the decoded layer's lines y665 and y682 agree), where E_A is the total field the next line computes as E_1A + E_2A = 7.2 × 10^4 N C^-1, twice either part; the arithmetic and the English row ('points towards the right and has the same magnitude' as E_1A, 3.6 × 10^4 N C^-1) give E_1A; a dropped subscript, so by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 23, kind: text, address: "ch 1 §1.10.1 ¶2",
+     transcribed: "मान लीजिए बिंदु P द्विध्रुव के केंद्र से q की ओर", printed: "(i) अक्ष पर स्थित बिंदुओं के लिए मान लीजिए बिंदु P द्विध्रुव के केंद्र से q की ओर", reason: "the page prints the unnumbered side heading '(i) अक्ष पर स्थित बिंदुओं के लिए' in bold italic on its own line above the paragraph (crop p23 x40-410 y570-640 at zoom 4; the decoded layer's line y582 agrees), and the row dropped it; by the side-heading rule (2026-09-27) the heading's words lead the paragraph printed under it, as the English row opens '(i) For points on the axis' and as this section's rows carry the matching '(ii)' heading"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 29, kind: text, address: "ch 1 §1.13 ¶2",
+     transcribed: "एकांक सदिश r का परिमाण 1 है", printed: "एकांक सदिश r_hat का परिमाण 1 है", reason: "the page prints 'चूँकि एकांक सदिश r का परिमाण 1 है' with a bold r and no hat (crop p29 x44-210 y682-703 at zoom 6; the decoded layer's line y700 agrees); a bold r is this chapter's position vector, whose magnitude is r, not 1 — the sentence is about the unit vector r_hat the same paragraph names twice before it, and the English row reads 'since the magnitude of a unit vector is 1'; by the founder's ruling of 2026-10-10, confirmed for this place on 2026-10-13, the row writes the meaning"}
+  # phy12-part1 Hindi, chapter 2
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 19, kind: section, address: "ch 2 §2.9 ¶11",
+     at: "किसी ऐसे चालक के विषय में विचार कीजिए", section: "2.9", reason: "the Hindi prints a 2.9.1 heading (electrostatic shielding, layer y533) where the English runs the text on in §2.9 as result 6; the English numbers it §2.9 ¶11 onwards"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 3, kind: split, address: "ch 2 §2.2 ¶3",
+     at: "यहाँ V_P तथा V_R क्रमशः बिंदु P तथा R", reason: "English ¶3, the 'where V_P and V_R' sentence after Eq. (2.4), begins here; the Hindi row runs it on after the display"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 4, kind: join, address: "ch 2 §2.3 ¶2",
+     at: "यहाँ r_hat′, OP′ के अनुदिश कोई एकांक सदिश है।", reason: "the 'where r_hat′ is the unit vector' sentence and Eq. (2.6) are the rest of English ¶2, which runs from the intermediate point P′ through Eq. (2.6)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 5, kind: split, address: "ch 2 §2.3 ¶8",
+     at: "(b) अब, आवेश 2 × 10^(-9) C को अनंत से", reason: "English ¶8, Example 2.1 part (b), begins here; the Hindi row runs (a) and (b) as one paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 5, kind: split, address: "ch 2 §2.3 ¶10",
+     at: "नहीं, कार्य पथ पर निर्भर नहीं होगा।", reason: "English ¶10, 'No, work done will be path independent', begins here, after the solution's working for (b)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 6, kind: split, address: "ch 2 §2.4 ¶3",
+     at: "अब, ज्यामिति द्वारा r_1^2 = r^2", reason: "English ¶3, the geometry of Eq. (2.10), begins here; the Hindi row puts the 'where r_1 and r_2' sentence of ¶2 before it"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 6, kind: join, address: "ch 2 §2.4 ¶2",
+     at: "यहाँ r_1 तथा r_2 बिंदु P की क्रमशः", reason: "the 'where r_1 and r_2 are the distances' sentence after Eq. (2.9) is the end of English ¶2"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 6, kind: split, address: "ch 2 §2.4 ¶5",
+     at: "इसी प्रकार, r_2^2 ≅ r^2", reason: "English ¶5, 'Similarly' and Eq. (2.12), begins here; the Hindi row keeps it with Eq. (2.11)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 6, kind: split, address: "ch 2 §2.4 ¶7",
+     at: "समीकरणों (2.9) तथा (2.13) तथा p = 2qa", reason: "English ¶7, using Eqs. (2.9) and (2.13) to reach Eq. (2.14), begins here; the Hindi row keeps it with the binomial step"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 7, kind: split, address: "ch 2 §2.4 ¶12",
+     at: "(धनात्मक चिह्न theta = 0 के लिए", reason: "English ¶12, the sign note and the zero potential in the equatorial plane, begins here, after Eq. (2.16)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 7, kind: split, address: "ch 2 §2.5 ¶2",
+     at: "यहाँ r_1P बिंदु P तथा आवेश q_1", reason: "English ¶2, 'where r_1P is the distance between q_1 and P', begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 7, kind: split, address: "ch 2 §2.5 ¶4",
+     at: "यहाँ r_2P तथा r_3P बिंदु P की", reason: "English ¶4, 'where r_2P and r_3P' and the superposition sum to Eq. (2.18), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 8, kind: join, address: "ch 2 §2.5 ¶9",
+     at: "यदि बिंदु x विस्तारित रेखा OA पर है", reason: "the case of x on the extended line OA and the result 9 cm and 45 cm are the rest of English ¶9, which begins with the required point P"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 9, kind: split, address: "ch 2 §2.5 ¶12",
+     at: "(b) बिंदु Q और P; A और B के बीच", reason: "English ¶12, Example 2.3 question (b), begins here; the Hindi row runs (a) to (e) as one paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 9, kind: split, address: "ch 2 §2.5 ¶13",
+     at: "(c) Q से P तक एक छोटे धनावेश", reason: "English ¶13, question (c), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 9, kind: split, address: "ch 2 §2.5 ¶14",
+     at: "(d) B से A तक एक छोटे से ऋण आवेश", reason: "English ¶14, question (d), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 9, kind: split, address: "ch 2 §2.5 ¶15",
+     at: "(e) B से A तक जाने में क्या", reason: "English ¶15, question (e), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 9, kind: split, address: "ch 2 §2.5 ¶17",
+     at: "(a) चूँकि V ∝ 1/r, V_P > V_Q;", reason: "English ¶17, answer (a), begins here; the English has the label Solution as ¶16, a row of its own, and the Hindi print sets हल on its own line (layer y493)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 11, kind: split, address: "ch 2 §2.6.1 ¶6",
+     at: "(i) विद्युत क्षेत्र उस दिशा में होता है", reason: "English ¶6, conclusion (i), begins here; the Hindi row runs both conclusions on after the lead-in"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 11, kind: split, address: "ch 2 §2.6.1 ¶7",
+     at: "(ii) किसी बिंदु पर विद्युत क्षेत्र का परिमाण", reason: "English ¶7, conclusion (ii), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 12, kind: split, address: "ch 2 §2.7 ¶6",
+     at: "आवेश q_3 को अनंत से बिंदु r_3 तक", reason: "English ¶6, the work in bringing q_3 and Eq. (2.25), begins here; the Hindi row keeps it with Eq. (2.24)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 13, kind: split, address: "ch 2 §2.7 ¶11",
+     at: "(i) आवेश +q को A पर लाने में", reason: "English ¶11, step (i) of Example 2.4's solution, begins here; the Hindi row keeps it at the end of the solution's opening"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 14, kind: join, address: "ch 2 §2.7 ¶14",
+     at: "चारों चरणों (i), (ii), (iii) एवं (iv)", reason: "adding the work of steps (i) to (iv), at the top of p14, is the end of English ¶14, which begins with step (iv) on p13"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 15, kind: join, address: "ch 2 §2.8.1 ¶3",
+     at: "किसी बाह्य क्षेत्र में आवेश q की r पर", reason: "Eq. (2.27) and 'where V(r) is the external potential' are the end of English ¶3"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 15, kind: join, address: "ch 2 §2.8.2 ¶1",
+     at: "q_2 पर बाह्य क्षेत्र के विरुद्ध किया गया कार्य", reason: "the two displayed works on q_2 are part of English ¶1, which runs through Eq. (2.29)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 15, kind: join, address: "ch 2 §2.8.2 ¶1",
+     at: "यहाँ r_12 आवेशों q_1 तथा q_2", reason: "'where r_12 is the distance', the superposition step and Eqs. (2.28) and (2.29) are the end of English ¶1"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 15, kind: split, address: "ch 2 §2.8.2 ¶3",
+     at: "(b) दोनों आवेशों को एक-दूसरे से", reason: "English ¶3, Example 2.5 question (b), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 16, kind: split, address: "ch 2 §2.8.2 ¶6",
+     at: "(b) W = U_2 – U_1", reason: "English ¶6, answer (b), begins here; the Hindi row keeps it with answer (a)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 18, kind: join, address: "ch 2 §2.9 ¶2",
+     at: "किसी उदासीन अथवा आवेशित चालक पर विचार", reason: "the numbered heading of result 1 leads the paragraph printed under it, as English ¶2 does; it loaded as a row of its own"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 18, kind: join, address: "ch 2 §2.9 ¶3",
+     at: "यदि E पृष्ठ के अभिलंबवत नहीं है", reason: "the numbered heading of result 2 leads the paragraph printed under it, as English ¶3 does; it loaded as a row of its own"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 18, kind: join, address: "ch 2 §2.9 ¶4",
+     at: "किसी उदासीन चालक के प्रत्येक लघु आयतन", reason: "the numbered heading of result 3 leads the paragraph printed under it, as English ¶4 does; it loaded as a row of its own"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 18, kind: join, address: "ch 2 §2.9 ¶5",
+     at: "यह उपरोक्त परिणाम 1 तथा 2 का अनुवर्ती है।", reason: "the numbered heading of result 4 leads the paragraph printed under it, as English ¶5 does; it loaded as a row of its own"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 19, kind: split, address: "ch 2 §2.9 ¶6",
+     at: "किसी यादृच्छिक आकार, आकृति तथा आवेश विन्यास", reason: "English ¶6, the system of conductors, begins here, an indented paragraph at the top of p19 (layer y100, indented); it does not continue p18's result 4"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 24, kind: split, address: "ch 2 §2.12 ¶2",
+     at: "बाह्य क्षेत्र I (पट्टिका 1 के ऊपर का क्षेत्र)", reason: "English ¶2, outer region I and Eq. (2.39), begins here; the Hindi row runs the regions on after the lead-in"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 24, kind: split, address: "ch 2 §2.12 ¶3",
+     at: "बाह्य क्षेत्र II (पट्टिका 2 के नीचे का क्षेत्र)", reason: "English ¶3, outer region II and Eq. (2.40), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 25, kind: split, address: "ch 2 §2.12 ¶5",
+     at: "विद्युत क्षेत्र की दिशा धनावेशित पट्टिका से", reason: "English ¶5, the direction of the field, begins here at the top of p25; the row ran on from Eq. (2.41) on p24"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 26, kind: split, address: "ch 2 §2.13 ¶3",
+     at: "रैखिक परावैद्युतों के लिए, हम अपेक्षा करते हैं", reason: "English ¶3, linear dielectrics and Eqs. (2.49) and (2.50), begins here; the Hindi row keeps it with Eq. (2.48)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 28, kind: split, address: "ch 2 §2.14.2 ¶2",
+     at: "यदि इस संयोजन के तुल्य किसी संधारित्र पर", reason: "English ¶2, the equivalent capacitor and Eqs. (2.62) and (2.63), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 28, kind: split, address: "ch 2 §2.14.2 ¶3",
+     at: "तो समीकरण (2.63) से प्रभावी धारिता", reason: "English ¶3, the effective capacitance from Eq. (2.63), begins here; the Hindi fuses it into ¶2's 'if' sentence, so the split falls at the 'then' clause, not at a sentence start"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 29, kind: join, address: "ch 2 §2.14.2 ¶6",
+     at: "(a) दिए गए नेटवर्क में तीन संधारित्र", reason: "the label हल leads answer (a), as English ¶6 'Solution (a)' does; it loaded as a row of its own"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 30, kind: split, address: "ch 2 §2.15 ¶2",
+     at: "आवेश को 2 से 1 पर स्थानांतरित करने में", reason: "English ¶2, the work in transferring charge through Eq. (2.69), begins here at the top of p30; the row ran on from p29"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 30, kind: split, address: "ch 2 §2.15 ¶5",
+     at: "पृष्ठीय आवेश घनत्व sigma पट्टिकाओं के बीच", reason: "English ¶5, sigma related to E and Eqs. (2.71) and (2.72), begins here; the Hindi row keeps it with Eq. (2.70)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 31, kind: split, address: "ch 2 §2.15 ¶10",
+     at: "(a) संधारित्र पर आवेश Q = CV", reason: "English ¶10, answer (a), begins here; the English has the label Solution as ¶9, a row of its own, and the Hindi print sets हल on its own line (layer y467)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 31, kind: split, address: "ch 2 §2.15 ¶13",
+     at: "निकाय को स्थिति (b) तक व्यवस्थित होने में", reason: "English ¶13, the transient period, begins here; the Hindi row keeps it with the question where the energy has gone"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 4, kind: false_positive, address: "ch 2 §2.3 ¶2",
+     transcribed: "epsilon_o r′^2) r_hat′", printed: "r_hat′ ... epsilon_o r′^2 r_hat′", reason: "the page prints the display (2.5) as (Q × 1)/(4 pi epsilon_o r′^2) r_hat′ (crop p4 x44-295 y438-545 at zoom 4; the decoded layer's lines y484-511 agree); the row's ') r_hat′' closes the fraction in the transcriber's notation, and the r_hat′ the verifier puts first opens the next row, 'यहाँ r_hat′, OP′ के अनुदिश'"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 6, kind: false_positive, address: "ch 2 §2.4 ¶8",
+     transcribed: "P cos theta = p·r_hat", printed: "P cos theta = p_vec . r_hat", reason: "the page prints 'अब, P cos θ = p•r̂' with p in bold and no arrow over it (crop p6 x44-410 y655-735 at zoom 4; the decoded layer's line y715 carries the left side); by the transcription convention a bold vector keeps its plain symbol and _vec is only for a drawn arrow, so the row matches the page. The capital P itself is written as the meaning p by the text entry after this one."}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 11, kind: false_positive, address: "ch 2 §2.7 ¶1",
+     transcribed: "q_1q_2 / r_12", printed: "q_1q_2 / r_1P", reason: "the page prints the work on q_2 as (1/4 pi epsilon_o) q_1q_2 / r_12, the denominator subscripted 12 (crop p11 x160-340 y700-737 at zoom 5; the decoded layer's line y726 agrees), and the next row defines r_12; r_1P is the potential's denominator two lines up. The row matches the page"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 6, kind: text, address: "ch 2 §2.4 ¶2",
+     transcribed: "पहले की ही भाँति, हम", printed: "पहले की ही भांति, हम", reason: "the page prints an anusvara here, not a chandrabindu (crop p6 x58-258 y196-214 at zoom 8; the decoded layer's line y199 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 7, kind: text, address: "ch 2 §2.4 ¶10",
+     transcribed: "के पदों को नगण्य", printed: "के पदों की नगण्य", reason: "the page prints the postposition with the ii-matra (crop p7 x158-526 y173-207 at zoom 5; the decoded layer's line y175 agrees): the book's own grammar, kept as printed (DECISIONS 2026-10-03)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 14, kind: text, address: "ch 2 §2.8.1 ¶1",
+     transcribed: "विद्युत क्षेत्र के स्रोत का विशेष", printed: "विद्युत क्षेत्र के स्त्रोत का विशेष", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p14 x40-410 y410-682 at zoom 3; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y414 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 14, kind: text, address: "ch 2 §2.8.1 ¶2",
+     transcribed: "E उस स्रोत द्वारा", printed: "E उस स्त्रोत द्वारा", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p14 x40-410 y410-682 at zoom 3; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y540 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 14, kind: text, address: "ch 2 §2.8.1 ¶2",
+     transcribed: "बाह्य स्रोत ज्ञात हो सकता है परंतु प्रायः ये स्रोत अज्ञात", printed: "बाह्य स्त्रोत ज्ञात हो सकता है परंतु प्रायः ये स्त्रोत अज्ञात", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p14 x40-410 y410-682 at zoom 3; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y554 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 14, kind: text, address: "ch 2 §2.8.1 ¶2",
+     transcribed: "बाह्य स्रोतों के कारण", printed: "बाह्य स्त्रोतों के कारण", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p14 x40-410 y410-682 at zoom 3; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y568 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 14, kind: text, address: "ch 2 §2.8.1 ¶2",
+     transcribed: "वाले स्रोतों को सार्थक", printed: "वाले स्त्रोतों को सार्थक", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p14 x40-410 y410-682 at zoom 3; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y582 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 14, kind: text, address: "ch 2 §2.8.1 ¶2",
+     transcribed: "बाह्य स्रोतों को दृढ़", printed: "बाह्य स्त्रोतों को दृढ़", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p14 x40-410 y410-682 at zoom 3; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y610 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 14, kind: text, address: "ch 2 §2.8.1 ¶2",
+     transcribed: "इसके बाह्य स्रोतों पर", printed: "इसके बाह्य स्त्रोतों पर", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p14 x40-410 y410-682 at zoom 3; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y610 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 14, kind: text, address: "ch 2 §2.8.1 ¶2",
+     transcribed: "प्रबल स्रोत हमारी", printed: "प्रबल स्त्रोत हमारी", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p14 x40-410 y410-682 at zoom 3; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y624 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 14, kind: text, address: "ch 2 §2.8.1 ¶2",
+     transcribed: "वाले स्रोत की स्थितिज", printed: "वाले स्त्रोत की स्थितिज", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p14 x40-410 y410-682 at zoom 3; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y666 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 22, kind: text, address: "ch 2 §2.10 ¶7",
+     transcribed: "बाह्य क्षेत्र E_0 में रखा है", printed: "बाह्य क्षेत्र E_o में रखा है", reason: "the page sets the subscript as a letter o, not a zero (crop p22 x150-300 y668-690 at zoom 10; the decoded layer's line y682 agrees); a look-alike that still reads as E-nought stays as printed (DECISIONS 2026-10-12), as phy11-part1 ch 2 p5's v_o did"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 23, kind: text, address: "ch 2 §2.11 ¶2",
+     transcribed: "का प्रतीक [illegible] है।", printed: "का प्रतीक है।", reason: "the page draws the variable-capacitor symbol as a picture, two plates crossed by an arrow (crop p23 x268-525 y700-740 at zoom 6); it is no character and the text layer carries nothing there. The canonical English row leaves the same picture out, so the transcriber's marker is removed rather than replaced (founder, 2026-10-13)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 28, kind: text, address: "ch 2 §2.14.2 ¶5",
+     transcribed: "500 V के स्रोत से", printed: "500 V के स्त्रोत से", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p28 x60-260 y693-710 at zoom 6; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y695 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 6, kind: text, address: "ch 2 §2.4 ¶8",
+     transcribed: "अब, P cos theta", printed: "अब, p cos theta", reason: "the page prints an italic capital P before cos theta = p•r-hat (crop p6 x55-200 y712-732 at zoom 8; the decoded layer's line y715 agrees); the quantity is the dipole moment's magnitude p of Eq. (2.14) just above, while P in this chapter names the point P and the polarisation; the English row reads 'p cos theta = p.r_hat'; a letter that names another quantity, so by the founder's ruling of 2026-10-10 and the look-alike test (DECISIONS 2026-10-12) the row writes the meaning. The false_positive on the verifier's flag here stands: the row will still differ from the verifier's quote, which gives the bold p an arrow the page does not draw"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 17, kind: text, address: "ch 2 §2.8.3 ¶8",
+     transcribed: "10^(-29) cm का", printed: "10^(-29) C m का", reason: "the page prints the molecule's dipole moment as 10^-29 cm, a lower-case c and m set together (crop p17 x175-512 y370-390 at zoom 6; the decoded layer's line y374 agrees), which reads as centimetres, a length; the English row and this example's own solution two lines on give 10^-29 C m; a wrong unit, so by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 19, kind: text, address: "ch 2 §2.9 ¶11",
+     transcribed: "किसी ऐसे चालक के विषय में विचार कीजिए", printed: "स्थिरवैद्युत परिरक्षण किसी ऐसे चालक के विषय में विचार कीजिए", reason: "the page prints the heading '2.9.1 स्थिरवैद्युत परिरक्षण' directly above this paragraph (crop p19 x40-530 y520-575 at zoom 4, and x260-400 y530-550 at zoom 8; the decoded layer's line y533 agrees); the alignment's section entry files the paragraph under §2.9, where the English row opens with its run-in heading '6. Electrostatic shielding' and the Hindi rows for results 1 to 5 carry their headings; by the side-heading rule (2026-09-27) the heading's words lead the paragraph, without the Hindi section number, which the English address replaces"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 21, kind: text, address: "ch 2 §2.10 ¶1",
+     transcribed: "यथार्थ रूप में निरसित नहीं करता", printed: "यथार्थ रूप में निरक्षित नहीं करता", reason: "the page prints the verb as निरक्षित (crop p21 x262-525 y410-430 at zoom 6; the decoded layer's line y414 agrees), a misspelling of निरसित (cancel), which the same page prints rightly as निरसन six lines above (crop p21 x262-525 y318-338 at zoom 6); a non-word that names no other word or quantity, so the book's own spelling, kept as printed (DECISIONS 2026-10-03, 2026-10-10), as the block keeps प्रबर्धित and परिवद्ध; the transcription repaired it"}
+  # phy12-part1 Hindi, chapter 3
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 4, kind: join, address: "ch 3 §3.4 ¶5",
+     at: "समीकरण (3.5) और (3.7) के संयोजन से", reason: "Eqs. (3.8) and (3.9) and the resistivity rho are the end of English ¶5, which the row before it (halving the cross-section, Eq. 3.7) begins"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 6, kind: split, address: "ch 3 §3.5 ¶5",
+     at: "|v_d| के मान को समीकरण (3.17) से प्रतिस्थापित", reason: "English ¶5, substituting |v_d| from Eq. (3.17) to give Eq. (3.19), begins here, after the displayed Eq. (3.18); the Hindi row runs English ¶4 to ¶9 as one paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 6, kind: split, address: "ch 3 §3.5 ¶6",
+     at: "परिभाषानुसार, धारा घनत्व के परिमाण |j| से", reason: "English ¶6, I = |j|A (Eq. 3.20), begins here, after the displayed Eq. (3.19)"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 6, kind: split, address: "ch 3 §3.5 ¶7",
+     at: "अतः समीकरण (3.19) तथा (3.20) से,", reason: "English ¶7, Eq. (3.21) from Eqs. (3.19) and (3.20), begins here, after the displayed Eq. (3.20)"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 6, kind: split, address: "ch 3 §3.5 ¶8",
+     at: "सदिश j, E के समांतर है, इसलिए", reason: "English ¶8, the vector form j = (ne^2/m) tau E (Eq. 3.22), begins here, after the displayed Eq. (3.21)"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 6, kind: split, address: "ch 3 §3.5 ¶9",
+     at: "अगर हम चालकता sigma का तादात्म्य", reason: "English ¶9, the comparison with Eq. (3.13) that identifies the conductivity sigma (Eq. 3.23), begins here at the foot of p6 (the decoded layer's line y688), after the displayed Eq. (3.22); the Hindi sentence opens with its if-clause"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 7, kind: join, address: "ch 3 §3.5 ¶9",
+     at: "इस प्रकार हम देखते हैं कि विद्युत चालकता", reason: "'We thus see' that the simple picture reproduces Ohm's law, the assumptions on tau and n and the next-section remark, are the end of English ¶9, which begins at the foot of p6"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 7, kind: split, address: "ch 3 §3.5 ¶12",
+     at: "(a) चालक इलेक्ट्रॉन के अपवाह वेग की दिशा", reason: "English ¶12, part (a) of the solution to Example 3.1, begins here; English ¶11 is the word Solution alone, so the Hindi हल stays as its own row"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 8, kind: split, address: "ch 3 §3.5 ¶17",
+     at: "(a) उदाहरण 3.1 में कुछ ऐम्पियर", reason: "English ¶17, question (a) of Example 3.2, begins here; English ¶16 is the label Example 3.2 alone, so the Hindi उदाहरण 3.2 stays as its own row"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 8, kind: split, address: "ch 3 §3.5 ¶18",
+     at: "(b) किसी चालक के अंदर इलेक्ट्रॉन अपवाह", reason: "English ¶18, question (b) of Example 3.2 (why a steady drift speed), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 8, kind: split, address: "ch 3 §3.5 ¶19",
+     at: "(c) यदि इलेक्ट्रॉन का अपवाह वेग", reason: "English ¶19, question (c) of Example 3.2 (large currents from a small drift speed), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 8, kind: split, address: "ch 3 §3.5 ¶20",
+     at: "(d) जब किसी धातु में इलेक्ट्रॉन", reason: "English ¶20, question (d) of Example 3.2 (do all free electrons move one way), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 8, kind: split, address: "ch 3 §3.5 ¶21",
+     at: "(e) क्या उत्तरोत्तर संघट्टों", reason: "English ¶21, question (e) of Example 3.2 (straight paths between collisions), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 8, kind: split, address: "ch 3 §3.5 ¶23",
+     at: "(a) पूर्ण परिपथ में विद्युत क्षेत्र", reason: "English ¶23, answer (a) of Example 3.2, begins here; English ¶22 is the word Solution alone, so the Hindi हल stays as its own row"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 8, kind: split, address: "ch 3 §3.5 ¶25",
+     at: "(c) सरल है, क्योंकि चालक", reason: "English ¶25, answer (c) (the electron number density ~10^29 m^-3), begins here; the Hindi row runs answers (b) to (e) as one paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 8, kind: split, address: "ch 3 §3.5 ¶26",
+     at: "(d) किसी प्रकार नहीं।", reason: "English ¶26, answer (d) (By no means), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 8, kind: split, address: "ch 3 §3.5 ¶27",
+     at: "(e) विद्युत क्षेत्र की अनुपस्थिति में पथ", reason: "English ¶27, answer (e) (straight paths without a field, curved with one), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 8, kind: split, address: "ch 3 §3.5.1 ¶3",
+     at: "गतिशीलता का SI मात्रक m^2/Vs है", reason: "English ¶3, the SI unit of mobility and Eq. (3.25), begins here, after the displayed Eq. (3.24)"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 9, kind: split, address: "ch 3 §3.6 ¶2",
+     at: "(a) V की I से आनुपातिकता", reason: "English ¶2, deviation (a), begins here, on a line of its own (the decoded layer's line y306); the transcription ran it on in ¶1's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 10, kind: join, address: "ch 3 §3.8 ¶6",
+     at: "किसी पदार्थ की प्रतिरोधकता प्रति एकांक आयतन", reason: "rho's inverse dependence on n and tau, and tau falling as the temperature rises, are the end of English ¶6, which the row before it (Eq. 3.27) begins"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 11, kind: split, address: "ch 3 §3.8 ¶7",
+     at: "धातुओं में n की ताप निर्भरता", reason: "English ¶7, n in a metal hardly depending on temperature, begins here at the top of p11; it does not continue ¶6 from p10"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 11, kind: split, address: "ch 3 §3.8 ¶11",
+     at: "संबंध R_2 = R_1 [1 + alpha (T_2 – T_1)] का उपयोग", reason: "English ¶11, using R_2 = R_1[1 + alpha(T_2 – T_1)] to get T_2 = 847 °C, begins here, after the displayed R_2 = 85.8 Ω; the Hindi row runs Example 3.3's solution as one paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 11, kind: split, address: "ch 3 §3.8 ¶12",
+     at: "इस प्रकार, तापन अवयव का ताप", reason: "English ¶12, the steady temperature of the heating element (847 °C), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 15, kind: join, address: "ch 3 §3.10 ¶7",
+     at: "समीकरण (3.38) तथा (3.39) को संयोजित करने पर", reason: "combining Eqs. (3.38) and (3.39) into Eq. (3.40), at the top of p15, is the end of English ¶7, which the row on p14 (V = IR, Eq. 3.39) begins"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 16, kind: join, address: "ch 3 §3.11 ¶6",
+     at: "और हमें प्राप्त होता है", reason: "epsilon_eq = epsilon_1 – epsilon_2 (Eq. 3.47) is the end of English ¶6, the two negative terminals joined; the Hindi row was cut at the displayed V_BC"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 16, kind: split, address: "ch 3 §3.11 ¶8",
+     at: "(i) n सेलों के श्रेणी संयोजन का", reason: "English ¶8, rule (i) (the equivalent emf of n cells in series), begins here; English ¶7 is the lead-in sentence alone"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 16, kind: split, address: "ch 3 §3.11 ¶9",
+     at: "(ii) n सेल के श्रेणी संयोजन का", reason: "English ¶9, rule (ii) (the equivalent internal resistance of n cells in series), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 16, kind: join, address: "ch 3 §3.11 ¶11",
+     at: "चूँकि उतने ही आवेश अन्दर प्रवाहित होते हैं", reason: "as much charge flowing in as out, and I = I_1 + I_2 (Eq. 3.48), are the end of English ¶11, the parallel combination, which the row before it begins"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 18, kind: join, address: "ch 3 §3.12 ¶3",
+     at: "(a) संधि नियम–किसी संधि पर", reason: "step 1 of 3: p18 prints the sentence of English ¶3 twice, as two identical paragraphs (crop p18 x260-530 y170-240; the decoded layer's lines y178 and y208), so neither can be named by its first words; the junction rule joins the second copy for a moment so that the next entry can name it"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 18, kind: join, address: "ch 3 §3.12 ¶3",
+     at: "चिह्नों को बनाने कि प्रक्रिया को स्पष्ट करने के बाद अब हम नियमों तथा उपपत्तियों को अभिव्यक्त करेंगे : (a) संधि नियम", reason: "step 2 of 3: the print's second copy of English ¶3's sentence has no English of its own; it is kept, joined to the first copy it follows"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 18, kind: split, address: "ch 3 §3.12 ¶4",
+     at: "(a) संधि नियम–किसी संधि पर", reason: "step 3 of 3: English ¶4, the junction rule (a), begins here again, as printed"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 18, kind: unprinted, address: "ch 3 §3.12 ¶5",
+     at: "इस नियम का प्रमाण इस तथ्य से", reason: "the Hindi edition does not print English ¶5 ('This applies equally well if instead of a junction of several lines, we consider a point in a line'): rule (a) runs straight into the paragraph on its proof, English ¶6 (crop p18 x265-525 y240-358 at zoom 2.2; p17 and p18 read for the sentence elsewhere); by the founder's ruling of 2026-10-13 ¶5 keeps its English with no Hindi beside it and this row takes ¶6"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 20, kind: join, address: "ch 3 §3.12 ¶15",
+     at: "बंद पाश ADCA में किरखोफ के द्वितीय नियम", reason: "the loop equations 3.61(a)–(c) and the branch currents are the middle of English ¶15, Example 3.6's solution, which the row before it begins"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 20, kind: join, address: "ch 3 §3.12 ¶15",
+     at: "यह आसानी से सत्यापित किया जा सकता है", reason: "the check on the remaining loops (BADEB) is the end of English ¶15, Example 3.6's solution"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 2, kind: text, address: "ch 3 §3.3 ¶1",
+     transcribed: "तथा धनावेशित इलेक्ट्रॉन एक-दूसरे", printed: "तथा धनावेशित नाभिक एक-दूसरे", reason: "the page prints 'ऋणावेशित इलेक्ट्रॉन तथा धनावेशित इलेक्ट्रॉन एक-दूसरे' — positively charged electrons (crop p2 x160-525 y436-456 at zoom 5; the decoded layer's line y440 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row's 'the negatively charged electrons and the positively charged nuclei are bound to each other', nuclei written नाभिक as the same paragraph writes it ('व्यष्टिगत नाभिक')"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 2, kind: misprint, address: "ch 3 §3.3 ¶1",
+     transcribed: "धनावेशित इलेक्ट्रॉन एक-दूसरे", printed: "धनावेशित आयन एक-दूसरे", reason: "the verifier is right that the row reads wrongly, but the page prints इलेक्ट्रॉन there, not आयन (crop p2 x160-525 y436-456 at zoom 5; the decoded layer's line y440 agrees); the text entry for this paragraph writes the meaning by the founder's ruling of 2026-10-10, नाभिक from the English row's 'nuclei', so the row will still differ from the verifier's quote"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 12, kind: false_positive, address: "ch 3 §3.9 ¶2",
+     transcribed: "Delta U_pot है Delta U_pot = अंतिम स्थितिज ऊर्जा – प्रारंभिक स्थितिज ऊर्जा", printed: "Delta U_pot है", reason: "the page prints the sentence ending 'यह परिवर्तन Delta U_pot है' and then the display 'Delta U_pot = अंतिम स्थितिज ऊर्जा – प्रारंभिक स्थितिज ऊर्जा' (crop p12 x160-525 y398-455 at zoom 4; the decoded layer's lines y402 and y420 agree); the row carries both, the verifier quoted the first line alone"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 17, kind: misprint, address: "ch 3 §3.11 ¶19",
+     transcribed: "हमने दोनों टर्मिनलों को", printed: "हमने दोनों धन टर्मिनलों को", reason: "the page prints 'चित्र (3.14) में हमने दोनों टर्मिनलों को एक साथ तथा इसी प्रकार दोनों ऋण टर्मिनलों को' without धन (crop p17 x44-330 y293-342 at zoom 4; the decoded layer's line y296 agrees); the Hindi leaves out the word the English row has ('joined the positive terminals together'), and its own 'similarly both negative ones' makes the first pair the positive terminals, so the row carries the print"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 7, kind: text, address: "ch 3 §3.5 ¶9",
+     transcribed: "तथ्यत: ओम", printed: "तथ्यतः ओम", reason: "Visarga: an adverb in -tah (in fact), printed with the visarga glyph that this font shares with the colon. Crop p7 x44-408 y97-117 at zoom 4; the decoded layer's line y101 agrees"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 18, kind: text, address: "ch 3 §3.12 ¶9",
+     transcribed: "विकर्णत: सम्मुख", printed: "विकर्णतः सम्मुख", reason: "Visarga: an adverb in -tah (diagonally), printed with the visarga glyph that this font shares with the colon. Crop p18 x172-505 y458-477 at zoom 4; the decoded layer's line y462 agrees"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 10, kind: text, address: "ch 3 §3.8 ¶6",
+     transcribed: "धारा वहन करने वाले", printed: "धारा वहने करने वाले", reason: "the page prints an e-matra on the word (crop p10 x380-525 y684-702 at zoom 10; the decoded layer's line y686 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 13, kind: text, address: "ch 3 §3.9 ¶7",
+     transcribed: "यही स्रोत है जिसे", printed: "यही स्त्रोत है जिसे", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p13 x44-302 y213-232 at zoom 8, the second of the line's two forms; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y216 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 14, kind: text, address: "ch 3 §3.10 ¶5",
+     transcribed: "विभवांतर के लिए व्यंजक (I r)", printed: "विभवांतर के लिए व्यजंक (I r)", reason: "the page sets the anusvara over the third consonant, not the second (crop p14 x318-370 y603-620 at zoom 14; the decoded layer's line y605 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 17, kind: text, address: "ch 3 §3.12 ¶2",
+     transcribed: "कोई दूसरा स्रोत) के लिए", printed: "कोई दूसरा स्त्रोत) के लिए", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p17 x44-300 y681-713 at zoom 6, the second line; the first line's form is sa-ra; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y698 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 22, kind: text, address: "ch 3 §3.13 ¶7",
+     transcribed: "I_2 = n = (6.0 × 10^23 / 63.5) × 9.0 × 10^6 I_g = 31.5I_g", printed: "I_2 = 31.5I_g", reason: "the page prints [3.65(e)] with a stray fragment, I_2 = n = (6.0 × 10^23 / 63.5) × 9.0 × 10^6 I_g = 31.5 I_g (crop p22 x168-512 y365-450 at zoom 4; the layer's lines y403-427 agree), equating I_2 to about 8.5 × 10^28 I_g; the English row and the arithmetic of 63 I_g − 2 I_2 = 0 give I_2 = 31.5 I_g; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 22, kind: text, address: "ch 3 §3.13 ¶7",
+     transcribed: "10 (I − I_g)", printed: "10 (I_1 − I_g)", reason: "the page prints the mesh BCDB equation as 10 (I − I_g) − 15 I_g − 5 (I_2 + I_g) = 0 with no subscript on the first I (crop p22 x165-450 y210-245 at zoom 6; the decoded layer's line y224 agrees), while the very next line expands it as 10 I_1 − 30 I_g − 5 I_2 = 0; the arithmetic and the English row's 10 (I_1 – I_g) give I_1; a dropped subscript, so by the founder's ruling of 2026-10-10 the row writes the meaning. The meaning entry before it in this row, on the [3.65(e)] fragment, does not reach this span"}
+  # phy12-part1 Hindi, chapter 4
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 3, kind: split, address: "ch 4 §4.2.2 ¶3",
+     at: "(i) यह q, v तथा B", reason: "English ¶3, item (i) (the force depends on q, v and B), begins here; the Hindi print runs it on at the end of ¶2's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 5, kind: split, address: "ch 4 §4.2.3 ¶3",
+     at: "अधिकांश प्रकरणों में संकलन को समाकलन", reason: "English ¶3, the summation converted to an integral, begins here after the displayed sum; the Hindi print keeps it in ¶2's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 7, kind: join, address: "ch 4 §4.3 ¶4",
+     at: "कोणीय आवृत्ति omega वेग अथवा ऊर्जा", reason: "omega's independence of velocity or energy and the cyclotron remark, at the top of p7, are the end of English ¶4, which the row on p6 begins and which runs through Eq. [4.6(a)]"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 10, kind: join, address: "ch 4 §4.5 ¶5",
+     at: "चित्र 4.9 के लिए cos theta", reason: "cos theta for Fig. 4.9, Eq. (4.10), is the end of English ¶5; the Hindi print sets it as a new paragraph after the integration sentence"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 10, kind: split, address: "ch 4 §4.5 ¶6",
+     at: "समीकरणों (4.9) और (4.10), dB_x", reason: "English ¶6, dB_x from Eqs. (4.9) and (4.10), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 10, kind: split, address: "ch 4 §4.5 ¶7",
+     at: "समस्त पाश पर dl अवयवों का संकलन", reason: "English ¶7, the summation of dl over the loop (2πR) and Eq. (4.11), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 10, kind: join, address: "ch 4 §4.5 ¶7",
+     at: "उपरोक्त परिणाम की एक विशेष स्थिति", reason: "the special case at the centre of the loop, Eq. (4.12), is the end of English ¶7; the Hindi print starts a new paragraph at it"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 13, kind: join, address: "ch 4 §4.6 ¶9",
+     at: "तार को अपने दाएँ हाथ में इस प्रकार", reason: "the rule itself (grasp the wire in the right hand, fingers curl with the field) is the end of English ¶9, item (iv), which runs on after 'This rule ... is:'; the Hindi print sets it as its own paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 13, kind: defer, address: "ch 4 §4.6 ¶12",
+     at: "* कृपया ध्यान दीजिए", reason: "the footnote on the two right-hand rules is English ¶12, numbered after Example 4.7's statement (¶11); the Hindi prints it at the foot of p13, before the example, which opens p14"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 15, kind: split, address: "ch 4 §4.6 ¶16",
+     at: "इस उदाहरण में आवश्यक सममिति विद्यमान है", reason: "English ¶16, the example possessing the symmetry Ampere's law needs, begins here; the Hindi print keeps it in ¶15's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 18, kind: split, address: "ch 4 §4.8 ¶7",
+     at: "समांतर धाराएँ आकर्षित तथा प्रतिसमांतर धाराएँ", reason: "English ¶7, the rule 'Parallel currents attract, and antiparallel currents repel', begins here; the English ends ¶6 on 'Thus,' inside the sentence, so the split leaves 'इस प्रकार' with ¶6"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 19, kind: split, address: "ch 4 §4.8 ¶19",
+     at: "यह ऐम्पियर की परिभाषा में वर्णित बल", reason: "English ¶19, the force being larger than the 2×10^-7 N m^-1 of the ampere's definition, begins here; the Hindi row ran Example 4.9's part (a) as one paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 19, kind: split, address: "ch 4 §4.8 ¶20",
+     at: "बल की दिशा अधोमुखी है।", reason: "English ¶20, the direction of the force being downwards, begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 18, kind: move, address: "ch 4 §4.8 ¶11",
+     at: "* इससे यह अर्थ निकलता है", after: "उपरोक्त व्यंजक का उपयोग विद्युत धारा", after_page: 18, reason: "the footnote on Newton's third law, printed at the foot of p18 after Example 4.9's first solution line, is English ¶11 and goes back after ¶10, the ampere defined from Eq. (4.19)"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 23, kind: split, address: "ch 4 §4.9.2 ¶2",
+     at: "ध्यान दीजिए, पाश का क्षेत्रफल A = pi R^2", reason: "English ¶2, the loop's area A = πR² and B in terms of A, begins here; the Hindi row runs ¶1 to ¶3 as one paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 23, kind: split, address: "ch 4 §4.9.2 ¶3",
+     at: "जैसा कि पहले हमने चुंबकीय आघूर्ण m", reason: "English ¶3, the magnetic moment m = IA and Eq. [4.25(a)], begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 25, kind: split, address: "ch 4 §4.10 ¶3",
+     at: "कोष्ठक की राशि का मान किसी दिए गए", reason: "English ¶3, the bracketed quantity being a constant for a given galvanometer, begins here after Eq. (4.26); the Hindi row runs ¶2 to ¶4 as one paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 25, kind: split, address: "ch 4 §4.10 ¶4",
+     at: "गैल्वेनोमीटर का उपयोग कई प्रकार से", reason: "English ¶4, the galvanometer used as a detector, begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 26, kind: split, address: "ch 4 §4.10 ¶14",
+     at: "(b) ऐमीटर में रूपांतरित गैल्वेनोमीटर", reason: "English ¶14, part (b) of Example 4.12's solution (the shunted galvanometer), begins here; the Hindi row runs the solution as one paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 26, kind: split, address: "ch 4 §4.10 ¶15",
+     at: "(c) शून्य प्रतिरोध के आदर्श ऐमीटर", reason: "English ¶15, part (c) (the ideal ammeter, I = 1.00 A), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 2, kind: false_positive, address: "ch 4 §4.2.1 ¶1",
+     transcribed: "E = Q r_hat / (4 pi epsilon_0)r^2", printed: "E = Q r̂ / (4 pi epsilon_0)r^2", reason: "the page prints E = Q r-hat / (4 pi epsilon_0) r^2 (4.1) (crop p2 x240-525 y655-695 at zoom 4; the decoded layer's line y680 agrees); r_hat is the transcriber's spelling of the hatted r, so the spans differ only in notation"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 9, kind: false_positive, address: "ch 4 §4.5 ¶3",
+     transcribed: "dB = (mu_0 / 4pi) I|dl × r| / r^3 (4.8)", printed: "dB = (mu_0 / 4pi) I|dl × r| / r^3", reason: "the page prints the display with its number (4.8) at the right margin (crop p9 x44-400 y705-740 at zoom 4; the decoded layer's line y720 has the number); the row keeps an equation number at the end of its equation by the transcription convention, so it matches the page"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 26, kind: text, address: "ch 4 §4.10 ¶14",
+     transcribed: "(60 + 0.02) Ω - 0.02 Ω", printed: "(60 + 0.02) Ω ≃ 0.02 Ω", reason: "the page sets a short text hyphen between the fraction and its value, R_G r_s/(R_G + r_s) = 60 Ω × 0.02Ω/(60 + 0.02)Ω - 0.02Ω (crop p26 x170-410 y610-662 at zoom 5 and x290-340 y636-656 at zoom 12; the decoded layer's line y641 agrees), which reads as subtracting 0.02 Ω; by the founder's ruling of 2026-10-10 the row writes the meaning: the English row's 60 Ω × 0.02Ω / (60 + 0.02)Ω ≃ 0.02Ω, the shunted galvanometer's resistance that the next line adds to 3 Ω"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 26, kind: false_positive, address: "ch 4 §4.10 ¶14",
+     transcribed: "60 + 0.02) Ω - 0.02 Ω", printed: "0.02)Ω - 0.02 Ω", reason: "the page prints the denominator as (60 + 0.02)Ω (crop p26 x170-410 y610-662 at zoom 5; the decoded layer's line y648 agrees), so the row's '60 +' is on the page and the verifier's printed span stops short of it; the hyphen both spans carry is written ≃ by the text entry for this paragraph (the founder's ruling of 2026-10-10), so the row will still differ from the verifier's quote"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 1, kind: text, address: "ch 4 §4.1 ¶1",
+     transcribed: "केंद्रत: वृत्त", printed: "केंद्रतः वृत्त", reason: "Visarga: the word is an adverb in -tah (centred on the wire's position) in the middle of a clause, where a colon cannot stand; printed with the visarga glyph that this font shares with the colon. Crop p1 x44-408 y538-557 at zoom 4; the decoded layer's line y541 agrees"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 13, kind: text, address: "ch 4 §4.6 ¶10",
+     transcribed: "जैसे अन्त: क्षेत्र", printed: "जैसे अन्तः क्षेत्र", reason: "Visarga: antah (inner), the word the load already restores as अन्तः on p16, printed with the visarga glyph that this font shares with the colon. Crop p13 x44-326 y591-611 at zoom 4; the decoded layer's line y595 agrees"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 17, kind: text, address: "ch 4 §4.8 ¶3",
+     transcribed: "पार्श्वत: एक", printed: "पार्श्वतः एक", reason: "Visarga: an adverb in -tah (sideways), printed with the visarga glyph that this font shares with the colon. Crop p17 x280-408 y505-524 at zoom 5; the decoded layer's line y508 agrees"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 1, kind: text, address: "ch 4 §4.1 ¶1",
+     transcribed: "समांतर सरेखित होती है", printed: "समांतर संरेखित होती है", reason: "the page prints an anusvara on the first syllable, set just before the e-matra (crop p1 x42-120 y553-570 at zoom 10; the decoded layer's line y556 agrees); the transcription dropped it"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 1, kind: text, address: "ch 4 §4.1 ¶1",
+     transcribed: "विपरीत दिशा में सरेखित हो जाती", printed: "विपरीत दिशा में संरेखित हो जाती", reason: "the page prints an anusvara on the first syllable, set just before the e-matra (crop p1 x200-330 y598-615 at zoom 6; the decoded layer's line y601 agrees); the transcription dropped it"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 2, kind: text, address: "ch 4 §4.1 ¶2",
+     transcribed: "उत्पन्न, प्रवर्धित, प्रेषित", printed: "उत्पन्न, प्रबर्धित, प्रेषित", reason: "the page prints ba, not va, after the first conjunct (crop p2 x160-420 y129-146 at zoom 7; the decoded layer's line y131 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 12, kind: text, address: "ch 4 §4.6 ¶3",
+     transcribed: "पाश में परिविद्ध विद्युत धारा", printed: "पाश में परिवद्ध विद्युत धारा", reason: "the page prints no i-matra on the third consonant (crop p12 x159-275 y540-557 at zoom 9; the decoded layer's line y542 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the row's form is a misreading"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 20, kind: text, address: "ch 4 §4.9.1 ¶7",
+     transcribed: "अनुदिश सरेखित होने", printed: "अनुदिश संरेखित होने", reason: "the page prints an anusvara on the first syllable, set just before the e-matra (crop p20 x274-380 y260-277 at zoom 6; the decoded layer's line y262 agrees); the transcription dropped it"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 20, kind: text, address: "ch 4 §4.9.1 ¶8",
+     transcribed: "ये सरेख नहीं हैं", printed: "ये संरेख नहीं हैं", reason: "the page prints an anusvara on the first syllable, set just before the e-matra (crop p20 x292-400 y337-354 at zoom 6; the decoded layer's line y339 agrees); the transcription dropped it"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 20, kind: text, address: "ch 4 §4.9.1 ¶9",
+     transcribed: "बल सरेख बन जाते", printed: "बल संरेख बन जाते", reason: "the page prints an anusvara on the first syllable, set just before the e-matra (crop p20 x159-320 y536-553 at zoom 6; the decoded layer's line y538 agrees); the transcription dropped it"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 21, kind: text, address: "ch 4 §4.9.1 ¶11",
+     transcribed: "स्वयं को सरेखित कर लेता", printed: "स्वयं को संरेखित कर लेता", reason: "the page prints an anusvara on the first syllable, set just before the e-matra (crop p21 x40-400 y238-382 at zoom 3; the decoded layer's line y241 agrees); the transcription dropped it"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 21, kind: text, address: "ch 4 §4.9.1 ¶14",
+     transcribed: "व्यास से सरेखित है", printed: "व्यास से संरेखित है", reason: "the page prints an anusvara on the first syllable, set just before the e-matra (crop p21 x40-400 y238-382 at zoom 3; the decoded layer's line y367 agrees); the transcription dropped it"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 9, kind: text, address: "ch 4 §4.5 ¶2",
+     transcribed: "x y तल में स्थित", printed: "y z तल में स्थित", reason: "the page prints the loop as lying in the x y plane (crop p9 x40-410 y590-615 at zoom 5; the decoded layer's line y598 agrees), while the next sentence makes the x-axis the loop's axis and Fig. 4.9 beside it draws the loop in the Y-Z plane (crop p9 x320-530 y380-720 at zoom 2); a loop in the x-y plane cannot have the x-axis as its axis; the English row reads 'placed in the y-z plane'; by the founder's ruling of 2026-10-10 the row writes the meaning, in the print's own form of the plane's name"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 21, kind: text, address: "ch 4 §4.9.1 ¶10",
+     transcribed: "चुंबकीय क्षेत्र की विमाएँ", printed: "चुंबकीय आघूर्ण की विमाएँ", reason: "the page prints 'as is clear from Eq. (4.22), the dimensions of the magnetic field are [AL^2] and its unit is Am^2' (crop p21 x40-410 y95-130 at zoom 5; the decoded layer's line y100 agrees); Eq. (4.22) defines the magnetic moment m = I A, whose dimensions and unit these are, while the magnetic field's unit is the tesla; the English row reads 'the dimensions of the magnetic moment'; by the founder's ruling of 2026-10-10 the row writes the meaning, in this section's own word for the moment"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 22, kind: text, address: "ch 4 §4.9.1 ¶18",
+     transcribed: "से 𝒥 dω/dt", printed: "से I dω/dt", reason: "the page prints the moment of inertia as a script capital I that sits on the baseline with no descender, as a script I does and a script J does not (crop p22 x193-300 y128-160 at zoom 14; the layer's glyph at y146 agrees, by position); the row's script J names another letter; the rows carry no type style, bold or script, so by the founder's ruling of 2026-10-13 the row writes the moment of inertia as a plain I, as the English row does"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 22, kind: text, address: "ch 4 §4.9.1 ¶18",
+     transcribed: "= m sin theta", printed: "= m B sin theta", reason: "the page prints Newton's second law for the coil as I dω/dt = m sin θ, without B (crop p22 x175-430 y105-355 at zoom 4; the decoded layer's line y137 agrees), a torque without the field; Eq. (4.23) above, the next lines of this solution (m B sin θ dθ) and the English row (mB sin theta) give m B sin θ; a dropped symbol that changes the physics, so by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 22, kind: text, address: "ch 4 §4.9.1 ¶18",
+     transcribed: "𝒥 कुंडली", printed: "I कुंडली", reason: "the page prints the moment of inertia as a script capital I on the baseline, no descender (crop p22 x193-260 y155-172 at zoom 14; the layer's glyph at y170 agrees, by position); the row's script J names another letter; the rows carry no type style, bold or script, so by the founder's ruling of 2026-10-13 the row writes the moment of inertia as a plain I, as the English row does"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 22, kind: text, address: "ch 4 §4.9.1 ¶18",
+     transcribed: "(dω/dt) ω", printed: "(dω/d theta) ω", reason: "the page prints the chain rule as dω/dt = (dω/dθ)(dθ/dt) = (dω/dt) ω, the last fraction over dt (crop p22 x195-305 y172-206 at zoom 10; the decoded layer's denominators at y193 agree), which makes ω equal to 1; the English row's (dω/dtheta) ω and the next line's ω dω = m B sin θ dθ give dω/dθ; by the founder's ruling of 2026-10-10 the row writes the meaning, in the row's own spelling of the fraction before it"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 22, kind: text, address: "ch 4 §4.9.1 ¶18",
+     transcribed: "पर, 𝒥 ω dω", printed: "पर, I ω dω", reason: "the page prints the moment of inertia as a script capital I on the baseline, no descender (crop p22 x175-430 y105-355 at zoom 4; the layer's glyph at y235 agrees, by position); the row's script J names another letter; the rows carry no type style, bold or script, so by the founder's ruling of 2026-10-13 the row writes the moment of inertia as a plain I, as the English row does"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 22, kind: text, address: "ch 4 §4.9.1 ¶18",
+     transcribed: "पर, 𝒥 integral", printed: "पर, I integral", reason: "the page prints the moment of inertia before the integral as a script capital I on the baseline, no descender, the same shape as the four the layer places on this page (crop p22 x193-300 y255-290 at zoom 10; the text layer carries no glyph on this line); the row's script J names another letter; the rows carry no type style, bold or script, so by the founder's ruling of 2026-10-13 the row writes the moment of inertia as a plain I, as the English row does"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 22, kind: text, address: "ch 4 §4.9.1 ¶18",
+     transcribed: "d theta 𝒥 ω_f^2", printed: "d theta I ω_f^2", reason: "the page prints the moment of inertia as a script capital I on the baseline, no descender (crop p22 x175-430 y105-355 at zoom 4; the layer's glyph at y310 agrees, by position); the row's script J names another letter; the rows carry no type style, bold or script, so by the founder's ruling of 2026-10-13 the row writes the moment of inertia as a plain I, as the English row does"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 22, kind: text, address: "ch 4 §4.9.1 ¶18",
+     transcribed: "/ 𝒥)^(1/2)", printed: "/ I)^(1/2)", reason: "the page prints the moment of inertia in the denominator as a script capital I, no descender, the same shape as the four the layer places on this page (crop p22 x193-300 y322-358 at zoom 10; the text layer carries no glyph for this fraction); the row's script J names another letter; the rows carry no type style, bold or script, so by the founder's ruling of 2026-10-13 the row writes the moment of inertia as a plain I, as the English row does"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 23, kind: text, address: "ch 4 §4.9.2 ¶3",
+     transcribed: "B mu_0 m / (2 pi x^3)", printed: "B ≃ mu_0 m / (2 pi x^3)", reason: "the page draws no relation sign between B and the fraction of [4.25(a)], a blank where the second line has its = (crop p23 x55-410 y340-418 at zoom 5; the layer has a symbol-font glyph at that gap that the raster does not draw); the English row reads B ≃ mu_0 m / (2 pi x^3), the approximation for x >> R; a relation sign not drawn, so by the founder's ruling of 2026-10-10, confirmed for this place on 2026-10-13, the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 25, kind: text, address: "ch 4 §4.10 ¶8",
+     transcribed: "R_G + R R :", printed: "R_G + R ≃ R :", reason: "the page draws no relation sign between R_G + R and R, a blank (crop p25 x55-260 y668-694 at zoom 8; the layer has a symbol-font glyph at that gap that the raster does not draw); the English row reads R_G + R ≃ R : large, the voltmeter's resistance; a relation sign not drawn, so by the founder's ruling of 2026-10-10, confirmed for this place on 2026-10-13, the row writes the meaning, as the entry for the same sign in §4.10 on p26 does"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 8, kind: text, address: "ch 4 §4.4 ¶11",
+     transcribed: "4pi 10^(-7)", printed: "4pi × 10^(-7)", reason: "the page draws a gap between 4π and 10⁻⁷ (crop p8 x150-262 y636-660 at zoom 8); the text layer has a Bookman Unicode span in that gap, which the raster does not draw; by the founder's ruling of 2026-10-13, as for phy11-part1's four × (DECISIONS 2026-10-03), the row writes the English row's sign, 4 pi × 10^(-7), in the gap the page leaves"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 12, kind: text, address: "ch 4 §4.6 ¶1",
+     transcribed: "integral B dl = mu_0 I [4.13(a)]", printed: "integral(closed) B·dl = mu_0 I [4.13(a)]", reason: "the page draws a plain integral sign and a space between B and dl in Eq. [4.13(a)] (crop p12 x178-245 y300-324 at zoom 14; wider, x180-525 y295-325 at zoom 5); the loop's circle and the dot are only text-layer glyphs there, which the raster does not draw. Three lines lower the same page draws the loop integral with both (crop p12 x440-525 y358-376 at zoom 14), and the English row reads integral(closed) B·dl = mu_0 I [4.13(a)]; by the founder's ruling of 2026-10-13 the row writes the equation as the English row has it"}
+  # phy12-part1 Hindi, chapter 5
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 1, kind: split, address: "ch 5 §5.1 ¶4",
+     at: "चुंबकत्व संबंधी कुछ आम विचार", reason: "English ¶4, the commonly known ideas and item (i), the earth as a magnet, begins here; the Hindi print keeps it in ¶3's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 2, kind: move, address: "ch 5 §5.2.1 ¶3",
+     at: "* कुछ पाठ्यपुस्तकों में चुंबकीय", after: "(i) किसी चुंबक (या धारावाही परिनालिका)", after_page: 2, reason: "the footnote on magnetic lines of force, printed at the foot of p2 after items (ii) and (iii), is English §5.2.1 ¶3 and goes back after ¶2, item (i)"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 4, kind: join, address: "ch 5 §5.2.3 ¶2",
+     at: "यहाँ tau प्रत्यानयन आघूर्ण है", reason: "'here tau is the restoring torque' is the end of English ¶2, which holds Eq. (5.2) and its magnitude tau = mB sin theta"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 5, kind: join, address: "ch 5 §5.2.3 ¶7",
+     at: "(c) क्या प्रत्येक चुंबकीय विन्यास", reason: "Example 5.1's question (c), at the top of p5, is the end of English ¶7, which holds questions (b) and (c); it joins (b) at the foot of p4"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 5, kind: split, address: "ch 5 §5.2.4 ¶2",
+     at: "इसी प्रकार, r दूरी (r >> l के लिए) पर", reason: "English ¶2, 'Likewise' and the axial field B_A of Eq. (5.5), begins here; the Hindi row runs it on after Eq. (5.4)"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 6, kind: split, address: "ch 5 §5.2.4 ¶5",
+     at: "(a) किस विन्यास में यह निकाय", reason: "English ¶5, Example 5.2's question (a), begins here; the Hindi row runs the questions on after the statement"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 6, kind: split, address: "ch 5 §5.2.4 ¶6",
+     at: "(b) किस विन्यास में निकाय (i)", reason: "English ¶6, Example 5.2's question (b), stable and unstable equilibrium, begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 6, kind: split, address: "ch 5 §5.2.4 ¶7",
+     at: "(c) दिखाए गए सभी विन्यासों में", reason: "English ¶7, Example 5.2's question (c), the lowest potential energy, begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 6, kind: join, address: "ch 5 §5.2.4 ¶9",
+     at: "उदाहरणार्थ, विन्यास Q_3 में", reason: "the configuration Q_3 example is the rest of English ¶9, which begins with the stable and unstable equilibrium sentence"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 6, kind: join, address: "ch 5 §5.2.4 ¶9",
+     at: "इस प्रकार, (a) PQ_1 एवं PQ_2", reason: "'Thus,' ends English ¶9; the row joins ¶9 so that the split after it leaves 'Thus,' there and starts answer (a) as ¶10"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 6, kind: split, address: "ch 5 §5.2.4 ¶10",
+     at: "(a) PQ_1 एवं PQ_2", reason: "English ¶10, answer (a) PQ_1 and PQ_2, begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 6, kind: split, address: "ch 5 §5.2.4 ¶11",
+     at: "(b) (i) PQ_3, PQ_6", reason: "English ¶11, answer (b), stable PQ_3, PQ_6 and unstable PQ_5, PQ_4, begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 6, kind: split, address: "ch 5 §5.2.4 ¶12",
+     at: "(c) PQ_6", reason: "English ¶12, answer (c) PQ_6, begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 8, kind: split, address: "ch 5 §5.3 ¶5",
+     at: "चुंबकत्व के लिए गाउस का नियम", reason: "English ¶5, 'Thus, Gauss's law for magnetism is:', begins here at the top of p8; the row ran on from p7"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 8, kind: split, address: "ch 5 §5.3 ¶6",
+     at: "किसी भी बंद सतह से गुज़रने वाला", reason: "English ¶6, the statement of the law, the net flux through any closed surface is zero, begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 9, kind: split, address: "ch 5 §5.3 ¶9",
+     at: "(a) गलत है। चुंबकीय बल रेखाएँ", reason: "English ¶9, Example 5.3's answer (a), begins here; the English keeps 'Solution' as ¶8, a row of its own, so the Hindi 'हल' stays as ¶8"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 9, kind: split, address: "ch 5 §5.3 ¶17",
+     at: "(a) चुंबकीय क्षेत्र रेखाएँ (हर बिंदु पर)", reason: "English ¶17, Example 5.4's question (a), begins here; the English keeps 'Example 5.4' as ¶16, a row of its own"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 9, kind: split, address: "ch 5 §5.3 ¶18",
+     at: "(b) यदि चुंबकीय एकल ध्रुवों", reason: "English ¶18, Example 5.4's question (b), Gauss's law if monopoles existed, begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 10, kind: join, address: "ch 5 §5.4 ¶2",
+     at: "M एक सदिश राशि है", reason: "'M is a vector' with its dimensions and unit is the end of English ¶2, after Eq. (5.7)"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 11, kind: join, address: "ch 5 §5.4 ¶5",
+     at: "इस प्रकार कुल चुंबकीय क्षेत्र B", reason: "the total field B = mu_0 (H + M), Eq. (5.12), is the end of English ¶5, which begins with H, Eq. (5.11)"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 11, kind: join, address: "ch 5 §5.4 ¶6",
+     at: "जहाँ chi एक विमाविहीन राशि", reason: "the 'where chi' text through Eqs. (5.14), (5.15) and mu = mu_0 mu_r is the rest of English ¶6, which begins 'We repeat our defining procedure' and holds Eq. (5.13)"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 14, kind: split, address: "ch 5 §5.5.3 ¶2",
+     at: "किसी लौह चुंबकीय पदार्थ के एकल परमाणुओं", reason: "English ¶2, the individual atoms of a ferromagnetic material and domains, begins here; the Hindi print keeps it in ¶1's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 1, kind: text, address: "ch 5 §5.1 ¶1",
+     transcribed: "भाँति-भाँति के स्रोतों से", printed: "भाँति-भाँति के स्त्रोतों से", reason: "the page sets the sa-ta-ra ligature here, not the sa-ra conjunct (crop p1 x44-330 y481-498 at zoom 6; compared at zoom 16 with the sa-ra glyph of ch 3 p13 x98-118 y214-232 and the ligature at x272-292 on the same line; the decoded layer's line y483 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 5, kind: text, address: "ch 5 §5.2.4 ¶1",
+     transcribed: "द्विध्रुव आघूर्णो वाले", printed: "द्विध्रुव आघूर्णों वाले", reason: "the page prints an anusvara beside the reph on the last syllable (crop p5 x300-410 y509-526 at zoom 9; the decoded layer's line y511 agrees); the transcription dropped it"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 10, kind: text, address: "ch 5 §5.3 ¶24",
+     transcribed: "चुंबकीय आघूर्णो का औसत", printed: "चुंबकीय आघूर्णों का औसत", reason: "the page prints an anusvara beside the reph on the last syllable (crop p10 x188-505 y387-417 at zoom 5; the decoded layer's line y389 agrees); the transcription dropped it"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 10, kind: text, address: "ch 5 §5.3 ¶24",
+     transcribed: "अनुचुंबकीय पदार्थो के संदर्भ", printed: "अनुचुंबकीय पदार्थों के संदर्भ", reason: "the page prints an anusvara beside the reph on the last syllable (crop p10 x188-505 y387-417 at zoom 5; the decoded layer's line y403 agrees); the transcription dropped it"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 11, kind: text, address: "ch 5 §5.4 ¶4",
+     transcribed: "वही नियतांक है", printed: "वही नियंताक है", reason: "the page sets the anusvara on the second syllable, not the third (crop p11 x40-200 y203-220 at zoom 9; the decoded layer's line y205 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 13, kind: text, address: "ch 5 §5.5.1 ¶3",
+     transcribed: "ये परिक्रमण करते", printed: "ये प्ररिक्रमण करते", reason: "the page prints a ra-stroke under the first consonant as well (crop p13 x180-290 y176-193 at zoom 10; the decoded layer's line y178 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 14, kind: text, address: "ch 5 §5.5.2 ¶3",
+     transcribed: "अनुदिश सरेखित हो जाते", printed: "अनुदिश संरेखित हो जाते", reason: "the page prints an anusvara on the first syllable, set just before the e-matra (crop p14 x160-525 y117-288 at zoom 3; the decoded layer's line y119 agrees); the transcription dropped it"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 14, kind: text, address: "ch 5 §5.5.3 ¶2",
+     transcribed: "दिशा में सरेखित हो जाते", printed: "दिशा में संरेखित हो जाते", reason: "the page prints an anusvara on the first syllable, set just before the e-matra (crop p14 x160-525 y117-288 at zoom 3; the decoded layer's line y273 agrees); the transcription dropped it"}
+  # phy12-part1 Hindi, chapter 6
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 5, kind: join, address: "ch 6 §6.4 ¶2",
+     at: "प्रेरित विद्युत वाहक बल का परिमाण चुंबकीय फ्लक्स में", reason: "the statement of Faraday's law printed on p5 is the last sentence of English ¶2, which the row from p4 begins and which ends with the law as stated"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 5, kind: split, address: "ch 6 §6.4 ¶5",
+     at: "ऋण चिह्न epsilon की दिशा तथा परिणामतः", reason: "English ¶5, the negative sign giving the direction of epsilon, begins here after Eq. (6.3), which ends English ¶4"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 5, kind: split, address: "ch 6 §6.4 ¶11",
+     at: "(a) अधिक विक्षेप प्राप्त करने के लिए", reason: "English ¶11, answer (a) of Example 6.1, begins here; the English keeps the label Solution as ¶10 on its own, so the Hindi label हल stays alone as ¶10"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 5, kind: split, address: "ch 6 §6.4 ¶13",
+     at: "प्रयोगात्मक भौतिकी में हमें नवीनता लाने", reason: "English ¶13, on innovation in experimental physics and Faraday, begins here; the Hindi row runs it on after answer (b)"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 6, kind: join, address: "ch 6 §6.4 ¶15",
+     at: "ध्यान दें कि पृथ्वी का चुंबकीय क्षेत्र भी", reason: "the note on the earth's steady field is the last sentence of English ¶15, Example 6.2's solution, which the row before it begins"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 6, kind: join, address: "ch 6 §6.4 ¶17",
+     at: "ध्यान दें कि ये epsilon तथा I के", reason: "the note that epsilon and I are estimated values is the end of English ¶17, Example 6.3's solution, which the row before it begins"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 7, kind: join, address: "ch 6 §6.5 ¶4",
+     at: "प्रेरित विद्युत वाहक बल की दिशा लेंज के नियम", reason: "the direction by Lenz's law and Figs. 6.6 (a) and (b) are the rest of English ¶4, the open circuit, which the row before it begins"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 8, kind: join, address: "ch 6 §6.5 ¶10",
+     at: "नोट कीजिए कि जब तक लूप पूरी तरह", reason: "the note that no current flows while a loop is wholly inside or outside the field is the last sentence of English ¶10, answer (iii) of Example 6.4"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 9, kind: join, address: "ch 6 §6.5 ¶13",
+     at: "(d) चित्र 6.9 में वर्णित स्थिति", reason: "question (d) on the capacitor's polarity is the end of English ¶13, which carries parts (c) and (d) of Example 6.5 as one row"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 9, kind: split, address: "ch 6 §6.5 ¶15",
+     at: "(b) नहीं। विद्युत फ्लक्स परिवर्तित करके", reason: "English ¶15, answer (b) of Example 6.5, begins here; the Hindi row runs it on after answer (a)"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 10, kind: join, address: "ch 6 §6.6 ¶3",
+     at: "आवेश को P से Q तक ले जाने", reason: "the work done in moving the charge from P to Q, W = qvBl, is part of English ¶3 (the Lorentz-force account), which the row before it begins"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 10, kind: join, address: "ch 6 §6.6 ¶3",
+     at: "चूँकि प्रति इकाई आवेश पर किया गया", reason: "emf as work per unit charge, epsilon = W/q = Blv, is the end of English ¶3"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 11, kind: split, address: "ch 6 §6.6 ¶9",
+     at: "यह व्यंजक प्रथम विधि द्वारा प्राप्त", reason: "English ¶9, the result agreeing with Method I, begins here; the Hindi row runs it on after Method II"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 12, kind: split, address: "ch 6 §6.6 ¶12",
+     at: "क्योंकि स्पोक के आरपार विद्युत वाहक बल", reason: "English ¶12, the number of spokes being immaterial, begins here; the Hindi row runs it on after Example 6.7's solution"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 13, kind: split, address: "ch 6 §6.7.1 ¶9",
+     at: "समीकरण (6.9) तथा समीकरण (6.10) का उपयोग", reason: "English ¶9, M_12 = M_21 = M from Eqs. (6.9) and (6.10), begins here after Eq. (6.11), which ends English ¶8"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 14, kind: join, address: "ch 6 §6.7.1 ¶14",
+     at: "ध्यान दीजिए कि हमने M_12 की गणना", reason: "the note on the approximate value of Phi_1 is the end of English ¶14, Example 6.8's solution, which the row before it begins"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 16, kind: join, address: "ch 6 §6.7.2 ¶7",
+     at: "यह व्यंजक हमें m द्रव्यमान के", reason: "the comparison with mv^2/2 and L as electrical inertia is the end of English ¶7, which the row before it (Eq. 6.17) begins"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 16, kind: split, address: "ch 6 §6.7.2 ¶12",
+     at: "(a) समीकरण (6.17) से, चुंबकीय ऊर्जा है", reason: "English ¶12, answer (a) of Example 6.9, begins here; the English keeps the label Solution as ¶11 on its own, so the Hindi label हल stays alone as ¶11"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 18, kind: join, address: "ch 6 §6.8 ¶5",
+     at: "क्योंकि ज्या फलन (sine function) का मान", reason: "the sign of the emf changing with time and its extremum at theta = 90° or 270° (Fig. 6.14) are the end of English ¶5, which the row before it (Eqs. 6.19 and 6.20) begins"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 19, kind: split, address: "ch 6 §6.8 ¶6",
+     at: "क्योंकि धारा की दिशा आवर्ती रूप से", reason: "English ¶6, alternating current and Eq. (6.21), begins here at the top of p19; the transcription ran it on from the p18 paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 4, kind: misprint, address: "ch 6 §6.4 ¶2",
+     transcribed: "प्रयोग 6.2 में कुंडली C_1 की ओर अथवा इससे दूर एक धारा वाहक कुंडली C_2 की गति, कुंडली C_1 की ओर अथवा इससे दूर एक धारा वाहक कुंडली C_2 की गति,", printed: "6.2 में कुंडली C_1 की ओर अथवा इससे दूर एक धारा वाहक कुंडली C_2 की गति,", reason: "the page prints the clause 'कुंडली C_1 की ओर अथवा इससे दूर एक धारा वाहक कुंडली C_2 की गति,' twice, on consecutive lines after 'प्रयोग 6.2 में' (crop p4 x44-385 y398-470 at zoom 4; the decoded layer's lines y416 and y432 agree); the doubled clause is the book's, kept as printed, and the row carries it"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 5, kind: text, address: "ch 6 §6.4 ¶4",
+     transcribed: "प्रेरित विद्युत धारा बल को", printed: "प्रेरित विद्युत वाहक बल को", reason: "the page prints 'गणितीय रूप में प्रेरित विद्युत धारा बल को' — induced current force — before epsilon = − dPhi_B / dt (6.3) (crop p5 x250-525 y155-215 at zoom 5; the decoded layer's line y164 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row's 'the induced emf is given by', emf being विद्युत वाहक बल as this section writes it everywhere else, the same page included ('प्रेरित विद्युत वाहक बल को', crop p5 x250-525 y335-355 at zoom 4)"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 9, kind: false_positive, address: "ch 6 §6.5 ¶16",
+     transcribed: "प्रेरित विद्युत वाहक बल के स्थिर रहने की अपेक्षा कर सकते हैं। वृत्ताकार लूप में क्षेत्र के प्रभाव से बाहर निकलते समय लूप के क्षेत्रफल के परिवर्तन की दर स्थिर नहीं है", printed: "प्रेरित विद्युत वाहक बल के स्थिर रहने की अपेक्षा कर सकते हैं", reason: "the page prints answer (c) as one item of two sentences, the second beginning 'वृत्ताकार लूप में' on the next line (crop p9 x170-510 y396-458 at zoom 4; the decoded layer's lines y399-428 agree); the row carries the item whole, the verifier quoted its first sentence"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 2, kind: text, address: "ch 6 §6.2 ¶3",
+     transcribed: "धारा को निर्दशित करता है", printed: "धारा को निदर्शित करता है", reason: "the page prints the word with a reph over the third syllable and none before it (crop p2 x42-200 y647-664 at zoom 9; the decoded layer's line y649 agrees), as on ch 1 p5 and p37: the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 7, kind: text, address: "ch 6 §6.5 ¶4",
+     transcribed: "ध्यान दीजिए कि [illegible] तथा [illegible] द्वारा", printed: "ध्यान दीजिए कि तथा द्वारा", reason: "the page draws two small arrow pictures here (crop p7 x178-525 y455-505 at zoom 5); they are no characters and the text layer carries nothing there. The canonical English row leaves the same pictures out, so the transcriber's markers are removed rather than replaced (founder, 2026-10-13)"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 10, kind: text, address: "ch 6 §6.6 ¶5",
+     transcribed: "के साथ परिवर्तनशील चुंबकीय क्षेत्र एक", printed: "के साथ परितवर्तनशील चुंबकीय क्षेत्र एक", reason: "the page prints an extra ta after the second syllable (crop p10 x150-300 y538-555 at zoom 10; the decoded layer's line y540 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 10, kind: text, address: "ch 6 §6.6 ¶6",
+     transcribed: "50 चक्कर/सेकंड की", printed: "50 चक्कर/सेंकड की", reason: "the page sets the anusvara on the first syllable, not the second (crop p10 x230-330 y647-663 at zoom 12; the decoded layer's line y649 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 16, kind: text, address: "ch 6 §6.7.2 ¶8",
+     transcribed: "रूप में रूपांतरित हो जाएगी", printed: "रूप में रूपातंरित हो जाएगी", reason: "the page sets the anusvara on the third syllable, not the second (crop p16 x140-262 y467-484 at zoom 12; the decoded layer's line y469 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 3, kind: text, address: "ch 6 §6.2 ¶5",
+     transcribed: "उपरोक्त दोनों प्रयोगों में चुंबक", printed: "प्रयोग 6.3 उपरोक्त दोनों प्रयोगों में चुंबक", reason: "the page prints the label 'प्रयोग 6.3' in italic on its own line above the paragraph (crop p3 x40-530 y125-180 at zoom 4; the decoded layer's line y138 agrees), and the row dropped it; the rows for experiments 6.1 and 6.2 carry their labels as their first words, as the English row opens 'Experiment 6.3'"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 17, kind: text, address: "ch 6 §6.7.2 ¶15",
+     transcribed: "ऊर्जा क्षेत्र की तीव्रता के समानुपाती", printed: "ऊर्जा क्षेत्र की तीव्रता के वर्ग के समानुपाती", reason: "the page prints 'in both cases the energy is proportional to the intensity of the field', without 'square' (crop p17 x170-510 y365-384 at zoom 5; the decoded layer's line y369 agrees), right after the two energy densities u_B = B^2/2mu_0 and u_E = epsilon_0 E^2/2 that go as the square; the English row reads 'proportional to the square of the field strength'; a dropped word that changes the physics, so by the founder's ruling of 2026-10-10 the row writes the meaning, in the book's own phrase for a square ('दूरी के वर्ग के', ch 1 §1.5)"}
+  # phy12-part1 Hindi, chapter 7
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 2, kind: join, address: "ch 7 §7.2 ¶2",
+     at: "यहाँ धारा आयाम i_m के लिए सूत्र है", reason: "the current amplitude i_m = v_m/R, Eq. (7.3), is the end of English ¶2, which the row before it begins; the Hindi row broke it off after Eq. (7.2)"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 4, kind: split, address: "ch 7 §7.2 ¶14",
+     at: "(a) दिया है P = 100 W", reason: "English ¶13 is the label Solution alone and ¶14, part (a) with P = 100 W and R = 484 Ω, begins here; the Hindi row runs the label हल into (a)"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 8, kind: split, address: "ch 7 §7.5 ¶4",
+     at: "धारा का मान ज्ञात करने के लिए हम संबंध i = dq / dt", reason: "English ¶4, the current from i = dq/dt, begins here; the Hindi print keeps it in ¶3's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 8, kind: split, address: "ch 7 §7.5 ¶5",
+     at: "संबंध, cos(omega t) = sin(omega t + pi/2), का उपयोग करने से", reason: "English ¶5, cos(omega t) = sin(omega t + pi/2) and Eqs. (7.16) to (7.18), begins here; the Hindi print keeps it in ¶3's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 9, kind: split, address: "ch 7 §7.5 ¶8",
+     at: "चित्र 7.8 (a) किसी क्षण t_1 पर फेजर आरेख", reason: "English ¶8, the phasor diagram of Fig. 7.8(a), begins here; the Hindi print keeps it in ¶7's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 9, kind: split, address: "ch 7 §7.5 ¶10",
+     at: "इस प्रकार हम देखते हैं कि प्रेरक के प्रकरण में", reason: "English ¶10, the current lagging in an inductor and leading in a capacitor by pi/2, begins here; the Hindi print keeps it in ¶9's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 10, kind: split, address: "ch 7 §7.5 ¶17",
+     at: "स्विच को बंद कर दिया गया है", reason: "English ¶17, the switch closed and the iron rod inserted, begins here; the Hindi row keeps it with Example 7.5's opening sentence"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 10, kind: join, address: "ch 7 §7.5 ¶17",
+     at: "छड़ को प्रविष्ट कराते समय", reason: "the bulb's glow (a) increases (b) decreases (c) is unchanged is the end of English ¶17, which the split before it begins"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 11, kind: split, address: "ch 7 §7.6.1 ¶7",
+     at: "समीकरण (7.22) से v_Rm, v_Cm, एवं v_Lm के मान", reason: "English ¶7, substituting Eq. (7.22) to give Eq. 7.25(a), begins here; the Hindi print keeps it in ¶6's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 11, kind: split, address: "ch 7 §7.6.1 ¶8",
+     at: "किसी परिपथ में प्रतिरोध से समतुल्यता के आधार पर", reason: "English ¶8, the impedance Z by analogy to resistance and Eq. (7.26), begins here; the Hindi print keeps it in ¶6's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 14, kind: join, address: "ch 7 §7.6.2 ¶10",
+     at: "दोनों वोल्टताओं V_R एवं V_C का बीजगणितीय योग", reason: "the algebraic sum of 311.3 V, the paradox and V_(R+C) = 220 V are the rest of English ¶10, part (b) of Example 7.6's solution, which the row before it begins"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 14, kind: split, address: "ch 7 §7.6.2 ¶11",
+     at: "इस प्रकार, यदि दो वोल्टताओं के बीच के कला-अंतर", reason: "English ¶11, the total voltage equal to the source's once the phase difference is taken into account, begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 15, kind: join, address: "ch 7 §7.7 ¶2",
+     at: "एक पूर्ण चक्र में माध्य शक्ति समीकरण (7.29)", reason: "the average power over a cycle and Eq. 7.30(a) are the rest of English ¶2, which the row with Eq. (7.29) begins"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 15, kind: join, address: "ch 7 §7.7 ¶3",
+     at: "अतः क्षयित माध्य शक्ति, न केवल", reason: "the dependence on cos phi, the power factor and 'let us discuss the following cases' are the rest of English ¶3, which the row with Eq. 7.30(b) begins"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 15, kind: split, address: "ch 7 §7.7 ¶9",
+     at: "(b) परिपथ का शक्ति गुणांक, प्रायः", reason: "English ¶9, part (b) of Example 7.7's statement (the power factor improved by a capacitor), begins here; the Hindi row runs (a) and (b) as one"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 16, kind: split, address: "ch 7 §7.7 ¶12",
+     at: "हम शक्ति गुणांक का सुधार कर इसका मान", reason: "English ¶12, improving the power factor by making Z tend to R, begins here at the top of p16; the row ran on from (b)'s cos phi = R/Z on p15, which is English ¶11"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 17, kind: split, address: "ch 7 §7.7 ¶22",
+     at: "अनुनाद स्थिति में rms धारा = V / Z", reason: "English ¶22, the rms current at resonance (66.7 A), begins here; the Hindi row runs part (b) of Example 7.9's solution as one"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 17, kind: split, address: "ch 7 §7.7 ¶23",
+     at: "अनुनाद स्थिति में शक्ति क्षय P = I^2 × R", reason: "English ¶23, the power dissipated at resonance (13.35 kW), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 3, kind: text, address: "ch 7 §7.2 ¶6",
+     transcribed: "(P = I^2R)", printed: "(P = i^2R)", reason: "the page prints dc power as (P = i^2R) with a lower-case italic i (crop p3 x235-525 y410-445 at zoom 5; the decoded layer's line y432 agrees); the row's capital I is the transcriber's repair to the English; as printed, the case of the symbol copied exactly: in this chapter i is the instantaneous current, which for a dc current is the current itself, so the print still states dc power, a look-alike that reads as the same quantity (DECISIONS 2026-10-12)"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 18, kind: false_positive, address: "ch 7 §7.7 ¶26",
+     transcribed: "इलेक्ट्रॉनिक परिपथिकी के कारण चेतावनी", printed: "इलेक्ट्रॉनिक परिपथिकी", reason: "the page prints 'एवं इलेक्ट्रॉनिक परिपथिकी के कारण चेतावनी की ध्वनि उत्पन्न होती है।' (crop p18 x60-398 y173-206 at zoom 4; the decoded layer's line y177 agrees); the row matches the page, the verifier's span stops two words early"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 20, kind: false_positive, address: "ch 7 §7.8 ¶20",
+     transcribed: "हानि घट जाती है। इसकी लंबी दूरी के उपभोक्ता", printed: "हानि घट जाती है।", reason: "the page prints 'I^2R हानि घट जाती है। इसकी लंबी दूरी के उपभोक्ता के समीप' on one line, the paragraph running on (crop p20 x44-410 y350-400 at zoom 4; the decoded layer's line y370 agrees); the row matches the page, the verifier quoted the clause before the full stop"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 8, kind: text, address: "ch 7 §7.5 ¶5",
+     transcribed: "हम पाते हैं कि (1/omega C)", printed: "हम पाते हें कि (1/omega C)", reason: "the page prints the e-matra, not the ai-matra, on the auxiliary (crop p8 x40-200 y612-643 at zoom 8; the decoded layer's line y629 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 20, kind: text, address: "ch 7 §7.8 ¶15",
+     transcribed: "वास्तविक ट्राँसफॉर्मरों में", printed: "वास्तविक ट्रॉसफॉर्मरों में", reason: "the page prints the candra-o vowel sign on the first syllable, a crescent with no dot (crop p20 x168-188 y109-130 at zoom 20; the decoded layer's line y114 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 4, kind: text, address: "ch 7 §7.2 ¶16",
+     transcribed: "= 0.450A", printed: "= 0.454A", reason: "the page prints I = P/V = 100 W / 220 V = 0.450A (crop p4 x40-420 y680-725 at zoom 5; the decoded layer's line y705 agrees); 100/220 = 0.4545, so the printed result is false in its third figure; the English row gives 0.454 A; by the founder's ruling of 2026-10-10, confirmed for this place on 2026-10-13, the row writes the meaning, the English row's value"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 9, kind: text, address: "ch 7 §7.5 ¶12",
+     transcribed: "पहले की तुलना में दीप्ति से", printed: "पहले की तुलना में कम दीप्ति से", reason: "the page prints 'reducing C will increase the reactance and the lamp will light with brightness compared to before', with no word for less (crop p9 x165-510 y565-598 at zoom 5; the decoded layer's line y570 agrees), which reads as brighter; a larger reactance passes less current and the lamp dims, as the English row says ('shine less brightly than before') and as the Hindi itself says of the bulb on p10 ('बल्ब की दीप्ति कम हो जाती है'); a dropped word that reverses the physics, so by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  # phy12-part1 Hindi, chapter 8
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 2, kind: join, address: "ch 8 §8.2 ¶2",
+     at: "[चित्र 8.1(a)] में एक समांतर प्लेट संधारित्र C", reason: "the capacitor of Fig. 8.1(a), the circular loop at P and Eq. (8.2) are the rest of English ¶2, which the Hindi row before begins with Ampere's law, Eq. (8.1)"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 3, kind: split, address: "ch 8 §8.2 ¶4",
+     at: "क्योंकि यह विरोधाभास हमारे द्वारा लागू किए गए", reason: "English ¶4, the contradiction that shows Ampere's circuital law is missing a term, begins here; the Hindi row keeps it in ¶3's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 3, kind: split, address: "ch 8 §8.2 ¶6",
+     at: "अब यदि संधारित्र की प्लेटों पर आवेश Q", reason: "English ¶6, the current i = dQ/dt and dPhi_E/dt, begins here after Eq. (8.3); the Hindi row runs it on in ¶5's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 3, kind: split, address: "ch 8 §8.2 ¶7",
+     at: "यह निर्दिष्ट करता है कि ऐम्पियर के नियम में संगति के लिए", reason: "English ¶7, 'for consistency' and Eq. (8.4), begins here; the Hindi row runs it on in ¶5's paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 6, kind: split, address: "ch 8 §8.3.1 ¶3",
+     at: "मैक्सवेल के सिद्धांत के परीक्षण के लिए किए गए हर्ट्ज़", reason: "English ¶3, the sensation Hertz's test created and Bose's experiment, begins here at the top of p6; the row ran on from p5, where English ¶2 ends with Hertz's experiment (1887)"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 7, kind: split, address: "ch 8 §8.3.2 ¶3",
+     at: "समीकरण omega = ck, सभी तरंगों के लिए प्रामाणिक संबंध", reason: "English ¶3, the relation omega = ck as the standard one for waves and Eq. [8.9(b)], begins here after Eq. [8.9(a)]"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 8, kind: split, address: "ch 8 §8.3.2 ¶12",
+     at: "इसकी दिशा के संबंध में हम जानते हैं", reason: "English ¶12, the direction of B in Example 8.1's solution, begins here; the Hindi row runs the solution as one paragraph"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 8, kind: split, address: "ch 8 §8.3.2 ¶14",
+     at: "(a) तरंग की आवृत्ति तथा तरंगदैर्घ्य क्या है?", reason: "English ¶14, Example 8.2's question (a), begins here; the Hindi row sets the statement and both questions together"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 8, kind: split, address: "ch 8 §8.3.2 ¶15",
+     at: "(b) विद्युत क्षेत्र के लिए व्यंजक लिखिए।", reason: "English ¶15, Example 8.2's question (b), begins here"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 8, kind: split, address: "ch 8 §8.3.2 ¶17",
+     at: "(a) दिए गए समीकरण की निम्न समीकरण", reason: "English ¶16 is the Solution label alone and ¶17 begins at part (a); the Hindi row sets them together, so हल stays as its own row"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 8, kind: false_positive, address: "ch 8 §8.3.2 ¶12",
+     transcribed: "B z-दिशा के अनुदिश है। अतः B = 2.1 × 10^(-8) k_hat T", printed: "B z-दिशा के अनुदिश है। अतः: B = 2.1 × 10^(-8) k_hat T", reason: "the page prints अतः with its visarga and then B = 2.1 × 10^-8 k_hat T, no colon after the visarga (crop p8 x60-200 y262-292 at zoom 6; the decoded layer's line y278 agrees); the row matches the page, the verifier's colon doubles the visarga glyph"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 8, kind: false_positive, address: "ch 8 §8.3.2 ¶18",
+     transcribed: "होता है। अतः, विद्युत", printed: "होता है। अतः:, विद्युत", reason: "the page prints 'होता है। अतः,' — the visarga and a comma, no colon (crop p8 x300-395 y494-510 at zoom 8; the decoded layer's line y496 agrees); the row matches the page, the verifier's colon doubles the visarga glyph"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 4, kind: text, address: "ch 8 §8.2 ¶13",
+     transcribed: "(शब्दश:)", printed: "(शब्दशः)", reason: "Visarga: an adverb in -shah (literally), printed with the visarga glyph that this font shares with the colon. Crop p4 x60-408 y534-553 at zoom 4; the decoded layer's line y537 agrees"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 7, kind: text, address: "ch 8 §8.3.2 ¶5",
+     transcribed: "स्व:संपोषित", printed: "स्वःसंपोषित", reason: "Visarga: the glyph sits inside the compound (self-sustained) with no space after it, where a colon cannot stand; printed with the visarga glyph that this font shares with the colon, as printed (the book's own form of the word). Crop p7 x160-525 y279-299 at zoom 4; the decoded layer's line y283 agrees"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 1, kind: text, address: "ch 8 §8.1 ¶2",
+     transcribed: "विद्युत-चुंबकत्व के सभी", printed: "विद्युत-चुंबकत्च के सभी", reason: "the page prints ca, not va, under the final conjunct (crop p1 x330-470 y652-669 at zoom 12; the decoded layer's line y654 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 8, kind: text, address: "ch 8 §8.4 ¶1",
+     transcribed: "पराबैंगनी एवं अवरक्त तरंगों का", printed: "पराबैगनी एवं अवरक्त तरंगों का", reason: "the page prints no anusvara on the third syllable here, against the next occurrence on the page which has one (crop p8 x250-300 y597-614 at zoom 16; the decoded layer's line y599 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 9, kind: text, address: "ch 8 §8.4.1 ¶1",
+     transcribed: "आवृत्तियाँ लघुतरंग बैंडों", printed: "आवृत्तियाँ लघुतंरग बैंडों", reason: "the page sets the anusvara over the third syllable, not the fourth (crop p9 x380-420 y558-576 at zoom 16, against a correctly set tarang at x206-246 y661-679; the decoded layer's line y561 agrees): the book's own spelling, kept as printed (DECISIONS 2026-10-03); the transcription repaired it"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 10, kind: text, address: "ch 8 §8.4.3 ¶1",
+     transcribed: "दीर्घ तरंगदैर्ध्य सिरे", printed: "दीर्घ तरंगदैर्घ्य सिरे", reason: "the page prints the half gha here, open to the headline (crop p10 x120-180 y198-214 at zoom 14, against the half dha at x75-89 y443-458 at zoom 30; the decoded layer's line y199 agrees); the row misread it"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 10, kind: text, address: "ch 8 §8.4.3 ¶1",
+     transcribed: "दीर्घ तरंगदैर्ध्य की अवरक्त", printed: "दीर्घ तरंगदैर्घ्य की अवरक्त", reason: "the page prints the half gha here, open to the headline (crop p10 x62-76 y309-324 at zoom 30, against the half dha at x75-89 y443-458; the decoded layer's line y310 agrees); the row misread it"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 9, kind: text, address: "ch 8 §8.4.2 ¶1",
+     transcribed: "सूक्ष्म तरंगें (लघु", printed: "सूक्ष्म तरंगों (लघु", reason: "the page prints the oblique plural, the o-matra with its anusvara, before the bracket (crop p9 x150-420 y655-685 at zoom 5; the decoded layer's line y663 agrees); the row's form is the heading's above it, a misreading"}

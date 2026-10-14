@@ -492,7 +492,14 @@ HOW TO RESUME (supersedes item 2 of the list below):
      its spec audit FAILED (ch 5 p4 first ruled misprint against precedent; the dry run claimed before it was made; the
      तापन layer line unnamed) and all three are fixed. APPROVAL DRY RUN pipeline/reports/2026-10-14-ncert-load-dry-run-2.md
      (uncommitted): ok, 53 rulings, 115 of 115, no row changed. APPROVED by the founder 2026-10-14 "as written";
-     round three + report committed 14d6838, DECISIONS row. NEXT: the founder runs `d16-phy12p1-hi-r3.sh` (re-reads of ch 2 p17 and ch 4 p22, whose rows the verifier never
+     round three + report committed 14d6838, DECISIONS row. 09:10 the founder's closing run (reports af2b98a): the book
+     at 1,032 of 1,041 — the ch 4 p22 re-read returned no verdict for §4.9.1 ¶19–¶24 (clean before) and §4.9.2 ¶1; the
+     ch 2 p17 re-read again could not find §2.8.3 ¶6 (on the page, checked on the crop; likely confused by ¶5's
+     Hindi-only restatement) and flagged ¶8's span. ROUND FOUR written UNCOMMITTED (== scratchpad `block-r4-repo.txt`,
+     `r4.py`): 1 false_positive; its audit FAILED on the header (fixed); approval dry run
+     pipeline/reports/2026-10-14-ncert-load-dry-run-3.md (uncommitted): ok, 54 rulings, no row changed. NEXT: the
+     founder approves round four and answers on ¶6 → `d16-phy12p1-hi-r4.sh` (a fresh read of ch 4 p22 ≈₹2, the book
+     judged) → expected 1,040 of 1,041 → the founder's ten ✅ pairs → close. (Before:) the founder runs `d16-phy12p1-hi-r3.sh` (re-reads of ch 2 p17 and ch 4 p22, whose rows the verifier never
      found, ≈₹3; the book judged, ₹0; expected 1,039–1,041 of 1,041) → the founder's ten ✅ pairs → close the book.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet

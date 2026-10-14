@@ -4848,3 +4848,26 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      transcribed: "करने वाला तरंग फलन", printed: "करने वाला तंरग फलन", reason: "the page prints तंरग, the anusvara set over ta rather than over ra (crop p11 x0-621 y698-732 at zoom 4, and x150-300 y700-728 at zoom 8; the decoded layer's line y712 agrees): the book's own spelling at this place, which the transcriber repaired; restored as printed"}
   - {book: phy11-part2, lang: hi, chapter: 14, page: 13, kind: text, address: "ch 14 §14.6.1 ¶1",
      transcribed: "उदाहरण के लिए, किसी डोरी", printed: "उदाहरण के लए, किसी डोरी", reason: "the page ends a line with 'उदाहरण के' and starts the next with 'लए,', the i-sign of लिए missing and no hyphen (crop p13 x40-300 y574-616 at zoom 4, and the line end x200-330 y574-598 at zoom 8; the decoded layer's line y602 agrees): the book's own spelling, which the transcriber repaired; restored as printed"}
+  # phy11-part1 and phy11-part2 Hindi, round five (D16, 2026-10-14). The reload with round four, the re-reads of the
+  # 15 pages whose rows it changed, and both books judged from the stored reads
+  # (pipeline/reports/2026-10-14-ncert-verify-20.md: phy11-part1 908 of 909; -21.md: phy11-part2 679 of 682) left four
+  # flags, all from the fresh reads, each read on a crop of the page image. Three are the verifier's (false_positive): a span that drops the φ its line
+  # begins with (phy11-part1 ch 3 p8), a span that repairs the book's उष्मागतिकीय (phy11-part2 ch 11 p2), and a span
+  # that stops before cos φ/2 (ch 14 p11). One is round one's meaning entry read back (misprint, ch 14 p13), quoted
+  # this time with the danda. Changes no row. The passages no row carries and the coverage lines are each book's
+  # closing report's, line for line (2026-10-07-ncert-verify-2.md, 2026-10-12-ncert-verify-7.md), and the layer check
+  # prints the 4 and 8 word lines round four left. A ruling quotes the verifier as the report gives it. Simulated with
+  # `ncert load --dry-run` on each book's extraction (phy11-part1 sha256 2f7d3414…, phy11-part2 51ab7180…): no
+  # refusal, 84 of 84 and 95 of 95 sections one to one, 40 and 59 rulings on flags, no row changed. Approved by the
+  # founder 2026-10-14, as written (on pipeline/reports/2026-10-14-ncert-load-dry-run-6.md and -7.md).
+  # phy11-part1 Hindi, chapter 3
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 8, kind: false_positive, address: "ch 3 §3.6 ¶11",
+     transcribed: "phi ≅ 23.4°", printed: "≅ 23.4°", reason: "the page prints 'φ ≅ 23.4°' on its own line under ≅ 0.397 (crop p8 x290-576 y600-690 at zoom 4): the row matches the page, and the verifier's printed span leaves out the φ the line begins with, as round two ruled its other short quote of these lines"}
+  # phy11-part2 Hindi, chapter 11
+  - {book: phy11-part2, lang: hi, chapter: 11, page: 2, kind: false_positive, address: "ch 11 §11.2 ¶3",
+     transcribed: "यद्यपि किसी उष्मागतिकीय अवस्था को पाँच अवस्था चरों", printed: "यद्यपि किसी ऊष्मागतिकीय अवस्था को पाँच अवस्था चरों", reason: "the footnote's second line prints उष्मागतिकीय with the short u (crop p2 x235-320 y696-716 at zoom 10), where its first line prints ऊष्मागतिकी with the long uu (crop p2 x55-110 y683-703 at zoom 10), and the rest of the span as both quotes give it (the sentence: crop p2 x40-603 y650-735 at zoom 3): the row carries the word as printed, the book's own spelling (DECISIONS 2026-10-03), and the verifier's printed span repairs it; round one ruled a flag on the same nine words, quoted then against the row's whole sentence"}
+  # phy11-part2 Hindi, chapter 14
+  - {book: phy11-part2, lang: hi, chapter: 14, page: 11, kind: false_positive, address: "ch 14 §14.5 ¶6",
+     transcribed: "a [2 sin [((kx – omega t) + (kx – omega t + phi)) / 2] cos (phi / 2)]", printed: "a [2 sin [((kx – omega t) + (kx – omega t + phi)) / 2]", reason: "the page prints (14.30) whole, the bracketed sine followed by cos φ/2 and the closing bracket (crop p11 x300-621 y405-485 at zoom 3.5): the row matches it, with round one's = a for the α the page sets (founder, 2026-10-10), and the verifier's printed span stops before cos (φ/2): a claim of extent on a meaning place, ruled on what it claims (pipeline/inputs/README)"}
+  - {book: phy11-part2, lang: hi, chapter: 14, page: 13, kind: misprint, address: "ch 14 §14.6 ¶4",
+     transcribed: "y = y_i + y_r = 0 सभी क्षणों पर।", printed: "y = y_i + y_r = 0 सभी बलों पर।", reason: "the page prints y = y_i + y_r = 0 सभी बलों पर। (crop p13 x40-330 y455-505 at zoom 4), at all forces where the condition holds at all times (the English row: at all times): the book's error, which the row does not keep — round one's text entry, under the founder's ruling of 2026-10-10, writes सभी क्षणों पर; round two's misprint ruling on the same place quoted it without the danda"}

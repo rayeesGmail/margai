@@ -4725,3 +4725,26 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      transcribed: "चित्र 8.1(a)] में एक समांतर प्लेट संधारित्र C दर्शाया गया है", printed: "चित्र 8.1(b)] पर", reason: "the page prints '[चित्र 8.1(a)] में एक समांतर प्लेट संधारित्र C' at the head of this row (crop p2 x44-330 y515-620 at zoom 3; the decoded layer's line y523 agrees); the '[चित्र 8.1(b)] पर' the verifier quotes is printed at the foot of the page (crop p2 x44-330 y700-732 at zoom 4; the decoded layer's line y714 agrees) and is carried by the next row, §8.2 ¶3"}
   - {book: phy12-part1, lang: hi, chapter: 8, page: 4, kind: false_positive, address: "ch 8 §8.2 ¶9",
      transcribed: "i = i_c + i_d = i_c + epsilon_0 dPhi_E / dt (8.5)", printed: "i = i_c + i_d = i_c + epsilon_0 dPhi_E / dt", reason: "the page prints the display with its number (8.5) at the right margin (crop p4 x44-400 y150-185 at zoom 4; the decoded layer's line y164 has the number); the row keeps an equation number at the end of its equation by the transcription convention, so it matches the page"}
+  # phy12-part1 Hindi, round three (D16, 2026-10-14). The reload with round two, align, one-page re-reads of ch 1 p32,
+  # ch 5 p4, ch 7 p3, ch 3 p17 and ch 6 p5, and the whole book judged from the stored reads
+  # (pipeline/reports/2026-10-14-ncert-verify-7.md: 1,036 of 1,041 clean) left two flags and one claim code set
+  # aside, each read on a crop of the page image, all three false_positive: a span cut short (ch 3 p17), round two's
+  # dot read back as the raster's gap (ch 5 p4: the verifier reads the raster, as for phy11-part1's ×), and the
+  # verifier's swap at ch 6 p5 once more with a word added. Changes no row. The two rows the verifier could not find
+  # (ch 2 p17 §2.8.3 ¶6; ch 4 p22 §4.9.2 ¶1, which starts at the foot of its page) are on the page and in the rows and
+  # need no entry; no ruling reaches a row the verifier could not find, so a one-page re-read of each is the closing
+  # run's. The 9 passages no row carries are round two's eight and the Faraday biography box in ch 6 p5's margin,
+  # which the English rows leave out too. The layer check's one new line, ch 7 p3's तापन, is round two's जूल तापन.
+  # Align is as round two read it (the same 7 sections of paired proposals, each pair right; §3.12 ¶5 set aside). A
+  # ruling quotes the verifier as the report gives it. Simulated with `ncert load --dry-run` on the extraction (sha256
+  # 97cf92b1…): no refusal, 115 of 115 sections one to one, 53 rulings on flags, no row changed. Approved by the
+  # founder 2026-10-14, as written (on pipeline/reports/2026-10-14-ncert-load-dry-run-2.md).
+  # phy12-part1 Hindi, chapter 3
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 17, kind: false_positive, address: "ch 3 §3.11 ¶19",
+     transcribed: "हमने दोनों टर्मिनलों को एक साथ", printed: "हमने दोनों टर्मिनलों को", reason: "the page prints 'हमने दोनों टर्मिनलों को एक साथ' on one line (crop p17 x44-330 y293-342 at zoom 4; the decoded layer's line y296 agrees); the row matches the page, the verifier's span stops two words early. The धन the page leaves out is round one's misprint ruling"}
+  # phy12-part1 Hindi, chapter 5
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 4, kind: false_positive, address: "ch 5 §5.2.3 ¶4",
+     transcribed: "U_m = integral tau(theta) d theta = integral mB sin theta d theta = −mB cos theta = − m·B (5.3)", printed: "U_m = integral tau(theta) d theta = integral mB sin theta d theta = -mB cos theta = -m B (5.3)", reason: "this dot is the one round two's text entry writes into the row, allowed by the founder for this place on 2026-10-14: the raster leaves a gap between m and B (crop p4 x180-525 y528-545 at zoom 8) where the text layer places an MT-Extra glyph (the decoded layer's line y532), and the English row has the dot; the verifier reads the raster. Its - for the page's − is notation"}
+  # phy12-part1 Hindi, chapter 6
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 5, kind: false_positive, address: "ch 6 §6.4 ¶4",
+     transcribed: "प्रेरित विद्युत धारा बल को", printed: "प्रेरित विद्युत वाहक बल को", reason: "the verifier swapped the row's span and the page's again, round two having ruled the same claim without प्रेरित: the page prints 'प्रेरित विद्युत धारा बल को' (crop p5 x250-525 y155-215 at zoom 4; the decoded layer's line y164 agrees) and the row carries वाहक बल, round one's meaning entry; code set the claim aside as one it could not place"}

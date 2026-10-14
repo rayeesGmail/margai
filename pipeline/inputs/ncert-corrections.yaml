@@ -4871,3 +4871,60 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      transcribed: "a [2 sin [((kx – omega t) + (kx – omega t + phi)) / 2] cos (phi / 2)]", printed: "a [2 sin [((kx – omega t) + (kx – omega t + phi)) / 2]", reason: "the page prints (14.30) whole, the bracketed sine followed by cos φ/2 and the closing bracket (crop p11 x300-621 y405-485 at zoom 3.5): the row matches it, with round one's = a for the α the page sets (founder, 2026-10-10), and the verifier's printed span stops before cos (φ/2): a claim of extent on a meaning place, ruled on what it claims (pipeline/inputs/README)"}
   - {book: phy11-part2, lang: hi, chapter: 14, page: 13, kind: misprint, address: "ch 14 §14.6 ¶4",
      transcribed: "y = y_i + y_r = 0 सभी क्षणों पर।", printed: "y = y_i + y_r = 0 सभी बलों पर।", reason: "the page prints y = y_i + y_r = 0 सभी बलों पर। (crop p13 x40-330 y455-505 at zoom 4), at all forces where the condition holds at all times (the English row: at all times): the book's error, which the row does not keep — round one's text entry, under the founder's ruling of 2026-10-10, writes सभी क्षणों पर; round two's misprint ruling on the same place quoted it without the danda"}
+  # phy11-part1 Hindi, round six (D16, 2026-10-14): the meaning round. The founder ruled on 2026-10-14 that the
+  # meaning ruling of 2026-10-10 governs this book too, though it closed before it (DECISIONS 2026-10-14), so where the
+  # print states something false the row writes the meaning, as phy11-part2's and phy12-part1's do. Nine places in
+  # seven rows, each read on a crop of the page image, each fixed by the English row and by the page's own figures or
+  # the book's own word. Six were listed with that ruling: on ch 2 p2, t_2 = t − Δt/2 and x(t_2) = 0.03 t^3, where Table
+  # 2.1 on the same page gives t_2 = 5.0 s and x(t_2) = 10.0 m for t = 4 s and Δt = 2.0 s; ch 5 p6's W_F, the woman's
+  # symbol, for the friction's W_f; ch 6 p17's कण ("particle") for क्षण ("instant"); ch 6 p22's 40 cm, where Example
+  # 6.8's own answer has AP = 30 cm; ch 6 p30's (OC × mv) twice, where the page's r = OC + CP gives (OC × mv) + (CP ×
+  # mv). Three more came from the sweep of the numbers each row and its English partner do not share, run on the
+  # current rows rather than read off the 2026-10-07 align report: the same pairing, numbers compared by value (4.0 and
+  # 4 as one), and a number right after a reference word (समीकरण, चित्र, Eq., Fig. …) left out as a cross-reference,
+  # which the meaning ruling keeps as printed — the align report's other lines are such cross-references or one value
+  # written two ways. Of the 106 rows left, four hold places: ch 6 p22's, listed above, and three the sweep found —
+  # ch 2 p2's x = 0.8 t^3, where the same table gives x(t_1) = 2.16 m at t_1 = 3.0 s (0.08 × 3^3); ch 6 p27's angular
+  # speed "in rev s^-1" divided by 60 s/min, where Example 6.11's 1200 rpm and the page's next line, 2π × 1200/60 =
+  # 40π rad/s, need rev/min; and ch 7 p5's F¹_GA, F¹_GB, F¹_GC, a raised 1 where the English has the prime of F′. That
+  # one reads two ways — as an exponent, F¹_GA is part (a)'s F_GA = 2Gm² ĵ set equal to 4Gm² ĵ, which is false; as a
+  # label for the new force ("F¹_GB = F_GB"), nothing false — so it was put to the founder (DECISIONS 2026-10-12: a
+  # look-alike ambiguous between the two), who ruled for the meaning on 2026-10-14: its entry writes the English's F′.
+  # The other 102 rows hold no false print: cross-references the reference-word filter let through (a figure or
+  # section number written without its period, a bare equation tag), list numbers, one value written two ways,
+  # subscripts and exponents the editions write differently, Hindi-only remarks that hold (4 सार्थक अंक, पृथ्वी 24
+  # घंटे, sin 90° = 1, लगभग 1/5 गुना), an English-only sentence (ch 5's "14-16 hours"), working steps one edition leaves
+  # out, ch 1's rounding example worked with its own values, and two dates the editions give differently (Joule's birth
+  # year, which the Hindi prints right; Cavendish's 1797, a year his experiment spans). The sweep sees numbers only —
+  # not numbers written as words, nor signs and symbols with no number in them; with the slips already on record it is
+  # this round's whole reach. ch 7 p12 and p13 label Examples 7.5 and 7.6 "उत्तर" ("answer") in the example box's
+  # style, where p13 labels Example 7.7 "उदाहरण": a label that states no physics; kept as printed (founder,
+  # 2026-10-14). The misprint rulings
+  # of rounds one and two at ch 2 p2, ch 5 p6, ch 6 p17 and ch 6 p30 recorded the row carrying the print; they no longer
+  # match a row, and the flags the re-reads raise at these places take the next round's misprint rulings. 9 text
+  # entries; no row's place changes. A span is written as the load shows the rows, after the visarga step. Simulated
+  # with `ncert load --dry-run` on the extraction (sha256 2f7d3414…): no refusal, 84 of 84 sections one to one, 40
+  # rulings on flags, 0 rows inserted, 7 updated, 902 unchanged. Approved by the founder 2026-10-14, as written (on
+  # pipeline/reports/2026-10-14-ncert-load-dry-run-8.md).
+  # phy11-part1 Hindi, chapter 2
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 2, kind: text, address: "ch 2 §2.2 ¶4",
+     transcribed: "x = 0.8 t^3", printed: "x = 0.08 t^3", reason: "the page prints x = 0.8 t³ for the graph of Fig. 2.1 (crop p2 x290-576 y430-545 at zoom 3); by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: Table 2.1 on the same page gives x(t_1) = 2.16 m at t_1 = 3.0 s, which is 0.08 × 3³ (crop p2 x100-576 y585-725 at zoom 2), the paragraph's own x(t_1) = 0.08 t_1³ has 0.08, and so does the English row"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 2, kind: text, address: "ch 2 §2.2 ¶4",
+     transcribed: "t_2(= t - Delta t/2)", printed: "t_2(= t + Delta t/2)", reason: "the page prints t_2(=t–Δt/2), the same minus as t_1 beside it (crop p2 x290-576 y430-545 at zoom 3); by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: Table 2.1 on the same page gives t_2 = 5.0 s for t = 4 s and Δt = 2.0 s, which is t + Δt/2 (crop p2 x100-576 y585-725 at zoom 2), as the English row has"}
+  - {book: phy11-part1, lang: hi, chapter: 2, page: 2, kind: text, address: "ch 2 §2.2 ¶4",
+     transcribed: "x(t_2) = 0.03 t^3_2", printed: "x(t_2) = 0.08 t^3_2", reason: "the page prints x(t_2) = 0.03 t³₂ (crop p2 x290-576 y430-545 at zoom 3); by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: Table 2.1 on the same page gives x(t_2) = 10.0 m at t_2 = 5.0 s, which is 0.08 × 5³ (crop p2 x100-576 y585-725 at zoom 2), as the English row's 0.08 t_2³ does"}
+  # phy11-part1 Hindi, chapter 5
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 6, kind: text, address: "ch 5 §5.5 ¶8",
+     transcribed: "कार्य W_F -> आयत AGHI", printed: "कार्य W_f -> आयत AGHI", reason: "the page labels the friction's work W_F, with a capital italic F, in 'घर्षण बल द्वारा किया गया कार्य W_F→आयत AGHI का क्षेत्रफल' (crop p6 x290-576 y70-130 at zoom 4), the symbol the same answer gives the woman's work, W_F = 1750 J (crop p6 x40-300 y645-725 at zoom 3); by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: the display under it computes W_f = (−50) × 20 = −1000 J, and the English row has W_f"}
+  # phy11-part1 Hindi, chapter 6
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 17, kind: text, address: "ch 6 §6.7.2 ¶26",
+     transcribed: "कोई कण P किसी कण t पर", printed: "कोई कण P किसी क्षण t पर", reason: "the answer prints 'माना कि कोई कण P किसी कण t पर, v वेग से चल रहा है' (crop p17 x290-576 y425-470 at zoom 4), a particle t where an instant t is meant; by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: क्षण, the book's word for an instant ('किसी क्षण t पर', ch 3 p13, crop x40-300 y524-552 at zoom 6), as the English row's 'at some instant t' has"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 22, kind: text, address: "ch 6 §6.8.2 ¶8",
+     transcribed: "इसके एक सिरे से 40 सेंटीमीटर की दूरी", printed: "इसके एक सिरे से 30 सेंटीमीटर की दूरी", reason: "Example 6.8 prints the load '40 सेंटीमीटर' from one end (crop p22 x290-576 y135-265 at zoom 3); by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: the example's own answer works with AP = 30 cm and PG = 5 cm, AG being 35 cm (crop p22 x290-576 y488-530 at zoom 3), and the English row has 30 cm"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 27, kind: text, address: "ch 6 §6.10 ¶13",
+     transcribed: "rev s^-1 में कोणीय वेग", printed: "rev/min में कोणीय वेग", reason: "the answer writes ω_0 = 2π × (the speed in rev/s) and then = (2π × rev s⁻¹ में कोणीय वेग)/(60 सेकेंड/मिनट) (crop p27 x40-300 y520-585 at zoom 4), a speed in rev/s divided by 60 s/min, which is false; by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: the division by 60 s/min converts a speed in rev/min, Example 6.11's 1200 rpm (crop p27 x40-300 y355-435 at zoom 3), which the page's next line works as 2π × 1200/60 = 40π rad/s (crop p27 x40-300 y583-655 at zoom 3), as the English row's 'angular speed in rev/min' has"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 30, kind: text, address: "ch 6 §6.12 ¶4",
+     transcribed: "l = (OC × mv) + (OC × mv)", printed: "l = (OC × mv) + (CP × mv)", reason: "the page prints l = (OC × mv) + (OC × mv), OC twice, under its own r = OC + CP (crop p30 x290-576 y100-175 at zoom 4); by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: l = r × mv with r = OC + CP gives (OC × mv) + (CP × mv), as the English row has"}
+  # phy11-part1 Hindi, chapter 7
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 5, kind: text, address: "ch 7 §7.3 ¶14",
+     transcribed: "F^1_GA = G.2m.2m j_hat = 4Gm^2 j_hat F^1_GB = F_GB and F^1_GC = F_GC F'_R = F^1_GA + F^1_GB + F^1_GC", printed: "F'_GA = G.2m.2m j_hat = 4Gm^2 j_hat F'_GB = F_GB and F'_GC = F_GC F'_R = F'_GA + F'_GB + F'_GC", reason: "Example 7.2 (b) prints F¹_GA, F¹_GB and F¹_GC with a raised 1, while the same lines print F′_R with a prime, and its last line sets a stray hyphen before GA in F¹'s subscript, which the row has never carried (crop p5 x290-576 y405-475 at zoom 5). Read as an exponent, F¹_GA is part (a)'s F_GA = Gm(2m)/1 ĵ = 2Gm² ĵ (crop p5 x40-300 y585-640 at zoom 3), set equal to 4Gm² ĵ, which is false; read as a label for the doubled mass's force, as 'F¹_GB = F_GB' reads, nothing false. A look-alike ambiguous between the two (DECISIONS 2026-10-12), put to the founder, who ruled for the meaning on 2026-10-14: this entry writes the primed forces as the English row has them (F'_GA, F'_GB, F'_GC), the stray hyphen dropped with the symbol it sits in, under the founder's ruling of 2026-10-10, which governs this book from 2026-10-14"}

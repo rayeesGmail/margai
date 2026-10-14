@@ -4765,3 +4765,86 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
   # phy12-part1 Hindi, chapter 2
   - {book: phy12-part1, lang: hi, chapter: 2, page: 17, kind: false_positive, address: "ch 2 §2.8.3 ¶8",
      transcribed: "10^(-29) C m का स्थायी वैद्युत द्विध्रुव आघूर्ण है", printed: "10^(-29) C m", reason: "the page prints the sentence whole on one line, the words after the unit included (crop p17 x44-525 y365-395 at zoom 4; the decoded layer's line y374 agrees): the row matches the page and the verifier's span stops at the unit, as round two ruled its shorter quote of the same place; the cm the page prints is written C m by round one's meaning entry, the form both spans carry"}
+  # phy11-part1 Hindi, round four (D16, 2026-10-14). Not from a second read: since 2026-10-12 the Hindi check counts
+  # words (f2f2ec9; DECISIONS 2026-10-12), and on this book, closed at 909 of 909 on 2026-10-07, it prints fourteen
+  # word lines. Eleven are places where the rows carry a word more often than the page (ch 6 p24's word at two places
+  # on its page), none in the book's ✅ sample, each read on a crop of the page image. Nine are the book's own slips of
+  # spelling or grammar, which state nothing false and which the transcriber repaired: चर्तुभुज, प्रारंम्भिक,
+  # गुरुत्वाकषर्ण, सरंक्षण, कब्जों without the nukta the same row's first कब्ज़ों has, समीरकण, जड़त्त्व (twice),
+  # द्रव्यामन, and "किसी कण को स्थितिज ऊर्जा" where the grammar wants की — restored as printed (DECISIONS 2026-10-03;
+  # the meaning ruling of 2026-10-10 keeps such slips as printed). One is the transcriber's misreading: क्रमविनियम for
+  # the क्रमविनिमय ("commutative") the page prints. The eleventh, ch 3 p16 §3.10 ¶10, has no entry: the page prints
+  # परिणाम ("result") where the example asks for a magnitude, and the row already writes परिमाण, as the English row
+  # does ("What is its magnitude ?") — the meaning ruling's case, as phy12-part1 ch 3 p5 and phy11-part2 ch 13 p13 and
+  # ch 14 p12 (crop p16 x0-576 y525-559 at zoom 4; the decoded layer's line y539). This book closed before that ruling,
+  # and its rows keep false prints as printed that the ruling would write as their meaning: ch 2 p2's t_2 = t − Δt/2
+  # for t + Δt/2 and x(t_2) = 0.03 t^3 for 0.08 t^3; ch 5 p6's W_F, the woman's symbol, for the friction's W_f; ch 6
+  # p17's कण ("particle") for क्षण ("instant"); ch 6 p22's 40 cm for the 30 cm Example 6.8's own solution uses; ch 6
+  # p30's (OC × mv) + (OC × mv) for (OC × mv) + (CP × mv) (ch 6 p16's p for p_i stays either way: the English prints
+  # it so) — and the book's number lines in the align report are not yet swept for more. The founder ruled on
+  # 2026-10-14 that the meaning ruling governs this book too (as recommended): ch 3 p16 keeps no entry, and those
+  # places, with a sweep of the number lines, take a later round. The check's other three lines are the ones read on
+  # 2026-10-12 and left as they are (TRACKER): ch 6 p29's दृढ़, a vowel sign PDFBox folds into its letter, and ch 1 p5's
+  # की and चाल, where the page sets कीचाल with the word space squeezed out (crop p5 x40-300 y580-602 at zoom 8) and the
+  # row keeps the space, spacing the verifier counts as no difference (founder, 2026-10-14, as recommended). 11 text
+  # entries; each changes one word of one row and no row's place; the pages they are on are read again after the
+  # reload, a stored read counting only while its page's rows are unchanged. A span is written as the load shows the
+  # rows, after the visarga step. Simulated with `ncert load --dry-run` on the extraction (sha256 2f7d3414…): no
+  # refusal, 84 of 84 sections one to one, 39 rulings on flags, 0 rows inserted, 11 updated, 898 unchanged. Approved by
+  # the founder 2026-10-14, as written (on pipeline/reports/2026-10-14-ncert-load-dry-run-4.md).
+  # phy11-part1 Hindi, chapter 3
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 8, kind: text, address: "ch 3 §3.6 ¶8",
+     transcribed: "समान्तर चतुर्भुज नियम", printed: "समान्तर चर्तुभुज नियम", reason: "the page prints चर्तुभुज, the reph set over tu rather than over bhu (crop p8 x0-576 y229-263 at zoom 4; the decoded layer's line y243 agrees): the book's own spelling, which the transcriber repaired; restored as printed"}
+  - {book: phy11-part1, lang: hi, chapter: 3, page: 13, kind: text, address: "ch 3 §3.9 ¶4",
+     transcribed: "प्रारंभिक वेग v_0 के घटक", printed: "प्रारंम्भिक वेग v_0 के घटक", reason: "the page prints प्रारंम्भिक, an anusvara and a half ma both before bha (crop p13 x0-576 y277-311 at zoom 4; the decoded layer's line y291 agrees), where lower in the left column it prints प्रारंभिक in 'किसी क्षण t पर प्रारंभिक वेग' (crop p13 x40-300 y524-552 at zoom 6): the book's own spelling at this place, which the transcriber repaired; restored as printed"}
+  # phy11-part1 Hindi, chapter 5
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 7, kind: text, address: "ch 5 §5.7 ¶4",
+     transcribed: "विचार गुरुत्वाकर्षण (अध्याय 7)", printed: "विचार गुरुत्वाकषर्ण (अध्याय 7)", reason: "the footnote prints गुरुत्वाकषर्ण, the reph set over na rather than over sha (crop p7 x0-576 y706-740 at zoom 4; the decoded layer's line y720 agrees): the book's own spelling, which the transcriber repaired; restored as printed"}
+  - {book: phy11-part1, lang: hi, chapter: 5, page: 12, kind: text, address: "ch 5 §5.9 ¶12",
+     transcribed: "ऊर्जा-संरक्षण नियम में किंचित", printed: "ऊर्जा-सरंक्षण नियम में किंचित", reason: "the page prints सरंक्षण, the anusvara set over ra rather than over sa (crop p12 x0-576 y551-585 at zoom 4; the decoded layer's line y565 agrees), where higher in the left column it prints 'ऊर्जा-संरक्षण नियम के अनुसार' right (crop p12 x40-300 y244-270 at zoom 6): the book's own spelling at this place, which the transcriber repaired; restored as printed, the joining dash as the row writes it"}
+  # phy11-part1 Hindi, chapter 6
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 11, kind: text, address: "ch 6 §6.5 ¶12",
+     transcribed: "सदिश गुणन क्रमविनियम नियम", printed: "सदिश गुणन क्रमविनिमय नियम", reason: "the page prints क्रमविनिमय, ma before ya (crop p11 x0-576 y301-335 at zoom 4; the decoded layer's line y315 agrees), the word for 'commutative', as the English row reads ('not commutative'); the row's क्रमविनियम, ya before ma, is the transcriber's misreading"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 14, kind: text, address: "ch 6 §6.7.1 ¶1",
+     transcribed: "ऐसा नहीं है। कब्ज़ों से", printed: "ऐसा नहीं है। कब्जों से", reason: "at this place the page prints कब्जों with no nukta under ja (crop p14 x0-576 y673-707 at zoom 4, and x370-450 y674-700 at zoom 10; the decoded layer's line y687 agrees), where higher in the same paragraph it prints कब्ज़ों with the nukta, as the row has it there (crop p14 x470-576 y598-626 at zoom 10): the book's own spelling, which the transcriber made uniform; restored as printed"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 21, kind: text, address: "ch 6 §6.8.2 ¶5",
+     transcribed: "हम देखते हैं कि समीकरण (6.33)", printed: "हम देखते हैं कि समीरकण (6.33)", reason: "the page prints समीरकण, ra and ka in each other's place (crop p21 x0-576 y529-563 at zoom 4; the decoded layer's line y543 agrees): the book's own spelling, which the transcriber repaired; restored as printed"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 24, kind: text, address: "ch 6 §6.9 ¶4",
+     transcribed: "जिसका नाम जड़त्व आघूर्ण", printed: "जिसका नाम जड़त्त्व आघूर्ण", reason: "the page prints जड़त्त्व, a doubled ta before va (crop p24 x0-576 y180-214 at zoom 4, and x140-260 y180-208 at zoom 10; the decoded layer's line y194 agrees), where the same page prints जड़त्व with one ta in 'जड़त्व आघूर्ण ज्ञात करने' (crop p24 x40-300 y544-568 at zoom 6): the book's own spelling at this place, which the transcriber repaired; restored as printed"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 24, kind: text, address: "ch 6 §6.9 ¶11",
+     transcribed: "दी गई अक्ष के परितः जड़त्व आघूर्ण", printed: "दी गई अक्ष के परितः जड़त्त्व आघूर्ण", reason: "at the end of a right-column line the page prints जड़त्त्व again, a doubled ta before va (crop p24 x0-576 y532-566 at zoom 4, and x460-576 y530-554 at zoom 10; the decoded layer's line y546 agrees): the book's own spelling at this place, which the transcriber repaired; restored as printed"}
+  - {book: phy11-part1, lang: hi, chapter: 6, page: 29, kind: text, address: "ch 6 §6.11 ¶19",
+     transcribed: "नगण्य द्रव्यमान वाली", printed: "नगण्य द्रव्यामन वाली", reason: "Example 6.12 prints द्रव्यामन, the aa-sign after ya rather than after ma, and on its next line '20 kg द्रव्यमान' right (crop p29 x0-576 y211-255 at zoom 4; the decoded layer's line y225 agrees): the book's own spelling at this place, which the transcriber repaired; restored as printed"}
+  # phy11-part1 Hindi, chapter 7
+  - {book: phy11-part1, lang: hi, chapter: 7, page: 9, kind: text, address: "ch 7 §7.7 ¶7",
+     transcribed: "किसी कण की स्थितिज ऊर्जा उस कण", printed: "किसी कण को स्थितिज ऊर्जा उस कण", reason: "the italic definition prints 'किसी कण को स्थितिज ऊर्जा उस कण को अनन्त से', को where the grammar wants की (crop p9 x290-576 y548-590 at zoom 4), and the paragraph below prints 'किसी कण की स्थितिज ऊर्जा का' right (crop p9 x290-576 y612-642 at zoom 5): a slip of grammar that states nothing false — the sentence still sets the potential energy at a point equal to the work done in bringing the particle from infinity, as the English row does; restored as printed"}
+  # phy11-part2 Hindi, round four (D16, 2026-10-14). Not from a second read: since 2026-10-12 the Hindi check counts
+  # words (f2f2ec9; DECISIONS 2026-10-12), and on this book, closed at 682 of 682 on 2026-10-12, it prints thirteen
+  # word lines. Five are places where the rows carry a word more often than the page, none in the book's ✅ sample, each
+  # read on a crop of the page image and each the book's own slip of spelling or grammar, which states nothing false
+  # and which the transcriber repaired: कईं, तंरग, "उदाहरण के लए," (the i-sign of लिए missing at a line start),
+  # "पिस्टन की 6 cm" where the grammar wants को, and वेर्गों — one mark from वेगों ("velocities") and one from वर्गों
+  # ("squares"), naming neither; the sentence and the English row's "molecular distribution of velocities" read it as
+  # velocities, and it is kept as printed as phy12-part1 ch 2 p21's निरक्षित was (founder, 2026-10-13) and as this
+  # book's वर्गीकृत चालों is (founder, 2026-10-12); the founder kept this place as printed on 2026-10-14. Restored as printed
+  # (DECISIONS 2026-10-03; the meaning ruling of 2026-10-10 keeps such slips as printed). The other eight lines are
+  # meaning places: six where an earlier round wrote the meaning (round one: ch 10 p5 दाब, ch 10 p10 द्रव, ch 12 p7
+  # माध्य, ch 13 p13 विस्थापन, ch 14 p13 क्षणों; round two: ch 14 p9 अपेक्षित) and two where the row already wrote it
+  # (परिमाण, ch 13 p13 and ch 14 p12). 5 text entries; each changes one word of one row and no row's place; the pages they are on are read again
+  # after the reload, a stored read counting only while its page's rows are unchanged. A span is written as the load
+  # shows the rows, after the visarga step. Simulated with `ncert load --dry-run` on the extraction (sha256 51ab7180…):
+  # no refusal, 95 of 95 sections one to one, 56 rulings on flags, 0 rows inserted, 5 updated, 677 unchanged. Approved
+  # by the founder 2026-10-14, as written (on pipeline/reports/2026-10-14-ncert-load-dry-run-5.md).
+  # phy11-part2 Hindi, chapter 9
+  - {book: phy11-part2, lang: hi, chapter: 9, page: 6, kind: text, address: "ch 9 §9.2.4 ¶3",
+     transcribed: "कई युक्तियाँ", printed: "कईं युक्तियाँ", reason: "the page prints कईं, an anusvara dot over the ii (crop p6 x0-603 y604-638 at zoom 4; the decoded layer's line y618 agrees): the book's own spelling, which the transcriber repaired; restored as printed"}
+  - {book: phy11-part2, lang: hi, chapter: 9, page: 7, kind: text, address: "ch 9 §9.2.4 ¶4",
+     transcribed: "छोटे पिस्टन को 6 cm", printed: "छोटे पिस्टन की 6 cm", reason: "Example 9.5's box prints '(b) यदि छोटे पिस्टन की 6 cm अंदर धक्का दिया जाता है', की where the grammar wants को (crop p7 x0-603 y565-599 at zoom 4; the decoded layer's line y579 agrees): a slip of grammar that states nothing false — the smaller piston is still the one pushed in 6 cm, as in the English row's 'If the smaller piston is pushed in through 6.0 cm'; restored as printed"}
+  # phy11-part2 Hindi, chapter 11
+  - {book: phy11-part2, lang: hi, chapter: 11, page: 2, kind: text, address: "ch 11 §11.1 ¶4",
+     transcribed: "इसमें अणुओं के वेगों का", printed: "इसमें अणुओं के वेर्गों का", reason: "the page prints वेर्गों, with a reph over ga that वेगों ('velocities') does not have and an e-sign that वर्गों ('squares') does not have (crop p2 x0-603 y275-309 at zoom 4; the decoded layer's line y289 agrees): a misspelling one mark from either word and naming neither, in a sentence about what the kinetic theory describes, which the English row gives as the 'molecular distribution of velocities'; the book's own spelling, which the transcriber repaired; restored as printed, as phy12-part1 ch 2 p21's निरक्षित was (founder, 2026-10-13) and as this book's वर्गीकृत चालों is (founder, 2026-10-12); kept as printed at this place by the founder, 2026-10-14"}
+  # phy11-part2 Hindi, chapter 14
+  - {book: phy11-part2, lang: hi, chapter: 14, page: 11, kind: text, address: "ch 14 §14.5 ¶3",
+     transcribed: "करने वाला तरंग फलन", printed: "करने वाला तंरग फलन", reason: "the page prints तंरग, the anusvara set over ta rather than over ra (crop p11 x0-621 y698-732 at zoom 4, and x150-300 y700-728 at zoom 8; the decoded layer's line y712 agrees): the book's own spelling at this place, which the transcriber repaired; restored as printed"}
+  - {book: phy11-part2, lang: hi, chapter: 14, page: 13, kind: text, address: "ch 14 §14.6.1 ¶1",
+     transcribed: "उदाहरण के लिए, किसी डोरी", printed: "उदाहरण के लए, किसी डोरी", reason: "the page ends a line with 'उदाहरण के' and starts the next with 'लए,', the i-sign of लिए missing and no hyphen (crop p13 x40-300 y574-616 at zoom 4, and the line end x200-330 y574-598 at zoom 8; the decoded layer's line y602 agrees): the book's own spelling, which the transcriber repaired; restored as printed"}

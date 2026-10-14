@@ -1,0 +1,437 @@
+# margai-pipeline ncert load dry-run
+
+- run: 2026-10-14 16:25 IST
+- input: /Users/rayeesahmed/Documents/margai/pipeline/inputs/books.yaml
+- sha256: 43094de04766d480a31d739fac3a7135d697568a2cc78ef7ebe587685e3b6b5c
+- read: 7 chapters of phy11-part1 (hi)
+- result: ok
+DRY RUN: nothing is written — the database write runs inside a transaction that is rolled back, so every count below is what this load would do
+extraction: p1-hi.jsonl sha256 2f7d341499c86ca945fdc22577961e13253639affc08c93a1af70289c9b80901 — a local file read in place of extract/phy11-part1/hi.jsonl, not the content store; the reload's report prints the artefact's sha256 to match
+corrections: /Users/rayeesahmed/Documents/margai/pipeline/inputs/ncert-corrections.yaml sha256 b29499860a2ecd1354cabfd0be634c804c87bad2b9dedc72213aa855b25999ec
+
+## page-break repairs to the model's continuation flags (deterministic, each one named)
+
+none
+
+## a visarga the model wrote as a colon (deterministic, each one named)
+
+- ch 1 p2 §1.2: a visarga written as a colon — परितः
+- ch 1 p4 §1.3: a visarga written as a colon — अतः
+- ch 1 p4 §1.3: a visarga written as a colon — अतः, अतः
+- ch 1 p4 §1.3: a visarga written as a colon — अतः
+- ch 1 p4 §1.3: a visarga written as a colon — प्रायः
+- ch 2 p2 §2.2: a visarga written as a colon — अतः
+- ch 2 p2 §2.2: a visarga written as a colon — अंततः
+- ch 2 p4 §2.3: a visarga written as a colon — अतः
+- ch 2 p5 §2.4: a visarga written as a colon — अतः, अतः
+- ch 2 p7 §2.4: a visarga written as a colon — अतः
+- ch 2 p9 §2.4: a visarga written as a colon — अतः
+- ch 2 p9 §2.4: a visarga written as a colon — क्रमशः
+- ch 2 p9 §2.4: a visarga written as a colon — अतः
+- ch 3 p4 §3.4: a visarga written as a colon — पुनः
+- ch 3 p5 §3.5: a visarga written as a colon — अतः
+- ch 3 p9 §3.7.1: a visarga written as a colon — अतः
+- ch 3 p9 §3.7.1: a visarga written as a colon — अतः
+- ch 3 p9 §3.7.1: a visarga written as a colon — प्रायः
+- ch 3 p10 §3.7.1: a visarga written as a colon — अतः
+- ch 3 p10 §3.7.1: a visarga written as a colon — क्रमशः
+- ch 3 p14 §3.9: a visarga written as a colon — अतः
+- ch 3 p14 §3.9: a visarga written as a colon — अतः
+- ch 3 p15 §3.10: a visarga written as a colon — अतः
+- ch 3 p15 §3.10: a visarga written as a colon — पुनः, अतः, पुनः
+- ch 3 p15 §3.10: a visarga written as a colon — अतः
+- ch 4 p1 §4.1: a visarga written as a colon — स्पष्टतः
+- ch 4 p2 §4.2: a visarga written as a colon — वस्तुतः
+- ch 4 p2 §4.2: a visarga written as a colon — अंततः
+- ch 4 p2 §4.3: a visarga written as a colon — पूर्णतः
+- ch 4 p2 §4.3: a visarga written as a colon — निः
+- ch 4 p3 §4.4: a visarga written as a colon — अतः
+- ch 4 p5 §4.5: a visarga written as a colon — अतः
+- ch 4 p6 §4.5: a visarga written as a colon — अतः
+- ch 4 p9 §4.6: a visarga written as a colon — अतः, अतः
+- ch 4 p9 §4.6: a visarga written as a colon — अतः
+- ch 4 p13 §4.9.1: a visarga written as a colon — अंतिमतः
+- ch 4 p13 §4.9.1: a visarga written as a colon — सन्निकटतः
+- ch 4 p13 §4.9.1: a visarga written as a colon — अतः
+- ch 4 p13 §4.9.1: a visarga written as a colon — अतः
+- ch 4 p15 §4.9.1: a visarga written as a colon — प्रायः, अतः
+- ch 4 p15 §4.10: a visarga written as a colon — अतः
+- ch 5 p1 §5.1: a visarga written as a colon — प्रायः, मुख्यतः
+- ch 5 p6 §5.5: a visarga written as a colon — अतः
+- ch 5 p6 §5.6: a visarga written as a colon — अतः
+- ch 5 p7 §5.7: a visarga written as a colon — अतः, अतः, स्वतः
+- ch 5 p7 §5.7: a visarga written as a colon — स्वतः
+- ch 5 p11 §5.9: a visarga written as a colon — अतः, अतः, अतः
+- ch 5 p12 §5.9: a visarga written as a colon — अतः
+- ch 5 p12 §5.9: a visarga written as a colon — अतः
+- ch 5 p16 §5.11.3: a visarga written as a colon — अतः
+- ch 5 p16 §5.11.3: a visarga written as a colon — अतः
+- ch 5 p16 §5.11.3: a visarga written as a colon — अतः
+- ch 6 p2 §6.1.1: a visarga written as a colon — अतः, अतः, अतः
+- ch 6 p2 §6.1.1: a visarga written as a colon — परितः
+- ch 6 p6 §6.2: a visarga written as a colon — प्रायः
+- ch 6 p6 §6.2: a visarga written as a colon — अतः
+- ch 6 p6 §6.2: a visarga written as a colon — परिणामतः
+- ch 6 p6 §6.2: a visarga written as a colon — क्रमशः
+- ch 6 p8 §6.3: a visarga written as a colon — अतः
+- ch 6 p15 §6.7.1: a visarga written as a colon — अतः
+- ch 6 p15 §6.7.1: a visarga written as a colon — अतः
+- ch 6 p20 §6.8: a visarga written as a colon — परितः
+- ch 6 p20 §6.8: a visarga written as a colon — क्रमशः, क्रमशः, परितः
+- ch 6 p20 §6.8: a visarga written as a colon — स्पष्टतः, परितः
+- ch 6 p20 §6.8.1: a visarga written as a colon — परितः, क्रमशः
+- ch 6 p20 §6.8.1: a visarga written as a colon — परितः, अतः
+- ch 6 p20 §6.8.1: a visarga written as a colon — सामान्यतः
+- ch 6 p20 §6.8.1: a visarga written as a colon — प्रायः
+- ch 6 p21 §6.8.1: a visarga written as a colon — अतः
+- ch 6 p21 §6.8.2: a visarga written as a colon — पूर्णतः, ऊर्ध्वाधरतः
+- ch 6 p21 §6.8.2: a visarga written as a colon — परितः
+- ch 6 p21 §6.8.2: a visarga written as a colon — परितः, परितः
+- ch 6 p21 §6.8.2: a visarga written as a colon — परितः
+- ch 6 p21 §6.8.2: a visarga written as a colon — अतः, अतः, अतः
+- ch 7 p14 §7.10: a visarga written as a colon — अतः
+
+## a word glued to a colon that the visarga list does not know — adjudicate
+
+left as written: a `text` entry if the page means a visarga, nothing if it is a colon
+- ch 2 p2 §2.2: अनन्त:
+
+## corrections from ncert-corrections.yaml (founder-adjudicated, each one named)
+
+- ch 1 page 3 §1.2: "ध्यान दीजिए, मोल का उपयोग करते समय" starts a new paragraph, not the previous page's (English ¶6 begins here; the row ran from p2 across the footnote onto p3)
+- ch 1 page 4 §1.3: "इन सभी संख्याओं में सार्थक अंकों की संख्या वही" starts a new paragraph, not the previous page's (English ¶4 begins here; the Hindi print runs English ¶4 to ¶6 as one paragraph)
+- ch 1 page 4 §1.3: a new paragraph starts at "यह दर्शाता है कि सार्थक अंकों की संख्या निर्धारित करने में" (English ¶5 begins here)
+- ch 1 page 4 §1.3: a new paragraph starts at "उपरोक्त उदाहरण से निम्नलिखित नियम" (English ¶6 begins here)
+- ch 1 page 4 §1.3: a new paragraph starts at "• सभी शून्येतर अंक सार्थक" (English ¶7, the first rule of the list, begins here)
+- ch 1 page 4 §1.3: a new paragraph starts at "• यदि किसी संख्या में दशमलव बिन्दु है, तो" (English ¶8, the second rule of the list, begins here)
+- ch 1 page 4 §1.3: a new paragraph starts at "(अतः 123 m = 12300 cm" (English ¶11, the bracketed remark, begins here)
+- ch 1 page 4 §1.3: a new paragraph starts at "• एक से बड़ी, बिना दशमलव वाली" (English ¶18, the first rule under (4), begins here)
+- ch 1 page 4 §1.3: a new paragraph starts at "• दशमलव वाली संख्या के लिए अनुगामी" (English ¶19, the second rule under (4), begins here)
+- ch 1 page 6 §1.3.3: a new paragraph starts at "उदाहरणार्थ, 12.9 g" (English ¶6 begins here; the Hindi print keeps it in ¶5's paragraph)
+- ch 1 page 6 §1.3.3: "1.02 में आपेक्षिक त्रुटि = (± 0.01/1.02)" joined onto the paragraph before it (the displayed relative errors belong to English ¶8, which the row before it begins)
+- ch 1 page 7 §1.3.3: "अंत में, याद रखिए कि बहुपदीय" starts a new paragraph, not the previous page's (English ¶9 begins here, at the top of p7; it does not continue p6's displays)
+- ch 1 page 7 §1.4: a new paragraph starts at "बल की विमाएँ [M] [L]/[T]^2" (English ¶4 begins here, after the displayed definition of force)
+- ch 1 page 8 §1.6.1: a new paragraph starts at "प्रत्येक पद के लिए विमीय समीकरण लिखने पर" (English ¶4 begins here)
+- ch 1 page 8 §1.6.1: a new paragraph starts at "दक्षिण पक्ष की विमाएँ [M][L T^-2] [L]" (English ¶8 (the RHS) begins here; the Hindi print sets Example 1.3's answer as one paragraph)
+- ch 1 page 8 §1.6.1: a new paragraph starts at "चूँकि, दोनों पक्षों की विमाएँ समान हैं" (English ¶9 begins here)
+- ch 1 page 9 §1.6.2: a new paragraph starts at "जहाँ, k एक विमाहीन स्थिरांक है" (English ¶4 begins here)
+- ch 1 page 9 §1.6.2: a new paragraph starts at "दोनों ओर की राशियों के विमीय सूत्र लिखने पर" (English ¶5 begins here)
+- ch 1 page 9 §1.6.2: a new paragraph starts at "दोनों ओर की विमाएँ समीकृत करने पर" (English ¶6 begins here)
+- ch 1 page 9 §1.6.2: a new paragraph starts at "वास्तव में, k = 2pi, अतः" (English ¶8 begins here)
+- ch 2 page 2 §2.2: a new paragraph starts at "अब हम Delta t का मान 2 s से घटाकर 1 s कर देते हैं" (English ¶4 begins here; the Hindi print keeps it in ¶3's paragraph)
+- ch 2 page 4 §2.3: "यदि क्षण t=0 पर वस्तु का वेग v_0" joined onto the paragraph before it (the sentence leading to Eq. (2.4) is the end of English ¶6, which the row before it begins)
+- ch 2 page 5 §2.4: "इस समीकरण को चित्र 2.5 में ग्राफ के रूप में" joined onto the paragraph before it (English ¶1 runs on past Eq. (2.4) to the figure sentence; the Hindi row was cut at the display)
+- ch 2 page 5 §2.4: "इस वक्र के अंतर्गत आने वाला क्षेत्रफल :" joined onto the paragraph before it (the area under the curve is the end of English ¶1)
+- ch 2 page 5 §2.4: "समीकरण (2.5) को हम निम्न प्रकार भी लिख सकते हैं" joined onto the paragraph before it (Eqs. (2.7a) and (2.7b) are the end of English ¶2, which the row before it begins)
+- ch 2 page 5 §2.4: "समीकरण (2.4) से t = (v–v_0)/a" joined onto the paragraph before it (the substitution leading to Eq. (2.8) is the end of English ¶3, which the row before it begins)
+- ch 2 page 6 §2.4: "ये सभी एकसमान त्वरित सरल रेखीय गति के" joined onto the paragraph before it (the sentence after Eq. (2.9a) is the end of English ¶4; the Hindi row was cut at the display)
+- ch 2 page 6 §2.4: "पुनः v = dx/dt dx = v dt" joined onto the paragraph before it (the second integration is the end of English ¶7, the first half of Example 2.2's answer)
+- ch 2 page 6 §2.4: "अब, v_o = + 20 m s^-1" joined onto the paragraph before it (the given values and the working are the rest of English ¶11, Example 2.3's answer (a))
+- ch 2 page 7 §2.4: "हमें y_0 = 45 m दिया है" joined onto the paragraph before it (the given values and the substituted equation are the end of English ¶14; the Hindi row was cut at the display)
+- ch 2 page 7 §2.4: a new paragraph starts at "अतः t_2 = 3 s" (English ¶15, the result t_2 = 3 s, begins here)
+- ch 2 page 7 §2.4: "वस्तु को y = 0 स्थिति में विरामावस्था से गिराते हैं" joined onto the paragraph before it (the release from rest and the three equations are the end of English ¶22; the Hindi row was cut at the display)
+- ch 2 page 8 §2.4: a new paragraph starts at "ये समीकरण वस्तु के वेग, और उसके द्वारा चली गई दूरी" (English ¶23 begins here, after the three displayed equations)
+- ch 2 page 8 §2.4: a new paragraph starts at "इस समीकरण की सहायता से हम भिन्न-भिन्न समय अंतरालों" (English ¶26 begins here, after the displayed equation that ends ¶25)
+- ch 2 page 8 §2.4: "इस नियम को सर्वप्रथम गैलीलियो गैलिली" joined onto the paragraph before it (the sentence on Galileo is the end of English ¶26; the Hindi print sets it as its own paragraph)
+- ch 2 page 9 §2.4: a new paragraph starts at "आप स्वयं का प्रतिक्रिया काल एक साधारण प्रयोग द्वारा" (English ¶32 begins here; the Hindi print runs Example 2.7's statement as one paragraph)
+- ch 2 page 2 §2.2: "अनन्त: सूक्ष्म" → "अनन्तः सूक्ष्म" (the page means the adverb (infinitesimally small) — a visarga, which the transcriber wrote as a colon (crop p2 x40-300 y205-235); the visarga step does not list this word and left it for a ruling)
+- ch 2 page 5 §2.4: "प्रारंभिक वेग (v_0)" → "प्रारंभिक वेग (v_o)" (the page prints a subscript letter o here, '(v_o)', the same glyph as the two v_o the row already carries in the next lines; the right column's v_0 are narrow zeros (crop p5 y610-645 at zoom 7 against y340-365; layer y616, y349). The flag quoted 'v_0)', which occurs six times on the page, so the span is widened)
+- ch 3 page 3 §3.3: a new paragraph starts at "उदाहरणस्वरूप, यदि A को 2 से गुणा किया जाए" (English ¶2 begins here; the Hindi print runs English ¶1 to ¶3 as one paragraph)
+- ch 3 page 3 §3.3: a new paragraph starts at "सदिश A को यदि एक ऋणात्मक संख्या" (English ¶3 begins here)
+- ch 3 page 4 §3.4: a new paragraph starts at "सदिशों का योग साहचर्य नियम का भी पालन" (English ¶2 begins here, after Eq. (3.1); the Hindi row runs English ¶1 to ¶4 as one paragraph)
+- ch 3 page 4 §3.4: a new paragraph starts at "दो समान और विपरीत सदिशों को जोड़ने पर" (English ¶3 begins here, after Eq. (3.2))
+- ch 3 page 4 §3.4: a new paragraph starts at "दरअसल जब हम एक सदिश A को संख्या शून्य" (English ¶4 begins here: the null vector from multiplying by zero, then its properties (3.4))
+- ch 3 page 4 §3.4: a new paragraph starts at "इसे चित्र 3.5 में दर्शाया गया है" (English ¶7 begins here, after Eq. (3.5); the Hindi print keeps it in ¶6's paragraph)
+- ch 3 page 6 §3.5: "एकांक सदिश : एकांक सदिश वह सदिश होता है" joined onto the paragraph before it (English ¶2 runs on through the definition of a unit vector; the Hindi print starts a new paragraph at it)
+- ch 3 page 6 §3.5: a new paragraph starts at "क्योंकि ये सभी एकांक सदिश हैं, इसलिए" (English ¶3, the sentence carrying Eq. (3.9), begins here)
+- ch 3 page 6 §3.5: "यदि किसी एकांक सदिश n_hat को एक अदिश" joined onto the paragraph before it (English ¶4 runs on through Eq. (3.10); the Hindi print breaks it in two)
+- ch 3 page 6 §3.5: a new paragraph starts at "इसे चित्र (3.9c) में दर्शाया गया है" (English ¶6 begins here, after Eq. (3.12); the Hindi print keeps it in ¶5's paragraph)
+- ch 3 page 6 §3.5: "त्रिकोणमिति का उपयोग करके A_x व A_y को" joined onto the paragraph before it (English ¶6 runs on through Eq. (3.13) and the sentence after it; the Hindi print starts a new paragraph at the trigonometry sentence)
+- ch 3 page 6 §3.5: a new paragraph starts at "(i) उसके परिमाण A तथा उसके द्वारा" (English ¶8, list item (i), begins here)
+- ch 3 page 6 §3.5: a new paragraph starts at "(ii) उसके घटकों A_x तथा A_y द्वारा" (English ¶9, list item (ii), begins here)
+- ch 3 page 7 §3.5: "सदिश A का परिमाण A = sqrt(A_x^2" joined onto the paragraph before it (Eq. (3.16c) belongs to English ¶12, which the row before it begins with Eq. (3.16b))
+- ch 3 page 7 §3.5: "एक स्थिति सदिश r को निम्नलिखित प्रकार से" joined onto the paragraph before it (the position vector and Eq. (3.17) close English ¶12)
+- ch 3 page 7 §3.6: a new paragraph starts at "क्योंकि सदिश क्रमविनिमेय तथा साहचर्य नियमों" (English ¶2 begins here, after the sum R = A + B; the Hindi print runs English ¶1 to ¶3 as one paragraph)
+- ch 3 page 7 §3.6: a new paragraph starts at "इस प्रकार परिणामी सदिश R का प्रत्येक घटक" (English ¶3 begins here, after Eq. (3.21))
+- ch 3 page 7 §3.6: a new paragraph starts at "इस विधि को अनेक सदिशों को जोड़ने व घटाने" (English ¶5 begins here, after Eq. (3.22); the Hindi print keeps it in ¶4's paragraph)
+- ch 3 page 8 §3.6: "समीकरण (3.24a) से परिणामी R का परिमाण" joined onto the paragraph before it (the closing sentences of the Answer to Example 3.2 belong to English ¶8)
+- ch 3 page 8 §3.6: a new paragraph starts at "कोज्या-नियम का उपयोग करके हम R का परिमाण" (English ¶11 begins here; the Hindi print keeps the magnitude step in ¶10's paragraph)
+- ch 3 page 8 §3.6: "R की दिशा ज्ञात करने के लिए हम" joined onto the paragraph before it (the direction step by the Law of sines belongs to English ¶11)
+- ch 3 page 9 §3.7.1: a new paragraph starts at "क्योंकि v_bar = Delta r / Delta t, इसलिए चित्र (3.12)" (English ¶5 begins here; the Hindi print keeps this sentence in ¶4's paragraph)
+- ch 3 page 9 §3.7.1: "गतिमान वस्तु का वेग (तात्क्षणिक वेग)" joined onto the paragraph before it (the instantaneous velocity and Eq. (3.28) belong to English ¶5)
+- ch 3 page 9 §3.7.1: a new paragraph starts at "चित्रों 3.13(a) से लेकर 3.13(d) की सहायता" (English ¶6 begins here, after Eq. (3.28))
+- ch 3 page 10 §3.7.1: "चित्र 3.14 में बिन्दु P पर किसी वेग सदिश" joined onto the paragraph before it (the Fig. 3.14 sentence closes English ¶9; the Hindi print sets it as its own paragraph)
+- ch 3 page 11 §3.7.1: a new paragraph starts at "जहां t सेकंड में व्यक्त किया गया है" (English ¶16 begins here; English ¶15 is the Example 3.4 statement up to the position vector)
+- ch 3 page 11 §3.8: "तब परिभाषा के अनुसार a = (v - v_0)/(t - 0)" joined onto the paragraph before it (Eqs. (3.33a) and (3.33b) belong to English ¶1; the Hindi print breaks it in two)
+- ch 3 page 12 §3.8: "यह बात आसानी से सत्यापित की जा सकती है" joined onto the paragraph before it (English ¶2 runs on through Eq. (3.34b); the Hindi print starts a new paragraph after Eq. (3.34a))
+- ch 3 page 12 §3.9: "सर्वप्रथम गैलीलियो ने अपने लेख" joined onto the paragraph before it (the Galileo sentence closes English ¶1; the Hindi print sets it as its own paragraph)
+- ch 3 page 13 §3.9: a new paragraph starts at "यदि चित्र 3.16 के अनुसार वस्तु की प्रारंभिक स्थिति" (English ¶5 begins here, after Eq. (3.36); the Hindi print keeps it in ¶4's paragraph)
+- ch 3 page 13 §3.9: "समीकरण (3.33b) का उपयोग करके किसी समय" joined onto the paragraph before it (English ¶5 runs on through Eq. (3.38) to the maximum-height remark; the Hindi print breaks it after Eq. (3.37))
+- ch 3 page 13 §3.9: a new paragraph starts at "क्योंकि g, theta_0 तथा v_0 अचर हैं" (English ¶7 begins here; the Hindi-only sentence before it, on Eq. (3.39) being the path's equation, stays with ¶6)
+- ch 3 page 14 §3.9: "अब कोणों (45° + alpha) तथा (45° − alpha)" joined onto the paragraph before it (the Answer to Example 3.6 is one English row; the Hindi print breaks it after the range formula)
+- ch 3 page 15 §3.9: "(c) फेंकने वाले बिंदु से उस बिंदु की दूरी जहाँ गेंद" starts a new paragraph, not the previous page's (English ¶19, part (c) of the Answer to Example 3.8, begins here at the top of p15; it does not continue part (b) on p14)
+- ch 3 page 15 §3.10: a new paragraph starts at "मान लीजिए r व r' के बीच का कोण" (English ¶4 begins here; English ¶3 is the definition of |a| alone)
+- ch 3 page 16 §3.10: "इस प्रकार किसी R त्रिज्या वाले वृत्तीय पथ" joined onto the paragraph before it (English ¶4 runs on after Eq. (3.43) to the end of the centripetal-acceleration discussion; the Hindi print starts a new paragraph)
+- ch 3 page 16 §3.10: a new paragraph starts at "अभिकेंद्र त्वरण को हम कोणीय चाल के रूप में" (English ¶8 begins here, after Eq. (3.45); the Hindi print runs English ¶7 to ¶9 as one paragraph)
+- ch 3 page 16 §3.10: a new paragraph starts at "वृत्त का एक चक्कर लगाने में वस्तु को" (English ¶9 begins here, after Eq. (3.46))
+- ch 3 page 16 §3.10: a new paragraph starts at "वृत्त के हर बिंदु पर वेग v की दिशा" (English ¶12 begins here; the Hindi print keeps the whole Answer to Example 3.9 in one paragraph)
+- ch 3 page 9 §3.7.1: "वस्तु के विस्थापन और संगत समय अंतराल के अनुपात" joined onto the paragraph before it (the side heading वेग leads the paragraph printed under it (DECISIONS 2026-09-27); it loaded as a row of its own)
+- ch 3 page 14 §3.9: "समीकरण (3.37) में t = t_m रखकर" joined onto the paragraph before it (the side heading प्रक्षेप्य की अधिकतम ऊँचाई leads the paragraph printed under it (DECISIONS 2026-09-27); it loaded as a row of its own)
+- ch 3 page 14 §3.9: "प्रारंभिक स्थिति (x = y = 0) से चलकर" joined onto the paragraph before it (the side heading प्रक्षेप्य का क्षैतिज परास leads the paragraph printed under it (DECISIONS 2026-09-27); it loaded as a row of its own)
+- ch 3 page 10 §3.7.1: "x-y समतल में गतिमान वस्तु का औसत त्वरण" → "त्वरण x-y समतल में गतिमान वस्तु का औसत त्वरण" (the page prints the side heading त्वरण above this paragraph (crop p10 x290-560 y262-318; the layer's line agrees) and the transcription left it out; a side heading leads its paragraph and is never dropped (DECISIONS 2026-09-27))
+- ch 4 page 2 §4.3: a new paragraph starts at "व्यवहार में गेंद क्षैतिज समतल पर" (English ¶4 begins here; the Hindi print keeps it in ¶3's paragraph)
+- ch 4 page 3 §4.4: a new paragraph starts at "अब विरामावस्था अथवा एकसमान रैखिक गति दोनों ही में" (English ¶3 begins here; the Hindi print runs English ¶2 to ¶4 as one paragraph)
+- ch 4 page 3 §4.4: a new paragraph starts at "व्यवहार में इस नियम के अनुप्रयोग से" (English ¶4 begins here)
+- ch 4 page 5 §4.5: a new paragraph starts at "स्पष्ट रूप से संवेग एक सदिश राशि है" (English ¶3 begins here, after the display (4.1) that closes ¶2)
+- ch 4 page 6 §4.5: a new paragraph starts at "1. गति के द्वितीय नियम में F = 0" (English ¶15, point 1 of the list, begins here; the row before it is the lead-in sentence, English ¶14)
+- ch 4 page 7 §4.5: a new paragraph starts at "गति के द्वितीय नियम के द्वारा, मंदन बल" (English ¶21 begins here; the Hindi keeps the whole Answer of Example 4.2 as one paragraph)
+- ch 4 page 7 §4.5: a new paragraph starts at "इस प्रकरण में, वास्तविक अवरोधी बल" (English ¶22 begins here)
+- ch 4 page 7 §4.5: a new paragraph starts at "अतः दिए गए समीकरण से गुरुत्वीय त्वरण" (English ¶25 begins here; the Hindi keeps it in the Answer of Example 4.3)
+- ch 4 page 7 §4.5: "कभी-कभी हमारा सामना ऐसे दृष्टांतों से" joined onto the paragraph before it (English ¶26 carries the run-in head Impulse and its paragraph as one row; the Hindi head was loaded as a row of its own)
+- ch 4 page 8 §4.6: a new paragraph starts at "प्रत्येक क्रिया की सदैव समान एवं विपरीत दिशा में" (English ¶3, the statement of the third law, begins here)
+- ch 4 page 8 §4.6: a new paragraph starts at "बल सदैव युगलों में पाए जाते हैं" (English ¶6, the restated third law, begins here; the Hindi keeps it in point 1's paragraph)
+- ch 4 page 9 §4.6: "(A पर B द्वारा बल) = – (B पर A द्वारा बल)" continues the previous page's paragraph (the line under (4.8) and the two sentences after it belong to English ¶8, point 3, which the last row of p8 begins)
+- ch 4 page 9 §4.6: a new paragraph starts at "फिर भी, यदि आप दो पिण्डों के किसी निकाय" (English ¶9 begins here)
+- ch 4 page 9 §4.6: "प्रकरण (a) (p_x)_आरंभिक = mu" joined onto the paragraph before it (English ¶12 is one row from the method through Case (a) and Case (b); the Hindi has Case (a) as a row of its own)
+- ch 4 page 9 §4.6: "प्रकरण (b) (p_x)_आरंभिक = m u cos 30°" joined onto the paragraph before it (Case (b) is the rest of English ¶12)
+- ch 4 page 10 §4.8: a new paragraph starts at "यदि किसी कण पर दो बल F_1 तथा F_2 कार्यरत हैं" (English ¶2 begins here; the Hindi print keeps it in ¶1's paragraph)
+- ch 4 page 11 §4.8: a new paragraph starts at "सर्वप्रथम भार W की साम्यावस्था पर विचार कीजिए" (English ¶8 begins here; the Hindi keeps the whole Answer of Example 4.6 as one paragraph)
+- ch 4 page 11 §4.8: a new paragraph starts at "अब तीन बलों - तनाव T_1 तथा T_2" (English ¶9 begins here)
+- ch 4 page 11 §4.8: a new paragraph starts at "ध्यान दीजिए, उत्तर न तो डोरी" (English ¶10 begins here)
+- ch 4 page 12 §4.9.1: "यदि आरोपित बल F का मान (f_s)_अधिकतम से" joined onto the paragraph before it (English ¶2 runs on from (4.14) through (4.15) to the end of the passage; the Hindi print starts a new paragraph after (4.14))
+- ch 4 page 13 §4.9.1: a new paragraph starts at "अतः tan theta_(अधिकतम) = mu_s अथवा" (English ¶9 begins here; the Hindi keeps the whole Answer of Example 4.8 as one paragraph)
+- ch 4 page 13 §4.9.1: a new paragraph starts at "theta_(अधिकतम) = 15° के लिए" (English ¶10, the numerical result, begins here)
+- ch 4 page 15 §4.10: a new paragraph starts at "जहाँ m पिण्ड की संहति है" (English ¶2 begins here, after the display (4.16) that closes ¶1)
+- ch 4 page 15 §4.10: a new paragraph starts at "(i) कार का भार, mg" (English ¶5, the first force of the list, begins here)
+- ch 4 page 15 §4.10: a new paragraph starts at "(ii) अभिलम्ब प्रतिक्रिया, N" (English ¶6, the second force of the list, begins here)
+- ch 4 page 15 §4.10: a new paragraph starts at "(iii) घर्षण बल, f" (English ¶7, the third force of the list, begins here)
+- ch 4 page 15 §4.10: a new paragraph starts at "क्योंकि यहाँ ऊर्ध्वाधर दिशा में कोई त्वरण नहीं है, अतः" (English ¶8 begins here, after the list)
+- ch 4 page 16 §4.10: a new paragraph starts at "यह संबंध कार की संहति पर निर्भर नहीं करता" (English ¶10 begins here, after the displayed inequalities that close ¶9)
+- ch 4 page 16 §4.10: a new paragraph starts at "N तथा f के घटकों द्वारा अभिकेंद्र बल" (English ¶12 begins here, after (4.19a); the Hindi print runs English ¶11 to ¶15 as one paragraph)
+- ch 4 page 16 §4.10: a new paragraph starts at "यहाँ, पहले कि भाँति, f ≤ mu_s N" (English ¶13 begins here)
+- ch 4 page 16 §4.10: a new paragraph starts at "v_अधिकतम के लिए हम f = mu_s N लेते हैं" (English ¶14 begins here)
+- ch 4 page 16 §4.10: a new paragraph starts at "समीकरण (4.19a) तथा (4.19b) को लिखा जा सकता है" (English ¶15 begins here)
+- ch 4 page 16 §4.10: "समीकरण (4.18) से तुलना करने पर" joined onto the paragraph before it (the comparison with (4.18) is the last sentence of English ¶15; the Hindi print starts a new paragraph with it)
+- ch 4 page 16 §4.10: a new paragraph starts at "समीकरण (4.21) में mu_s = 0 के लिए" (English ¶16 begins here)
+- ch 4 page 16 §4.10: "अब, यहाँ इस प्रश्न में R = 3 m" joined onto the paragraph before it (English ¶18 is the whole Answer of Example 4.10; the Hindi print breaks it after the displayed condition)
+- ch 4 page 17 §4.10: "समीकरण (4.21) द्वारा रेसकार की अधिकतम" joined onto the paragraph before it (English ¶20 is the whole Answer of Example 4.11; the Hindi print breaks it before the maximum speed)
+- ch 4 page 17 §4.11: a new paragraph starts at "(i) पिण्डों के संयोजन के विभिन्न भागों" (English ¶2, step (i), begins here; the Hindi keeps steps (i) and (ii) in ¶1's paragraph)
+- ch 4 page 17 §4.11: a new paragraph starts at "(ii) संयोजन के किसी सुविधाजनक भाग को" (English ¶3, step (ii), begins here)
+- ch 4 page 17 §4.11: a new paragraph starts at "(a) फर्श पर गुटका विरामावस्था में है" (English ¶10, part (a), begins here; English ¶9 is the word Answer alone, so the Hindi हल stays as its own row)
+- ch 4 page 18 §4.11: a new paragraph starts at "तृतीय नियम के अनुसार फर्श पर निकाय की क्रिया" (English ¶12 begins here; the Hindi keeps it in part (b)'s paragraph)
+- ch 4 page 18 §4.11: a new paragraph starts at "(a) के लिए :(i) पृथ्वी द्वारा गुटके पर" (English ¶14, the pairs for (a), begins here; the row before it is the head Action-reaction pairs, English ¶13)
+- ch 4 page 18 §4.11: a new paragraph starts at "(b) के लिए (i) पृथ्वी द्वारा निकाय पर" (English ¶15, the first pair for (b), begins here)
+- ch 4 page 18 §4.11: a new paragraph starts at "(ii) निकाय द्वारा फर्श पर आरोपित बल" (English ¶16, the second pair for (b) with the closing remark, begins here)
+- ch 4 page 10 §4.8: the paragraph starting "* किसी पिण्ड की साम्यावस्था के लिए" takes its number after the next paragraph of its section (the Hindi prints this footnote at the foot of p10 and Example 4.6 on p11; the English has both on p10 and numbers the Example first)
+- ch 4 page 11 §4.9: the paragraph starting "* सुगमता के लिए यहाँ हम आवेशित" takes its number after the next paragraph of its section (the Hindi prints this footnote at the foot of p11 and the paragraph on the four fundamental forces on p12; the English starts that paragraph on p11 and numbers it first)
+- ch 4 page 16 §4.10: "यदि सड़क ढालू है (चित्र 4.14b)" → "ढालू सड़क पर कार की गति यदि सड़क ढालू है (चित्र 4.14b)" (the page prints the side heading above this paragraph (p16, left column, under Eq. 4.18; crop; the layer's line agrees) and the transcription left it out; a side heading leads its paragraph (DECISIONS 2026-09-27), as the English row's does)
+- ch 4 page 5 §4.5: "किसी पिण्ड के संवेग को उसकी संहति" → "संवेग किसी पिण्ड के संवेग को उसकी संहति" (the page prints the side heading संवेग above this paragraph (crop p5 x40-300 y262-318; the layer's line agrees) and the transcription left it out; a side heading leads its paragraph and is never dropped (DECISIONS 2026-09-27))
+- ch 4 page 5 §4.5: "मान लीजिए एक कम भार का वाहन" → "• मान लीजिए एक कम भार का वाहन" (the paragraph opens with a printed list bullet (crop; a Wingdings glyph in the layer), as the English row does)
+- ch 4 page 5 §4.5: "यदि दो पत्थर, एक हलका" → "• यदि दो पत्थर, एक हलका" (the paragraph opens with a printed list bullet (crop; a Wingdings glyph in the layer), as the English row does)
+- ch 4 page 5 §4.5: "विचार करने योग्य एक अन्य" → "• विचार करने योग्य एक अन्य" (the paragraph opens with a printed list bullet (crop; a Wingdings glyph in the layer), as the English row does)
+- ch 4 page 5 §4.5: "क्रिकेट का कोई अभ्यस्त खिलाड़ी" → "• क्रिकेट का कोई अभ्यस्त खिलाड़ी" (the paragraph opens with a printed list bullet (crop; a Wingdings glyph in the layer), as the English row does)
+- ch 4 page 5 §4.5: "एक अत्यंत महत्त्वपूर्ण प्रेक्षण इस तथ्य" → "• एक अत्यंत महत्त्वपूर्ण प्रेक्षण इस तथ्य" (the paragraph opens with a printed list bullet (crop; a Wingdings glyph in the layer), as the English row does)
+- ch 4 page 6 §4.5: "पिछले प्रेक्षणों में संवेग का सदिश" → "• पिछले प्रेक्षणों में संवेग का सदिश" (the paragraph opens with a printed list bullet (crop; a Wingdings glyph in the layer), as the English row does)
+- ch 4 page 7 §4.5: "परिमित परिवर्तन उत्पन्न" → "परिमित परिर्वतन उत्पन्न" (the page sets the reph over va, not ta: the book's own spelling, kept as printed; zoomed crop and the decoded layer's line agree)
+- ch 4 page 15 §4.9.1: "बाल बेयरिंगों के बीच" → "बाल बेयरिगों के बीच" (the page prints no anusvara on ri: the book's own spelling, kept; zoomed crop and the decoded layer's line agree)
+- ch 5 page 2 §5.1.1: a new paragraph starts at "समीकरण (5.1a) से हमें निम्नलिखित परिणाम मिलता है" (English ¶2 begins here; the Hindi print keeps it in ¶1's paragraph)
+- ch 5 page 2 §5.1.1: a new paragraph starts at "(i) A·A = A_xA_x + A_yA_y" (English ¶6, item (i), begins here; the Hindi row runs English ¶5 to ¶7 as one paragraph)
+- ch 5 page 2 §5.1.1: a new paragraph starts at "(ii) A·B = 0 यदि" (English ¶7, item (ii), begins here)
+- ch 5 page 3 §5.2: a new paragraph starts at "एक बार फिर दोनों पक्षों को m/2 से गुणा करने पर" (English ¶2 begins here; the Hindi print keeps it in ¶1's paragraph)
+- ch 5 page 3 §5.2: a new paragraph starts at "गुरुत्वाकर्षण बल द्वारा किया गया कार्य W_g = m g h मान लीजिए" (English ¶7, the work done by gravity, begins here; the Hindi row keeps it in the Answer (a) paragraph)
+- ch 5 page 4 §5.3: "अतः किसी बल द्वारा किया गया कार्य “बल के विस्थापन" starts a new paragraph, not the previous page's (English ¶2 begins here, at the top of p4; it does not continue p3's paragraph)
+- ch 5 page 4 §5.4: a new paragraph starts at "गतिज ऊर्जा एक अदिश राशि है।" (English ¶2 begins here, after equation (5.5), and runs on to p5)
+- ch 5 page 5 §5.5: a new paragraph starts at "इसे चित्र 5.3(a) में समझाया गया है" (English ¶3 begins here; the Hindi print keeps it in ¶2's paragraph)
+- ch 5 page 6 §5.5: "x = 20 m पर F = 50 N(≠ 0) है" joined onto the paragraph before it (this text is the rest of English ¶6, the Answer paragraph of Example 5.5, which the row before it begins)
+- ch 5 page 7 §5.6: a new paragraph starts at "ध्यान दीजिए कि ln आधार e पर" (English ¶5, the remark on ln, begins here; the Hindi row keeps it in the Answer paragraph)
+- ch 5 page 8 §5.7: a new paragraph starts at "किसी संरक्षी बल जैसे गुरुत्वाकर्षण बल द्वारा किया गया कार्य" (English ¶5 begins here, after the displayed integral that ends English ¶3 (¶4 is the p7 footnote))
+- ch 5 page 8 §5.7: a new paragraph starts at "इस अनुभाग में गिरती हुई गेंद के उदाहरण में" (English ¶7 begins here, after equation (5.9); the Hindi print keeps it in ¶6's paragraph)
+- ch 5 page 8 §5.8: a new paragraph starts at "• तीसरी परिभाषा के अनुसार, इस बल द्वारा" (English ¶5, the third bullet, begins here; the Hindi row keeps it in the second bullet's paragraph)
+- ch 5 page 9 §5.8: "गेंद की" starts a new paragraph, not the previous page's (English ¶8 begins here, at the top of p9; it does not continue p8's paragraph (span kept to two words, unique on the page, because the third word is a suspected misreading))
+- ch 5 page 9 §5.8: "उपरोक्त परिणाम अनुभाग 5.7 में" joined onto the paragraph before it (this sentence is inside English ¶9 (a result that was obtained in section 5.7), which the row before it begins)
+- ch 5 page 9 §5.8: "इसके अतिरिक्त E_H = E_h" joined onto the paragraph before it (English ¶9 continues here (Further, E_H = E_h) to equation (5.11 d))
+- ch 5 page 9 §5.8: "उपरोक्त परिणाम, शुद्धगतिकी का" joined onto the paragraph before it (this sentence closes English ¶9 (and is a familiar result from kinematics))
+- ch 5 page 9 §5.8: "यहाँ T_A, बिंदु A पर डोरी का तनाव है" joined onto the paragraph before it (English ¶12 continues here (where T_A is the tension in the string at A) to T_C becoming zero)
+- ch 5 page 9 §5.8: a new paragraph starts at "अतः बिंदु C पर हमें प्राप्त होता है" (English ¶13 (Thus, at C) begins here)
+- ch 5 page 9 §5.8: "जहाँ v_c बिंदु C पर गोलक की चाल है" joined onto the paragraph before it (English ¶13 continues here (where v_C is the speed at C) to v_0 = sqrt(5gL) on p10)
+- ch 5 page 11 §5.9: a new paragraph starts at "यदि स्प्रिंग का विस्थापन x_c (<0) से संपीडित" (English ¶3 begins here, after equation (5.16); the Hindi print keeps it in ¶2's paragraph)
+- ch 5 page 11 §5.9: "यदि गुटके को इसके आरंभिक विस्थापन x_i से" joined onto the paragraph before it (English ¶3 continues here to equation (5.17))
+- ch 5 page 11 §5.9: a new paragraph starts at "अतः स्प्रिंग-बल द्वारा किया गया कार्य केवल सिरे के बिंदुओं" (English ¶4 begins here, after equation (5.17))
+- ch 5 page 12 §5.9: a new paragraph starts at "गतिमान कार की गतिज ऊर्जा : K" (English ¶8 begins here; English ¶7 is the Answer's first sentence alone)
+- ch 5 page 12 §5.9: "अतः V = (1/2) k x_m^2" joined onto the paragraph before it (the displayed V = (1/2) k x_m^2 = 1.25 × 10^4 J belongs to English ¶8)
+- ch 5 page 12 §5.9: "हल करने पर हम प्राप्त करते हैं कि x_m" joined onto the paragraph before it (the result x_m = 2.00 m closes English ¶8)
+- ch 5 page 13 §5.10: a new paragraph starts at "किसी बल की औसत शक्ति उस बल द्वारा" (English ¶2 begins here; the Hindi print keeps it in ¶1's paragraph)
+- ch 5 page 13 §5.10: a new paragraph starts at "जहाँ विस्थापन dr में बल F द्वारा किया गया कार्य" (English ¶4 begins here, after equation (5.20); the Hindi opens it with 'where', as a continuation of the equation)
+- ch 5 page 13 §5.10: a new paragraph starts at "विद्युत-ऊर्जा की खपत के लिए मूल्य" (English ¶8 begins here, after the displayed kilowatt hour sum)
+- ch 5 page 14 §5.11: a new paragraph starts at "संघट्ट के पश्चात् द्रव्यमान m_1 व m_2 विभिन्न दिशाओं" (English ¶3 begins here; the Hindi print keeps it in ¶2's paragraph)
+- ch 5 page 14 §5.11.1: a new paragraph starts at "यदि बल संघट्ट समय Delta t के दौरान जटिल रूप से" (English ¶2 begins here, after the displayed sum of the momentum changes)
+- ch 5 page 14 §5.11.2: a new paragraph starts at "संघट्ट में गतिज ऊर्जा की क्षतिः Delta K" (English ¶2 begins here, after equation (5.22))
+- ch 5 page 14 §5.11.2: a new paragraph starts at "इसे समीकरण (5.23) में प्रतिस्थापित करने पर" (English ¶4 begins here, after equation (5.25))
+- ch 5 page 15 §5.11.2: "तथा v_2f = 2m_1 v_1i" continues the previous page's paragraph (equation (5.27) at the top of p15 closes English ¶4, begun at the foot of p14)
+- ch 5 page 15 §5.11.2: a new paragraph starts at "क्षयित आंशिक गतिज ऊर्जा है f_1" (English ¶10 begins here; the Hindi row sets the Answer of Example 5.11 as one paragraph)
+- ch 5 page 15 §5.11.2: a new paragraph starts at "उपरोक्त परिणाम को समीकरण (5.27) से प्रतिस्थापित करके" (English ¶11 begins here)
+- ch 5 page 15 §5.11.3: "अधिकतर स्थितियों में यह माना जाता है" joined onto the paragraph before it (English ¶1 continues here, after equation (5.29), to its end)
+- ch 5 page 15 §5.11.3: a new paragraph starts at "यह हमें समीकरण (5.28) व (5.29) के अलावा" (English ¶3 begins here, after equation (5.30), and runs on to p16)
+- ch 5 page 16 §5.11.3: "चूंकि संघट्ट प्रत्यास्थ है और द्रव्यमान m_1 = m_2 है" joined onto the paragraph before it (English ¶5, the Answer of Example 5.12, continues here from equation (5.31))
+- ch 5 page 16 §5.11.3: "इससे सिद्ध होता है कि जब समान द्रव्यमान" joined onto the paragraph before it (the result this proves closes English ¶5)
+- ch 5 page 16 §5.11.3: "गतिज ऊर्जा के संरक्षण, समीकरण (5.31)" → "गतिज ऊर्जा के सरंक्षण, समीकरण (5.31)" (the page prints सरंक्षण here, the anusvara over र (crop p16 y455-495 at zoom 5; layer y479), the book's own spelling, which the row normalised to संरक्षण; the page's other संरक्षण (y336) is printed as the row has it)
+- ch 5 page 14 §5.11.2: "गतिज ऊर्जा की क्षतिः Delta K" → "गतिज ऊर्जा की क्षति: Delta K" (the line introduces the displayed Delta K: a colon, which the print draws with the visarga's glyph (crop p14 x290-560 y300-345); क्षति takes no visarga)
+- ch 5 page 1 §5.1: "दूरी वाले धावक को" → "दूरी वाले घातक को" (the page prints gha-aa-ta-ka, the book's own error for the word the row wrote; kept as printed; zoomed crop and the decoded layer's line agree)
+- ch 5 page 9 §5.8: "गेंद की निर्दशित ऊँचाई" → "गेंद की निदर्शित ऊँचाई" (the reph sits on shi, not on da; zoomed crop and the decoded layer's line agree)
+- ch 6 page 4 §6.1.1: "जब पंखा घूमता है और इसकी अक्ष इधर से उधर" starts a new paragraph, not the previous page's (English ¶7 begins here, at the top of p4; the Hindi row ran on from p3)
+- ch 6 page 5 §6.2: a new paragraph starts at "जहाँ x_1, x_2,....x_n कणों की क्रमशः मूलबिन्दु" (English ¶6, the where-clause after Eq. (6.2), begins here; the Hindi print keeps it in ¶5's paragraph)
+- ch 6 page 5 §6.2: a new paragraph starts at "समान द्रव्यमान वाले कणों के लिए m = m_1 = m_2 = m_3," (English ¶8, the equal-mass case after Eqs. (6.3a) and (6.3b), begins here)
+- ch 6 page 5 §6.2: a new paragraph starts at "यदि हम स्थिति-सदिश की अवधारणा का उपयोग करें" (English ¶12 begins here; the Hindi print keeps it in ¶11's paragraph)
+- ch 6 page 6 §6.2: "भुजा की लम्बाई 0.5 m है।" → "भुजा की लम्बाई 0.5 m है। हल" (the page prints the label हल under the Example 6.1 statement (p6, right column, above Fig. 6.9; crop; the layer's line agrees) and the transcription left it out)
+- ch 6 page 6 §6.2: a new paragraph starts at "हल" (English ¶25, the Answer to Example 6.1, begins at its label on p6 and runs on to p7)
+- ch 6 page 9 §6.4: "इस समीकरण की समीकरण (6.8) से तुलना करने पर" joined onto the paragraph before it (the comparison with Eq. (6.8) and Eq. (6.15) are the end of English ¶3, which the row before it begins)
+- ch 6 page 9 §6.4: "समीकरण (6.16) एवं समीकरण (6.11) की तुलना करने पर" joined onto the paragraph before it (the comparison giving Eq. (6.17) is the middle of English ¶4, which the row before it begins)
+- ch 6 page 9 §6.4: "यह गति के न्यूटन के द्वितीय नियम का कथन है" joined onto the paragraph before it (the sentence after Eq. (6.17) is the end of English ¶4)
+- ch 6 page 11 §6.5: a new paragraph starts at "(i) जिसका परिमाण c = ab sin theta है" (English ¶4, item (i) of the definition, begins here; the Hindi print runs the three items on in ¶3's paragraph)
+- ch 6 page 11 §6.5: a new paragraph starts at "(ii) c उस तल के अभिलम्बवत् है" (English ¶5, item (ii), begins here)
+- ch 6 page 11 §6.5: a new paragraph starts at "(iii) यदि हम एक दक्षिणावर्त्त पेंच लें" (English ¶6, item (iii), begins here)
+- ch 6 page 11 §6.5: a new paragraph starts at "परन्तु, सदिश गुणन क्रमविनियम नियम का पालन नहीं करता" (English ¶12 begins here, after the display a.b = b.a; the Hindi print keeps it in ¶11's paragraph)
+- ch 6 page 11 §6.5: a new paragraph starts at "अतः परावर्तन से a × b का चिह्न नहीं बदलता" (English ¶15 begins here, after the displayed reflection of a × b)
+- ch 6 page 12 §6.5: "ध्यान दें कि, b × a" joined onto the paragraph before it (the closing note on b × a is the end of English ¶27, the Answer to Example 6.4)
+- ch 6 page 13 §6.6: a new paragraph starts at "इस सदिश का परिमाण, omega = d theta/dt" (English ¶10 begins here; the Hindi print keeps it in ¶9's paragraph)
+- ch 6 page 16 §6.7.2: a new paragraph starts at "कोणीय संवेग सदिश की परिमाण है l = r p sin theta" (English ¶4 begins here, after Eq. (6.25a) at the top of p16, which ends ¶3)
+- ch 6 page 16 §6.7.2: a new paragraph starts at "दाईं ओर के व्यंजक पर गुणन के अवकलन का नियम" (English ¶6 begins here, after the displayed derivative that ends ¶5)
+- ch 6 page 16 §6.7.2: a new paragraph starts at "अब, कण का वेग v = dr/dt एवं p = mv लिखें" (English ¶7 begins here, after the displayed product rule that ends ¶6)
+- ch 6 page 16 §6.7.2: a new paragraph starts at "dr/dt × p = v × mv = 0," (English ¶8 begins with this display; the Hindi runs ¶7 and ¶8 as one sentence, so the split is at the display after the lead-in clause, not at a sentence start)
+- ch 6 page 16 §6.7.2: "क्योंकि दो समान्तर सदिशों का सदिश गुणनफल" joined onto the paragraph before it (the reason clause and the derivation to Eq. (6.27) are the rest of English ¶8; the Hindi row was cut at the display)
+- ch 6 page 18 §6.7.2: "l की दिशा, r एवं v के तल के अभिलम्बवत्" starts a new paragraph, not the previous page's (English ¶28 begins here, at the top of p18; the Hindi row ran on from p17)
+- ch 6 page 18 §6.8: a new paragraph starts at "यदि पिण्ड पर लगने वाला कुल बल शून्य होगा तो" (English ¶5 begins here, after Eq. (6.30a); the Hindi row keeps it in condition (1)'s paragraph)
+- ch 6 page 18 §6.8: "जहाँ F_ix, F_iy एवं F_iz बल F_i के" joined onto the paragraph before it (English ¶9 runs from the vector equations through Eq. (6.31b) and its where-clause as one row; this is its middle part)
+- ch 6 page 18 §6.8: "जहाँ tau_ix, tau_iy एवं tau_iz क्रमशः" joined onto the paragraph before it (the where-clause after Eq. (6.31b) closes English ¶9)
+- ch 6 page 22 §6.8.2: "ध्यान दें कि W_1 एवं W ऊर्ध्वाधरतः नीचे" joined onto the paragraph before it (the note on the directions of W_1, W, R_1 and R_2 is the second sentence of English ¶11, after equation (i))
+- ch 6 page 23 §6.8.2: a new paragraph starts at "समीकरण (i) में आंकिक मान प्रतिस्थापित करने पर" (English ¶14 (the numerical values inserted) begins here; the Hindi row runs English ¶13 to ¶15 as one paragraph)
+- ch 6 page 23 §6.8.2: a new paragraph starts at "अतः क्षुर-धारों के आधारों के प्रतिक्रिया बल हैं" (English ¶15, the closing statement of Example 6.8, begins here)
+- ch 6 page 23 §6.8.2: "सीढ़ी AB की लंबाई = 3 m" joined onto the paragraph before it (English ¶17 is the Answer label and the first paragraph of Example 6.9's answer in one row; the Hindi row before this holds only the label)
+- ch 6 page 23 §6.8.2: a new paragraph starts at "इसी प्रकार क्षैतिज बल लें तो" (English ¶19 (the horizontal forces, equation (ii)) begins here; the Hindi print keeps it in ¶18's paragraph)
+- ch 6 page 23 §6.8.2: a new paragraph starts at "बल F_2, क्षैतिज से alpha कोण बनाता है" (English ¶21 (the angle of F_2 with the horizontal) begins here)
+- ch 6 page 24 §6.9: "इस परिभाषा के साथ K =" joined onto the paragraph before it (Eq. (6.35) closes English ¶4, which defines the moment of inertia and gives Eq. (6.34) and (6.35) in one row)
+- ch 6 page 24 §6.9: a new paragraph starts at "यहाँ m पिण्ड का द्रव्यमान और v उसका वेग है" (English ¶7 begins here, after K = (1/2) m v^2; the Hindi print keeps it in ¶6's paragraph)
+- ch 6 page 24 §6.9: "समीकरण (6.35) से तुलना करने पर" joined onto the paragraph before it (the comparison with Eq. (6.35) giving I = MR^2 closes English ¶9, case (a))
+- ch 6 page 24 §6.9: "अतः, द्रव्यमानों के इस जोड़े का" joined onto the paragraph before it (English ¶10 holds the whole of case (b) and the remark on Table 6.1 in one row)
+- ch 6 page 26 §6.9: "अतः, किसी दृढ़ पिण्ड का जड़त्व आघूर्ण, उसके द्रव्यमान" starts a new paragraph, not the previous page's (English ¶13 begins here, at the top of p26; it does not continue the radius-of-gyration paragraph of p25)
+- ch 6 page 26 §6.9: a new paragraph starts at "समीकरण (6.34), में दी गई परिभाषा के आधार पर" (English ¶14 (dimensions and SI unit of the moment of inertia) begins here)
+- ch 6 page 26 §6.10: a new paragraph starts at "जहाँ x_0 = प्रारंभिक विस्थापन एवं" (English ¶5, the where-clause after equations (a) to (c), begins here)
+- ch 6 page 26 §6.10: a new paragraph starts at "जहाँ theta_0 = घूर्णन करते पिण्ड का प्रारंभिक" (English ¶7, the where-clause after Eq. (6.36) to (6.38), begins here)
+- ch 6 page 27 §6.10: a new paragraph starts at "(i) ω = ω_0 + alpha t, जहाँ" (English ¶12 is the Answer label alone and ¶13 begins at part (i); the Hindi row sets them together)
+- ch 6 page 27 §6.10: a new paragraph starts at "इंजन का कोणीय त्वरण 4π rad/s^2 है" (English ¶14, the stated result of part (i), begins here)
+- ch 6 page 28 §6.11: "या यूँ कहें कि बलों और स्थिति सदिशों" joined onto the paragraph before it (this Hindi sentence has no English row of its own (it restates what English ¶3 and ¶4 each end with); kept with item (2), the paragraph it follows)
+- ch 6 page 29 §6.11: "याद रहे, कि बल आघूर्णो को जन्म देने वाले" starts a new paragraph, not the previous page's (English ¶9 begins here, at the top of p29; it does not continue p28's paragraph ending in dW = (tau_1 + tau_2 + ...) d theta)
+- ch 6 page 29 §6.11: "से इसकी तुल्यता स्पष्ट ही है" joined onto the paragraph before it (this finishes the sentence broken at the displayed dW = F ds, the last sentence of English ¶10)
+- ch 6 page 29 §6.11: a new paragraph starts at "समीकरण (6.39) के दोनों पक्षों को dt से" (English ¶11 (dividing Eq. (6.39) by dt, Eq. (6.40)) begins here)
+- ch 6 page 29 §6.11: a new paragraph starts at "(a) पहिये के कोणीय त्वरण की गणना" (English ¶20, part (a) of Example 6.12, is its own row; the Hindi print runs the statement and its four parts as one paragraph)
+- ch 6 page 29 §6.11: a new paragraph starts at "(b) 2 m रस्सी खुलने तक कर्षण बल" (English ¶21, part (b) of Example 6.12, begins here)
+- ch 6 page 29 §6.11: a new paragraph starts at "(c) इस क्षण पर पहिये की गतिज ऊर्जा" (English ¶22, part (c) of Example 6.12, begins here)
+- ch 6 page 29 §6.11: a new paragraph starts at "(d) भाग (b) एवं (c) के उत्तरों" (English ¶23, part (d) of Example 6.12, begins here)
+- ch 6 page 29 §6.11: a new paragraph starts at "(a) इसके लिए I alpha = tau" (English ¶24 is the Answer label alone and ¶25 begins at part (a); the Hindi row sets them together)
+- ch 6 page 30 §6.12: "चित्र (6.17b) देखिए" joined onto the paragraph before it (English ¶4 runs from l = r × p through l = (OC × mv) + (CP × mv); the Hindi row before this holds only its first line)
+- ch 6 page 30 §6.12: a new paragraph starts at "P पर कण के रेखीय वेग v का परिमाण" (English ¶5 (the magnitude of the linear velocity at P) begins here)
+- ch 6 page 31 §6.12: a new paragraph starts at "अतः अचल अक्ष के परितः घूर्णी पिण्ड का अचल अक्ष के लम्बवत्" (English ¶17 begins here, after Eq. (6.43b); the Hindi print runs English ¶16 to ¶18 as one paragraph)
+- ch 6 page 31 §6.12: a new paragraph starts at "यदि जड़त्व आघूर्ण I समय के साथ परिवर्तित नहीं होता" (English ¶18 begins here, after Eq. (6.43c))
+- ch 6 page 17 §6.7.2: "यदि tau_ext = 0, तो समीकरण (6.28b) रह जाती है" → "कोणीय संवेग का संरक्षण यदि tau_ext = 0, तो समीकरण (6.28b) रह जाती है" (the page prints the side heading कोणीय संवेग का संरक्षण above this paragraph (crop p17 x40-300 y462-520; the layer's line agrees) and the transcription left it out; a side heading leads its paragraph and is never dropped (DECISIONS 2026-09-27))
+- ch 6 page 1 §6.1: "परिवर्तित नहीं होतीं।" → "परिवर्तित नहीं होती।" (the page prints no anusvara on the last syllable (the anusvara of the word before it is plainly drawn); zoomed crop and the decoded layer's line agree)
+- ch 6 page 10 §6.4: "रेखा में समागं गति" → "रेखा में समांग गति" (the anusvara is on maa, not on ga; zoomed crop and the decoded layer's line agree)
+- ch 6 page 13 §6.6: "पुनः देखें। जैसा" → "पुनः देंखे। जैसा" (the page sets the anusvara on the first syllable: the book's own spelling, kept as printed; zoomed crop and the decoded layer's line agree)
+- ch 6 page 26 §6.10: "संकेत दिए हैं। उदाहरण के लिए यह" → "संकेत दिए हैं। उदारहण के लिए यह" (the page prints ra before ha: the book's own error, kept as printed; zoomed crop and the decoded layer's line agree)
+- ch 6 page 29 §6.11: "कि बल आघूर्णो को जन्म" → "कि बल आघूर्णों को जन्म" (the page prints the anusvara beside the reph (the reph-and-anusvara glyph); zoomed crop and the decoded layer's line agree)
+- ch 6 page 29 §6.11: "प्रत्येक बल आघूर्णो के परिमाणों" → "प्रत्येक बल आघूर्णों के परिमाणों" (the page prints the anusvara beside the reph (the reph-and-anusvara glyph); zoomed crop and the decoded layer's line agree)
+- ch 6 page 29 §6.11: "बाह्य बल आघूर्णो द्वारा" → "बाह्य बल आघूर्णों द्वारा" (the page prints the anusvara beside the reph (the reph-and-anusvara glyph); zoomed crop and the decoded layer's line agree)
+- ch 6 page 29 §6.11: "जिसके बियरिंगों में कोई" → "जिसके वियरिंगों में कोई" (the page prints va, with no stroke across the loop: the book's own spelling, kept as printed; zoomed crop and the decoded layer's line agree)
+- ch 6 page 30 §6.12: "L_perp से दर्शाते हैं।" → "L_perp से दर्शात हैं।" (the page prints no e-sign on ta: the book's own error, kept as printed; zoomed crop and the decoded layer's line agree)
+- ch 6 page 31 §6.12: "बाह्य बल आघूर्णो के केवल" → "बाह्य बल आघूर्णी के केवल" (the page prints the ii-sign under the reph: the book's own spelling here, kept as printed; zoomed crop and the decoded layer's line agree)
+- ch 7 page 4 §7.3: a new paragraph starts at "यह स्पष्ट रूप से इस तथ्य को दर्शाता है कि पृथ्वी के गुरुत्व बल" (English ¶2 begins here; the Hindi print keeps it in ¶1's paragraph)
+- ch 7 page 4 §7.3: "यहाँ G सार्वत्रिक गुरुत्वीय नियतांक" joined onto the paragraph before it (the where-clause after the vector form of Eq. (7.5) is the end of English ¶5, which the row before it begins)
+- ch 7 page 5 §7.3: "m_1 पर कुल बल है F_1" starts a new paragraph, not the previous page's (English ¶8, the total force on m_1, begins here at the top of p5; it does not continue p4's ¶7)
+- ch 7 page 5 §7.3: a new paragraph starts at "(a) इस त्रिभुज के केन्द्रक G पर" (English ¶10, part (a) of Example 7.2, begins here; the Hindi print runs the Example statement as one paragraph)
+- ch 7 page 5 §7.3: a new paragraph starts at "(b) यदि शीर्ष A पर रखे द्रव्यमान को दो गुना" (English ¶11, part (b) of Example 7.2, begins here)
+- ch 7 page 6 §7.3: "गुणात्मक रूप में, हम फिर से इस परिणाम" joined onto the paragraph before it (the qualitative explanation belongs to English ¶17, case (2), which the row before it begins)
+- ch 7 page 7 §7.5: a new paragraph starts at "द्रव्यमान m द्वारा अनुभव किया जाने वाला त्वरण" (English ¶6 begins here; the sentence before it in the Hindi row is the where-clause of Eq. (7.11))
+- ch 7 page 7 §7.5: "यहाँ M_E तथा R_E क्रमशः पृथ्वी का द्रव्यमान" joined onto the paragraph before it (the where-clause for M_E and R_E follows Eq. (7.11) and belongs to English ¶5's paragraph; the English has no such sentence)
+- ch 7 page 8 §7.6: a new paragraph starts at "h / R_E << 1 के लिए द्विपद व्यंजक" (English ¶4, the binomial step to Eq. (7.15), begins here; the Hindi print keeps it in ¶3's paragraph)
+- ch 7 page 9 §7.7: "जो कि r > R के लिए वैध है।" joined onto the paragraph before it ('valid for r > R' follows Eq. (7.25) inside English ¶7)
+- ch 7 page 9 §7.7: "अतः एक बार फिर W_12 = W(r_2)" joined onto the paragraph before it ('so that once again W_12 = ...' and the rest to the end of the row are still English ¶7)
+- ch 7 page 10 §7.7: a new paragraph starts at "वर्ग के केन्द्र (r = sqrt(2) l/2) पर गुरुत्वीय विभव" (English ¶12, the potential at the centre of the square, begins here; the Hindi print keeps it in the Answer paragraph)
+- ch 7 page 12 §7.9: "यहाँ M_E पृथ्वी का द्रव्यमान है।" joined onto the paragraph before it (the where-clause after Eq. (7.34) is the end of English ¶2)
+- ch 7 page 12 §7.9: "यहाँ हमने समीकरण (7.35) से V का मान" joined onto the paragraph before it ('on substitution of value of V from Eq. (7.35)' and Eq. (7.38) are inside English ¶5, which the row before it begins)
+- ch 7 page 12 §7.9: "उन भू उपग्रहों के लिए, जो पृथ्वी के पृष्ठ के अति निकट" joined onto the paragraph before it (the near-surface satellite passage with Eq. (7.39) is the end of English ¶5)
+- ch 7 page 12 §7.9: a new paragraph starts at "जो लगभग 85 मिनट के बराबर" (English ¶7, 'Which is approximately 85 minutes.', is its own row; the Hindi print keeps it in ¶6's sentence)
+- ch 7 page 4 §7.3: "लगभग 3.84 10^8m ज्ञात" → "लगभग 3.84 × 10^8m ज्ञात" (the page leaves a gap between 3.84 and 10^8m: the raster does not draw the glyph, and the layer's Unicode span carries × there; the English row reads 3.84 × 10^8 m)
+- ch 7 page 6 §7.4: "केन्द्रों पर संकेन्द्रित मान कर" → "केन्द्रों पर संकेंन्द्रित मान कर" (the page prints an anusvara on ke as well as the half na: the book's own spelling, kept; zoomed crop and the decoded layer's line agree)
+- ch 7 page 9 §7.7: "केन्द्र की ओर निर्देशित होती है" → "केन्द्र की ओर निदेशित होती है" (the page prints no reph: the book's own spelling here, kept as printed; zoomed crop and the decoded layer's line agree)
+- ch 7 page 9 §7.7: "W_12 = बल विस्थापन =" → "W_12 = बल × विस्थापन =" (the page leaves a wide gap between the two words: the raster does not draw the glyph, and the layer's Unicode span carries × there; the English row reads force × displacement)
+- ch 7 page 10 §7.7: "वर्ग के शीर्षो पर स्थित" → "वर्ग के शीर्षों पर स्थित" (the page prints the anusvara beside the reph (the reph-and-anusvara glyph); zoomed crop and the decoded layer's line agree)
+- ch 3 page 5 §3.4: "tan^-1 (0.343) = 19" → "tan^-1 (0.343) = 19°" (the raster does not draw the degree sign after 19 and the layer's Unicode span carries ° there (layer y661; crop p5 x40-290 y650-706 at zoom 5); the English row reads 19°)
+- ch 3 page 5 §3.4: "ऊर्ध्वाधर से 19 का कोण" → "ऊर्ध्वाधर से 19° का कोण" (the same angle in the answer's last sentence: the raster does not draw the degree sign and the layer's Unicode span carries ° there (layer y689; crop p5 x40-290 y650-706 at zoom 5); the English row reads 19°)
+- ch 7 page 11 §7.8: "= G M M_E / (h + R_E) (7.30)" → "= G m M_E / (h + R_E) (7.30)" (the display prints G m M_E over h + R_E, a lower-case italic m after G (crop p11 x40-290 y85-130 at zoom 5; layer y104); the row had a capital M, found on the read of the 40-pair sample; the English row reads GmM_E)
+- ch 3 page 8 §3.6: "समान्तर चतुर्भुज नियम" → "समान्तर चर्तुभुज नियम" (the page prints चर्तुभुज, the reph set over tu rather than over bhu (crop p8 x0-576 y229-263 at zoom 4; the decoded layer's line y243 agrees): the book's own spelling, which the transcriber repaired; restored as printed)
+- ch 3 page 13 §3.9: "प्रारंभिक वेग v_0 के घटक" → "प्रारंम्भिक वेग v_0 के घटक" (the page prints प्रारंम्भिक, an anusvara and a half ma both before bha (crop p13 x0-576 y277-311 at zoom 4; the decoded layer's line y291 agrees), where lower in the left column it prints प्रारंभिक in 'किसी क्षण t पर प्रारंभिक वेग' (crop p13 x40-300 y524-552 at zoom 6): the book's own spelling at this place, which the transcriber repaired; restored as printed)
+- ch 5 page 7 §5.7: "विचार गुरुत्वाकर्षण (अध्याय 7)" → "विचार गुरुत्वाकषर्ण (अध्याय 7)" (the footnote prints गुरुत्वाकषर्ण, the reph set over na rather than over sha (crop p7 x0-576 y706-740 at zoom 4; the decoded layer's line y720 agrees): the book's own spelling, which the transcriber repaired; restored as printed)
+- ch 5 page 12 §5.9: "ऊर्जा-संरक्षण नियम में किंचित" → "ऊर्जा-सरंक्षण नियम में किंचित" (the page prints सरंक्षण, the anusvara set over ra rather than over sa (crop p12 x0-576 y551-585 at zoom 4; the decoded layer's line y565 agrees), where higher in the left column it prints 'ऊर्जा-संरक्षण नियम के अनुसार' right (crop p12 x40-300 y244-270 at zoom 6): the book's own spelling at this place, which the transcriber repaired; restored as printed, the joining dash as the row writes it)
+- ch 6 page 11 §6.5: "सदिश गुणन क्रमविनियम नियम" → "सदिश गुणन क्रमविनिमय नियम" (the page prints क्रमविनिमय, ma before ya (crop p11 x0-576 y301-335 at zoom 4; the decoded layer's line y315 agrees), the word for 'commutative', as the English row reads ('not commutative'); the row's क्रमविनियम, ya before ma, is the transcriber's misreading)
+- ch 6 page 14 §6.7.1: "ऐसा नहीं है। कब्ज़ों से" → "ऐसा नहीं है। कब्जों से" (at this place the page prints कब्जों with no nukta under ja (crop p14 x0-576 y673-707 at zoom 4, and x370-450 y674-700 at zoom 10; the decoded layer's line y687 agrees), where higher in the same paragraph it prints कब्ज़ों with the nukta, as the row has it there (crop p14 x470-576 y598-626 at zoom 10): the book's own spelling, which the transcriber made uniform; restored as printed)
+- ch 6 page 21 §6.8.2: "हम देखते हैं कि समीकरण (6.33)" → "हम देखते हैं कि समीरकण (6.33)" (the page prints समीरकण, ra and ka in each other's place (crop p21 x0-576 y529-563 at zoom 4; the decoded layer's line y543 agrees): the book's own spelling, which the transcriber repaired; restored as printed)
+- ch 6 page 24 §6.9: "जिसका नाम जड़त्व आघूर्ण" → "जिसका नाम जड़त्त्व आघूर्ण" (the page prints जड़त्त्व, a doubled ta before va (crop p24 x0-576 y180-214 at zoom 4, and x140-260 y180-208 at zoom 10; the decoded layer's line y194 agrees), where the same page prints जड़त्व with one ta in 'जड़त्व आघूर्ण ज्ञात करने' (crop p24 x40-300 y544-568 at zoom 6): the book's own spelling at this place, which the transcriber repaired; restored as printed)
+- ch 6 page 24 §6.9: "दी गई अक्ष के परितः जड़त्व आघूर्ण" → "दी गई अक्ष के परितः जड़त्त्व आघूर्ण" (at the end of a right-column line the page prints जड़त्त्व again, a doubled ta before va (crop p24 x0-576 y532-566 at zoom 4, and x460-576 y530-554 at zoom 10; the decoded layer's line y546 agrees): the book's own spelling at this place, which the transcriber repaired; restored as printed)
+- ch 6 page 29 §6.11: "नगण्य द्रव्यमान वाली" → "नगण्य द्रव्यामन वाली" (Example 6.12 prints द्रव्यामन, the aa-sign after ya rather than after ma, and on its next line '20 kg द्रव्यमान' right (crop p29 x0-576 y211-255 at zoom 4; the decoded layer's line y225 agrees): the book's own spelling at this place, which the transcriber repaired; restored as printed)
+- ch 7 page 9 §7.7: "किसी कण की स्थितिज ऊर्जा उस कण" → "किसी कण को स्थितिज ऊर्जा उस कण" (the italic definition prints 'किसी कण को स्थितिज ऊर्जा उस कण को अनन्त से', को where the grammar wants की (crop p9 x290-576 y548-590 at zoom 4), and the paragraph below prints 'किसी कण की स्थितिज ऊर्जा का' right (crop p9 x290-576 y612-642 at zoom 5): a slip of grammar that states nothing false — the sentence still sets the potential energy at a point equal to the work done in bringing the particle from infinity, as the English row does; restored as printed)
+rulings on verifier flags that change no text: 39
+
+## zero exponents the book set as a degree sign (deterministic, each one named)
+
+- ch 1 p7 §1.4: a zero exponent set as a degree sign, written as the convention has it — [M^0], [T^0]
+- ch 1 p7 §1.5: a zero exponent set as a degree sign, written as the convention has it — [M^0 L^3 T^0], [M^0 L T^-1], [M^0 L T^-2], [M L^-3 T^0]
+
+## figure_refs that are not figure or table labels — dropped
+
+- ch 4 §4.8 ¶7: "4.8(c)"
+
+## ncert_paragraphs
+
+| inserted | updated | unchanged |
+|---|---|---|
+| 0 | 11 | 898 |
+
+## sections whose Hindi rows do not number as the English (English is canonical)
+
+84 of 84 sections one to one
+| chapter | section | en | hi | unprinted |
+|---|---|---|---|---|
+
+## English paragraphs this edition does not print — left without Hindi by an `unprinted` entry
+
+none
+
+## pages per chapter
+
+| chapter | pages extracted | pages with text | paragraphs | text yield |
+|---|---|---|---|---|
+| 1 | 12 | 9 | 84 | 75.0% |
+| 2 | 15 | 9 | 58 | 60.0% |
+| 3 | 22 | 16 | 103 | 72.7% |
+| 4 | 22 | 18 | 142 | 81.8% |
+| 5 | 22 | 16 | 128 | 72.7% |
+| 6 | 36 | 32 | 284 | 88.9% |
+| 7 | 18 | 14 | 110 | 77.8% |
+
+## paragraphs that begin in the middle of the previous one's sentence
+
+a band boundary is not a paragraph boundary; these are where it was read as one
+none
+
+## coverage for the book
+
+| pages rendered | pages extracted | pages with text | paragraphs | coverage |
+|---|---|---|---|---|
+| 147 | 147 | 114 | 909 | 100.0% |
+
+## addresses in the database this extraction no longer carried — a load would delete them
+
+none
+
+## rows the other edition still carries — this edition's text a load would clear from them
+
+none

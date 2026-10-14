@@ -485,9 +485,15 @@ HOW TO RESUME (supersedes item 2 of the list below):
      DRY RUN pipeline/reports/2026-10-14-ncert-load-dry-run.md (uncommitted): ok, 50 rulings, 115 of 115, rows changed
      ch 1 §1.13 ¶20, ch 5 §5.2.3 ¶4, ch 7 §7.2 ¶4 and no other. APPROVED by the founder 2026-10-14 "as written" (all
      four places allowed); round two + report committed 1ba27aa, DECISIONS row (supersedes 2026-10-13's "two signs
-     only the text layer carries"). NEXT: the founder runs scratchpad 92559e62 `d16-phy12p1-hi-r2.sh` (reload ₹0,
-     align ≈₹10, one-page re-reads of ch 1 p32, ch 5 p4, ch 7 p3, ch 3 p17, ch 6 p5 ≈₹8, the book judged from the
-     stored reads ₹0) → round three if any flag → the founder's ten ✅ pairs → close the book.
+     only the text layer carries"). 2026-10-14 08:10–08:17 the founder ran `d16-phy12p1-hi-r2.sh` (reports 9316bb8):
+     reload (three rows), align ₹10.71, five one-page re-reads ₹7.53, the book judged: 1,036 of 1,041 clean (99.5%).
+     ROUND THREE written UNCOMMITTED (== scratchpad `block-r3-repo.txt`, generator `r3.py`): 3 false_positive, no row
+     changed (ch 3 p17 span cut short; ch 5 p4 the allowed dot read back as the raster's gap; ch 6 p5 the swap again);
+     its spec audit FAILED (ch 5 p4 first ruled misprint against precedent; the dry run claimed before it was made; the
+     तापन layer line unnamed) and all three are fixed. APPROVAL DRY RUN pipeline/reports/2026-10-14-ncert-load-dry-run-2.md
+     (uncommitted): ok, 53 rulings, 115 of 115, no row changed. NEXT: the founder approves round three → commit →
+     the founder runs `d16-phy12p1-hi-r3.sh` (re-reads of ch 2 p17 and ch 4 p22, whose rows the verifier never
+     found, ≈₹3; the book judged, ₹0; expected 1,039–1,041 of 1,041) → the founder's ten ✅ pairs → close the book.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

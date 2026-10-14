@@ -483,10 +483,11 @@ HOW TO RESUME (supersedes item 2 of the list below):
      जूल → जूल तापन, found by the ✅ sample read (40 pairs on the page images by an agent, 39 match). All four put to
      the founder place by place. Three spec audits (FAIL, FAIL, FAIL on two MINORs only), every finding fixed. APPROVAL
      DRY RUN pipeline/reports/2026-10-14-ncert-load-dry-run.md (uncommitted): ok, 50 rulings, 115 of 115, rows changed
-     ch 1 §1.13 ¶20, ch 5 §5.2.3 ¶4, ch 7 §7.2 ¶4 and no other. NEXT: the founder's four answers → approval line →
-     commit round two + report + DECISIONS row (supersede 2026-10-13's "two signs only the text layer carries") →
-     a one-page re-read (≈₹5) of ch 1 p32, ch 5 p4, ch 7 p3 and the two not-judged rows' pages (ch 3 p17, ch 6 p5) on a
-     reload → the founder's ten ✅ pairs → close the book.
+     ch 1 §1.13 ¶20, ch 5 §5.2.3 ¶4, ch 7 §7.2 ¶4 and no other. APPROVED by the founder 2026-10-14 "as written" (all
+     four places allowed); round two + report committed 1ba27aa, DECISIONS row (supersedes 2026-10-13's "two signs
+     only the text layer carries"). NEXT: the founder runs scratchpad 92559e62 `d16-phy12p1-hi-r2.sh` (reload ₹0,
+     align ≈₹10, one-page re-reads of ch 1 p32, ch 5 p4, ch 7 p3, ch 3 p17, ch 6 p5 ≈₹8, the book judged from the
+     stored reads ₹0) → round three if any flag → the founder's ten ✅ pairs → close the book.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

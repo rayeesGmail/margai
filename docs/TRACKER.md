@@ -491,8 +491,8 @@ HOW TO RESUME (supersedes item 2 of the list below):
      changed (ch 3 p17 span cut short; ch 5 p4 the allowed dot read back as the raster's gap; ch 6 p5 the swap again);
      its spec audit FAILED (ch 5 p4 first ruled misprint against precedent; the dry run claimed before it was made; the
      तापन layer line unnamed) and all three are fixed. APPROVAL DRY RUN pipeline/reports/2026-10-14-ncert-load-dry-run-2.md
-     (uncommitted): ok, 53 rulings, 115 of 115, no row changed. NEXT: the founder approves round three → commit →
-     the founder runs `d16-phy12p1-hi-r3.sh` (re-reads of ch 2 p17 and ch 4 p22, whose rows the verifier never
+     (uncommitted): ok, 53 rulings, 115 of 115, no row changed. APPROVED by the founder 2026-10-14 "as written";
+     round three + report committed 14d6838, DECISIONS row. NEXT: the founder runs `d16-phy12p1-hi-r3.sh` (re-reads of ch 2 p17 and ch 4 p22, whose rows the verifier never
      found, ≈₹3; the book judged, ₹0; expected 1,039–1,041 of 1,041) → the founder's ten ✅ pairs → close the book.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet

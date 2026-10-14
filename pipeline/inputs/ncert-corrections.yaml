@@ -4748,3 +4748,20 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
   # phy12-part1 Hindi, chapter 6
   - {book: phy12-part1, lang: hi, chapter: 6, page: 5, kind: false_positive, address: "ch 6 §6.4 ¶4",
      transcribed: "प्रेरित विद्युत धारा बल को", printed: "प्रेरित विद्युत वाहक बल को", reason: "the verifier swapped the row's span and the page's again, round two having ruled the same claim without प्रेरित: the page prints 'प्रेरित विद्युत धारा बल को' (crop p5 x250-525 y155-215 at zoom 4; the decoded layer's line y164 agrees) and the row carries वाहक बल, round one's meaning entry; code set the claim aside as one it could not place"}
+  # phy12-part1 Hindi, round four (D16, 2026-10-14). The closing run's one-page re-reads of ch 2 p17 and ch 4 p22 and
+  # the book judged from the stored reads (pipeline/reports/2026-10-14-ncert-verify-10.md: 1,032 of 1,041 clean) left
+  # one flag, read on a crop of the page image: a span stopped at a unit (ch 2 p17 §2.8.3 ¶8, false_positive). Changes
+  # no row. From 1,036: round three's rulings clear three rows (1,039); the ch 4 p22 re-read returned no verdict for
+  # §4.9.1 ¶19–¶24, which the earlier read had judged clean (−6), nor for §4.9.2 ¶1, which it had not found; the ch 2
+  # p17 re-read raised the ¶8 flag (−1). Neither row the closing run was for is resolved: §4.9.2 ¶1 now has no verdict,
+  # and the ch 2 p17 read again could not find §2.8.3 ¶6, which the page prints and the row carries as printed (crop
+  # p17 x160-525 y200-330 at zoom 3). A likely cause there: the page states ¶6's point once already, in other words,
+  # before Eq. (2.34) — a Hindi-only sentence ¶5's row carries, an edition difference kept as printed (README) — and no
+  # ruling reaches a row the verifier could not find. A fresh read of ch 4 p22 is the next run's. The 9 passages no row
+  # carries and the layer check's lines are as round three accounted for them. A ruling quotes the verifier as the
+  # report gives it. Simulated with `ncert load --dry-run` on the extraction (sha256 97cf92b1…): no refusal, 115 of
+  # 115 sections one to one, 54 rulings on flags, no row changed. Approved by the founder 2026-10-14, as written (on
+  # pipeline/reports/2026-10-14-ncert-load-dry-run-3.md), with §2.8.3 ¶6 accepted as checked on the page image.
+  # phy12-part1 Hindi, chapter 2
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 17, kind: false_positive, address: "ch 2 §2.8.3 ¶8",
+     transcribed: "10^(-29) C m का स्थायी वैद्युत द्विध्रुव आघूर्ण है", printed: "10^(-29) C m", reason: "the page prints the sentence whole on one line, the words after the unit included (crop p17 x44-525 y365-395 at zoom 4; the decoded layer's line y374 agrees): the row matches the page and the verifier's span stops at the unit, as round two ruled its shorter quote of the same place; the cm the page prints is written C m by round one's meaning entry, the form both spans carry"}

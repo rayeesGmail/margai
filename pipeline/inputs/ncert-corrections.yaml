@@ -4601,3 +4601,127 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      transcribed: "दीर्घ तरंगदैर्ध्य की अवरक्त", printed: "दीर्घ तरंगदैर्घ्य की अवरक्त", reason: "the page prints the half gha here, open to the headline (crop p10 x62-76 y309-324 at zoom 30, against the half dha at x75-89 y443-458; the decoded layer's line y310 agrees); the row misread it"}
   - {book: phy12-part1, lang: hi, chapter: 8, page: 9, kind: text, address: "ch 8 §8.4.2 ¶1",
      transcribed: "सूक्ष्म तरंगें (लघु", printed: "सूक्ष्म तरंगों (लघु", reason: "the page prints the oblique plural, the o-matra with its anusvara, before the bracket (crop p9 x150-420 y655-685 at zoom 5; the decoded layer's line y663 agrees); the row's form is the heading's above it, a misreading"}
+  # phy12-part1 Hindi, round two (D16, 2026-10-14). The reload with round one, align and the second read
+  # (pipeline/reports/2026-10-14-ncert-load.md, -align.md, -verify.md: 115 of 115 sections one to one, §3.12 ¶5 set
+  # aside; 1,008 of 1,041 clean) left 30 flags and two claims code set aside as ones it could not place, each read on
+  # a crop of the page image. 13 misprint: the verifier quotes the print where the row writes the meaning — round one's
+  # entries, and ch 1 p36 and ch 2 p16, which the transcription already wrote. 19 false_positive: a span cut short or
+  # run across two rows, notation, Devanagari quoted in Latin letters, the book's own spellings kept as printed read
+  # as the words they stand for (ch 1 p3, ch 2 p21, ch 6 p12), the arrow pictures round one removed, a figure
+  # reference quoted from the next row, and the two set-aside claims, which quote spans the rows do not carry (ch 3
+  # p17, the verifier's own wording of round one's flag there; ch 6 p5, the row's span and the page's swapped) — so
+  # neither row, ch 6 p5's changed by round one, has a verdict of its own from this read. Four text entries, each
+  # allowed by the founder for its place on 2026-10-14. One writes a meaning the ✅ sample read found: ch 7 p3 prints "जूल
+  # i²R" with no word for heating — read as the unit, an energy set equal to a power; read as the effect's name, a
+  # slip the clause's i² still carries — and the English row and the page's next sentence give जूल तापन, which the
+  # entry writes. Three write dots the raster does not draw where the text layer places an MT-Extra glyph — î·ΔS twice
+  # on ch 1 p32, −m·B in Eq. (5.3) on ch 5 p4 — as the English rows have them, in the rows' · for the dot. Unlike ch 4
+  # p12, whose page draws the same sign three lines lower, these rest on the English row and the layer's glyph (ch 1
+  # p32's first line draws the dot of E·ΔS): signs ruled per place (DECISIONS 2026-10-03, 2026-10-13). The layer check
+  # cannot count such signs, which MT-Extra decodes to a blank, so the book's 14 MT-Extra glyphs were listed and each
+  # read on its page: three are these dots, five are round one's places (ch 4 p12 twice, ch 4 p23, p25, and p26, where
+  # it lies on the printed hyphen), three sit in the Summaries the rows leave out (ch 1 p39, ch 2 p32, ch 6 p20) and
+  # three are drawn and in the rows (ch 1 p13, ch 2 p7, ch 8 p2) — which corrects round one's "no other sign rests on
+  # the layer alone". The layer check's lines are round one's meaning places and its noise classes, and three that
+  # follow from round one's entries: ch 1 p25's हैं (the decoded layer sets the anusvara the page draws on the verb
+  # apart as a mark of its own, so it counts that word as neither है nor हैं: before round one it was the है the rows
+  # carried one more of, now the हैं), ch 3 p22's three × (the stray fragment round one replaced by its meaning) and
+  # ch 4 p12's "closed" (round one's integral(closed)). The two rows the verifier could not find (ch 2 p17 §2.8.3 ¶6;
+  # ch 4 p22 §4.9.2 ¶1, which starts at the foot of its page) are on the page and in the rows. Its 8 passages no row
+  # carries are the labels inside Fig. 1.7 (ch 1 p13), a side label (ch 3 p20), the Summary (ch 3 p22) and four boxes
+  # (ch 4 p2, ch 6 p2 twice, ch 8 p5, p6), which the English rows leave out too. Align: its 7 sections with paired
+  # split and join proposals (ch 1 §1.7.1, §1.10.1; ch 2 §2.4, §2.7, §2.15; ch 4 §4.8, §4.9.2) were read pair by
+  # pair — every Hindi row is beside its own English, the proposals come from short equation rows alike in their
+  # vectors; its 43 weak pairs are each a row and its translation; its 100 number lines, each read in both rows, are
+  # edition differences and none a misread number: cross-references each edition sets its own way (figure, equation,
+  # section and chapter numbers; Class XI as कक्षा 11; page 117 as 119), numbers one edition writes in words (one,
+  # three-dimensional, an exponent as प्रति वोल्ट), a label or subscript one edition repeats, the zero of ε_0, E_0,
+  # R_0, μ_0 that the Hindi print sets as a letter o or names in words, the Hindi's own 9.81 for 9.8 and 50 लाख for 5
+  # million, a 90° the Hindi states where the English leaves it implicit, the English-only sentence of §4.2.2 ¶7 and
+  # its "(= r_hat_12)", and spacing inside three equation numbers (two Hindi, one English). The ✅ sample's 40 pairs
+  # were read on the page images: 39 match, and the 40th is the ch 7 p3 entry above. A ruling quotes the verifier as
+  # it read the rows after round one; addresses are the rows as loaded. Simulated with `ncert load --dry-run` on the
+  # extraction (sha256 97cf92b1…): no refusal, 115 of 115 sections one to one, 50 rulings on flags (18 of round one),
+  # three rows changed (ch 1 §1.13 ¶20, ch 5 §5.2.3 ¶4, ch 7 §7.2 ¶4) and no other. Approved by the founder
+  # 2026-10-14, as written (on pipeline/reports/2026-10-14-ncert-load-dry-run.md), the four text entries each allowed
+  # for its place.
+  # phy12-part1 Hindi, chapter 1
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 3, kind: false_positive, address: "ch 1 §1.3 ¶4",
+     transcribed: "इस अवरोध का परिमााण", printed: "इस अवरोध का परिमाण", reason: "the page sets the aa-stroke twice in this word (crop p3 x40-300 y700-732 at zoom 5; the decoded layer's line y718 agrees), as round one's text entry writes it: the book's own spelling, kept as printed (DECISIONS 2026-10-03); the verifier read the doubled stroke as one"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 9, kind: misprint, address: "ch 1 §1.5 ¶18",
+     transcribed: "m_p = 1.67 × 10^(-27) kg,", printed: "m_p = 1.67 × 10^(-27) K,", reason: "the page prints the proton's mass in K (crop p9 x60-270 y350-370 at zoom 6; the decoded layer's line y356 agrees): the book's error, which the row does not keep; round one's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes kg, the English row's unit"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 9, kind: misprint, address: "ch 1 §1.5 ¶19",
+     transcribed: "(जो सदैव आकर्षी है)", printed: "(जो सदैव धनात्मक है)", reason: "the page prints 'always positive' for the gravitational force (crop p9 x60-400 y445-520 at zoom 4; the decoded layer's line y465 agrees): the book's error, which the row does not keep; round one's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes आकर्षी, the English row's 'always attractive'"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 13, kind: misprint, address: "ch 1 §1.6 ¶9",
+     transcribed: "की दूरी AO = (2/3) AD = (1/sqrt(3)) l", printed: "की दूरी AD = (2/3) AD = (1/sqrt(3)) l", reason: "the page prints AD = (2/3) AD (crop p13 x55-395 y105-155 at zoom 5; the decoded layer's line y124 agrees): the book's error, which the row does not keep; round one's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes AO, the English row's distance of the centroid from A"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 13, kind: false_positive, address: "ch 1 §1.6 ¶12",
+     transcribed: "F_1 है F_1 = F r_hat_1", printed: "F_1 है", reason: "the page prints 'कुल बल F_1 है' and then the display F_1 = F r-hat_1 (crop p13 x50-400 y650-685 at zoom 4; the decoded layer's lines y653 and y670 agree); the row carries both, the verifier quoted the first line alone"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 29, kind: misprint, address: "ch 1 §1.13 ¶2",
+     transcribed: "चूँकि एकांक सदिश r_hat का परिमाण 1 है।", printed: "चूँकि एकांक सदिश r का परिमाण 1 है।", reason: "the page prints a bold r with no hat (crop p29 x44-210 y682-703 at zoom 6; the decoded layer's line y700 agrees): the book's error, which the row does not keep; round one's text entry, under the founder's ruling of 2026-10-10, confirmed for this place on 2026-10-13, writes the unit vector r_hat"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 30, kind: false_positive, address: "ch 1 §1.13 ¶5",
+     transcribed: "q/epsilon_0", printed: "q/ε_0", reason: "the page prints = q/ε_0 (crop p30 x170-330 y288-310 at zoom 6; the decoded layer's line y294 agrees); epsilon_0 is the transcriber's spelling of ε_0, so the spans differ only in notation"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 36, kind: misprint, address: "ch 1 §1.14.3 ¶6",
+     transcribed: "E(r) का परिमाण", printed: "E(r) का परिणाम", reason: "the page prints परिणाम (result) for the field's magnitude (crop p36 x175-505 y540-557 at zoom 5; the decoded layer's line y542 agrees): the book's error, which the row does not keep; the transcription writes the meaning परिमाण and round one left it with no entry, as phy11-part2 did (round one's header)"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 32, kind: text, address: "ch 1 §1.13 ¶20",
+     transcribed: "– 200 i_hat ΔS", printed: "– 200 i_hat·ΔS", reason: "the page draws î and ΔS with a gap and no dot between them (crop p32 x160-420 y398-436 at zoom 5), where the same line, just before, draws the dot of E·ΔS; the text layer places an MT-Extra glyph in that gap (the decoded layer's line y411), which the raster does not draw, and the English row reads –200 i_hat·DeltaS, a dot product, written in the rows' · for the dot. Unlike ch 4 p12, whose page draws the same sign three lines lower, this place rests on the English row and the layer's glyph, with the dot the page draws for E·ΔS: a sign the raster leaves out, ruled per place (DECISIONS 2026-10-03, 2026-10-13); allowed by the founder for this place on 2026-10-14, asked with this round"}
+  - {book: phy12-part1, lang: hi, chapter: 1, page: 32, kind: text, address: "ch 1 §1.13 ¶20",
+     transcribed: "चूँकि i_hat ΔS", printed: "चूँकि i_hat·ΔS", reason: "the page draws î and ΔS with a gap and no dot between them (crop p32 x160-420 y398-436 at zoom 5), where the line above draws the dot of E·ΔS; the text layer places an MT-Extra glyph in that gap (the decoded layer's line y429), which the raster does not draw, and the English row reads since i_hat·DeltaS = –DeltaS, a dot product, written in the rows' · for the dot. Unlike ch 4 p12, whose page draws the same sign three lines lower, this place rests on the English row and the layer's glyph, with the dot the page draws for E·ΔS: a sign the raster leaves out, ruled per place (DECISIONS 2026-10-03, 2026-10-13); allowed by the founder for this place on 2026-10-14, asked with this round"}
+  # phy12-part1 Hindi, chapter 2
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 6, kind: misprint, address: "ch 2 §2.4 ¶8",
+     transcribed: "p cos theta = p·r_hat", printed: "P cos theta = p_vec . r_hat", reason: "the page prints an italic capital P before cos θ (crop p6 x55-200 y712-732 at zoom 8; the decoded layer's line y715 agrees): the book's error, which the row does not keep; round one's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes p, the dipole moment's magnitude; the verifier's p_vec gives the bold p an arrow the page does not draw"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 16, kind: misprint, address: "ch 2 §2.8.2 ¶4",
+     transcribed: "A = 9 × 10^5 NC^-1 m^2", printed: "A = 9 × 10^5 Ne^-1 m^2", reason: "the page prints the unit as Ne⁻¹ m², a Latin e for C (crop p16 x48-400 y102-136 at zoom 5; the decoded layer's line y123 agrees): the book's error, which the row does not keep; the transcription writes the meaning NC^-1 and round one left it with no entry (round one's header)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 17, kind: false_positive, address: "ch 2 §2.8.3 ¶8",
+     transcribed: "10^(-29) C m का स्थायी", printed: "10^(-29) C m", reason: "the row's 'का स्थायी' follows the unit on the page (crop p17 x175-512 y370-390 at zoom 6; the decoded layer's line y374 agrees), so the verifier's span stops two words early; the unit the page prints as cm is written C m by round one's meaning entry, the form the verifier quotes too"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 19, kind: false_positive, address: "ch 2 §2.9 ¶9",
+     transcribed: "E delta S = |sigma| delta S / epsilon_o E = |sigma| / epsilon_o (2.36)", printed: "E = |sigma| delta S / epsilon_o (2.36)", reason: "the page prints E δS = |σ| δS / ε_o and, on the next line, E = |σ| / ε_o (2.36) (crop p19 x160-525 y395-450 at zoom 4; the decoded layer's line y433 has the number); the row carries both lines as printed, the verifier joined them into one"}
+  - {book: phy12-part1, lang: hi, chapter: 2, page: 21, kind: false_positive, address: "ch 2 §2.10 ¶1",
+     transcribed: "यथार्थ रूप में निरक्षित नहीं करता", printed: "यथार्थ रूप में निरसित नहीं करता", reason: "the page prints निरक्षित (crop p21 x262-525 y410-430 at zoom 6; the decoded layer's line y414 agrees), the misspelling round one's text entry keeps as printed (founder, 2026-10-13); the verifier read it as the word it misspells"}
+  # phy12-part1 Hindi, chapter 3
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 2, kind: misprint, address: "ch 3 §3.3 ¶1",
+     transcribed: "धनावेशित नाभिक", printed: "धनावेशित इलेक्ट्रॉन", reason: "the page prints positively charged electrons (crop p2 x160-525 y436-456 at zoom 5; the decoded layer's line y440 agrees): the book's error, which the row does not keep; round one's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes नाभिक, the English row's nuclei"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 11, kind: false_positive, address: "ch 3 §3.8 ¶12",
+     transcribed: "धारा के कारण तापीय प्रभाव प्रतिवेश में हुए", printed: "धारा के कारण तापीय प्रभाव प्रतिवेश", reason: "the page prints 'प्रतिवेश में हुए ऊष्मा' on one line (crop p11 x60-395 y695-713 at zoom 5; the decoded layer's line y698 agrees); the row matches the page, the verifier's span stops two words early"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 22, kind: misprint, address: "ch 3 §3.13 ¶7",
+     transcribed: "10 (I_1 − I_g) − 15 I_g", printed: "10 (I − I_g) − 15 I_g", reason: "the page prints the first I with no subscript (crop p22 x165-450 y210-245 at zoom 6; the decoded layer's line y224 agrees): the book's error, which the row does not keep; round one's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes I_1, as the next line's expansion and the English row have it"}
+  - {book: phy12-part1, lang: hi, chapter: 3, page: 17, kind: false_positive, address: "ch 3 §3.11 ¶19",
+     transcribed: "हमने दोनों धन टर्मिनलों को", printed: "हमने दोनों टर्मिनलों को", reason: "the verifier's transcribed span adds धन, which neither the row nor the page carries — its own wording of round one's flag here: the page prints 'हमने दोनों टर्मिनलों को' without धन (crop p17 x44-330 y293-342 at zoom 4; the decoded layer's line y296 agrees) and the row carries the print, as round one's misprint ruling keeps it; code set the claim aside as one it could not place, so this row has no verdict of its own from this read"}
+  # phy12-part1 Hindi, chapter 4
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 19, kind: false_positive, address: "ch 4 §4.8 ¶19",
+     transcribed: "के प्रभावों को समाप्त करना महत्वपूर्ण है।", printed: "को समाप्त करना महत्वपूर्ण है। बल की दिशा अधोमुखी है।", reason: "the page prints 'तथा अन्य भूले-भटके क्षेत्रों के प्रभावों' at the end of one line and 'को समाप्त करना महत्वपूर्ण है। बल की दिशा अधोमुखी है।' on the next (crop p19 x44-530 y170-216 at zoom 3; the decoded layer's lines y187 and y201 agree); the row carries the sentence whole, and 'बल की दिशा अधोमुखी है।' opens the next row, §4.8 ¶20 (round one's split, English ¶20); the verifier quoted across the two rows"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 21, kind: misprint, address: "ch 4 §4.9.1 ¶10",
+     transcribed: "चुंबकीय आघूर्ण की विमाएँ", printed: "चुंबकीय क्षेत्र की विमाएँ", reason: "the page prints the dimensions of the magnetic field (crop p21 x40-410 y95-130 at zoom 5; the decoded layer's line y100 agrees): the book's error, which the row does not keep; round one's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes आघूर्ण, the English row's magnetic moment"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 22, kind: false_positive, address: "ch 4 §4.9.1 ¶22",
+     transcribed: "बल आघूर्ण tau", printed: "bal aaghurn tau", reason: "the page prints 'बल आघूर्ण τ' (crop p22 x170-505 y525-600 at zoom 3; the decoded layer's line y527 agrees); the row carries the page's Devanagari, the verifier wrote it in Latin letters"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 22, kind: false_positive, address: "ch 4 §4.9.1 ¶22",
+     transcribed: "tau को B", printed: "tau ko B", reason: "the page prints 'τ को B' (crop p22 x170-505 y525-600 at zoom 3; the decoded layer's line y542 agrees); the row carries the page's Devanagari, the verifier wrote it in Latin letters"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 25, kind: false_positive, address: "ch 4 §4.10 ¶8",
+     transcribed: "R_G + R ≃ R :", printed: "R_G + R ≃ R", reason: "the page prints the colon after R, before अर्थात (crop p25 x55-260 y668-694 at zoom 8; the decoded layer's line y685 agrees); the row matches the page, the verifier's span stops before the colon. The ≃ both spans carry is round one's meaning entry"}
+  - {book: phy12-part1, lang: hi, chapter: 4, page: 26, kind: misprint, address: "ch 4 §4.10 ¶14",
+     transcribed: "(60 + 0.02) Ω ≃ 0.02 Ω", printed: "(60 + 0.02) Ω - 0.02 Ω", reason: "the page sets a short hyphen between the fraction and its value (crop p26 x170-410 y610-662 at zoom 5; the decoded layer's line y641 agrees): the book's error, which the row does not keep; round one's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes ≃, the English row's sign"}
+  # phy12-part1 Hindi, chapter 5
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 4, kind: false_positive, address: "ch 5 §5.2.3 ¶4",
+     transcribed: "= −mB cos theta = − m B (5.3)", printed: "= −mB cos theta", reason: "the page prints '= −mB cos θ' and, on the next line, '= − m B (5.3)' (crop p4 x160-525 y495-545 at zoom 6; the decoded layer's lines y512 and y532 agree); the row carries both, the verifier quoted the first line alone. The dot between m and B, which the raster does not draw, is written by the text entry after this one"}
+  - {book: phy12-part1, lang: hi, chapter: 5, page: 4, kind: text, address: "ch 5 §5.2.3 ¶4",
+     transcribed: "− m B (5.3)", printed: "− m·B (5.3)", reason: "the page draws bold m and B with a gap and no dot between them (crop p4 x180-525 y528-545 at zoom 8); the text layer places an MT-Extra glyph in that gap (the decoded layer's line y532), which the raster does not draw, and the English row reads −m.B, its period the dot product that makes U_m a scalar, written in the rows' · for the dot as round one's B·dl is. Unlike ch 4 p12, whose page draws the same sign three lines lower, this place rests on the English row and the layer's glyph alone: a sign the raster leaves out, ruled per place (DECISIONS 2026-10-03, 2026-10-13); allowed by the founder for this place on 2026-10-14, asked with this round"}
+  # phy12-part1 Hindi, chapter 6
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 5, kind: false_positive, address: "ch 6 §6.4 ¶4",
+     transcribed: "विद्युत धारा बल को", printed: "विद्युत वाहक बल को", reason: "the verifier swapped the row's span and the page's: the page prints 'प्रेरित विद्युत धारा बल को' (crop p5 x250-525 y155-215 at zoom 4; the decoded layer's line y164 agrees) and the row carries वाहक बल, round one's meaning entry; code set the claim aside as one it could not place, so this row has no verdict of its own from this read"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 7, kind: false_positive, address: "ch 6 §6.5 ¶4",
+     transcribed: "ध्यान दीजिए कि तथा द्वारा दर्शायी गई", printed: "ध्यान दीजिए कि ↗ तथा ⤸ द्वारा दर्शायी गई", reason: "the page draws two small arrow pictures here (crop p7 x178-525 y455-505 at zoom 5), which round one removed as the founder ruled on 2026-10-13: no characters, and the English row leaves them out too; the verifier wrote them as arrow characters"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 9, kind: false_positive, address: "ch 6 §6.5 ¶16",
+     transcribed: "प्रेरित विद्युत वाहक बल के स्थिर रहने की अपेक्षा कर सकते हैं। वृत्ताकार", printed: "प्रेरित विद्युत वाहक बल के स्थिर रहने की अपेक्षा कर सकते हैं।", reason: "the page prints answer (c) as one item of two sentences, the second beginning 'वृत्ताकार लूप में' on the next line (crop p9 x170-510 y396-458 at zoom 4; the decoded layer's lines y399-428 agree); the row carries the item whole, the verifier's span stops at the first full stop"}
+  - {book: phy12-part1, lang: hi, chapter: 6, page: 12, kind: false_positive, address: "ch 6 §6.7 ¶3",
+     transcribed: "फेस प्रेरित विद्युत वाहक", printed: "फेरा प्रेरित विद्युत वाहक", reason: "the page prints फेस (crop p12 x205-410 y450-469 at zoom 8; the decoded layer's line y453 agrees), kept as printed by the founder's ruling of 2026-10-13; the verifier read the word as the one it stands for"}
+  # phy12-part1 Hindi, chapter 7
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 3, kind: text, address: "ch 7 §7.2 ¶4",
+     transcribed: "जानते हैं जूल i^2R द्वारा", printed: "जानते हैं जूल तापन i^2R द्वारा", reason: "the page prints 'as you know, Joule is given by i^2R', with no word for heating (crop p3 x236-420 y98-117 at zoom 8, and x236-524 y96-160 at zoom 4; the decoded layer's line y101 agrees); the English row reads 'Joule heating is given by i^2R' and the page's own next sentence says जूल तापन. Read as the unit, जूल sets an energy equal to a power, a false statement the ruling of 2026-10-10 writes as its meaning; read as the name of the effect, a slip the clause's i^2 still carries, which stays as printed like the slips ruled on 2026-10-13. Written as the meaning, in the book's own phrase, and allowed by the founder for this place on 2026-10-14, asked with this round (found by the ✅ sample read)"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 4, kind: misprint, address: "ch 7 §7.2 ¶16",
+     transcribed: "100 W / 220 V = 0.454A", printed: "100 W / 220 V = 0.450A", reason: "the page prints 0.450A (crop p4 x40-420 y680-725 at zoom 5; the decoded layer's line y705 agrees): the book's error, which the row does not keep; round one's text entry, under the founder's ruling of 2026-10-10, confirmed for this place on 2026-10-13, writes 0.454 A, the English row's value"}
+  - {book: phy12-part1, lang: hi, chapter: 7, page: 9, kind: misprint, address: "ch 7 §7.5 ¶12",
+     transcribed: "तुलना में कम दीप्ति से प्रकाशित", printed: "तुलना में दीप्ति से प्रकाशित", reason: "the page prints the comparison without कम (crop p9 x165-510 y565-598 at zoom 5; the decoded layer's line y570 agrees): the book's error, which the row does not keep; round one's text entry, under the founder's ruling of 2026-10-10 that the row writes the meaning, writes कम, the English row's 'less brightly'"}
+  # phy12-part1 Hindi, chapter 8
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 2, kind: false_positive, address: "ch 8 §8.2 ¶2",
+     transcribed: "चित्र 8.1(a)] में एक समांतर प्लेट संधारित्र C दर्शाया गया है", printed: "चित्र 8.1(b)] पर", reason: "the page prints '[चित्र 8.1(a)] में एक समांतर प्लेट संधारित्र C' at the head of this row (crop p2 x44-330 y515-620 at zoom 3; the decoded layer's line y523 agrees); the '[चित्र 8.1(b)] पर' the verifier quotes is printed at the foot of the page (crop p2 x44-330 y700-732 at zoom 4; the decoded layer's line y714 agrees) and is carried by the next row, §8.2 ¶3"}
+  - {book: phy12-part1, lang: hi, chapter: 8, page: 4, kind: false_positive, address: "ch 8 §8.2 ¶9",
+     transcribed: "i = i_c + i_d = i_c + epsilon_0 dPhi_E / dt (8.5)", printed: "i = i_c + i_d = i_c + epsilon_0 dPhi_E / dt", reason: "the page prints the display with its number (8.5) at the right margin (crop p4 x44-400 y150-185 at zoom 4; the decoded layer's line y164 has the number); the row keeps an equation number at the end of its equation by the transcription convention, so it matches the page"}

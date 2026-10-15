@@ -578,6 +578,15 @@ HOW TO RESUME (supersedes item 2 of the list below):
      MT-Extra glyph); p27's ≅ is in the Summary; p22 is a figure page (Fig. 9.23). FULL-BOOK SCRIPT READY: scratchpad
      f6ccef84 `d16-phy12p2-hi.sh` (extract ch 10–14 ≈₹320 → load → align ≈₹5 → Sonnet 5 second read ≈₹135 → the
      JSONL copied to `$SP/dry/hi.jsonl`), awaiting the founder's launch.
+     07:05–07:35 the founder ran it (reports a620e47): ch 10–14 transcribed, 75 pages, ₹372.31 (the book's extract
+     ₹493.04, 102 pages sent, 20 apparatus pages not); loaded as written, 465 Hindi rows beside 500 English, 38 of 70
+     sections one to one (extraction sha 0d357bbd…); align ₹4.92; the Sonnet 5 second read ₹119.31 over 99 pages,
+     449 of 465 rows clean (96.6%) — 17 flags, 3 claims code set aside, 7 passages no row carries; the layer check
+     23 word lines and 6 symbol lines on ch 10–14; 9 glued-colon words. Book ≈₹617. ADJUDICATION IN FLIGHT
+     (scratchpad f6ccef84, `dry.sh base` reproduces 38/70 and 465 unchanged): eight fresh readers — ch9…ch14 on
+     BRIEF-align.md (now with `unprinted`), b1 (second-read flags, set-asides, omitted passages, colons, the
+     notation flag, the low-confidence pages) and b2 (the layer-check lines, ch 9 from the crops above, a Greek
+     sweep) on BRIEF-chars-b{1,2}.md; outputs rulings-<name>.json / block-<name>.yaml.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

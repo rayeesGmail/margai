@@ -568,6 +568,16 @@ HOW TO RESUME (supersedes item 2 of the list below):
      all under 0.05%. THE FOURTH HINDI BOOK = phy12-part2 (ch 9–14, 122 chapter pages; one MT-Extra glyph, lhph201
      p21). Stage script ready: scratchpad f6ccef84 `d16-phy12p2-hi-stage.sh` (render all + extract ch 9, 34 pages,
      ≈₹155–175); the founder uploads the Hindi PDFs to S3, then launches.
+     06:47–06:53 the founder ran it (reports b70a62d): 122 pages rendered; ch 9 transcribed, 27 pages sent and 7
+     apparatus pages not, 138 paragraphs, ₹120.73 (₹4.47 a sent page). Its check lines READ on the print (crops):
+     three places where the row repairs the print — p6 prints प्रतिबिबों (no anusvara on the second बि), p11
+     प्रिज्मों (no nukta), p21 जिनसे where the row writes जिससे — each for a `text` entry as printed, as round four's
+     slips; one meaning place, p21's "छोटे कोण के प्रिज़्म अर्थात पहले प्रिज़्म" where the English says "a thin prism"
+     and the row writes पतले (as phy11-part1 ch 6 p17's कण for क्षण); p9 पार्श्विक is printed as the row has it
+     (decoder artefact); the four symbol lines are printed (p7 −2.5, p14 n₂₁ twice in Eq. 9.21, p17 0.5, p21 ≃ — the
+     MT-Extra glyph); p27's ≅ is in the Summary; p22 is a figure page (Fig. 9.23). FULL-BOOK SCRIPT READY: scratchpad
+     f6ccef84 `d16-phy12p2-hi.sh` (extract ch 10–14 ≈₹320 → load → align ≈₹5 → Sonnet 5 second read ≈₹135 → the
+     JSONL copied to `$SP/dry/hi.jsonl`), awaiting the founder's launch.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

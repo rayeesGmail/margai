@@ -587,6 +587,20 @@ HOW TO RESUME (supersedes item 2 of the list below):
      BRIEF-align.md (now with `unprinted`), b1 (second-read flags, set-asides, omitted passages, colons, the
      notation flag, the low-confidence pages) and b2 (the layer-check lines, ch 9 from the crops above, a Greek
      sweep) on BRIEF-chars-b{1,2}.md; outputs rulings-<name>.json / block-<name>.yaml.
+     Later: ADJUDICATED IN SIMULATION — scratchpad f6ccef84 `block-final.yaml` (merge.py → readdress.py → hgen;
+     rulings-final.json), 153 entries: 57 split, 22 join, 1 defer, 1 move (alignment, 81; ch 9 25, ch 10 9, ch 11
+     11, ch 12 10, ch 13 15, ch 14 11) + 53 text, 17 false_positive, 2 misprint (b1 29, b2 31, b3 12); `dry.sh
+     final`: no refusal, 465 → 500 rows, 70 of 70 sections one to one. The text entries: 9 visargas; the book's own
+     spellings the rows repaired, back as printed (स्त्रोत ×8 — the print's real स्त्र conjunct, तंरग, प्रिज्मों,
+     प्रोट्रॉन, ट्रांजिस्टर …); misreadings (शृंखला, संरेखित, तेज़ी; ν read as v ×3); a bullet and three dropped side
+     headings restored; 11 meaning entries (I_a → I_0, Eq. 12.11's reversed E_n, E_3 −1.53 → −1.51 eV, A > 30 → A < 30,
+     ³₂H → ³₂He, अदीप्त, the valence band, "n से p", "gains electrons", "charge neutrality", मिलीऐमीटर). Ch 10 p16's
+     P_1 is right as printed (the frozen English has P_2). SEVEN FOUNDER QUESTIONS (scratchpad founder-questions.md:
+     हाइडोजन; भुजा/चतुर्भुज; 1864/1855; उत्सर्जित/उत्तेजित; आवृत्तियों; 100 keV; नाभिक/न्यूक्लियॉन ×4) + four
+     frozen-English slips noted. Check noise classes for later: a ि+anusvara glyph after a Bookman letter decodes as
+     a combining macron (बिंदु); an overprinted double halant (सन््); the glued "hnu"; the reph in पार्श्विक.
+     NEXT: the founder's answers → header + block into ncert-corrections.yaml by Edit → spec audit → approval dry
+     run → approval → commit → reload, re-read of the changed pages, judge.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

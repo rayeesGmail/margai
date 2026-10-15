@@ -560,6 +560,14 @@ HOW TO RESUME (supersedes item 2 of the list below):
      2026-10-15), the check-only ruling unchanged; each new book's decoded layer is measured against it before its
      corrections block, a Chemistry book first in line to exceed it. Still open: the founder's ten ✅ pairs on all three
      books, then the next Hindi book (recommended phy12-part2, ≈122 pages).
+     Later: THE KIT REBUILT in scratchpad f6ccef84 by replaying the Write/Edit calls of sessions 38d88bed, ca91e9fb,
+     92559e62 and 88e65b97 (139 files: kit/ compiles, c4/, c6/numdiff.py, hgen/readdress/crop/sbs/pairs, the BRIEFs;
+     py/ reinstalled, libs/ from the jar); jar copy `server-d16-1c34114.jar`, byte-identical to a fresh HEAD package.
+     The decoded layer's words that cannot be right, per book on the trigger's measure: phy11-part1 25 of 67,772
+     (0.037%), phy11-part2 5 of 63,500 (0.008%), phy12-part1 8 of 76,685 (0.010%), phy12-part2 6 of 46,710 (0.013%) —
+     all under 0.05%. THE FOURTH HINDI BOOK = phy12-part2 (ch 9–14, 122 chapter pages; one MT-Extra glyph, lhph201
+     p21). Stage script ready: scratchpad f6ccef84 `d16-phy12p2-hi-stage.sh` (render all + extract ch 9, 34 pages,
+     ≈₹155–175); the founder uploads the Hindi PDFs to S3, then launches.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

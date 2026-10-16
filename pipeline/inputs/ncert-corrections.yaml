@@ -5335,3 +5335,63 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      transcribed: "p-क्षेत्र में होलों की प्राप्ति", printed: "p-क्षेत्र में इलेक्ट्रॉनों की प्राप्ति", reason: "the page prints 'p-क्षेत्र में होलों की प्राप्ति' ('the gain of holes by the p-region') (crop p12 x205-525 y173-210 at zoom 4; the decoded layer's line y177 agrees), where the p-region loses holes by diffusion; the English row reads 'the gain of electron by the p-region', as the same paragraph prints later ('p-पदार्थ ने इलेक्ट्रॉन अर्जित किए हैं'). By the founder's ruling of 2026-10-10 the row writes the meaning"}
   - {book: phy12-part2, lang: hi, chapter: 14, page: 14, kind: text, address: "ch 14 §14.6.2 ¶5",
      transcribed: "हम मिलीमीटर का उपयोग", printed: "हम मिलीऐमीटर का उपयोग", reason: "the page prints मिलीमीटर ('millimetre', a length) as the meter used for the forward-bias current (crop p14 x155-525 y333-382 at zoom 4 and x330-470 y350-366 at zoom 7; the decoded layer's line y351 agrees); the English row reads 'we use a milliammeter since the expected current is large'. By the founder's ruling of 2026-10-10 the row writes the meaning: मिलीऐमीटर, spelt as the same sentence spells माइक्रोऐमीटर"}
+  # phy12-part2 Hindi, round two (D16, 2026-10-16). The reload with round one, align, and the second read of the 62
+  # changed pages (pipeline/reports/2026-10-16-ncert-verify.md: 487 of 500 clean) left 10 flags and two claims code
+  # set aside, each read on a crop of the page image. 7 misprint: six are round one's meaning places, where the row
+  # writes the meaning and the page prints the false word, sign or number (ch 9 p19 भुजा, ch 10 p12 उदीप्त, ch 12 p11's
+  # reversed (12.11), ch 13 p9's A > 30 twice — once filed under §13.6 ¶2 — and ch 13 p11's ^3_2H), and ch 9 p5's
+  # glyph that reads as Q where ∵ is meant, which the row already writes as the meaning. 5 false_positive: the side
+  # heading round one restored, which the verifier leaves out of running text (ch 9 p10); a span cut short (ch 11
+  # p13); प्रोट्रॉन, which the page prints and the verifier reads as प्रोटॉन (ch 13 p3); the page's p-क्षेत्र read as
+  # n-क्षेत्र (ch 14 p12, round one's meaning place); and a transcription the row does not carry, the first line's
+  # क्वार्टज़ paired with the third line's गवाक्ष (ch 11 p4). One text entry, the founder's answer of 2026-10-16
+  # (DECISIONS): ch 10 p17's "P_1 एवं P_3 … उनके पारित-अक्षों", which puts the crossed polaroids' axes at π/2 − θ, written
+  # as the meaning, the axes of P_2 and P_3. Kept as printed by the founder's answers the same day: ch 13 p10's प्रकार
+  # where प्रहार (bombardment) is meant, and ch 11 p2's आपेक्षित आवेश (e/m) for the book's own आपेक्षिक — slips that
+  # state nothing false. The row the verifier could not find (ch 12 p7 §12.3 ¶1) is printed under the 12.3 heading
+  # and in the rows, so it needs no entry; no ruling reaches it, and a one-page re-read is the closing run's. The six
+  # passages no row carries are a heading now in its row (ch 9 p10), figure labels (ch 9 p18), text rows carry (ch 10
+  # p6), the verifier's own note (ch 11 p4), a biography box (ch 11 p9) and the Summary (ch 13 p13). The layer check's
+  # new word lines are round one's meaning places and हाइड्रोजन, by design. The load numbers all 70 sections one to
+  # one; align, comparing vectors, still proposes reshapes in two sections whose counts match (ch 9 §9.2.3 ¶19–¶21,
+  # ch 14 §14.2 ¶2–¶4), each pair read and right as it stands. Its 18 pairs weaker than 0.45 were read in full and are
+  # translation pairs (two one-line lead-ins; §13.7.2 ¶3 the Hindi's longer wording). Its number lines are round one's
+  # sweep: cross-references, digits written as words (§14.3 ¶7's चार), the edition's own additions, subscripts the
+  # Hindi sets as a zero or a letter o (look-alike, DECISIONS 2026-10-12), round one's meaning places, and ch 10 p17
+  # (this round's entry). Its ✅ sample of 40 pairs was read on the page images: 40 of 40 rows match their page; the
+  # founder's ten are #5, 21, 22, 23, 24, 26, 31, 32, 34, 36. A ruling quotes the verifier as the report gives it.
+  # Simulated with `ncert load --dry-run` on the extraction (sha256 0d357bbd…): no refusal, 70 of 70 sections one to
+  # one, one row changed. Approved by the founder 2026-10-16, as recommended (on
+  # pipeline/reports/2026-10-16-ncert-load-dry-run-2.md).
+  # phy12-part2 Hindi, round two, chapter 9
+  - {book: phy12-part2, lang: hi, chapter: 9, page: 5, kind: misprint, address: "ch 9 §9.2.3 ¶9",
+     transcribed: "(∵ PM = AB)", printed: "(Q PM = AB)", reason: "the page draws a glyph that reads as Q before PM = AB in '(Q PM = AB)' beside Eq. (9.4) (crop p5 x40-540 y99-149 at zoom 3), where the English row and the sense have ∵ ('since': PM = AB is the reason the ratios are equal); a glyph standing in for a sign, and by the founder's ruling of 2026-10-10 the row writes the meaning, which it already does (∵); the first read quoted ∵ here and raised nothing"}
+  - {book: phy12-part2, lang: hi, chapter: 9, page: 10, kind: false_positive, address: "ch 9 §9.4 ¶6",
+     transcribed: "पूर्ण आंतरिक परावर्तन के लिए एक प्रदर्शन सभी प्रकाशिक परिघटनाओं को आजकल", printed: "सभी प्रकाशिक परिघटनाओं को आजकल", reason: "the page prints the italic side heading पूर्ण आंतरिक परावर्तन के लिए एक प्रदर्शन above this paragraph (crop p10 x150-530 y585-645 at zoom 4), which round one's text entry puts before the paragraph's first words by the side-heading ruling (DECISIONS 2026-09-27); the verifier's printed span leaves the heading out, as it leaves headings out of running text: the row matches the page"}
+  - {book: phy12-part2, lang: hi, chapter: 9, page: 19, kind: misprint, address: "ch 9 §9.6 ¶2",
+     transcribed: "चतुर्भुज के अन्य दो कोणों का योग", printed: "भुजा के अन्य दो कोणों का योग", reason: "the page prints भुजा ('side') in a sentence giving it two angles that sum to 180°, where the quadrilateral AQNR is meant (crop p19 x40-410 y636-692 at zoom 3); round one's text entry writes चतुर्भुज: by the founder's ruling of 2026-10-10 the row writes the meaning (the founder ruled this place on 2026-10-16)"}
+  # phy12-part2 Hindi, round two, chapter 10
+  - {book: phy12-part2, lang: hi, chapter: 10, page: 12, kind: misprint, address: "ch 10 §10.6 ¶1",
+     transcribed: "बारी-बारी से अदीप्त तथा दीप्त क्षेत्र आते हैं", printed: "बारी-बारी से उदीप्त तथा दीप्त क्षेत्र आते हैं", reason: "the page prints उदीप्त ('lit up') where the English row says dark (crop p12 x330-525 y472-490 at zoom 6); round one's text entry writes अदीप्त: by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 10, page: 17, kind: text, address: "ch 10 §10.7 ¶10",
+     transcribed: "उनके पारित-अक्षों के बीच कोण", printed: "P_2 एवं P_3 के पारित-अक्षों के बीच कोण", reason: "the page prints 'क्योंकि P_1 एवं P_3 क्रॉसित हैं उनके पारित-अक्षों के बीच कोण (π/2−θ) होगा' (crop p17 x40-420 y230-340 at zoom 3), which puts P_1's and P_3's pass axes at π/2 − θ, though crossed axes are at π/2; the English row reads 'the angle between the pass axes of P_2 and P_3 will be (pi/2 − theta)', as the intensity that follows requires: a dropped phrase that makes the statement false, and by the founder's ruling of 2026-10-10 the row writes the meaning (the founder ruled this place on 2026-10-16)"}
+  # phy12-part2 Hindi, round two, chapter 11
+  - {book: phy12-part2, lang: hi, chapter: 11, page: 13, kind: false_positive, address: "ch 11 §11.8 ¶7",
+     transcribed: "m' = 0.150 kg, वेग v' = 30.0 m/s", printed: "m' =", reason: "the page prints 'द्रव्यमान m' = 0.150 kg, वेग v' = 30.0 m/s' on one line (crop p13 x40-540 y358-408 at zoom 3; the decoded layer's line y374 agrees), as the row has it; the verifier's printed span stops after m' ="}
+  - {book: phy12-part2, lang: hi, chapter: 11, page: 4, kind: false_positive, address: "ch 11 §11.4 ¶1",
+     transcribed: "क्वार्टज़ गवाक्ष", printed: "क्वार्ट्ज़ गवाक्ष", reason: "the page prints 'पारदर्शी क्वार्ट्ज़ गवाक्ष' with the halant on its third line (crop p4 x40-540 y252-302 at zoom 3), and the row carries it so; the transcription the verifier quoted is not in the row — it pairs the first line's क्वार्टज़, which round one's text entry keeps as printed, with the third line's गवाक्ष"}
+  # phy12-part2 Hindi, round two, chapter 12
+  - {book: phy12-part2, lang: hi, chapter: 12, page: 11, kind: misprint, address: "ch 12 §12.5 ¶1",
+     transcribed: "h nu_if = E_(n_i) – E_(n_f)", printed: "h nu_if = E_(n_f) – E_(n_i)", reason: "the page prints (12.11) with the energy difference reversed, E_nf − E_ni, which gives the emitted photon a negative energy since n_f < n_i (crop p11 x160-521 y640-682 at zoom 4); round one's text entry writes E_(n_i) – E_(n_f), as the English row has it: by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  # phy12-part2 Hindi, round two, chapter 13
+  - {book: phy12-part2, lang: hi, chapter: 13, page: 3, kind: false_positive, address: "ch 13 §13.2 ¶10",
+     transcribed: "यह एक प्रोट्रॉन, एक इलेक्ट्रॉन", printed: "यह एक प्रोटॉन, एक इलेक्ट्रॉन", reason: "the page prints प्रोट्रॉन, a र-stroke under the ट drawn as in न्यूट्रॉन on the same line (crop p3 x300-530 y510-540 at zoom 8), and the row carries it as printed by round one's text entry (DECISIONS 2026-10-03); the verifier's printed span misreads the page"}
+  - {book: phy12-part2, lang: hi, chapter: 13, page: 9, kind: misprint, address: "ch 13 §13.7 ¶1",
+     transcribed: "नाभिकों, A < 30, वाले भाग एवं भारी नाभिकों, A > 170, वाले", printed: "नाभिकों, A > 30, वाले भाग एवं भारी नाभिकों, A > 170, वाले", reason: "the page prints 'हलके नाभिकों, A > 30' (crop p9 x155-525 y588-640 at zoom 4), putting the lighter nuclei inside the flat region; round one's text entry writes A < 30, as the English row and the page's own p7 have it: by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 13, page: 11, kind: misprint, address: "ch 13 §13.7.2 ¶5",
+     transcribed: "^3_2He + ^3_2He -> ^4_2He + ^1_1H + ^1_1H + 12.86 MeV", printed: "^3_2H + ^3_2H -> ^4_2He + ^1_1H + ^1_1H + 12.86 MeV", reason: "the page prints reaction (iv) with ^3_2H + ^3_2H (crop p11 x170-525 y685-735 at zoom 5), a hydrogen symbol with Z = 2; round one's text entry writes ^3_2He + ^3_2He, the product of reaction (iii) and the only form that balances: by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 13, page: 9, kind: misprint, address: "ch 13 §13.6 ¶2",
+     transcribed: "नाभिकों, A < 30, वाले", printed: "नाभिकों, A > 30, वाले", reason: "the claim is filed under §13.6 ¶2 but quotes §13.7 ¶1's 'हलके नाभिकों, A > 30' on the same page, round one's meaning place: the page prints A > 30 (crop p9 x155-525 y588-640 at zoom 4) and the row writes A < 30 by the founder's ruling of 2026-10-10; ruled on its exact spans"}
+  # phy12-part2 Hindi, round two, chapter 14
+  - {book: phy12-part2, lang: hi, chapter: 14, page: 12, kind: false_positive, address: "ch 14 §14.5.1 ¶6",
+     transcribed: "p-क्षेत्र में इलेक्ट्रॉनों की प्राप्ति", printed: "n-क्षेत्र में होलों की प्राप्ति", reason: "the page prints 'n-क्षेत्र से इलेक्ट्रॉनों की हानि तथा p-क्षेत्र में होलों की प्राप्ति' (crop p12 x200-530 y165-215 at zoom 6): the region gaining holes is printed p, not n, so the verifier's printed span misreads the page and its claim does not describe it; the place is round one's meaning place, the p-region gaining holes where the English row and the paragraph's own later sentence have it gaining electrons, which the row writes by the founder's ruling of 2026-10-10"}

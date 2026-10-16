@@ -611,6 +611,20 @@ HOW TO RESUME (supersedes item 2 of the list below):
      70, 0/276/224, the 11 Hindi-only addresses deleted). NEXT: the founder runs scratchpad f6ccef84
      `d16-phy12p2-hi-reload.sh` (reload ₹0 → align ≈₹5 → second read of the changed pages ≈₹80) → round two on any
      flags → the ✅ sample → close the fourth Hindi book.
+     08:06–08:14 the founder ran it (reports 589bf66): the reload as approved (0d357bbd…, d0cd71ea…, 0/276/224, 70 of
+     70); align ₹5.28, 500 rows each side, its two leftover proposals read and right as they stand; the second read
+     of the 62 changed pages ₹76.62, 487 of 500 clean — 10 flags, 2 claims set aside, 1 row not found (ch 12 p7
+     §12.3 ¶1, printed under its heading). ROUND TWO: 12 rulings (7 misprint at round one's meaning places and ch 9
+     p5's Q-for-∵, 5 false_positive — among them the verifier's n-क्षेत्र for the printed p-क्षेत्र, ch 14 p12, and
+     प्रोटॉन for the printed प्रोट्रॉन, ch 13 p3, both read on crops), spec audit PASS (two MINOR header points fixed).
+     The ✅ SAMPLE read by two readers on the page images: 40 of 40 rows match their page; three founder questions
+     from it and the number lines — R2-1 ch 10 p17's dropped referent (P_2 and P_3) → meaning, R2-2 ch 13 p10's
+     प्रकार for प्रहार and R2-3 ch 11 p2's आपेक्षित for आपेक्षिक → as printed; the founder: "approved, as
+     recommended". Round two committed with one text entry (3c06357; approval dry run -2: corrections 6963a69e…,
+     0/1/499, 31 rulings on flags), re-check PASS. NEXT: the founder runs scratchpad f6ccef84 `d16-phy12p2-hi-r2.sh`
+     (reload ₹0, re-reads of ch 10 p17 and ch 12 p7 ≈₹4, whole book judged ₹0) → expect 500 of 500, or 499 with ch 12
+     p7 for the founder's page check → close the fourth Hindi book; the founder's ten ✅ pairs (#5, 21, 22, 23, 24,
+     26, 31, 32, 34, 36 in 2026-10-16-ncert-align.md).
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

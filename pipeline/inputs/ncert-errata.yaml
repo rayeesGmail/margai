@@ -2,7 +2,7 @@
 # 2026-10-17). A row corrects a printing error that changes the meaning and keeps a slip that changes nothing as
 # printed; every correction is logged here, and so is every kept wrong cross-reference or garbled phrase, as an
 # errata candidate. Spelling slips kept as printed are not logged. The English rows are canonical and frozen, so
-# an English error is logged as kept.
+# an English error the founder puts in the log is logged as kept.
 #
 # Unlike ncert-corrections.yaml, which is keyed on a page and a span of the transcription and applied before
 # the rows are numbered, an entry here names its row by address and is read against the loaded rows:
@@ -37,4 +37,828 @@
 #                               and whether a kept place is a wrong cross-reference or a garbled phrase (the
 #                               backfill of 2026-10-17 is unreviewed; the founder reviews the meaning_changing true
 #                               list before the errata notes are built)
-errata: []
+errata:
+  - {book: phy11-part1, lang: hi, chapter: 2, section: "2.2", para: 4, page: 2, action: corrected,
+     printed: "0.8", corrected: "0.08",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part1 Hindi round six, the meaning round, approved 2026-10-14 (42544f1)",
+     reason: "the page prints x = 0.8 t³ for the graph of Fig. 2.1 (crop p2 x290-576 y430-545 at zoom 3); by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: Table 2.1 on the same page gives x(t_1) = 2.16 m at t_1 = 3.0 s, which is 0.08 × 3³ (crop p2 x100-576 y585-725 at zoom 2), the paragraph's own x(t_1) = 0.08 t_1³ has 0.08, and so does the English row"}
+  - {book: phy11-part1, lang: hi, chapter: 2, section: "2.2", para: 4, page: 2, action: corrected,
+     printed: "t_2(= t - Delta t/2)", corrected: "t_2(= t + Delta t/2)",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part1 Hindi round six, the meaning round, approved 2026-10-14 (42544f1)",
+     reason: "the page prints t_2(=t–Δt/2), the same minus as t_1 beside it (crop p2 x290-576 y430-545 at zoom 3); by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: Table 2.1 on the same page gives t_2 = 5.0 s for t = 4 s and Δt = 2.0 s, which is t + Δt/2 (crop p2 x100-576 y585-725 at zoom 2), as the English row has"}
+  - {book: phy11-part1, lang: hi, chapter: 2, section: "2.2", para: 4, page: 2, action: corrected,
+     printed: "0.03", corrected: "0.08",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part1 Hindi round six, the meaning round, approved 2026-10-14 (42544f1)",
+     reason: "the page prints x(t_2) = 0.03 t³₂ (crop p2 x290-576 y430-545 at zoom 3); by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: Table 2.1 on the same page gives x(t_2) = 10.0 m at t_2 = 5.0 s, which is 0.08 × 5³ (crop p2 x100-576 y585-725 at zoom 2), as the English row's 0.08 t_2³ does"}
+  - {book: phy11-part1, lang: hi, chapter: 3, section: "3.10", para: 10, page: 16, action: corrected,
+     printed: "इसका परिणाम कितना", corrected: "इसका परिमाण कितना",
+     meaning_changing: true, flag_reviewed: false, round: "round four on the closed Hindi books, approved 2026-10-14 (2c8ff90)",
+     reason: "the page prints परिणाम (\"result\") where the example asks for the magnitude of the acceleration, as the English row does (crop p16 x0-576 y525-559 at zoom 4); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy11-part1, lang: hi, chapter: 5, section: "5.3", para: 11, page: 4, action: kept,
+     printed: "किया किया कार्य", corrected: "किया गया कार्य",
+     meaning_changing: false, flag_reviewed: false, round: "phy11-part1 Hindi round one, approved 2026-10-03 (1601867)",
+     reason: "a garbled phrase: the page prints the word किया twice, द्वारा किया किया कार्य है (crop p4 y285-335, the approved misprint ruling's; the decoded layer's line y307 agrees); kept as printed (misprint ruling of phy11-part1 Hindi round one)"}
+  - {book: phy11-part1, lang: hi, chapter: 5, section: "5.5", para: 8, page: 6, action: corrected,
+     printed: "W_F", corrected: "W_f",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part1 Hindi round six, the meaning round, approved 2026-10-14 (42544f1)",
+     reason: "the page labels the friction's work W_F, with a capital italic F, in 'घर्षण बल द्वारा किया गया कार्य W_F→आयत AGHI का क्षेत्रफल' (crop p6 x290-576 y70-130 at zoom 4), the symbol the same answer gives the woman's work, W_F = 1750 J (crop p6 x40-300 y645-725 at zoom 3); by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: the display under it computes W_f = (−50) × 20 = −1000 J, and the English row has W_f"}
+  - {book: phy11-part1, lang: hi, chapter: 6, section: "6.7.2", para: 26, page: 17, action: corrected,
+     printed: "किसी कण t", corrected: "किसी क्षण t",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part1 Hindi round six, the meaning round, approved 2026-10-14 (42544f1)",
+     reason: "the answer prints 'माना कि कोई कण P किसी कण t पर, v वेग से चल रहा है' (crop p17 x290-576 y425-470 at zoom 4), a particle t where an instant t is meant; by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: क्षण, the book's word for an instant ('किसी क्षण t पर', ch 3 p13, crop x40-300 y524-552 at zoom 6), as the English row's 'at some instant t' has"}
+  - {book: phy11-part1, lang: hi, chapter: 6, section: "6.8.2", para: 8, page: 22, action: corrected,
+     printed: "से 40 सेंटीमीटर", corrected: "से 30 सेंटीमीटर",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part1 Hindi round six, the meaning round, approved 2026-10-14 (42544f1)",
+     reason: "Example 6.8 prints the load '40 सेंटीमीटर' from one end (crop p22 x290-576 y135-265 at zoom 3); by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: the example's own answer works with AP = 30 cm and PG = 5 cm, AG being 35 cm (crop p22 x290-576 y488-530 at zoom 3), and the English row has 30 cm"}
+  - {book: phy11-part1, lang: hi, chapter: 6, section: "6.10", para: 13, page: 27, action: corrected,
+     printed: "rev s^-1", corrected: "rev/min",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part1 Hindi round six, the meaning round, approved 2026-10-14 (42544f1)",
+     reason: "the answer writes ω_0 = 2π × (the speed in rev/s) and then = (2π × rev s⁻¹ में कोणीय वेग)/(60 सेकेंड/मिनट) (crop p27 x40-300 y520-585 at zoom 4), a speed in rev/s divided by 60 s/min, which is false; by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: the division by 60 s/min converts a speed in rev/min, Example 6.11's 1200 rpm (crop p27 x40-300 y355-435 at zoom 3), which the page's next line works as 2π × 1200/60 = 40π rad/s (crop p27 x40-300 y583-655 at zoom 3), as the English row's 'angular speed in rev/min' has"}
+  - {book: phy11-part1, lang: hi, chapter: 6, section: "6.12", para: 4, page: 30, action: corrected,
+     printed: "+ (OC ×", corrected: "+ (CP ×",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part1 Hindi round six, the meaning round, approved 2026-10-14 (42544f1)",
+     reason: "the page prints l = (OC × mv) + (OC × mv), OC twice, under its own r = OC + CP (crop p30 x290-576 y100-175 at zoom 4); by the founder's ruling of 2026-10-10, which governs this book from 2026-10-14, the row writes the meaning: l = r × mv with r = OC + CP gives (OC × mv) + (CP × mv), as the English row has"}
+  - {book: phy11-part1, lang: hi, chapter: 7, section: "7.3", para: 14, page: 5, action: corrected,
+     printed: "F^1_GA = G.2m.2m", corrected: "F'_GA = G.2m.2m",
+     meaning_changing: false, flag_reviewed: false, round: "phy11-part1 Hindi round six, the meaning round, approved 2026-10-14 (42544f1)",
+     reason: "Example 7.2 (b) prints F¹_GA, F¹_GB and F¹_GC with a raised 1, while the same lines print F′_R with a prime, and its last line sets a stray hyphen before GA in F¹'s subscript, which the row has never carried (crop p5 x290-576 y405-475 at zoom 5). Read as an exponent, F¹_GA is part (a)'s F_GA = Gm(2m)/1 ĵ = 2Gm² ĵ (crop p5 x40-300 y585-640 at zoom 3), set equal to 4Gm² ĵ, which is false; read as a label for the doubled mass's force, as 'F¹_GB = F_GB' reads, nothing false. A look-alike ambiguous between the two (DECISIONS 2026-10-12), put to the founder, who ruled for the meaning on 2026-10-14: this entry writes the primed forces as the English row has them (F'_GA, F'_GB, F'_GC), the stray hyphen dropped with the symbol it sits in, under the founder's ruling of 2026-10-10, which governs this book from 2026-10-14"}
+  - {book: phy11-part1, lang: hi, chapter: 7, section: "7.3", para: 14, page: 5, action: corrected,
+     printed: "F^1_GB = F_GB", corrected: "F'_GB = F_GB",
+     meaning_changing: false, flag_reviewed: false, round: "phy11-part1 Hindi round six, the meaning round, approved 2026-10-14 (42544f1)",
+     reason: "Example 7.2 (b) prints F¹_GA, F¹_GB and F¹_GC with a raised 1, while the same lines print F′_R with a prime, and its last line sets a stray hyphen before GA in F¹'s subscript, which the row has never carried (crop p5 x290-576 y405-475 at zoom 5). Read as an exponent, F¹_GA is part (a)'s F_GA = Gm(2m)/1 ĵ = 2Gm² ĵ (crop p5 x40-300 y585-640 at zoom 3), set equal to 4Gm² ĵ, which is false; read as a label for the doubled mass's force, as 'F¹_GB = F_GB' reads, nothing false. A look-alike ambiguous between the two (DECISIONS 2026-10-12), put to the founder, who ruled for the meaning on 2026-10-14: this entry writes the primed forces as the English row has them (F'_GA, F'_GB, F'_GC), the stray hyphen dropped with the symbol it sits in, under the founder's ruling of 2026-10-10, which governs this book from 2026-10-14"}
+  - {book: phy11-part1, lang: hi, chapter: 7, section: "7.3", para: 14, page: 5, action: corrected,
+     printed: "F^1_GC = F_GC", corrected: "F'_GC = F_GC",
+     meaning_changing: false, flag_reviewed: false, round: "phy11-part1 Hindi round six, the meaning round, approved 2026-10-14 (42544f1)",
+     reason: "Example 7.2 (b) prints F¹_GA, F¹_GB and F¹_GC with a raised 1, while the same lines print F′_R with a prime, and its last line sets a stray hyphen before GA in F¹'s subscript, which the row has never carried (crop p5 x290-576 y405-475 at zoom 5). Read as an exponent, F¹_GA is part (a)'s F_GA = Gm(2m)/1 ĵ = 2Gm² ĵ (crop p5 x40-300 y585-640 at zoom 3), set equal to 4Gm² ĵ, which is false; read as a label for the doubled mass's force, as 'F¹_GB = F_GB' reads, nothing false. A look-alike ambiguous between the two (DECISIONS 2026-10-12), put to the founder, who ruled for the meaning on 2026-10-14: this entry writes the primed forces as the English row has them (F'_GA, F'_GB, F'_GC), the stray hyphen dropped with the symbol it sits in, under the founder's ruling of 2026-10-10, which governs this book from 2026-10-14"}
+  - {book: phy11-part1, lang: hi, chapter: 7, section: "7.3", para: 14, page: 5, action: corrected,
+     printed: "= F^1_GA + F^1_GB + F^1_GC", corrected: "= F'_GA + F'_GB + F'_GC",
+     meaning_changing: false, flag_reviewed: false, round: "phy11-part1 Hindi round six, the meaning round, approved 2026-10-14 (42544f1)",
+     reason: "Example 7.2 (b) prints F¹_GA, F¹_GB and F¹_GC with a raised 1, while the same lines print F′_R with a prime, and its last line sets a stray hyphen before GA in F¹'s subscript, which the row has never carried (crop p5 x290-576 y405-475 at zoom 5). Read as an exponent, F¹_GA is part (a)'s F_GA = Gm(2m)/1 ĵ = 2Gm² ĵ (crop p5 x40-300 y585-640 at zoom 3), set equal to 4Gm² ĵ, which is false; read as a label for the doubled mass's force, as 'F¹_GB = F_GB' reads, nothing false. A look-alike ambiguous between the two (DECISIONS 2026-10-12), put to the founder, who ruled for the meaning on 2026-10-14: this entry writes the primed forces as the English row has them (F'_GA, F'_GB, F'_GC), the stray hyphen dropped with the symbol it sits in, under the founder's ruling of 2026-10-10, which governs this book from 2026-10-14"}
+  - {book: phy11-part2, lang: hi, chapter: 8, section: "8.3", para: 1, page: 3, action: corrected,
+     printed: "प्रतिबल α विकृति", corrected: "प्रतिबल ∝ विकृति",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets α where ∝ belongs in Hooke's law (crop p3 x61-134 y625-654 at zoom 4); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy11-part2, lang: hi, chapter: 8, section: "8.5.1", para: 12, page: 6, action: corrected,
+     printed: "8.8", corrected: "9.8",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints = 220 kg wt = 220 × 8.8 N = 2156 N (crop p6 x325-560 y175-195 at zoom 4; the decoded layer's line y181 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the arithmetic, 220 × 9.8 = 2156 where 220 × 8.8 is 1936, and the English row's 220 × 9.8 N = 2156 N"}
+  - {book: phy11-part2, lang: hi, chapter: 8, section: "8.5.1", para: 13, page: 6, action: corrected,
+     printed: "= – (2156)", corrected: "= (1/2) (2156)",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets an en dash where ½ belongs, = – (2156) N = 1078 N (crop p6 x325-560 y210-230 at zoom 4; the decoded layer's line y215 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: each thighbone carries half the load, 2156/2 = 1078, and the English row has ½ (2156) N = 1078 N"}
+  - {book: phy11-part2, lang: hi, chapter: 8, section: "8.5.1", para: 14, page: 6, action: corrected,
+     printed: "8.4", corrected: "9.4",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints bone's Y = 8.4 × 10^9 N m^-2 (crop p6 x325-560 y245-262 at zoom 4; the decoded layer's line y249 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: this edition's Table 8.1 gives bone 9.4 (crop p5 x40-400 y75-260 at zoom 3), the English row has 9.4 × 10^9, and only 9.4 gives the page's result, 1078 × 0.5/(9.4 × 10^9 × 1.26 × 10^-3) = 4.55 × 10^-5 m, where 8.4 gives 5.1 × 10^-5 m"}
+  - {book: phy11-part2, lang: hi, chapter: 8, section: "8.5.1", para: 17, page: 6, action: corrected,
+     printed: "/(8.4", corrected: "/(9.4",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints [(1078 × 0.5)/(8.4 × 10^9 × 1.26 × 10^-3)] = 4.55 × 10^-5 m (crop p6 x325-560 y360-395 at zoom 4; the decoded layer's line y365 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: bone's 9.4 × 10^9 N m^-2 from this edition's Table 8.1 (crop p5 x40-400 y75-260) and the English row, the only value that gives the 4.55 × 10^-5 m the page prints"}
+  - {book: phy11-part2, lang: hi, chapter: 8, section: "8.5.2", para: 3, page: 7, action: corrected,
+     printed: "8.0", corrected: "9.0",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints a shearing force of 8.0 × 10^4 N in Example 8.4 (crop p7 x50-280 y295-350 at zoom 4; the decoded layer's line y334 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row's 9.0 × 10^4 N, the force the solution's stress needs, 1.80 × 10^6 N m^-2 × 0.05 m^2 = 9.0 × 10^4 N, where 8.0 would give 1.60 × 10^6 N m^-2"}
+  - {book: phy11-part2, lang: hi, chapter: 8, section: "8.5.2", para: 4, page: 7, action: corrected,
+     printed: "(8.4", corrected: "(9.0",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints the stress as (8.4 × 10^4 N/0.05 m^2) = 1.80 × 10^6 N m^-2 (crop p7 x55-280 y470-522 at zoom 4; the decoded layer's line y492 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning from the arithmetic: 1.80 × 10^6 N m^-2 over 0.05 m^2 needs 9.0 × 10^4 N (8.4 gives 1.68 × 10^6), the force of the statement as the English row prints it; the English row's 9.4 at this place is its own slip, so the arithmetic fixes the value"}
+  - {book: phy11-part2, lang: hi, chapter: 9, section: "9.5.1", para: 7, page: 14, action: kept,
+     printed: "समीकरण (9.20) से", corrected: "समीकरण (9.18) से",
+     meaning_changing: false, flag_reviewed: false, round: "phy11-part2 Hindi round two, approved 2026-10-12 (0e652c6)",
+     reason: "a wrong cross-reference: the page prints समीकरण (9.20) से for the terminal-velocity equation, which the same page numbers (9.18) (crop p14 x325-560 y70-300 at zoom 4); the English row cites Eq. (9.18); kept as printed (false_positive ruling of phy11-part2 Hindi round two)"}
+  - {book: phy11-part2, lang: hi, chapter: 9, section: "9.6.4", para: 5, page: 18, action: corrected,
+     printed: "उत्तल पार्श्व की ओर दाब का मान अवतल", corrected: "अवतल पार्श्व की ओर दाब का मान उत्तल",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints उत्तल first and अवतल second, making the convex side's pressure the greater (crop p18 x325-560 y186-268 at zoom 4; the decoded layer's lines y190 and y207 agree); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row says the concave side (inside) has the higher pressure than the convex side (outside), as (9.25) and the air bubble the page cites next require"}
+  - {book: phy11-part2, lang: hi, chapter: 10, section: "10.4", para: 2, page: 3, action: corrected,
+     printed: "PV α T", corrected: "PV ∝ T",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets α where ∝ belongs, PV α T (crop p3 x42-279 y334-360 at zoom 3); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy11-part2, lang: hi, chapter: 10, section: "10.4", para: 2, page: 3, action: corrected,
+     printed: "P α T", corrected: "P ∝ T",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets α where ∝ belongs, the second time on the page, PαT (crop p3 x42-279 y376-402 at zoom 3); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy11-part2, lang: hi, chapter: 10, section: "10.5", para: 9, page: 5, action: corrected,
+     printed: "नियत ताप पर", corrected: "नियत दाब पर",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints नियत ताप पर (at constant temperature) above P∆V = µR∆T (crop p5 x288-525 y280-400 at zoom 4; the decoded layer's line y327 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row says at constant pressure, the condition the sentence before names (किसी नियत दाब पर) and the only one under which PV = µRT gives P∆V = µR∆T; at constant temperature ∆T is zero"}
+  - {book: phy11-part2, lang: hi, chapter: 10, section: "10.5", para: 11, page: 6, action: corrected,
+     printed: "l^3 3l^2", corrected: "l^3 ≈ 3l^2",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page draws no relation sign between (l+Δl)³ – l³ and 3l²Δl in (10.7) (crop p6 x40-320 y120-460 at zoom 2.2, the line of (10.7)); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy11-part2, lang: hi, chapter: 10, section: "10.5", para: 16, page: 6, action: corrected,
+     printed: "alpha_l 10^(-5)", corrected: "alpha_l ≈ 10^(-5)",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page draws no relation sign between α_l and 10⁻⁵ K⁻¹ (crop p6 x300-580 y100-700 at zoom 1.6, the line under the area expansion); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy11-part2, lang: hi, chapter: 10, section: "10.6", para: 9, page: 7, action: corrected,
+     printed: "s =", corrected: "C =",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints (10.12) as s = S/µ = (1/µ) ∆Q/∆T and the next line names the quantity C (crop p7 x290-525 y420-515 at zoom 4; the decoded layer's lines y472 and y499 place them); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row has C = S/µ, s being (10.11)'s heat capacity per unit mass, and the page's own next sentence (जहाँ C मोलर विशिष्ट ऊष्मा धारिता कहलाती है) names the molar quantity C"}
+  - {book: phy11-part2, lang: hi, chapter: 10, section: "10.8", para: 6, page: 10, action: corrected,
+     printed: "ठोस", corrected: "द्रव",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints अर्थात्, ठोस से वाष्प में अवस्था परिवर्तन, solid to vapour (crop p10 x78-315 y578-652 at zoom 4; the decoded layer's line y609 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row says during the change of state from liquid to vapour, the vaporisation the paragraph defines, and the same sentence names the liquid and the gas as the states that coexist"}
+  - {book: phy11-part2, lang: hi, chapter: 10, section: "10.9.1", para: 11, page: 16, action: corrected,
+     printed: "ताँबे", corrected: "पीतल",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints ताँबे की छड़ (the copper bar) for the second bar (crop p16 x78-315 y224-272 at zoom 4; the decoded layer's line y240 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: Example 10.7 joins an iron bar to a brass bar, पीतल की छड़, with K_2 = 109 W m^-1 K^-1, the value this solution uses (crop p15 x300-515 y538-650 at zoom 3.5), and the English row says brass bar"}
+  - {book: phy11-part2, lang: hi, chapter: 10, section: "10.9.1", para: 12, page: 16, action: corrected,
+     printed: "चालकता K है", corrected: "चालकता K′ है",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints the compound bar's equivalent conductivity as K with no prime (crop p16 x78-315 y535-575 at zoom 4; the decoded layer's line y556 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row has K′, and the page's own next lines name it K′ (H′ = K′A (T_1 − T_2)/2L, K′ = 2K_1K_2/(K_1 + K_2)); a plain K is no quantity of this example"}
+  - {book: phy11-part2, lang: hi, chapter: 10, section: "10.9.4", para: 8, page: 19, action: corrected,
+     printed: "20°C", corrected: "28°C",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round two, approved 2026-10-12 (0e652c6)",
+     reason: "the page prints the skin temperature as 20°C (crop p19 x42-280 y580-706 at zoom 3; the decoded layer's line y644 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the paragraph's own rate of heat loss takes the skin at (301)^4, and 301 K is 28 °C where 20 °C is 293 K; the English row has 28 °C"}
+  - {book: phy11-part2, lang: hi, chapter: 10, section: "10.10", para: 6, page: 20, action: kept,
+     printed: "समीकरणों (10.15) तथा (10.16)", corrected: "समीकरणों (10.19) तथा (10.20)",
+     meaning_changing: false, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "a wrong cross-reference: the page derives (10.21) from Newton's law of cooling, (10.19), and the rate of heat loss, (10.20), and cites (10.15) and (10.16); kept as printed (misprint ruling of phy11-part2 Hindi round one); the English row cites the same"}
+  - {book: phy11-part2, lang: hi, chapter: 11, section: "11.8.3", para: 5, page: 10, action: corrected,
+     printed: "T_2>T_1", corrected: "T_2<T_1",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints (W > 0), तब समीकरण (11.16) से T_2>T_1 (crop p10 x305-545 y345-412 at zoom 4; the decoded layer's line y365 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: (11.16) gives W = µR(T_1 − T_2)/(γ − 1) with γ > 1, so W > 0 means T_2 < T_1, as the English row has; the next sentence, W < 0 giving T_2 > T_1, is the converse and is printed right"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.4.1", para: 2, page: 7, action: corrected,
+     printed: "(2mv_x) (– n", corrected: "(2mv_x) ((1/2) n",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets an en dash where ½ belongs in (12.10), (– n A v_x ∆t) (crop p7 x40-280 y140-232 at zoom 4; the decoded layer's line y217 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row has (½ n A v_x ∆t), and the page itself prints ½A v_x ∆t n four lines above for the molecules that hit the wall, half of them moving towards it"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.4.1", para: 4, page: 7, action: corrected,
+     printed: "v^2_bar", corrected: "v_x^2_bar",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints (12.12) as P = n m with the bar over v^2 and no subscript x (crop p7 x40-280 y365-385 at zoom 4; the decoded layer's line y371 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row has P = n m v_x^2_bar, the sum of (12.11)'s n m v_x^2 over the groups; without the x the pressure would be three times (12.14)'s (1/3) n m v^2_bar"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.4.1", para: 5, page: 7, action: corrected,
+     printed: "v_3^2_bar = (1/3) [v_x^2_bar + v_y^2_bar + v_3^2_bar]", corrected: "v_z^2_bar = (1/3) [v_x^2_bar + v_y^2_bar + v_z^2_bar]",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets a subscript 3 where z belongs, twice in (12.13) (crop p7 x40-280 y435-475 at zoom 4; the decoded layer's lines y441 and y460 agree); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row has v_z, the third of the components (v_x, v_y, v_z) the page names"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.4.1", para: 6, page: 7, action: corrected,
+     printed: "माध्यम", corrected: "माध्य",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints माध्यम (crop p7 x40-280 y478-496 at zoom 4; the decoded layer's line y480 agrees), the book's word for a medium (the waves' माध्यम of chapter 14), where the English row says v^2_bar denotes the mean of the squared speed; by the founder's ruling of 2026-10-10 the row writes the meaning: माध्य, the book's word for mean (माध्य मुक्त पथ, §12.7)"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.4.1", para: 7, page: 7, action: corrected,
+     printed: "संख्या – n", corrected: "संख्या (1/2) n",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets an en dash where ½ belongs, औसत संख्या – n Av_x ∆t (crop p7 x288-525 y150-178 at zoom 4; the decoded layer's line y158 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row has ½ n Av_x ∆t, the number the derivation found for (12.10)"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.4.2", para: 1, page: 7, action: corrected,
+     printed: "x – m", corrected: "x (1/2) m",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets an en dash where ½ belongs in (12.15b), [N x – m v^2_bar] (crop p7 x288-525 y365-400 at zoom 4; the decoded layer's line y387 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row has N x ½ m v^2_bar, as the page's own (12.16) gives E = N × (1/2) m v^2_bar; the letter x the page sets for the product stays, as in the English row"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.4.2", para: 3, page: 7, action: corrected,
+     printed: "= – m", corrected: "= (1/2) m",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets an en dash where ½ belongs in (12.19), E/N = – m v^2_bar (crop p7 x288-525 y460-592 at zoom 4; the decoded layer's line y572 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row has E/N = ½ m v^2_bar, as (12.16) on the same page gives"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.4.2", para: 5, page: 8, action: corrected,
+     printed: "अर्थात् – m_1 v_1^2_bar = – m_2 v_2^2_bar", corrected: "अर्थात् (1/2) m_1 v_1^2_bar = (1/2) m_2 v_2^2_bar",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets an en dash where ½ belongs, before m_1 and before m_2 (crop p8 x85-315 y290-340 at zoom 4); the row already writes the meaning and no text entry was written (named in the misprint ruling on this place)"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.4.2", para: 12, page: 8, action: corrected,
+     printed: "अब – m v_rms^2", corrected: "अब (1/2) m v_rms^2",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets an en dash where ½ belongs, (ii) अब – m v_rms² (crop p8 x325-560 y210-260 at zoom 4); the row already writes the meaning and no text entry was written (named in the misprint ruling on this place)"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.4.2", para: 12, page: 8, action: kept,
+     printed: "(3/2) ) k_B T", corrected: "(3/2) k_B T",
+     meaning_changing: false, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "a garbled phrase: the page prints a stray closing bracket after (3/2) (crop p8 x325-560 y218-256 at zoom 5; the decoded layer's line y242 agrees), which the English row keeps too; restored as printed (DECISIONS 2026-09-29)"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.5", para: 3, page: 10, action: corrected,
+     printed: "– mv_x^2", corrected: "(1/2) mv_x^2",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets an en dash where ½ belongs before mv_x^2 (crop p10 x75-290 y255-335 at zoom 4; the decoded layer's line y272 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row has ½ mv_x^2, the term of (12.24) on the page before"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.5", para: 3, page: 10, action: corrected,
+     printed: "मान – k_BT", corrected: "मान (1/2) k_BT",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets an en dash where ½ belongs, औसत मान – k_BT (crop p10 x75-290 y255-335 at zoom 4; the decoded layer's line y316 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row has ½ k_B T, the average (12.24) gives each such term; a negative average energy would be false"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.6.1", para: 2, page: 11, action: corrected,
+     printed: "(3/2) RT (12.28)", corrected: "(3/2) R (12.28)",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints (12.28) as C_v = dU/dT = (3/2) RT (crop p11 x60-290 y340-395 at zoom 4; the decoded layer's line y386 places the number); by the founder's ruling of 2026-10-10 the row writes the meaning from the arithmetic: U = (3/2) RT (12.27) gives dU/dT = (3/2) R, a molar heat capacity; the English row prints the same RT, its own slip, kept there"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.6.2", para: 3, page: 11, action: corrected,
+     printed: "(9/7) R", corrected: "9/7",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints (12.35) ending γ = 9/7 R (crop p11 x295-530 y140-215 at zoom 4; the decoded layer's line y191 places it); by the founder's ruling of 2026-10-10 the row writes the meaning from the arithmetic: γ = C_p/C_v = (9/2) R/(7/2) R = 9/7, a pure number like (12.31)'s 5/3 and (12.34)'s 7/5; the English row prints the same R, its own slip, kept there"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.6.3", para: 4, page: 12, action: corrected,
+     printed: "J mo1^-1 K^-1", corrected: "J mol^-1 K^-1",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints mo1 (a digit 1) for the unit mol (crop p12 x90-276 y429-454 at zoom 3); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.7", para: 5, page: 13, action: corrected,
+     printed: "एवं T का", corrected: "एवं tau का",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints l एवं T, an italic capital T where τ belongs (crop p13 x288-525 y75-200 at zoom 4; the decoded layer's line y95 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row says estimate l and τ, and the lines below compute τ = 6.1 × 10^-10 s; T is this chapter's temperature"}
+  - {book: phy11-part2, lang: hi, chapter: 12, section: "12.7", para: 5, page: 13, action: corrected,
+     printed: "(0.02", corrected: "(6.02",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints n = (0.02 × 10^23)/(22.4 × 10^-3) = 2.7 × 10^25 m^-3 (crop p13 x288-525 y75-200 at zoom 4; the decoded layer's line y120 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning from the arithmetic: 2.7 × 10^25 m^-3 × 22.4 × 10^-3 m^3 = 6.0 × 10^23, the molecules in a mole at STP (Avogadro's number, 6.02 × 10^23), where 0.02 × 10^23 gives 8.9 × 10^22 m^-3; the English row prints 0.02 too, its own slip, kept there"}
+  - {book: phy11-part2, lang: hi, chapter: 13, section: "13.2.1", para: 2, page: 3, action: corrected,
+     printed: "प्रतीक v द्वारा", corrected: "प्रतीक nu द्वारा",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets a round Latin v where ν belongs, unlike the pointed ν of the next line (crop p3 x65-305 y232-270 at zoom 4); the row already writes the meaning and no text entry was written (named in the misprint ruling on this place)"}
+  - {book: phy11-part2, lang: hi, chapter: 13, section: "13.5", para: 9, page: 9, action: corrected,
+     printed: "(1.5 s + pi/4)]", corrected: "1.5 s + pi/4]",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints (b)'s argument as sin [(2π s^-1) × (1.5 s + π/4)], the bracket taking in π/4 (crop p9 x320-560 y185-222 at zoom 4; the decoded layer's lines y190-215 place it); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row has sin [(2π s^-1) × 1.5 s + π/4], the phase of x = (5.0 m) cos [(2π rad/s) t + π/4] at t = 1.5 s, which the next line evaluates as (3π + π/4); the printed bracket adds π/4 to seconds and gives 3π + π^2/2"}
+  - {book: phy11-part2, lang: hi, chapter: 13, section: "13.5", para: 10, page: 9, action: corrected,
+     printed: "130", corrected: "140",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints the acceleration as = 130 m s^-2 (crop p9 x320-560 y270-340 at zoom 4; the decoded layer's line y327 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning from the arithmetic: (2π s^-1)^2 × 3.535 m = 39.48 × 3.535 = 139.6 ≈ 140 m s^-2, as the English row has"}
+  - {book: phy11-part2, lang: hi, chapter: 13, section: "13.6", para: 4, page: 10, action: corrected,
+     printed: "कमानियाँ M संहति", corrected: "कमानियाँ m संहति",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round two, approved 2026-10-12 (0e652c6)",
+     reason: "the page prints the block's mass as a capital M (crop p10 x65-307 y90-140 at zoom 4; the decoded layer's line y114 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the same example's answer (¶7) gives T = 2 pi sqrt(m / 2k) with a lower-case m, and the English row has a block of mass m"}
+  - {book: phy11-part2, lang: hi, chapter: 13, section: "13.8", para: 5, page: 13, action: corrected,
+     printed: "विस्थापन के परिणाम", corrected: "विस्थापन के परिमाण",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints परिणाम (\"result\") where the magnitude of the displacement is meant (crop p13 x66-305 y91-116 at zoom 3); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy11-part2, lang: hi, chapter: 13, section: "13.8", para: 9, page: 13, action: corrected,
+     printed: "त्वरण", corrected: "विस्थापन",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints चर राशि कोणीय त्वरण है, the variable being the angular acceleration (crop p13 x315-555 y85-135 at zoom 4; the decoded layer's line y105 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row says the variable is angular displacement, θ in α = −(mgL/I) θ (13.24) as x is in (13.11); कोणीय विस्थापन is the book's term for it (§8.2)"}
+  - {book: phy11-part2, lang: hi, chapter: 14, section: "14.3.2", para: 3, page: 6, action: corrected,
+     printed: "k a पर", corrected: "k पर",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets an italic a after x + 2nπ/k (crop p6 x65-305 y580-625 at zoom 5; the decoded layer's line y599 agrees), which reads as x + 2nπa/k; by the founder's ruling of 2026-10-10 the row writes the meaning: the points of equal displacement are x and x + 2nπ/k, from sin k[x + 2nπ/k] on the line before, as the English row has"}
+  - {book: phy11-part2, lang: hi, chapter: 14, section: "14.3.3", para: 12, page: 7, action: corrected,
+     printed: "= 30 s^-1", corrected: "= 3.0 s^-1",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints ω = 30 s^-1 (crop p7 x65-305 y520-572 at zoom 4; the decoded layer's line y559 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: Example 14.2 gives 3.0 rad/s (y = 0.005 sin (80.0 x – 3.0 t)) and the solution goes on with T = 2π/3.0 s^-1 = 2.09 s; the English row has ω = 3.0 s^-1"}
+  - {book: phy11-part2, lang: hi, chapter: 14, section: "14.4.2", para: 1, page: 9, action: corrected,
+     printed: "उपेक्षित", corrected: "अपेक्षित",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round two, approved 2026-10-12 (0e652c6)",
+     reason: "the page prints the word with the vowel u, which reads 'neglected' (crop p9 x65-307 y320-360 at zoom 4; the decoded layer's line y334 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the sentence goes on to show that B/rho has the dimension of a velocity squared, [L^2 T^-2], so the word meant is the one with the vowel a, 'required', and the English row has 'has the relevant dimension'"}
+  - {book: phy11-part2, lang: hi, chapter: 14, section: "14.5", para: 6, page: 11, action: corrected,
+     printed: "alpha", corrected: "= a",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page sets a Greek α where = a belongs, before the bracket of (14.30) (crop p11 x315-555 y412-478 at zoom 4; the decoded layer's line y454 places it); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row has = a[2 sin [...] cos (φ/2)], the sum (14.29) by the identity for sin A + sin B, which (14.31) then writes as 2a cos (φ/2) sin (kx – ωt + φ/2)"}
+  - {book: phy11-part2, lang: hi, chapter: 14, section: "14.6", para: 2, page: 12, action: corrected,
+     printed: "डोरी पर परिणाम में", corrected: "डोरी पर परिमाण में",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints परिणाम (\"result\") where the force equal in magnitude is meant (crop p12 x315-554 y451-476 at zoom 3); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy11-part2, lang: hi, chapter: 14, section: "14.6", para: 4, page: 13, action: corrected,
+     printed: "बलों", corrected: "क्षणों",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints y = y_i + y_r = 0 सभी बलों पर, at all forces (crop p13 x200-305 y480-500 at zoom 8; the decoded layer's line y484 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row says at all times, and the page's own words for it in this section are सभी क्षणों पर (crop p12 x315-555 y340-362 at zoom 4)"}
+  - {book: phy11-part2, lang: hi, chapter: 14, section: "14.6.1", para: 16, page: 16, action: corrected,
+     printed: "300", corrected: "330",
+     meaning_changing: true, flag_reviewed: false, round: "phy11-part2 Hindi round one, approved 2026-10-12 (b855d6c)",
+     reason: "the page prints L = 30 cm तथा v = 300 m s^-1 (crop p16 x315-555 y570-730 at zoom 3.5; the decoded layer's line y699 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: Example 14.5 gives the speed of sound as 330 m s^-1, the solution uses 330 for the open pipe, and the 275 Hz the page prints is 330/(4 × 0.30 m), where 300 gives 250 Hz; the English row has 330"}
+  - {book: phy12-part1, lang: hi, chapter: 1, section: "1.5", para: 12, page: 8, action: corrected,
+     printed: "(r_n21 = r_n12)", corrected: "(r_21 = r_12)",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints the bracket with a stray n before both subscripts, (r_n21 = r_n12) (crop p8 x150-525 y420-462 at zoom 5; the decoded layer's line y434 agrees), naming two quantities the chapter never defines; the sentence defines r_21 and r_12 as the magnitudes of the vectors r_21 and r_12, and the English row's '(r_12 = r_21)' says they are equal; by the founder's ruling of 2026-10-10 the row writes the meaning, in the Hindi's own order"}
+  - {book: phy12-part1, lang: hi, chapter: 1, section: "1.5", para: 18, page: 9, action: corrected,
+     printed: "10^(-27) K, m_e", corrected: "10^(-27) kg, m_e",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints the proton's mass as 1.67 × 10^-27 K, a capital K where the unit belongs, while m_e beside it is in kg (crop p9 x60-270 y350-370 at zoom 6; the decoded layer's line y356 agrees); K is the kelvin, a wrong unit for a mass; the English row and this chapter's other proton masses (p10, p18) give 1.67 × 10^-27 kg; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 1, section: "1.5", para: 19, page: 9, action: corrected,
+     printed: "धनात्मक", corrected: "आकर्षी",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints the gravitational force as '(which is always positive)' just before F_G = −G m_p m_e / r^2 and just after the sentence saying that the negative sign marks an attractive force (crop p9 x60-400 y445-520 at zoom 4; the decoded layer's line y465 agrees); under that sign convention a force that is always positive is repulsive, the opposite of gravity and of the minus sign the formula carries; the English row reads '(always attractive)'; by the founder's ruling of 2026-10-10 the row writes the meaning, in the word the same solution uses for gravity further down this page ('गुरुत्वाकर्षण बल आकर्षी है', §1.5 ¶21)"}
+  - {book: phy12-part1, lang: hi, chapter: 1, section: "1.6", para: 9, page: 13, action: corrected,
+     printed: "दूरी AD =", corrected: "दूरी AO =",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints the distance of the centroid from A as AD = (2/3) AD = (1/sqrt(3)) l (crop p13 x55-395 y105-155 at zoom 5; the decoded layer's line y124 agrees), an equation that makes AD zero; the English row reads 'the distance AO of the centroid O from A is (2/3) AD', and the next line of the page continues 'AO = BO = CO'; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 1, section: "1.7.2", para: 8, page: 18, action: corrected,
+     printed: "परिमाण E_A के", corrected: "परिमाण E_1A के",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints the magnitude of E_2A as equal to E_A, with no subscript 1 (crop p18 x165-510 y660-715 at zoom 5; the decoded layer's lines y665 and y682 agree), where E_A is the total field the next line computes as E_1A + E_2A = 7.2 × 10^4 N C^-1, twice either part; the arithmetic and the English row ('points towards the right and has the same magnitude' as E_1A, 3.6 × 10^4 N C^-1) give E_1A; a dropped subscript, so by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 1, section: "1.13", para: 2, page: 29, action: corrected,
+     printed: "सदिश r का", corrected: "सदिश r_hat का",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints 'चूँकि एकांक सदिश r का परिमाण 1 है' with a bold r and no hat (crop p29 x44-210 y682-703 at zoom 6; the decoded layer's line y700 agrees); a bold r is this chapter's position vector, whose magnitude is r, not 1 — the sentence is about the unit vector r_hat the same paragraph names twice before it, and the English row reads 'since the magnitude of a unit vector is 1'; by the founder's ruling of 2026-10-10, confirmed for this place on 2026-10-13, the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 1, section: "1.14.3", para: 6, page: 36, action: corrected,
+     printed: "E(r) का परिणाम केवल", corrected: "E(r) का परिमाण केवल",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints परिणाम (\"result\") where the magnitude of E(r) is meant (crop p36 x170-507 y537-558 at zoom 4; the page's other परिणाम, y175, is a result and right); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy12-part1, lang: hi, chapter: 1, section: "1.14.3", para: 11, page: 37, action: corrected,
+     printed: "अथवा (r)", corrected: "अथवा E (r)",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints 'E (r) × 4 π r^2 = 0 अथवा (r) = 0;  r > R' with no E before the second (r) (crop p37 x60-400 y292-380 at zoom 4; the decoded layer's line y326 agrees), which reads as r = 0 for points with r > R; by the founder's ruling of 2026-10-10 the row writes the meaning: the English row's 'E (r) × 4 pi r^2 = 0 or E (r) = 0; r > R', the field outside the neutral atom. The row will then differ from the verifier's quote only in writing pi for π"}
+  - {book: phy12-part1, lang: hi, chapter: 2, section: "2.4", para: 8, page: 6, action: corrected,
+     printed: "अब, P cos", corrected: "अब, p cos",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints an italic capital P before cos theta = p•r-hat (crop p6 x55-200 y712-732 at zoom 8; the decoded layer's line y715 agrees); the quantity is the dipole moment's magnitude p of Eq. (2.14) just above, while P in this chapter names the point P and the polarisation; the English row reads 'p cos theta = p.r_hat'; a letter that names another quantity, so by the founder's ruling of 2026-10-10 and the look-alike test (DECISIONS 2026-10-12) the row writes the meaning. The false_positive on the verifier's flag here stands: the row will still differ from the verifier's quote, which gives the bold p an arrow the page does not draw"}
+  - {book: phy12-part1, lang: hi, chapter: 2, section: "2.8.2", para: 4, page: 16, action: corrected,
+     printed: "9 × 10^5 Ne^-1 m^2", corrected: "9 × 10^5 NC^-1 m^2",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints the unit as N e⁻¹ m² for N C⁻¹ m² (crop p16 x48-400 y102-136 at zoom 5, the approved misprint ruling's); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy12-part1, lang: hi, chapter: 2, section: "2.8.3", para: 8, page: 17, action: corrected,
+     printed: "10^(-29) cm का", corrected: "10^(-29) C m का",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints the molecule's dipole moment as 10^-29 cm, a lower-case c and m set together (crop p17 x175-512 y370-390 at zoom 6; the decoded layer's line y374 agrees), which reads as centimetres, a length; the English row and this example's own solution two lines on give 10^-29 C m; a wrong unit, so by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 2, section: "2.10", para: 5, page: 22, action: corrected,
+     printed: "P = E_o chi_e E", corrected: "P = epsilon_0 chi_e E",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints E with a subscript o for ε₀ in (2.37) (crop p22 x61-410 y557-579 at zoom 3); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy12-part1, lang: hi, chapter: 3, section: "3.3", para: 1, page: 2, action: corrected,
+     printed: "धनावेशित इलेक्ट्रॉन एक-दूसरे", corrected: "धनावेशित नाभिक एक-दूसरे",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints 'ऋणावेशित इलेक्ट्रॉन तथा धनावेशित इलेक्ट्रॉन एक-दूसरे' — positively charged electrons (crop p2 x160-525 y436-456 at zoom 5; the decoded layer's line y440 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row's 'the negatively charged electrons and the positively charged nuclei are bound to each other', nuclei written नाभिक as the same paragraph writes it ('व्यष्टिगत नाभिक')"}
+  - {book: phy12-part1, lang: hi, chapter: 3, section: "3.4", para: 7, page: 5, action: corrected,
+     printed: "का परिणाम El", corrected: "का परिमाण El",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints परिणाम (\"result\") where the magnitude of the potential difference is meant (crop p5 x40-405 y128-148 at zoom 4); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy12-part1, lang: hi, chapter: 3, section: "3.12", para: 3, page: 18, action: kept,
+     printed: "चिह्नों को बनाने कि प्रक्रिया को स्पष्ट करने के बाद अब हम नियमों तथा उपपत्तियों को अभिव्यक्त करेंगे : चिह्नों को बनाने कि प्रक्रिया को स्पष्ट करने के बाद अब हम नियमों तथा उपपत्तियों को अभिव्यक्त करेंगे :", corrected: "चिह्नों को बनाने कि प्रक्रिया को स्पष्ट करने के बाद अब हम नियमों तथा उपपत्तियों को अभिव्यक्त करेंगे :",
+     meaning_changing: false, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "a garbled phrase: the page prints the sentence of English ¶3 twice, as two identical paragraphs (crop p18 x260-530 y170-240, the approved join ruling's; the decoded layer's lines y178 and y208 agree); kept, the second copy joined to the first (phy12-part1 Hindi round one)"}
+  - {book: phy12-part1, lang: hi, chapter: 3, section: "3.13", para: 7, page: 22, action: corrected,
+     printed: "= n = (6.0 × 10^23 / 63.5) × 9.0 × 10^6 I_g = 31.5I_g", corrected: "= 31.5I_g",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints [3.65(e)] with a stray fragment, I_2 = n = (6.0 × 10^23 / 63.5) × 9.0 × 10^6 I_g = 31.5 I_g (crop p22 x168-512 y365-450 at zoom 4; the layer's lines y403-427 agree), equating I_2 to about 8.5 × 10^28 I_g; the English row and the arithmetic of 63 I_g − 2 I_2 = 0 give I_2 = 31.5 I_g; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 3, section: "3.13", para: 7, page: 22, action: corrected,
+     printed: "10 (I −", corrected: "10 (I_1 −",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints the mesh BCDB equation as 10 (I − I_g) − 15 I_g − 5 (I_2 + I_g) = 0 with no subscript on the first I (crop p22 x165-450 y210-245 at zoom 6; the decoded layer's line y224 agrees), while the very next line expands it as 10 I_1 − 30 I_g − 5 I_2 = 0; the arithmetic and the English row's 10 (I_1 – I_g) give I_1; a dropped subscript, so by the founder's ruling of 2026-10-10 the row writes the meaning. The meaning entry before it in this row, on the [3.65(e)] fragment, does not reach this span"}
+  - {book: phy12-part1, lang: hi, chapter: 4, section: "4.5", para: 2, page: 9, action: corrected,
+     printed: "x y", corrected: "y z",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints the loop as lying in the x y plane (crop p9 x40-410 y590-615 at zoom 5; the decoded layer's line y598 agrees), while the next sentence makes the x-axis the loop's axis and Fig. 4.9 beside it draws the loop in the Y-Z plane (crop p9 x320-530 y380-720 at zoom 2); a loop in the x-y plane cannot have the x-axis as its axis; the English row reads 'placed in the y-z plane'; by the founder's ruling of 2026-10-10 the row writes the meaning, in the print's own form of the plane's name"}
+  - {book: phy12-part1, lang: hi, chapter: 4, section: "4.9.1", para: 10, page: 21, action: corrected,
+     printed: "चुंबकीय क्षेत्र की", corrected: "चुंबकीय आघूर्ण की",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints 'as is clear from Eq. (4.22), the dimensions of the magnetic field are [AL^2] and its unit is Am^2' (crop p21 x40-410 y95-130 at zoom 5; the decoded layer's line y100 agrees); Eq. (4.22) defines the magnetic moment m = I A, whose dimensions and unit these are, while the magnetic field's unit is the tesla; the English row reads 'the dimensions of the magnetic moment'; by the founder's ruling of 2026-10-10 the row writes the meaning, in this section's own word for the moment"}
+  - {book: phy12-part1, lang: hi, chapter: 4, section: "4.9.1", para: 18, page: 22, action: corrected,
+     printed: "m sin", corrected: "m B sin",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints Newton's second law for the coil as I dω/dt = m sin θ, without B (crop p22 x175-430 y105-355 at zoom 4; the decoded layer's line y137 agrees), a torque without the field; Eq. (4.23) above, the next lines of this solution (m B sin θ dθ) and the English row (mB sin theta) give m B sin θ; a dropped symbol that changes the physics, so by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 4, section: "4.9.1", para: 18, page: 22, action: corrected,
+     printed: "(dω/dt)", corrected: "(dω/d theta)",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints the chain rule as dω/dt = (dω/dθ)(dθ/dt) = (dω/dt) ω, the last fraction over dt (crop p22 x195-305 y172-206 at zoom 10; the decoded layer's denominators at y193 agree), which makes ω equal to 1; the English row's (dω/dtheta) ω and the next line's ω dω = m B sin θ dθ give dω/dθ; by the founder's ruling of 2026-10-10 the row writes the meaning, in the row's own spelling of the fraction before it"}
+  - {book: phy12-part1, lang: hi, chapter: 4, section: "4.9.2", para: 3, page: 23, action: corrected,
+     printed: "B mu_0", corrected: "B ≃ mu_0",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page draws no relation sign between B and the fraction of [4.25(a)], a blank where the second line has its = (crop p23 x55-410 y340-418 at zoom 5; the layer has a symbol-font glyph at that gap that the raster does not draw); the English row reads B ≃ mu_0 m / (2 pi x^3), the approximation for x >> R; a relation sign not drawn, so by the founder's ruling of 2026-10-10, confirmed for this place on 2026-10-13, the row writes the meaning"}
+  - {book: phy12-part1, lang: hi, chapter: 4, section: "4.10", para: 8, page: 25, action: corrected,
+     printed: "R R", corrected: "R ≃ R",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page draws no relation sign between R_G + R and R, a blank (crop p25 x55-260 y668-694 at zoom 8; the layer has a symbol-font glyph at that gap that the raster does not draw); the English row reads R_G + R ≃ R : large, the voltmeter's resistance; a relation sign not drawn, so by the founder's ruling of 2026-10-10, confirmed for this place on 2026-10-13, the row writes the meaning, as the entry for the same sign in §4.10 on p26 does"}
+  - {book: phy12-part1, lang: hi, chapter: 4, section: "4.10", para: 14, page: 26, action: corrected,
+     printed: "Ω - 0.02", corrected: "Ω ≃ 0.02",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page sets a short text hyphen between the fraction and its value, R_G r_s/(R_G + r_s) = 60 Ω × 0.02Ω/(60 + 0.02)Ω - 0.02Ω (crop p26 x170-410 y610-662 at zoom 5 and x290-340 y636-656 at zoom 12; the decoded layer's line y641 agrees), which reads as subtracting 0.02 Ω; by the founder's ruling of 2026-10-10 the row writes the meaning: the English row's 60 Ω × 0.02Ω / (60 + 0.02)Ω ≃ 0.02Ω, the shunted galvanometer's resistance that the next line adds to 3 Ω"}
+  - {book: phy12-part1, lang: hi, chapter: 6, section: "6.4", para: 2, page: 4, action: kept,
+     printed: "कुंडली C_1 की ओर अथवा इससे दूर एक धारा वाहक कुंडली C_2 की गति, कुंडली C_1 की ओर अथवा इससे दूर एक धारा वाहक कुंडली C_2 की गति,", corrected: "कुंडली C_1 की ओर अथवा इससे दूर एक धारा वाहक कुंडली C_2 की गति,",
+     meaning_changing: false, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "a garbled phrase: the page sets the clause twice on consecutive lines after प्रयोग 6.2 में (crop p4 x44-385 y398-470 at zoom 4; the decoded layer's lines y416 and y432 agree); kept as printed (misprint ruling of phy12-part1 Hindi round one)"}
+  - {book: phy12-part1, lang: hi, chapter: 6, section: "6.4", para: 4, page: 5, action: corrected,
+     printed: "धारा", corrected: "वाहक",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints 'गणितीय रूप में प्रेरित विद्युत धारा बल को' — induced current force — before epsilon = − dPhi_B / dt (6.3) (crop p5 x250-525 y155-215 at zoom 5; the decoded layer's line y164 agrees); by the founder's ruling of 2026-10-10 the row writes the meaning: the English row's 'the induced emf is given by', emf being विद्युत वाहक बल as this section writes it everywhere else, the same page included ('प्रेरित विद्युत वाहक बल को', crop p5 x250-525 y335-355 at zoom 4)"}
+  - {book: phy12-part1, lang: hi, chapter: 6, section: "6.7.2", para: 15, page: 17, action: corrected,
+     printed: "तीव्रता के समानुपाती", corrected: "तीव्रता के वर्ग के समानुपाती",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints 'in both cases the energy is proportional to the intensity of the field', without 'square' (crop p17 x170-510 y365-384 at zoom 5; the decoded layer's line y369 agrees), right after the two energy densities u_B = B^2/2mu_0 and u_E = epsilon_0 E^2/2 that go as the square; the English row reads 'proportional to the square of the field strength'; a dropped word that changes the physics, so by the founder's ruling of 2026-10-10 the row writes the meaning, in the book's own phrase for a square ('दूरी के वर्ग के', ch 1 §1.5)"}
+  - {book: phy12-part1, lang: hi, chapter: 7, section: "7.2", para: 4, page: 3, action: corrected,
+     printed: "जूल i^2R", corrected: "जूल तापन i^2R",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round two, approved 2026-10-14 (1ba27aa)",
+     reason: "the page prints 'as you know, Joule is given by i^2R', with no word for heating (crop p3 x236-420 y98-117 at zoom 8, and x236-524 y96-160 at zoom 4; the decoded layer's line y101 agrees); the English row reads 'Joule heating is given by i^2R' and the page's own next sentence says जूल तापन. Read as the unit, जूल sets an energy equal to a power, a false statement the ruling of 2026-10-10 writes as its meaning; read as the name of the effect, a slip the clause's i^2 still carries, which stays as printed like the slips ruled on 2026-10-13. Written as the meaning, in the book's own phrase, and allowed by the founder for this place on 2026-10-14, asked with this round (found by the ✅ sample read)"}
+  - {book: phy12-part1, lang: hi, chapter: 7, section: "7.2", para: 16, page: 4, action: corrected,
+     printed: "0.450A", corrected: "0.454A",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints I = P/V = 100 W / 220 V = 0.450A (crop p4 x40-420 y680-725 at zoom 5; the decoded layer's line y705 agrees); 100/220 = 0.4545, so the printed result is false in its third figure; the English row gives 0.454 A; by the founder's ruling of 2026-10-10, confirmed for this place on 2026-10-13, the row writes the meaning, the English row's value"}
+  - {book: phy12-part1, lang: hi, chapter: 7, section: "7.5", para: 12, page: 9, action: corrected,
+     printed: "में दीप्ति", corrected: "में कम दीप्ति",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part1 Hindi round one, approved 2026-10-13 (76e2ba0)",
+     reason: "the page prints 'reducing C will increase the reactance and the lamp will light with brightness compared to before', with no word for less (crop p9 x165-510 y565-598 at zoom 5; the decoded layer's line y570 agrees), which reads as brighter; a larger reactance passes less current and the lamp dims, as the English row says ('shine less brightly than before') and as the Hindi itself says of the bulb on p10 ('बल्ब की दीप्ति कम हो जाती है'); a dropped word that reverses the physics, so by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 9, section: "9.2.3", para: 9, page: 5, action: corrected,
+     printed: "(Q PM = AB)", corrected: "(∵ PM = AB)",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round two, approved 2026-10-16 (3c06357)",
+     reason: "the page draws a glyph that reads as Q where ∵ (\"since\") is meant (crop p5 x40-540 y99-149 at zoom 3, the approved misprint ruling's); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy12-part2, lang: hi, chapter: 9, section: "9.6", para: 2, page: 19, action: corrected,
+     printed: "भुजा", corrected: "चतुर्भुज",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints 'इसलिए इस भुजा के अन्य दो कोणों का योग 180° है' — a side having angles (crop p19 x40-410 y636-692 at zoom 3), where the sentence before names the quadrilateral AQNR and the English row says 'the sum of the other angles of the quadrilateral is 180°': by the founder's ruling of 2026-10-10 the row writes the meaning (the founder ruled this place on 2026-10-16)"}
+  - {book: phy12-part2, lang: hi, chapter: 9, section: "9.6", para: 11, page: 21, action: corrected,
+     printed: "अर्थात पहले प्रिज़्म", corrected: "अर्थात पतले प्रिज़्म",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints पहले (\"first\") where the English says a thin prism (crop p21 x60-260 y120-255 at zoom 3); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: phy12-part2, lang: hi, chapter: 10, section: "10.6", para: 1, page: 12, action: corrected,
+     printed: "उदीप्त", corrected: "अदीप्त",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints उदीप्त ('lit up') in 'बारी-बारी से उदीप्त तथा दीप्त क्षेत्र' (crop p12 x155-525 y455-506 at zoom 4 and x330-525 y472-490 at zoom 6; the decoded layer's line y475 agrees), so the sentence says the shadow's edge shows alternately lit and bright regions; the English row reads 'alternate dark and bright regions just like in interference', and अदीप्त is the word for dark the chapter's rows carry in §10.5 (p11) and §10.6.1 (p13). By the founder's ruling of 2026-10-10 the row writes the meaning: अदीप्त ('dark')"}
+  - {book: phy12-part2, lang: hi, chapter: 10, section: "10.7", para: 10, page: 17, action: corrected,
+     printed: "I_a", corrected: "I_0",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints I with an italic subscript a, 'तीव्रता I_a है' (crop p17 x58-390 y242-300 at zoom 5; the decoded layer's line y244 agrees), for the intensity after the first polaroid P_1, while the next display and the rest of the solution use I_0 (I = I_0 cos^2 theta, same crop) and this page's line above Example 10.2 defines I_0 as that intensity (crop p17 x44-410 y96-118); the English row reads 'Let I_0 be the intensity of polarised light after passing through the first polariser P_1'. I_a names a quantity the solution never uses and leaves its I_0 undefined; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 10, section: "10.7", para: 10, page: 17, action: corrected,
+     printed: "उनके", corrected: "P_2 एवं P_3 के",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round two, approved 2026-10-16 (3c06357)",
+     reason: "the page prints 'क्योंकि P_1 एवं P_3 क्रॉसित हैं उनके पारित-अक्षों के बीच कोण (π/2−θ) होगा' (crop p17 x40-420 y230-340 at zoom 3), which puts P_1's and P_3's pass axes at π/2 − θ, though crossed axes are at π/2; the English row reads 'the angle between the pass axes of P_2 and P_3 will be (pi/2 − theta)', as the intensity that follows requires: a dropped phrase that makes the statement false, and by the founder's ruling of 2026-10-10 the row writes the meaning (the founder ruled this place on 2026-10-16)"}
+  - {book: phy12-part2, lang: hi, chapter: 11, section: "11.4.3", para: 6, page: 7, action: corrected,
+     printed: "v_0", corrected: "nu_0",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints the threshold frequency with a letter that reads as an italic v (crop p7 x175-400 y97-117 at zoom 6), and in this book an italic v names a speed; the sentence and the English row (§11.4.3 ¶6, 'This minimum, cut-off frequency nu_0') mean ν, and the decoded layer's line y99 agrees with the meaning: by the founder's ruling of 2026-10-10 (a Latin italic v for ν, DECISIONS 2026-10-12) the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 12, section: "12.3", para: 1, page: 7, action: corrected,
+     printed: "उत्सर्जित की", corrected: "उत्तेजित की",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints 'जब किसी परमाण्वीय गैस अथवा वाष्प … उत्सर्जित की जाती है' — the gas 'is emitted' (crop p7 x155-525 y662-730 at zoom 3), where the English row says 'when an atomic gas or vapour is excited at low pressure', a different process, and the chapter's own word for it is उत्तेजित (§12.4.1): by the founder's ruling of 2026-10-10 the row writes the meaning (the founder ruled this place on 2026-10-16)"}
+  - {book: phy12-part2, lang: hi, chapter: 12, section: "12.4.1", para: 2, page: 11, action: corrected,
+     printed: "–1.53", corrected: "–1.51",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints E_3 = –1.53 eV (crop p11 x280-525 y360-395 at zoom 5; the decoded layer's line y363 agrees); the English row reads E_3 = –1.51 eV, Eq. (12.10) gives –13.6/3^2 = –1.51 eV, the same sentence's E_3 – E_1 = 12.09 eV requires –1.51, and the page's own Fig. 12.7 labels n = 3 at −1.51 (crop p11 x40-200 y180-210). By the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 12, section: "12.5", para: 1, page: 11, action: corrected,
+     printed: "आवृत्ति v_if का", corrected: "आवृत्ति nu_if का",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints the photon's frequency with a letter that reads as an italic v (crop p11 x160-521 y640-682 at zoom 4), where the sentence and the English row (nu_(if)) mean ν, and the decoded layer's line y645 agrees with the meaning: by the founder's ruling of 2026-10-10 (a Latin italic v for ν, DECISIONS 2026-10-12) the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 12, section: "12.5", para: 1, page: 11, action: corrected,
+     printed: "hv_if", corrected: "h nu_if",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "Eq. (12.11) prints hv_if with the same italic-v letter (crop p11 x160-521 y640-682 at zoom 4), where the English row writes h nu_if, the photon's energy, and the decoded layer's line y668 agrees with the meaning: by the founder's ruling of 2026-10-10 (a Latin italic v for ν, DECISIONS 2026-10-12) the row writes the meaning, spelled h nu as the Hindi rows spell hν (ch 11 §11.6 ¶5, ch 12 §12.4 ¶8)"}
+  - {book: phy12-part2, lang: hi, chapter: 12, section: "12.5", para: 1, page: 11, action: corrected,
+     printed: "E_(n_f) – E_(n_i)", corrected: "E_(n_i) – E_(n_f)",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints (12.11) as hν_if = E_nf − E_ni (crop p11 x160-521 y640-682 at zoom 4; the decoded layer's line y668 agrees), the energy difference reversed: the same sentence sets n_f < n_i, so E_nf < E_ni and the print gives the emitted photon a negative energy; the English row writes h nu_if = E_ni – E_nf. By the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 13, section: "13.4.2", para: 15, page: 7, action: corrected,
+     printed: "विचाराधीन नाभिक की", corrected: "विचाराधीन न्यूक्लियॉन की",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints 'विचाराधीन नाभिक की बंधन-ऊर्जा' — the nucleus under consideration (crop p7 x170-525 y588-736 at zoom 3), where the English row says 'the binding energy of the nucleon under consideration' and the sentence's own subject is one nucleon: by the founder's ruling of 2026-10-10 the row writes the meaning (the founder ruled this paragraph's four places on 2026-10-16)"}
+  - {book: phy12-part2, lang: hi, chapter: 13, section: "13.4.2", para: 15, page: 7, action: corrected,
+     printed: "किसी नाभिक के", corrected: "किसी न्यूक्लियॉन के",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints 'यदि किसी नाभिक के नाभिकीय बल के परिसर में अधिकतम p न्यूक्लियॉन' (crop p7 x170-525 y588-736 at zoom 3), where the English row says 'if a nucleon can have a maximum of p neighbours within the range of nuclear force': by the founder's ruling of 2026-10-10 the row writes the meaning (the founder, 2026-10-16)"}
+  - {book: phy12-part2, lang: hi, chapter: 13, section: "13.4.2", para: 15, page: 7, action: corrected,
+     printed: "नाभिक की बंधन-ऊर्जा पर", corrected: "प्रति न्यूक्लियॉन बंधन-ऊर्जा पर",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints 'नाभिक की बंधन-ऊर्जा पर A की वृद्धि का कुल प्रभाव नगण्य रहता है' — the nucleus's binding energy (crop p7 x170-525 y588-736 at zoom 3), where the English row says 'the change in binding energy per nucleon would be small' and the next sentence prints प्रति न्यूक्लियॉन बंधन-ऊर्जा: by the founder's ruling of 2026-10-10 the row writes the meaning (the founder, 2026-10-16); 'माना कि किसी नाभिक की बंधन-ऊर्जा pk है' stays as printed, the English printing 'nucleus' there too"}
+  - {book: phy12-part2, lang: hi, chapter: 13, section: "13.4.2", para: 15, page: 8, action: corrected,
+     printed: "नाभिक केवल अपने निकट के नाभिकों", corrected: "न्यूक्लियॉन केवल अपने निकट के न्यूक्लियॉनों",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints 'कोई नाभिक केवल अपने निकट के नाभिकों को ही प्रभावित करता है' (crop p8 x40-410 y96-135 at zoom 3), where the English row defines the saturation property as 'a given nucleon influences only nucleons close to it': by the founder's ruling of 2026-10-10 the row writes the meaning (the founder, 2026-10-16)"}
+  - {book: phy12-part2, lang: hi, chapter: 13, section: "13.7", para: 1, page: 9, action: corrected,
+     printed: "A > 30", corrected: "A < 30",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints 'हलके नाभिकों, A > 30, वाले भाग' (crop p9 x155-525 y588-640 at zoom 4; the decoded layer's line y625 agrees), which puts the lighter nuclei above A = 30, inside the flat region the same paragraph has just placed between A = 30 and A = 170; the English row reads 'For the lighter nuclei region, A < 30', as does the page's own §13.4.2 (ii) 'हलके नाभिकों (A < 30)' on p7. By the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 13, section: "13.7.1", para: 1, page: 10, action: kept,
+     printed: "के प्रकार से", corrected: "के प्रहार से",
+     meaning_changing: false, flag_reviewed: false, round: "phy12-part2 Hindi round two, approved 2026-10-16 (3c06357)",
+     reason: "phrasing garbled but stating nothing false: प्रकार (\"kind\") where प्रहार (\"bombardment\") is meant, as the next paragraph prints न्यूट्रॉन से प्रहार (crop p10 x40-420 y243-265 at zoom 6); kept as printed (founder, R2-2, 2026-10-16)"}
+  - {book: phy12-part2, lang: hi, chapter: 13, section: "13.7.2", para: 5, page: 11, action: corrected,
+     printed: "^3_2H + ^3_2H", corrected: "^3_2He + ^3_2He",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints reaction (iv) of Eq. (13.14) with ^3_2H + ^3_2H on the left (crop p11 x170-525 y685-735 at zoom 5; the decoded layer's line y717 agrees), a hydrogen symbol with Z = 2; the English row reads 3_2He + 3_2He, the ^3_2He that reaction (iii) on the line above produces, and only He-3 + He-3 balances to ^4_2He + 2 ^1_1H. By the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 14, section: "14.2", para: 9, page: 3, action: corrected,
+     printed: "स्तर चालन बैंड", corrected: "स्तर संयोजकता बैंड",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints 'यदि चालन बैंड में निम्नतम स्तर चालन बैंड के उच्चतम स्तर से भी नीचे है' ('if the lowest level in the conduction band is below the highest level of the conduction band') (crop p3 x40-410 y400-448 at zoom 4; the decoded layer's line y419 agrees); the English row reads 'lower than the highest level of the valence band', which the rest of the sentence (electrons pass from the valence band) and the overlap that follows require. By the founder's ruling of 2026-10-10 the row writes the meaning: संयोजकता बैंड ('valence band'), the book's own term"}
+  - {book: phy12-part2, lang: hi, chapter: 14, section: "14.4", para: 10, page: 9, action: corrected,
+     printed: "समग्र ऋणात्मक उदासीनता", corrected: "समग्र आवेश उदासीनता",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints 'क्रिस्टल एक समग्र ऋणात्मक उदासीनता बनाए रखता है' ('the crystal maintains an overall negative neutrality') (crop p9 x40-365 y525-590 at zoom 4; the decoded layer's line y545 agrees), a sign put on a crystal the sentence's own reason (the carriers' charge equal and opposite to the ionised cores') makes neutral; the English row reads 'the crystal maintains an overall charge neutrality'. By the founder's ruling of 2026-10-10 the row writes the meaning: आवेश ('charge'), the sentence's own word for charge"}
+  - {book: phy12-part2, lang: hi, chapter: 14, section: "14.5.1", para: 3, page: 11, action: corrected,
+     printed: "p से n", corrected: "n से p",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints 'जब कोई इलेक्ट्रॉन p से n की ओर विसरित होता है' ('when an electron diffuses from p to n') (crop p11 x40-410 y412-448 at zoom 4; the decoded layer's line y416 agrees); the English row reads 'from n → p', and the same paragraph says the electron leaves an ionised donor on the n-side and continues 'n -> p'. By the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 14, section: "14.5.1", para: 6, page: 12, action: corrected,
+     printed: "होलों", corrected: "इलेक्ट्रॉनों",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints 'p-क्षेत्र में होलों की प्राप्ति' ('the gain of holes by the p-region') (crop p12 x205-525 y173-210 at zoom 4; the decoded layer's line y177 agrees), where the p-region loses holes by diffusion; the English row reads 'the gain of electron by the p-region', as the same paragraph prints later ('p-पदार्थ ने इलेक्ट्रॉन अर्जित किए हैं'). By the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: phy12-part2, lang: hi, chapter: 14, section: "14.6.2", para: 5, page: 14, action: corrected,
+     printed: "मिलीमीटर", corrected: "मिलीऐमीटर",
+     meaning_changing: true, flag_reviewed: false, round: "phy12-part2 Hindi round one, approved 2026-10-16 (1dbb392)",
+     reason: "the page prints मिलीमीटर ('millimetre', a length) as the meter used for the forward-bias current (crop p14 x155-525 y333-382 at zoom 4 and x330-470 y350-366 at zoom 7; the decoded layer's line y351 agrees); the English row reads 'we use a milliammeter since the expected current is large'. By the founder's ruling of 2026-10-10 the row writes the meaning: मिलीऐमीटर, spelt as the same sentence spells माइक्रोऐमीटर"}
+  - {book: bio11, lang: hi, chapter: 1, section: "1.2.3", para: 1, page: 7, action: corrected,
+     printed: "कैनीडी तथा फेलिडी", corrected: "फेलिडी तथा कैनीडी",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that cat and dog are placed respectively (क्रमशः) in Canidae and Felidae, cat first and Canidae first, so the cat lands in Canidae and the dog in Felidae (crop p7 x42-402 y386-422 at zoom 5; the decoded layer's line y406 agrees); the English row says they are separated into Felidae and Canidae, respectively, and the cat is a felid; by the founder's ruling of 2026-10-10 the row writes the meaning: the two family names in the English order"}
+  - {book: bio11, lang: hi, chapter: 2, section: "2.1", para: 3, page: 4, action: corrected,
+     printed: "स्वपोषी होते हैं, अर्थात्", corrected: "स्वपोषी होते हैं। अधिकांश बैक्टीरिया परपोषी होते हैं, अर्थात्",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page runs the photosynthetic and chemosynthetic autotrophs straight on into 'that is, they do not synthesise their own food but depend on other organisms or dead organic matter for it' (crop p4 x40-404 y146-182 at zoom 4; the decoded layer's lines y150 and y166 agree): the heterotrophs' sentence has lost its subject, so the row says autotrophs do not make their own food, which is false; the English row says the vast majority of bacteria are heterotrophs, i.e., they depend on other organisms or on dead organic matter for food; by the founder's answer C2 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes the dropped clause, with the edition's own परपोषी (ch 2 §2.1.2 ¶2)"}
+  - {book: bio11, lang: hi, chapter: 2, section: "2.1.2", para: 2, page: 4, action: corrected,
+     printed: "साइट्रस, कैंकर", corrected: "साइट्रस कैंकर",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "the page lists the diseases bacteria cause as हैजा, टायफॉयड, टिटनेस, साइट्रस, कैंकर, a comma inside the disease name (crop p4 x40-350 y682-706 at zoom 5), which makes citrus a disease of its own; the English row says citrus canker; by the founder's answer R2-2 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes the meaning: the stray comma is removed, nothing typed"}
+  - {book: bio11, lang: hi, chapter: 2, section: "2.3", para: 8, page: 8, action: corrected,
+     printed: "दो गुणित कोशिकाओं", corrected: "दो अगुणित कोशिकाओं",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that in some fungi two गुणित cells fuse to give a diploid (2n) cell, without the negating a- of अगुणित, haploid (crop p8 x86-323 y242-262 at zoom 6; the decoded layer's line y245 agrees); the English row says the fusion of two haploid cells immediately results in diploid cells, as the sentence before (two अगुणित hyphae fuse) also says; by the founder's ruling of 2026-10-10 the row writes the meaning, with this paragraph's own word अगुणित"}
+  - {book: bio11, lang: hi, chapter: 2, section: "2.4", para: 1, page: 10, action: kept,
+     printed: "अध्याय 3 में", corrected: "अध्याय 8 में",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "a wrong cross-reference: the page sends the reader to chapter 3 for the plant cell's structure (crop p10 x38-406 y201-227 at zoom 4), which is chapter 8, as the English row has it; kept as printed (bio11 Hindi round two, its align number lines: three the Hindi prints wrong)"}
+  - {book: bio11, lang: hi, chapter: 2, section: "2.6", para: 5, page: 12, action: corrected,
+     printed: "में आरएनए तथा प्रोटीन", corrected: "में प्रोटीन",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that viroids lack RNA and the protein coat found in viruses (crop p12 x40-402 y246-266 at zoom 6 and x40-410 y205-445 at zoom 3; the decoded layer's lines y248-y263 agree), which the paragraph's own last sentence (the viroid's RNA has a low molecular weight) contradicts; the English row says the agent was found to be a free RNA that lacked the protein coat found in viruses; by the founder's ruling of 2026-10-10 the row writes the meaning: the false 'RNA and' is removed, nothing typed"}
+  - {book: bio11, lang: hi, chapter: 3, section: "3.1.1", para: 1, page: 4, action: corrected,
+     printed: "पाइरीनॉइड स्टार्च होते", corrected: "पाइरीनॉइड में स्टार्च के अतिरिक्त प्रोटीन होते",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that pyrenoids are starch (crop p4 x173-537 y623-643 at zoom 4; the decoded layer's line y626 agrees), which is false: a pyrenoid is a protein body with starch stored about it; the English row says pyrenoids contain protein besides starch; by the founder's answer C3 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes the English sentence's meaning"}
+  - {book: bio11, lang: hi, chapter: 3, section: "3.1.3", para: 2, page: 5, action: corrected,
+     printed: "एमाइलो प्रोटीन", corrected: "एमाइलोपेक्टिन",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that floridean starch is built like एमाइलो प्रोटीन and glycogen (crop p5 x42-330 y638-674 at zoom 5; the decoded layer's line y657 agrees), a protein where a polysaccharide belongs; the English row says floridean starch is very similar to amylopectin and glycogen in structure; by the founder's ruling of 2026-10-10 the row writes the meaning (the edition names amylopectin nowhere else, so the term is the English one transliterated); a term the edition never prints, accepted by the founder's answer C22 (2026-10-17)"}
+  - {book: bio11, lang: hi, chapter: 3, section: "3.3", para: 2, page: 10, action: corrected,
+     printed: "आवश्यकता कम होने", corrected: "आवश्यकता होने",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that the spread of living pteridophytes is limited because the need for water for fertilisation is low, कम (crop p10 x240-534 y98-134 at zoom 5; the decoded layer's line y117 agrees), which the same paragraph contradicts (water is needed to carry the antherozoids); the English row says the need for water for fertilisation limits their spread; by the founder's ruling of 2026-10-10 the row writes the meaning: the false 'low' is removed, nothing typed"}
+  - {book: bio11, lang: hi, chapter: 4, section: "4.1.1", para: 3, page: 2, action: corrected,
+     printed: "कोशिकाएं)", corrected: "केशिकाएं)",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints the closed system's vessels as artery, vein and कोशिकाएं, cells (crop p2 x340-534 y322-342 at zoom 7; the decoded layer's line y325 agrees); the English row says arteries, veins and capillaries; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word for capillaries (केशिकाओं, ch 15 §15.4, ch 16 §16.1)"}
+  - {book: bio11, lang: hi, chapter: 4, section: "4.2.2", para: 2, page: 5, action: corrected,
+     printed: "व्यंजन)", corrected: "व्यजन)",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "the page glosses Gorgonia as समुद्री व्यंजन, broken across a line end, with an anusvara that makes व्यजन (a fan) into व्यंजन (a dish) (crop p5 x40-404 y543-580 at zoom 5); the English row says Gorgonia (Sea-fan), and a gloss whose job is to name the organism gives it a name that is no organism's; by the founder's answer R2-2 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes the meaning: the stray anusvara is removed, nothing typed"}
+  - {book: bio11, lang: hi, chapter: 4, section: "4.2.3", para: 1, page: 6, action: corrected,
+     printed: "होता है, जिसमें लार्वा अवस्था नहीं होती", corrected: "होता है",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that ctenophores have indirect development in which there is no larval stage (crop p6 x225-534 y117-152 at zoom 5; the decoded layer's line y136 agrees), a contradiction by this chapter's own definition (indirect development is through a larval stage, §4.2.1, §4.2.5); the English row says fertilisation is external with indirect development; by the founder's ruling of 2026-10-10 the row writes the meaning: the false clause is removed, nothing typed"}
+  - {book: bio11, lang: hi, chapter: 4, section: "4.2.5", para: 1, page: 7, action: kept,
+     printed: "(परिवर्धन प्रत्यक्ष", corrected: "परिवर्धन प्रत्यक्ष",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "a garbled phrase: the page sets a stray opening bracket before परिवर्धन that nothing closes (crop p7 x40-292 y168-203, the approved false_positive ruling's; the decoded layer's line y170 agrees); kept as printed (bio11 Hindi round one)"}
+  - {book: bio11, lang: hi, chapter: 4, section: "4.2.10", para: 1, page: 9, action: corrected,
+     printed: "कशेरुकी", corrected: "कॉर्डेटा",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that Hemichordata was earlier a subphylum of the कशेरुकी (vertebrate) phylum (crop p9 x42-345 y477-497 at zoom 5; the decoded layer's line y480 agrees), but hemichordates were never vertebrates and the edition itself makes Vertebrata a subphylum of Chordata (§4.2.11 ¶2, ¶6); the English row says a sub-phylum under phylum Chordata; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own name कॉर्डेटा संघ (ch 1 §1.2.6)"}
+  - {book: bio11, lang: hi, chapter: 4, section: "4.2.10", para: 2, page: 9, action: corrected,
+     printed: "बंद", corrected: "खुले",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that the hemichordates' circulatory system is of the closed type (crop p9 x42-345 y596-616 at zoom 5; the decoded layer's line y599 agrees); the English row says the circulatory system is of open type; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word (खुले परिसंचरण-तंत्र, §4.1.1)"}
+  - {book: bio11, lang: hi, chapter: 4, section: "4.2.11", para: 1, page: 10, action: corrected,
+     printed: "कशेरुकी", corrected: "कॉर्डेटा",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page names the phylum whose three fundamental characters (notochord, dorsal hollow nerve cord, paired pharyngeal gill slits) the paragraph lists as कशेरुकी संघ, the vertebrate phylum (crop p10 x295-536 y121-141 at zoom 5; the decoded layer's line y124 agrees); the phylum is Chordata — the same section makes the vertebrates only part of it, all vertebrates being chordates but not all chordates vertebrates (§4.2.11 ¶6) — and the English row says phylum Chordata; by the founder's answer C4 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes the meaning with the edition's own name कॉर्डेटा संघ (ch 1 §1.2.6 ¶1, p8 x218-536 y114-134 at zoom 4), as the block's entry on §4.2.10 ¶1 does; §4.2.11 ¶6's कशेरुकी, for subphylum Vertebrata, stays as printed"}
+  - {book: bio11, lang: hi, chapter: 4, section: "4.2.11.2", para: 2, page: 12, action: corrected,
+     printed: "(व्हेल शार्क)", corrected: "(स्टिंग रे)",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints Trygon's common name as व्हेल शार्क, whale shark (crop p12 x273-534 y290-342 at zoom 5; the decoded layer's lines y309-y325 agree), a different fish; the English row says Trygon (Sting ray), and ¶1 of this page gives Trygon its poison sting; by the founder's ruling of 2026-10-10 the row writes the meaning (the edition names the sting ray nowhere else, so the common name is the English one transliterated, as the row writes शार्क and the edition ब्लू व्हेल); a term the edition never prints, accepted by the founder's answer C22 (2026-10-17)"}
+  - {book: bio11, lang: hi, chapter: 4, section: "4.2.11.4", para: 1, page: 13, action: corrected,
+     printed: "परिवर्धन प्रत्यक्ष अथवा लार्वा", corrected: "परिवर्धन लार्वा",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that amphibian development is direct or through a larva (crop p13 x40-404 y167-187 at zoom 4; the decoded layer's line y170 agrees); the English row says development is indirect, and the class's development is through the larva the clause itself names; by the founder's answer C5 (2026-10-17) under the meaning ruling of 2026-10-10 the row drops the words for 'direct or', leaving development through a larva, and types nothing new"}
+  - {book: bio11, lang: hi, chapter: 4, section: "4.2.11.7", para: 1, page: 14, action: corrected,
+     printed: "पेशीय डायफ्राम", corrected: "फुप्फुस",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that respiration in mammals is by the muscular diaphragm (crop p14 x172-536 y661-681 at zoom 4; the decoded layer's line y664 agrees): the diaphragm ventilates the lungs, but the organ of respiration the class description names is the lung, and the English row says respiration is by lungs; by the founder's answer C6 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes the lungs in the edition's own words for birds on the same page (§4.2.11.6 ¶1, p14 x172-536 y248-268 at zoom 4)"}
+  - {book: bio11, lang: hi, chapter: 5, section: "5.2", para: 1, page: 5, action: corrected,
+     printed: "ये गांठें", corrected: "कलियाँ",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that these nodes may be terminal or axillary (crop p5 x290-535 y310-378 at zoom 5; the decoded layer's line y344 agrees), but a node is neither; the English row says the stem bears buds, which may be terminal or axillary; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word for bud (कली, कक्षीय कली, §5.3 ¶1); the definition of the internode the Hindi leaves out stays an edition difference"}
+  - {book: bio11, lang: hi, chapter: 5, section: "5.5", para: 1, page: 8, action: corrected,
+     printed: "पुंकेसर तथा पुमंग", corrected: "पुमंग तथा जायांग",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that a flower with both stamens and androecium is bisexual (crop p8 x42-402 y246-314 at zoom 4; the decoded layer's line y282 agrees), two names for the male whorl; the English row says when a flower has both androecium and gynoecium it is bisexual; by the founder's ruling of 2026-10-10 the row writes the meaning, with the terms the same row uses (पुमंग, जायांग)"}
+  - {book: bio11, lang: hi, chapter: 5, section: "5.5.1.4", para: 1, page: 11, action: corrected,
+     printed: "मटर", corrected: "सरसों",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints pea (मटर) as an example of fused carpels, syncarpous (crop p11 x209-535 y308-328 at zoom 5; the decoded layer's line y311 agrees), but the pea's gynoecium is a single carpel (monocarpellary; this page's next paragraph gives pea for marginal placentation); the English row says syncarpous as in mustard and tomato; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word for mustard (सरसों, §5.5 ¶3)"}
+  - {book: bio11, lang: hi, chapter: 5, section: "5.8", para: 1, page: 14, action: corrected,
+     printed: "G और अधोवर्ती अंडाशय को G", corrected: "G_underline और अधोवर्ती अंडाशय को G_bar",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints a plain G for the superior ovary and an underlined G for the inferior ovary (crop p14 x42-330 y130-166 at zoom 6; the decoded layer's line y149 agrees), the reverse of the convention, which the edition's own floral formula keeps (p15, the Solanaceae ovary is superior and its G is underlined); the English row says G_underline for superior ovary and G_bar for inferior ovary; by the founder's ruling of 2026-10-10 the row writes the meaning, in the English row's notation"}
+  - {book: bio11, lang: hi, chapter: 5, section: "5.9", para: 5, page: 15, action: corrected,
+     printed: "अनुपर्णी", corrected: "अननुपर्णी",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints the Solanaceae leaves as अनुपर्णी, with stipules (crop p15 x172-495 y172-192 at zoom 6; the decoded layer's line y175 agrees); the English row says exstipulate; by the founder's ruling of 2026-10-10 the row writes the meaning: the edition's own अनुपर्ण (stipule, §5.3 ¶2) with the negating prefix, as it writes अशाखित, अरोमिल (the edition has no other word for exstipulate); a term the edition never prints, accepted by the founder's answer C22 (2026-10-17)"}
+  - {book: bio11, lang: hi, chapter: 6, section: "6.2.6", para: 1, page: 7, action: corrected,
+     printed: "समृद्धि पार्श्व पत्ती", corrected: "समद्विपार्श्व पत्ती",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints समृद्धि पार्श्व (\"prosperity-sided\") for the isobilateral leaf, its heading misspelling it too (crop p7 x355-430 y206-224 at zoom 14, the approved misprint ruling's); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: bio11, lang: hi, chapter: 7, section: "7.2", para: 1, page: 2, action: corrected,
+     printed: "कशेरुकी", corrected: "कॉर्डेटा",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that the frog belongs to class Amphibia of कशेरुकी संघ, the vertebrate phylum (crop p2 x40-404 y447-467 at zoom 4; the decoded layer's line y450 agrees); the vertebrates are a subphylum of Chordata in the edition itself (ch 4 §4.2.11 ¶6) and the English row says class Amphibia of phylum Chordata; by the founder's answer C4 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes the meaning with the edition's own name कॉर्डेटा संघ (ch 1 §1.2.6 ¶1)"}
+  - {book: bio11, lang: hi, chapter: 7, section: "7.2.2", para: 4, page: 4, action: corrected,
+     printed: "एक त्रिकोष्ठीय संरचना,", corrected: "एक त्रिभुजाकार संरचना,",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints the sinus venosus as a three-chambered (त्रिकोष्ठीय) structure (crop p4 x42-402 y598-634 at zoom 5; the decoded layer's line y617 agrees), the word the row also uses, rightly, for the heart; the English row says a triangular structure called sinus venosus; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word for triangular (त्रिभुजाकार, ch 17 §17.3)"}
+  - {book: bio11, lang: hi, chapter: 8, section: "8.2", para: 1, page: 4, action: corrected,
+     printed: "ब्रिटिश", corrected: "जर्मन",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints Theodore Schwann as a British zoologist (crop p4 x174-534 y152-172 at zoom 5; the decoded layer's line y155 agrees); the English row says Theodore Schwann (1839), a German Zoologist; by the founder's ruling of 2026-10-10 the row writes the meaning, जर्मन, the English word transliterated; a term the edition never prints, accepted by the founder's answer C22 (2026-10-17)"}
+  - {book: bio11, lang: hi, chapter: 8, section: "8.4.1", para: 3, page: 7, action: corrected,
+     printed: "वर्णात्मक", corrected: "चयनित पारगम्य",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that the plasma membrane is वर्णात्मक, of colour, in nature (crop p7 x60-402 y178-198 at zoom 5; the decoded layer's line y181 agrees); the English row says the plasma membrane is selectively permeable in nature; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own term (चयनित पारगम्य, §8.5.1)"}
+  - {book: bio11, lang: hi, chapter: 8, section: "8.4.1", para: 5, page: 7, action: corrected,
+     printed: "जैसी", corrected: "से निकली",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that motile bacteria have a thin structure like the cell wall, called flagellum (crop p7 x42-402 y322-358 at zoom 5; the decoded layer's line y341 agrees), a false likeness; the English row says thin filamentous extensions from their cell wall called flagella; by the founder's ruling of 2026-10-10 the row writes the meaning: 'like' becomes 'arising from'"}
+  - {book: bio11, lang: hi, chapter: 8, section: "8.5.4", para: 1, page: 13, action: corrected,
+     printed: "यह तश्तरीनुमा बेलनाकार", corrected: "यह बेलनाकार",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints mitochondria as saucer-shaped (तश्तरीनुमा) cylindrical (crop p13 x42-402 y230-250 at zoom 5; the decoded layer's line y233 agrees); the English row says sausage-shaped or cylindrical; by the founder's ruling of 2026-10-10 the row writes the meaning: the false 'saucer-shaped' is removed, leaving the English's cylindrical, nothing typed"}
+  - {book: bio11, lang: hi, chapter: 8, section: "8.5.5", para: 4, page: 14, action: corrected,
+     printed: "हरित लवक थाइलेकोइड", corrected: "पर्णहरित वर्णक थाइलेकोइड",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that chloroplasts are present in the thylakoids (crop p14 x301-534 y584-620 at zoom 6; the decoded layer's line y587 agrees), the container inside its own part; the English row says chlorophyll pigments are present in the thylakoids; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own term (पर्णहरित वर्णक, §8.5.5 ¶2)"}
+  - {book: bio11, lang: hi, chapter: 8, section: "8.5.6", para: 2, page: 15, action: corrected,
+     printed: "अपरोक्ष", corrected: "परोक्ष",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that S expresses size and density अपरोक्ष रूप में — directly (crop p15 x42-312 y145-164 at zoom 6; the decoded layer's line y148 agrees), but a sedimentation coefficient is only an indirect measure of them; the English row says \"indirectly a measure of density and size\", and the edition writes परोक्ष for indirectly (ch 14 §14 ¶1, oxygen used परोक्ष रूप से); by the founder's answer C10 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes परोक्ष"}
+  - {book: bio11, lang: hi, chapter: 8, section: "8.5.10", para: 1, page: 16, action: corrected,
+     printed: "से पूर्व", corrected: "में",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that Robert Brown first described the nucleus before 1831 (crop p16 x174-534 y327-347 at zoom 5; the decoded layer's line y330 agrees); the English row says as early as 1831, the year of the description; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: bio11, lang: hi, chapter: 8, section: "8.5.10", para: 5, page: 17, action: corrected,
+     printed: "तारककाय,", corrected: "गुणसूत्रबिंदु,",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that the centrosome (तारककाय) holds the chromosome's two chromatid threads at one point (crop p17 x42-345 y313-350 at zoom 6; the decoded layer's line y316 agrees); the English row says the centromere holds two chromatids of a chromosome; by the founder's ruling of 2026-10-10 the row writes the meaning, with the row's own word for centromere (गुणसूत्रबिंदु); the garbled word for chromatid on the same line is the book's slip, kept"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.1", para: 3, page: 3, action: corrected,
+     printed: "ये 21 प्रकार", corrected: "ये 20 प्रकार",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that the amino acids which occur in proteins are of 21 types (crop p3 x172-536 y98-150 at zoom 4; the decoded layer's line y102 agrees); the English row says only twenty types, and the edition itself prints 20 types at §9.4 ¶2 (p6 x40-308 y512-532 at zoom 4); by the founder's answer C9 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes 20"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.1", para: 3, page: 3, action: corrected,
+     printed: "21 में", corrected: "20 में",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that three of the 21 are shown in Figure 9.1 (crop p3 x172-536 y98-150 at zoom 4, the line at y134; the decoded layer's line y134 agrees), the count the entry before this one writes as 20; the English row says three of the twenty; by the founder's answer C9 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes 20"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.4", para: 1, page: 6, action: kept,
+     printed: "चित्र 9.2", corrected: "चित्र 9.3",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "a wrong cross-reference: the page cites Figure 9.2 (crop p6 x38-310 y462-488 at zoom 4) where the English row has Figure 9.3; kept as printed (bio11 Hindi round two, its align number lines: three the Hindi prints wrong)"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.8", para: 1, page: 10, action: corrected,
+     printed: "(40^0", corrected: "(40°",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "the page sets a raised zero after 40 where the degree sign is meant (crop p10 x42-402 y145-220 at zoom 4): as the row writes it, 40^0 reads as 40 to the power 0, a look-alike that reads false as an exponent and true as the degree sign (DECISIONS 2026-10-12); the English row has 40°C; by the founder's answer R2-1 (2026-10-17) under the meaning ruling of 2026-10-10, as phy11-part1's F′ (2026-10-14), the row writes the meaning, the degree sign"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.8", para: 1, page: 10, action: corrected,
+     printed: "(80^0 से 90^0", corrected: "(80° से 90°",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "the page sets a raised zero after 80 and after 90 where the degree sign is meant (crop p10 x42-402 y145-220 at zoom 4): as the row writes them they read as powers, a look-alike that reads false as an exponent and true as the degree sign (DECISIONS 2026-10-12); the English row has 80°-90°C; by the founder's answer R2-1 (2026-10-17) under the meaning ruling of 2026-10-10, as phy11-part1's F′ (2026-10-14), the row writes the meaning, the degree signs"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.8.1", para: 1, page: 10, action: corrected,
+     printed: "10^0", corrected: "10°",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "the page sets a raised zero after 10 where the degree sign is meant, before सेंटिग्रेड (crop p10 x42-402 y568-595 at zoom 4): as the row writes it, 10^0 reads as 10 to the power 0, a look-alike that reads false as an exponent and true as the degree sign (DECISIONS 2026-10-12); the English row has 10°C; by the founder's answer R2-1 (2026-10-17) under the meaning ruling of 2026-10-10, as phy11-part1's F′ (2026-10-14), the row writes the meaning, the degree sign"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.8.1", para: 1, page: 11, action: corrected,
+     printed: "लाख", corrected: "मिलियन",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that carbonic anhydrase raised the rate 10 lakh (one million) times (crop p11 x174-534 y162-182 at zoom 5; the decoded layer's line y165 agrees); the English row says about 10 million times, and the page's own figures give that: 600000 a second against 200 an hour is 600000 × 3600 / 200 ≈ 1.08 × 10^7; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own unit (मिलियन, ch 1 §1.1, ch 3 §3.3)"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.8.5", para: 2, page: 14, action: corrected,
+     printed: "S(उपचयित)", corrected: "S(अपचयित)",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints the oxidoreductase example with उपचयित (oxidised) where each substrate is reduced, so both sides read oxidised + oxidised (crop p14 x42-402 y438-478 at zoom 6; the decoded layer's line y462 agrees); the English row says S reduced + S' oxidised -> S oxidised + S' reduced; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word for reduced (अपचयित, ch 11 §11.6, ch 12 §12.3), the print's sign and spacing kept"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.8.5", para: 2, page: 14, action: corrected,
+     printed: "S^1 (उपचयित)", corrected: "S' (अपचयित)",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints the oxidoreductase example with उपचयित (oxidised) where each substrate is reduced, so both sides read oxidised + oxidised (crop p14 x42-402 y438-478 at zoom 6; the decoded layer's line y462 agrees); the English row says S reduced + S' oxidised -> S oxidised + S' reduced; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word for reduced (अपचयित, ch 11 §11.6, ch 12 §12.3), the print's sign and spacing kept (this entry: the second of the two places; the S′ beside it is round two's, 5e3f6f8)"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.8.5", para: 2, page: 14, action: corrected,
+     printed: "के S^1 बीच", corrected: "के S' बीच",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "the page prints S¹, a raised 1 where the English row's S' marks the second substrate (crop p14 x42-402 y400-560 at zoom 3): as the row writes it, S^1 reads as S to the power 1, the substrate S itself, a look-alike that reads false as an exponent and true as a label (DECISIONS 2026-10-12); by the founder's answer R2-1 (2026-10-17), as phy11-part1's F′ (2026-10-14), the row writes the meaning, S' as the English row has it"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.8.5", para: 2, page: 14, action: corrected,
+     printed: "+S^1 (ऑक्सीकृत) =S (ऑक्सीकृत) +S^1", corrected: "+S' (ऑक्सीकृत) =S (ऑक्सीकृत) +S'",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "the page prints S¹ twice in the oxidoreductase example (crop p14 x42-402 y400-560 at zoom 3), a raised 1 where the English row's S' marks the second substrate: as the row writes it, S^1 reads as S to the power 1, so both sides name one substrate; by the founder's answer R2-1 (2026-10-17), as phy11-part1's F′ (2026-10-14), the row writes the meaning, S' as the English row has it, on the equation round one's entry wrote with अपचयित, whose 'print's sign kept' this supersedes"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.8.5", para: 3, page: 14, action: corrected,
+     printed: "व S^1 के", corrected: "व S' के",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "the page prints S¹, a raised 1 where the English row's S' marks the second substrate of the pair (crop p14 x42-402 y400-560 at zoom 3): as the row writes it, S^1 reads as S to the power 1, the substrate S itself; by the founder's answer R2-1 (2026-10-17), as phy11-part1's F′ (2026-10-14), the row writes the meaning, S' as the English row has it"}
+  - {book: bio11, lang: hi, chapter: 9, section: "9.8.5", para: 3, page: 14, action: corrected,
+     printed: "S^1 -> S + S^1", corrected: "S' -> S + S'",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "the page prints S¹ twice in the transferase example (crop p14 x42-402 y400-560 at zoom 3), a raised 1 where the English row's S' marks the second substrate: as the row writes it, S^1 reads as S to the power 1, so the group passes from S to S itself; by the founder's answer R2-1 (2026-10-17), as phy11-part1's F′ (2026-10-14), the row writes the meaning, S' as the English row has it, the print's spacing and its G after S' kept"}
+  - {book: bio11, lang: hi, chapter: 10, section: "10.4", para: 4, page: 6, action: corrected,
+     printed: "II विभाजन", corrected: "विभाजन",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints the bullet अर्धसूत्री II विभाजन में समजात गुणसूत्रों का युगलन व पुनर्योजन होता है। (crop p6 x55-400 y684-705 at zoom 5; the decoded layer's line y688 agrees): pairing and recombination of homologous chromosomes in meiosis II; the English row has 'Meiosis involves pairing of homologous chromosomes and recombination between non-sister chromatids of homologous chromosomes', and pairing and crossing over happen in prophase I, never in meiosis II; by the founder's ruling of 2026-10-10 the row writes the meaning: अर्धसूत्री विभाजन (meiosis), the term of this section's own ¶1-¶2"}
+  - {book: bio11, lang: hi, chapter: 11, section: "11.2", para: 6, page: 5, action: kept,
+     printed: "और और फिर", corrected: "और फिर",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "a garbled phrase: the page prints और at the end of one line and again at the start of the next (crop p5 x250-402 y316-349 and x42-200 y332-349, the approved misprint ruling's; the decoded layer's lines agree); kept as printed (bio11 Hindi round one)"}
+  - {book: bio11, lang: hi, chapter: 11, section: "11.5", para: 1, page: 8, action: corrected,
+     printed: "हजारों", corrected: "सैकड़ों",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints एलएचसी प्रोटीन से आबद्ध हजारों वर्णक अणुओं से बने होते (crop p8 x290-536 y602-620 at zoom 5; the decoded layer's line y605 agrees): light harvesting complexes of thousands of pigment molecules; the English row has 'The LHC are made up of hundreds of pigment molecules bound to proteins', and an antenna holds a few hundred pigment molecules, a tenfold smaller number; by the founder's ruling of 2026-10-10 the row writes the meaning: सैकड़ों, this edition's word for hundreds (ch 2 §2.1 ¶1, ch 3 §3 ¶4)"}
+  - {book: bio11, lang: hi, chapter: 11, section: "11.7", para: 1, page: 12, action: corrected,
+     printed: "प्रक्रिया परोक्ष रूप", corrected: "प्रक्रिया अपरोक्ष रूप",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that the biosynthetic phase does not depend on light परोक्ष रूप से — indirectly (crop p12 x172-536 y597-630 at zoom 4; the decoded layer's line y599 agrees), while the same sentence makes it depend on the light reaction's products, which is the indirect dependence; the English row says it \"does not directly depend on the presence of light\"; the edition writes परोक्ष for indirectly (ch 14 §14 ¶1) and अपरोक्ष for its opposite; by the founder's answer C10 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes अपरोक्ष"}
+  - {book: bio11, lang: hi, chapter: 12, section: "12", para: 4, page: 2, action: corrected,
+     printed: "परोक्ष (शाकाहारी), या अपरोक्ष", corrected: "अपरोक्ष (शाकाहारी), या परोक्ष",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that animals get their food from plants परोक्ष for herbivores and अपरोक्ष for carnivores (crop p2 x172-536 y146-166 at zoom 4; the decoded layer's line y150 agrees) — the two words swapped, since a herbivore eats the plant itself; the English row says \"directly (herbivores) or indirectly (carnivores)\", and the edition writes परोक्ष for indirectly (ch 14 §14 ¶1); by the founder's answer C10 (2026-10-17) under the meaning ruling of 2026-10-10 the row swaps the two words back"}
+  - {book: bio11, lang: hi, chapter: 12, section: "12.1", para: 1, page: 3, action: corrected,
+     printed: "कोशिका श्वसन करती", corrected: "कोशिका प्रकाश-संश्लेषण करती",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that when a cell respires (श्वसन) oxygen is no problem because oxygen is released in the cell during photosynthesis (crop p3 x40-404 y148-182 at zoom 4; the decoded layer's line y166 agrees) — the reason holds only for a cell that photosynthesises, the subject of the sentence before; the English row says \"When cells photosynthesise\"; by the founder's answer C12 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes प्रकाश-संश्लेषण, as the same paragraph spells it; the danda after the clause stays as printed"}
+  - {book: bio11, lang: hi, chapter: 12, section: "12.2", para: 3, page: 4, action: corrected,
+     printed: "हाइड्रोजन अणु", corrected: "हाइड्रोजन परमाणु",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints पीजीएएल से दो समान अपचयोपचय (रिडॉक्स) दो हाइड्रोजन अणु at the foot of the column (crop p4 x300-534 y694-712 at zoom 6; the decoded layer's line y696 agrees): two hydrogen molecules, four hydrogen atoms, removed from PGAL; the English row has 'Two redox-equivalents are removed (in the form of two hydrogen atoms) from PGAL and transferred to a molecule of NAD^+'; by the founder's ruling of 2026-10-10 the row writes the meaning: हाइड्रोजन परमाणु, this chapter's own term (§12.4 ¶1, ¶2)"}
+  - {book: bio11, lang: hi, chapter: 12, section: "12.4.2", para: 1, page: 8, action: kept,
+     printed: "भीतरी: झिल्ली", corrected: "भीतरी झिल्ली",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "a garbled phrase: the page sets a stray mark after भीतरी, the one glyph the font draws for colon and visarga, which the row carries as a colon (crop p8 x317-538 y332-362 at zoom 4); neither a label nor an adverb in -तः, it states nothing; kept (bio11 Hindi round one)"}
+  - {book: bio11, lang: hi, chapter: 12, section: "12.4.2", para: 2, page: 8, action: corrected,
+     printed: "प्रोटीन", corrected: "प्रोटोन",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints जहाँ प्रोटीन प्रवणता के निर्माण में प्रकाश ऊर्जा (crop p8 x174-400 y657-675 at zoom 6; the decoded layer's line y659 agrees): a protein gradient built by light energy in photophosphorylation; the English row has 'the production of proton gradient required for phosphorylation'; by the founder's ruling of 2026-10-10 the row writes the meaning: प्रोटोन प्रवणता, this edition's term (seven places in ch 11 §11.6.3, and ch 12 §12.4.2 ¶3)"}
+  - {book: bio11, lang: hi, chapter: 12, section: "12.6", para: 2, page: 11, action: corrected,
+     printed: "कि उपचय पथ", corrected: "कि अपचयी पथ",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that the respiratory pathway is better called amphibolic rather than an उपचय (anabolic) pathway (crop p11 x40-382 y372-406 at zoom 4; the decoded layer's line y390 agrees), but the view the paragraph argues against, stated in its first sentence, is respiration as an अपचयी (catabolic) process and pathway; the English row says \"rather than as a catabolic one\"; by the founder's answer C13 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes अपचयी पथ, the paragraph's own words"}
+  - {book: bio11, lang: hi, chapter: 13, section: "13.1.4", para: 5, page: 5, action: corrected,
+     printed: "W_1 = W_0^ert", corrected: "W_1 = W_0 e^(rt)",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "the page sets e, r and t raised together after W₀, which reads as a power of W₀ (crop p5 x170-540 y560-640 at zoom 3); the row already writes the meaning, so no corrections entry was written (named in the block that ruled the page)"}
+  - {book: bio11, lang: hi, chapter: 14, section: "14.2.1", para: 10, page: 7, action: corrected,
+     printed: "निःश्वसन", corrected: "अंतःश्वसन",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints the TLC definition बलपूर्वक निःश्वसन के पश्चात फेफड़ों में समायोजित (उपस्थित) वायु की कुल मात्रा (crop p7 x40-404 y531-581 at zoom 4; the decoded layer's lines y533 and y549 agree): the total air in the lungs after a forced expiration, which is the residual volume; the English row has 'Total volume of air accommodated in the lungs at the end of a forced inspiration'; by the founder's ruling of 2026-10-10 the row writes the meaning: बलपूर्वक अंतःश्वसन, the term of this section's ¶9"}
+  - {book: bio11, lang: hi, chapter: 14, section: "14.2.1", para: 10, page: 7, action: corrected,
+     printed: "अवशिष्ट क्षमता (VC+RV)", corrected: "अवशिष्ट आयतन (VC+RV)",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints यानि जैव क्षमता + अवशिष्ट क्षमता (VC+RV) (crop p7 x40-404 y531-581 at zoom 4; the decoded layer's line y565 agrees): vital capacity plus a 'residual capacity', a quantity the section never defines (its only residual capacity is FRC, क्रियाशील अवशिष्ट क्षमता, which includes ERV), while the bracket beside it prints RV; the English row has 'vital capacity + residual volume'; by the founder's ruling of 2026-10-10 the row writes the meaning: अवशिष्ट आयतन, the section's own name for RV (¶4)"}
+  - {book: bio11, lang: hi, chapter: 14, section: "14.4.2", para: 2, page: 10, action: corrected,
+     printed: "HCO_3 और", corrected: "HCO_3^- और",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints the bicarbonate formed in blood as HCO₃ with no minus sign (crop p10 x174-400 y428-448 at zoom 8; the decoded layer's line y431 agrees), while the equation above it on the same page prints HCO₃⁻ (crop p10 x180-520 y380-406 at zoom 5), as the row there writes it; without its charge HCO₃ names no ion; the English row writes HCO_3^-; by the founder's answer C14 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes HCO_3^-"}
+  - {book: bio11, lang: hi, chapter: 14, section: "14.4.2", para: 2, page: 10, action: kept,
+     printed: "चित्र 17.4", corrected: "चित्र 14.4",
+     meaning_changing: false, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "a wrong cross-reference: the page cites Figure 17.4 (crop p10 x356-538 y473-499 at zoom 4), a figure of another chapter, where the English row has Figure 14.4; kept as printed (bio11 Hindi round two, its align number lines: three the Hindi prints wrong)"}
+  - {book: bio11, lang: hi, chapter: 14, section: "14.5", para: 1, page: 10, action: corrected,
+     printed: "केंद्र लयकेंद्र के लिए अति संवेदी होता है, जो CO_2", corrected: "केंद्र CO_2",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that the chemosensitive centre beside the rhythm centre is highly sensitive to the rhythm centre, which (जो) is highly sensitive to CO₂ and hydrogen ions (crop p10 x170-536 y668-703 at zoom 4, running on at p11 x40-420 y95-116 at zoom 5; the decoded layer's lines y672 and y687 agree) — अति संवेदी होता है printed twice, the first time making the rhythm centre the sensor; the English row says the chemosensitive area is highly sensitive to CO₂ and hydrogen ions, and the next sentence has this centre activated by them; by the founder's answer C15 (2026-10-17) under the meaning ruling of 2026-10-10 the row leaves out the repeated phrase and types nothing"}
+  - {book: bio11, lang: hi, chapter: 15, section: "15.1.1", para: 2, page: 2, action: corrected,
+     printed: "HCO_3,", corrected: "HCO_3^-,",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints the plasma's mineral ions with bicarbonate alone written HCO₃ without its minus sign, between Mg⁺⁺ and Cl⁻ (crop p2 x300-440 y118-135 at zoom 10; the decoded layer's line y122 agrees); without its charge HCO₃ names no ion, every other ion of the list carries its charge, and the English row writes HCO_3^-; by the founder's answer C14 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes HCO_3^-, as it writes Cl^- beside it and as ch 16 p5's row writes the ion"}
+  - {book: bio11, lang: hi, chapter: 15, section: "15.1.2", para: 2, page: 2, action: corrected,
+     printed: "से 50 लाख", corrected: "से 55 लाख",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints लगभग 50 से 50 लाख प्रतिघन मिमी. रक्त (5 से 5.5 मिलियन प्रतिघन मिमी.) (crop p2 x350-534 y293-327 at zoom 6; the decoded layer's line y295 agrees): a range from 50 lakh to 50 lakh, against its own bracket of 5 to 5.5 million; the English row has '5 millions to 5.5 millions of RBCs mm^-3 of blood'; by the founder's ruling of 2026-10-10 the row writes the meaning: 55 लाख (5.5 million)"}
+  - {book: bio11, lang: hi, chapter: 15, section: "15.3", para: 2, page: 5, action: corrected,
+     printed: "दाएं एवं बाएं", corrected: "एवं दाएं",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round two, approved 2026-10-17 (5e3f6f8)",
+     reason: "the page prints that in birds and mammals the blood passes, in the same order (उसी क्रम से), to the बाएं दाएं एवं बाएं ventricles (crop p5 x42-402 y628-664 at zoom 5), a third ventricle where the same paragraph gives them two (दो अलिंद तथा दो निलय, crop p5 x42-402 y468-534 at zoom 4); the English row says it passes on to the ventricles of the same sides; by the founder's answer R2-2 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes the meaning with the page's own words, बाएं एवं दाएं, in the order its atria clause sets (बाएं व दाएं आलिंदों), nothing typed"}
+  - {book: bio11, lang: hi, chapter: 15, section: "15.3.2", para: 1, page: 7, action: corrected,
+     printed: "अलिंद प्रकुंचन के", corrected: "निलय प्रकुंचन के",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints इसे अलिंद को अनुशिथिलन कहते हैं जो अलिंद प्रकुंचन के साथ-साथ होता है (crop p7 x40-404 y655-704 at zoom 4; the decoded layer's lines y672 and y689 agree): atrial diastole coinciding with atrial systole, a chamber relaxing and contracting at once; the English row has 'the atria undergoes relaxation (diastole), coinciding with the ventricular systole'; by the founder's ruling of 2026-10-10 the row writes the meaning: निलय प्रकुंचन, the row's own term one line above"}
+  - {book: bio11, lang: hi, chapter: 16, section: "16.3", para: 2, page: 5, action: corrected,
+     printed: "अवरोही भुजा जल के लिए अपारगम्य", corrected: "अवरोही भुजा जल के लिए पारगम्य",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints हेनले-लूप की अवरोही भुजा जल के लिए अपारगम्य होती है, परंतु वैद्युत अपघट्य के लिए सक्रियता से या धीरे-धीरे पारगम्य होती है। (crop p5 x40-404 y634-668 at zoom 4; the decoded layer's lines y636 and y652 agree): the descending limb impermeable to water and permeable to electrolytes 'actively or slowly', the ascending limb's properties, which the print gives the ascending limb again two lines on, and which cannot concentrate the filtrate as the print's next sentence says this limb does; the English row has 'The descending limb of loop of Henle is permeable to water but almost impermeable to electrolytes'; by the founder's ruling of 2026-10-10 the row writes the meaning: पारगम्य and लगभग अपारगम्य, this paragraph's own words, in place of the reversed pair and the ascending limb's 'actively or slowly'"}
+  - {book: bio11, lang: hi, chapter: 16, section: "16.3", para: 2, page: 5, action: corrected,
+     printed: "सक्रियता से या धीरे-धीरे पारगम्य", corrected: "लगभग अपारगम्य",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints हेनले-लूप की अवरोही भुजा जल के लिए अपारगम्य होती है, परंतु वैद्युत अपघट्य के लिए सक्रियता से या धीरे-धीरे पारगम्य होती है। (crop p5 x40-404 y634-668 at zoom 4; the decoded layer's lines y636 and y652 agree): the descending limb impermeable to water and permeable to electrolytes 'actively or slowly', the ascending limb's properties, which the print gives the ascending limb again two lines on, and which cannot concentrate the filtrate as the print's next sentence says this limb does; the English row has 'The descending limb of loop of Henle is permeable to water but almost impermeable to electrolytes'; by the founder's ruling of 2026-10-10 the row writes the meaning: पारगम्य and लगभग अपारगम्य, this paragraph's own words, in place of the reversed pair and the ascending limb's 'actively or slowly'"}
+  - {book: bio11, lang: hi, chapter: 16, section: "16.4", para: 1, page: 8, action: corrected,
+     printed: "जिसे हेनले-लूप की", corrected: "जिसे वासा रेक्टा की",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints NaCl का परिवहन हेनले-लूप की आरोही भुजा द्वारा होता है। जिसे हेनले-लूप की अवरोही भुजा के साथ विनमित किया है (crop p8 x174-534 y98-132 at zoom 4; the decoded layer's line y100 agrees): the NaCl exchanged with the descending limb of Henle's loop itself; the English row has 'NaCl is transported by the ascending limb of Henle's loop which is exchanged with the descending limb of vasa recta', and the print's next sentence returns it by the ascending limb of the vasa recta; by the founder's ruling of 2026-10-10 the row writes the meaning: वासा रेक्टा, the row's own term"}
+  - {book: bio11, lang: hi, chapter: 17, section: "17.2", para: 4, page: 2, action: corrected,
+     printed: "शाश्वत", corrected: "शाखित",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that cardiac muscle cells assemble in a शाश्वत (eternal) pattern to form cardiac muscle (crop p2 x172-536 y614-648 at zoom 4; the decoded layer's line y631 agrees), a word that says nothing of the arrangement; the English row says \"in a branching pattern\", and the edition writes शाखित for branched (ch 14 p4's शाखित जाल, ch 15 p6's शाखित बंद रक्त वाहिनियों); by the founder's answer C18 (2026-10-17) under the meaning ruling of 2026-10-10 the row writes शाखित"}
+  - {book: bio11, lang: hi, chapter: 17, section: "17.2.2", para: 3, page: 5, action: corrected,
+     printed: "'A' रेखा", corrected: "'Z' रेखा",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints इन एक्टिनों से जुड़ी हुई 'A' रेखा भी अंदर की तरफ खिंच जाती है (crop p5 x40-404 y689-707 at zoom 5; the decoded layer's line y691 agrees): an 'A' line attached to the actins, a structure the sarcomere does not have ('A' is the band the actins are pulled into, in the same sentence); the English row has 'The 'Z' line attached to these actins are also pulled inwards'; by the founder's ruling of 2026-10-10 the row writes the meaning: 'Z' रेखा, the edition's own name ('Z'-रेखा, §17.2 ¶5; 'Z'-रेखाएं later in this row)"}
+  - {book: bio11, lang: hi, chapter: 17, section: "17.2.2", para: 3, page: 6, action: corrected,
+     printed: "P_2", corrected: "P_1",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints ADP और P with a subscript 2 मुक्तकर (crop p6 x420-534 y431-453 at zoom 8; the decoded layer's lines y433 and y446 agree): myosin releasing ADP and two phosphates; the English row has 'The myosin, releasing the ADP and P_1 goes back to its relaxed state', the English page's form for the one inorganic phosphate a hydrolysed ATP leaves; by the founder's ruling of 2026-10-10 the row writes the meaning: P_1, as the English row; the P_1 the row writes is itself the English page's slip for P_i (TRACKER PARKED 2026-10-17, and this address's English entry below): a note built from this entry must give P_i"}
+  - {book: bio11, lang: hi, chapter: 17, section: "17.2.2", para: 3, page: 6, action: corrected,
+     printed: "Ca^+1", corrected: "Ca^++",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints Ca with a superscript +1 (crop p6 x174-300 y495-513 at zoom 8; the decoded layer's lines y497 and y503 agree): a singly charged calcium ion; the English row has 'till the Ca++ ions are pumped back to the sarcoplasmic cisternae', and calcium ions carry two charges; by the founder's ruling of 2026-10-10 the row writes the meaning: Ca^++, this edition's own form (ch 15 §15.1.1 ¶1)"}
+  - {book: bio11, lang: hi, chapter: 18, section: "18.2", para: 3, page: 2, action: corrected,
+     printed: "चालक/अभिवाही", corrected: "चालक/अपवाही",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints तथा चालक/अभिवाही तंत्रिकाएं नियामक उद्दीपनों को केंद्रीय तंत्रिका तंत्र से संबंधित परिधीय ऊतक/अंगों तक पहुँचाती हैं (crop p2 x40-404 y284-398 at zoom 3; the decoded layer's line y301 agrees): afferent nerves carrying regulatory impulses out of the CNS, where the sentence before names the motor nerves चालक/प्रेरक या अपवाही and has the afferent ones carry impulses in; the English row has 'the efferent fibres transmit regulatory impulses from the CNS to the concerned peripheral tissues/organs'; by the founder's ruling of 2026-10-10 the row writes the meaning: अपवाही, the row's own term"}
+  - {book: bio11, lang: hi, chapter: 18, section: "18.2", para: 4, page: 2, action: corrected,
+     printed: "कायिक तंत्रिका तंत्र उद्दीपनों", corrected: "स्वायत्त तंत्रिका तंत्र उद्दीपनों",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints that the कायिक (somatic) neural system carries impulses from the central neural system to the body's involuntary organs and smooth muscles (crop p2 x40-404 y333-382 at zoom 4; the decoded layer's line y366 agrees) — the clause on the somatic system's skeletal muscles is not printed, and the autonomic system's role is left under the somatic name; the English row gives the involuntary organs and smooth muscles to the autonomic neural system, which the sentence before names स्वायत्त तंत्रिका तंत्र; by the founder's answer C19 (2026-10-17) under the meaning ruling of 2026-10-10 one word changes, कायिक to स्वायत्त, and the unprinted clause stays an edition difference"}
+  - {book: bio11, lang: hi, chapter: 18, section: "18.3.1", para: 2, page: 4, action: corrected,
+     printed: "स्थान A पर", corrected: "स्थान B पर",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints अतः स्थान A पर आवेग क्रियात्मक विभव उत्पन्न होता है (crop p4 x40-404 y384-417 at zoom 4; the decoded layer's line y401 agrees): after the current has flowed from site A to site B, the action potential generated at site A, where it began; the English row has 'and an action potential is generated at site B. Thus, the impulse (action potential) generated at site A arrives at site B'; by the founder's ruling of 2026-10-10 the row writes the meaning: स्थान B"}
+  - {book: bio11, lang: hi, chapter: 19, section: "19.2.5", para: 2, page: 5, action: corrected,
+     printed: "यह थाइरोकैल्सिटोनिन के साथ मिलकर, यह शरीर में Ca^2+ स्तर को बढ़ाता है। टी", corrected: "टी",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints, after PTH is called hypercalcaemic, a sentence that together with thyrocalcitonin it raises the body's Ca²⁺ level, then the sentence that together with TCT it keeps the body's Ca²⁺ in balance (crop p5 x40-404 y643-713 at zoom 4, running on at p6 x172-536 y100-136 at zoom 4; the decoded layer's lines y680 and y697 agree) — a garbled doublet of the second sentence that has thyrocalcitonin raising blood calcium, when it is the hormone PTH is balanced against; the English row has only the balance sentence; by the founder's answer C21 (2026-10-17) under the meaning ruling of 2026-10-10 the row leaves out the repeated sentence and types nothing"}
+  - {book: bio11, lang: hi, chapter: 19, section: "19.2.8", para: 2, page: 8, action: corrected,
+     printed: "पेट", corrected: "ग्लूकागॉन",
+     meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
+     reason: "the page prints इसके अतिरिक्त पेट ग्लूकोनियोजिनेसिस की प्रक्रिया को भी प्रेरित करता है (crop p8 x174-534 y182-200 at zoom 5; the decoded layer's line y184 agrees): the stomach stimulating gluconeogenesis, in a paragraph on glucagon; the English row has 'In addition, this hormone stimulates the process of gluconeogenesis'; by the founder's ruling of 2026-10-10 the row writes the meaning: ग्लूकागॉन, the row's own spelling of the hormone"}
+  - {book: phy12-part2, lang: en, chapter: 10, section: "10.7", para: 6, page: 16, action: kept,
+     printed: "passes through the polaroid P_2", corrected: "passes through the polaroid P_1",
+     meaning_changing: true, flag_reviewed: false, round: "parked 2026-10-16",
+     reason: "the page names P_2 three times in the second sentence (the polaroid the beam passes, its pass-axis, the one the component passes) where P_1 is meant, as the Hindi edition prints (crop p16 x114-567 y561-657 at zoom 3); the English rows are canonical and frozen, so kept (TRACKER PARKED, founder, \"park the English slips\")"}
+  - {book: phy12-part2, lang: en, chapter: 10, section: "10.7", para: 6, page: 16, action: kept,
+     printed: "(along the pass-axis of P_2)", corrected: "(along the pass-axis of P_1)",
+     meaning_changing: true, flag_reviewed: false, round: "parked 2026-10-16",
+     reason: "the second of the three P_2 the sentence prints where P_1 is meant (crop p16 x114-567 y561-657 at zoom 3); kept (TRACKER PARKED)"}
+  - {book: phy12-part2, lang: en, chapter: 10, section: "10.7", para: 6, page: 16, action: kept,
+     printed: "will pass through P_2.", corrected: "will pass through P_1.",
+     meaning_changing: true, flag_reviewed: false, round: "parked 2026-10-16",
+     reason: "the third of the three P_2 the sentence prints where P_1 is meant (crop p16 x114-567 y561-657 at zoom 3); kept (TRACKER PARKED)"}
+  - {book: phy12-part2, lang: en, chapter: 12, section: "12.6", para: 4, page: 13, action: kept,
+     printed: "[Eq. (12.15)]", corrected: "[Eq. (12.5)]",
+     meaning_changing: false, flag_reviewed: false, round: "parked 2026-10-16",
+     reason: "a wrong cross-reference: the page cites [Eq. (12.15)] (crop p13 x130-560 y202-272 at zoom 3) for Bohr's quantum condition, which is Eq. (12.5) (§12.4 ¶6), as the Hindi edition prints; kept (TRACKER PARKED)"}
+  - {book: phy12-part2, lang: en, chapter: 14, section: "14.6.2", para: 5, page: 14, action: kept,
+     printed: "a micrometer is used", corrected: "a microammeter is used",
+     meaning_changing: true, flag_reviewed: false, round: "parked 2026-10-16",
+     reason: "the page names a micrometer, a length gauge, as the meter used in reverse bias, for a microammeter (crop p14 x175-567 y343-415 at zoom 3); kept (TRACKER PARKED)"}
+  - {book: bio11, lang: en, chapter: 17, section: "17.2.2", para: 3, page: 6, action: kept,
+     printed: "ADP and P_1", corrected: "ADP and P_i",
+     meaning_changing: true, flag_reviewed: false, round: "parked 2026-10-17",
+     reason: "the page sets P with a subscript 1 where the inorganic phosphate, P_i, is meant (kebo117 p6; crop p6 x84-529 y640-711 at zoom 3); kept (TRACKER PARKED)"}
+  - {book: chem12-part2, lang: en, chapter: 9, section: "9.4", para: 8, page: 5, action: kept,
+     printed: "(C_2H_5)_3N^+Cl^-", corrected: "(C_2H_5)_4N^+Cl^-",
+     meaning_changing: true, flag_reviewed: false, round: "parked 2026-09-29",
+     reason: "Example 9.1's solution prints the quaternary ammonium salt with three ethyl groups for four (crop p5 x410-500 y345-375 at zoom 10); kept (TRACKER PARKED, the book-errata list)"}

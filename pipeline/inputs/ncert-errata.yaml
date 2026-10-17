@@ -1,0 +1,40 @@
+# ncert-errata.yaml — the printing errors the NCERT books make, as their loaded rows stand (D16, DECISIONS
+# 2026-10-17). A row corrects a printing error that changes the meaning and keeps a slip that changes nothing as
+# printed; every correction is logged here, and so is every kept wrong cross-reference or garbled phrase, as an
+# errata candidate. Spelling slips kept as printed are not logged. The English rows are canonical and frozen, so
+# an English error is logged as kept.
+#
+# Unlike ncert-corrections.yaml, which is keyed on a page and a span of the transcription and applied before
+# the rows are numbered, an entry here names its row by address and is read against the loaded rows:
+# `ncert errata` checks that each row is there, on the entry's page, and carries the entry's span (its
+# correction, or the print it keeps), and that a corrected row no longer carries the print; it fails the run
+# when one does not — run it after every reload. Nothing reads this file to change a row. The Phase 2 book
+# errata notes (DECISIONS 2026-10-17) will read it.
+#
+# Every entry has every field:
+#   book, lang, chapter, page   the book code, the edition (en | hi), the chapter, the page within the chapter's PDF
+#   section, para               the row's address; section quoted (unquoted, 8.10 reads as 8.1)
+#   printed                     the wrong word or phrase as the page prints it — no more of the book than that; a
+#                               missing or an extra word, or a sign or two that reads as nothing alone, takes its
+#                               neighbouring word on each side where it has one, and a span that recurs in its row
+#                               more neighbours, within the approved entry's own span, until it names its place
+#                               (DECISIONS 2026-10-17, the working-rules row): a corrected row must not carry it.
+#                               Read on a crop of the page image, or carried over
+#                               from an approved entry whose span was; never taken from the decoded text layer
+#                               (SPEC §12.2). Quoted, as every span is
+#   corrected                   what it should read: the row's text (`corrected`), or the sense (`kept`)
+#   reason                      what the page says and why it is wrong; the decoded text layer by position only
+#   round                       the approval it came with and its commit; for an English kept entry, the date
+#                               it was parked
+#   meaning_changing            true when a student reading the printed words would learn something false — every
+#                               place the 2026-10-10 and 2026-10-12 rulings correct as printing something false,
+#                               glyph stand-ins included (½ set as an en dash, α for ∝, "mo1" for mol, a Latin v
+#                               for ν, T for τ); false only for a glyph that reads false only as transcribed and
+#                               true as the sign on the page (a raised zero for °, S¹ for S′, the F′ class), and
+#                               for a kept wrong cross-reference or garbled phrase
+#   action                      corrected — the row writes `corrected`; kept — the row keeps `printed`
+#   flag_reviewed               whether the founder has reviewed Claude's two classifications: meaning_changing,
+#                               and whether a kept place is a wrong cross-reference or a garbled phrase (the
+#                               backfill of 2026-10-17 is unreviewed; the founder reviews the meaning_changing true
+#                               list before the errata notes are built)
+errata: []

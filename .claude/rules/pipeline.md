@@ -11,7 +11,8 @@ paths:
 - Order matters (TECH_PLAN §6.3): taxonomy — `taxonomy load`, `taxonomy prerequisites`,
   `backbone load`, `cutoffs load` (D13) → NCERT — `ncert register|render|extract|load|verify|align|embed`
   (D14–D17; `verify` before a book is taken as canonical, its outcome applied by the next `load` from
-  `pipeline/inputs/ncert-corrections.yaml`) → PYQ — `pyq load|solve|verify|distractors` (D19–D21) → `stats compute` (D22) →
+  `pipeline/inputs/ncert-corrections.yaml`; `ncert errata` checks `pipeline/inputs/ncert-errata.yaml` against
+  the loaded rows after every reload, D16) → PYQ — `pyq load|solve|verify|distractors` (D19–D21) → `stats compute` (D22) →
   `anchors link`, `eval snapshot` (D23) → seed generation and trap mining (unscheduled, §12.2) →
   `cache seed` (D76). A step must fail loudly, never half-write: one transaction per natural-key batch.
 - Founder-owned inputs live in `pipeline/inputs/` (taxonomy CSV, prerequisites CSV, archetypes YAML,

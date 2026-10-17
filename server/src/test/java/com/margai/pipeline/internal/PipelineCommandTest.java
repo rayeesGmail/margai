@@ -242,6 +242,9 @@ class PipelineCommandTest {
                 if (cls == NcertRegisterCommand.class) {
                     return cls.cast(new NcertRegisterCommand(imports, writer));
                 }
+                if (cls == NcertErrataCommand.class) {
+                    return cls.cast(new NcertErrataCommand(imports, writer));
+                }
                 if (cls == NcertRenderCommand.class) {
                     return cls.cast(new NcertRenderCommand(new NcertRenderCommandTest.RecordingStore(), imports,
                             new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40), writer));
@@ -356,13 +359,17 @@ class PipelineCommandTest {
             return 0;
         }
 
-        /** What {@link #alignmentRows} answers; and the similarity {@link #similarityToEnglish} gives every pair. */
+        /**
+         * What {@link #alignmentRows} answers — a book's own rows when {@code alignmentByBook} names it; and the
+         * similarity {@link #similarityToEnglish} gives every pair.
+         */
         List<com.margai.curriculum.api.AlignmentRow> alignmentAnswer = List.of();
+        Map<String, List<com.margai.curriculum.api.AlignmentRow>> alignmentByBook = Map.of();
         java.util.function.BiFunction<float[], UUID, Double> similarity = (vector, id) -> 0.5;
 
         @Override
         public List<com.margai.curriculum.api.AlignmentRow> alignmentRows(String bookCode, Collection<Short> chapters) {
-            return alignmentAnswer;
+            return alignmentByBook.getOrDefault(bookCode, alignmentAnswer);
         }
 
         @Override

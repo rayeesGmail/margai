@@ -679,6 +679,18 @@ equations and sense against its English partner, its Devanagari checked against 
 check, never quoted); the founder reads the ten marked. A book is done when every section is one to one,
 the second read is clean and the sample passes.
 
+**The errata log** (`pipeline/inputs/ncert-errata.yaml`, DECISIONS 2026-10-17): every round that writes a
+meaning entry adds its erratum — the row's address and page, the wrong word or phrase as printed and the
+correction — and so does every ruling that keeps a wrong cross-reference or garbled phrase as printed
+(`action: kept`). After any reload, check the log against the rows, at no cost:
+
+```
+DB_URL=… java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline ncert errata
+```
+
+It fails the run on an entry whose row is gone, is off the entry's page, or no longer carries its span, and on a
+correction whose row carries the print again.
+
 ## 7. embed — a vector per paragraph, and the scored concept queries
 
 Runs after a book is canonical (verified, loaded, its clean share read). It embeds `text_en` and

@@ -116,6 +116,16 @@ class InputReadersTest {
         assertThat(corrections).allSatisfy(entry -> assertThat(books).contains(entry.book()));
     }
 
+    /** The committed errata log reads, and every entry in it names a book books.yaml carries. */
+    @Test
+    void theCommittedErrataLogReadsAndNamesOnlyRegisteredBooks() {
+        List<NcertErratum> errata = NcertErrataYamlReader.read(INPUTS.resolve(NcertErrataYamlReader.FILE));
+        List<String> books = BooksYamlReader.read(INPUTS.resolve(NcertRegisterCommand.FILE)).stream()
+                .map(BookDefinition::code).toList();
+
+        assertThat(errata).allSatisfy(entry -> assertThat(books).contains(entry.book()));
+    }
+
     @Test
     void aWrongHeaderIsRefusedOnLineOne() throws IOException {
         Path file = write("taxonomy.csv", "code,subject,kind\nPHY,physics,subject\n");

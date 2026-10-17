@@ -8,9 +8,9 @@ import picocli.CommandLine.Spec;
 /**
  * The command tree of TECH_PLAN §6.3: D13's {@code taxonomy load}, {@code taxonomy
  * prerequisites}, {@code backbone load}, {@code cutoffs load}, D14's {@code ncert register},
- * {@code ncert render}, {@code ncert extract}, {@code ncert load}, and D15's {@code ncert verify}
- * and {@code ncert embed}. The group commands only route; calling a group without a subcommand is
- * a usage error.
+ * {@code ncert render}, {@code ncert extract}, {@code ncert load}, D15's {@code ncert verify}
+ * and {@code ncert embed}, and D16's {@code ncert align} and {@code ncert errata}. The group commands
+ * only route; calling a group without a subcommand is a usage error.
  */
 @Command(name = PipelineRunner.COMMAND_NAME, mixinStandardHelpOptions = true,
         description = "MARG AI content pipeline (TECH_PLAN §6). Every command is idempotent and writes a report.",
@@ -73,9 +73,10 @@ final class PipelineCommand implements Runnable {
     }
 
     @Command(name = "ncert", mixinStandardHelpOptions = true,
-            description = "The NCERT layer: register the books, render their pages, extract, load, verify, align and embed paragraphs (D14–D16).",
+            description = "The NCERT layer: register the books, render their pages, extract, load, verify, align and embed paragraphs, check the errata log (D14–D16).",
             subcommands = {NcertRegisterCommand.class, NcertRenderCommand.class, NcertExtractCommand.class,
-                    NcertLoadCommand.class, NcertVerifyCommand.class, NcertAlignCommand.class, NcertEmbedCommand.class})
+                    NcertLoadCommand.class, NcertVerifyCommand.class, NcertAlignCommand.class, NcertEmbedCommand.class,
+                    NcertErrataCommand.class})
     static final class Ncert implements Runnable {
 
         @Spec

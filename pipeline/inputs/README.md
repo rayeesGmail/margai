@@ -14,6 +14,7 @@ dated 2026-09-10 record the spec-silent choices.
 | `cutoffs.csv` | `cutoffs` | `cutoffs load` | 40 qualifying rows, 2019–2026 |
 | `books.yaml` | `ncert_books` | `ncert register` (D14) | 10 books, 79 chapters, both editions |
 | `ncert-corrections.yaml` | `ncert_paragraphs`, through the extraction | `ncert load` (D15) | the founder's rulings on `ncert verify` flags for the ten English books (D15), and since D16 the `lang: hi` entries that join and split a Hindi book to its English rows |
+| `ncert-errata.yaml` | nothing — checked against `ncert_paragraphs` | `ncert errata` (D16) | the printing errors the books make: each correction a row makes, each wrong cross-reference or garbled phrase it keeps, the English errors kept |
 
 ## ncert-corrections.yaml
 
@@ -75,6 +76,29 @@ committed.
   Spelling, grammar and edition differences stay as printed.
 - Quote every value holding a comma or a colon: in YAML's `{…}` form an unquoted comma starts a new key,
   and the reader refuses the key it does not know.
+
+## ncert-errata.yaml
+
+The printing errors the books make, as their loaded rows stand (D16, DECISIONS 2026-10-17): every correction
+a row makes — a printing error that changes the meaning — every wrong cross-reference or garbled phrase a row
+keeps as printed, an errata candidate, and the English errors, kept because the English rows are frozen.
+Spelling slips kept as printed are not logged. Its header lists the fields; every entry has all of them.
+
+- **Keyed on the row's address**, not on a span of the transcription: it records the book, not the extraction,
+  and nothing reads it to change a row. `ncert errata` reads it against the loaded rows and fails on an entry
+  the rows do not bear out, so run it after every reload.
+- **`printed` quotes no more of the book than the wrong word or phrase** (a missing or an extra word, or a sign
+  or two that reads as nothing alone, takes its neighbouring word on each side where it has one, and a span that
+  recurs in its row more neighbours, within the approved entry's own span, until it names its place — a corrected
+  row must not carry it; DECISIONS 2026-10-17, the working-rules row), read on a page-image crop or
+  carried over from an approved entry whose span was — never taken from the decoded layer; `reason` carries
+  the context, the decoded layer by position only.
+- **`meaning_changing`** is true when a student reading the printed words would learn something false, glyph
+  stand-ins included, and false only for a glyph that reads false only as transcribed (the raised zero for °,
+  S¹ for S′, the F′ class) and for a kept cross-reference or garbled phrase; `flag_reviewed: false` marks
+  Claude's classifications, which the founder reviews before the Phase 2 book errata notes (DECISIONS
+  2026-10-17) are built.
+- Claude adds an entry with the round that brings its correction or ruling, in the same commit.
 
 ## books.yaml
 

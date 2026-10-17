@@ -634,6 +634,23 @@ HOW TO RESUME (supersedes item 2 of the list below):
      the push; then the next Hindi book — the six left are Biology and Chemistry (bio11, bio12, chem11-part1,
      chem11-part2, chem12-part1, chem12-part2), each measured against the 0.05% trigger before its block, a Chemistry
      book first in line to exceed it.
+     2026-10-17: the push is done (branch level with origin). THE SIX BOOKS LEFT MEASURED at ₹0 on their local Hindi
+     PDFs (kit Symptoms, the measure that gave phy12-part2 6 of 46,710 again today): bio11 35 of 83,151 (0.042%),
+     bio12 21 of 87,566 (0.024%) — under the trigger; chem11-part1 49 of 87,666 (0.056%), chem11-part2 20 of 32,341
+     (0.062%), chem12-part1 91 of 44,048 (0.207%), chem12-part2 79 of 36,144 (0.219%) — ALL FOUR CHEMISTRY BOOKS
+     ABOVE IT, so the founder rules again on each before its block (DECISIONS 2026-10-15). Nearly all of the excess
+     is one shape, a glyph run the layer holds twice or more — a heading set in faked bold by overprinting
+     (पाठ्यनिहित प्रश्न decodes as प्रश्न््र््र््र््र, 21 and 22 times in the class-12 books) and a doubled halant
+     (अर्थात््, विद्युत््; 30 of chem11-part1's 49): 35, 9, 73 and 66 of the four books' words; without that shape
+     each reads 0.016–0.041%. Biology goes first. Render pre-flight for both Biology books (all 500 pages through
+     PdfPageRenderer at 150 dpi, scratchpad cc81d476 kit2/RenderCheck): one undrawn glyph, a Hygiene-font sign in
+     bio11's Figure 16.5 caption (ch 16 p6) that the PDF itself draws as a broken mark, in a caption no row carries;
+     no MT-Extra glyph in either book. bio11 ch 1 opens on the Unit 1 opener (p1) and its biography (p2), as the
+     English does — prompt v5's rule returns no paragraphs for either; the stage shows whether it holds on the Hindi
+     edition. THE FIFTH HINDI BOOK = bio11 (19 chapters, 252
+     pages). Stage script ready: scratchpad cc81d476 `d16-bio11-hi-stage.sh` (render all + extract ch 1–2, 22 pages,
+     ≈₹90–125, jar copy `server-d16-1c34114.jar` in scratchpad f6ccef84; no server code since); the founder uploads
+     the Hindi PDFs to S3, then launches. Still open: the founder's ten ✅ pairs on all four closed books.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

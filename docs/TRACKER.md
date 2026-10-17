@@ -663,6 +663,26 @@ HOW TO RESUME (supersedes item 2 of the list below):
      go to the second read. FULL-BOOK SCRIPT READY: scratchpad cc81d476 `d16-bio11-hi.sh` (extract ch 3–19
      ≈₹900 → load → align ≈₹8 → Sonnet 5 second read ≈₹270 → the JSONL copied to `$SP/dry/hi.jsonl`), awaiting
      the founder's launch.
+     07:14–08:37 the founder ran it (reports 13df5e5, 1e5bdb5): a 07:14 launch stopped before any call on an
+     expired SSO session; the 07:15 launch called 54 pages (₹206.04) and stopped when the 55th call got no
+     response within the 120 s call timeout — timeouts are not retried by design (DECISIONS D5), and a page
+     that runs to the 8,192-token cap fails in ≈65 s with a max_tokens stop, not a timeout, so it was the
+     provider or the network, not the page; the 07:48 relaunch resumed after the last flush (the four
+     unflushed pages, ₹16.82, called again) and finished: 157 pages, ₹657.45 (the book's extract ₹956.07 over
+     233 calls, ₹4.10 a call). Loaded as written: 717 Hindi rows beside 748 English (39 at addresses English
+     does not have), 193 of 271 sections one to one (extraction c3644542…); the visarga step rewrote 109 words
+     and left 20 lines (23 words) of glued colons for adjudication. Align ₹7.85. The Sonnet 5 second read ₹231.89 over 208 pages: 683 of
+     717 clean (95.3%) — 33 flags, 3 claims set aside, 22 passages no row carries. The layer check: 120 word
+     lines and 19 symbol lines over the book. Book ≈₹1,196. ADJUDICATION IN FLIGHT (scratchpad cc81d476; `dry.sh
+     base` reproduces 0/0/717 and 193 of 271): eight chapter aligners (ch 1–3, 4, 5–7, 8–9, 10–11, 12–13,
+     14–16, 17–19) on BRIEF-align.md, three character readers on BRIEF-chars.md — b1 the second read's flags,
+     set-asides, omitted passages, low-coverage pages, colon list and low-confidence pages; b2 the layer
+     check's word lines of ch 2–12 and every symbol line; b3 the स्त्र class over the book and the word lines
+     of ch 13–19. THE स्त्र CLASS: 34 of the word lines, 73 places on 20 pages (स्राव, स्रावी, स्रवण …, most in
+     ch 16, 18, 19), are where the rows write स्र and the page draws the loop glyph phy11-part2 and phy12-part2 ruled to
+     be स्त्र (their स्त्रोत entries, as printed); compared at zoom 12 against both books' reference shapes
+     (scratchpad cc81d476 p2/sara-cmp.png) — the same glyph. Under the standing "as printed" ruling each place
+     is a `text` entry; its size goes to the founder with the block.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

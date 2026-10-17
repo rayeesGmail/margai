@@ -768,15 +768,27 @@ HOW TO RESUME (supersedes item 2 of the list below):
      phy12-part1 #1, 5, 8, 11, 15, 19, 22, 23, 34, 39 (2026-10-14-ncert-align-2); phy12-part2 #5, 21, 22, 23, 24, 26,
      31, 32, 34, 36 (2026-10-16-ncert-align). Every `lang: hi` entry of a pair's chapter whose text sits in the row
      was read: two pairs differ from their page by an approved meaning entry, marked — phy11-part2 #19 (द्रव for the
-     printed ठोस, 2026-10-10) and phy12-part1 #34 (जूल तापन, allowed 2026-10-14); eleven pairs carry the page's own
+     printed ठोस, 2026-10-10) and phy12-part1 #34 (जूल तापन, allowed 2026-10-14); ten pairs carry the page's own
      slip as printed, marked as matching the page — five from entries (निदेशित, उष्मागतिकीय, द्रुत्र, निदर्शित,
-     निरक्षित), प्रकार by phy12-part2's ruling R2-2, and five Claude found on the page images (प्रासंगित, परित,
-     अंकिक, अधचालक, phy12-part2's समीकरण (12.5) for the English 12.15). Claude read 12 of the 38 page images
+     निरक्षित), प्रकार by phy12-part2's ruling R2-2, and four Claude found on the page images (प्रासंगित, परित,
+     अंकिक, अधचालक; phy11-part1 #16 gained a second, के रूप माना, the page leaving out में, after the founder's
+     read). An eleventh mark, phy12-part2 #31's समीकरण (12.5) as a Hindi slip, was WRONG, corrected the same day:
+     Bohr's quantum condition is Eq. (12.5) in both editions (§12.4 ¶6), so the Hindi is right and the English
+     row's (12.15) is the English book's slip, as PARKED 2026-10-16 and DECISIONS 2026-10-16 already said; the
+     page now marks the English as the one in error. Claude read 12 of the 38 page images
      against their rows, every one matching; the founder's read is the check. bio12 STAGE SCRIPT ready: scratchpad
      b3c73b13 `d16-bio12-hi-stage.sh` (render all 248 pages, ₹0; transcribe ch 1, 27 pages — the Unit 6 opener,
      Panchanan Maheshwari's biography, then the chapter — ≈₹110–125), on the jar copy `server-d16-fc13b9b.jar` (the
      code bio11 closed on; no server code since); the founder uploads the bio12 Hindi PDFs to S3, then launches.
      NEXT: the founder's read of the 40 pairs (each book whose ten match is done) and the bio12 stage.
+     Night: THE FOUNDER READ THE 40 PAIRS. phy11-part1, phy12-part1 and phy12-part2: "all ten match — close them" —
+     the three are CLOSED on their ten pairs. phy11-part2 #18 "does NOT match": the row opens on क्रियाकलाप 10.2, a
+     heading the English does not print — phy11-part2 reopens (DECISIONS 2026-10-17, the activity-label row). Then
+     the founder's correction rule and the structured errata log (DECISIONS 2026-10-17), "Book errata notes" for
+     Phase 2, and a timebox: Hindi ingest had D16 plus one buffer day; after phy11-part2 closes, Claude reports what
+     is done and left, and the next Hindi book (bio12's stage included) waits for the founder's ruling. Order of
+     work, approved: the DECISIONS rows; `ncert errata`; the errata backfill; phy11-part2's activity-label block and
+     reload script; SPEC §12.2; TECH_PLAN, README, PARKED and this log.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

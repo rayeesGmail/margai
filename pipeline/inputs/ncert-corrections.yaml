@@ -6574,3 +6574,32 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      transcribed: "अतिरिक्त ग्लूकागॉन ग्लूकोनियोजिनेसिस", printed: "अतिरिक्त पेट ग्लूकोनियोजिनेसिस", reason: "the flag is at round one's meaning place (ch 19 §19.2.8 ¶2; crop p8 x174-534 y182-200 at zoom 5): the verifier quotes the print, which states something false, against the row's meaning, written by the founder's meaning ruling of 2026-10-10; the book's own error, which the row does not keep"}
   - {book: bio11, lang: hi, chapter: 19, page: 9, kind: false_positive, address: "ch 19 §19.3 ¶2",
      transcribed: "इरिथ्रोपोईटिन", printed: "इरिश्रोपोईटिन", reason: "the page prints the bold इरिथ्रोपोईटिन, the thra conjunct (crop p9 x42-402 y428-448 at zoom 5; the decoded layer's line y432 agrees), as the row carries it; the verifier read shra"}
+  # bio11 Hindi, round three (D16, 2026-10-17). Round two's closing run — the reload (pipeline/reports/
+  # 2026-10-17-ncert-load-3.md: corrections f6131461…, 0/8/738), fresh one-page reads of the six changed pages and of
+  # ch 4 p10 and ch 5 p5 (verify-3 to -10, ₹10.71), and the whole book judged from the stored reads (verify-11) —
+  # counts 741 of 746 clean: both rows round two could not find are found, the 24 passages no row carries are round
+  # two's 24, and 7 flags on five rows remain, each read on a crop of the page image. 5 misprint at round two's
+  # meaning places, where the row writes the meaning and the page prints the false mark or sign: ch 2 p4's comma in
+  # साइट्रस, कैंकर (R2-2), and ch 9 p14's S¹ at R2-1's six places, quoted in four flags (the second is also round
+  # one's अपचयित place). 2
+  # false_positive, notation only: ch 9 p10's rate = δP / δt, which the row writes with the Greek letter by name, as
+  # the prompt does and as the English row has it; and ch 9 p14's lyase equation, which the page draws with X and Y
+  # above the two carbons on vertical bonds and the row writes on one line, X-C—C-Y, where the verifier quoted an em
+  # dash for the X bond. verify-2's reads of those two pages quoted both places as the rows carry them; the fresh
+  # reads are new draws. The layer check's one new word line, ch 4 p5's व्यजन, is R2-2's meaning place. The rulings
+  # change no row. Simulated with `ncert load --dry-run` on the extraction (sha256 c3644542…): no refusal, 271 of
+  # 271 sections one to one, no row changed, 96 rulings on flags.
+  - {book: bio11, lang: hi, chapter: 2, page: 4, kind: misprint, address: "ch 2 §2.1.2 ¶2",
+     transcribed: "साइट्रस कैंकर", printed: "साइट्रस, कैंकर", reason: "the flag is at round two's meaning place (ch 2 §2.1.2 ¶2; crop p4 x40-350 y682-706 at zoom 5): the verifier quotes the print, whose comma makes citrus a disease of its own, against the row's meaning, written by the founder's answer R2-2 (2026-10-17) under the meaning ruling of 2026-10-10; the book's own error, which the row does not keep"}
+  - {book: bio11, lang: hi, chapter: 9, page: 10, kind: false_positive, address: "ch 9 §9.8.1 ¶1",
+     transcribed: "दर = delta P / delta t", printed: "दर = δP / δt", reason: "the page prints the rate as δP over δt (crop p10 x150-260 y508-532 at zoom 8), which the row writes with the Greek letter by name, as the prompt writes a Greek letter and as the English row has it (rate = delta P / delta t): notation only, as the English phy11-part2 ruling on ΔV/V"}
+  - {book: bio11, lang: hi, chapter: 9, page: 14, kind: misprint, address: "ch 9 §9.8.5 ¶2",
+     transcribed: "S व के S' बीच", printed: "S व के S¹ बीच", reason: "the flag is at round two's meaning place (ch 9 §9.8.5 ¶2; crop p14 x42-402 y400-560 at zoom 3): the verifier quotes the print's S¹, a raised 1 that reads as an exponent, against the row's S', written by the founder's answer R2-1 (2026-10-17) under the meaning ruling of 2026-10-10; the book's own error, which the row does not keep"}
+  - {book: bio11, lang: hi, chapter: 9, page: 14, kind: misprint, address: "ch 9 §9.8.5 ¶2",
+     transcribed: "S(अपचयित) +S' (ऑक्सीकृत) =S (ऑक्सीकृत) +S' (अपचयित)", printed: "S(उपचयित) +S¹ (ऑक्सीकृत) =S (ऑक्सीकृत) +S¹ (उपचयित)", reason: "the flag is at round one's meaning place (अपचयित, ch 9 §9.8.5 ¶2) and round two's (S'; crop p14 x42-402 y400-560 at zoom 3): the verifier quotes the print, which states something false, against the row's meaning, written by the founder's meaning ruling of 2026-10-10 and answer R2-1 (2026-10-17); the book's own error, which the row does not keep"}
+  - {book: bio11, lang: hi, chapter: 9, page: 14, kind: misprint, address: "ch 9 §9.8.5 ¶3",
+     transcribed: "S व S' के बीच", printed: "S व S¹ के बीच", reason: "the flag is at round two's meaning place (ch 9 §9.8.5 ¶3; crop p14 x42-402 y400-560 at zoom 3): the verifier quotes the print's S¹, a raised 1 that reads as an exponent, against the row's S', written by the founder's answer R2-1 (2026-10-17) under the meaning ruling of 2026-10-10; the book's own error, which the row does not keep"}
+  - {book: bio11, lang: hi, chapter: 9, page: 14, kind: misprint, address: "ch 9 §9.8.5 ¶3",
+     transcribed: "S- G+ S' -> S + S' G", printed: "S- G+ S¹ → S + S¹ G", reason: "the flag is at round two's meaning place (ch 9 §9.8.5 ¶3; crop p14 x42-402 y400-560 at zoom 3): the verifier quotes the print's S¹ twice, a raised 1 that reads as an exponent, against the row's S', written by the founder's answer R2-1 (2026-10-17) under the meaning ruling of 2026-10-10; the book's own error, which the row does not keep; the arrow is the prompt's notation"}
+  - {book: bio11, lang: hi, chapter: 9, page: 14, kind: false_positive, address: "ch 9 §9.8.5 ¶5",
+     transcribed: "X-C—C-Y -> X-Y+ C=C", printed: "X—C—C-Y → X-Y+ C=C", reason: "the page draws the lyase's X and Y above the two carbons on vertical bonds, then C—C → X-Y+ C=C (crop p14 x60-260 y655-708 at zoom 6), which the row writes on one line as X-C—C-Y, the vertical bonds as hyphens; the verifier's em dash for the X bond is no more on the page than the row's hyphen, and the arrow is the prompt's notation: notation only, as round two ruled ch 9 p10's enzyme name over its arrow"}

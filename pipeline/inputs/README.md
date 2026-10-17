@@ -43,7 +43,9 @@ committed.
   English numbers first. A `section` entry (Hindi only) names the first paragraph under a heading the Hindi
   numbers differently and the quoted section the English gives it — phy11-part2 prints "8.5.6" for the
   English 8.5.5 and adds a 13.8.1 the English does not have — and every paragraph of that section in the
-  chapter moves with it; put it before any join it makes possible. A `move` names a row by its first
+  chapter moves with it; put it before any join it makes possible. Named at a later paragraph — a section the
+  Hindi prints with no heading of its own, which the transcription left in the section above (bio11's §10.5,
+  2026-10-17) — it moves that paragraph and the section's later ones, and the ones before it keep their number. A `move` names a row by its first
   words (`at`, on `page`) and the row it follows (`after`, on `after_page`): once page breaks are joined the
   row is taken out and numbered right after that one, earlier or later, in that row's section — for a footnote or a
   box the Hindi prints pages away from where the English numbers it. An `unprinted` entry (Hindi only) names
@@ -51,7 +53,12 @@ committed.
   takes the number after it, so the English row keeps its number with no Hindi beside it; the load names each
   such address and counts it when it holds a section to the English, and `ncert align` sets it aside rather
   than proposing it again. The number left goes with its row: a `move` of that row leaves it right before the
-  row wherever it is numbered. Two English paragraphs not printed in a row take two entries on the one row.
+  row (with `after`, right after it) wherever it is numbered. Two English paragraphs not printed in a row take two entries on the one row.
+  A section's last English paragraph, which no row follows, takes `after: true` on the row before it: the
+  number after that row is left, and goes with it through a `move` or a `defer` (bio11's §4.2.11.7 ¶3,
+  2026-10-17). On a row another follows the load refuses it: that gap is the next row's to name. `ncert align`
+  reads only the stored rows, which cannot tell that number from a Hindi row short, so it still proposes it;
+  the load's report names it.
   Write its spans as the rows show them —
   the Hindi load puts back a visarga written as a colon (`अत:` → `अतः`) before it applies an entry.
 - **A Hindi `text` entry's `printed` span is read off the page image.** The decoded text layer is a check

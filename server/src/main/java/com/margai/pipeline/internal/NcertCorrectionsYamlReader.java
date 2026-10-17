@@ -35,7 +35,7 @@ final class NcertCorrectionsYamlReader {
             Map.entry(NcertCorrection.Kind.defer, Set.of("at")),
             Map.entry(NcertCorrection.Kind.section, Set.of("at", "section")),
             Map.entry(NcertCorrection.Kind.move, Set.of("at", "after", "after_page")),
-            Map.entry(NcertCorrection.Kind.unprinted, Set.of("at")),
+            Map.entry(NcertCorrection.Kind.unprinted, Set.of("at", "after")),
             Map.entry(NcertCorrection.Kind.misprint, Set.of("transcribed", "printed")),
             Map.entry(NcertCorrection.Kind.false_positive, Set.of("transcribed", "printed")),
             Map.entry(NcertCorrection.Kind.noise, Set.of("at", "flag")));
@@ -128,7 +128,8 @@ final class NcertCorrectionsYamlReader {
         if (move && language != BookLanguage.hi) {
             throw new InputFormatException(file, 0, label + ": only a Hindi entry moves a row — the English rows are canonical");
         }
-        if (kind == NcertCorrection.Kind.unprinted && language != BookLanguage.hi) {
+        boolean unprinted = kind == NcertCorrection.Kind.unprinted;
+        if (unprinted && language != BookLanguage.hi) {
             throw new InputFormatException(file, 0, label + ": only a Hindi entry leaves an English number unfilled — "
                     + "the English rows are canonical");
         }
@@ -148,7 +149,25 @@ final class NcertCorrectionsYamlReader {
                 flag,
                 section,
                 move ? required(file, entry, "after", label) : null,
-                move ? whole(file, entry, "after_page", 1, 999, label) : null);
+                move ? whole(file, entry, "after_page", 1, 999, label) : null,
+                unprinted && gapAfter(file, entry, label));
+    }
+
+    /**
+     * An {@code unprinted} entry's {@code after}: true when the English paragraph not printed is the one after the
+     * row, a section's last, which no row follows. Not words, as a {@code move}'s {@code after} is — a gap is
+     * named by its one row either way.
+     */
+    private static boolean gapAfter(Path file, JsonNode entry, String label) {
+        JsonNode value = entry.get("after");
+        if (value == null || value.isNull()) {
+            return false;
+        }
+        if (!value.isBoolean()) {
+            throw new InputFormatException(file, 0, label + ": 'after' must be true or false — true when the paragraph "
+                    + "not printed is the one after the row");
+        }
+        return value.booleanValue();
     }
 
     /**

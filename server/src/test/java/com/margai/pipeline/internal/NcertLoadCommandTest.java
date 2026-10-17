@@ -595,6 +595,110 @@ class NcertLoadCommandTest {
                 .doesNotContain("\"unprinted\"");
     }
 
+    /**
+     * bio11's Hindi does not print §4.2.11.7's last English paragraph (2026-10-17): no row follows it, so the entry
+     * names the row before it with `after`, the number after that row stays the English row's alone, and the section
+     * is held to the English as one to one.
+     */
+    @Test
+    void anUnprintedEntryAfterItsRowLeavesTheSectionsLastNumberToTheEnglish() throws IOException {
+        hindiEdition();
+        Files.writeString(inputs.resolve(NcertCorrectionsYamlReader.FILE), """
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 4, kind: unprinted, at: "नियम (b)", after: true,
+                     reason: the Hindi does not print English ¶3}
+                """);
+        imports.paragraphsAnswer = List.of(english("7.3", 1, "Rule (a)."), english("7.3", 2, "Rule (b)."),
+                english("7.3", 3, "It holds at a point too."), english("7.4", 1, "A new section."));
+        Path local = inputs.resolve("hi.jsonl");
+        Files.write(local, ExtractJsonl.write(List.of(page(7, 4, "0.95",
+                p("7.3", "नियम (a)।"), p("7.3", "नियम (b)।"), p("7.4", "एक नया अनुभाग।")))));
+        Path pairs = inputs.resolve("pairs.jsonl");
+
+        assertThat(commandLine.execute("ncert", "load", "--book", "phy11-part1", "--lang", "hi", "--dry-run",
+                "--extraction", local.toString(), "--pairs", pairs.toString(),
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(imports.previewed).extracting(NcertParagraphRow::address).containsExactly(
+                "ch 7 §7.3 ¶1", "ch 7 §7.3 ¶2", "ch 7 §7.4 ¶1");
+        assertThat(out.toString()).contains("2 of 2 sections one to one")
+                .contains("- ch 7 page 4 §7.3: the English paragraph after the row starting \"नियम (b)\" is not printed "
+                        + "in this edition — the number after the row is left to it (the Hindi does not print English ¶3)")
+                .contains("- ch 7 §7.3 ¶3");
+        assertThat(Files.readAllLines(pairs).get(2)).contains("\"address\":\"ch 7 §7.3 ¶3\"").contains("\"unprinted\":true")
+                .doesNotContain("\"hi\"");
+    }
+
+    /** The number left after a row goes with it: a move numbers its new place with that number after the row. */
+    @Test
+    void aMoveKeepsTheNumberLeftAfterItsRow() throws IOException {
+        assertThat(loadHindi("""
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: unprinted, at: "* A footnote", after: true,
+                     reason: the Hindi does not print the English paragraph after the footnote}
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: move, at: "* A footnote",
+                     after: "Rule (a)", after_page: 7, reason: the English numbers the footnote last}
+                """, page(7, 7, "0.95", p("7.4", "* A footnote."), p("7.4", "Rule (a).")))).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactlyInAnyOrder(
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶1", "Rule (a)."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶2", "* A footnote."));
+        assertThat(out.toString()).contains("- ch 7 §7.4 ¶3");
+    }
+
+    /** A deferred row with `after` leaves the number after its own when it takes one, after the row it waits for. */
+    @Test
+    void aDeferredRowLeavesTheNumberAfterItWhenItIsNumbered() throws IOException {
+        assertThat(loadHindi("""
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: defer, at: "* A footnote",
+                     reason: the English numbers the next paragraph first}
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: unprinted, at: "* A footnote", after: true,
+                     reason: the Hindi does not print the section's last English paragraph}
+                """, page(7, 7, "0.95", p("7.4", "Rule (a)."), p("7.4", "* A footnote.")),
+                page(7, 8, "0.95", p("7.4", "Rule (b).")))).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactly(
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶1", "Rule (a)."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶2", "Rule (b)."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶3", "* A footnote."));
+        assertThat(out.toString()).contains("- ch 7 §7.4 ¶4");
+    }
+
+    /** `after` is for a section's last paragraph: on a row another follows, the gap is that row's to name. */
+    @Test
+    void anUnprintedEntryAfterARowAnotherFollowsIsRefused() throws IOException {
+        assertThat(loadHindi("""
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: unprinted, at: "Rule (a)", after: true,
+                     reason: the Hindi does not print English ¶2}
+                """, page(7, 7, "0.95", p("7.4", "Rule (a)."), p("7.4", "Rule (b).")))).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(imports.rows).isNull();
+        assertThat(out.toString()).contains("1 unprinted correction(s) with after name a row another follows")
+                .contains("ch 7 §7.4 ¶1 is not its section's last row").contains("Name the row after the gap, without after.");
+    }
+
+    /**
+     * bio11's Hindi prints §10.5 with no heading of its own (2026-10-17), so the transcription numbered its paragraph
+     * as the fifth of §10.4.2; a `section` entry on that paragraph numbers it §10.5 ¶1 and leaves the four before it.
+     */
+    @Test
+    void aSectionEntryOnALaterParagraphNumbersItFromOneInItsSection() throws IOException {
+        assertThat(loadHindi("""
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 7, page: 7, kind: section, at: "Rule (c)", section: "7.5",
+                     reason: the Hindi prints §7.5 with no heading}
+                """, page(7, 7, "0.95", p("7.4", "Rule (a)."), p("7.4", "Rule (b)."), p("7.4", "Rule (c).")),
+                page(7, 8, "0.95", new NcertPage.Paragraph("7.4", "It holds.", true, List.of()), p("7.6", "Next.")))).isZero();
+
+        assertThat(imports.rows).extracting(NcertParagraphRow::address, NcertParagraphRow::text).containsExactly(
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶1", "Rule (a)."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.4 ¶2", "Rule (b)."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.5 ¶1", "Rule (c). It holds."),
+                org.assertj.core.groups.Tuple.tuple("ch 7 §7.6 ¶1", "Next."));
+    }
+
     /** Two English paragraphs in a row the edition does not print: two entries on the one row leave two numbers. */
     @Test
     void twoUnprintedEntriesOnOneRowLeaveTwoNumbers() throws IOException {
@@ -690,7 +794,7 @@ class NcertLoadCommandTest {
         List<ExtractedPage> pages = List.of(page(7, 2, "0.95", p("7.2", "Pressure is a scalar.")));
 
         assertThatThrownBy(() -> NcertLoadCommand.number(pages, "hi.jsonl", Set.of(), List.of(),
-                List.of(new NcertCorrections.Unprinted((short) 7, 2, 4, "* Nowhere"))))
+                List.of(new NcertCorrections.Unprinted((short) 7, 2, 4, "* Nowhere", false))))
                 .isInstanceOf(InputFormatException.class)
                 .hasMessageContaining("1 unprinted correction(s) cannot be placed")
                 .hasMessageContaining("ch 7 page 2: the row starting \"* Nowhere\" is not a row of its own");

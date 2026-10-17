@@ -329,9 +329,10 @@ before it numbers: the founder's rulings on what `ncert verify` flagged. `text`,
 `figure_ref` (one label removed from or added to the paragraph holding a span), `drop` (a paragraph
 that is not running text removed), `defer` (D16: the paragraph takes its number after the next one of
 its section — a footnote the other edition prints a page later; no word moves and it stays on its own
-page), `section` (D16, Hindi only: a section the Hindi numbers otherwise takes the English number) and
+page), `section` (D16, Hindi only: a section the Hindi numbers otherwise takes the English number),
 `move` (D16, Hindi only: a whole row numbered right after another, carried out by the numbering once page
-breaks are joined) change the frozen run's pages; `misprint`, `false_positive` and
+breaks are joined) and `unprinted` (D16, Hindi only: the number before a row — with `after: true`, after it
+— left to an English paragraph the Hindi does not print) change the frozen run's pages; `misprint`, `false_positive` and
 `noise` rule on a flag and change nothing, and `ncert verify` reads those three itself. The first two
 answer the second read, matched on the spans the verifier quoted; `noise` answers one of the **free**
 checks, which quotes no span, so it names the check (`flag: join` or `flag: figure`) and the words the
@@ -636,13 +637,16 @@ heavy neighbours score alike). The entries come from reading:
   heading starts with and the quoted number the English gives that section, where the Hindi print numbers it
   otherwise or adds a sub-heading (phy11-part2's "8.5.6" for 8.5.5, its 13.8.1) — read the load report's
   section table for a count of 0 on one side; written first, so the joins after it see the English section.
+  Named at a later paragraph of its section, it moves that one and those after it: a section the Hindi prints
+  with no heading of its own (bio11's §10.5, 2026-10-17).
   `move`: a row's first words (`at`, on `page`) and those of the row it is numbered after (`after`, on
   `after_page`) — once page breaks are joined, the whole row is renumbered there, earlier or later, in that
   row's section: a footnote or box the Hindi prints pages away from where the English numbers it, which
   `defer` (one paragraph later, no further) cannot place.
   Entries apply in file order, each to the page the earlier ones left; no entry moves text between paragraphs
   that are not neighbours, and only a `move` takes a row across sections — whole, into the section of the row
-  it follows.
+  it follows — besides a `section` entry named mid-section, which takes its paragraph and the section's later
+  ones into the English section together.
 - One fresh reader per chapter (two for a long one), briefed with these rules whole, then a separate pass
   on characters, then the spec-auditor on the whole block before the founder approves it.
 

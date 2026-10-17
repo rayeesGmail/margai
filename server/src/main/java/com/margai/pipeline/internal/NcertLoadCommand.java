@@ -433,12 +433,15 @@ class NcertLoadCommand extends NcertBookCommand {
     /**
      * @param unprinted the rows an {@code unprinted} correction names (D16), once per entry: each takes the number
      *                  after the English paragraph its edition does not print, wherever it is numbered — in page
-     *                  order, after a deferral, or again after a move — so that number stays the English row's alone.
+     *                  order, after a deferral, or again after a move — so that number stays the English row's alone;
+     *                  an entry with {@code after} leaves the number after its row instead (2026-10-17).
      */
     static Numbered number(List<ExtractedPage> pages, String jsonlKey, Set<NcertCorrections.Deferred> deferred,
             List<NcertCorrections.Moved> moves, List<NcertCorrections.Unprinted> unprinted) {
         Map<Start, Integer> gaps = new LinkedHashMap<>();
-        unprinted.forEach(gap -> gaps.merge(new Start(gap.chapter(), gap.page(), gap.index()), 1, Integer::sum));
+        Map<Start, Integer> gapsAfter = new LinkedHashMap<>();
+        unprinted.forEach(gap -> (gap.after() ? gapsAfter : gaps).merge(new Start(gap.chapter(), gap.page(), gap.index()),
+                1, Integer::sum));
         List<Joined> rows = new ArrayList<>();
         Map<Start, Joined> starts = new HashMap<>();
         List<String> refusals = new ArrayList<>();
@@ -490,6 +493,8 @@ class NcertLoadCommand extends NcertBookCommand {
                 Joined joined = new Joined(chapter, section, counters.merge(counter, 1 + gap, Integer::sum), page,
                         paragraph);
                 joined.unprintedBefore = gap;
+                joined.unprintedAfter = gapsAfter.getOrDefault(start, 0);
+                counters.merge(counter, joined.unprintedAfter, Integer::sum);
                 rows.add(joined);
                 starts.put(start, joined);
                 // A footnote is never the paragraph the next page continues, so it never becomes the
@@ -504,6 +509,8 @@ class NcertLoadCommand extends NcertBookCommand {
                     Joined placed = new Joined(chapter, section, counters.merge(counter, 1 + heldGap, Integer::sum),
                             held.page(), held.paragraph());
                     placed.unprintedBefore = heldGap;
+                    placed.unprintedAfter = gapsAfter.getOrDefault(heldStart, 0);
+                    counters.merge(counter, placed.unprintedAfter, Integer::sum);
                     rows.add(placed);
                     starts.put(heldStart, placed);
                 }
@@ -540,10 +547,25 @@ class NcertLoadCommand extends NcertBookCommand {
                     + "\nFix each entry against the page, or remove it.");
         }
         move(rows, starts, moves);
+        // `after` is for a section's last English paragraph, which no row follows; on any other row the gap is the
+        // next row's, and a plain entry there says so — one spelling, which a move or a deferral cannot pull apart.
+        Map<String, Integer> lastNumber = new HashMap<>();
+        rows.forEach(row -> lastNumber.merge(row.counter(), row.paraNo, Math::max));
+        List<String> notLast = rows.stream().filter(row -> row.unprintedAfter > 0 && row.paraNo < lastNumber.get(row.counter()))
+                .map(row -> "ch " + row.chapterNo + " §" + row.section + " ¶" + row.paraNo + " is not its section's last row")
+                .toList();
+        if (!notLast.isEmpty()) {
+            throw new InputFormatException(Path.of(NcertCorrectionsYamlReader.FILE), 0, notLast.size()
+                    + " unprinted correction(s) with after name a row another follows:\n  " + String.join("\n  ", notLast)
+                    + "\nName the row after the gap, without after.");
+        }
         List<EditionPairs.Address> left = new ArrayList<>();
         for (Joined row : rows) {
             for (int before = row.unprintedBefore; before > 0; before--) {
                 left.add(new EditionPairs.Address(row.chapterNo, row.section, row.paraNo - before));
+            }
+            for (int after = 1; after <= row.unprintedAfter; after++) {
+                left.add(new EditionPairs.Address(row.chapterNo, row.section, row.paraNo + after));
             }
         }
         // A model put "Eq. (7.5)" in figure_refs (D15, the Opus run). A rule can ask; this
@@ -604,9 +626,10 @@ class NcertLoadCommand extends NcertBookCommand {
         for (String key : touched) {
             int paraNo = 0;
             for (Joined row : sections.get(key)) {
-                // A row after an English paragraph its edition does not print leaves that number wherever it goes.
+                // A row beside an English paragraph its edition does not print leaves that number wherever it goes.
                 paraNo += 1 + row.unprintedBefore;
                 row.paraNo = paraNo;
+                paraNo += row.unprintedAfter;
             }
         }
     }
@@ -709,6 +732,8 @@ class NcertLoadCommand extends NcertBookCommand {
         private int paraNo;
         // How many English paragraphs right before this row its edition does not print: numbers it leaves (D16).
         private int unprintedBefore;
+        // And right after it, where no row follows them in the section: the numbers it leaves after its own.
+        private int unprintedAfter;
         private final StringBuilder text = new StringBuilder();
         private final List<Integer> pages = new ArrayList<>();
         private final List<Integer> pageStarts = new ArrayList<>();

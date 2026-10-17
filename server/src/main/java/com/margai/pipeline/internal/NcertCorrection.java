@@ -26,6 +26,8 @@ import com.margai.curriculum.api.BookLanguage;
  * @param section     the section the English numbers what a {@code section} entry names, or null
  * @param after       the words the row a {@code move} entry's row follows starts with, or null
  * @param afterPage   the page that row starts on, or null
+ * @param gapAfter    whether the English paragraph an {@code unprinted} entry names is the one after its row
+ *                    rather than the one before it — a section's last, which no row follows
  */
 record NcertCorrection(
         String book,
@@ -43,13 +45,17 @@ record NcertCorrection(
         LayoutChecks.Kind flag,
         String section,
         String after,
-        Integer afterPage) {
+        Integer afterPage,
+        boolean gapAfter) {
 
-    /** An entry of any kind but {@code figure_ref}, {@code noise}, {@code section} and {@code move}, which name more. */
+    /**
+     * An entry of any kind but {@code figure_ref}, {@code noise}, {@code section} and {@code move}, which name more,
+     * and an {@code unprinted} entry's gap after its row.
+     */
     NcertCorrection(String book, BookLanguage language, short chapter, int page, Kind kind, String transcribed,
             String printed, String at, String reason, String address) {
         this(book, language, chapter, page, kind, transcribed, printed, at, reason, address, null, null, null, null,
-                null, null);
+                null, null, false);
     }
 
     enum Kind {
@@ -74,11 +80,13 @@ record NcertCorrection(
          */
         defer,
         /**
-         * The section the paragraph starting {@code at} opens is numbered {@code section} in the English, and
-         * so is every later paragraph the transcription put in it (D16). The Hindi print can number a section
+         * The paragraph starting {@code at} is numbered in section {@code section} in the English, and so is every
+         * later paragraph the transcription put in its section (D16). The Hindi print can number a section
          * differently — phy11-part2 goes from 8.5.4 to "8.5.6", and adds a 13.8.1 the English does not print
          * — and the transcription copies the heading, leaving rows at an address no English row has, which no
-         * join can mend because a join never crosses a section. Only a Hindi entry: the English is canonical.
+         * join can mend because a join never crosses a section. Usually the paragraph is the first under the
+         * heading; a later one is a section the Hindi prints with no heading of its own, which the transcription
+         * left in the section above (bio11's §10.5, 2026-10-17). Only a Hindi entry: the English is canonical.
          */
         section,
         /**
@@ -95,8 +103,10 @@ record NcertCorrection(
          * the number after it, and that number stays the English row's alone (D16). phy12-part1's Hindi leaves out
          * §3.12's English ¶5, so numbered in order its next row sat beside ¶5 and every later row of the section one
          * off; no join or split can mend a paragraph that is not there. Applied to whole rows once the page breaks
-         * are joined, like {@code move}; each entry leaves one number, and two on one row leave two. Only a Hindi
-         * entry: the English is canonical.
+         * are joined, like {@code move}; each entry leaves one number, and two on one row leave two. With
+         * {@code gapAfter} the paragraph not printed is the one after the row, for a section's last English
+         * paragraph, which no row follows (bio11's §4.2.11.7 ¶3, 2026-10-17); on a row another follows the
+         * numbering refuses it, that gap being the next row's to name. Only a Hindi entry: the English is canonical.
          */
         unprinted,
         /**

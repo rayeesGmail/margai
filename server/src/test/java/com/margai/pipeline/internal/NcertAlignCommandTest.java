@@ -182,7 +182,8 @@ class NcertAlignCommandTest {
 
         assertThat(out.toString())
                 .contains("4 English and 2 Hindi row(s)")
-                .contains("## English paragraphs the Hindi does not print — numbers an `unprinted` entry left, not aligned")
+                .contains("## English paragraphs the Hindi does not print — numbers an `unprinted` entry left before the "
+                        + "section's last Hindi row, not aligned")
                 .contains("- ch 1 §1.5 ¶2")
                 .contains("- ch 1 §1.5: hi ¶3 = en ¶3+¶4 (split hi)")
                 .doesNotContain("en ¶2 has no hindi");

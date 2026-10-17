@@ -35,8 +35,8 @@ import picocli.CommandLine.Option;
  * paragraph embedded on the pin, its similarity to every English row of its section read from the stored
  * vectors ({@link CurriculumImport#similarityToEnglish}), and {@link Alignment} proposing the joins and splits
  * that make the pairs one to one. It changes no row and stores no vector; the corrections file does the rest.
- * An English paragraph the Hindi does not print, whose number an {@code unprinted} entry left, is named and set
- * aside rather than proposed again.
+ * An English paragraph the Hindi does not print, whose number an {@code unprinted} entry left before its section's
+ * last Hindi row, is named and set aside rather than proposed again; one left after that row is not (2026-10-17).
  *
  * <p>It also names each pair's numbers that one edition carries and the other does not — a misread digit on
  * either side — and draws the ✅ sample (PLAN D16, DECISIONS 2026-10-01): aligned pairs weighted toward the
@@ -191,9 +191,11 @@ class NcertAlignCommand extends NcertBookCommand {
                     + notAligned.stream().map(String::valueOf).collect(Collectors.joining(", ")));
         }
         report.section("sections whose rows do not pair one to one")
-                .line("en counts the English rows aligned: a number an `unprinted` entry left is listed below, not here")
+                .line("en counts the English rows aligned: a number an `unprinted` entry left before the section's last "
+                        + "Hindi row is listed below, not here; one left after it is aligned, and the load's report names it")
                 .table(List.of("chapter", "section", "en", "hi", "proposals"), sections);
-        report.section("English paragraphs the Hindi does not print — numbers an `unprinted` entry left, not aligned")
+        report.section("English paragraphs the Hindi does not print — numbers an `unprinted` entry left before the "
+                + "section's last Hindi row, not aligned")
                 .list(unprinted);
         report.section("proposed Hindi joins and splits — adjudicate each; nothing is applied")
                 .list(proposals, "none: every section pairs one to one");
@@ -208,7 +210,9 @@ class NcertAlignCommand extends NcertBookCommand {
      * The English rows of a section an {@code unprinted} entry left without Hindi (D16): the load numbers a
      * section's Hindi from ¶1 with no gap but those, so an English row with no Hindi before the section's last
      * Hindi row is one of them. It is the founder's ruling, an English paragraph the Hindi does not print, and
-     * not a step to propose; an English row with no Hindi after the last one is still aligned, and proposed.
+     * not a step to propose; an English row with no Hindi after the last one is still aligned, and proposed. That
+     * includes a section's last number an entry with {@code after} left (2026-10-17), which the stored rows cannot
+     * tell from a Hindi row short — the load's report names it among the numbers left.
      */
     private static List<AlignmentRow> unprinted(List<AlignmentRow> section) {
         int lastHindi = section.stream().filter(row -> row.textHi() != null).mapToInt(AlignmentRow::paraNo).max().orElse(0);

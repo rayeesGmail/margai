@@ -34,8 +34,8 @@ final class NcertCorrections {
     /**
      * The corrected pages, one line per change, how many entries were rulings on verifier flags that
      * change no text, the paragraphs a {@code defer} entry makes wait for their number, the rows a
-     * {@code move} entry renumbers, in file order, and the rows an {@code unprinted} entry numbers one later,
-     * once per entry.
+     * {@code move} entry renumbers, in file order, and the rows an {@code unprinted} entry leaves a number before —
+     * or, with {@code after}, after — once per entry.
      */
     record Applied(List<ExtractedPage> pages, List<String> notes, int rulings, Set<Deferred> deferred,
             List<Moved> moves, List<Unprinted> unprinted) {
@@ -53,11 +53,11 @@ final class NcertCorrections {
     }
 
     /**
-     * A row that takes the number after the English paragraph its edition does not print, named by the place its
-     * first paragraph has on its page once every page-level entry has applied; {@code at} is the entry's words,
-     * for a refusal.
+     * A row that takes the number after the English paragraph its edition does not print — or, {@code after}, that
+     * leaves the number after its own to it — named by the place its first paragraph has on its page once every
+     * page-level entry has applied; {@code at} is the entry's words, for a refusal.
      */
-    record Unprinted(short chapter, int page, int index, String at) {
+    record Unprinted(short chapter, int page, int index, String at, boolean after) {
     }
 
     /** The entries this load carries: its book, its edition, its chapters. */
@@ -88,7 +88,7 @@ final class NcertCorrections {
             NcertCorrection entry = new NcertCorrection(written.book(), written.language(), written.chapter(),
                     written.page(), written.kind(), spaced(written.transcribed()), spaced(written.printed()),
                     spaced(written.at()), written.reason(), written.address(), written.removeRef(), written.addRef(),
-                    written.flag(), written.section(), spaced(written.after()), written.afterPage());
+                    written.flag(), written.section(), spaced(written.after()), written.afterPage(), written.gapAfter());
             Integer at = index.get(entry.chapter() + "/" + entry.page());
             if (at == null) {
                 throw refuse(entry, "that page is not in the extraction");
@@ -142,24 +142,28 @@ final class NcertCorrections {
         List<Unprinted> unprinted = new ArrayList<>();
         for (NcertCorrection entry : gaps) {
             List<NcertPage.Paragraph> page = singleSpaced(out.get(index.get(entry.chapter() + "/" + entry.page())));
-            unprinted.add(new Unprinted(entry.chapter(), entry.page(), onlyStart(entry, page), entry.at()));
+            unprinted.add(new Unprinted(entry.chapter(), entry.page(), onlyStart(entry, page), entry.at(), entry.gapAfter()));
         }
         return new Applied(List.copyOf(out), List.copyOf(notes), rulings, Set.copyOf(deferred), List.copyOf(moved),
                 List.copyOf(unprinted));
     }
 
     /**
-     * Names the row only: the numbering leaves the number before it once the page breaks are joined. It must start
-     * a paragraph — a continuation is the rest of another page's row.
+     * Names the row only: the numbering leaves the number before it — or after it — once the page breaks are joined.
+     * It must start a paragraph — a continuation is the rest of another page's row.
      */
     private static String unprinted(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs) {
         int at = onlyStart(entry, paragraphs);
         if (at == 0 && paragraphs.getFirst().continuesPreviousPage()) {
             throw refuse(entry, "\"" + entry.at() + "\" continues the previous page's row — name the row by its first words");
         }
-        return entry.where() + " §" + paragraphs.get(at).section().strip() + ": the English paragraph before the row "
-                + "starting \"" + entry.at() + "\" is not printed in this edition — the row takes the number after it ("
-                + entry.reason() + ")";
+        String section = entry.where() + " §" + paragraphs.get(at).section().strip();
+        if (entry.gapAfter()) {
+            return section + ": the English paragraph after the row starting \"" + entry.at() + "\" is not printed in "
+                    + "this edition — the number after the row is left to it (" + entry.reason() + ")";
+        }
+        return section + ": the English paragraph before the row starting \"" + entry.at() + "\" is not printed in "
+                + "this edition — the row takes the number after it (" + entry.reason() + ")";
     }
 
     /**
@@ -316,10 +320,11 @@ final class NcertCorrections {
     }
 
     /**
-     * The section the paragraph starting {@code at} opens takes the English number, on its page and on every
-     * later page of the chapter. The paragraph must be the first of its section — where the heading is — so
-     * an entry can never re-address half a section; the later pages are changed in {@code pages} directly,
-     * their words untouched.
+     * The paragraph starting {@code at} and every later paragraph of its section take the English number, on its
+     * page and on every later page of the chapter; the later pages are changed in {@code pages} directly, their
+     * words untouched. Named at the heading it re-addresses the whole section; named at a later paragraph, the
+     * paragraphs before it keep their number — the Hindi printed that one with no heading of its own (2026-10-17).
+     * It must start a row: a continuation is the rest of another page's row, which keeps its section.
      */
     private static String section(NcertCorrection entry, List<NcertPage.Paragraph> paragraphs, List<ExtractedPage> pages,
             int at) {
@@ -329,12 +334,16 @@ final class NcertCorrections {
         if (from.equals(to)) {
             throw refuse(entry, "\"" + entry.at() + "\" is in §" + to + " already");
         }
-        boolean earlier = paragraphs.subList(0, first).stream().anyMatch(paragraph -> paragraph.section().strip().equals(from));
-        for (int before = at - 1; !earlier && before >= 0 && pages.get(before).chapterNo() == entry.chapter(); before--) {
-            earlier = pages.get(before).paragraphs().stream().anyMatch(paragraph -> paragraph.section().strip().equals(from));
+        if (first == 0 && paragraphs.getFirst().continuesPreviousPage()) {
+            throw refuse(entry, "\"" + entry.at() + "\" continues the previous page's row — name the row by its first words");
         }
-        if (earlier) {
-            throw refuse(entry, "§" + from + " has a paragraph before \"" + entry.at() + "\" — name the first paragraph under its heading");
+        // The next page's continuation is the rest of this page's last body paragraph: named at a footnote below it,
+        // the entry would move the continuation and leave its first half behind.
+        int body = lastBody(paragraphs);
+        if (body >= 0 && body < first && paragraphs.get(body).section().strip().equals(from)
+                && continuedOnNextPage(pages, at)) {
+            throw refuse(entry, "the next page continues a paragraph of §" + from + " before \"" + entry.at()
+                    + "\" — name that paragraph or an earlier one");
         }
         int moved = 0;
         for (int index = first; index < paragraphs.size(); index++) {

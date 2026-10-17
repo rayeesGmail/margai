@@ -45,10 +45,13 @@ committed.
   English 8.5.5 and adds a 13.8.1 the English does not have — and every paragraph of that section in the
   chapter moves with it; put it before any join it makes possible. Named at a later paragraph — a section the
   Hindi prints with no heading of its own, which the transcription left in the section above (bio11's §10.5,
-  2026-10-17) — it moves that paragraph and the section's later ones, and the ones before it keep their number. A `move` names a row by its first
+  2026-10-17) — it moves that paragraph and the section's later ones, and the ones before it keep their number;
+  the load refuses one named at a continuation, or at a footnote below a paragraph the next page continues, which
+  would leave the two halves of one paragraph in two sections. A `move` names a row by its first
   words (`at`, on `page`) and the row it follows (`after`, on `after_page`): once page breaks are joined the
   row is taken out and numbered right after that one, earlier or later, in that row's section — for a footnote or a
-  box the Hindi prints pages away from where the English numbers it. An `unprinted` entry (Hindi only) names
+  box the Hindi prints pages away from where the English numbers it, or a paragraph of running text it prints at
+  another place in the section (bio11 ch 19, founder, 2026-10-17). An `unprinted` entry (Hindi only) names
   the row after an English paragraph the Hindi edition does not print — phy12-part1's §3.12 ¶5 — and that row
   takes the number after it, so the English row keeps its number with no Hindi beside it; the load names each
   such address and counts it when it holds a section to the English, and `ncert align` sets it aside rather

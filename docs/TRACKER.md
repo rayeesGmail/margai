@@ -702,6 +702,29 @@ HOW TO RESUME (supersedes item 2 of the list below):
      running text (ch 19 ×2) and ch 17's section-early sentences; B4 three places no entry kind expresses (two
      sections' last English rows not printed, §10.5 printed with no heading) — a small loader change proposed;
      B5 two mid-sentence splits; C1–C22 meaning places and four terms the edition never prints.
+     Afternoon: THE FOUNDER ANSWERED "all as recommended, C7 and C16 as printed" (DECISIONS 2026-10-17). B4's loader
+     change COMMITTED (fc13b9b): `unprinted` takes `after: true` for a section's last English paragraph (refused on a
+     row another follows) and `section` may name a later paragraph of its section (refused at a continuation or at a
+     footnote below a continued paragraph); verify 1,003 green; spec audit PASS, its seven MINOR points fixed;
+     phy12-part2's Hindi dry run byte-identical on the old and new jars. Two background readers wrote the 19 answered
+     meaning entries on crops (C2–C21; C1, C7, C11, C16, C17, C20 checked as printed in the rows); A2's five entries
+     dropped and ch 3 p4 written स्पाइरुलिना; C8 a misprint. THE BLOCK WRITTEN into ncert-corrections.yaml by Edit and
+     compared byte for byte with the scratch copy (scratchpad cc81d476 founder.py → fix2.py → hgen; header-bio11w2.txt),
+     uncommitted. Its spec audit FAILED on one MAJOR — a seventh A2 spelling, ch 12 p8's यूबीक्विीनोन, written as
+     printed — and 13 MINOR (reasons citing the layer alone, unrecorded founder answers on entries, header gaps); all
+     fixed. A re-audit FAILED on one MAJOR and two MINOR: two meaning entries Claude had added for places the readers
+     filed as edition differences, and a crop cited on the wrong page (ch 3 p2, fixed): ch 3 p8's फूल वाले अधिकांश फर्न का उपयोग … करते हैं reads "florists use most ferns", true, and ch 4
+     p13's घडियाल is everyday Hindi for the crocodile as well as the gharial; both removed, kept as printed, the second
+     put to the founder. Now 433 entries: 79 split, 50 join, 2 move, 2 unprinted, 1 section, 266 text (24
+     misreadings, 15 visargas, 13 label colons, 46 as printed, 74 स्त्र, 2 valid spellings, 27 bullets, 5 side
+     headings, 60 meaning), 27 false_positive, 6 misprint. APPROVAL DRY RUN
+     pipeline/reports/2026-10-17-ncert-load-dry-run.md: corrections b4f92e4f…, extraction c3644542…, no refusal,
+     0/382/364, 746 Hindi rows, 271 of 271 sections one to one, §4.2.11.7 ¶3 and §8.5.10 ¶6 English-only, the 39
+     Hindi-only addresses deleted, no English row cleared. English slip parked (bio11 §17.2.2 ¶3 P_1 for P_i).
+     APPROVED: "approved, keep घडियाल as printed" (DECISIONS 2026-10-17) — the block COMMITTED with its approval dry
+     run (ec40175), with the seventh A2 place and §4.2.7 ¶3–¶5's list-item splits. NEXT: the founder runs the reload
+     script scratchpad cc81d476 `d16-bio11-hi-reload.sh` from server/ (jar `server-d16-b4.jar`, fc13b9b's code: reload
+     ₹0, align ≈₹8, second read ≤₹230); then round two on its flags, the ✅ sample, and the founder's ten pairs.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier
@@ -4901,6 +4924,7 @@ Tomorrow's first task:
 ## 🅿️ PARKED (Sunday review only)
 
 - _idea · date · one line_
+- **A slip in the frozen English rows of bio11, found by its Hindi adjudication** · 2026-10-17 (D16, parked by Claude as the founder had phy12-part2's below parked; put to the founder with the block) · §17.2.2 ¶3 "releasing the ADP and P_1": the English page sets P with a subscript 1 (kebo117 p6, a 6.1 pt "1" after "P"), where the inorganic phosphate is P_i; the Hindi prints P_2, two phosphates, and its row writes P_1 as the English row does (a meaning entry of the bio11 block). The frozen row keeps what its book prints. Revisit with the book-errata list below, or if a student-facing answer quotes it
 - **Slips in the frozen English rows of phy12-part2, found by its Hindi adjudication** · 2026-10-16 (D16, founder: "park the English slips") · §10.7 ¶6 says P_2 three times ("light passing through the polaroid P_2 gets polarised along the pass-axis of P_2. If the pass-axis of P_2 makes an angle theta with the pass-axis of P_1…") where the Hindi edition prints P_1, the polaroid the beam reaches second (Fig. 10.18) — the Hindi is right; §12.6 ¶4 cites "[Eq. (12.15)]" for Bohr's quantum condition, which the Hindi prints as (12.5); §14.6.2 ¶5 "a micrometer is used in reverse bias" for a microammeter. Each is what the English book prints, so the frozen rows keep it (English is canonical and its books are closed); the readers' claims are checked against the English row text only, not yet against the English page. Revisit with the book-errata list below, or if a student-facing answer quotes one
 - **A per-edition display section number for a Hindi anchor** · 2026-10-12 (D16, founder: "English numbers, park a Hindi one") · one row holds both editions, so a Hindi row's anchor shows the English section: phy11-part2's §8.5.5 where the Hindi prints 8.5.6, §13.8 for text it prints under 13.8.1, §9.2 for the STP footnote it prints under 9.2.1 (spec audit MAJOR, DECISIONS 2026-10-12). A `section_hi` label on the row (migration, entity, loader, the `section`/`move` entries keeping the print's number) would let the Hindi anchor name what the student's book prints. Revisit when a Hindi book's numbering would send a student to the wrong page
 - **`ncert align` with 1:N steps and reshapes scored on the joined text** · 2026-10-09 (D16, founder: "park the aligner") · `Alignment` allows 1:1, 1:2 and 2:1 and scores a split as the sum of two separate links, so an equation-heavy Hindi paragraph moderately like two English neighbours out-scores the right pairs: on phy11-part1 about half its proposals were exact, and once every section was one to one it still proposed 30 reshapes in 12 sections. The candidate: score a reshape by the Hindi vector against the normalised mean of the English vectors it covers (and the reverse for a join), up to four paragraphs a step. Calibrating it needs real Hindi vectors, which the command does not store — two paid runs and new code — while its proposals are only a map and reading makes the entries. Revisit if a later book's readers are seen following a wrong proposal, or reading dominates a book's cost

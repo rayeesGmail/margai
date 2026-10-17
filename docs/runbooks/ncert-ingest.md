@@ -641,7 +641,8 @@ heavy neighbours score alike). The entries come from reading:
   with no heading of its own (bio11's §10.5, 2026-10-17).
   `move`: a row's first words (`at`, on `page`) and those of the row it is numbered after (`after`, on
   `after_page`) — once page breaks are joined, the whole row is renumbered there, earlier or later, in that
-  row's section: a footnote or box the Hindi prints pages away from where the English numbers it, which
+  row's section: a footnote or box the Hindi prints pages away from where the English numbers it, or a paragraph of
+  running text it prints at another place in the section (bio11 ch 19, 2026-10-17), which
   `defer` (one paragraph later, no further) cannot place.
   Entries apply in file order, each to the page the earlier ones left; no entry moves text between paragraphs
   that are not neighbours, and only a `move` takes a row across sections — whole, into the section of the row

@@ -1067,7 +1067,11 @@ English, Hindi, Hinglish into the existing doubt pipeline) · an Android home-sc
 learned from behaviour · **graduation flows and the continuity path** (journey card, data
 export package, referral gift; humane re-onboarding for another attempt) — must ship
 before the first cohort's June results · a web review surface (notebook, reports, the
-parent's window) · a Hindi-first experience (Hindi NCERT
+parent's window) · **book errata notes** (all tiers): when an answer's NCERT anchor points
+to a passage where the student's edition has a logged printing error that changes the
+meaning, one factual line under the anchor names the printed word or phrase as a printing
+error and gives the correct one — shown only to students of that edition, never for a slip
+kept as printed, quoting no more of the book than the wrong word or phrase · a Hindi-first experience (Hindi NCERT
 extraction stays image-only by the founder's 2026-09-13 ruling; the Chanakya→Unicode
 converter checks the Hindi transcription but never supplies its text — founder rulings
 2026-10-01, 2026-10-02) · **“studying right now” presence**

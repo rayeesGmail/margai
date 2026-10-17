@@ -651,6 +651,18 @@ HOW TO RESUME (supersedes item 2 of the list below):
      pages). Stage script ready: scratchpad cc81d476 `d16-bio11-hi-stage.sh` (render all + extract ch 1–2, 22 pages,
      ≈₹90–125, jar copy `server-d16-1c34114.jar` in scratchpad f6ccef84; no server code since); the founder uploads
      the Hindi PDFs to S3, then launches. Still open: the founder's ten ✅ pairs on all four closed books.
+     06:53–06:59 the founder ran it (reports a5b0830): 252 pages rendered, the console naming the Figure 16.5 sign
+     once as expected; ch 1–2 transcribed, 21 pages called and 1 apparatus page not, 80 paragraphs (30 + 50 beside
+     the English 29 + 48), ₹92.58 (₹4.41 a called page). The Unit 1 opener and its biography returned no paragraphs
+     — prompt v5's rule holds on the Hindi edition. Ch 1 p9 opens on the Summary and carries nothing; ch 2 p12's
+     4 paragraphs are the four blocks above its Summary. Its four check lines READ on the print (crops): p4 prints
+     संबधी (no anusvara on ब) and p12 माइकोवायंट (व, in bold), where the rows repair the book's own spelling —
+     `text` entries as printed, as round four's slips; p7 पदार्थों and p10 वर्गों, where the rows drop a printed
+     anusvara — the font draws it at the tip of the reph's hook, identical to p4's पदार्थों the rows read right,
+     both at a line end — misreadings, `text` entries to the print. Low-confidence pages ch 2 p2 and p4 (0.75)
+     go to the second read. FULL-BOOK SCRIPT READY: scratchpad cc81d476 `d16-bio11-hi.sh` (extract ch 3–19
+     ≈₹900 → load → align ≈₹8 → Sonnet 5 second read ≈₹270 → the JSONL copied to `$SP/dry/hi.jsonl`), awaiting
+     the founder's launch.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

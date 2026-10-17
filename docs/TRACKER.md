@@ -683,6 +683,25 @@ HOW TO RESUME (supersedes item 2 of the list below):
      be स्त्र (their स्त्रोत entries, as printed); compared at zoom 12 against both books' reference shapes
      (scratchpad cc81d476 p2/sara-cmp.png) — the same glyph. Under the standing "as printed" ruling each place
      is a `text` entry; its size goes to the founder with the block.
+     Later: ADJUDICATED IN SIMULATION — scratchpad cc81d476 `block-final.yaml` (merge.py → readdress.py →
+     finalize.py, 8 addresses by hand → hgen; rulings-final.json), 415 entries: 79 split, 50 join, 2 move
+     (alignment, 131) + 252 text, 27 false_positive, 5 misprint (b1 57, b2 71, b3 97, b4 42, b5 17); `dry.sh final`:
+     no refusal, 717 → 746 rows, the 38 Hindi-only addresses deleted, 267 of 271 sections one to one. A network
+     drop stopped b1–b3 mid-run; resumed with their context. The text entries: 74 स्त्र places; the book's own
+     spellings the rows repaired, back as printed (64); misreadings (प्ररोह ×6, reph-tip anusvaras, सेंट्रोमियर
+     …); 15 glued-colon visargas and 13 label colons; 27 printed bullets restored; 5 dropped side headings (ch 2
+     p12 ×3, ch 9 p13 ×2 — a bold-line sweep of every page found no others); 41 MEANING entries (2026-10-10) —
+     the Hindi print states something false far more often than the Physics books' (cat and dog in each other's
+     families, open circulation printed closed, the descending limb given the ascending limb's permeability, pea
+     as syncarpous, Schwann British, 10 lakh for 10 million, meiosis II for the pairing of homologues …). The
+     second read's 22 "no row carries" passages: none missing (Summaries, tables, two carried). Check noise for
+     later: overprinted duplicate glyphs, glyph-order variants, pre-cluster ि, small labels, a nukta set as a
+     hyphen glyph. FOUNDER QUESTIONS (scratchpad cc81d476 founder-questions.md): A1 the स्त्र class's size; A2
+     six as-printed spellings that are not valid Devanagari (परिमााण vs हाइड्रोजन precedents); A3 bullets the
+     English rows lack; B1 §5.9's three English heading rows (mirror); B2 two print-order places; B3 `move` on
+     running text (ch 19 ×2) and ch 17's section-early sentences; B4 three places no entry kind expresses (two
+     sections' last English rows not printed, §10.5 printed with no heading) — a small loader change proposed;
+     B5 two mid-sentence splits; C1–C22 meaning places and four terms the edition never prints.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

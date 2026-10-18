@@ -126,6 +126,62 @@ class RetrievalRunTest {
         assertThat(rendered).doesNotContain("1. ✅");
     }
 
+    // ── D17: the founder's bar (DECISIONS 2026-10-18) ────────────────────────────────────────────
+
+    /** Thirteen of fifteen, every Hindi query in, no subject below four of five: met. */
+    @Test
+    void theBarIsMetAtThirteenWithEveryHindiQueryAndNoSubjectBelowFour() {
+        List<RetrievalRun.Result> acceptance = acceptance(List.of(
+                // physics: 5 of 5; chemistry: 4 of 5 (an English miss); biology: 4 of 5 (an English miss)
+                true, true, true, true, true, true, true, true, true, false, true, true, true, true, false));
+
+        assertThat(RetrievalRun.bar(acceptance)).allSatisfy(check ->
+                assertThat(check.met()).as(check.check()).isTrue());
+    }
+
+    @Test
+    void oneHindiMissFailsTheBarWhateverTheTotal() {
+        List<Boolean> hits = new java.util.ArrayList<>(java.util.Collections.nCopies(15, true));
+        hits.set(2, false);  // a Hindi query (positions 2 and 3 of each subject are Hindi)
+
+        List<RetrievalRun.Check> bar = RetrievalRun.bar(acceptance(hits));
+
+        assertThat(bar).filteredOn(check -> check.check().equals("in the answer set"))
+                .singleElement().satisfies(check -> assertThat(check.met()).isTrue());
+        assertThat(bar).filteredOn(check -> check.check().equals("every Hindi query"))
+                .singleElement().satisfies(check -> assertThat(check.got()).isEqualTo("5 of 6"));
+        assertThat(bar).anySatisfy(check -> assertThat(check.met()).isFalse());
+    }
+
+    @Test
+    void aSubjectAtThreeOfFiveFailsTheBarEvenAtThirteenOverall() {
+        List<RetrievalRun.Check> bar = RetrievalRun.bar(acceptance(List.of(
+                true, true, true, true, true, true, true, true, true, true, false, true, true, false, false)));
+
+        assertThat(bar).filteredOn(check -> check.check().equals("biology"))
+                .singleElement().satisfies(check -> {
+                    assertThat(check.got()).isEqualTo("2 of 5");
+                    assertThat(check.met()).isFalse();
+                });
+    }
+
+    /**
+     * Fifteen results in subject order, five each; within a subject positions 0–1 are English, 2–3
+     * Hindi and 4 Hinglish — the shape the D17 plan gives the acceptance set.
+     */
+    private static List<RetrievalRun.Result> acceptance(List<Boolean> hits) {
+        String[] languages = {"en", "en", "hi", "hi", "hinglish"};
+        BookSubject[] subjects = {BookSubject.physics, BookSubject.chemistry, BookSubject.biology};
+        List<RetrievalRun.Result> results = new java.util.ArrayList<>();
+        for (int index = 0; index < hits.size(); index++) {
+            RetrievalQuery query = new RetrievalQuery("a" + index, RetrievalQuery.QuerySet.acceptance,
+                    subjects[index / 5], languages[index % 5], "why", List.of(address(1, "1.1", 1)), "n");
+            results.add(new RetrievalRun.Result(query, new RetrievedPassages(List.of(), false, true),
+                    hits.get(index) ? 1 : 0));
+        }
+        return results;
+    }
+
     @Test
     void anEmptyQuerySetAddsNothingToTheReport() {
         Report report = new Report("t", InputReadersTest.INPUTS.resolve(NcertRegisterCommand.FILE));

@@ -1277,7 +1277,7 @@ class NcertLoadCommandTest {
         assertThat(run()).isZero();
 
         assertThat(imports.rows).hasSize(1);
-        assertThat(out.toString()).contains("leaves its paragraph set and English text as they are");
+        assertThat(out.toString()).contains("leaves its English rows and English text as they are");
     }
 
     /** The named corpus event: the load goes through, and the report says why and what to re-embed. */
@@ -1308,7 +1308,10 @@ class NcertLoadCommandTest {
         assertThat(out.toString()).contains("its English rewritten");
     }
 
-    /** The D16 corrections land as Hindi text on frozen books; nothing embeds Hindi, so they go through. */
+    /**
+     * The D16 corrections land as Hindi on frozen books, and the beta period's Chemistry Hindi loads will;
+     * nothing embeds Hindi, so they go through — Hindi-only rows added or deleted included (FrozenCorpusTest).
+     */
     @Test
     void aHindiRewriteOnAFrozenBookGoesThrough() throws IOException {
         frozen(stored("7.3", 1, "The canonical words.", "पुराने शब्द।"));
@@ -1316,7 +1319,18 @@ class NcertLoadCommandTest {
         assertThat(loadHindi("corrections: []\n", page(7, 4, "0.95", p("7.3", "नए शब्द।")))).isZero();
 
         assertThat(imports.rows).hasSize(1);
-        assertThat(out.toString()).contains("leaves its paragraph set and English text as they are");
+        assertThat(out.toString()).contains("a hi load changes no English row and no vector, so it is not guarded");
+    }
+
+    /** A first Hindi load as written puts a row where the English has none: still no English row moves. */
+    @Test
+    void aHindiLoadThatAddsAHindiOnlyRowOnAFrozenBookGoesThrough() throws IOException {
+        frozen(stored("7.3", 1, "The canonical words.", null));
+
+        assertThat(loadHindi("corrections: []\n",
+                page(7, 4, "0.95", p("7.3", "पहला।"), p("7.3", "दूसरा, जो अंग्रेज़ी में नहीं है।")))).isZero();
+
+        assertThat(imports.rows).hasSize(2);
     }
 
     @Test

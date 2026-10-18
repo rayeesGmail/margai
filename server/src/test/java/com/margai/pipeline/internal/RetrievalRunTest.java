@@ -132,7 +132,7 @@ class RetrievalRunTest {
     @Test
     void theBarIsMetAtThirteenWithEveryHindiQueryAndNoSubjectBelowFour() {
         List<RetrievalRun.Result> acceptance = acceptance(List.of(
-                // physics: 5 of 5; chemistry: 4 of 5 (an English miss); biology: 4 of 5 (an English miss)
+                // physics: 5 of 5; chemistry: 4 of 5 (a Hinglish miss); biology: 4 of 5 (a Hinglish miss)
                 true, true, true, true, true, true, true, true, true, false, true, true, true, true, false));
 
         assertThat(RetrievalRun.bar(acceptance)).allSatisfy(check ->
@@ -156,11 +156,13 @@ class RetrievalRunTest {
     @Test
     void aSubjectAtThreeOfFiveFailsTheBarEvenAtThirteenOverall() {
         List<RetrievalRun.Check> bar = RetrievalRun.bar(acceptance(List.of(
-                true, true, true, true, true, true, true, true, true, true, false, true, true, false, false)));
+                true, true, true, true, true, true, true, true, true, true, false, true, true, true, false)));
 
+        assertThat(bar).filteredOn(check -> check.check().equals("in the answer set"))
+                .singleElement().satisfies(check -> assertThat(check.met()).isTrue());
         assertThat(bar).filteredOn(check -> check.check().equals("biology"))
                 .singleElement().satisfies(check -> {
-                    assertThat(check.got()).isEqualTo("2 of 5");
+                    assertThat(check.got()).isEqualTo("3 of 5");
                     assertThat(check.met()).isFalse();
                 });
     }

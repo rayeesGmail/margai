@@ -295,10 +295,12 @@ class NcertLoadCommand extends NcertBookCommand {
 
     /**
      * The freeze guard (DECISIONS 2026-09-13; built at D17). A book with embedded paragraphs is the
-     * frozen corpus — every canonical book is embedded, a scratch database's never is — and a load
-     * that would add or delete one of its rows, or rewrite or remove a row's English text, is a corpus
-     * event: refused, every such row named, unless {@code --migrate} gives the reason, and then
-     * recorded in the report with the re-embedding it calls for. A dry run is refused the same way, so
+     * frozen corpus — every canonical book is embedded, a scratch database's never is — and an English
+     * load that would add or delete one of its English rows, or rewrite or remove a row's English text,
+     * is a corpus event: refused, every such row named, unless {@code --migrate} gives the reason, and
+     * then recorded in the report with the re-embedding it calls for. A Hindi load changes no English
+     * row and no vector, Hindi-only rows included, so it is not guarded (Claude's reading of the
+     * founder's Q2, DECISIONS 2026-10-18); once something embeds Hindi, Q2 guards Hindi text the same way. A dry run is refused the same way, so
      * it still predicts the load. Anchored rows (D23) stay the importer's refusal even under
      * {@code --migrate}: re-anchoring is that migration's own step.
      */
@@ -310,10 +312,16 @@ class NcertLoadCommand extends NcertBookCommand {
                     + (migrate == null ? "" : "; --migrate has nothing to permit"));
             return;
         }
+        if (language != BookLanguage.en) {
+            report.line("freeze guard: " + definition.code() + " is frozen (" + embedded + " embedded paragraphs); a "
+                    + language + " load changes no English row and no vector, so it is not guarded (DECISIONS "
+                    + "2026-10-18)" + (migrate == null ? "" : "; --migrate has nothing to permit"));
+            return;
+        }
         List<String> changes = FrozenCorpus.changes(language, imports.alignmentRows(definition.code(), chapters), rows);
         if (changes.isEmpty()) {
             report.line("freeze guard: " + definition.code() + " is frozen (" + embedded + " embedded paragraphs) and "
-                    + "this load leaves its paragraph set and English text as they are"
+                    + "this load leaves its English rows and English text as they are"
                     + (migrate == null ? "" : "; --migrate has nothing to permit"));
             return;
         }

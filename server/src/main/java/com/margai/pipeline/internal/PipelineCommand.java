@@ -9,7 +9,8 @@ import picocli.CommandLine.Spec;
  * The command tree of TECH_PLAN §6.3: D13's {@code taxonomy load}, {@code taxonomy
  * prerequisites}, {@code backbone load}, {@code cutoffs load}, D14's {@code ncert register},
  * {@code ncert render}, {@code ncert extract}, {@code ncert load}, D15's {@code ncert verify}
- * and {@code ncert embed}, and D16's {@code ncert align} and {@code ncert errata}. The group commands
+ * and {@code ncert embed}, D16's {@code ncert align} and {@code ncert errata}, and D17's
+ * {@code ncert retrieve}. The group commands
  * only route; calling a group without a subcommand is a usage error.
  */
 @Command(name = PipelineRunner.COMMAND_NAME, mixinStandardHelpOptions = true,

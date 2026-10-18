@@ -11,8 +11,9 @@ import org.junit.jupiter.api.Test;
 
 /**
  * The freeze guard's question (DECISIONS 2026-09-13, built at D17): does this load leave the frozen
- * corpus as it is — the paragraph set, and the English text the vectors describe? Every row it would
- * move is named. Hindi text is not frozen while nothing embeds it (DECISIONS 2026-10-18, Q2).
+ * corpus as it is — the English rows and the English text the vectors describe? Every row it would
+ * move is named. Hindi is not frozen while nothing embeds it, so a Hindi load is never refused
+ * (Claude's reading of the founder's Q2, DECISIONS 2026-10-18).
  */
 class FrozenCorpusTest {
 
@@ -66,20 +67,43 @@ class FrozenCorpusTest {
                 .isEmpty();
     }
 
-    /** A Hindi paragraph at an address the English does not have is a new row in the set. */
+    /**
+     * A first Hindi load as written puts Hindi rows at addresses the English lacks — phy11-part1's put 23
+     * there (D16) — and nothing embeds them, so it is not a change to the frozen English set.
+     */
     @Test
-    void aHindiLoadThatAddsARowChangesTheSet() {
+    void aHindiLoadThatAddsAHindiOnlyRowGoesThrough() {
         assertThat(FrozenCorpus.changes(BookLanguage.hi, CURRENT, List.of(load(7, "7.9", 1, "कक्षा की ऊर्जा।"),
                 load(7, "7.9", 2, "पलायन चाल।"), load(7, "7.9", 3, "तीसरा।"))))
-                .containsExactly("ch 7 §7.9 ¶3 — a new row");
+                .isEmpty();
     }
 
+    /** …and the corrections block that numbers it to the English deletes the Hindi-only row again. */
     @Test
-    void aHindiLoadThatWouldDeleteAHindiOnlyRowChangesTheSet() {
+    void aHindiLoadThatDeletesAHindiOnlyRowGoesThrough() {
         List<AlignmentRow> current = List.of(CURRENT.get(0), row(7, "7.9", 2, null, "केवल हिंदी।"));
 
         assertThat(FrozenCorpus.changes(BookLanguage.hi, current, List.of(load(7, "7.9", 1, "कक्षा की ऊर्जा।"))))
-                .containsExactly("ch 7 §7.9 ¶2 — deleted (no edition carries it)");
+                .isEmpty();
+    }
+
+    /** An English load that writes English onto a Hindi-only row adds a row to the English set. */
+    @Test
+    void anEnglishLoadThatWritesEnglishOntoAHindiOnlyRowIsNamed() {
+        List<AlignmentRow> current = List.of(CURRENT.get(0), row(7, "7.9", 2, null, "केवल हिंदी।"));
+
+        assertThat(FrozenCorpus.changes(BookLanguage.en, current,
+                List.of(load(7, "7.9", 1, "Energy of an orbit."), load(7, "7.9", 2, "Now in English."))))
+                .containsExactly("ch 7 §7.9 ¶2 — English written onto a Hindi-only row");
+    }
+
+    /** The importer deletes only within chapters the load carries, so a chapter with no loaded row loses nothing. */
+    @Test
+    void aStoredChapterTheLoadCarriesNoRowOfIsNotNamed() {
+        List<AlignmentRow> current = List.of(CURRENT.get(0), row(8, "8.1", 1, "Another chapter.", null));
+
+        assertThat(FrozenCorpus.changes(BookLanguage.en, current, List.of(load(7, "7.9", 1, "Energy of an orbit."))))
+                .isEmpty();
     }
 
     private static AlignmentRow row(int chapter, String section, int para, String english, String hindi) {

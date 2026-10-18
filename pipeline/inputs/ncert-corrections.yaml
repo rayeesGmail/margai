@@ -3229,6 +3229,10 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
   # character entries; a `move` is checked where it stands and carried out on the numbered rows. Simulated with
   # `ncert load --dry-run` on the extraction (sha256 51ab7180…): no refusal, 95 of 95 sections one to one.
   # Approved by the founder 2026-10-12, as written (on pipeline/reports/2026-10-12-ncert-load-dry-run.md).
+  # The counts above are the block as approved then. On 2026-10-18 (9529a1c, DECISIONS 2026-10-18) chapter 10 gained
+  # four entries under a dated comment of their own, two split and two drop that take the activity headings 10.2 and
+  # 10.3 out of their rows, and three were rewritten: the move's anchor, the Activity 10.4 box typed without its
+  # title, and its split.
   # phy11-part2 Hindi, chapter 8
   - {book: phy11-part2, lang: hi, chapter: 8, page: 8, kind: section, address: "ch 8 §8.5.5 ¶1",
      at: "जब किसी तार पर तनन प्रतिबल", section: "8.5.5", reason: "the Hindi prints 8.5.6 after 8.5.4; the English numbers the section 8.5.5"}
@@ -6616,3 +6620,18 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      transcribed: "S- G+ S' -> S + S' G", printed: "S- G+ S¹ → S + S¹ G", reason: "the flag is at round two's meaning place (ch 9 §9.8.5 ¶3; crop p14 x42-402 y400-560 at zoom 3): the verifier quotes the print's S¹ twice, a raised 1 that reads as an exponent, against the row's S', written by the founder's answer R2-1 (2026-10-17) under the meaning ruling of 2026-10-10; the book's own error, which the row does not keep; the arrow is the prompt's notation"}
   - {book: bio11, lang: hi, chapter: 9, page: 14, kind: false_positive, address: "ch 9 §9.8.5 ¶5",
      transcribed: "X-C—C-Y -> X-Y+ C=C", printed: "X—C—C-Y → X-Y+ C=C", reason: "the page draws the lyase's X and Y above the two carbons on vertical bonds, then C—C → X-Y+ C=C (crop p14 x60-260 y655-708 at zoom 6), which the row writes on one line as X-C—C-Y, the vertical bonds as hyphens; the verifier's em dash for the X bond is no more on the page than the row's hyphen, and the arrow is the prompt's notation: notation only, as round two ruled ch 9 p10's enzyme name over its arrow"}
+  # phy11-part2 Hindi, round six (D16, 2026-10-18). The closing run of the activity-label block (9529a1c, DECISIONS
+  # 2026-10-18) — the reload (pipeline/reports/2026-10-18-ncert-load.md: corrections e9a2c4c8…, 0/3/679), align
+  # (₹7.15), fresh one-page reads of ch 10 p10 and p19, the two pages whose rows changed (verify and verify-2, ₹4.20),
+  # and the whole book judged from the stored reads (verify-3) — counts 680 of 682 clean: the 15 passages no row
+  # carries are the 15 of the book's last close (2026-10-14-ncert-verify-23.md), and the two flags are at round one's
+  # and round two's meaning places, each read on a crop of the page image. The fresh reads quote both places
+  # differently from the misprint rulings that cover them (round two's on p10, round three's on p19), and a misprint
+  # matches the verifier's two spans exactly, so each new quote takes an entry of its own. The rulings change no row.
+  # Simulated with `ncert load --dry-run` on the extraction (sha256 51ab7180…): no refusal, 95 of 95 sections one to
+  # one, no row changed, 61 rulings on flags.
+  # phy11-part2 Hindi, round six, chapter 10
+  - {book: phy11-part2, lang: hi, chapter: 10, page: 10, kind: misprint, address: "ch 10 §10.8 ¶6",
+     transcribed: "द्रव से वाष्प में अवस्था परिवर्तन की अवधि", printed: "ठोस से वाष्प", reason: "the page prints अर्थात्, ठोस से वाष्प में अवस्था परिवर्तन की अवधि (crop p10 x80-315 y578-640 at zoom 3), solid to vapour, where the paragraph is about liquid to vapour: the book's error, which the row does not keep — round one's text entry, under the founder's ruling of 2026-10-10, writes द्रव; the verifier quotes more of the row than of the page, but the page prints में अवस्था परिवर्तन की अवधि right after वाष्प, as the row does, so the one difference is the misprint; round two's misprint ruling on the same place quoted the row's द्रव से वाष्प alone"}
+  - {book: phy11-part2, lang: hi, chapter: 10, page: 19, kind: misprint, address: "ch 10 §10.9.4 ¶8",
+     transcribed: "त्वचा का ताप 28°C है।", printed: "त्वचा का ताप 20°C है।", reason: "the page prints त्वचा का ताप 20°C है। (crop p19 x42-280 y580-706 at zoom 3), where the paragraph's own rate of heat loss takes the skin at (301)^4, 28 °C: the book's error, which the row does not keep — round two's text entry, under the founder's ruling of 2026-10-10, writes 28°C; round three's misprint ruling on the same place quoted it without the danda"}

@@ -1006,7 +1006,7 @@ Column **Day** is the PLAN day the endpoint ships. **Auth** is `user` unless not
 | Method, path | Day | Request → response | Notes |
 |---|---|---|---|
 | `GET /curriculum/syllabus` | D13 | → tree `{subjects: [{code, name, chapters: [{code, name, topics}]}]}` | the read side of PLAN D13 ✅ "taxonomy queryable"; ETag; cached by the app |
-| `GET /curriculum/ncert/{paragraph_id}` | D40 | → `{display, text (user language), book, chapter, section, neighbours: [addresses]}` | one paragraph at a time (§2.10) |
+| `GET /curriculum/ncert/{paragraph_id}` | D40 | → `{display, text (user language), book, chapter, section, neighbours: [addresses]}` | one paragraph at a time (§2.10). *Amended 2026-10-18 (founder; DECISIONS 2026-10-18): `text` is in the student's textbook edition, not the app language; where the Hindi is not loaded (the deferred books) the English paragraph, with no note; where the Hindi edition does not print the paragraph the English one, with the line "This paragraph is only in the English edition" in the student's language for Hindi-edition readers; a per-book "Hindi loaded" marker tells the two apart.* |
 
 **Ops (`ops`)** — `role = admin`
 
@@ -1891,6 +1891,10 @@ pages, and the Hindi-only `move` and `unprinted` (D16) renumber whole rows once 
 rely on the model's cross-lingual space plus the `tsv` match on `text_hi` in the hybrid retriever.
 The D17 acceptance (15 hand-written concept queries, at least 5 in Hindi) decides whether a second
 pass embedding `text_hi` into a separate column is needed; that would be a D18 buffer item.
+*Amended 2026-10-18 (founder; DECISIONS 2026-10-18):* the cross-lingual measure so far is thin — five
+Hindi queries, all Physics from phy11-part1 (MRR 0.500 against 0.639 for English on the ten-book
+corpus); at D17 at least one of the ≥5 Hindi queries is in each subject, Chemistry included, whose
+Hindi editions load in the beta period, and at D23 the eval suite carries Hindi questions in every subject.
 
 ### 6.5 Stats and exam intelligence (D22)
 

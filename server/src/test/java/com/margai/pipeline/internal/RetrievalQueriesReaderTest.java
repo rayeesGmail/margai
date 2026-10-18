@@ -43,6 +43,30 @@ class RetrievalQueriesReaderTest {
         assertThat(baseline.stream().filter(RetrievalQuery::isHindi)).hasSize(5);
     }
 
+    /**
+     * D17's acceptance set has the shape its bar is written for (DECISIONS 2026-10-18): fifteen, five
+     * a subject, each subject two English, two Hindi and one Hinglish; at least five in the founder's
+     * student phrasing; and none on phy11-part1, the book the D15 baseline tuned retrieval on.
+     */
+    @Test
+    void theAcceptanceSetHasTheShapeItsBarIsWrittenFor() {
+        List<RetrievalQuery> acceptance = RetrievalQueriesReader.read(COMMITTED).stream()
+                .filter(query -> query.set() == RetrievalQuery.QuerySet.acceptance).toList();
+
+        assertThat(acceptance).hasSize(RetrievalRun.ACCEPTANCE_SIZE);
+        for (BookSubject subject : BookSubject.values()) {
+            List<RetrievalQuery> ofSubject = acceptance.stream().filter(query -> query.subject() == subject).toList();
+            assertThat(ofSubject).as(subject.name()).hasSize(RetrievalRun.PER_SUBJECT);
+            assertThat(ofSubject).as(subject + ": two English, two Hindi, one Hinglish")
+                    .extracting(RetrievalQuery::language)
+                    .containsExactlyInAnyOrder("en", "en", "hi", "hi", "hinglish");
+        }
+        assertThat(acceptance).filteredOn(query -> query.note().startsWith("Written by the founder"))
+                .as("the founder's student phrasing").hasSizeGreaterThanOrEqualTo(5);
+        assertThat(acceptance).allSatisfy(query -> assertThat(query.expect())
+                .noneMatch(address -> address.book().equals("phy11-part1")));
+    }
+
     @Test
     void everyQueryRecordsHowItWasWritten() {
         assertThat(RetrievalQueriesReader.read(COMMITTED)).allSatisfy(query -> {

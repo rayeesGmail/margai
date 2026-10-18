@@ -153,6 +153,223 @@
       "text": "पृथ्वी की सतह से नीचे जाने पर गुरुत्वीय त्वरण का मान कैसे बदलता है",
       "expect": [{ "book": "phy11-part1", "chapter":7, "section": "7.6", "para": 11 }],
       "note": "Hindi → English paragraph. g decreases below the surface as well as above it."
+    },
+    {
+      "id": "a01-photoelectric-stopping-potential",
+      "set": "acceptance",
+      "subject": "physics",
+      "language": "hinglish",
+      "text": "sir photoelectric effect me stopping potential frequency badhane se kyu badhta hai, intensity badhane se kyu nahi badhta",
+      "expect": [
+        { "book": "phy12-part2", "chapter": 11, "section": "11.6", "para": 2 },
+        { "book": "phy12-part2", "chapter": 11, "section": "11.6", "para": 4 },
+        { "book": "phy12-part2", "chapter": 11, "section": "11.6", "para": 8 }
+      ],
+      "note": "Written by the founder in student phrasing and used as written (DECISIONS 2026-10-18). The question is why, so the key is Einstein's explanation in §11.6, read from the rows: ¶2 (intensity is the number of photons, not their energy), ¶4 (K_max linear in frequency, independent of intensity), ¶8 (eV_0 = h nu – phi_0). §11.4.3 states the observations without the reason and is left out."
+    },
+    {
+      "id": "a02-apparent-depth-hi",
+      "set": "acceptance",
+      "subject": "physics",
+      "language": "hi",
+      "text": "पानी से भरी बाल्टी की तली ऊपर उठी हुई क्यों दिखती है असली गहराई से कम",
+      "expect": [{ "book": "phy12-part2", "chapter": 9, "section": "9.3", "para": 8 }],
+      "note": "Written by the founder in student phrasing and used as written. The book's example is a tank, not a bucket: §9.3 ¶8 says the bottom of a tank filled with water appears raised and gives apparent depth as real depth over the refractive index."
+    },
+    {
+      "id": "a03-comb-attracts-paper",
+      "set": "acceptance",
+      "subject": "physics",
+      "language": "en",
+      "text": "why does a plastic comb pull small pieces of paper after I run it through my dry hair",
+      "expect": [
+        { "book": "phy12-part1", "chapter": 1, "section": "1.11", "para": 9 },
+        { "book": "phy12-part1", "chapter": 2, "section": "2.9", "para": 17 }
+      ],
+      "note": "Claude's draft. Two places answer it: §1.11 ¶9 (the charged comb polarises the uncharged paper, and the field is non-uniform) and Example 2.7's solution, §2.9 ¶17."
+    },
+    {
+      "id": "a04-optical-fibre",
+      "set": "acceptance",
+      "subject": "physics",
+      "language": "en",
+      "text": "how does light stay inside an optical fibre all the way to the other end",
+      "expect": [
+        { "book": "phy12-part2", "chapter": 9, "section": "9.4.1", "para": 2 },
+        { "book": "phy12-part2", "chapter": 9, "section": "9.4.1", "para": 3 }
+      ],
+      "note": "Claude's draft, avoiding the book's term 'total internal reflection'. §9.4.1 ¶2 (the core's refractive index higher than the cladding's) and ¶3 (repeated total internal reflections along the fibre)."
+    },
+    {
+      "id": "a05-thermal-expansion-lid-hi",
+      "set": "acceptance",
+      "subject": "physics",
+      "language": "hi",
+      "text": "गरम पानी में रखने पर धातु का कसा हुआ ढक्कन आसानी से क्यों खुल जाता है?",
+      "expect": [
+        { "book": "phy11-part2", "chapter": 10, "section": "10.5", "para": 1 },
+        { "book": "phy11-part2", "chapter": 10, "section": "10.5", "para": 2 }
+      ],
+      "note": "Claude's draft; the book's own opening example. §10.5 ¶1 (a tight metal lid put in hot water expands and loosens) and ¶2 (thermal expansion defined)."
+    },
+    {
+      "id": "a06-sn1-racemisation",
+      "set": "acceptance",
+      "subject": "chemistry",
+      "language": "hinglish",
+      "text": "SN1 reaction me racemisation kyu hota hai matlab product dono forms me kaise aata hai",
+      "expect": [{ "book": "chem12-part2", "chapter": 6, "section": "6.7.1", "para": 49 }],
+      "note": "Written by the founder in student phrasing and used as written. §6.7.1 ¶49: the carbocation of the slow step is planar, the nucleophile attacks from either side, giving both configurations. ¶45 only defines racemisation and is left out."
+    },
+    {
+      "id": "a07-catalyst-equilibrium",
+      "set": "acceptance",
+      "subject": "chemistry",
+      "language": "en",
+      "text": "if catalyst makes the reaction faster then why doesnt the equilibrium shift or K change",
+      "expect": [
+        { "book": "chem11-part1", "chapter": 6, "section": "6.8.5", "para": 1 },
+        { "book": "chem12-part1", "chapter": 3, "section": "3.4.1", "para": 5 }
+      ],
+      "note": "Written by the founder in student phrasing and used as written. Two books answer it: chem11-part1 §6.8.5 ¶1 (forward and reverse barriers lowered by the same amount; not in the K expression) and chem12-part1 §3.4.1 ¶5 (K unchanged, equilibrium reached sooner)."
+    },
+    {
+      "id": "a08-boiling-point-elevation",
+      "set": "acceptance",
+      "subject": "chemistry",
+      "language": "en",
+      "text": "why does water boil at a higher temperature when sugar is dissolved in it",
+      "expect": [
+        { "book": "chem12-part1", "chapter": 1, "section": "1.6.2", "para": 1 },
+        { "book": "chem12-part1", "chapter": 1, "section": "1.6.2", "para": 2 }
+      ],
+      "note": "Claude's draft. §1.6.2 ¶1 (the solution's vapour pressure must be raised to 1.013 bar, so it boils above 373.15 K; the book's example is sucrose) and ¶2 (elevation of boiling point defined)."
+    },
+    {
+      "id": "a09-aufbau-order-hi",
+      "set": "acceptance",
+      "subject": "chemistry",
+      "language": "hi",
+      "text": "परमाणु के कक्षकों में इलेक्ट्रॉन किस क्रम में भरे जाते हैं?",
+      "expect": [
+        { "book": "chem11-part1", "chapter": 2, "section": "2.6.4", "para": 2 },
+        { "book": "chem11-part1", "chapter": 2, "section": "2.6.4", "para": 3 }
+      ],
+      "note": "Claude's draft. No Chemistry book has Hindi rows yet (the four move to the beta period), so this reaches English paragraphs through the cross-lingual vector alone. §2.6.4 ¶2 (aufbau: increasing energy) and ¶3 (the order 1s, 2s, 2p …)."
+    },
+    {
+      "id": "a10-ionisation-enthalpy-trend-hi",
+      "set": "acceptance",
+      "subject": "chemistry",
+      "language": "hi",
+      "text": "आवर्त में बाएँ से दाएँ जाने पर आयनन एन्थैल्पी क्यों बढ़ती है?",
+      "expect": [{ "book": "chem11-part1", "chapter": 3, "section": "3.7.1", "para": 15 }],
+      "note": "Claude's draft; cross-lingual vector alone, as a09. §3.7.1 ¶15: across a period the nuclear charge outweighs the shielding."
+    },
+    {
+      "id": "a11-double-fertilisation",
+      "set": "acceptance",
+      "subject": "biology",
+      "language": "hinglish",
+      "text": "bhai double fertilisation me ek sperm egg se milta hai to dusra kisse fuse hota hai aur triple fusion ka matlab kya hai",
+      "expect": [{ "book": "bio12", "chapter": 1, "section": "1.3", "para": 1 }],
+      "note": "Written by the founder in student phrasing and used as written. §1.3 ¶1: the second male gamete fuses with the two polar nuclei; three haploid nuclei, hence triple fusion; syngamy plus triple fusion is double fertilisation."
+    },
+    {
+      "id": "a12-rh-incompatibility",
+      "set": "acceptance",
+      "subject": "biology",
+      "language": "en",
+      "text": "why does the second baby get affected when mother is rh negative and father positive but first baby is fine",
+      "expect": [{ "book": "bio11", "chapter": 15, "section": "15.1.3.2", "para": 1 }],
+      "note": "Written by the founder in student phrasing and used as written. bio11 §15.1.3.2 ¶1 carries the whole answer: no exposure in the first pregnancy, exposure at delivery, antibodies in later pregnancies, erythroblastosis foetalis."
+    },
+    {
+      "id": "a13-dna-fingerprinting",
+      "set": "acceptance",
+      "subject": "biology",
+      "language": "en",
+      "text": "how can a drop of blood be used to identify a person or find out who the father is",
+      "expect": [
+        { "book": "bio12", "chapter": 5, "section": "5.10", "para": 2 },
+        { "book": "bio12", "chapter": 5, "section": "5.10", "para": 5 }
+      ],
+      "note": "Claude's draft, without the term 'DNA fingerprinting'. §5.10 ¶2 (DNA from blood or any tissue identifies a person in forensic use; inherited polymorphisms make it the basis of paternity testing) and ¶5 (a single cell is enough; the forensic application)."
+    },
+    {
+      "id": "a14-light-reactions-site-hi",
+      "set": "acceptance",
+      "subject": "biology",
+      "language": "hi",
+      "text": "क्लोरोप्लास्ट में प्रकाश अभिक्रियाएँ कहाँ होती हैं और शर्करा कहाँ बनती है?",
+      "expect": [{ "book": "bio11", "chapter": 11, "section": "11.3", "para": 3 }],
+      "note": "Claude's draft. §11.3 ¶3: the membrane system traps light and makes ATP and NADPH (light reactions); the stroma's enzymatic reactions make sugar."
+    },
+    {
+      "id": "a15-vaccination-hi",
+      "set": "acceptance",
+      "subject": "biology",
+      "language": "hi",
+      "text": "टीका लगवाने से शरीर बीमारी से कैसे बचता है?",
+      "expect": [{ "book": "bio12", "chapter": 7, "section": "7.2.4", "para": 1 }],
+      "note": "Claude's draft. §7.2.4 ¶1: vaccination rests on the immune system's memory; memory B and T cells recognise the pathogen on later exposure."
+    },
+    {
+      "id": "d01-cannizzaro",
+      "set": "diagnostic",
+      "subject": "chemistry",
+      "language": "en",
+      "text": "what do you get when benzaldehyde is heated with concentrated sodium hydroxide",
+      "expect": [{ "book": "chem12-part2", "chapter": 8, "section": "8.4", "para": 35 }],
+      "note": "Reaction-pass evidence (DECISIONS 2026-09-29; founder Q3 2026-10-18): an organic reaction the book explains in prose. §8.4 ¶35, Cannizzaro."
+    },
+    {
+      "id": "d02-aldol",
+      "set": "diagnostic",
+      "subject": "chemistry",
+      "language": "en",
+      "text": "what is formed when ethanal is treated with dilute alkali",
+      "expect": [
+        { "book": "chem12-part2", "chapter": 8, "section": "8.4", "para": 31 },
+        { "book": "chem12-part2", "chapter": 8, "section": "8.4", "para": 32 }
+      ],
+      "note": "Reaction-pass evidence. §8.4 ¶31 (aldol reaction) and ¶32 (aldol condensation products)."
+    },
+    {
+      "id": "d03-etard",
+      "set": "diagnostic",
+      "subject": "chemistry",
+      "language": "en",
+      "text": "how can toluene be turned into benzaldehyde with chromyl chloride",
+      "expect": [{ "book": "chem12-part2", "chapter": 8, "section": "8.2.2", "para": 7 }],
+      "note": "Reaction-pass evidence. §8.2.2 ¶7, the Etard reaction."
+    },
+    {
+      "id": "d04-reimer-tiemann",
+      "set": "diagnostic",
+      "subject": "chemistry",
+      "language": "en",
+      "text": "what product forms when phenol is treated with chloroform and sodium hydroxide",
+      "expect": [{ "book": "chem12-part2", "chapter": 7, "section": "7.4.4", "para": 56 }],
+      "note": "Reaction-pass evidence. §7.4.4 ¶56, the Reimer-Tiemann reaction."
+    },
+    {
+      "id": "d05-gabriel",
+      "set": "diagnostic",
+      "subject": "chemistry",
+      "language": "en",
+      "text": "how is a primary amine made from phthalimide",
+      "expect": [{ "book": "chem12-part2", "chapter": 9, "section": "9.4", "para": 11 }],
+      "note": "Reaction-pass evidence. §9.4 ¶11, Gabriel phthalimide synthesis."
+    },
+    {
+      "id": "d06-rosenmund",
+      "set": "diagnostic",
+      "subject": "chemistry",
+      "language": "hinglish",
+      "text": "acid chloride ko aldehyde mein kaise badalte hain",
+      "expect": [{ "book": "chem12-part2", "chapter": 8, "section": "8.2.2", "para": 1 }],
+      "note": "Reaction-pass evidence. §8.2.2 ¶1, Rosenmund reduction."
     }
   ]
 }

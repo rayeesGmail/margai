@@ -1437,6 +1437,11 @@ a re-learn block candidate.
   (TRACKER, 2026-09-12), and the price key is its precondition: adding image embedding means giving
   the price table a second key per model first, which is a change to its shape rather than a config
   edit.
+  *Amended 2026-10-18 (founder, D17 plan approval; DECISIONS 2026-10-18):* the 2026-09-12 rider's
+  "the swap happens before the D16 corpus embedding, while it is still free" has lapsed — the whole
+  corpus was embedded on the v4 line at D15 (all ten books, 7,658 English rows), so a change of
+  provider, model or width now means re-embedding the full corpus and rebuilding its index, never a
+  config flip.
 - Indexes: HNSW cosine on `ncert_paragraphs.embedding`, `questions.embedding`,
   `doubt_cache.embedding` (`m = 16, ef_construction = 64`); GIN on `ncert_paragraphs.tsv`.
 - `HybridRetriever` is the one retrieval component (§4.3 stage 6) and is also used by the pipeline

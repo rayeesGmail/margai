@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -241,15 +242,18 @@ class PipelineCommandTest {
                 if (cls == NcertRegisterCommand.class) {
                     return cls.cast(new NcertRegisterCommand(imports, writer));
                 }
+                if (cls == NcertErrataCommand.class) {
+                    return cls.cast(new NcertErrataCommand(imports, writer));
+                }
                 if (cls == NcertRenderCommand.class) {
                     return cls.cast(new NcertRenderCommand(new NcertRenderCommandTest.RecordingStore(), imports,
-                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40), writer));
                 }
                 if (cls == NcertExtractCommand.class) {
                     return cls.cast(new NcertExtractCommand(new NcertRenderCommandTest.RecordingStore(),
                             new NcertExtractCommandTest.RecordingExtract(), new NcertExtractCommandTest.StubSpend(),
                             new AiClientInfo("anthropic", List.of("ledger")),
-                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40), writer));
                 }
                 if (cls == NcertLoadCommand.class) {
                     return cls.cast(new NcertLoadCommand(new NcertRenderCommandTest.RecordingStore(),
@@ -260,13 +264,19 @@ class PipelineCommandTest {
                             new NcertVerifyCommandTest.StubVerifier(), ids -> Map.of(),
                             new NcertExtractCommandTest.StubSpend(),
                             new com.margai.ai.api.AiClientInfo("anthropic", List.of("ledger")),
-                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40), writer));
                 }
                 if (cls == NcertEmbedCommand.class) {
                     return cls.cast(new NcertEmbedCommand(imports, new NcertEmbedCommandTest.StubEmbeddings(),
                             NcertEmbedCommandTest.noRetriever(), new NcertExtractCommandTest.StubSpend(),
                             new com.margai.ai.api.AiClientInfo("cohere", List.of("ledger")),
-                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40), writer));
+                }
+                if (cls == NcertAlignCommand.class) {
+                    return cls.cast(new NcertAlignCommand(imports, new NcertEmbedCommandTest.StubEmbeddings(),
+                            new NcertExtractCommandTest.StubSpend(),
+                            new com.margai.ai.api.AiClientInfo("cohere", List.of("ledger")),
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40), writer));
                 }
                 return CommandLine.defaultFactory().create(cls);
             }
@@ -331,12 +341,42 @@ class PipelineCommandTest {
 
         @Override
         public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
-            return new NcertLoadReport(rows.size(), 0, 0, Map.of(), List.of(), 0, 0);
+            return new NcertLoadReport(rows.size(), 0, 0, Map.of(), List.of(), 0, 0, List.of());
+        }
+
+        @Override
+        public NcertLoadReport previewParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
+            return new NcertLoadReport(rows.size(), 0, 0, Map.of(), List.of(), 0, 0, List.of());
         }
 
         @Override
         public Integer renderedPages(String bookCode, BookLanguage language) {
             return renderedPagesAnswer;
+        }
+
+        @Override
+        public long embeddedParagraphs(String bookCode) {
+            return 0;
+        }
+
+        /**
+         * What {@link #alignmentRows} answers — a book's own rows when {@code alignmentByBook} names it; and the
+         * similarity {@link #similarityToEnglish} gives every pair.
+         */
+        List<com.margai.curriculum.api.AlignmentRow> alignmentAnswer = List.of();
+        Map<String, List<com.margai.curriculum.api.AlignmentRow>> alignmentByBook = Map.of();
+        java.util.function.BiFunction<float[], UUID, Double> similarity = (vector, id) -> 0.5;
+
+        @Override
+        public List<com.margai.curriculum.api.AlignmentRow> alignmentRows(String bookCode, Collection<Short> chapters) {
+            return alignmentByBook.getOrDefault(bookCode, alignmentAnswer);
+        }
+
+        @Override
+        public Map<UUID, Double> similarityToEnglish(String bookCode, float[] vector, Collection<UUID> paragraphIds) {
+            Map<UUID, Double> answer = new java.util.HashMap<>();
+            paragraphIds.forEach(id -> answer.put(id, similarity.apply(vector, id)));
+            return answer;
         }
 
         /** What {@link #paragraphsToEmbed} answers: the rows `ncert embed` still has to read. */

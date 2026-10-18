@@ -120,12 +120,18 @@ tools; your reviews focus on output quality.)*
   and on that first book, a query → top-passages run, including a Hindi query that reaches
   an English paragraph.*
 - **D16 —** Hindi ingest + EN↔HI paragraph alignment. ✅ *20 aligned pairs spot-checked.*
+  *Amended 2026-10-18 (founder; DECISIONS 2026-10-18): bio12 is D16's last Hindi book, in a 24-hour
+  timebox; the Hindi editions of the four Chemistry books move to the beta period (§4); D16 ticks when
+  bio12 closes.*
 - **D17 —** Embeddings + hybrid retrieval over the whole corpus, on the pin settled at D15
   (amended 2026-09-19); the test harness widened to it. ✅ *15 hand-written concept queries
-  return the right paragraphs.*
+  return the right paragraphs.* *Amended 2026-10-18 (founder; DECISIONS 2026-10-18): at least one
+  of the ≥5 Hindi queries (TECH_PLAN §6.4) is in each subject, Chemistry included.*
 - **D18 —** Buffer for extraction mess (there will be some). **Week-3 gate:** NCERT
   layer searchable in both languages. *Added 2026-10-01 (CS-2 §4.11): Bedrock configured as a
   completion fallback behind a flag — config only; embeddings stay on Bedrock as their primary.*
+  *Amended 2026-10-18 (founder; DECISIONS 2026-10-18): the gate reads “searchable in both languages
+  for the six books with Hindi text; for Chemistry, Hindi queries reach the English rows”.*
 - **D19 —** PYQ ingest: papers loaded, question records created, tagging pass.
   ✅ *Counts per year/subject match official papers.*
 - **D20 —** AI solution generation (batch) for one subject; verification pass wired.
@@ -139,7 +145,8 @@ tools; your reviews focus on output quality.)*
   (CS-4 §3; at risk): the `concept_primers` migration and `primers generate` begin for the top-50
   weightage chapters (TECH_PLAN §15.7), staged on one chapter first.*
 - **D23 —** Anchor-linking questions↔NCERT; seed the eval suite v1 (~60 questions
-  across subjects). ✅ *Eval harness runs and reports.*
+  across subjects). ✅ *Eval harness runs and reports.* *Amended 2026-10-18 (founder; DECISIONS
+  2026-10-18): the eval suite carries Hindi questions in every subject.*
 - **D24 —** Buffer + **Week-4 gate:** solved, tagged, anchored PYQ bank + eval suite
   running in CI. In the buffer (CS-1 §4, §7, §9.3; added 2026-09-12): `collective from-pyq`
   misconception drafts from the distractor maps; `collective from-inputs` over the F11
@@ -227,7 +234,14 @@ tools; your reviews focus on output quality.)*
   wrong-answer test proves unverified numericals never render.*
 - **D40 —** Answer contract UI: steps, anchor chip (opens NCERT reference view),
   NTA-trap note (only when PYQ-backed), follow-up chips, report flag. ✅ *Pixel/copy
-  review against spec wireframe.*
+  review against spec wireframe.* *Amended 2026-10-18 (founder; DECISIONS 2026-10-18): the
+  reference view shows the paragraph in the student's textbook edition; the English paragraph where
+  the Hindi is not loaded (no note) or not printed (one line, “This paragraph is only in the English
+  edition”, in the student's language, to Hindi-edition readers); a per-book “Hindi loaded” marker.*
+  *Build note 2026-10-18 (founder; DECISIONS 2026-10-17, the correction rule as revised 2026-10-18): the
+  anchor view never presents corrected text as the book's own words; it either shows the printed text
+  with an errata note, or marks the corrected span as corrected. The same principle holds for the Phase 2
+  errata feature.*
 - **D41 —** Cache write path (verified only) + semantic near-match; hit metrics.
   ✅ *Same question twice = instant second answer; near-duplicate hits logged.*
 - **D42 —** Buffer + mid-module audit: you review 30 real answers across subjects.
@@ -437,6 +451,10 @@ crash-free ≥ 99.5% · cache ≥ 55% · at least 15 organic-feeling payments.
 opting into a founding plan to start at launch**, read at F13's pricing-evidence review, and
 “OTP ≥ 98%” reads **sign-in success ≥ 98% first attempt**. The beta backlog is SPEC §12.1, in its
 order, each behind a flag with its metric live, and only after the D60 gate passed.
+*Amended 2026-10-18 (founder; DECISIONS 2026-10-18):* the Hindi editions of the four Chemistry books,
+deferred from D16, come first in the beta period's build hours, ahead of the §12.1 backlog and
+without waiting on the D60 gate condition, each after its decoder-check trigger ruling; and the exit
+criteria to public launch add **all Hindi books loaded and closed**.
 
 ---
 

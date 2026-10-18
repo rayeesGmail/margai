@@ -126,10 +126,15 @@ final class Report {
 
     static String sha256(Path file) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            return HexFormat.of().formatHex(digest.digest(Files.readAllBytes(file)));
+            return sha256(Files.readAllBytes(file));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        }
+    }
+
+    static String sha256(byte[] bytes) {
+        try {
+            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("SHA-256 is part of every Java runtime", e);
         }

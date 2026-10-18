@@ -2,6 +2,7 @@ package com.margai.curriculum.api;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -69,6 +70,34 @@ public interface CurriculumImport {
      * one address twice in the same extraction.
      */
     NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows);
+
+    /**
+     * {@code ncert load --dry-run} (D16): exactly what {@link #loadParagraphs} would write and report — its
+     * statements run and checked by the database — inside a transaction of its own, whatever the caller
+     * holds, which is then rolled back, so nothing is written. Refused as the load is, and by any constraint
+     * the database would refuse the load on.
+     */
+    NcertLoadReport previewParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows);
+
+    /**
+     * {@code ncert align} (D16): every row of the given chapters that carries either edition, with both texts
+     * and each edition's pages, in reading order. Refused when the book is not registered.
+     */
+    List<AlignmentRow> alignmentRows(String bookCode, Collection<Short> chapters);
+
+    /**
+     * {@code ncert align} (D16): the cosine similarity of one vector — a Hindi paragraph's, embedded on the pin
+     * — to the stored English vector of each of these rows, computed in the database; a row with no vector is
+     * absent. Nothing is written.
+     */
+    Map<UUID, Double> similarityToEnglish(String bookCode, float[] vector, Collection<UUID> paragraphIds);
+
+    /**
+     * How many of the book's paragraphs carry an embedding — the mark of the canonical corpus, which
+     * {@code ncert load --artefact-tag} reads to refuse loading a trial draw over it (D16). Zero for a
+     * book that is not registered, since a scratch database may hold nothing yet.
+     */
+    long embeddedParagraphs(String bookCode);
 
     /**
      * What {@code ncert verify} checks (D15): the rows of the given chapters that carry this

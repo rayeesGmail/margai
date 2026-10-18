@@ -117,9 +117,13 @@ public class NcertParagraph {
                 && current.verification() != null && Objects.equals(text(language), row.text())) {
             incoming = incoming.withVerification(current.verification());
         }
+        // The English rows are canonical and Hindi follows them (founder, 2026-10-01, D16): the figures a
+        // paragraph names and whether it carries an equation were adjudicated on the English edition, so
+        // a Hindi load writes them only on a row with no English text to follow.
+        boolean ownsTheShared = language == BookLanguage.en || textEn == null;
         boolean changed = !Objects.equals(text(language), row.text())
-                || hasEquations != row.hasEquations()
-                || !Objects.equals(figureRefs, row.figureRefs())
+                || ownsTheShared && hasEquations != row.hasEquations()
+                || ownsTheShared && !Objects.equals(figureRefs, row.figureRefs())
                 || !Objects.equals(current, incoming);
         if (changed) {
             if (language == BookLanguage.en) {
@@ -127,13 +131,31 @@ public class NcertParagraph {
             } else {
                 this.textHi = row.text();
             }
-            this.hasEquations = row.hasEquations();
-            this.figureRefs = row.figureRefs();
+            if (ownsTheShared) {
+                this.hasEquations = row.hasEquations();
+                this.figureRefs = row.figureRefs();
+            }
             Map<BookLanguage, ParagraphExtraction> updated = new EnumMap<>(extraction);
             updated.put(language, incoming);
             this.extraction = updated;
         }
         return changed;
+    }
+
+    /**
+     * {@code ncert load} (D16): this edition's text and provenance removed from a row the load no
+     * longer carries but the other edition still does, so stale words never stand beside a live
+     * translation. The caller drops an English row's vector with it.
+     */
+    public void clear(BookLanguage language) {
+        if (language == BookLanguage.en) {
+            this.textEn = null;
+        } else {
+            this.textHi = null;
+        }
+        Map<BookLanguage, ParagraphExtraction> updated = new EnumMap<>(extraction);
+        updated.remove(language);
+        this.extraction = updated;
     }
 
     /**

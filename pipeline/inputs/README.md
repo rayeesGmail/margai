@@ -13,7 +13,8 @@ dated 2026-09-10 record the spec-silent choices.
 | `archetypes.yaml` | `archetype_tracks`, `archetype_track_steps` | `backbone load` | 4 tracks, 744 steps |
 | `cutoffs.csv` | `cutoffs` | `cutoffs load` | 40 qualifying rows, 2019–2026 |
 | `books.yaml` | `ncert_books` | `ncert register` (D14) | 10 books, 79 chapters, both editions |
-| `ncert-corrections.yaml` | `ncert_paragraphs`, through the extraction | `ncert load` (D15) | the founder's rulings on `ncert verify` flags; seven entries from chapter 7's adjudication (2026-09-15/16) |
+| `ncert-corrections.yaml` | `ncert_paragraphs`, through the extraction | `ncert load` (D15) | the founder's rulings on `ncert verify` flags for the ten English books (D15), and since D16 the `lang: hi` entries that join and split a Hindi book to its English rows |
+| `ncert-errata.yaml` | nothing — checked against `ncert_paragraphs` | `ncert errata` (D16) | the printing errors the books make: each correction a row makes, each wrong cross-reference or garbled phrase it keeps, the English errors kept |
 
 ## ncert-corrections.yaml
 
@@ -29,13 +30,75 @@ committed.
   reader and is never used to apply the entry.
 - **A span must occur exactly once on its page**, or the load refuses by name: not at all means the
   page is not what the entry was written against, twice means the entry does not say which.
-- **`text`, `join`, `split`, `figure_ref` (remove or add one label on the paragraph holding a span) and
-  `drop` (remove a paragraph that is not running text) change the extraction; `misprint` and
-  `false_positive` do not** — they
-  rule on a flag (the book's own error kept; the verifier wrong), and `ncert verify` reads them so a
-  ruled flag is not raised again.
+- **`text`, `join`, `split`, `figure_ref` (remove or add one label on the paragraph holding a span),
+  `drop` (remove a paragraph that is not running text), `defer` (number a paragraph after the next one
+  of its section), `section` (give a Hindi section the English number), `move` (number a whole row
+  right after another, in that row's section) and `unprinted` (leave an English number without Hindi)
+  change the extraction;
+  `misprint`, `false_positive` and `noise` do not** — they
+  rule on a flag (the book's own error kept; the verifier wrong; a free check wrong about a paragraph),
+  and `ncert verify` reads them so a ruled flag is not raised again.
+- **A `lang: hi` entry aligns the Hindi to the English rows** (D16, DECISIONS 2026-10-01: English is
+  canonical): `join` and `split` reshape the Hindi paragraphs until Hindi ¶n of a section is the
+  translation of English ¶n, and `defer` moves a footnote the Hindi prints a page before the paragraph the
+  English numbers first. A `section` entry (Hindi only) names the first paragraph under a heading the Hindi
+  numbers differently and the quoted section the English gives it — phy11-part2 prints "8.5.6" for the
+  English 8.5.5 and adds a 13.8.1 the English does not have — and every paragraph of that section in the
+  chapter moves with it; put it before any join it makes possible. Named at a later paragraph — a section the
+  Hindi prints with no heading of its own, which the transcription left in the section above (bio11's §10.5,
+  2026-10-17) — it moves that paragraph and the section's later ones, and the ones before it keep their number;
+  the load refuses one named at a continuation, or at a footnote below a paragraph the next page continues, which
+  would leave the two halves of one paragraph in two sections. A `move` names a row by its first
+  words (`at`, on `page`) and the row it follows (`after`, on `after_page`): once page breaks are joined the
+  row is taken out and numbered right after that one, earlier or later, in that row's section — for a footnote or a
+  box the Hindi prints pages away from where the English numbers it, or a paragraph of running text it prints at
+  another place in the section (bio11 ch 19, founder, 2026-10-17). An `unprinted` entry (Hindi only) names
+  the row after an English paragraph the Hindi edition does not print — phy12-part1's §3.12 ¶5 — and that row
+  takes the number after it, so the English row keeps its number with no Hindi beside it; the load names each
+  such address and counts it when it holds a section to the English, and `ncert align` sets it aside rather
+  than proposing it again. The number left goes with its row: a `move` of that row leaves it right before the
+  row (with `after`, right after it) wherever it is numbered. Two English paragraphs not printed in a row take two entries on the one row.
+  A section's last English paragraph, which no row follows, takes `after: true` on the row before it: the
+  number after that row is left, and goes with it through a `move` or a `defer` (bio11's §4.2.11.7 ¶3,
+  2026-10-17). On a row another follows the load refuses it: that gap is the next row's to name. `ncert align`
+  reads only the stored rows, which cannot tell that number from a Hindi row short, so it still proposes it;
+  the load's report names it.
+  Write its spans as the rows show them —
+  the Hindi load puts back a visarga written as a colon (`अत:` → `अतः`) before it applies an entry.
+- **A Hindi `text` entry's `printed` span is read off the page image.** The decoded text layer is a check
+  and never a source (SPEC §12.2): a reason may say the layer's line agrees and give its position, and
+  never quotes the layer's text or its glyph codes. The one exception to "as the page prints it" (founder,
+  DECISIONS 2026-10-10): where the Hindi print states something false — ½ set as an en dash, α for ∝, a wrong
+  number, sign, subscript or word — `printed` carries the meaning, from the English row or the arithmetic, and
+  the reason names the crop and what fixes the meaning; a second-read flag on such a place is a `misprint`,
+  which then means the book's error the row does not keep. A flag there that claims some other difference — a
+  span's extent, an ellipsis, a number the page prints — is ruled on what it claims, usually `false_positive`.
+  Spelling, grammar and edition differences stay as printed.
 - Quote every value holding a comma or a colon: in YAML's `{…}` form an unquoted comma starts a new key,
   and the reader refuses the key it does not know.
+
+## ncert-errata.yaml
+
+The printing errors the books make, as their loaded rows stand (D16, DECISIONS 2026-10-17): every correction
+a row makes — a printing error that changes the meaning — every wrong cross-reference or garbled phrase a row
+keeps as printed, an errata candidate, and the English errors, kept because the English rows are frozen.
+Spelling slips kept as printed are not logged. Its header lists the fields; every entry has all of them.
+
+- **Keyed on the row's address**, not on a span of the transcription: it records the book, not the extraction,
+  and nothing reads it to change a row. `ncert errata` reads it against the loaded rows and fails on an entry
+  the rows do not bear out, so run it after every reload.
+- **`printed` quotes no more of the book than the wrong word or phrase** (a missing or an extra word, or a sign
+  or two that reads as nothing alone, takes its neighbouring word on each side where it has one, and a span that
+  recurs in its row more neighbours, within the approved entry's own span, until it names its place — a corrected
+  row must not carry it; DECISIONS 2026-10-17, the working-rules row), read on a page-image crop or
+  carried over from an approved entry whose span was — never taken from the decoded layer; `reason` carries
+  the context, the decoded layer by position only.
+- **`meaning_changing`** is true when a student reading the printed words would learn something false, glyph
+  stand-ins included, and false only for a glyph that reads false only as transcribed (the raised zero for °,
+  S¹ for S′, the F′ class) and for a kept cross-reference or garbled phrase; `flag_reviewed: false` marks
+  Claude's classifications, which the founder reviews before the Phase 2 book errata notes (DECISIONS
+  2026-10-17) are built.
+- Claude adds an entry with the round that brings its correction or ruling, in the same commit.
 
 ## books.yaml
 

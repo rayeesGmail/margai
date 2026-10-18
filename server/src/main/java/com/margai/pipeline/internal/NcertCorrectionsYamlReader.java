@@ -26,16 +26,21 @@ final class NcertCorrectionsYamlReader {
     static final String FILE = "ncert-corrections.yaml";
 
     private static final Set<String> COMMON_KEYS = Set.of("book", "lang", "chapter", "page", "kind", "reason", "address");
-    private static final Map<NcertCorrection.Kind, Set<String>> KIND_KEYS = Map.of(
-            NcertCorrection.Kind.text, Set.of("transcribed", "printed"),
-            NcertCorrection.Kind.join, Set.of("at"),
-            NcertCorrection.Kind.split, Set.of("at"),
-            NcertCorrection.Kind.figure_ref, Set.of("at", "remove", "add"),
-            NcertCorrection.Kind.drop, Set.of("at"),
-            NcertCorrection.Kind.misprint, Set.of("transcribed", "printed"),
-            NcertCorrection.Kind.false_positive, Set.of("transcribed", "printed"),
-            NcertCorrection.Kind.noise, Set.of("at", "flag"));
-    private static final Set<String> KIND_SPECIFIC = Set.of("transcribed", "printed", "at", "remove", "add", "flag");
+    private static final Map<NcertCorrection.Kind, Set<String>> KIND_KEYS = Map.ofEntries(
+            Map.entry(NcertCorrection.Kind.text, Set.of("transcribed", "printed")),
+            Map.entry(NcertCorrection.Kind.join, Set.of("at")),
+            Map.entry(NcertCorrection.Kind.split, Set.of("at")),
+            Map.entry(NcertCorrection.Kind.figure_ref, Set.of("at", "remove", "add")),
+            Map.entry(NcertCorrection.Kind.drop, Set.of("at")),
+            Map.entry(NcertCorrection.Kind.defer, Set.of("at")),
+            Map.entry(NcertCorrection.Kind.section, Set.of("at", "section")),
+            Map.entry(NcertCorrection.Kind.move, Set.of("at", "after", "after_page")),
+            Map.entry(NcertCorrection.Kind.unprinted, Set.of("at", "after")),
+            Map.entry(NcertCorrection.Kind.misprint, Set.of("transcribed", "printed")),
+            Map.entry(NcertCorrection.Kind.false_positive, Set.of("transcribed", "printed")),
+            Map.entry(NcertCorrection.Kind.noise, Set.of("at", "flag")));
+    private static final Set<String> KIND_SPECIFIC = Set.of("transcribed", "printed", "at", "remove", "add", "flag",
+            "section", "after", "after_page");
     /**
      * The checks a {@code noise} entry may rule on: the two that name a row and so enter the clean share.
      * The page-level start flags are outside it already, and 85 entries a book would bury this file
@@ -115,10 +120,23 @@ final class NcertCorrectionsYamlReader {
                 throw new InputFormatException(file, 0, label + ": flag must be one of " + RULEABLE);
             }
         }
+        short chapter = (short) whole(file, entry, "chapter", 1, 99, label);
+        String section = kind == NcertCorrection.Kind.section ? section(file, entry, language, chapter, label) : null;
+        boolean move = kind == NcertCorrection.Kind.move;
+        // The English rows are canonical: their sections and numbers carry the anchors and the vectors, so only the
+        // edition set to them may move a row (spec-auditor, D16).
+        if (move && language != BookLanguage.hi) {
+            throw new InputFormatException(file, 0, label + ": only a Hindi entry moves a row — the English rows are canonical");
+        }
+        boolean unprinted = kind == NcertCorrection.Kind.unprinted;
+        if (unprinted && language != BookLanguage.hi) {
+            throw new InputFormatException(file, 0, label + ": only a Hindi entry leaves an English number unfilled — "
+                    + "the English rows are canonical");
+        }
         return new NcertCorrection(
                 required(file, entry, "book", label),
                 language,
-                (short) whole(file, entry, "chapter", 1, 99, label),
+                chapter,
                 whole(file, entry, "page", 1, 999, label),
                 kind,
                 spans ? required(file, entry, "transcribed", label) : null,
@@ -128,7 +146,50 @@ final class NcertCorrectionsYamlReader {
                 optional(file, entry, "address", label),
                 remove,
                 add,
-                flag);
+                flag,
+                section,
+                move ? required(file, entry, "after", label) : null,
+                move ? whole(file, entry, "after_page", 1, 999, label) : null,
+                unprinted && gapAfter(file, entry, label));
+    }
+
+    /**
+     * An {@code unprinted} entry's {@code after}: true when the English paragraph not printed is the one after the
+     * row, a section's last, which no row follows. Not words, as a {@code move}'s {@code after} is — a gap is
+     * named by its one row either way.
+     */
+    private static boolean gapAfter(Path file, JsonNode entry, String label) {
+        JsonNode value = entry.get("after");
+        if (value == null || value.isNull()) {
+            return false;
+        }
+        if (!value.isBoolean()) {
+            throw new InputFormatException(file, 0, label + ": 'after' must be true or false — true when the paragraph "
+                    + "not printed is the one after the row");
+        }
+        return value.booleanValue();
+    }
+
+    /**
+     * A {@code section} entry's number: Hindi only, since the English sections are canonical and carry the
+     * anchors a student taps; quoted, since YAML reads an unquoted 8.10 as the number 8.1; and a printed
+     * section of the entry's own chapter, as the load requires of every row.
+     */
+    private static String section(Path file, JsonNode entry, BookLanguage language, short chapter, String label) {
+        if (language != BookLanguage.hi) {
+            throw new InputFormatException(file, 0, label + ": only a Hindi entry re-addresses a section — "
+                    + "the English sections are canonical");
+        }
+        JsonNode value = entry.get("section");
+        if (value != null && value.isNumber()) {
+            throw new InputFormatException(file, 0, label + ": 'section' must be quoted — unquoted, 8.10 reads as 8.1");
+        }
+        String section = required(file, entry, "section", label).strip();
+        if (!NcertLoadCommand.SECTION.matcher(section).matches()
+                || !(section + ".").startsWith(chapter + ".")) {
+            throw new InputFormatException(file, 0, label + ": '" + section + "' is not a section of chapter " + chapter);
+        }
+        return section;
     }
 
     /**

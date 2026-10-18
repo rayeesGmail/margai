@@ -8,6 +8,7 @@ import com.margai.ai.api.ImagePart;
 import com.margai.ai.tasks.NcertPage;
 import com.margai.ai.tasks.NcertPageExtractor;
 import com.margai.ai.tasks.PreviousPage;
+import com.margai.curriculum.api.BookLanguage;
 import com.margai.storage.api.ObjectStore;
 import java.math.BigDecimal;
 import java.nio.file.Path;
@@ -54,6 +55,11 @@ class NcertExtractCommand extends NcertBookCommand {
     @Option(names = "--redo", description = "Call again for pages already in the JSONL, replacing them.")
     boolean redo;
 
+    @Option(names = "--artefact-tag", paramLabel = "TAG",
+            description = "Keep this run's pages in extract/{book}/{lang}.TAG.jsonl — for a scratch run such as a "
+                    + "model trial; the canonical JSONL is neither read nor written.")
+    String artefactTag;
+
     private final ObjectStore content;
     private final NcertPageExtractor extract;
     private final AiSpend spend;
@@ -72,16 +78,17 @@ class NcertExtractCommand extends NcertBookCommand {
 
     @Override
     void run(BookDefinition definition, List<BookDefinition.Chapter> selected, Report report) {
+        String jsonlKey = ContentKeys.extract(definition.code(), language, ContentKeys.tag(artefactTag));
         guardLiveClient();
         guardTranscribeModel();
         report.line("content store: " + content.describe());
+        report.line("artefact: " + jsonlKey + (artefactTag == null ? "" : " (a scratch run's own; the canonical JSONL is untouched)"));
         report.line("page tiles: " + properties.pageTiles()
                 + (properties.pageTiles() > 1 ? " (each page sent as overlapping bands, unscaled)" : " (whole page)"));
         String runId = "pipeline-ncert-extract-" + UUID.randomUUID();
         report.line("request id: " + runId);
         AiCallContext ctx = AiCallContext.system(runId);
 
-        String jsonlKey = ContentKeys.extract(definition.code(), language);
         Map<String, ExtractedPage> done = new LinkedHashMap<>();
         if (content.exists(jsonlKey)) {
             ExtractJsonl.read(jsonlKey, content.get(jsonlKey)).forEach(page -> done.put(page.address(), page));
@@ -92,6 +99,7 @@ class NcertExtractCommand extends NcertBookCommand {
         List<List<String>> apparatusRows = new ArrayList<>();
         List<List<String>> textLayerRows = new ArrayList<>();
         List<String> diffFlags = new ArrayList<>();
+        HindiChecks.Findings hindi = new HindiChecks.Findings();
         List<String> notationFlags = new ArrayList<>();
         List<String> structureFlags = new ArrayList<>();
         List<EmptyPage> emptyPages = new ArrayList<>();
@@ -118,6 +126,9 @@ class NcertExtractCommand extends NcertBookCommand {
             // English words by construction, and gating per page would withhold the text layer from
             // exactly the pages it exists to fix.
             boolean textLayerTrusted = PdfTextLayer.isLegible(pageTexts);
+            // A Hindi layer is Chanakya glyph codes, withheld from the model either way; decoded, it is the
+            // check the rows are held to (SPEC §12.2, DECISIONS 2026-10-02) — read here, never sent or stored.
+            List<HindiLayer.Page> hindiLayer = language == BookLanguage.hi ? HindiLayer.pages(sourcePdf) : List.of();
             textLayerRows.add(List.of(String.valueOf(chapter.no()),
                     textLayerTrusted ? "fed as the character authority" : "withheld: illegible",
                     "%.3f".formatted(PdfTextLayer.meanLegibility(pageTexts))));
@@ -126,7 +137,7 @@ class NcertExtractCommand extends NcertBookCommand {
             // chapter-numbered exercises from its sections, and it does not have to if it never
             // sees them (D14, ChapterApparatus). The heading's own page is sent when teaching is
             // printed above the heading, and placing it is read from the page's glyphs (D15).
-            Optional<ChapterApparatus.Boundary> apparatus = ChapterApparatus.locate(pageTexts, sourcePdf);
+            Optional<ChapterApparatus.Boundary> apparatus = ChapterApparatus.locate(pageTexts, sourcePdf, language);
             apparatusRows.add(List.of(String.valueOf(chapter.no()),
                     apparatus.map(boundary -> "page " + boundary.page()).orElse("—"),
                     apparatus.map(ChapterApparatus.Boundary::heading).orElse("not found: every page is sent"),
@@ -225,6 +236,11 @@ class NcertExtractCommand extends NcertBookCommand {
                         case MATCHED -> { }
                     }
                 }
+                if (page <= hindiLayer.size()) {
+                    String transcribed = response.output().paragraphs().stream()
+                            .map(NcertPage.Paragraph::text).collect(java.util.stream.Collectors.joining(" "));
+                    hindi.check("ch " + chapter.no() + " p" + page, hindiLayer.get(page - 1), transcribed, headingPage);
+                }
                 previous = PreviousPage.of(response.output(), previous);
                 if (read.confidence() != null && read.confidence().compareTo(LOW_CONFIDENCE) < 0) {
                     lowConfidence.add("ch " + chapter.no() + " page " + page + " — confidence "
@@ -267,6 +283,9 @@ class NcertExtractCommand extends NcertBookCommand {
         // nothing — but its silence hid three pages of bio11, one of them a biography (D15).
         if (!notJudged.isEmpty()) {
             coverage.line("").line("and " + notJudged.size() + " page(s) the ratio could not judge:").list(notJudged);
+        }
+        if (language == BookLanguage.hi) {
+            hindi.report(report, " of the " + called + " page(s) called this run");
         }
         report.section("pages the Summary starts on — confirm the rows carry what is above the heading and nothing below it")
                 .line("the coverage ratio cannot judge these: the layer carries the Summary, the rows must not")
@@ -325,11 +344,14 @@ class NcertExtractCommand extends NcertBookCommand {
      * first is money spent on an artefact that has to be thrown away.
      */
     private void guardTranscribeModel() {
-        if (!Objects.equals(extract.model(), properties.transcribeModel())) {
+        String transcriber = properties.transcribeModel(language);
+        if (!Objects.equals(extract.model(), transcriber)) {
             throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
-                    "the vision tier is " + extract.model() + ", not " + properties.transcribeModel()
-                            + " (margai.pipeline.transcribe-model, DECISIONS 2026-09-14 \"the pair\") — run with "
-                            + "`--spring.profiles.active=pipeline,live,visionopus`");
+                    "the vision tier is " + extract.model() + ", not " + transcriber + ", the " + language
+                            + " edition's transcriber (margai.pipeline.transcribe-model"
+                            + (language == BookLanguage.hi ? "-hi" : "") + "; DECISIONS 2026-09-14 \"the pair\", "
+                            + "2026-10-02) — run with `--spring.profiles.active=pipeline,live,"
+                            + (language == BookLanguage.hi ? "visionopus55" : "visionopus") + "`");
         }
     }
 

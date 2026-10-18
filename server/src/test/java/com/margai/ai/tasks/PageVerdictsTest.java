@@ -32,6 +32,20 @@ class PageVerdictsTest {
                 .hasMessageContaining("item 3 is 'differs' but names no difference");
     }
 
+    /**
+     * Claude Sonnet 5.5 answers {@code matches} and lists the span it checked, printed and transcribed
+     * the same (phy11-part1 ch 7 p4, the 5.5 validation, D16). A difference that differs in nothing is
+     * no difference, so it is dropped rather than refused — only spacing separates the two spans here.
+     */
+    @Test
+    void aMatchesThatListsOnlyIdenticalSpansDropsThem() {
+        PageVerdicts.ItemVerdict verdict = new PageVerdicts.ItemVerdict(1, PageVerdicts.Verdict.matches,
+                List.of(new PageVerdicts.Difference("assumes that the gravitational", "assumes that  the gravitational")));
+
+        assertThat(verdict.verdict()).isEqualTo(PageVerdicts.Verdict.matches);
+        assertThat(verdict.differences()).isEmpty();
+    }
+
     @Test
     void aVerdictThatIsNotDiffersNamesNoDifference() {
         assertThatThrownBy(() -> new PageVerdicts.ItemVerdict(2, PageVerdicts.Verdict.matches,

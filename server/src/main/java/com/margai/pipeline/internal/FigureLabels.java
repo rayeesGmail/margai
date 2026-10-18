@@ -17,11 +17,16 @@ final class FigureLabels {
 
     /**
      * The word, the chapter-numbered label, and a part letter written "(a)" or glued on as "7.1a" — a
-     * bare letter after a space is the next word ("Fig 7.3 a point"), not a part.
+     * bare letter after a space is the next word ("Fig 7.3 a point"), not a part. The Hindi edition's
+     * words are चित्र and सारणी (D16); they sit outside the {@code \b}, which marks no boundary before
+     * Devanagari.
      */
     private static final Pattern LABEL = Pattern.compile(
-            "\\b(Fig(?:ure)?s?\\.?|Table)\\s*(\\d{1,2}\\.\\d{1,2})(?:\\s*\\(([a-z])\\)|([a-z])(?![a-z]))?",
+            "(\\bFig(?:ure)?s?\\.?|\\bTable|चित्र|सारणी)\\s*(\\d{1,2}\\.\\d{1,2})(?:\\s*\\(([a-z])\\)|([a-z])(?![a-z]))?",
             Pattern.CASE_INSENSITIVE);
+
+    /** The words that name a table rather than a figure. */
+    private static final List<String> TABLE_WORDS = List.of("table", "सारणी");
 
     private FigureLabels() {
     }
@@ -66,7 +71,7 @@ final class FigureLabels {
     }
 
     private static Label label(Matcher matcher) {
-        String kind = matcher.group(1).toLowerCase(Locale.ROOT).startsWith("t") ? "table" : "fig";
+        String kind = TABLE_WORDS.contains(matcher.group(1).toLowerCase(Locale.ROOT)) ? "table" : "fig";
         String part = matcher.group(3) != null ? matcher.group(3) : matcher.group(4);
         return new Label(kind, matcher.group(2), part == null ? null : part.toLowerCase(Locale.ROOT));
     }

@@ -76,6 +76,22 @@ class VerdictSpansTest {
         assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("the symbol L°m", "the symbol L^0m")).isFalse();
     }
 
+    /**
+     * The Hindi print draws the visarga and the colon with one glyph, and a Hindi load writes a visarga
+     * where the transcriber wrote a colon ({@link VisargaColons}, D16). The verifier reads the image, where
+     * the two cannot be told apart, so a span that differs only in which of the two follows a Devanagari
+     * letter is code's own rewrite coming back — not a difference. A colon after anything else still counts.
+     */
+    @Test
+    void aVisargaAndAColonAfterADevanagariLetterAreOneGlyph() {
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("अत: v = u + at", "अतः v = u + at")).isTrue();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("होते हैं :", "होते हैंः")).isTrue();
+        assertThat(VerdictSpans.carries("अतः बल F = ma है।", "अत: बल F = ma")).isTrue();
+
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("ratio 1:2", "ratio 1ः2")).isFalse();
+        assertThat(VerdictSpans.sameExceptSpacingAndGlyphs("अतः v", "अत v")).isFalse();
+    }
+
     @Test
     void aSpanIsCarriedHoweverTheVerifierSpacedIt() {
         String part = "F = - G m_1m_2 / |r|^3 r_hat where G is the constant.";

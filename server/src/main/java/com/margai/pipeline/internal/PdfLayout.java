@@ -53,7 +53,7 @@ final class PdfLayout {
     static final double MAX_INDENT = 40;
 
     /** Glyphs whose baselines differ by at most this much are one line. */
-    private static final double SAME_LINE = 1.5;
+    static final double SAME_LINE = 1.5;
     /** Wider than a word space: where a line may cross the column gutter. */
     private static final double SEGMENT_GAP = 12;
     /** Wider than any justified word space: a display's spacing, which splits a line anywhere. */
@@ -219,12 +219,23 @@ final class PdfLayout {
     }
 
     private static PageShape shape(PDDocument document, int page, String heading) throws IOException {
+        return shape(glyphs(document, page, true), document.getPage(page - 1).getMediaBox().getWidth(), heading);
+    }
+
+    /**
+     * One page's glyphs as PDFBox positions them, each with its font — also what {@link HindiLayer} reads.
+     *
+     * @param byPosition sorted by baseline and then position along it; false keeps the order the page draws
+     *                   them in, which the Chanakya fonts need — they draw a vowel sign over or before the
+     *                   letter it follows in the typed order the decoder reads (D16)
+     */
+    static List<Glyph> glyphs(PDDocument document, int page, boolean byPosition) throws IOException {
         GlyphCollector collector = new GlyphCollector();
-        collector.setSortByPosition(true);
+        collector.setSortByPosition(byPosition);
         collector.setStartPage(page);
         collector.setEndPage(page);
         collector.getText(document);
-        return shape(collector.glyphs, document.getPage(page - 1).getMediaBox().getWidth(), heading);
+        return collector.glyphs;
     }
 
     static PageShape shape(List<Glyph> glyphs, double pageWidth) {

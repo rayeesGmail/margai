@@ -1,7 +1,9 @@
 package com.margai.pipeline.internal;
 
+import com.margai.curriculum.api.BookLanguage;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -29,6 +31,9 @@ import java.util.Optional;
  *       above the heading and are sent, which leaves 14.2% of all pages never sent (2026-09-24);
  *   <li>{@code kech202.pdf}'s layer is shifted, so its heading page is sent unplaced ({@link #locate})
  *       and only its three exercise pages are skipped — 243 of 1,690 pages never sent (2026-09-30).
+ *   <li>Hindi (D16, 2026-10-01): all 79 Hindi chapter files, whose layer is Chanakya glyph codes, find
+ *       their boundary from the encoded headings ({@code HINDI_HEADINGS}); none is placed, so every
+ *       heading page is sent and the 223 of 1,720 pages after the headings are not.
  * </ul>
  *
  * <p>Only the back half is searched: a Physics chapter's first page carries a contents sidebar
@@ -37,9 +42,25 @@ import java.util.Optional;
  */
 final class ChapterApparatus {
 
-    /** The headings that open the end matter, as printed in one book or another. */
+    /** The headings that open the English end matter, as printed in one book or another; any case. */
     private static final List<String> HEADINGS = List.of(
             "SUMMARY", "POINTS TO PONDER", "EXERCISES", "ADDITIONAL EXERCISES", "ANSWERS", "APPENDIX");
+
+    /**
+     * The Hindi headings as the layer carries them — Walkman-Chanakya glyph codes, since the books have
+     * no Unicode map — each with the Devanagari it prints, for the report. Matched exactly: case is a
+     * different glyph in this encoding. Measured over all 79 Hindi chapter files (D16, 2026-10-01): a
+     * boundary in every back half, सारांश keyed three ways by the typesetters, अभ्यास first in the layer
+     * on the two pages it shares with the Summary; the only front-half hits are Physics contents sidebars.
+     * The fourth सारांश is how PDFBox reads Chemistry 12's: six files set it in KrutiDev501 Bold printed
+     * five times over itself, and the stripper drops the repeated letters but keeps four anusvaras.
+     */
+    private static final Map<String, String> HINDI_HEADINGS = Map.of(
+            "lkjka'k", "सारांश",
+            "lkjak'k", "सारांश",
+            "Lkkjka'k", "सारांश",
+            "lkjka'kaaaa", "सारांश",
+            "vH;kl", "अभ्यास");
 
     private ChapterApparatus() {
     }
@@ -53,20 +74,29 @@ final class ChapterApparatus {
      * the shape D14 found read as sections — were sent (2026-09-30).
      *
      * @param pageTexts the chapter's pages in order, from {@link PdfTextLayer#pages}
+     * @param language  the edition, whose headings are looked for
      */
-    static Optional<Boundary> find(List<String> pageTexts) {
+    static Optional<Boundary> find(List<String> pageTexts, BookLanguage language) {
         if (pageTexts.isEmpty()) {
             return Optional.empty();
         }
         for (int index = pageTexts.size() / 2; index < pageTexts.size(); index++) {
             for (String line : pageTexts.get(index).split("\\R")) {
-                String heading = line.strip().replaceAll("\\s+", " ");
-                if (HEADINGS.stream().anyMatch(heading::equalsIgnoreCase)) {
-                    return Optional.of(new Boundary(index + 1, heading.toUpperCase(Locale.ROOT), Boundary.UNPLACED));
+                Optional<String> heading = heading(line.strip().replaceAll("\\s+", " "), language);
+                if (heading.isPresent()) {
+                    return Optional.of(new Boundary(index + 1, heading.get(), Boundary.UNPLACED));
                 }
             }
         }
         return Optional.empty();
+    }
+
+    /** The heading a layer line is, as the report names it, or empty when it is none of this edition's. */
+    private static Optional<String> heading(String line, BookLanguage language) {
+        if (language == BookLanguage.hi) {
+            return Optional.ofNullable(HINDI_HEADINGS.get(line));
+        }
+        return HEADINGS.stream().filter(line::equalsIgnoreCase).findFirst().map(match -> line.toUpperCase(Locale.ROOT));
     }
 
     /**
@@ -78,9 +108,10 @@ final class ChapterApparatus {
      *
      * @param pageTexts the chapter's pages in order, from {@link PdfTextLayer#pages}
      * @param pdf       the chapter PDF those pages were read from
+     * @param language  the edition, whose headings are looked for
      */
-    static Optional<Boundary> locate(List<String> pageTexts, byte[] pdf) {
-        Optional<Boundary> found = find(pageTexts);
+    static Optional<Boundary> locate(List<String> pageTexts, byte[] pdf, BookLanguage language) {
+        Optional<Boundary> found = find(pageTexts, language);
         return PdfTextLayer.isLegible(pageTexts) ? found.map(boundary -> boundary.placedIn(pdf)) : found;
     }
 

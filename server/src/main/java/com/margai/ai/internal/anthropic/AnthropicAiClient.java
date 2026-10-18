@@ -11,6 +11,8 @@ import com.anthropic.errors.RateLimitException;
 import com.anthropic.models.messages.ContentBlock;
 import com.anthropic.models.messages.Message;
 import com.anthropic.models.messages.MessageCreateParams;
+import com.anthropic.models.messages.RefusalStopDetails;
+import com.anthropic.models.messages.StopReason;
 import com.anthropic.models.messages.ToolUseBlock;
 import com.margai.ai.api.AiRequest;
 import com.margai.ai.api.AiResponse;
@@ -88,14 +90,22 @@ public final class AnthropicAiClient implements CompletionClient {
     }
 
     /**
-     * The forced tool's input is the answer; a response without a tool call is invalid output, and
-     * so is one the model was cut off in the middle of. A truncated tool input can still parse as
+     * The tool's input is the answer; a response without a tool call is invalid output, and so is
+     * one the model was cut off in the middle of, and so is a refusal — which alone is never
+     * repaired, since a retry sends the same input to the same classifier (D16). A truncated tool input can still parse as
      * a Map — the SDK completes what it has — so a short answer would otherwise look like a valid
      * one: a page transcription missing its last paragraphs, silently (spec-auditor, D14). The
      * caller's fix is `margai.ai.max-output-tokens`, so the message says which knob.
      */
     static JsonNode toolInput(Message response, Usage usage, String modelId, StructuredOutput codec) {
         String stopReason = response.stopReason().map(Object::toString).orElse("none");
+        if (response.stopReason().filter(StopReason.REFUSAL::equals).isPresent()) {
+            String category = response.stopDetails().flatMap(RefusalStopDetails::category)
+                    .map(Object::toString).orElse("no category");
+            throw new InvalidOutputException(List.of("the model refused (" + category
+                    + ") — a safety classifier's decline, not a malformed answer, so it is not retried"),
+                    null, usage, modelId, false);
+        }
         if (stopReason.toLowerCase(Locale.ROOT).contains("max_tokens")) {
             throw new InvalidOutputException(List.of("the answer was cut off at the output-token limit ("
                     + usage.outputTokens() + " tokens) — raise margai.ai.max-output-tokens for this workload"),

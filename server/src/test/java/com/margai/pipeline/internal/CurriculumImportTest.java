@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.margai.TestcontainersConfiguration;
 import com.margai.common.api.AttemptType;
 import com.margai.common.api.Category;
+import com.margai.curriculum.api.AlignmentRow;
 import com.margai.curriculum.api.ArchetypeStepRow;
 import com.margai.curriculum.api.ArchetypeTrackRow;
 import com.margai.curriculum.api.BackboneLoadReport;
@@ -42,6 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -131,6 +133,88 @@ class CurriculumImportTest {
                 .isEqualTo("The gravitational potential energy of a body.");
     }
 
+    /**
+     * {@code ncert load --dry-run} (D16): the load's statements run and are counted, then rolled back —
+     * the Hindi text it reports as an update is not in the row afterwards.
+     */
+    @Test
+    void aPreviewReportsTheLoadAndLeavesTheRowsAsTheyWere() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        NcertLoadReport preview = imports.previewParagraphs("phy11-part1", BookLanguage.hi, List.of(new NcertParagraphRow(
+                (short) 7, "7.9", (short) 1, "गुरुत्वीय स्थितिज ऊर्जा।", false, List.of(),
+                new ParagraphExtraction(List.of(12), new BigDecimal("0.90"), null))));
+
+        assertThat(preview.updated()).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs WHERE text_hi IS NOT NULL", Long.class))
+                .isZero();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(2);
+    }
+
+    /**
+     * The destructive half rolls back too: a preview that rewrites one row, inserts another and leaves the
+     * third address out — which a load deletes — counts all three, and the rows are as they were after it.
+     */
+    @Test
+    void aPreviewsInsertRewriteAndDeleteAreAllRolledBack() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        NcertLoadReport preview = imports.previewParagraphs("phy11-part1", BookLanguage.en, List.of(
+                english((short) 1, "A rewritten first paragraph."), english((short) 3, "A third, new.")));
+
+        assertThat(preview.inserted()).isEqualTo(1);
+        assertThat(preview.updated()).isEqualTo(1);
+        assertThat(preview.orphans()).hasSize(1);
+        assertThat(jdbc.queryForList("SELECT text_en FROM ncert_paragraphs ORDER BY para_no", String.class))
+                .containsExactly("The gravitational potential energy of a body.", paragraphs().get(1).text());
+    }
+
+    /** A row the database refuses — ¶0 fails its CHECK, which no code before it tests — refuses the preview. */
+    @Test
+    void aRowTheDatabaseRefusesRefusesThePreview() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        assertThatThrownBy(() -> imports.previewParagraphs("phy11-part1",
+                BookLanguage.en, List.of(english((short) 0, "Numbered zero."))))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasStackTraceContaining("ncert_paragraphs_para_no_check");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs", Long.class)).isEqualTo(2);
+    }
+
+    /**
+     * What a dry run on the canonical database must never cost: a paid vector, which a rewrite clears, and
+     * the other edition's text, which a load drops from an address it no longer carries — both counted by
+     * the preview, both still there after it.
+     */
+    @Test
+    void aPreviewLeavesThePaidVectorsAndTheOtherEditionsTextInPlace() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(hindi((short) 1, "पहला।"), hindi((short) 2, "दूसरा।")));
+        String vector = "[" + "0.1,".repeat(1023) + "0.1]";
+        jdbc.update("UPDATE ncert_paragraphs SET embedding = ?::vector WHERE para_no = 1", vector);
+
+        NcertLoadReport rewrite = imports.previewParagraphs("phy11-part1", BookLanguage.en, List.of(
+                english((short) 1, "A rewritten first paragraph."), paragraphs().get(1)));
+        NcertLoadReport hindiShort = imports.previewParagraphs("phy11-part1", BookLanguage.hi,
+                List.of(hindi((short) 1, "पहला।")));
+
+        assertThat(rewrite.embeddingsCleared()).isEqualTo(1);
+        assertThat(hindiShort.cleared()).hasSize(1);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM ncert_paragraphs WHERE embedding IS NOT NULL", Long.class))
+                .isEqualTo(1);
+        assertThat(jdbc.queryForList("SELECT text_hi FROM ncert_paragraphs ORDER BY para_no", String.class))
+                .containsExactly("पहला।", "दूसरा।");
+    }
+
+    private static NcertParagraphRow english(short paraNo, String text) {
+        return new NcertParagraphRow((short) 7, "7.9", paraNo, text, false, List.of(),
+                new ParagraphExtraction(List.of(12), new BigDecimal("0.90"), null));
+    }
+
     /** D16's Hindi pass fills the same row rather than making a second one. */
     @Test
     void theHindiEditionLandsOnTheSameParagraphRow() {
@@ -146,6 +230,85 @@ class CurriculumImportTest {
                 "SELECT text_en, text_hi FROM ncert_paragraphs WHERE chapter_no = 7 AND section = '7.9' AND para_no = 1");
         assertThat(row.get("text_en")).isEqualTo("The gravitational potential energy of a body.");
         assertThat(row.get("text_hi")).isEqualTo("गुरुत्वीय स्थितिज ऊर्जा।");
+    }
+
+    /**
+     * The English rows are canonical and Hindi follows them (founder, 2026-10-01, D16): a row's figure
+     * references and equation flag were adjudicated on the English edition, so a Hindi load beside it
+     * leaves them alone. Before D16 a Hindi load replaced both, and the next English load put them back.
+     */
+    @Test
+    void aHindiLoadLeavesTheEnglishFigureReferencesAndEquationFlag() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(hindi((short) 2, "W = -G M m / r (चित्र 7.9)।")));
+
+        Map<String, Object> row = jdbc.queryForMap("SELECT text_hi, has_equations, figure_refs::text AS refs"
+                + " FROM ncert_paragraphs WHERE section = '7.9' AND para_no = 2");
+        assertThat(row.get("text_hi")).isEqualTo("W = -G M m / r (चित्र 7.9)।");
+        assertThat(row.get("has_equations")).isEqualTo(true);
+        assertThat((String) row.get("refs")).contains("Fig. 7.9");
+    }
+
+    /** A row only the Hindi edition carries has no English to follow, so it takes the Hindi row's own. */
+    @Test
+    void aHindiOnlyRowTakesItsOwnFigureReferences() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(new NcertParagraphRow((short) 7, "7.9",
+                (short) 3, "चित्र 7.10 देखिए।", true, List.of("Fig. 7.10"),
+                new ParagraphExtraction(List.of(13), new BigDecimal("0.90"), null))));
+
+        Map<String, Object> row = jdbc.queryForMap(
+                "SELECT has_equations, figure_refs::text AS refs FROM ncert_paragraphs WHERE para_no = 3");
+        assertThat(row.get("has_equations")).isEqualTo(true);
+        assertThat((String) row.get("refs")).contains("Fig. 7.10");
+    }
+
+    /**
+     * A row that carries both editions is not this load's to delete, but its text in the edition being
+     * loaded is: a Hindi join that moves ¶2's words into ¶1 must not leave the old ¶2 Hindi standing
+     * beside the English. It is cleared, with its provenance, and named.
+     */
+    @Test
+    void aReloadClearsItsOwnEditionFromARowItNoLongerCarriesAndKeepsTheOther() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(hindi((short) 1, "पहला।"), hindi((short) 2, "दूसरा।")));
+
+        NcertLoadReport report = imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(hindi((short) 1, "पहला। दूसरा।")));
+
+        assertThat(report.cleared()).containsExactly("ch 7 §7.9 ¶2");
+        assertThat(report.orphans()).isEmpty();
+        Map<String, Object> row = jdbc.queryForMap(
+                "SELECT text_en, text_hi, extraction::text AS x FROM ncert_paragraphs WHERE para_no = 2");
+        assertThat(row.get("text_en")).isEqualTo("W = -G M m / r (Fig. 7.9).");
+        assertThat(row.get("text_hi")).isNull();
+        assertThat((String) row.get("x")).doesNotContain("\"hi\"");
+    }
+
+    /** The same for English after Hindi lands: its stale words and the vector describing them both go. */
+    @Test
+    void anEnglishReloadClearsTheEnglishTextAndVectorOfARowOnlyHindiStillCarries() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(hindi((short) 2, "दूसरा।")));
+        embedEverything();
+
+        NcertLoadReport report = imports.loadParagraphs("phy11-part1", BookLanguage.en, List.of(paragraphs().getFirst()));
+
+        assertThat(report.cleared()).containsExactly("ch 7 §7.9 ¶2");
+        Map<String, Object> row = jdbc.queryForMap(
+                "SELECT text_en, text_hi, embedding IS NULL AS unembedded FROM ncert_paragraphs WHERE para_no = 2");
+        assertThat(row.get("text_en")).isNull();
+        assertThat(row.get("text_hi")).isEqualTo("दूसरा।");
+        assertThat(row.get("unembedded")).isEqualTo(true);
+    }
+
+    private static NcertParagraphRow hindi(short paraNo, String text) {
+        return new NcertParagraphRow((short) 7, "7.9", paraNo, text, false, List.of(),
+                new ParagraphExtraction(List.of(12), new BigDecimal("0.90"), null));
     }
 
     /**
@@ -486,6 +649,58 @@ class CurriculumImportTest {
                 new ParagraphExtraction(List.of(12), new BigDecimal("0.90"), null))));
 
         assertThat(imports.paragraphsToEmbed("phy11-part1", List.of(), false)).isEmpty();
+    }
+
+    /** `ncert align` (D16): each address with both editions' text and pages, in reading order. */
+    @Test
+    void alignmentRowsCarryBothEditionsTextAndPages() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        imports.loadParagraphs("phy11-part1", BookLanguage.hi, List.of(new NcertParagraphRow((short) 7, "7.9", (short) 1,
+                "गुरुत्वीय स्थितिज ऊर्जा।", false, List.of(), new ParagraphExtraction(List.of(14), new BigDecimal("0.9"), null))));
+
+        List<AlignmentRow> rows = imports.alignmentRows("phy11-part1", List.of((short) 7));
+
+        assertThat(rows).extracting(AlignmentRow::address).containsExactly("ch 7 §7.9 ¶1", "ch 7 §7.9 ¶2");
+        assertThat(rows.getFirst().textEn()).isEqualTo("The gravitational potential energy of a body.");
+        assertThat(rows.getFirst().textHi()).isEqualTo("गुरुत्वीय स्थितिज ऊर्जा।");
+        assertThat(rows.getFirst().pagesEn()).containsExactly(12);
+        assertThat(rows.getFirst().pagesHi()).containsExactly(14);
+        assertThat(rows.get(1).textHi()).isNull();
+        assertThat(rows.get(1).pagesHi()).isEmpty();
+    }
+
+    /** The Hindi side's vector against the stored English ones, in pgvector: cosine similarity, unembedded rows absent. */
+    @Test
+    void similarityToEnglishIsTheCosineToEachStoredVector() {
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        List<ParagraphToEmbed> waiting = imports.paragraphsToEmbed("phy11-part1", List.of(), false);
+        imports.storeEmbeddings("phy11-part1", List.of(new ParagraphEmbedding(waiting.getFirst().paragraphId(), vector(0.5f))));
+        float[] orthogonal = new float[1024];
+        orthogonal[1] = 1f;
+
+        Map<UUID, Double> same = imports.similarityToEnglish("phy11-part1", vector(0.25f),
+                waiting.stream().map(ParagraphToEmbed::paragraphId).toList());
+        Map<UUID, Double> other = imports.similarityToEnglish("phy11-part1", orthogonal,
+                List.of(waiting.getFirst().paragraphId()));
+
+        assertThat(same).containsOnlyKeys(waiting.getFirst().paragraphId());
+        assertThat(same.get(waiting.getFirst().paragraphId())).isCloseTo(1.0, org.assertj.core.data.Offset.offset(1e-6));
+        assertThat(other.get(waiting.getFirst().paragraphId())).isCloseTo(0.0, org.assertj.core.data.Offset.offset(1e-6));
+    }
+
+    /** What keeps a trial draw out of the canonical corpus (D16): the book's embedded paragraphs, counted. */
+    @Test
+    void theEmbeddedParagraphsOfABookAreCountedAndAnUnregisteredBookHasNone() {
+        assertThat(imports.embeddedParagraphs("phy11-part1")).as("a scratch database may hold nothing yet").isZero();
+        imports.registerBooks(BooksYamlReader.read(BOOKS).stream().map(BookDefinition::row).toList());
+        imports.loadParagraphs("phy11-part1", BookLanguage.en, paragraphs());
+        assertThat(imports.embeddedParagraphs("phy11-part1")).isZero();
+
+        embedEverything();
+
+        assertThat(imports.embeddedParagraphs("phy11-part1")).isEqualTo(2);
     }
 
     @Test

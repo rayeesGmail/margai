@@ -44,6 +44,11 @@ public record PageVerdicts(List<ItemVerdict> verdicts, List<String> omitted) {
 
         public ItemVerdict {
             differences = differences == null ? List.of() : List.copyOf(differences);
+            if (verdict == Verdict.matches) {
+                // Claude Sonnet 5.5 lists the span it checked, printed and transcribed alike, under a
+                // match (D16): differing in nothing but spacing, it names no difference, so it is dropped.
+                differences = differences.stream().filter(difference -> !difference.isNoDifference()).toList();
+            }
             if (verdict == Verdict.differs && differences.isEmpty()) {
                 throw new IllegalArgumentException("item " + item + " is 'differs' but names no difference");
             }
@@ -70,6 +75,15 @@ public record PageVerdicts(List<ItemVerdict> verdicts, List<String> omitted) {
             if (printed == null || printed.isBlank() || transcribed == null || transcribed.isBlank()) {
                 throw new IllegalArgumentException("both spans must quote text");
             }
+        }
+
+        /** The two spans are the same text once runs of whitespace are read as one space. */
+        boolean isNoDifference() {
+            return collapsed(printed).equals(collapsed(transcribed));
+        }
+
+        private static String collapsed(String span) {
+            return span.strip().replaceAll("\\s+", " ");
         }
     }
 }

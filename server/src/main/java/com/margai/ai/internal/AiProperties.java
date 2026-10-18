@@ -115,24 +115,48 @@ public record AiProperties(
      *
      * @param id              provider model id, never a code constant
      * @param temperature     sampling temperature, or null where the model rejects the field
-     * @param thinking        {@code disabled} or {@code adaptive} (§4.11)
+     * @param thinking        {@code disabled}, {@code adaptive} or {@code between_tools} (§4.11)
      * @param effort          reasoning effort, or null where the model rejects the field
      * @param cacheMinTokens  the model's minimum cacheable prefix; below it a cache point is a
      *                        silent no-op, which {@code AiConfiguration} warns about at startup.
      *                        Required, so that adding a tier means looking the figure up
+     * @param toolChoice      how the answer's tool is chosen, or null for {@code forced} — the
+     *                        shape every tier had before the 5.5 generation refused it (D16)
      */
     public record Model(
             @NotBlank String id,
             @DecimalMin("0.0") @DecimalMax("1.0") Double temperature,
             @NotNull Thinking thinking,
             Effort effort,
-            @Positive int cacheMinTokens) {
+            @Positive int cacheMinTokens,
+            ToolChoice toolChoice) {
+
+        /** Whether the request may name the tool in {@code tool_choice}. */
+        public boolean forcesTheTool() {
+            return toolChoice == null || toolChoice == ToolChoice.forced;
+        }
     }
 
-    /** Whether a tier's calls carry reasoning (§4.11); constants are the config spellings. */
+    /**
+     * Whether a tier's calls carry reasoning (§4.11); constants are the config spellings.
+     * {@code between_tools} is Claude Sonnet 5.5's way of turning thinking off — that model answers
+     * {@code disabled} with a 400 (D16).
+     */
     public enum Thinking {
         disabled,
-        adaptive
+        adaptive,
+        between_tools
+    }
+
+    /**
+     * How the one answer tool is chosen. {@code forced} names it in {@code tool_choice}, so the call
+     * cannot be skipped; {@code auto} leaves the choice to the model, for the models that answer a
+     * forced choice with a 400 (Claude Opus 5.5 and Sonnet 5.5) — the tool is then strict and the
+     * user turn asks for it, and a response without a call is still invalid output (D16).
+     */
+    public enum ToolChoice {
+        forced,
+        auto
     }
 
     /** Reasoning effort, where the model accepts it; constants are the config spellings. */

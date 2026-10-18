@@ -1,17 +1,22 @@
 package com.margai.pipeline.internal;
 
 import com.margai.ai.tasks.NcertPage;
+import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.NcertLoadReport;
 import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.ParagraphExtraction;
 import com.margai.storage.api.ObjectStore;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +26,7 @@ import java.util.regex.Pattern;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 /**
  * {@code ncert load}: the book's JSONL into {@code ncert_paragraphs} (TECH_PLAN §6.3), upserted
@@ -44,7 +50,28 @@ class NcertLoadCommand extends NcertBookCommand {
     /** {@code ncert_paragraphs.section} is VARCHAR(16); a printed section is "7" or "7.9.2". */
     static final int SECTION_MAX_LENGTH = 16;
 
-    private static final Pattern SECTION = Pattern.compile("\\d{1,2}(\\.\\d{1,3})*");
+    /** A printed section number; a {@code section} correction is held to it too. */
+    static final Pattern SECTION = Pattern.compile("\\d{1,2}(\\.\\d{1,3})*");
+
+    @Option(names = "--artefact-tag", paramLabel = "TAG",
+            description = "Load extract/{book}/{lang}.TAG.jsonl, a scratch run's draw, as written — no correction is "
+                    + "applied — and only into a database where the book has no embedded paragraph.")
+    String artefactTag;
+
+    @Option(names = "--dry-run",
+            description = "Read, repair, correct and number exactly as a load does, and write nothing: the database "
+                    + "write runs inside a transaction that is rolled back, and the report says what the load would do.")
+    boolean dryRun;
+
+    @Option(names = "--extraction", paramLabel = "FILE",
+            description = "With --dry-run: read the extraction from this local copy of extract/{book}/{lang}.jsonl "
+                    + "instead of the content store.")
+    Path extraction;
+
+    @Option(names = "--pairs", paramLabel = "FILE",
+            description = "With --dry-run: write each address's English and Hindi text to this local JSONL, to read "
+                    + "the pairs the load would leave.")
+    Path pairsFile;
 
     private final ObjectStore content;
     private final CurriculumImport imports;
@@ -55,28 +82,95 @@ class NcertLoadCommand extends NcertBookCommand {
         this.imports = imports;
     }
 
+    /** A dry run's report is filed under its own name, so it is never taken for a load of record. */
+    @Override
+    String reportTitle() {
+        return dryRun ? super.reportTitle() + " dry-run" : super.reportTitle();
+    }
+
     @Override
     void run(BookDefinition definition, List<BookDefinition.Chapter> selected, Report report) {
-        report.line("content store: " + content.describe());
-        String jsonlKey = ContentKeys.extract(definition.code(), language);
-        if (!content.exists(jsonlKey)) {
+        if (!dryRun && (extraction != null || pairsFile != null)) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0, "--extraction and --pairs belong to "
+                    + "--dry-run: a load of record reads the content store's artefact and writes the database");
+        }
+        if (pairsFile != null && language != BookLanguage.hi) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "--pairs sets a Hindi load's rows beside the English ones: give --lang hi");
+        }
+        if (extraction != null && artefactTag != null) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
+                    "--extraction is a local copy of the canonical artefact; --artefact-tag names another — give one");
+        }
+        if (dryRun) {
+            report.line("DRY RUN: nothing is written — the database write runs inside a transaction that is rolled "
+                    + "back, so every count below is what this load would do");
+        }
+        String jsonlKey = ContentKeys.extract(definition.code(), language, ContentKeys.tag(artefactTag));
+        if (extraction != null && !Files.isRegularFile(extraction)) {
+            throw new InputFormatException(extraction, 0, "no local extraction at "
+                    + extraction.toAbsolutePath().normalize());
+        }
+        if (extraction == null) {
+            report.line("content store: " + content.describe());
+        }
+        if (artefactTag != null) {
+            // Every canonical book is embedded and a scratch database never is, so this is what keeps a
+            // trial draw out of the frozen corpus — the database, unlike the artefact, has no tag (D16).
+            long embedded = imports.embeddedParagraphs(definition.code());
+            if (embedded > 0) {
+                throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0, definition.code() + " has "
+                        + embedded + " embedded paragraph(s) in this database: a tagged load belongs in a scratch "
+                        + "database, never over the canonical corpus — point DB_URL at one; nothing was written");
+            }
+            report.line("artefact: " + jsonlKey + " (a scratch run's draw)");
+        }
+        if (extraction == null && !content.exists(jsonlKey)) {
             throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
                     "no extraction at " + jsonlKey + " — run `ncert extract` first");
         }
+        String source = extraction == null ? jsonlKey : extraction.normalize().toString();
+        byte[] jsonl = extraction == null ? content.get(jsonlKey) : read(extraction);
+        // The input's own hash on every load: a dry run read from a local file rehearses a reload only if the
+        // load of record later prints the same one for the content store's artefact.
+        // A local file by its name alone: the approved dry run's report is committed, and a committed report
+        // reads the same on every machine — the hash, not the scratch path, is what pins the input.
+        report.line(extraction == null ? "extraction: " + jsonlKey + " sha256 " + Report.sha256(jsonl)
+                : "extraction: " + extraction.getFileName() + " sha256 " + Report.sha256(jsonl) + " — a local file "
+                        + "read in place of " + jsonlKey + ", not the content store; the reload's report prints the "
+                        + "artefact's sha256 to match");
         Set<Short> chapters = new TreeSet<>();
         selected.forEach(chapter -> chapters.add(chapter.no()));
-        List<ExtractedPage> pages = ExtractJsonl.read(jsonlKey, content.get(jsonlKey)).stream()
+        List<ExtractedPage> pages = ExtractJsonl.read(source, jsonl).stream()
                 .filter(page -> chapters.contains(page.chapterNo()))
                 .sorted((left, right) -> left.chapterNo() != right.chapterNo()
                         ? Short.compare(left.chapterNo(), right.chapterNo())
                         : Integer.compare(left.page(), right.page()))
                 .toList();
+        if (extraction != null) {
+            // The JSONL names neither book nor edition, so a local file is held to what it must be.
+            if (pages.isEmpty()) {
+                throw new InputFormatException(extraction, 0, "the local extraction carries no page of chapter(s) "
+                        + chapters + " — it is not " + jsonlKey);
+            }
+            String wrong = wrongEdition(pages, language);
+            if (wrong != null) {
+                throw new InputFormatException(extraction, 0, "the local extraction " + wrong + " — it is not "
+                        + jsonlKey);
+            }
+        }
 
         // Deterministic corrections first, each reported: a re-transcribed tail is cut and a
         // labelled paragraph is never a continuation. Then the numbering and the join, which
         // refuse a continuation that cannot be one (D14, the first full-book load; D15).
         PageBreakRepairs.Repaired repaired = PageBreakRepairs.apply(pages);
         pages = repaired.pages();
+        // A Hindi load then puts back the visargas the transcriber wrote as colons (D16) — before the
+        // corrections, so an entry is written against the words the rows will show.
+        VisargaColons.Applied visargas = language == BookLanguage.hi ? VisargaColons.apply(pages) : null;
+        if (visargas != null) {
+            pages = visargas.pages();
+        }
         // Then the founder's rulings on what `ncert verify` flagged (D15): the canonical run is
         // frozen, so a defect in it is corrected here, on the record, rather than re-drawn.
         NcertCorrections.Applied corrected = NcertCorrections.apply(pages, corrections(definition, chapters, report));
@@ -85,10 +179,17 @@ class NcertLoadCommand extends NcertBookCommand {
         // sign for a zero exponent, written as the convention has it (D15, 2026-09-17).
         DimensionalBrackets.Applied dimensioned = DimensionalBrackets.apply(pages);
         pages = dimensioned.pages();
-        Numbered numbered = number(pages, jsonlKey);
+        Numbered numbered = number(pages, source, corrected.deferred(), corrected.moves(), corrected.unprinted());
         List<NcertParagraphRow> rows = numbered.rows();
         report.section("page-break repairs to the model's continuation flags (deterministic, each one named)")
                 .list(repaired.notes());
+        if (visargas != null) {
+            report.section("a visarga the model wrote as a colon (deterministic, each one named)")
+                    .list(visargas.notes());
+            report.section("a word glued to a colon that the visarga list does not know — adjudicate")
+                    .line("left as written: a `text` entry if the page means a visarga, nothing if it is a colon")
+                    .list(visargas.undecided());
+        }
         report.section("corrections from " + NcertCorrectionsYamlReader.FILE + " (founder-adjudicated, each one named)")
                 .list(corrected.notes())
                 .line("rulings on verifier flags that change no text: " + corrected.rulings());
@@ -96,20 +197,43 @@ class NcertLoadCommand extends NcertBookCommand {
                 .list(dimensioned.notes());
         report.section("figure_refs that are not figure or table labels — dropped")
                 .list(numbered.droppedRefs());
-        NcertLoadReport result = imports.loadParagraphs(definition.code(), language, rows);
+        NcertLoadReport result = dryRun ? imports.previewParagraphs(definition.code(), language, rows)
+                : imports.loadParagraphs(definition.code(), language, rows);
 
         report.section("ncert_paragraphs")
                 .table(List.of("inserted", "updated", "unchanged"), List.of(List.of(
                         String.valueOf(result.inserted()), String.valueOf(result.updated()),
                         String.valueOf(result.unchanged()))));
 
+        // English is canonical and the Hindi follows it (D16): the first thing a Hindi load is held to is
+        // whether each section now has as many Hindi rows as English ones.
+        if (language == BookLanguage.hi) {
+            List<NcertParagraphRow> english = imports.paragraphs(definition.code(), BookLanguage.en, chapters);
+            List<EditionPairs.Section> sections = EditionPairs.sections(english, rows, numbered.unprinted());
+            List<List<String>> differing = sections.stream().filter(section -> !section.oneToOne())
+                    .map(section -> List.of(String.valueOf(section.chapter()), section.section(),
+                            String.valueOf(section.english()), String.valueOf(section.hindi()),
+                            String.valueOf(section.unprinted())))
+                    .toList();
+            report.section("sections whose Hindi rows do not number as the English (English is canonical)")
+                    .line((sections.size() - differing.size()) + " of " + sections.size() + " sections one to one")
+                    .table(List.of("chapter", "section", "en", "hi", "unprinted"), differing);
+            report.section("English paragraphs this edition does not print — left without Hindi by an `unprinted` entry")
+                    .list(numbered.unprinted().stream().map(EditionPairs.Address::toString).toList());
+            if (pairsFile != null) {
+                write(pairsFile, EditionPairs.jsonl(english, rows, numbered.unprinted()));
+                report.line("pairs: " + pairsFile.getFileName() + " — each address's English and Hindi, to read");
+            }
+        }
+
         // Named rather than left silent (D15): a load that rewrites a paragraph's words throws
         // away the vector that described the old ones, and a load that deletes an embedded row
         // throws away its vector outright. Both are re-earned by `ncert embed` at the price of the
         // paragraphs involved — but a run that quietly destroys paid work should say so.
         if (result.embeddingsCleared() > 0 || result.embeddedOrphans() > 0) {
-            report.section("embeddings this load dropped")
-                    .line("run `ncert embed --book " + definition.code() + "` to earn them back")
+            report.section(dryRun ? "embeddings this load would drop" : "embeddings this load dropped")
+                    .line(dryRun ? "the load of record would leave `ncert embed --book " + definition.code() + "` to earn "
+                            + "them back" : "run `ncert embed --book " + definition.code() + "` to earn them back")
                     .table(List.of("cleared (text rewritten)", "deleted with their paragraph"),
                             List.of(List.of(String.valueOf(result.embeddingsCleared()),
                                     String.valueOf(result.embeddedOrphans()))));
@@ -155,8 +279,53 @@ class NcertLoadCommand extends NcertBookCommand {
             report.line("INCOMPLETE: " + (rendered - pages.size()) + " rendered pages are not in the "
                     + "extraction — run `ncert extract` again before trusting this load");
         }
-        report.section("addresses in the database this extraction no longer carried — deleted")
+        report.section("addresses in the database this extraction no longer carried — "
+                        + (dryRun ? "a load would delete them" : "deleted"))
                 .list(result.orphans());
+        report.section("rows the other edition still carries — this edition's text "
+                        + (dryRun ? "a load would clear from them" : "cleared from them"))
+                .list(result.cleared());
+    }
+
+    /** Why a local file is not this edition's transcription: a Hindi one is Devanagari, an English one Latin. */
+    private static String wrongEdition(List<ExtractedPage> pages, BookLanguage language) {
+        long devanagari = 0;
+        long latin = 0;
+        for (ExtractedPage page : pages) {
+            for (NcertPage.Paragraph paragraph : page.paragraphs()) {
+                for (char c : paragraph.text().toCharArray()) {
+                    if (c >= 'ऀ' && c <= 'ॿ') {
+                        devanagari++;
+                    } else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+                        latin++;
+                    }
+                }
+            }
+        }
+        if (language == BookLanguage.hi && devanagari == 0) {
+            return "carries no Devanagari";
+        }
+        return language == BookLanguage.en && devanagari > latin ? "is mostly Devanagari" : null;
+    }
+
+    private static byte[] read(Path file) {
+        try {
+            return Files.readAllBytes(file);
+        } catch (IOException e) {
+            throw new UncheckedIOException("cannot read the local extraction " + file.toAbsolutePath().normalize(), e);
+        }
+    }
+
+    private static void write(Path file, byte[] bytes) {
+        try {
+            Path parent = file.toAbsolutePath().getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+            Files.write(file, bytes);
+        } catch (IOException e) {
+            throw new UncheckedIOException("cannot write the pairs to " + file.toAbsolutePath().normalize(), e);
+        }
     }
 
     /**
@@ -165,6 +334,11 @@ class NcertLoadCommand extends NcertBookCommand {
      * book still fails this load — the file is one founder-owned input, not one per book.
      */
     private List<NcertCorrection> corrections(BookDefinition definition, Set<Short> chapters, Report report) {
+        if (artefactTag != null) {
+            // The rulings name spans of the canonical draw; a trial is measured as the model wrote it.
+            report.line("corrections: not applied to a scratch run — its draw is loaded as the model wrote it");
+            return List.of();
+        }
         Path file = io.input(NcertCorrectionsYamlReader.FILE);
         if (!Files.isRegularFile(file)) {
             report.line("no " + NcertCorrectionsYamlReader.FILE + " under the inputs: nothing to apply");
@@ -172,6 +346,53 @@ class NcertLoadCommand extends NcertBookCommand {
         }
         report.line("corrections: " + file.normalize() + " sha256 " + Report.sha256(file));
         return NcertCorrections.forLoad(NcertCorrectionsYamlReader.read(file), definition.code(), language, chapters);
+    }
+
+    /**
+     * The numbered rows, the figure_refs entries that were not figure or table labels, and the English addresses
+     * an {@code unprinted} entry left without a row of this edition.
+     */
+    record Numbered(List<NcertParagraphRow> rows, List<String> droppedRefs, List<EditionPairs.Address> unprinted) {
+    }
+
+    /**
+     * What figure_refs may hold: a figure or a table label as the books print them, singular or
+     * plural — a sentence naming several parts at once prints "Figs. 3.15(a) to (d)" or
+     * "Figures 4.8(b)", and taking only the singular dropped four real references from phy11-part1
+     * (D15, 2026-09-17). An equation number a paragraph cites is still not a figure reference.
+     *
+     * <p>The Hindi edition's words are चित्र and सारणी, चित्रों and सारणियों for several; taking only the
+     * English ones named every real label of the first Hindi book as dropped (D16). They are matched
+     * without {@code \b}, which marks no boundary after a Devanagari vowel sign.
+     */
+    private static final Pattern FIGURE_REF = Pattern.compile(
+            "^(?:(?:Fig(?:ure)?s?\\.?|Tables?)\\b|(?:चित्र(?:ों)?|सारण(?:ी|ियों))(?![\\p{L}\\p{M}])).*",
+            Pattern.CASE_INSENSITIVE);
+
+    /**
+     * A footnote, which the books set at the foot of the page under a rule. It is the page's last
+     * paragraph but never what the next page continues: the body above it is. Before this, four of
+     * phy11-part1's nine footnotes had absorbed the following page's opening words — polluting the
+     * footnote and truncating the body paragraph, two rows each (D15, 2026-09-17).
+     *
+     * <p>The mark may touch its first word: the Hindi Physics Part I prints "*Delta t->0 सीमा में…",
+     * and asking for a space after the asterisk let that footnote take a continuation (D16). Of the 61
+     * English rows that start with an asterisk one lacks the space, and it is a footnote too (chem12-part1
+     * §2.1, the last row of its section), so no English load changes.
+     */
+    private static final Pattern FOOTNOTE = Pattern.compile("^\\*");
+
+    /** Whether a paragraph is a footnote: it starts with the mark. */
+    static boolean footnote(String text) {
+        return FOOTNOTE.matcher(text.stripLeading()).find();
+    }
+
+    /** A deferred paragraph until the next one of its section has taken its number. */
+    private record Waiting(ExtractedPage page, int index, NcertPage.Paragraph paragraph) {
+    }
+
+    /** Where a row's first paragraph sits on its page, as a {@code move} or an {@code unprinted} entry names it. */
+    private record Start(short chapter, int page, int index) {
     }
 
     /**
@@ -189,34 +410,47 @@ class NcertLoadCommand extends NcertBookCommand {
      * requiring strict adjacency refused that legitimate book (spec-auditor, D14). A flag that
      * fails any of these is refused by name, every one at once, with the pages to re-extract:
      * nothing is written either way, so there is no reason to withhold the rest of the list.
+     *
+     * @param deferred the paragraphs a {@code defer} correction names (D16): each takes its number after
+     *                 the next paragraph its section starts, so a footnote the other edition prints a
+     *                 page earlier still sits beside its own English. It stays on its page, and like a
+     *                 footnote it is never what the next page continues.
      */
-    /** The numbered rows, and the figure_refs entries that were not figure or table labels. */
-    record Numbered(List<NcertParagraphRow> rows, List<String> droppedRefs) {
+    static Numbered number(List<ExtractedPage> pages, String jsonlKey, Set<NcertCorrections.Deferred> deferred) {
+        return number(pages, jsonlKey, deferred, List.of());
     }
 
     /**
-     * What figure_refs may hold: a figure or a table label as the books print them, singular or
-     * plural — a sentence naming several parts at once prints "Figs. 3.15(a) to (d)" or
-     * "Figures 4.8(b)", and taking only the singular dropped four real references from phy11-part1
-     * (D15, 2026-09-17). An equation number a paragraph cites is still not a figure reference.
+     * @param moves the rows a {@code move} correction names (D16), in file order: once every page break is
+     *              joined, each row is taken out of its section and numbered right after the row it names, in
+     *              that row's section, and both sections are numbered again from ¶1.
      */
-    private static final Pattern FIGURE_REF =
-            Pattern.compile("^(Fig(?:ure)?s?\\.?|Tables?)\\b.*", Pattern.CASE_INSENSITIVE);
+    static Numbered number(List<ExtractedPage> pages, String jsonlKey, Set<NcertCorrections.Deferred> deferred,
+            List<NcertCorrections.Moved> moves) {
+        return number(pages, jsonlKey, deferred, moves, List.of());
+    }
 
     /**
-     * A footnote, which the books set at the foot of the page under a rule. It is the page's last
-     * paragraph but never what the next page continues: the body above it is. Before this, four of
-     * phy11-part1's nine footnotes had absorbed the following page's opening words — polluting the
-     * footnote and truncating the body paragraph, two rows each (D15, 2026-09-17).
+     * @param unprinted the rows an {@code unprinted} correction names (D16), once per entry: each takes the number
+     *                  after the English paragraph its edition does not print, wherever it is numbered — in page
+     *                  order, after a deferral, or again after a move — so that number stays the English row's alone;
+     *                  an entry with {@code after} leaves the number after its row instead (2026-10-17).
      */
-    private static final Pattern FOOTNOTE = Pattern.compile("^\\*+\\s");
-
-    static Numbered number(List<ExtractedPage> pages, String jsonlKey) {
+    static Numbered number(List<ExtractedPage> pages, String jsonlKey, Set<NcertCorrections.Deferred> deferred,
+            List<NcertCorrections.Moved> moves, List<NcertCorrections.Unprinted> unprinted) {
+        Map<Start, Integer> gaps = new LinkedHashMap<>();
+        Map<Start, Integer> gapsAfter = new LinkedHashMap<>();
+        unprinted.forEach(gap -> (gap.after() ? gapsAfter : gaps).merge(new Start(gap.chapter(), gap.page(), gap.index()),
+                1, Integer::sum));
         List<Joined> rows = new ArrayList<>();
+        Map<Start, Joined> starts = new HashMap<>();
         List<String> refusals = new ArrayList<>();
         Map<Short, TreeSet<Integer>> redo = new LinkedHashMap<>();
         // (chapter, section) → the last number given out; a resumed section continues its count.
         Map<String, Integer> counters = new HashMap<>();
+        // (chapter, section) → the deferred paragraph waiting for that section's next one.
+        Map<String, Waiting> waiting = new LinkedHashMap<>();
+        List<String> unplaced = new ArrayList<>();
         short chapter = -1;
         Joined last = null;
         for (ExtractedPage page : pages) {
@@ -246,15 +480,50 @@ class NcertLoadCommand extends NcertBookCommand {
                     last.add(page, paragraph);
                     continue;
                 }
-                int paraNo = counters.merge(chapter + " " + section, 1, Integer::sum);
-                Joined joined = new Joined(chapter, section, paraNo, page, paragraph);
+                String counter = chapter + " " + section;
+                if (deferred.contains(new NcertCorrections.Deferred(chapter, page.page(), index))) {
+                    Waiting earlier = waiting.put(counter, new Waiting(page, index, paragraph));
+                    if (earlier != null) {
+                        unplaced.add(stranded(chapter, section, earlier) + " before the next deferred one");
+                    }
+                    continue;
+                }
+                Start start = new Start(chapter, page.page(), index);
+                int gap = gaps.getOrDefault(start, 0);
+                Joined joined = new Joined(chapter, section, counters.merge(counter, 1 + gap, Integer::sum), page,
+                        paragraph);
+                joined.unprintedBefore = gap;
+                joined.unprintedAfter = gapsAfter.getOrDefault(start, 0);
+                counters.merge(counter, joined.unprintedAfter, Integer::sum);
                 rows.add(joined);
+                starts.put(start, joined);
                 // A footnote is never the paragraph the next page continues, so it never becomes the
                 // anchor: the body above it stays the one a continuation joins to.
-                if (!FOOTNOTE.matcher(paragraph.text().stripLeading()).find()) {
+                if (!footnote(paragraph.text())) {
                     last = joined;
                 }
+                Waiting held = waiting.remove(counter);
+                if (held != null) {
+                    Start heldStart = new Start(chapter, held.page().page(), held.index());
+                    int heldGap = gaps.getOrDefault(heldStart, 0);
+                    Joined placed = new Joined(chapter, section, counters.merge(counter, 1 + heldGap, Integer::sum),
+                            held.page(), held.paragraph());
+                    placed.unprintedBefore = heldGap;
+                    placed.unprintedAfter = gapsAfter.getOrDefault(heldStart, 0);
+                    counters.merge(counter, placed.unprintedAfter, Integer::sum);
+                    rows.add(placed);
+                    starts.put(heldStart, placed);
+                }
             }
+        }
+        for (Map.Entry<String, Waiting> left : waiting.entrySet()) {
+            String[] key = left.getKey().split(" ");
+            unplaced.add(stranded(Short.parseShort(key[0]), key[1], left.getValue()));
+        }
+        if (!unplaced.isEmpty()) {
+            throw new InputFormatException(Path.of(NcertCorrectionsYamlReader.FILE), 0, unplaced.size()
+                    + " defer correction(s) cannot be placed:\n  " + String.join("\n  ", unplaced)
+                    + "\nFix each entry against the page, or remove it.");
         }
         if (!refusals.isEmpty()) {
             throw new InputFormatException(Path.of(jsonlKey), 0, refusals.size()
@@ -265,6 +534,39 @@ class NcertLoadCommand extends NcertBookCommand {
                                     + entry.getValue().stream().map(String::valueOf)
                                             .collect(java.util.stream.Collectors.joining(",")))
                             .collect(java.util.stream.Collectors.joining("\n  ")));
+        }
+        // The numbering's own net, as for a move: the corrections step refuses a continuation by name first.
+        List<String> unnumbered = unprinted.stream()
+                .filter(gap -> !starts.containsKey(new Start(gap.chapter(), gap.page(), gap.index())))
+                .map(gap -> "ch " + gap.chapter() + " page " + gap.page() + ": the row starting \"" + gap.at()
+                        + "\" is not a row of its own")
+                .toList();
+        if (!unnumbered.isEmpty()) {
+            throw new InputFormatException(Path.of(NcertCorrectionsYamlReader.FILE), 0, unnumbered.size()
+                    + " unprinted correction(s) cannot be placed:\n  " + String.join("\n  ", unnumbered)
+                    + "\nFix each entry against the page, or remove it.");
+        }
+        move(rows, starts, moves);
+        // `after` is for a section's last English paragraph, which no row follows; on any other row the gap is the
+        // next row's, and a plain entry there says so — one spelling, which a move or a deferral cannot pull apart.
+        Map<String, Integer> lastNumber = new HashMap<>();
+        rows.forEach(row -> lastNumber.merge(row.counter(), row.paraNo, Math::max));
+        List<String> notLast = rows.stream().filter(row -> row.unprintedAfter > 0 && row.paraNo < lastNumber.get(row.counter()))
+                .map(row -> "ch " + row.chapterNo + " §" + row.section + " ¶" + row.paraNo + " is not its section's last row")
+                .toList();
+        if (!notLast.isEmpty()) {
+            throw new InputFormatException(Path.of(NcertCorrectionsYamlReader.FILE), 0, notLast.size()
+                    + " unprinted correction(s) with after name a row another follows:\n  " + String.join("\n  ", notLast)
+                    + "\nName the row after the gap, without after.");
+        }
+        List<EditionPairs.Address> left = new ArrayList<>();
+        for (Joined row : rows) {
+            for (int before = row.unprintedBefore; before > 0; before--) {
+                left.add(new EditionPairs.Address(row.chapterNo, row.section, row.paraNo - before));
+            }
+            for (int after = 1; after <= row.unprintedAfter; after++) {
+                left.add(new EditionPairs.Address(row.chapterNo, row.section, row.paraNo + after));
+            }
         }
         // A model put "Eq. (7.5)" in figure_refs (D15, the Opus run). A rule can ask; this
         // guarantees, and names what it dropped so a wrong label is never silently discarded.
@@ -282,7 +584,61 @@ class NcertLoadCommand extends NcertBookCommand {
             result.add(new NcertParagraphRow(row.chapterNo(), row.section(), row.paraNo(), row.text(),
                     row.hasEquations(), kept, row.extraction()));
         }
-        return new Numbered(List.copyOf(result), List.copyOf(dropped));
+        return new Numbered(List.copyOf(result), List.copyOf(dropped), List.copyOf(left));
+    }
+
+    /**
+     * The {@code move} entries, on whole rows: each row leaves its section and is numbered right after the row it
+     * names, in that row's section; every section a move touched is then numbered from ¶1 in its new order, still
+     * leaving the numbers an {@code unprinted} entry leaves. A row's words, pages and page parts go with it, so
+     * nothing a continuation joined is split again.
+     */
+    private static void move(List<Joined> rows, Map<Start, Joined> starts, List<NcertCorrections.Moved> moves) {
+        if (moves.isEmpty()) {
+            return;
+        }
+        Map<String, List<Joined>> sections = new LinkedHashMap<>();
+        rows.stream().sorted(Comparator.comparingInt(row -> row.paraNo))
+                .forEach(row -> sections.computeIfAbsent(row.counter(), key -> new ArrayList<>()).add(row));
+        Set<String> touched = new LinkedHashSet<>();
+        List<String> unplaced = new ArrayList<>();
+        for (NcertCorrections.Moved move : moves) {
+            Joined row = starts.get(new Start(move.chapter(), move.page(), move.index()));
+            Joined after = starts.get(new Start(move.chapter(), move.afterPage(), move.afterIndex()));
+            if (row == null || after == null) {
+                unplaced.add("ch " + move.chapter() + " page " + move.page() + ": the row starting \"" + move.at()
+                        + "\" or the row starting \"" + move.after() + "\" (page " + move.afterPage()
+                        + ") is not a row of its own");
+                continue;
+            }
+            touched.add(row.counter());
+            sections.get(row.counter()).remove(row);
+            List<Joined> target = sections.get(after.counter());
+            target.add(target.indexOf(after) + 1, row);
+            row.section = after.section;
+            touched.add(after.counter());
+        }
+        if (!unplaced.isEmpty()) {
+            throw new InputFormatException(Path.of(NcertCorrectionsYamlReader.FILE), 0, unplaced.size()
+                    + " move correction(s) cannot be placed:\n  " + String.join("\n  ", unplaced)
+                    + "\nFix each entry against the page, or remove it.");
+        }
+        for (String key : touched) {
+            int paraNo = 0;
+            for (Joined row : sections.get(key)) {
+                // A row beside an English paragraph its edition does not print leaves that number wherever it goes.
+                paraNo += 1 + row.unprintedBefore;
+                row.paraNo = paraNo;
+                paraNo += row.unprintedAfter;
+            }
+        }
+    }
+
+    private static String stranded(short chapter, String section, Waiting waiting) {
+        String text = waiting.paragraph().text().strip().replaceAll("\\s+", " ");
+        return "ch " + chapter + " page " + waiting.page().page() + ": the deferred paragraph starting \""
+                + (text.length() > 60 ? text.substring(0, 60) + "…" : text) + "\" has no later paragraph of §"
+                + section + " to follow";
     }
 
     /**
@@ -371,8 +727,13 @@ class NcertLoadCommand extends NcertBookCommand {
     private static final class Joined {
 
         private final short chapterNo;
-        private final String section;
-        private final int paraNo;
+        // Not final: a move entry gives a row another section and both sections new numbers (D16).
+        private String section;
+        private int paraNo;
+        // How many English paragraphs right before this row its edition does not print: numbers it leaves (D16).
+        private int unprintedBefore;
+        // And right after it, where no row follows them in the section: the numbers it leaves after its own.
+        private int unprintedAfter;
         private final StringBuilder text = new StringBuilder();
         private final List<Integer> pages = new ArrayList<>();
         private final List<Integer> pageStarts = new ArrayList<>();
@@ -389,6 +750,11 @@ class NcertLoadCommand extends NcertBookCommand {
 
         private int lastPage() {
             return pages.getLast();
+        }
+
+        /** The (chapter, section) key the numbering counts in. */
+        private String counter() {
+            return chapterNo + " " + section;
         }
 
         private void add(ExtractedPage page, NcertPage.Paragraph paragraph) {

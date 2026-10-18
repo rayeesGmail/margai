@@ -3,6 +3,7 @@ package com.margai.pipeline.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import com.margai.curriculum.api.BookLanguage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +32,7 @@ class ChapterApparatusTest {
         List<String> pages = List.of(prose("7.1 INTRODUCTION"), prose("7.2 KEPLER"), prose("7.3 MORE"),
                 prose("SUMMARY"), prose("POINTS TO PONDER"), prose("EXERCISES", "7.1 Answer the following"));
 
-        Optional<ChapterApparatus.Boundary> boundary = ChapterApparatus.find(pages);
+        Optional<ChapterApparatus.Boundary> boundary = ChapterApparatus.find(pages, BookLanguage.en);
 
         assertThat(boundary).isPresent();
         assertThat(boundary.orElseThrow().page()).isEqualTo(4);
@@ -74,8 +75,8 @@ class ChapterApparatusTest {
         List<String> pages = List.of(prose("1.1 Types of Solutions"), prose("1.2 Expressing Concentration"),
                 prose("Summary"), prose("1.5 A solution of glucose in water is labelled"));
 
-        assertThat(ChapterApparatus.find(pages).orElseThrow().heading()).isEqualTo("SUMMARY");
-        assertThat(ChapterApparatus.find(pages).orElseThrow().page()).isEqualTo(3);
+        assertThat(ChapterApparatus.find(pages, BookLanguage.en).orElseThrow().heading()).isEqualTo("SUMMARY");
+        assertThat(ChapterApparatus.find(pages, BookLanguage.en).orElseThrow().page()).isEqualTo(3);
     }
 
     /**
@@ -88,14 +89,14 @@ class ChapterApparatusTest {
                 prose("7.2 MORE"), prose("7.3 MORE"), prose("7.4 MORE"),
                 prose("SUMMARY"), prose("EXERCISES"));
 
-        assertThat(ChapterApparatus.find(pages).orElseThrow().page()).isEqualTo(5);
+        assertThat(ChapterApparatus.find(pages, BookLanguage.en).orElseThrow().page()).isEqualTo(5);
     }
 
     @Test
     void aChapterWithNoApparatusHeadingSendsEveryPage() {
         List<String> pages = List.of(prose("7.1 ONE"), prose("7.2 TWO"), prose("7.3 THREE"), prose("7.4 FOUR"));
 
-        assertThat(ChapterApparatus.find(pages)).isEmpty();
+        assertThat(ChapterApparatus.find(pages, BookLanguage.en)).isEmpty();
     }
 
     /**
@@ -112,7 +113,7 @@ class ChapterApparatusTest {
                 "8.1 ZKDW DUH KBEULGLVDWLRQ VWDWHV");
 
         assertThat(PdfTextLayer.isLegible(garbled)).isFalse();
-        assertThat(ChapterApparatus.find(garbled).orElseThrow().page()).isEqualTo(3);
+        assertThat(ChapterApparatus.find(garbled, BookLanguage.en).orElseThrow().page()).isEqualTo(3);
     }
 
     /**
@@ -128,11 +129,100 @@ class ChapterApparatusTest {
                 "8.1 ZKDW DUH KBEULGLVDWLRQ VWDWHV");
 
         // No PDF behind it: an illegible layer's heading is never looked for among the page's glyphs.
-        ChapterApparatus.Boundary boundary = ChapterApparatus.locate(garbled, new byte[0]).orElseThrow();
+        ChapterApparatus.Boundary boundary = ChapterApparatus.locate(garbled, new byte[0], BookLanguage.en).orElseThrow();
 
         assertThat(boundary.proseLinesAbove()).isEqualTo(ChapterApparatus.Boundary.UNPLACED);
         assertThat(boundary.covers(3)).isFalse();
         assertThat(boundary.covers(4)).isTrue();
+    }
+
+    /**
+     * The Hindi books set every word in Walkman-Chanakya with no Unicode map, so the layer carries the
+     * font's glyph codes, not Devanagari — but a heading is still an exact line of them: सारांश is
+     * {@code lkjka'k} (D16; the PARKED "Hindi apparatus boundary" row's fourth route, founder 2026-10-01).
+     */
+    @Test
+    void aHindiChapterEndsAtItsEncodedSummary() {
+        List<String> pages = List.of("1-1 Hkwfedk\nHkkSfrdh D;k gS", "1-2 HkkSfrdh dk {ks=k", "1-3 vkSj Hkh",
+                "lkjka'k\nHkkSfrdh esa geus i<+k", "vH;kl\n1-1 fuEufyf[kr dk mÙkj nhft,");
+
+        ChapterApparatus.Boundary boundary = ChapterApparatus.find(pages, BookLanguage.hi).orElseThrow();
+
+        assertThat(boundary.page()).isEqualTo(4);
+        assertThat(boundary.heading()).isEqualTo("सारांश");
+    }
+
+    /**
+     * Typesetters keyed सारांश three ways, Chemistry 12's overprinted heading reads as a fourth, and
+     * अभ्यास heads the two chapters whose layer lists it first.
+     */
+    @Test
+    void everySpellingOfTheHindiHeadingsTheBooksUseIsFound() {
+        for (String typed : List.of("lkjka'k", "lkjak'k", "Lkkjka'k", "lkjka'kaaaa")) {
+            assertThat(ChapterApparatus.find(List.of("1-1 ,d", "1-2 nks", typed), BookLanguage.hi))
+                    .as(typed).map(ChapterApparatus.Boundary::heading).hasValue("सारांश");
+        }
+        assertThat(ChapterApparatus.find(List.of("1-1 ,d", "1-2 nks", "vH;kl"), BookLanguage.hi))
+                .map(ChapterApparatus.Boundary::heading).hasValue("अभ्यास");
+    }
+
+    /** Case carries meaning in the encoding (L is a half स, l a full one), and each edition has its own headings. */
+    @Test
+    void theHindiMatchIsExactAndTheEditionsDoNotShareHeadings() {
+        assertThat(ChapterApparatus.find(List.of("1-1 ,d", "1-2 nks", "LKJKA'K"), BookLanguage.hi)).isEmpty();
+        assertThat(ChapterApparatus.find(List.of("1-1 ,d", "1-2 nks", "SUMMARY"), BookLanguage.hi)).isEmpty();
+        assertThat(ChapterApparatus.find(List.of(prose("7.1 ONE"), prose("7.2 TWO"), "lkjka'k"), BookLanguage.en))
+                .isEmpty();
+    }
+
+    /**
+     * The Hindi rule against the books: all 79 chapter files. Every one has its boundary in the back half,
+     * none is placed — the layer has no words to count prose above the heading by, so the heading's page
+     * is sent (the kech202 rule, DECISIONS 2026-09-30) — and the pages after the heading are the 223 a
+     * pymupdf scan of the same files counted (D16).
+     */
+    @Test
+    void everyHindiChapterHasABoundaryInItsBackHalfLeftUnplaced() throws IOException {
+        Path hindi = Path.of("..", "ncert", "2022-ed", "hi");
+        assumeTrue(Files.exists(hindi.resolve("phy11-part1/khph101.pdf")), "founder's NCERT PDFs not on this machine");
+
+        int files = 0;
+        int apparatus = 0;
+        List<String> withoutBoundary = new java.util.ArrayList<>();
+        java.util.Map<String, Integer> headings = new java.util.TreeMap<>();
+        java.util.Map<String, String> pagesFound = new java.util.TreeMap<>();
+        try (var books = Files.list(hindi)) {
+            for (Path book : books.filter(Files::isDirectory).sorted().toList()) {
+                try (var chapters = Files.list(book)) {
+                    for (Path chapter : chapters
+                            .filter(path -> path.getFileName().toString().matches("[a-z]{4}\\d{3}\\.pdf"))
+                            .sorted().toList()) {
+                        files++;
+                        byte[] pdf = Files.readAllBytes(chapter);
+                        List<String> text = PdfTextLayer.pages(pdf);
+                        Optional<ChapterApparatus.Boundary> boundary = ChapterApparatus.locate(text, pdf, BookLanguage.hi);
+                        if (boundary.isEmpty()) {
+                            withoutBoundary.add(book.getFileName() + "/" + chapter.getFileName());
+                            continue;
+                        }
+                        ChapterApparatus.Boundary found = boundary.orElseThrow();
+                        assertThat(PdfTextLayer.isLegible(text)).as("%s's layer", chapter.getFileName()).isFalse();
+                        assertThat(found.page()).as("%s: the apparatus must be in the back half", chapter.getFileName())
+                                .isGreaterThan(text.size() / 2);
+                        assertThat(found.proseLinesAbove()).isEqualTo(ChapterApparatus.Boundary.UNPLACED);
+                        headings.merge(found.heading(), 1, Integer::sum);
+                        apparatus += (int) java.util.stream.IntStream.rangeClosed(1, text.size())
+                                .filter(found::covers).count();
+                        pagesFound.put(chapter.getFileName().toString(), found.page() + "/" + text.size());
+                    }
+                }
+            }
+        }
+
+        assertThat(files).as("every chapter file of all ten Hindi books").isEqualTo(79);
+        assertThat(withoutBoundary).isEmpty();
+        assertThat(headings.values().stream().mapToInt(Integer::intValue).sum()).isEqualTo(79);
+        assertThat(apparatus).as("boundary page / pages per file: %s", pagesFound).isEqualTo(223);
     }
 
     @Test
@@ -174,7 +264,7 @@ class ChapterApparatusTest {
                         byte[] pdf = Files.readAllBytes(chapter);
                         List<String> text = PdfTextLayer.pages(pdf);
                         pages += text.size();
-                        Optional<ChapterApparatus.Boundary> boundary = ChapterApparatus.locate(text, pdf);
+                        Optional<ChapterApparatus.Boundary> boundary = ChapterApparatus.locate(text, pdf, BookLanguage.en);
                         if (boundary.isEmpty()) {
                             withoutBoundary.add(book.getFileName() + "/" + chapter.getFileName());
                             continue;

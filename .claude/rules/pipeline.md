@@ -11,14 +11,17 @@ paths:
 - Order matters (TECH_PLAN §6.3): taxonomy — `taxonomy load`, `taxonomy prerequisites`,
   `backbone load`, `cutoffs load` (D13) → NCERT — `ncert register|render|extract|load|verify|align|embed`
   (D14–D17; `verify` before a book is taken as canonical, its outcome applied by the next `load` from
-  `pipeline/inputs/ncert-corrections.yaml`) → PYQ — `pyq load|solve|verify|distractors` (D19–D21) → `stats compute` (D22) →
+  `pipeline/inputs/ncert-corrections.yaml`; `ncert errata` checks `pipeline/inputs/ncert-errata.yaml` against
+  the loaded rows after every reload, D16) → PYQ — `pyq load|solve|verify|distractors` (D19–D21) → `stats compute` (D22) →
   `anchors link`, `eval snapshot` (D23) → seed generation and trap mining (unscheduled, §12.2) →
   `cache seed` (D76). A step must fail loudly, never half-write: one transaction per natural-key batch.
 - Founder-owned inputs live in `pipeline/inputs/` (taxonomy CSV, prerequisites CSV, archetypes YAML,
   cutoffs CSV, books YAML, PYQ papers JSON — TECH_PLAN §6.2) as data files in the repo; the pipeline
   never edits them. Every command writes `pipeline/reports/<date>-<command>.md`, committed as the
   day's evidence (§6.3); a second run of the same command on the same day writes `-2.md`, a third
-  `-3.md`, and no run ever overwrites an earlier one's report (D15).
+  `-3.md`, and no run ever overwrites an earlier one's report (D15). One exception (founder, D16,
+  DECISIONS 2026-10-09): `ncert load --dry-run`'s working runs go to a scratch `--reports` directory
+  and are not committed; the dry run a corrections block is approved on is committed with the block.
 - The commands are Java under the `pipeline` Spring profile (picocli, TECH_PLAN §6.1) in the
   `pipeline` module (`server/**/pipeline/**`), which reaches other modules only through their `api`
   packages. AI calls (solutions, distractor maps, embeddings) go through `AiClient` with the cost

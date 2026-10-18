@@ -9,6 +9,7 @@ import com.margai.ai.api.ImagePart;
 import com.margai.ai.tasks.NcertPageVerifier;
 import com.margai.ai.tasks.PageVerdicts;
 import com.margai.ai.tasks.VerifyItem;
+import com.margai.curriculum.api.BookLanguage;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.NcertParagraphRow;
 import com.margai.curriculum.api.NcertVerificationRow;
@@ -67,12 +68,11 @@ class NcertVerifyCommand extends NcertBookCommand {
 
     /**
      * A section heading as the verifier quotes one — "7.4 THE GRAVITATIONAL CONSTANT", "5.2.2 Inheritance of
-     * One Gene" — a printed section number and a word; "3.84 × 10^8 m" is not one.
+     * One Gene" — a printed section number and a word; "3.84 × 10^8 m" is not one. A word is a letter and
+     * then letters or combining marks, because a Hindi heading's second character is often a vowel sign
+     * ("1.3 सार्थक अंक", D16).
      */
-    private static final Pattern OMITTED_HEADING = Pattern.compile("\\d{1,2}(\\.\\d{1,2})+\\s+\\p{L}{2,}");
-
-    /** An artefact tag becomes part of an object key. */
-    private static final Pattern TAG = Pattern.compile("[a-z0-9][a-z0-9-]{0,31}");
+    private static final Pattern OMITTED_HEADING = Pattern.compile("\\d{1,2}(\\.\\d{1,2})+\\s+\\p{L}[\\p{L}\\p{M}]+");
 
     @Option(names = "--read-pages", description = "Also read every page with the verify tier (spends; resumes).")
     boolean readPages;
@@ -133,12 +133,11 @@ class NcertVerifyCommand extends NcertBookCommand {
 
         List<NcertCorrection> rulings = rulings(definition, chapterNos, report);
         CodeFlags codeFlags = layoutChecks(definition, selected, byChapter, rulings, report);
-
-        if (artefactTag != null && !TAG.matcher(artefactTag).matches()) {
-            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0,
-                    "--artefact-tag must be lowercase letters, digits and hyphens, at most 32 — it becomes part of an object key");
+        if (language == BookLanguage.hi) {
+            hindiChecks(definition, selected, byChapter, report);
         }
-        String key = ContentKeys.verify(definition.code(), language, artefactTag);
+
+        String key = ContentKeys.verify(definition.code(), language, ContentKeys.tag(artefactTag));
         Map<String, VerifiedPage> done = new TreeMap<>();
         if (content.exists(key)) {
             VerifyJsonl.read(key, content.get(key)).forEach(page -> done.put(page.address(), page));
@@ -247,7 +246,7 @@ class NcertVerifyCommand extends NcertBookCommand {
             }
             // The page the apparatus starts on is compared only as far as its heading: extract sends
             // it for what is taught above, and the Summary below is not text any row owes (D15).
-            List<PdfLayout.PageShape> shapes = ChapterApparatus.find(pageTexts)
+            List<PdfLayout.PageShape> shapes = ChapterApparatus.find(pageTexts, language)
                     .map(boundary -> PdfLayout.pages(pdf, boundary.page(), boundary.heading()))
                     .orElseGet(() -> PdfLayout.pages(pdf));
             LayoutChecks.Result result = LayoutChecks.check(ofChapter, shapes);
@@ -442,6 +441,38 @@ class NcertVerifyCommand extends NcertBookCommand {
         report.line("verifier: " + verifying + " (prompt " + verifier.promptVersion() + "); transcribed by: "
                 + rowsByModel.entrySet().stream()
                         .map(entry -> entry.getKey() + " (" + entry.getValue() + " rows)").collect(Collectors.joining(", ")));
+    }
+
+    /**
+     * The free pass for a Hindi book (SPEC §12.2, DECISIONS 2026-10-02): every page's parts of the loaded rows
+     * held to the decoded layer, as extract holds a page's transcription — so a reload after corrections is
+     * re-checked at no cost. The Summary's page is not judged for coverage: its layer carries the Summary.
+     */
+    private void hindiChecks(BookDefinition definition, List<BookDefinition.Chapter> selected,
+            Map<Short, List<NcertParagraphRow>> byChapter, Report report) {
+        HindiChecks.Findings findings = new HindiChecks.Findings();
+        int pages = 0;
+        for (BookDefinition.Chapter chapter : selected) {
+            List<NcertParagraphRow> ofChapter = byChapter.get(chapter.no());
+            if (ofChapter == null) {
+                continue;
+            }
+            byte[] pdf = content.get(definition.sourceKey(language, chapter));
+            List<HindiLayer.Page> layer = HindiLayer.pages(pdf);
+            int summaryPage = ChapterApparatus.find(PdfTextLayer.pages(pdf), language)
+                    .map(ChapterApparatus.Boundary::page).orElse(0);
+            for (Map.Entry<Integer, List<Placed>> page : partsByPage(ofChapter).entrySet()) {
+                if (page.getKey() > layer.size()) {
+                    continue;
+                }
+                pages++;
+                String rows = page.getValue().stream().map(placed -> placed.part().text())
+                        .collect(Collectors.joining(" "));
+                findings.check("ch " + chapter.no() + " p" + page.getKey(), layer.get(page.getKey() - 1), rows,
+                        page.getKey() == summaryPage);
+            }
+        }
+        findings.report(report, " of the " + pages + " page(s) the loaded rows are on");
     }
 
     /** One row's part on one page. */

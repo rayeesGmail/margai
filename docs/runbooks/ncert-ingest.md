@@ -326,8 +326,13 @@ Every run's report is its own file: a second run of the same command on the same
 
 **The load applies `pipeline/inputs/ncert-corrections.yaml`** (D15) after its page-break repairs and
 before it numbers: the founder's rulings on what `ncert verify` flagged. `text`, `join`, `split`,
-`figure_ref` (one label removed from or added to the paragraph holding a span) and `drop` (a paragraph
-that is not running text removed) change the frozen run's pages; `misprint`, `false_positive` and
+`figure_ref` (one label removed from or added to the paragraph holding a span), `drop` (a paragraph
+that is not running text removed), `defer` (D16: the paragraph takes its number after the next one of
+its section — a footnote the other edition prints a page later; no word moves and it stays on its own
+page), `section` (D16, Hindi only: a section the Hindi numbers otherwise takes the English number),
+`move` (D16, Hindi only: a whole row numbered right after another, carried out by the numbering once page
+breaks are joined) and `unprinted` (D16, Hindi only: the number before a row — with `after: true`, after it
+— left to an English paragraph the Hindi does not print) change the frozen run's pages; `misprint`, `false_positive` and
 `noise` rule on a flag and change nothing, and `ncert verify` reads those three itself. The first two
 answer the second read, matched on the spans the verifier quoted; `noise` answers one of the **free**
 checks, which quotes no span, so it names the check (`flag: join` or `flag: figure`) and the words the
@@ -337,6 +342,50 @@ once refuses the load by name. The file's own header and `pipeline/inputs/README
 one. Each row now also records where each of its pages' parts begins (`pageStarts` in the row's
 `extraction`), which verify needs — a row loaded before 2026-09-14's build has none, and verify asks for
 the reload.
+
+**A Hindi load first puts back the visargas the transcriber wrote as colons** (D16, `VisargaColons`):
+the Hindi font draws both with one glyph, and about a quarter of the first book's visarga words came
+back as `अत:`. It runs before the corrections, so a `lang: hi` entry is written against the words the
+rows show. The report names each rewrite under *a visarga the model wrote as a colon*, and under *a word
+glued to a colon that the visarga list does not know* each word it left alone because its list does not
+hold it — read those: a `text` entry if the page means a visarga, nothing if it is a colon. A colon set
+off by a space, or after a vowel sign (`है:`), is never touched. Inside a word a visarga follows one of a
+few prefixes (`निःसंदेह`, `दुःख`); any other colon glued on both sides — a ratio, a prefix the list lacks,
+two words that lost their space — is left and named too. `ncert verify` reads a visarga and a colon after
+a Devanagari letter as one glyph, as the print draws them, so the step's rewrite is not flagged.
+
+**A Hindi `text` entry takes its `printed` span from the page image**, read on a crop. The decoded text
+layer is a check and never a source (SPEC §12.2): a reason says where the layer's line is and that it
+agrees, and never quotes the layer's text or its glyph codes — the reason is printed in the load report,
+and a quote there would store what the ruling says is never stored. A character only the layer carries,
+where the raster draws nothing, is the founder's to rule on. Where the Hindi print states something false
+(½ set as an en dash, α for ∝, a wrong number, sign, subscript or word), `printed` carries the meaning from
+the English row or the arithmetic, the reason naming the crop and what fixes it (founder, DECISIONS
+2026-10-10); spelling, grammar and edition differences stay as printed.
+
+**A footnote is a paragraph starting with an asterisk**, with or without a space after it (D16): it is
+numbered where its page puts it and is never what the next page continues.
+
+**A Hindi load is held to the English rows** (D16): its report lists the *sections whose Hindi rows do not
+number as the English* — English is canonical, so each is a join or split still owed (section 6).
+
+**`--dry-run` loads nothing** (D16): it reads, repairs, corrects and numbers exactly as a load does, runs
+the database write in a transaction of its own that is rolled back — so a row the database would refuse
+refuses it too — and reports what the load would do, under its own name: `<date>-ncert-load-dry-run.md`.
+`--extraction FILE` reads a local copy of the JSONL instead of the content store; the file must carry a page
+of the chapters asked for, in the edition's script, or the run is refused. `--pairs FILE` (a Hindi dry run
+only) writes each address's English and Hindi side by side — whole NCERT text, so it goes to a scratch
+directory, never into the repository. Both belong to the dry run, because a load of record reads the content
+store's artefact. No model and no cost; with `--extraction`, no object store either, so it runs where only
+the database is. Every load prints its input's sha256 (`extraction: … sha256 …`): a dry run rehearsed a
+reload only if the reload prints the same hash, so a local copy taken before a `--redo` shows as stale.
+Don't run one while a load or `ncert embed` of the same book is running: its transaction holds that book's
+rows until it rolls back.
+
+**Which dry runs are evidence** (DECISIONS 2026-10-09): the iterations while a block is being written are
+working runs, pointed at a scratch directory with `--reports` and not committed; **the dry run the founder
+approves a block on is run into `pipeline/reports` and committed with the block**, so the approval and its
+evidence land together.
 
 ## 5. verify — the second read (D15, DECISIONS 2026-09-14 "the pair")
 
@@ -396,7 +445,8 @@ and a part the read cannot be matched to unambiguously is left without one, to b
 2. **`the second read's flags — adjudicate these against the page`** — one line per difference: the
    address, the page, the span as printed, the span as the row carries it. Render the page (pymupdf
    from the scratchpad) and look. Each real one becomes a `text` entry; a verifier error becomes a
-   `false_positive`; the book's own error, kept, becomes a `misprint`.
+   `false_positive`; the book's own error becomes a `misprint` — kept in the row, or, in a Hindi row where
+   it states something false, written as its meaning by a `text` entry beside it (DECISIONS 2026-10-10).
 3. **`rows the verifier could not find on their page`** and **`running text the page prints that no
    row carries`** — the second is the one check that sees lost text (run 9's three equations on page
    5); a real one is re-extracted or, for a sentence, joined in with a correction.
@@ -546,6 +596,100 @@ priced in, a new one means a change made something worse.
 Also read the extract report's low-confidence list: those pages are the model telling you where to
 look, and they should be checked whether or not the random sample lands on them — while remembering
 that at D14 it was silent about every defect that mattered.
+
+## 6. align — the Hindi rows set to the English ones (D16)
+
+```
+AI_LIVE=1 AWS_PROFILE=margai DB_URL=… \
+  java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live \
+  ncert align --book phy11-part1
+```
+
+**English is canonical and the Hindi follows it** (founder, DECISIONS 2026-10-01): a Hindi load puts each
+paragraph at the address of the same place in its section, and the Hindi print keeps two English
+paragraphs in one, or breaks one in two, often enough that the pairs drift inside most sections — the
+first book loaded 827 Hindi rows beside 909 English. `ncert align` embeds each Hindi paragraph (Cohere
+embed v4 on Bedrock, about ₹9 a Physics book; the English rows must be embedded first) and reports, per
+section: where the counts differ, the joins and splits it proposes, pairs weaker than 0.45, the numbers one
+edition of a pair carries and the other does not, and the PLAN D16 ✅ sample — 40 aligned pairs seeded so a
+re-run draws the same, the founder reading the ten most matra- and conjunct-dense. It changes no row and
+stores no vector.
+
+**Its proposals are a map, not entries.** On the first book about half were exact, and once every section
+was one to one it still proposed 30 reshapes in 12 sections whose pairs were all translations (equation-
+heavy neighbours score alike). The entries come from reading:
+
+- Per chapter, every section's English rows beside its Hindi rows, whole texts. The English row boundaries
+  decide — a list item, an Example statement, an Answer, a displayed-equation paragraph gets the same row in
+  Hindi — never the Hindi print's indents. A split goes where the English paragraph's first sentence begins
+  in the Hindi, matched by meaning, numbers, symbols and equation labels; where the translation fuses the
+  boundary inside a sentence, at the nearest sentence start, saying so in the reason.
+- Sections with equal counts are read too: a split and a join cancel in the count and leave the pairs
+  shifted.
+- Hindi-only text is kept, joined to the paragraph it follows; a caption, table, heading or running head
+  the transcriber let through is a `drop`; an English row with no Hindi anywhere is the transcription's
+  omission (if the page prints it) or the edition's (if it does not) — neither is forced with joins.
+- A `lang: hi` entry is written against the rows as the load shows them (after the visarga step, section
+  4). `split`: a span once on its page, a new paragraph from there (at a page's first words, it cuts the row
+  at the page break). `join`: the words a paragraph starts with; it becomes the rest of the one before —
+  across a page break the previous page's last body paragraph, a footnote skipped, same section only.
+  `defer`: a footnote one edition prints a page early. `section`: the words the first paragraph under a
+  heading starts with and the quoted number the English gives that section, where the Hindi print numbers it
+  otherwise or adds a sub-heading (phy11-part2's "8.5.6" for 8.5.5, its 13.8.1) — read the load report's
+  section table for a count of 0 on one side; written first, so the joins after it see the English section.
+  Named at a later paragraph of its section, it moves that one and those after it: a section the Hindi prints
+  with no heading of its own (bio11's §10.5, 2026-10-17).
+  `move`: a row's first words (`at`, on `page`) and those of the row it is numbered after (`after`, on
+  `after_page`) — once page breaks are joined, the whole row is renumbered there, earlier or later, in that
+  row's section: a footnote or box the Hindi prints pages away from where the English numbers it, or a paragraph of
+  running text it prints at another place in the section (bio11 ch 19, 2026-10-17), which
+  `defer` (one paragraph later, no further) cannot place.
+  Entries apply in file order, each to the page the earlier ones left; no entry moves text between paragraphs
+  that are not neighbours, and only a `move` takes a row across sections — whole, into the section of the row
+  it follows — besides a `section` entry named mid-section, which takes its paragraph and the section's later
+  ones into the English section together.
+- One fresh reader per chapter (two for a long one), briefed with these rules whole, then a separate pass
+  on characters, then the spec-auditor on the whole block before the founder approves it.
+
+**Simulate before the reload — with the loader itself.** `ncert load --dry-run` (section 4) applies the
+block exactly as the reload will and writes nothing; read its report for refusals and for *sections whose
+Hindi rows do not number as the English*, and its `--pairs` file for the pairs. Claude runs it from a local
+copy of the extraction — the founder copies it once per book, and again after any `--redo`:
+
+```
+aws s3 cp s3://margai-beta-content/extract/<book>/hi.jsonl <scratch dir>/ --profile margai
+DB_URL=… java -jar <jar> --spring.profiles.active=pipeline ncert load --book <book> --lang hi --dry-run \
+  --extraction <scratch dir>/hi.jsonl --pairs <scratch dir>/pairs.jsonl --reports <scratch dir>
+```
+
+The last run before the founder's approval drops `--reports`, so its report lands in `pipeline/reports` and
+is committed with the block (section 4). Every section one to one, no refusal, every pair read; then
+approval and commit, the reload (₹0), whose report must print the dry run's extraction sha256,
+`ncert align` again (expect the counts equal and the proposals only the known false alarms, each pair
+read), `ncert verify --read-pages` on the pages whose rows changed, and its flags adjudicated as section 5
+says. (The first book was simulated with a scratchpad copy of the loader's rules, which `/tmp` later took.)
+
+**The second read re-quotes.** A `misprint` or `false_positive` matches the verifier's two spans exactly,
+so a re-read that quotes the same place differently needs a new entry beside the old one, which stays for
+the read that quoted it that way. Once every page has a current read, `ncert verify` without
+`--read-pages` re-judges the stored reads with the rulings as they stand, at no cost.
+
+**The ✅ sample**: each of the 40 Hindi rows located on its page, read on a crop for digits, symbols,
+equations and sense against its English partner, its Devanagari checked against the decoded layer (a
+check, never quoted); the founder reads the ten marked. A book is done when every section is one to one,
+the second read is clean and the sample passes.
+
+**The errata log** (`pipeline/inputs/ncert-errata.yaml`, DECISIONS 2026-10-17): every round that writes a
+meaning entry adds its erratum — the row's address and page, the wrong word or phrase as printed and the
+correction — and so does every ruling that keeps a wrong cross-reference or garbled phrase as printed
+(`action: kept`). After any reload, check the log against the rows, at no cost:
+
+```
+DB_URL=… java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline ncert errata
+```
+
+It fails the run on an entry whose row is gone, is off the entry's page, or no longer carries its span, and on a
+correction whose row carries the print again.
 
 ## 7. embed — a vector per paragraph, and the scored concept queries
 

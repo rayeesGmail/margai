@@ -1,0 +1,26 @@
+# The Hindi transcriber's shape: the VISION tier on Claude Opus 5.5 at effort low.
+#
+#   java -jar server.jar --spring.profiles.active=pipeline,live,visionopus55 ncert extract --book <code> --lang hi …
+#
+# Added 2026-10-01 (D16) as a measurement when the founder asked to validate the 5.5 generation; since
+# 2026-10-02 it is how the Hindi corpus is cut (DECISIONS: on phy11-part1 Hindi ch 1 no Devanagari error
+# at low, ₹5.98 a page; medium and high "corrected" the print). The English corpus stays frozen on
+# Claude Opus 5: margai.pipeline.transcribe-model (en) is claude-opus-5 and transcribe-model-hi is this
+# model, so `ncert extract --lang en` on this profile is refused before any call.
+#
+# Request shape (the API reference for this model): a forced `tool_choice` is a 400, so the tool is
+# `auto` + strict and the user turn asks for it (MessageRequestMapper); thinking cannot be disabled at
+# any effort, so it is adaptive and `effort` is the only control — `low`, measured at the same output
+# tokens per page as Claude Opus 5 under a forced tool, so the thinking costs next to nothing.
+# `temperature` is rejected outright; an empty value binds to null, which is how "send nothing" is
+# spelled. Its cacheable prefix minimum is 512 tokens.
+margai:
+  ai:
+    tier:
+      vision:
+        id: claude-opus-5-5
+        temperature:
+        effort: low
+        thinking: adaptive
+        tool-choice: auto
+        cache-min-tokens: 512

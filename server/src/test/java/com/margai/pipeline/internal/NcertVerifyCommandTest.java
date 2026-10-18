@@ -97,7 +97,7 @@ class NcertVerifyCommandTest {
                 if (cls == NcertVerifyCommand.class) {
                     return cls.cast(new NcertVerifyCommand(store, imports, verifier, ids -> filter(ids),
                             new NcertExtractCommandTest.StubSpend(), client,
-                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", 100, 0, 40), writer));
+                            new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40), writer));
                 }
                 return siblings.create(cls);
             }
@@ -380,6 +380,61 @@ class NcertVerifyCommandTest {
                 .contains("- ch 7 p2: \"7.4 THE GRAVITATIONAL CONSTANT\"")
                 .contains("- ch 7 p2: \"Table 7.1 Data from measurement\"")
                 .contains("2 passages no row carries");
+    }
+
+    /**
+     * A Hindi heading's second character is often a vowel sign, a combining mark rather than a letter, so
+     * "1.3 सार्थक अंक" read as running text (phy11-part1 ch 1, D16). The Hindi figure and table words count too.
+     */
+    @Test
+    void anOmittedHindiHeadingOrCaptionIsSetAsideByCode() {
+        verifier.omitted.put(2, List.of("1.3 सार्थक अंक", "1.6.1 समीकरणों की विमीय संगति की जाँच",
+                "सारणी 1.1 SI मूल राशियाँ एवं उनके मात्रक", "किसी भौतिक राशि की विमाएँ उन घातों को कहते हैं"));
+
+        run("--read-pages");
+
+        assertThat(out.toString())
+                .contains("## running text the page prints that no row carries\n\n"
+                        + "- ch 7 p2: \"किसी भौतिक राशि की विमाएँ उन घातों को कहते हैं\"\n")
+                .contains("- ch 7 p2: \"1.3 सार्थक अंक\"")
+                .contains("- ch 7 p2: \"सारणी 1.1 SI मूल राशियाँ एवं उनके मात्रक\"")
+                .contains("1 passages no row carries");
+    }
+
+    /**
+     * The free pass holds a Hindi book's loaded rows to the decoded layer, page by page, so the rows a
+     * correction changed are re-checked at no cost (SPEC §12.2, DECISIONS 2026-10-02): khph101 p2's
+     * दाशिमक, Phase B's Opus 5 misreading of the printed दाश्मिक, is named.
+     */
+    @Test
+    void theFreePassHoldsAHindiBooksRowsToTheDecodedLayer() throws IOException {
+        Path khph101 = Path.of("..", "ncert", "2022-ed", "hi", "phy11-part1", "khph101.pdf");
+        org.junit.jupiter.api.Assumptions.assumeTrue(Files.exists(khph101), "founder's NCERT PDFs not on this machine");
+        Files.writeString(inputs.resolve(NcertRegisterCommand.FILE), """
+                books:
+                  - code: phy11-part1
+                    subject: physics
+                    class_level: 11
+                    part: 1
+                    title_en: "Physics Part-I, Textbook for Class XI"
+                    edition_year: 2022
+                    source:
+                      en: source/ncert/2022-ed/en/phy11-part1/
+                      hi: source/ncert/2022-ed/hi/phy11-part1/
+                    chapters:
+                      - {no: 1, en: keph101.pdf, hi: khph101.pdf}
+                """);
+        store.put("source/ncert/2022-ed/hi/phy11-part1/khph101.pdf", Files.readAllBytes(khph101), "application/pdf");
+        imports.paragraphsAnswer = List.of(new NcertParagraphRow((short) 1, "1.3", (short) 1,
+                "उदाहरण के लिए 1.28 को दो दाशिमक स्थानों तक निकटित करते हैं।", false, List.of(),
+                new ParagraphExtraction(List.of(2), List.of(0), new BigDecimal("0.9"), TRANSCRIBED_P1, null)));
+
+        assertThat(run("--lang", "hi")).isZero();
+
+        assertThat(verifier.calls).isEmpty();
+        assertThat(out.toString())
+                .contains("## Hindi rows against the decoded layer — a check only; the layer is never sent or stored")
+                .contains("- ch 1 p2: 'दाशिमक' 1x in the rows, 0x on the page");
     }
 
     @Test

@@ -379,6 +379,479 @@ class NcertCorrectionsTest {
                 .hasMessageContaining("drop correction on ch 7 page 3: page 4 continues the paragraph starting \"Starts here\"");
     }
 
+    /**
+     * A footnote takes its number where its page puts it, after the last paragraph printed above it, and
+     * the two editions break their pages in different places: the Hindi Physics Part I prints a footnote
+     * of §4.8 at the foot of p10 and Example 4.6 on p11, where the English has both on p10 — so the Hindi
+     * footnote was numbered before the Example and each sat beside the other's English (D16). No join or
+     * split reorders two paragraphs; a {@code defer} entry names the one that waits.
+     */
+    @Test
+    void readsADeferEntry() throws IOException {
+        Path file = write("""
+                corrections:
+                  - {book: phy11-part1, lang: hi, chapter: 4, page: 10, kind: defer, at: "* किसी पिण्ड की साम्यावस्था",
+                     reason: "the English numbers Example 4.6 before this footnote"}
+                """);
+
+        List<NcertCorrection> corrections = NcertCorrectionsYamlReader.read(file);
+
+        assertThat(corrections.getFirst().kind()).isEqualTo(NcertCorrection.Kind.defer);
+        assertThat(corrections.getFirst().at()).isEqualTo("* किसी पिण्ड की साम्यावस्था");
+        assertThat(corrections.getFirst().kind().changesText()).isTrue();
+    }
+
+    @Test
+    void aDeferNamesItsParagraphAndChangesNoWord() {
+        List<ExtractedPage> pages = List.of(
+                page(10, p("7.8", "Equation (7.11) implies that F = 0."), p("7.8", "* Equilibrium of a body requires more.")),
+                page(11, p("7.8", "Example 7.6 A mass of 6 kg hangs.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                correction(10, NcertCorrection.Kind.defer, null, null, "* Equilibrium of a body")));
+
+        assertThat(applied.pages()).isEqualTo(pages);
+        assertThat(applied.deferred()).containsExactly(new NcertCorrections.Deferred((short) 7, 10, 1));
+        assertThat(applied.notes()).containsExactly("ch 7 page 10 §7.8: the paragraph starting \"* Equilibrium of a body\" "
+                + "takes its number after the next paragraph of its section (read against the page)");
+    }
+
+    /** The entry names words, not a position: a later split above the paragraph moves it down the page, and the mark with it. */
+    @Test
+    void aDeferFollowsItsParagraphWhenALaterEntryMovesIt() {
+        List<ExtractedPage> pages = List.of(
+                page(10, p("7.8", "Equation (7.11) implies that F = 0. Example 7.5 follows."),
+                        p("7.8", "* Equilibrium of a body requires more.")),
+                page(11, p("7.8", "Example 7.6 A mass of 6 kg hangs.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                correction(10, NcertCorrection.Kind.defer, null, null, "* Equilibrium of a body"),
+                correction(10, NcertCorrection.Kind.split, null, null, "Example 7.5 follows")));
+
+        assertThat(applied.deferred()).containsExactly(new NcertCorrections.Deferred((short) 7, 10, 2));
+    }
+
+    /** Half a paragraph cannot wait while its other half is numbered: that is a join or a split to write first. */
+    @Test
+    void aDeferOfAParagraphThatRunsAcrossAPageBreakIsRefused() {
+        List<ExtractedPage> continuing = List.of(page(3, p("7.3", "Ends mid")),
+                page(4, new NcertPage.Paragraph("7.3", "sentence here.", true, List.of()), p("7.3", "Another.")));
+        assertThatThrownBy(() -> NcertCorrections.apply(continuing, List.of(
+                correction(4, NcertCorrection.Kind.defer, null, null, "sentence here"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("defer correction on ch 7 page 4: \"sentence here\" continues the previous page's paragraph");
+
+        List<ExtractedPage> continued = List.of(page(3, p("7.3", "Starts here and runs")),
+                page(4, new NcertPage.Paragraph("7.3", "on to the next page.", true, List.of()), p("7.3", "Another.")));
+        assertThatThrownBy(() -> NcertCorrections.apply(continued, List.of(
+                correction(3, NcertCorrection.Kind.defer, null, null, "Starts here"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("defer correction on ch 7 page 3: page 4 continues the paragraph starting \"Starts here\"");
+    }
+
+    /** A footnote is never what the next page continues, so one at the foot of a page whose body runs on can wait. */
+    @Test
+    void aFootnoteBelowAParagraphThatRunsOnCanBeDeferred() {
+        List<ExtractedPage> pages = List.of(
+                page(3, p("7.3", "The body starts here and runs"), p("7.3", "* A footnote under it.")),
+                page(4, new NcertPage.Paragraph("7.3", "on to the next page.", true, List.of()), p("7.3", "Another.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                correction(3, NcertCorrection.Kind.defer, null, null, "* A footnote")));
+
+        assertThat(applied.deferred()).containsExactly(new NcertCorrections.Deferred((short) 7, 3, 1));
+    }
+
+    /**
+     * A section the Hindi print numbers differently from the English (D16): phy11-part2's Hindi goes from
+     * 8.5.4 to "8.5.6" where the English prints 8.5.5, and puts "13.8.1 सरल लोलक" under a 13.8 the English
+     * does not have. The transcription copies the heading, so its rows sit at an address no English row
+     * has, and a join never crosses a section.
+     */
+    @Test
+    void readsASectionEntry() throws IOException {
+        Path file = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 8, page: 8, kind: section, at: "जब किसी तार पर",
+                     section: "8.5.5", reason: "the Hindi prints 8.5.6 after 8.5.4; the English numbers it 8.5.5"}
+                """);
+
+        List<NcertCorrection> corrections = NcertCorrectionsYamlReader.read(file);
+
+        assertThat(corrections).singleElement().satisfies(entry -> {
+            assertThat(entry.kind()).isEqualTo(NcertCorrection.Kind.section);
+            assertThat(entry.at()).isEqualTo("जब किसी तार पर");
+            assertThat(entry.section()).isEqualTo("8.5.5");
+            assertThat(entry.kind().changesText()).isTrue();
+        });
+    }
+
+    /**
+     * The English sections are canonical and their rows carry the vectors and the anchors a student taps,
+     * so only a Hindi entry re-addresses. A section number is quoted: unquoted, YAML reads 8.10 as 8.1.
+     */
+    @Test
+    void aSectionEntryIsForTheHindiEditionAndNamesAPrintedSectionOfItsChapter() throws IOException {
+        Path english = write("""
+                corrections:
+                  - {book: phy11-part2, lang: en, chapter: 8, page: 8, kind: section, at: "When a wire",
+                     section: "8.5.5", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(english))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (section): only a Hindi entry re-addresses a section");
+
+        Path unquoted = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 8, page: 8, kind: section, at: "जब किसी", section: 8.10, reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(unquoted))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (section): 'section' must be quoted");
+
+        Path otherChapter = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 8, page: 8, kind: section, at: "जब किसी", section: "9.5.5", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(otherChapter))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (section): '9.5.5' is not a section of chapter 8");
+
+        Path noSection = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 8, page: 8, kind: section, at: "जब किसी", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(noSection))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (section): 'section' is required");
+
+        Path stray = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 8, page: 8, kind: join, at: "जब किसी", section: "8.5.5", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(stray))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (join): 'section' does not belong to this kind");
+    }
+
+    /** From the paragraph the heading opens, every paragraph of that section in the chapter takes the English number. */
+    @Test
+    void aSectionEntryReaddressesItsSectionFromItsFirstParagraphOn() {
+        List<ExtractedPage> pages = List.of(
+                page(8, p("7.5.4", "The strain perpendicular to the force."), p("7.5.6", "When a wire is put under stress,")),
+                page(9, new NcertPage.Paragraph("7.5.6", "work is done against the forces.", true, List.of()),
+                        p("7.5.6", "This work is stored in the wire."), p("7.6", "Applications of elastic behaviour.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(section(8, "When a wire", "7.5.5")));
+
+        assertThat(applied.pages()).flatExtracting(ExtractedPage::paragraphs).extracting(NcertPage.Paragraph::section)
+                .containsExactly("7.5.4", "7.5.5", "7.5.5", "7.5.5", "7.6");
+        assertThat(applied.pages().get(1).paragraphs().getFirst().continuesPreviousPage()).isTrue();
+        assertThat(applied.notes()).containsExactly("ch 7 page 8 §7.5.6: the English numbers it §7.5.5, from \"When a wire\" "
+                + "on — 3 paragraph(s) (read against the page)");
+    }
+
+    /**
+     * A sub-heading the English does not print: once its paragraphs are back in the section above, the
+     * Hindi-only opening the heading followed can be joined to the paragraph the English starts with —
+     * the entries apply in file order.
+     */
+    @Test
+    void aSubHeadingTheEnglishDoesNotPrintFoldsIntoItsSectionAndThenJoins() {
+        List<ExtractedPage> pages = List.of(page(12,
+                p("7.8", "No physical example is purely simple harmonic."),
+                p("7.8.1", "It is said that Galileo measured the periods."), p("7.8.1", "We shall show that this is SHM.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                section(12, "It is said that Galileo", "7.8"),
+                correction(12, NcertCorrection.Kind.join, null, null, "It is said that Galileo")));
+
+        assertThat(applied.pages().getFirst().paragraphs()).containsExactly(
+                p("7.8", "No physical example is purely simple harmonic. It is said that Galileo measured the periods."),
+                p("7.8", "We shall show that this is SHM."));
+    }
+
+    /**
+     * A section the Hindi prints with no heading of its own (bio11's §10.5, 2026-10-17): the transcription leaves its
+     * paragraph in the section above, so the entry names that paragraph, and it and the section's later paragraphs
+     * take the English number while the ones before it keep theirs.
+     */
+    @Test
+    void aSectionEntryNamedAtALaterParagraphReaddressesFromThereOn() {
+        List<ExtractedPage> pages = List.of(
+                page(8, p("7.5.4", "The strain perpendicular to the force."), p("7.5.4", "When a wire is put under stress,")),
+                page(9, new NcertPage.Paragraph("7.5.4", "work is done against the forces.", true, List.of()),
+                        p("7.5.4", "This work is stored in the wire."), p("7.6", "Applications of elastic behaviour.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(section(8, "When a wire", "7.5.5")));
+
+        assertThat(applied.pages()).flatExtracting(ExtractedPage::paragraphs).extracting(NcertPage.Paragraph::section)
+                .containsExactly("7.5.4", "7.5.5", "7.5.5", "7.5.5", "7.6");
+        assertThat(applied.notes()).containsExactly("ch 7 page 8 §7.5.4: the English numbers it §7.5.5, from \"When a wire\" "
+                + "on — 3 paragraph(s) (read against the page)");
+    }
+
+    /** The entry names a row by its first words, and a new number: a continuation, or the section it is in, is a mistake. */
+    @Test
+    void aSectionEntryMustNameARowAndANewNumber() {
+        List<ExtractedPage> pages = List.of(
+                page(8, p("7.5.6", "When a wire is put under stress,")),
+                page(9, new NcertPage.Paragraph("7.5.6", "work is done against the forces.", true, List.of()),
+                        p("7.5.6", "This work is stored in the wire.")));
+
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(section(9, "work is done", "7.5.5"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("section correction on ch 7 page 9: \"work is done\" continues the previous page's row "
+                        + "— name the row by its first words");
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(section(8, "When a wire", "7.5.6"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("section correction on ch 7 page 8: \"When a wire\" is in §7.5.6 already");
+    }
+
+    /**
+     * The next page's continuation is the rest of the last body paragraph above a footnote: an entry named at the
+     * footnote would move the continuation into the new section and leave its first half behind.
+     */
+    @Test
+    void aSectionEntryAtAFootnoteBelowAContinuedParagraphIsRefused() {
+        List<ExtractedPage> pages = List.of(
+                page(8, p("7.5.4", "When a wire is put under stress,"), p("7.5.4", "* A footnote.")),
+                page(9, new NcertPage.Paragraph("7.5.4", "work is done against the forces.", true, List.of()),
+                        p("7.5.4", "This work is stored in the wire.")));
+
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(section(8, "* A footnote", "7.5.5"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("section correction on ch 7 page 8: the next page continues a paragraph of §7.5.4 "
+                        + "before \"* A footnote\" — name that paragraph or an earlier one");
+    }
+
+    /**
+     * A row numbered after another (D16): phy11-part2's Hindi prints a footnote a page late and inside the next
+     * section, one eight paragraphs before the English numbers it and one two paragraphs after, and a `defer`
+     * moves a paragraph one place later and no further.
+     */
+    @Test
+    void readsAMoveEntry() throws IOException {
+        Path file = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 9, page: 3, kind: move, at: "* STP का अर्थ",
+                     after: "उदाहरण 9.1 दो पैरों", after_page: 2, reason: "the English numbers the footnote before Example 9.1"}
+                """);
+
+        assertThat(NcertCorrectionsYamlReader.read(file)).singleElement().satisfies(entry -> {
+            assertThat(entry.kind()).isEqualTo(NcertCorrection.Kind.move);
+            assertThat(entry.at()).isEqualTo("* STP का अर्थ");
+            assertThat(entry.after()).isEqualTo("उदाहरण 9.1 दो पैरों");
+            assertThat(entry.afterPage()).isEqualTo(2);
+            assertThat(entry.kind().changesText()).isTrue();
+        });
+
+        Path noPage = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 9, page: 3, kind: move, at: "* STP", after: "उदाहरण 9.1", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(noPage))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (move): 'after_page' must be a whole number");
+
+        Path noAfter = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 9, page: 3, kind: move, at: "* STP", after_page: 2, reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(noAfter))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (move): 'after' is required");
+
+        Path stray = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 9, page: 3, kind: join, at: "* STP", after_page: 2, reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(stray))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (join): 'after_page' does not belong to this kind");
+    }
+
+    /** The English rows are canonical — their sections and numbers carry the anchors and the vectors — so no entry moves one (spec-auditor, D16). */
+    @Test
+    void onlyAHindiEntryMovesARow() throws IOException {
+        Path english = write("""
+                corrections:
+                  - {book: phy11-part2, lang: en, chapter: 9, page: 3, kind: move, at: "* STP means",
+                     after: "The density of water", after_page: 2, reason: r}
+                """);
+
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(english))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (move): only a Hindi entry moves a row — the English rows are canonical");
+    }
+
+    /** The entry changes no word; it names the two rows by where their first paragraphs sit once every page-level entry is applied. */
+    @Test
+    void aMoveNamesBothRowsAndChangesNoWord() {
+        List<ExtractedPage> pages = List.of(
+                page(7, p("7.4", "Answer (a) The period is 2 s."), p("7.4", "(b) The speed at the mean"),
+                        p("7.4", "* The radian is a ratio.")),
+                page(8, new NcertPage.Paragraph("7.4", "position is A omega.", true, List.of())));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                move(7, "* The radian", 7, "Answer (a)")));
+
+        assertThat(applied.pages()).isEqualTo(pages);
+        assertThat(applied.moves()).containsExactly(
+                new NcertCorrections.Moved((short) 7, 7, 2, 7, 0, "* The radian", "Answer (a)"));
+        assertThat(applied.notes()).containsExactly("ch 7 page 7 §7.4: the row starting \"* The radian\" is numbered "
+                + "after the row starting \"Answer (a)\" (page 7) (read against the page)");
+    }
+
+    /** A continuation is the rest of another page's row, so it names no row; and a row cannot follow itself. */
+    @Test
+    void aMoveMustNameTwoRowsByTheirFirstWords() {
+        List<ExtractedPage> pages = List.of(page(7, p("7.4", "(b) The speed at the mean")),
+                page(8, new NcertPage.Paragraph("7.4", "position is A omega.", true, List.of()), p("7.4", "* A note.")));
+
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(move(8, "position is", 7, "(b) The speed"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("move correction on ch 7 page 8: \"position is\" continues the previous page's row");
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(move(8, "* A note", 8, "position is"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("\"position is\" continues the previous page's row");
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(move(8, "* A note", 8, "* A note"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("a row cannot follow itself");
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(move(8, "* A note", 9, "Anything"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("page 9 is not in the extraction");
+    }
+
+    /**
+     * An English paragraph the Hindi edition does not print (D16): phy12-part1's Hindi leaves out §3.12's ¶5, and
+     * no join or split can mend a paragraph that is not there. The entry names the row after it.
+     */
+    @Test
+    void readsAnUnprintedEntryForTheHindiOnly() throws IOException {
+        Path file = write("""
+                corrections:
+                  - {book: phy12-part1, lang: hi, chapter: 3, page: 18, kind: unprinted, at: "(b) लूप नियम",
+                     reason: "the Hindi does not print English ¶5", address: "ch 3 §3.12 ¶5"}
+                """);
+
+        assertThat(NcertCorrectionsYamlReader.read(file)).singleElement().satisfies(entry -> {
+            assertThat(entry.kind()).isEqualTo(NcertCorrection.Kind.unprinted);
+            assertThat(entry.at()).isEqualTo("(b) लूप नियम");
+            assertThat(entry.kind().changesText()).isTrue();
+        });
+
+        Path english = write("""
+                corrections:
+                  - {book: phy12-part1, lang: en, chapter: 3, page: 18, kind: unprinted, at: "(b) Loop rule", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(english))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (unprinted): only a Hindi entry leaves an English number unfilled — "
+                        + "the English rows are canonical");
+
+        Path words = write("""
+                corrections:
+                  - {book: phy12-part1, lang: hi, chapter: 3, page: 18, kind: unprinted, at: "(b)", after: "(a)", reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(words))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (unprinted): 'after' must be true or false — true when the paragraph "
+                        + "not printed is the one after the row");
+    }
+
+    /**
+     * A section's last English paragraph the Hindi does not print (bio11's §4.2.11.7 ¶3, 2026-10-17): no row follows
+     * it to take the number after it, so the entry names the row before it, with {@code after}.
+     */
+    @Test
+    void readsAnUnprintedEntryAfterItsRow() throws IOException {
+        Path file = write("""
+                corrections:
+                  - {book: bio11, lang: hi, chapter: 4, page: 14, kind: unprinted, at: "स्तनधारियों में", after: true,
+                     reason: "the Hindi does not print the section's last English paragraph"}
+                  - {book: bio11, lang: hi, chapter: 4, page: 14, kind: unprinted, at: "स्तनधारियों में", after: false,
+                     reason: r}
+                """);
+
+        assertThat(NcertCorrectionsYamlReader.read(file)).extracting(NcertCorrection::gapAfter).containsExactly(true, false);
+
+        Path move = write("""
+                corrections:
+                  - {book: phy11-part2, lang: hi, chapter: 9, page: 3, kind: move, at: "* STP", after: true, after_page: 2, reason: r}
+                """);
+        assertThatThrownBy(() -> NcertCorrectionsYamlReader.read(move))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("correction 1 (move): 'after' must be a string");
+    }
+
+    /** The entry still names its row, and says the number left is the one after it. */
+    @Test
+    void anUnprintedEntryAfterItsRowNamesTheRow() {
+        List<ExtractedPage> pages = List.of(page(18, p("7.12", "(a) The junction rule."), p("7.13", "A new section.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(unprintedAfter(18, "(a) The junction")));
+
+        assertThat(applied.unprinted()).containsExactly(new NcertCorrections.Unprinted((short) 7, 18, 0, "(a) The junction", true));
+        assertThat(applied.notes()).containsExactly("ch 7 page 18 §7.12: the English paragraph after the row starting "
+                + "\"(a) The junction\" is not printed in this edition — the number after the row is left to it (read against "
+                + "the page)");
+    }
+
+    /** The entry changes no word; it names the row where its first paragraph sits once every page-level entry is applied. */
+    @Test
+    void anUnprintedEntryNamesItsRowAfterThePageLevelEntries() {
+        List<ExtractedPage> pages = List.of(page(18, p("7.12", "(a) The junction rule. (b) The loop rule.")));
+
+        NcertCorrections.Applied applied = NcertCorrections.apply(pages, List.of(
+                correction(18, NcertCorrection.Kind.split, null, null, "(b) The loop"), unprinted(18, "(b) The loop")));
+
+        assertThat(applied.pages().getFirst().paragraphs()).extracting(NcertPage.Paragraph::text)
+                .containsExactly("(a) The junction rule.", "(b) The loop rule.");
+        assertThat(applied.unprinted()).containsExactly(new NcertCorrections.Unprinted((short) 7, 18, 1, "(b) The loop", false));
+        assertThat(applied.notes()).last().isEqualTo("ch 7 page 18 §7.12: the English paragraph before the row starting "
+                + "\"(b) The loop\" is not printed in this edition — the row takes the number after it (read against the page)");
+    }
+
+    /** A continuation is the rest of another page's row, so it names no row. */
+    @Test
+    void anUnprintedEntryMustNameARowByItsFirstWords() {
+        List<ExtractedPage> pages = List.of(page(17, p("7.12", "The rule (a) holds")),
+                page(18, new NcertPage.Paragraph("7.12", "at every junction.", true, List.of()), p("7.12", "(b) The loop rule.")));
+
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(unprinted(18, "at every junction"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("unprinted correction on ch 7 page 18: \"at every junction\" continues the previous page's row");
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(unprinted(18, "(c)"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("0 paragraphs start with \"(c)\" there, not one");
+    }
+
+    /**
+     * The paragraph the next page continues is the last body paragraph, not the page's last: a footnote set
+     * below it is never continued. Deferring or dropping that paragraph would leave the continuation to join
+     * the paragraph above it.
+     */
+    @Test
+    void theParagraphTheNextPageContinuesIsTheLastBodyParagraphNotTheLast() {
+        List<ExtractedPage> pages = List.of(
+                page(3, p("7.3", "First."), p("7.3", "The body starts here and runs"), p("7.3", "* A footnote under it.")),
+                page(4, new NcertPage.Paragraph("7.3", "on to the next page.", true, List.of())));
+
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(
+                correction(3, NcertCorrection.Kind.defer, null, null, "The body starts"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("page 4 continues the paragraph starting \"The body starts\"");
+        assertThatThrownBy(() -> NcertCorrections.apply(pages, List.of(
+                correction(3, NcertCorrection.Kind.drop, null, null, "The body starts"))))
+                .isInstanceOf(InputFormatException.class)
+                .hasMessageContaining("page 4 continues the paragraph starting \"The body starts\"");
+        // The footnote itself is not what page 4 continues, so it can go.
+        assertThat(NcertCorrections.apply(pages, List.of(
+                correction(3, NcertCorrection.Kind.drop, null, null, "* A footnote"))).pages().getFirst().paragraphs())
+                .hasSize(2);
+    }
+
     /** Rulings on the verifier's flags change no text; verify reads them, the load only counts them. */
     @Test
     void misprintAndFalsePositiveRulingsChangeNothing() {
@@ -438,7 +911,27 @@ class NcertCorrectionsTest {
 
     private static NcertCorrection figureRef(int page, String at, String remove, String add) {
         return new NcertCorrection("phy11-part1", BookLanguage.en, (short) 7, page, NcertCorrection.Kind.figure_ref,
-                null, null, at, "read against the page", null, remove, add, null);
+                null, null, at, "read against the page", null, remove, add, null, null, null, null, false);
+    }
+
+    private static NcertCorrection section(int page, String at, String section) {
+        return new NcertCorrection("phy11-part2", BookLanguage.hi, (short) 7, page, NcertCorrection.Kind.section,
+                null, null, at, "read against the page", null, null, null, null, section, null, null, false);
+    }
+
+    static NcertCorrection move(int page, String at, int afterPage, String after) {
+        return new NcertCorrection("phy11-part2", BookLanguage.hi, (short) 7, page, NcertCorrection.Kind.move,
+                null, null, at, "read against the page", null, null, null, null, null, after, afterPage, false);
+    }
+
+    private static NcertCorrection unprinted(int page, String at) {
+        return new NcertCorrection("phy12-part1", BookLanguage.hi, (short) 7, page, NcertCorrection.Kind.unprinted,
+                null, null, at, "read against the page", null);
+    }
+
+    private static NcertCorrection unprintedAfter(int page, String at) {
+        return new NcertCorrection("bio11", BookLanguage.hi, (short) 7, page, NcertCorrection.Kind.unprinted,
+                null, null, at, "read against the page", null, null, null, null, null, null, null, true);
     }
 
     private static ExtractedPage page(int page, NcertPage.Paragraph... paragraphs) {

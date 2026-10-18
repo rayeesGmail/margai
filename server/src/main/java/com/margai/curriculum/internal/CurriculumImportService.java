@@ -1,5 +1,6 @@
 package com.margai.curriculum.internal;
 
+import com.margai.curriculum.api.AlignmentRow;
 import com.margai.curriculum.api.ArchetypeTrackRow;
 import com.margai.curriculum.api.BackboneLoadReport;
 import com.margai.curriculum.api.BookLanguage;
@@ -19,9 +20,12 @@ import com.margai.curriculum.api.SyllabusNodeRow;
 import com.margai.curriculum.api.TaxonomyLoadReport;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 /**
  * {@link CurriculumImport} over the D4 tables (TECH_PLAN §2.3, §6.3): one importer per load, one
@@ -94,6 +98,33 @@ class CurriculumImportService implements CurriculumImport {
     @Override
     public NcertLoadReport loadParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
         return ncertParagraphs.load(bookCode, language, rows);
+    }
+
+    /** A transaction of its own whatever the caller holds, so marking it rolls back the preview and nothing else. */
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public NcertLoadReport previewParagraphs(String bookCode, BookLanguage language, List<NcertParagraphRow> rows) {
+        NcertLoadReport report = ncertParagraphs.preview(bookCode, language, rows);
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        return report;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long embeddedParagraphs(String bookCode) {
+        return ncertEmbeddings.embeddedIn(bookCode);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AlignmentRow> alignmentRows(String bookCode, Collection<Short> chapters) {
+        return ncertParagraphs.alignmentRows(bookCode, chapters);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, Double> similarityToEnglish(String bookCode, float[] vector, Collection<UUID> paragraphIds) {
+        return ncertEmbeddings.similarityTo(bookCode, vector, paragraphIds);
     }
 
     @Override

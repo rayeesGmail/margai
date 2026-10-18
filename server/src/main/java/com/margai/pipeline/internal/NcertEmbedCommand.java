@@ -146,7 +146,7 @@ class NcertEmbedCommand extends NcertBookCommand {
             }
             embedded += imports.storeEmbeddings(definition.code(), batch);
             batch.clear();
-            results = RetrievalRun.run(queries, definition, retriever, ctx);
+            results = RetrievalRun.run(queries, retriever, ctx);
         } catch (RuntimeException e) {
             // Keep what was already paid for. The first live run died on call 101 of 894 and
             // discarded the vectors bought since the last commit — up to a batch of them, thrown
@@ -212,9 +212,10 @@ class NcertEmbedCommand extends NcertBookCommand {
     }
 
     /**
-     * The concept queries, when the set on disk is written against this book. A set written for
-     * another book is not run and says so — embedding the other nine books must not depend on a
-     * query set that exists for one.
+     * The concept queries that reach this book: since D17 the set covers the whole corpus, so a run
+     * over one book scores only the queries with an expected paragraph in it, and a book no query
+     * reaches says so and embeds anyway — embedding a book must not depend on a query set written
+     * for others. The corpus-wide score is {@code ncert retrieve}'s.
      *
      * <p>A <em>missing</em> file refuses the run instead, before anything is paid for. The default
      * is a relative path, so a command launched from the wrong directory would otherwise embed a
@@ -233,15 +234,19 @@ class NcertEmbedCommand extends NcertBookCommand {
                             + "spend, and produce no acceptance evidence (PLAN D15 ✅). Run from `server/`, pass "
                             + "--queries with the right path, or --queries none to embed without scoring");
         }
-        RetrievalQueriesReader.QuerySet set = RetrievalQueriesReader.read(queriesFile);
-        if (!set.book().equals(definition.code())) {
-            report.line("concept queries: the set at " + queriesFile + " is written against '" + set.book()
-                    + "', not '" + definition.code() + "' — not run");
+        List<RetrievalQuery> set = RetrievalQueriesReader.read(queriesFile);
+        RetrievalQueriesReader.checkBooks(queriesFile, set, BooksYamlReader.read(io.input(NcertRegisterCommand.FILE)));
+        List<RetrievalQuery> reaching = set.stream()
+                .filter(query -> query.expect().stream().anyMatch(address -> address.book().equals(definition.code())))
+                .toList();
+        if (reaching.isEmpty()) {
+            report.line("concept queries: none of the " + set.size() + " at " + queriesFile + " expects a paragraph of '"
+                    + definition.code() + "' — not run (the corpus-wide score is ncert retrieve's)");
             return List.of();
         }
-        report.line("concept queries: " + set.queries().size() + " from " + queriesFile
-                + " (" + set.queries().stream().filter(RetrievalQuery::isHindi).count() + " in Hindi)");
-        return set.queries();
+        report.line("concept queries: " + reaching.size() + " of the " + set.size() + " at " + queriesFile
+                + " reach this book (" + reaching.stream().filter(RetrievalQuery::isHindi).count() + " in Hindi)");
+        return reaching;
     }
 
     /**

@@ -47,11 +47,11 @@ final class RetrievalRun {
         }
     }
 
-    static List<Result> run(List<RetrievalQuery> queries, BookDefinition definition, HybridRetriever retriever,
-            AiCallContext ctx) {
+    /** Each query filtered to its own subject, as the doubt pipeline filters (§4.3 stage 6). */
+    static List<Result> run(List<RetrievalQuery> queries, HybridRetriever retriever, AiCallContext ctx) {
         List<Result> results = new ArrayList<>();
         for (RetrievalQuery query : queries) {
-            RetrievedPassages retrieved = retriever.retrieve(query.text(), definition.row().subject(), null, ctx);
+            RetrievedPassages retrieved = retriever.retrieve(query.text(), query.subject(), null, ctx);
             results.add(new Result(query, retrieved, rankOfFirstExpected(query, retrieved)));
         }
         return results;
@@ -60,12 +60,16 @@ final class RetrievalRun {
     static int rankOfFirstExpected(RetrievalQuery query, RetrievedPassages retrieved) {
         List<RetrievedPassages.Passage> passages = retrieved.passages();
         for (int index = 0; index < passages.size(); index++) {
-            var paragraph = passages.get(index).paragraph();
-            if (query.isExpected(paragraph.chapterNo(), paragraph.section(), paragraph.paraNo())) {
+            if (isExpected(query, passages.get(index))) {
                 return index + 1;
             }
         }
         return 0;
+    }
+
+    private static boolean isExpected(RetrievalQuery query, RetrievedPassages.Passage passage) {
+        var paragraph = passage.paragraph();
+        return query.isExpected(paragraph.bookCode(), paragraph.chapterNo(), paragraph.section(), paragraph.paraNo());
     }
 
     static void report(List<Result> results, List<RetrievalQuery> queries, Report report) {
@@ -114,8 +118,7 @@ final class RetrievalRun {
             }
             for (int index = 0; index < top.size(); index++) {
                 RetrievedPassages.Passage passage = top.get(index);
-                boolean expected = result.query().isExpected(passage.paragraph().chapterNo(),
-                        passage.paragraph().section(), passage.paragraph().paraNo());
+                boolean expected = isExpected(result.query(), passage);
                 report.line("  " + (index + 1) + ". " + (expected ? "✅ " : "") + passage.paragraph().address()
                         + " · " + passage.foundBy()
                         + (passage.similarity() == null ? "" : " · similarity %.3f".formatted(passage.similarity()))

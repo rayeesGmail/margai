@@ -3,6 +3,7 @@ package com.margai.pipeline.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.ai.retrieval.RetrievedPassages;
+import com.margai.curriculum.api.BookSubject;
 import com.margai.curriculum.api.ParagraphMatch;
 import java.util.List;
 import java.util.UUID;
@@ -54,6 +55,19 @@ class RetrievalRunTest {
                 passage(7, "7.9", 2), passage(7, "7.10", 1), passage(6, "7.9", 1));
 
         assertThat(result.hitRank()).isZero();
+    }
+
+    /**
+     * Chapter numbers repeat across books — phy11-part1 and phy12-part1 both open at chapter 1 — so
+     * over the whole corpus the same chapter, section and paragraph can come back from the wrong
+     * book. D15's scorer compared the three numbers alone, which the one-book set made harmless.
+     */
+    @Test
+    void theSameAddressInAnotherBookIsNotTheExpectedOne() {
+        RetrievalRun.Result result = result(query("q1", "en", address(1, "1.3.1", 2)),
+                match("phy12-part1", 1, "1.3.1", 2), match("phy11-part1", 1, "1.3.1", 2));
+
+        assertThat(result.hitRank()).isEqualTo(2);
     }
 
     /**
@@ -137,11 +151,12 @@ class RetrievalRunTest {
     }
 
     private static RetrievalQuery query(String id, String language, RetrievalQuery.Address... expect) {
-        return new RetrievalQuery(id, language, "why", List.of(expect), "n");
+        return new RetrievalQuery(id, RetrievalQuery.QuerySet.acceptance, BookSubject.physics, language, "why",
+                List.of(expect), "n");
     }
 
     private static RetrievalQuery.Address address(int chapter, String section, int para) {
-        return new RetrievalQuery.Address((short) chapter, section, (short) para);
+        return new RetrievalQuery.Address("phy11-part1", (short) chapter, section, (short) para);
     }
 
     private static ParagraphMatch passage(int chapter, String section, int para) {
@@ -149,7 +164,11 @@ class RetrievalRunTest {
     }
 
     private static ParagraphMatch match(int chapter, String section, int para) {
-        return new ParagraphMatch(UUID.randomUUID(), "phy11-part1", (short) chapter, section, (short) para,
+        return match("phy11-part1", chapter, section, para);
+    }
+
+    private static ParagraphMatch match(String book, int chapter, String section, int para) {
+        return new ParagraphMatch(UUID.randomUUID(), book, (short) chapter, section, (short) para,
                 "Some text of the paragraph.", null, 0.9);
     }
 }

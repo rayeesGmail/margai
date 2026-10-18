@@ -948,6 +948,28 @@ HOW TO RESUME (supersedes item 2 of the list below):
      unattended three days, then the 50-student beta from early January for four weeks, launch early-to-mid
      February, with whether Play's 12-testers-for-14-days rule applies to our account type — and one recommended;
      the founder decides, then amends SPEC's pricing and timeline paragraph.
+     2026-10-18 AFTERNOON: THE BIO12 HINDI BLOCK APPROVED AND COMMITTED. The founder launched the stage script at
+     12:44 IST, the timebox's start (01b672c: 248 pages rendered, ch 1 transcribed), then the full-book script
+     (c174d40: extract-2, the as-written load-2 at 639 rows, align-2, the second read verify-5 on 209 pages,
+     ₹235.27). Adjudicated on the bio11 method: eight chapter aligners, then character, meaning and side-heading
+     readers, every text entry read on a crop of the page image; 36 places and two structure questions put to the
+     founder (scratchpad b3c73b13 b12/founder-questions.md), answered "all as recommended". The block, 323 entries,
+     approved as written with C4 (b) and committed with its approval dry run (fd938d0; DECISIONS 2026-10-18, two
+     rows): 672 Hindi rows beside 673 English, 148 of 148 sections one to one, 313 rows changed. Three places the
+     question list got wrong were put right when the block went to him — C31's reader-recommended न्युकियोटाइड
+     left unmentioned, C32 called an A2 place where its anusvara is a sign the page image does not show, C34 said
+     to be settled as the row had it where the block restores the print's और — and बीटा-गैलेक्टोसाइड, a term the
+     edition never prints that the list left out, was named; Claude had written C31 as the reader's spelling and
+     credited it to him, and took it out before the audit. Spec audit FAIL on the first pass (the header's counts; C4 and C34 credited without his
+     answer; a reason describing the decoded layer's characters), PASS on the second and third. The question list's
+     reload estimate (≈₹40) was wrong: ≈₹160, about 132 changed pages read again at ₹1.13 a page, plus align. The
+     eleven passages verify-5 found the page printing and no row carrying are ruled at the close, after the
+     reload's read lists them again; ch 3 p7's MTP (Amendment) Act 2017 sentence is a margin box on the English
+     page too (lebo103 p6), so neither edition's rows carry it. NEXT: the founder runs scratchpad b3c73b13
+     `d16-bio12-hi-reload.sh` (load, align, `verify --read-pages` on the changed pages, `ncert errata`); a round two
+     if any flag remains; bio12's errata-log entries (the kept false or garbled passages C8, C16, C18, C21, C27 and
+     the other kept places); the ten-pair page; close within the timebox (12:44 IST 2026-10-19, a second day only if
+     his ten pairs reopen it); then the calendar report before D17.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

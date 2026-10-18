@@ -7550,3 +7550,14 @@ Propene                Propane", reason: "the page prints \"Propane\" under the 
      transcribed: "तीन अरब (3 बिलियन)", printed: "तीन करोड़ (3 बिलियन)", reason: "the flag is at round one's meaning place (ch 13 §13.1.4 ¶2; crop p7 x152-538 y396-416 at zoom 6): the verifier quotes the print, which states something false, against the row's meaning, written by the founder's meaning ruling of 2026-10-10; the book's own error, which the row does not keep"}
   - {book: bio12, lang: hi, chapter: 13, page: 8, kind: misprint, address: "ch 13 §13.1.4 ¶5",
      transcribed: "उसमें संभवतः लाखों जातियाँ", printed: "उसमें संभवत: करोड़ों जातियाँ", reason: "the flag is at round one's meaning place (ch 13 §13.1.4 ¶5; crop p8 x68-406 y131-151 at zoom 5): the verifier quotes the print, which states something false, against the row's meaning, written by the founder's meaning ruling of 2026-10-10; the book's own error, which the row does not keep"}
+  # bio12 Hindi, round three (D16, 2026-10-18). The reload with round two (64a4704) and the second read of its three
+  # changed pages (pipeline/reports/2026-10-18-ncert-verify-7.md: 671 of 672 clean; ch 1 p18 and ch 4 p11 raise
+  # nothing) left one flag, read on a crop of the page image: ch 1 p24's 1000 लघु बीज, round two's meaning place, where
+  # the row writes हजारों and the verifier quotes the print — a misprint ruling, which changes no row. The 17 passages
+  # no row carries are round two's 17, ruled in its header. The errata check bears out all 326 entries over seven
+  # books (pipeline/reports/2026-10-18-ncert-errata-3.md), round two's three corrections included. Simulated with
+  # `ncert load --dry-run` on the extraction (sha256 5f87503c…): no refusal, 148 of 148 sections one to one, no row
+  # changed, 100 rulings on flags.
+  # bio12 Hindi, round three, chapter 1
+  - {book: bio12, lang: hi, chapter: 1, page: 24, kind: misprint, address: "ch 1 §1.4.3 ¶9",
+     transcribed: "फल में हजारों लघु", printed: "फल में 1000 लघु", reason: "the flag is at round two's meaning place (ch 1 §1.4.3 ¶9; crop p24 x174-534 y132-155 at zoom 4): the verifier quotes the print, which states something false, against the row's meaning, written by the founder's approval of round two (2026-10-18) under the correction rule as he revised it the same day; the book's own error, which the row does not keep"}

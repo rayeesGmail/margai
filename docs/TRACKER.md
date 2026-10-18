@@ -83,7 +83,7 @@
 - [ ] **D37** Text path: normalize → cache → cheap-tier grounded answer · ✅ 10 doubts, right anchors
 - [ ] **D38** Photo path (vision extraction); minors without consent get CONSENT_REQUIRED on photo doubts (D3 decision 8) + the offline doubt queue (metered at send) and photo compression with a no-regression eval (CS-3 §3.1–§3.2; D42 if full) · ✅ 10 printed Qs faithful
 - [ ] **D39** Router + reasoning tier + numerical verification + honest fallback · ✅ unverified never renders
-- [ ] **D40** Answer UI per contract (steps/anchor/trap/follow-ups/report) · ✅ matches spec wireframe · *2026-10-18 (founder; DECISIONS 2026-10-18): the reference view in the student's textbook edition — the English paragraph where the Hindi is not loaded (no note) or not printed (one line, "This paragraph is only in the English edition", in the student's language, to Hindi-edition readers); a per-book "Hindi loaded" marker*
+- [ ] **D40** Answer UI per contract (steps/anchor/trap/follow-ups/report) · ✅ matches spec wireframe · *2026-10-18 (founder; DECISIONS 2026-10-18): the reference view in the student's textbook edition — the English paragraph where the Hindi is not loaded (no note) or not printed (one line, "This paragraph is only in the English edition", in the student's language, to Hindi-edition readers); a per-book "Hindi loaded" marker; build note (founder, 2026-10-18; the correction rule as revised that day): the anchor view never presents corrected text as the book's own words — it shows the printed text with an errata note, or marks the corrected span as corrected (the same for the Phase 2 errata feature)*
 - [ ] **D41** Cache write (verified only) + semantic near-match + metrics · ✅ instant repeat answer
 - [ ] **D42** Buffer + 30-answer founder audit + compression retro-fitted to the D28/D29 captures, any D38 overflow (CS-3 §3.2) · **🚩 WEEK-7 GATE:** text+photo+verify working
 - [ ] **D43** EN/HI/Hinglish answer behavior · ✅ 3-language read natural
@@ -970,6 +970,31 @@ HOW TO RESUME (supersedes item 2 of the list below):
      if any flag remains; bio12's errata-log entries (the kept false or garbled passages C8, C16, C18, C21, C27 and
      the other kept places); the ten-pair page; close within the timebox (12:44 IST 2026-10-19, a second day only if
      his ten pairs reopen it); then the calendar report before D17.
+     2026-10-18 EVENING: BIO12 ROUND TWO APPROVED AND COMMITTED; THE CORRECTION RULE REVISED. The founder ran the
+     reload (6e7a73c: load-3 0/313/359, align-3 ₹7.66, verify-6 129 pages ₹151.70, 604 of 672 clean, 69 flags, 6 code
+     set-asides, 17 passages no row carries; errata-2 206 borne out). Round two read every flag and set-aside on a
+     crop; two readers took the ✅ sample (33 match, 7 differ only by round one's entries) and align's 86 number lines
+     and 40 weak pairs (nine wrong cross-references; every pairing right). The founder read his ten on the reading
+     page (artifact K9Mwpd8DKyi5T7iK35fjh5): "all ten match their pages", with notes for #1, #2 and #10. He extended
+     the correction rule earlier that day (printing slips corrected, translation errors kept and logged) and asked
+     for the closed books' mistranslation corrections as a list (artifact CsVZMRVWeZAd1yPTg2nCVD: 117 slips, 47
+     mistranslations, 2 garbled names, 20 unsure of 186; bio12 35 / 47 / 0 / 8 of 90), then replaced the extension
+     the same day with one test — printed text that states something false is corrected and logged, however the
+     error arose — with a D40 build note (the anchor view never presents corrected text as the book's own words) and
+     "all approved corrections stand, in all six books" (DECISIONS 2026-10-17 row, revised). Round two, approved
+     with his two restored entries and Q1 (ch 4 p11's मानव जीव), committed with its approval dry run (64a4704: 56
+     misprint, 19 false_positive, 3 text; 0/3/669, 148/148, 99 rulings); spec audit FAIL twice (C26 against round
+     seven, ch 11 p9's header claim, the unaddressed मानव जीन, the conflict with round one), PASS after. bio12's
+     errata entries committed (0b1944b: 93 corrected, 27 kept; a local check bears out all but round two's three,
+     which wait for the reload). OPEN for the founder: under the single test, the nine false passages his earlier
+     answers kept as printed (C8, C18, C21 twice, C22, C27, C29, C36 twice) and C16's garbled phrase; C6 and कितने लाख
+     बीज as unclear; whether garbled phrasing stays logged as kept (the 2026-10-17 rule logs "garbled-but-not-false
+     phrasing", the revision names only garbled technical names and wrong cross-references: C16 and the closed books'
+     garbled-phrase entries); and the D40 display rule is product behaviour, so it wants a SPEC amendment when built,
+     as the 2026-10-17 SPEC row said of the edition setting.
+     NEXT: the founder runs scratchpad b3c73b13 `d16-bio12-hi-r2.sh` (reload 0/3/669, re-read of ch 1 p18, p24 and
+     ch 4 p11 ≈₹3.40, the judge, the errata check); round three on what the re-read raises; close bio12 by 12:44 IST
+     2026-10-19; then the ₹0 closed-book backfill, and the calendar report before D17.
 
 D16 · 2026-10-01 → 02 · Hindi build items + the founder's validation of Opus 5.5 / Sonnet 5.5 — no Hindi book loaded yet
 Commits on `d16-hindi-ingest` (from 36f2aeb), verify green throughout (890 at 623b4f3): 2f255e2 the 5.5 request shape (per-tier

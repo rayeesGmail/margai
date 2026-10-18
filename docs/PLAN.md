@@ -238,6 +238,10 @@ tools; your reviews focus on output quality.)*
   reference view shows the paragraph in the student's textbook edition; the English paragraph where
   the Hindi is not loaded (no note) or not printed (one line, “This paragraph is only in the English
   edition”, in the student's language, to Hindi-edition readers); a per-book “Hindi loaded” marker.*
+  *Build note 2026-10-18 (founder; DECISIONS 2026-10-17, the correction rule as revised 2026-10-18): the
+  anchor view never presents corrected text as the book's own words; it either shows the printed text
+  with an errata note, or marks the corrected span as corrected. The same principle holds for the Phase 2
+  errata feature.*
 - **D41 —** Cache write path (verified only) + semantic near-match; hit metrics.
   ✅ *Same question twice = instant second answer; near-duplicate hits logged.*
 - **D42 —** Buffer + mid-module audit: you review 30 real answers across subjects.

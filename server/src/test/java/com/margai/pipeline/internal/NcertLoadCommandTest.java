@@ -1253,6 +1253,93 @@ class NcertLoadCommandTest {
         assertThat(imports.rows).isNull();
     }
 
+    // ── the freeze guard (DECISIONS 2026-09-13, built at D17) ───────────────────────────────────
+
+    /** An embedded book is the frozen corpus: a load that rewrites a row's English is refused by name. */
+    @Test
+    void aLoadThatRewritesEnglishOnAFrozenBookIsRefusedAndWritesNothing() {
+        frozen(stored("7.3", 1, "The canonical words.", null));
+        jsonl(page(7, 4, "0.95", p("7.3", "Different words.")));
+
+        assertThat(run()).isEqualTo(1);
+
+        assertThat(imports.rows).as("nothing was loaded").isNull();
+        assertThat(out.toString()).contains("phy11-part1 is frozen (909 embedded paragraphs)")
+                .contains("ch 7 §7.3 ¶1 — its English rewritten")
+                .contains("--migrate \"<reason>\"");
+    }
+
+    @Test
+    void aLoadThatLeavesTheFrozenCorpusAsItIsGoesThrough() {
+        frozen(stored("7.3", 1, "The canonical words.", null));
+        jsonl(page(7, 4, "0.95", p("7.3", "The canonical words.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(imports.rows).hasSize(1);
+        assertThat(out.toString()).contains("leaves its paragraph set and English text as they are");
+    }
+
+    /** The named corpus event: the load goes through, and the report says why and what to re-embed. */
+    @Test
+    void migrateLetsTheLoadChangeTheFrozenCorpusAndRecordsTheEvent() {
+        frozen(stored("7.3", 1, "The canonical words.", null));
+        jsonl(page(7, 4, "0.95", p("7.3", "Different words."), p("7.3", "A new paragraph.")));
+
+        assertThat(commandLine.execute("ncert", "load", "--book", "phy11-part1", "--migrate", "second edition",
+                "--inputs", inputs.toString(), "--reports", reports.toString())).isZero();
+
+        assertThat(imports.rows).hasSize(2);
+        assertThat(out.toString()).contains("CORPUS EVENT (--migrate): second edition")
+                .contains("ch 7 §7.3 ¶1 — its English rewritten")
+                .contains("ch 7 §7.3 ¶2 — a new row")
+                .contains("ncert embed --book phy11-part1");
+    }
+
+    /** A rehearsal must predict the load, refusal included. */
+    @Test
+    void aDryRunIsRefusedTheSameWay() {
+        frozen(stored("7.3", 1, "The canonical words.", null));
+        jsonl(page(7, 4, "0.95", p("7.3", "Different words.")));
+
+        assertThat(dryRun()).isEqualTo(1);
+
+        assertThat(imports.previewed).isNull();
+        assertThat(out.toString()).contains("its English rewritten");
+    }
+
+    /** The D16 corrections land as Hindi text on frozen books; nothing embeds Hindi, so they go through. */
+    @Test
+    void aHindiRewriteOnAFrozenBookGoesThrough() throws IOException {
+        frozen(stored("7.3", 1, "The canonical words.", "पुराने शब्द।"));
+
+        assertThat(loadHindi("corrections: []\n", page(7, 4, "0.95", p("7.3", "नए शब्द।")))).isZero();
+
+        assertThat(imports.rows).hasSize(1);
+        assertThat(out.toString()).contains("leaves its paragraph set and English text as they are");
+    }
+
+    @Test
+    void aBookWithNoVectorIsNotFrozen() {
+        imports.alignmentAnswer = List.of(stored("7.3", 1, "The canonical words.", null));
+        jsonl(page(7, 4, "0.95", p("7.3", "Different words.")));
+
+        assertThat(run()).isZero();
+
+        assertThat(out.toString()).contains("has no embedded paragraph — not frozen yet");
+    }
+
+    private void frozen(com.margai.curriculum.api.AlignmentRow... rows) {
+        imports.embedded = 909;
+        imports.alignmentAnswer = List.of(rows);
+    }
+
+    private static com.margai.curriculum.api.AlignmentRow stored(String section, int paraNo, String english,
+            String hindi) {
+        return new com.margai.curriculum.api.AlignmentRow(UUID.randomUUID(), (short) 7, section, (short) paraNo,
+                english, hindi, List.of(4), hindi == null ? List.of() : List.of(4));
+    }
+
     private int run() {
         return commandLine.execute("ncert", "load", "--book", "phy11-part1",
                 "--inputs", inputs.toString(), "--reports", reports.toString());

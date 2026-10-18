@@ -1,7 +1,8 @@
 # ncert-errata.yaml — the printing errors the NCERT books make, as their loaded rows stand (D16, DECISIONS
-# 2026-10-17). A row corrects a printing error that changes the meaning and keeps a slip that changes nothing as
-# printed; every correction is logged here, and so is every kept wrong cross-reference or garbled phrase, as an
-# errata candidate. Spelling slips kept as printed are not logged. The English rows are canonical and frozen, so
+# 2026-10-17, the correction rule as the founder revised it on 2026-10-18). A row corrects printed text that states
+# something false — a printing slip, a wrong term or a mistranslation alike — and keeps as printed text that states
+# nothing false; every correction is logged here, and so is every kept wrong cross-reference, garbled technical name
+# or garbled phrase, as an errata candidate. Spelling and grammar slips kept as printed are not logged. The English rows are canonical and frozen, so
 # an English error the founder puts in the log is logged as kept.
 #
 # Unlike ncert-corrections.yaml, which is keyed on a page and a span of the transcription and applied before
@@ -18,7 +19,10 @@
 #                               missing or an extra word, or a sign or two that reads as nothing alone, takes its
 #                               neighbouring word on each side where it has one, and a span that recurs in its row
 #                               more neighbours, within the approved entry's own span, until it names its place
-#                               (DECISIONS 2026-10-17, the working-rules row): a corrected row must not carry it.
+#                               (DECISIONS 2026-10-17, the working-rules row); where no span inside the entry names
+#                               its place apart from the correction (the print sitting inside it), the span reaches
+#                               past the entry into the row's printed words on the same crop (founder, 2026-10-18):
+#                               a corrected row must not carry it.
 #                               Read on a crop of the page image, or carried over
 #                               from an approved entry whose span was; never taken from the decoded text layer
 #                               (SPEC §12.2). Quoted, as every span is
@@ -834,6 +838,486 @@ errata:
      printed: "पेट", corrected: "ग्लूकागॉन",
      meaning_changing: true, flag_reviewed: false, round: "bio11 Hindi round one, approved 2026-10-17 (ec40175)",
      reason: "the page prints इसके अतिरिक्त पेट ग्लूकोनियोजिनेसिस की प्रक्रिया को भी प्रेरित करता है (crop p8 x174-534 y182-200 at zoom 5; the decoded layer's line y184 agrees): the stomach stimulating gluconeogenesis, in a paragraph on glucagon; the English row has 'In addition, this hormone stimulates the process of gluconeogenesis'; by the founder's ruling of 2026-10-10 the row writes the meaning: ग्लूकागॉन, the row's own spelling of the hormone"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.1", para: 2, page: 5, action: kept,
+     printed: "परागकोश (चित्र 1.3 ब)", corrected: "परागकोश (चित्र 1.3 अ)",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a wrong cross-reference: the page cites Figure 1.3 (ब) for the transverse section of an anther (crop p5 x40-404 y452-476 at zoom 3.5), where the page's own caption gives the section as (अ) and the wall layers as (ब) (crop p6 x60-560 y240-485 at zoom 1.6), as the English row has Figure 1.3a; not on align's number lines, both editions carrying 1.3; kept as printed by the correction rule of 2026-10-17 (bio12 Hindi round two)"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.1", para: 4, page: 5, action: kept,
+     printed: "आवृत होती है (चित्र 1.3 अ)", corrected: "आवृत होती है (चित्र 1.3 ब)",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a wrong cross-reference: the page cites Figure 1.3 (अ) for the four wall layers (crop p5 x40-404 y620-644 at zoom 3.5), where the page's own caption gives the wall layers as (ब) (crop p6 x60-560 y240-485 at zoom 1.6), as the English row has Figure 1.3b; not on align's number lines, both editions carrying 1.3; kept as printed by the correction rule of 2026-10-17 (bio12 Hindi round two)"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.1", para: 7, page: 6, action: corrected,
+     printed: "लघुबीजाणुधानी कहते", corrected: "लघुबीजाणुजनन कहते",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints, in bold, that the formation of microspores from a pollen mother cell by meiosis is called लघुबीजाणुधानी, the microsporangium, a structure (crop p6 x174-535 y648-680 at zoom 5; the decoded layer's line y665 agrees); the English row says the process is called microsporogenesis; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own term लघुबीजाणुजनन (the side heading of ¶5 on the same page)"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.1", para: 9, page: 8, action: corrected,
+     printed: "झड़ते या संगलित होते हैं", corrected: "झड़ते हैं",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that in over 60 per cent of angiosperms the pollen grains are shed or संगलित (fused) at this two-celled stage (crop p8 x174-535 y100-150 at zoom 4; the decoded layer's lines y101-y118 agree); pollen grains do not fuse, and the English row says they are shed at this 2-celled stage; by the founder's ruling of 2026-10-10 the row writes the meaning: the false 'or fused' is removed with the auxiliary it needed, nothing typed"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.1", para: 9, page: 8, action: corrected,
+     printed: "(तीन-चरणीय)", corrected: "(तीन-कोशीय)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the label of the condition in which the generative cell has divided into two male gametes before shedding as (तीन-चरणीय), three-staged (crop p8 x174-535 y100-150 at zoom 4; the decoded layer's line y134 agrees); the English row says (3-celled stage), and the same sentence pair names the other condition दो कोशीय चरण; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own -कोशीय (दो कोशीय on this page, तीन कोशीय स्थिति in §1.2.3 ¶18)"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.2", para: 1, page: 9, action: corrected,
+     printed: "जो वर्तिका के", corrected: "जो वर्तिकाग्र के",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the style (वर्तिका) is the elongated slender part that lies beneath the वर्तिका, beneath itself (crop p9 x42-403 y544-577 at zoom 5; the decoded layer's lines y545-y562 agree); the English row says the style is the elongated slender part beneath the stigma; by the founder's ruling of 2026-10-10 the row writes the meaning, with this paragraph's own word for the stigma, वर्तिकाग्र"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.2", para: 1, page: 9, action: kept,
+     printed: "एक गर्भाशयी गुहा (कोष्ठक)", corrected: "the ovarian cavity (locule) (the English row)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a false statement kept as printed: the page calls the cavity inside the ovary a uterine cavity, गर्भाशयी गुहा (crop p9 x40-404 y574-615 at zoom 3.5), where the English row says the ovarian cavity (locule); kept as printed by the founder's answer C36 (2026-10-18), given before the rule's revision the same day"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.2", para: 1, page: 9, action: kept,
+     printed: "गर्भाशयी गुहा के अंदर", corrected: "Inside the ovarian cavity (the English row)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a false statement kept as printed: the second place, गर्भाशयी गुहा for the ovarian cavity (crop p9 x40-404 y574-615 at zoom 3.5); kept as printed by the founder's answer C36 (2026-10-18), given before the rule's revision the same day"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.2", para: 3, page: 10, action: corrected,
+     printed: "बीजांडकाय केंद्रक की", corrected: "बीजांडकाय की",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the cells of the बीजांडकाय केंद्रक, the nucellus's nucleus, hold abundant reserve food (crop p10 x174-535 y203-236 at zoom 4; the decoded layer's line y204 agrees); a nucleus has no cells, and the English row says the cells of the nucellus have abundant reserve food materials; by the founder's ruling of 2026-10-10 the row writes the meaning: the false 'nucleus' is removed, nothing typed"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.2", para: 4, page: 10, action: kept,
+     printed: "बीजांडद्वारी क्षेत्र में विलग होते हैं", corrected: "Ovules generally differentiate a single megaspore mother cell (MMC) in the micropylar region of the nucellus (the English row)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a false statement kept as printed: the page says ovules separate (विलग होते हैं) from a single megaspore mother cell in the micropylar region (crop p10 x174-535 y278-311), where the English row says ovules differentiate a single MMC there; a fix would retype the sentence, so it is kept as printed by the founder's answer C18 (2026-10-18)"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.2", para: 7, page: 11, action: corrected,
+     printed: "छोर, जिसे तंतुरूप समुच्चय कहते हैं, पर एक विशेष सहाय कोशिकीय स्थूलन", corrected: "छोर पर एक विशेष सहाय कोशिकीय स्थूलन, जिसे तंतुरूप समुच्चय कहते हैं,",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page names the micropylar end itself the filiform apparatus (crop p11 x42-403 y594-610; the decoded layer's line y595 agrees), where the English row and the page's own Fig. 1.8 give the name to the special cellular thickening at that end: the row writes the meaning by reordering the page's own words, nothing typed, by the founder's answer C19 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.3", para: 4, page: 13, action: corrected,
+     printed: "उन्मील परागणी पुष्प सुनिश्चित", corrected: "अनुन्मील्य परागणी पुष्प सुनिश्चित",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that उन्मील परागणी (chasmogamous) flowers produce assured seed-set (crop p13 x40-267 y82-99 at zoom 7; the decoded layer's line y83 agrees); chasmogamous flowers are open and need pollinators, and the English row says cleistogamous flowers produce assured seed-set even in the absence of pollinators; p12 ends a sentence before it, so nothing is hyphenated across the page; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own term अनुन्मील्य परागणी (same paragraph on p12, and the question after it)"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.3", para: 4, page: 13, action: corrected,
+     printed: "परागण की", corrected: "परागणकारियों की",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that cleistogamous flowers give assured seed-set even in the absence of परागण, pollination (crop p13 x40-267 y99-115 at zoom 7; the decoded layer's line y100 agrees); cleistogamous flowers are self-pollinated and set no seed without pollination, and the English row says even in the absence of pollinators; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word परागणकारियों (§1.2.3 ¶14); the printed अनुपस्थित is kept as printed"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.3", para: 11, page: 15, action: corrected,
+     printed: "बड़े नर", corrected: "बड़े प्राणी",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that even बड़े नर, large males, such as lemurs, arboreal rodents and lizards have been found pollinating some species (crop p15 x42-403 y116-133 at zoom 5; the decoded layer's line y117 agrees); pollination by these animals has nothing to do with their sex, and the English row says even larger animals; by the founder's ruling of 2026-10-10 the row writes the meaning, with this paragraph's own word प्राणी (प्राणियों in the sentence before)"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.2.3", para: 19, page: 18, action: corrected,
+     printed: "पराग जनन का अध्ययन", corrected: "पराग अंकुरण का अध्ययन",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "the page prints that after dusting pollen on a drop of sugar solution you can study पराग जनन, pollen generation (crop p18 x170-538 y163-267 at zoom 4.08), a different process from the one the activity shows; the English row says you can study pollen germination, and the paragraph goes on to the pollen tubes coming out of the grains; the row writes the meaning, with the edition's own term पराग अंकुरण (§1.2.3 ¶16, ¶17), by the founder's approval of round two (2026-10-18: \"both make the text state something false\"), under the correction rule as he revised it the same day (one test: the printed text states something false); found by the ✅ sample's reader (#7)"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.4.1", para: 1, page: 20, action: corrected,
+     printed: "के रूप में बढ़ता", corrected: "से पहले होता",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints भ्रूणपोष का विकास भ्रूण विकास के रूप में बढ़ता है। क्यों? (crop p20 x228-535 y105-122; the decoded layer's line y107 agrees), losing what the English row states and its own क्यों? presupposes, that endosperm development precedes embryo development: the row writes the meaning, से पहले होता है typed, by the founder's answer C17 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.4.2", para: 2, page: 20, action: corrected,
+     printed: "की प्रोटीन", corrected: "का भाग",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the प्रोटीन, protein, of the embryonal axis above the cotyledons is the epicotyl (crop p20 x228-535 y663-680 at zoom 5; the decoded layer's line y664 agrees); the English row says the portion of the embryonal axis above the level of cotyledons is the epicotyl; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own phrase भ्रूणीय अक्ष के भाग (§1.4.2 ¶3); the feminine verb after it is left as printed"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.4.2", para: 2, page: 21, action: corrected,
+     printed: "प्रोटीन,", corrected: "भाग,",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the cylindrical प्रोटीन, protein, below the cotyledons that ends in the radicle (crop p21 x42-403 y83-99 at zoom 5; the decoded layer's line y84 agrees); the English row says the cylindrical portion below the level of cotyledons is the hypocotyl; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word भाग (§1.4.2 ¶3)"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.4.2", para: 3, page: 21, action: corrected,
+     printed: "गोलाकार", corrected: "मूलांकुर",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that at its lower end the embryonal axis has a गोलाकार, round, [thing] and root cap in an undifferentiated sheath (crop p21 x42-403 y150-166 at zoom 5; the decoded layer's line y151 agrees); the English row says the radicle and root cap enclosed in the coleorrhiza; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word for the radicle, मूलांकुर (the label of Figure 1.14 (ब) on p20, crop x60-230 y280-540 at zoom 3, and मूलांकुर चोल in this sentence)"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.4.3", para: 2, page: 21, action: corrected,
+     printed: "बीजांड (अंडाशय) का", corrected: "बीजांड का",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the ovule glossed as the ovary, बीजांड (अंडाशय), in 'the integument of the ovule becomes the seed coat' (crop p21 x42-403 y523-539 at zoom 5; the decoded layer's line y524 agrees); an ovule is not an ovary, the next paragraph has the ovary become the fruit, and the English row says integuments of ovules harden as seed coats; by the founder's ruling of 2026-10-10 the row writes the meaning: the false gloss is removed, nothing typed"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.4.3", para: 4, page: 23, action: corrected,
+     printed: "अखरोट", corrected: "काजू",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints अखरोट, walnut, among apple and strawberry as fruits in which the thalamus contributes, the false fruits (crop p23 x42-403 y116-132 at zoom 5; the decoded layer's line y117 agrees); the English row names cashew, whose fleshy part grows from the swollen pedicel and thalamus, and the walnut is not a false fruit by this paragraph's definition; by the founder's ruling of 2026-10-10 the row writes the meaning; the edition prints no word for cashew, so the common Hindi name काजू is used, a term the edition never prints, as bio11's C22 accepted (founder, 2026-10-17)"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.4.3", para: 7, page: 23, action: corrected,
+     printed: "हैराल्ड", corrected: "हेरोड",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints किंग हैराल्ड (crop p23 x42-403 y604-620; the decoded layer's line y605 agrees) where the English row names King Herod's palace, the place of the date seed's discovery: the row writes the meaning, by the founder's answer C20 (2026-10-18) under the meaning ruling of 2026-10-10 (a term the edition never prints, as bio11's C22, founder, 2026-10-17)"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.4.3", para: 9, page: 24, action: corrected,
+     printed: "1000 लघु बीज", corrected: "हजारों लघु बीज",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "the page prints that each orchid fruit holds 1000 लघु बीज, a thousand tiny seeds (crop p24 x174-534 y132-155 at zoom 4; the decoded layer's line y137 agrees), a count where the English row says each fruit contains thousands of tiny seeds, the paragraph's point being very large numbers of seeds; the row writes the meaning, with the edition's own word हजारों (हजारों न्युक्ली, ch 1 §1.4.1 ¶1), by the founder's approval of round two (2026-10-18: \"both make the text state something false\"), under the correction rule as he revised it the same day (one test: the printed text states something false); found in align's number lines"}
+  - {book: bio12, lang: hi, chapter: 1, section: "1.5", para: 1, page: 24, action: corrected,
+     printed: "सैकड़ों तरीके", corrected: "कई तरीके",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that there are सैकड़ों, hundreds of, ways of development of apomictic seeds (crop p24 x174-535 y356-372 at zoom 5, the word at x330-368 zoom 12; the decoded layer's line y357 agrees), and then names two; the English row says there are several ways; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word for several, कई (§1.4.3 ¶7, several years)"}
+  - {book: bio12, lang: hi, chapter: 2, section: "2.2", para: 5, page: 6, action: corrected,
+     printed: "दो वृहद भगोष्ठ", corrected: "दो लघु भगोष्ठ",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the clitoris lies above the urethral opening near the upper junction of the two वृहद भगोष्ठ, labia majora (crop p6 x41-402 y374-392 at zoom 5; the decoded layer's line y376 agrees); the English row says the upper junction of the two labia minora; by the founder's ruling of 2026-10-10 the row writes the meaning, with this paragraph's own term लघु भगोष्ठ"}
+  - {book: bio12, lang: hi, chapter: 2, section: "2.3", para: 1, page: 7, action: corrected,
+     printed: "को (वीर्यसेचन) स्पर्मिएशन", corrected: "को स्पर्मिएशन",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints, in bold, वीर्यसेचन as the name of the release of sperms from the seminiferous tubules (crop p7 x319-536 y359-409 at zoom 5; the decoded layer's line y377 agrees); वीर्यसेचन is this edition's word for insemination, the transfer of sperms into the female tract (§2 ¶1, §2.1 ¶5, §2.5 ¶1, ch 3), and the English row says the process is called spermiation; by the founder's ruling of 2026-10-10 the row writes the meaning: the false gloss is removed, nothing typed, and the printed स्पर्मिएशन stays"}
+  - {book: bio12, lang: hi, chapter: 2, section: "2.3", para: 5, page: 8, action: corrected,
+     printed: "इस अवस्था में स्थायी तौर पर", corrected: "इस अवस्था में अस्थायी तौर पर",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the oogonia enter prophase I and stay स्थायी तौर पर, permanently, arrested at that stage (crop p8 x78-440 y661-678 at zoom 5; the decoded layer's line y662 agrees); the edition's own §2.3 ¶6 has the primary oocyte complete its first meiotic division in the tertiary follicle, and the English row says temporarily arrested; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's word अस्थायी (ch 5 §5.5.3 ¶2)"}
+  - {book: bio12, lang: hi, chapter: 2, section: "2.4", para: 1, page: 11, action: corrected,
+     printed: "गर्भाशय के भीतर", corrected: "अंडाशय के भीतर",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that during the follicular phase the primary follicles inside the गर्भाशय, uterus, grow into a Graafian follicle (crop p11 x175-536 y152-169 at zoom 5; the decoded layer's line y153 agrees); follicles are in the ovary, as the same row's next sentence (changes in the ovary and the uterus) and §2.3 say, and the English row says the primary follicles in the ovary; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's word अंडाशय"}
+  - {book: bio12, lang: hi, chapter: 2, section: "2.7", para: 1, page: 15, action: corrected,
+     printed: "लगभग 9.5 माह", corrected: "लगभग 9 माह",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the average duration of human pregnancy as about 9.5 months (crop p15 x176-536 y290-307 at zoom 5; the decoded layer's line y291 agrees); the edition's own §2.6 ¶4 says human pregnancy lasts 9 months and the foetus is fully developed by the end of the ninth month, and the English row says about 9 months; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: bio12, lang: hi, chapter: 3, section: "3.1", para: 3, page: 3, action: kept,
+     printed: "सिकल सैन एनीमिया", corrected: "सिकल सेल एनीमिया",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a garbled scientific name: the page prints सिकल सैन for sickle-cell (crop p3 x174-536 y95-119 at zoom 3.5); kept as printed and logged under the correction rule as the founder revised it on 2026-10-18 (the founder's note on his ten pairs, #10)"}
+  - {book: bio12, lang: hi, chapter: 3, section: "3.2", para: 1, page: 3, action: corrected,
+     printed: "1000 बिलियन", corrected: "1000 मिलियन",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that India's population passed एक अरब, i.e. 1000 बिलियन, in 2000 (crop p3 x174-536 y418-451 at zoom 5; the decoded layer's line y436 agrees); one arab is 1000 million, 1000 billion is a trillion, and the English row says close to the billion mark by 2000; by the founder's ruling of 2026-10-10 the row writes the meaning, with this paragraph's own unit मिलियन (2 अरब (2000 मिलियन))"}
+  - {book: bio12, lang: hi, chapter: 3, section: "3.2", para: 6, page: 5, action: kept,
+     printed: "कॉपर (सी यू) का आयन मोचित होने के कारण शुक्राणुओं की भक्षकाणुक्रिया (फैगोसाइटोसिस) बढ़ा देती हैं", corrected: "IUDs increase phagocytosis of sperms within the uterus and the Cu ions released suppress sperm motility and the fertilising capacity of sperms (the English row)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a false statement kept as printed: the page makes the copper ions the cause of the increased phagocytosis of sperms (crop p5 x174-536 y402-469), where the English row gives two separate actions, phagocytosis increased by the IUD and motility suppressed by the Cu ions; a fix would retype the sentence, so it is kept as printed by the founder's answer C21 (2026-10-18)"}
+  - {book: bio12, lang: hi, chapter: 3, section: "3.2", para: 6, page: 5, action: kept,
+     printed: "आइ यू डी हॉर्मोन को गर्भाशय में भ्रूण के रोपण के लिए अनुपयुक्त बनाते", corrected: "the hormone-releasing IUDs make the uterus unsuitable for implantation (the English row)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a false statement kept as printed: the page says IUDs make the hormone unsuitable for the implantation of the embryo in the uterus (crop p5 x174-536 y402-469), where the English row says the hormone-releasing IUDs make the uterus unsuitable for implantation; a fix would retype the clause, so it is kept as printed by the founder's answer C21 (2026-10-18)"}
+  - {book: bio12, lang: hi, chapter: 3, section: "3.4", para: 1, page: 8, action: kept,
+     printed: "पुस्तक के आठवें", corrected: "पुस्तक के सातवें",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a wrong cross-reference: the page sends the reader to the eighth chapter for HIV (crop p8 x42-402 y338-360 at zoom 4), which is chapter 7, Human Health and Disease, in this book; the older numbering; kept as printed by the correction rule of 2026-10-17 (bio12 Hindi round two, its align number lines)"}
+  - {book: bio12, lang: hi, chapter: 4, section: "4", para: 4, page: 3, action: kept,
+     printed: "8000-10000 वर्ष ईसा पूर्व", corrected: "8000-1000 B.C. (the English row)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a false statement kept as printed: the page says humans knew of variation from 8000-10000 years BC (crop p3 x170-540 y605-630 at zoom 3.5), where the English row says 8000-1000 B.C.; kept as printed by the founder's answer C22 (2026-10-18), given before the rule's revision the same day"}
+  - {book: bio12, lang: hi, chapter: 4, section: "4.2", para: 9, page: 7, action: corrected,
+     printed: "नर (अंड) और मादा", corrected: "मादा (अंड) और नर",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that ♀ and ♂ denote respectively the नर (अंड) and मादा (पराग) of the F_1, the eggs called male and the pollen female (crop p7 x175-536 y688-707 at zoom 5; the decoded layer's line y689 agrees); the English row says ♀ and ♂ denote the female (eggs) and male (pollen); by the founder's ruling of 2026-10-10 the row writes the meaning: the two printed words change places, nothing typed"}
+  - {book: bio12, lang: hi, chapter: 4, section: "4.2", para: 10, page: 8, action: corrected,
+     printed: "में जीनोटाइप अनुपात", corrected: "में फीनोटाइप अनुपात",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the 3/4 tall : 1/4 dwarf, i.e. 3:1, is the जीनोटाइप (genotypic) ratio, and then that the genotypic ratio is 1:2:1 (crop p8 x42-403 y335-372 at zoom 5; the decoded layer's line y336 agrees); the English row says a phenotypic ratio of 3:1 but a genotypic ratio of 1:2:1; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's word फीनोटाइप (this paragraph's second sentence)"}
+  - {book: bio12, lang: hi, chapter: 4, section: "4.2.2.2", para: 1, page: 11, action: corrected,
+     printed: "मानव जीन (2n)", corrected: "मानव जीव (2n)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "the page prints मानव जीन (2n) द्विगुणित होता है, the human gene diploid (crop p11 x174-536 y585-607 at zoom 3.5), one letter from जीव, organism, where the English row says humans are diploid organisms; the row writes जीव, as round one wrote जीवों for the printed जीनों at ch 10 p4 (§10.1 ¶13), by the founder's answer Q1 (2026-10-18: \"correct it (\"the human gene is diploid\" is false)\"), under the correction rule as he revised it the same day"}
+  - {book: bio12, lang: hi, chapter: 4, section: "4.2.2.2", para: 4, page: 12, action: corrected,
+     printed: "जनित जीनोटाइप पर", corrected: "जनित फीनोटाइप पर",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that dominance depends on the जीनोटाइप produced by the gene product, a product producing a genotype (crop p12 x42-403 y584-617 at zoom 5; the decoded layer's line y585 agrees); the English row says it depends on the production of a particular phenotype from this product; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's word फीनोटाइप (§4.2.2.2 ¶4, starch grain size as a फीनोटाइप)"}
+  - {book: bio12, lang: hi, chapter: 4, section: "4.2.2.2", para: 4, page: 12, action: corrected,
+     printed: "विशेष जीनोटाइप पर", corrected: "विशेष फीनोटाइप पर",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that dominance depends as much on the particular जीनोटाइप we choose to examine (crop p12 x42-403 y584-617 at zoom 5; the decoded layer's line y585 agrees); the English row says on the particular phenotype that we choose to examine, as ¶4's starch grains show; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's word फीनोटाइप"}
+  - {book: bio12, lang: hi, chapter: 4, section: "4.2.2.2", para: 4, page: 12, action: corrected,
+     printed: "एकाधिक जीनोटाइप", corrected: "एकाधिक फीनोटाइप",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that in that case more than one जीनोटाइप is influenced by one gene (crop p12 x42-403 y584-617 at zoom 5; the decoded layer's line y602 agrees); one gene is one genotype, and the English row says in case more than one phenotype is influenced by the same gene; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's word फीनोटाइप"}
+  - {book: bio12, lang: hi, chapter: 4, section: "4.3.1", para: 1, page: 14, action: corrected,
+     printed: "झुर्रीदार- हरा", corrected: "झुर्रीदार- पीला",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the four dihybrid phenotypes as round-yellow, wrinkled-green, round-green and wrinkled-green, wrinkled-green twice and no wrinkled-yellow (crop p14 x42-403 y369-403 at zoom 5; the decoded layer's line y370 agrees); the English row and the derivation in ¶2 on the same page (9 round-yellow : 3 wrinkled-yellow : 3 round-green : 1 wrinkled-green) give wrinkled, yellow second; by the founder's ruling of 2026-10-10 the row writes the meaning, with this sentence's own पीला; the printed hyphen and space are kept"}
+  - {book: bio12, lang: hi, chapter: 4, section: "4.3.2", para: 2, page: 16, action: corrected,
+     printed: "एलील के दोनों जीन", corrected: "जीन के दोनों एलील",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that both genes of an allele lie at homologous sites on homologous chromosomes (crop p16 x43-404 y314-366 at zoom 4; the decoded layer's line y350 agrees), the relation reversed: alleles are forms of a gene; the English row says the two alleles of a gene pair are located on homologous sites; by the founder's ruling of 2026-10-10 the row writes the meaning: the two printed words change places, nothing typed"}
+  - {book: bio12, lang: hi, chapter: 4, section: "4.8.3", para: 3, page: 27, action: kept,
+     printed: "द्विअधिसूत्री (टेट्रासोमी) या द्विन्यूनसूत्री (नलसोमी)", corrected: "trisomy or monosomy (the English row)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a false statement kept as printed: the page names the conditions of an extra or a missing pair tetrasomy or nullisomy (crop p27 x172-536 y649-673 at zoom 3.5), where the English row says an additional copy or the lack of one of a pair, trisomy or monosomy; kept as printed by the founder's answer C29 (2026-10-18), given before the rule's revision the same day"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.1.1", para: 8, page: 4, action: corrected,
+     printed: "का 10 करोड़वाँ", corrected: "का 100 करोड़वाँ",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints a nanometre as एक मीटर का 10 करोड़वाँ भाग, one ten-millionth (10^-8 m) (crop p4 x80-300 y470-540 at zoom 4; the decoded layer's line y484 agrees), where its own next words give 10^-9 मीटर and the English row says one billionth (10^-9) of a metre: by the founder's ruling of 2026-10-10 the row writes the meaning, 100 करोड़वाँ (one billionth), one digit added to the page's own words"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.2", para: 6, page: 7, action: corrected,
+     printed: "सभी प्रयोगों के आधार पर", corrected: "प्रयोगों के",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page says all of Griffith's experiments revealed the biochemical nature of the transforming principle (crop p7 x173-536 y405-512; the decoded layer's lines y478-y496 agree), against ¶5 on the same page (his experiments could not tell it) and the English row (the work of Avery, MacLeod and McCarty, named in the sentence before): the row writes the meaning by removing the page's own words, nothing typed, by the founder's answer C10 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.4.1", para: 2, page: 11, action: corrected,
+     printed: "सोडियम", corrected: "सीजिएम",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the heavy DNA is separated from normal DNA by centrifugation in a सोडियम क्लोराइड (sodium chloride) density gradient (crop p11 x220-536 y542-578 at zoom 4; the decoded layer's line y545 agrees); the English row says a caesium chloride (CsCl) density gradient, the gradient of the Meselson-Stahl experiment, and the next paragraph on this page prints सीजिएम CSCl for the same gradient (crop p11 x220-536 y677-711 at zoom 4); by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word for caesium (सीजिएम, §5.4.1 ¶3) beside its chloride"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.4.1", para: 3, page: 11, action: corrected,
+     printed: "CSCl", corrected: "CsCl",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the caesium chloride formula as CSCl, a capital S (crop p11 x450-490 y678-694 at zoom 16; the decoded layer's line y679 agrees), where the English row has CsCl: a wrong formula symbol, written as the meaning, by the founder's answer C35 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.4.2", para: 2, page: 13, action: corrected,
+     printed: "(3' -> 5' ध्रुवता वाले", corrected: "(5' -> 3' ध्रुवता वाले",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints (3' → 5' ध्रुवता वाले टेम्प्लेट) for the template of the strand replicated discontinuously (crop p13 x174-534 y400-436 at zoom 4; the decoded layer's line y434 agrees) — the same polarity it gives the continuously replicated strand's template one line above, which contradicts it; the English says the template with polarity 5'->3' — the print reverses the polarity; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.4.2", para: 4, page: 13, action: corrected,
+     printed: "समानता)", corrected: "असामान्यता)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that a failure of cell division after DNA replication gives polyploidy, glossed (गुणसूत्री समानता), a chromosomal similarity (crop p13 x172-536 y636-688 at zoom 3.5 and x172-290 y670-688 at zoom 9; the decoded layer's line y672 agrees); the English row says polyploidy (a chromosomal anomaly); by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word for abnormality (असामान्यताओं, ch 4 §4.7 ¶2)"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.5", para: 1, page: 14, action: kept,
+     printed: "कुल डीएनए द्विगुणित होकर अनुलेखन के दौरान अपना एक रज्जुक आरएनए के साथ मिलाकर उसी का रूप ले लेता है", corrected: "in transcription only a segment of DNA and only one of the strands is copied into RNA (the English row)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a false statement kept as printed: the page says an organism's total DNA doubles and, in transcription, joins one of its strands to the RNA and takes its form (crop p14 x40-404 y161-212), where the English row says that in transcription only a segment of DNA and only one strand is copied into RNA; a fix would retype the sentence, so it is kept as printed by the founder's answer C8 (2026-10-18)"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.5.1", para: 2, page: 14, action: corrected,
+     printed: "3'-ए टी जी सी ए टी जी सी ए टी जी सी ए टी जी सी ए टी जी सी ए टी जी सी ए टी जी सी-5'", corrected: "3'-ए टी जी सी ए टी जी सी ए टी जी सी ए टी जी सी ए टी जी सी ए टी जी सी-5'",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the hypothetical template strand with the group ए टी जी सी seven times, 28 bases (crop p14 x40-404 y638-706 at zoom 4; the decoded layer's lines y640 and y657 agree), above a coding strand whose complementary group टी ए सी जी it prints six times, 24 bases, so the two strands of one double-stranded segment do not pair over their length; the English row has six repeats on both strands (24 bases each); a repeated group that makes the statement false (R2-2, 2026-10-17); by the founder's ruling of 2026-10-10 the row writes the meaning: one group fewer on the template strand"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.5.3", para: 1, page: 16, action: corrected,
+     printed: "(आरआरएनए;", corrected: "(एमआरएनए;",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints दूत आरएनए (आरआरएनए; मेसेंजर आरएनए) — messenger RNA abbreviated as rRNA, the abbreviation two lines below gives ribosomal RNA (crop p16 x280-402 y107-125 at zoom 8; the decoded layer's line y123 agrees); the English says messenger RNA (mRNA), and the same Hindi paragraph later writes एमआरएनए for it; the print names the wrong molecule; by the founder's ruling of 2026-10-10 the row writes the meaning. Settles the second read's flag: the row then reads as the verifier's printed quote"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.5.3", para: 6, page: 18, action: corrected,
+     printed: "केंद्रक में", corrected: "केंद्रक से बाहर",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the fully processed hnRNA, now called mRNA, is transported केंद्रक में, into the nucleus, for translation (crop p18 x88-404 y82-134 at zoom 4; the decoded layer's line y102 agrees); the English row says it is transported out of the nucleus for translation, which takes place in the cytoplasm; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own construction for out of (से बाहर, as in स्तन से बाहर, ch 2 §2.2 ¶6)"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.5.3", para: 6, page: 18, action: corrected,
+     printed: "के 3'", corrected: "के बिना 3'",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that in tailing the adenine groups (200-300) join स्वतंत्र रूप में टेम्पलेट के 3' किनारे पर, independently at the template's 3' end (crop p17 x220-536 y370-421 at zoom 4, the clause opening at the foot of p17, and p18 x88-404 y82-100 at zoom 6; the decoded layer's lines p17 y406 and p18 y84 agree): the poly-A tail put on the template, the DNA, where the clause before it puts the cap on the hnRNA's 5' end; the English row says adenylate residues (200-300) are added at the 3'-end in a template independent manner; by the founder's ruling of 2026-10-10 the row writes the meaning: बिना after टेम्पलेट के, so the clause reads independently, without a template, at the 3' end (of the hnRNA the capping clause names), the edition's own construction for without (X के बिना: ch 8 §8.5 ¶2 इनके बिना, ch 1 §1.4.3 ¶6 बीज के बिना)"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.6", para: 3, page: 18, action: corrected,
+     printed: "के निश्चित", corrected: "के बिना निश्चित",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that Ochoa's enzyme (polynucleotide phosphorylase) helps RNA polymerise स्वतंत्र रूप (आरएनए का एंजाइम संश्लेषण) से टेम्प्लेट के निश्चित अनुक्रमों के साथ, with the template's defined sequences (crop p18 x40-404 y629-700 at zoom 3.5; the decoded layer's line y684 agrees): a synthesis directed by a template; the English row says the enzyme polymerises RNA with defined sequences in a template independent manner (enzymatic synthesis of RNA), and polynucleotide phosphorylase copies no template; by the founder's ruling of 2026-10-10 the row writes the meaning: बिना after टेम्प्लेट के, the page's स्वतंत्र रूप kept, the edition's own construction for without (X के बिना: ch 8 §8.5 ¶2 इनके बिना, ch 1 §1.4.3 ¶6 बीज के बिना)"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.6", para: 3, page: 18, action: corrected,
+     printed: "कोशिश", corrected: "कोशिका",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints कोशिश स्वतंत्र तंत्र, an attempt-independent system (crop p18 x40-404 y629-700; the decoded layer's line y649 agrees), where the English row names Nirenberg's cell-free system: the row writes the meaning, कोशिका, the edition's word for cell, by the founder's answer C11 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.6.1", para: 1, page: 20, action: kept,
+     printed: "अध्याय 5 में", corrected: "अध्याय 4 में",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a wrong cross-reference: the page sends the reader to chapter 5 for mutation (crop p20 x42-400 y199-221 at zoom 4), which is chapter 4 in this book; the older numbering; kept as printed by the correction rule of 2026-10-17 (bio12 Hindi round two, its align number lines)"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.6.1", para: 6, page: 20, action: corrected,
+     printed: "B1;", corrected: "BI;",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints B followed by the font's digit 1 (crop p20 x58-402 y456-474; the decoded layer's line y458 agrees), where the English row and the example line below it (RAM HAS BIR) have the letters BI: a look-alike that reads as another symbol, written as the sign (R2-1, 2026-10-17), by the founder's answer C9 (2026-10-18)"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.6.1", para: 12, page: 20, action: corrected,
+     printed: "DGA", corrected: "DCA",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the second deletion line as RAM HAS DGA P, with a G (crop p20 x58-170 y561-610 at zoom 8; the decoded layer's line y581 agrees): deleting R and E from RAM HAS RED CAP leaves the letters D, C, A, P, and a deletion cannot bring in a letter the statement never had, so the frameshift example reads false; the English row has RAM HAS DCA P; a slip that makes the example false (R2-2, 2026-10-17); by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.7", para: 2, page: 22, action: corrected,
+     printed: "(23 राइबोसोमल", corrected: "(23 एस राइबोसोमल",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the ribosome's catalyst as 23 राइबोसोमल आरएनए, the 23 with no S after it (crop p22 x250-404 y290-322 at zoom 6; the decoded layer's line y292 agrees): without the Svedberg unit it reads as twenty-three ribosomal RNAs and names no molecule; the English row says 23S rRNA in bacteria is the enzyme (ribozyme); by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own form of the unit (5 एस आर आरएनए, §5.5.3 ¶5), as bio11 wrote HCO_3^- where its page dropped the charge"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.8.1", para: 2, page: 24, action: corrected,
+     printed: "बीटा-गैलेक्टोसाइडेज की", corrected: "बीटा-गैलेक्टोसाइड की",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the y gene codes for permease, which increases the cell's permeability to बीटा-गैलेक्टोसाइडेज, the enzyme beta-galactosidase (crop p24 x40-404 y422-457 at zoom 4; the decoded layer's line y441 agrees), the z gene's product, an enzyme that works inside the cell; the English row says permease increases permeability of the cell to beta-galactosides, its substrates (lactose enters through permease, ¶3); by the founder's ruling of 2026-10-10 the row writes the meaning (the edition names beta-galactosides nowhere else, so the term is the English one transliterated, beside the edition's गैलेक्टोसाइडेज for the enzyme; a term the edition never prints, as bio11's C22 accepted (founder, 2026-10-17))"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.8.1", para: 4, page: 24, action: corrected,
+     printed: "को निष्क्रिय कर", corrected: "को बाधित कर",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page says the repressor inactivates RNA polymerase (crop p24 x40-404 y674-708; the decoded layer's line y693 agrees), where the English row says it prevents transcription, and the page's own Fig. 5.14 label says transcription by RNA polymerase is बाधित (crop p24 x228-380 y126-168): the row writes the meaning in the page's own word, by the founder's answer C7 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.9", para: 7, page: 27, action: corrected,
+     printed: "-22-3 लिंग", corrected: "-22 अलिंग",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that chromosome 1 was the last of the 24 human chromosomes, -22-3 लिंग गुणसूत्र and X and Y (crop p27 x300-536 y162-214 at zoom 4; the decoded layer's line y182 agrees): twenty-two sex chromosomes besides X and Y, with a stray -3 after the count; the English row says the 24 are 22 autosomes and X and Y; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word for autosome (अलिंग, ch 4 §4.6.3 ¶1: 22 जोड़े अलिंग सूत्र), the dash before 22 kept as the English dash"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.9.1", para: 1, page: 27, action: corrected,
+     printed: "करोड़", corrected: "मिलियन",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the human genome contains 3164.7 करोड़ base pairs (crop p27 x190-536 y368-436 at zoom 3.5; the decoded layer's line y370 agrees): a करोड़ is ten million, so some 31.6 billion; the English row says 3164.7 million bp, and §5.9 ¶3 of this chapter gives about 3×10^9 bp; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own unit (मिलियन, ch 6 §6.9, ch 13 §13.1.1), as bio11's 10 लाख गुना became 10 मिलियन गुना"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.9.1", para: 2, page: 27, action: corrected,
+     printed: "करोड़", corrected: "मिलियन",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that dystrophin, the largest known human gene, has 2.4 करोड़ bases (crop p27 x190-536 y368-436 at zoom 3.5; the decoded layer's line y420 agrees): 24 million; the English row says 2.4 million bases; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own unit (मिलियन, ch 6 §6.9, ch 13 §13.1.1), as bio11's 10 लाख गुना became 10 मिलियन गुना"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.9.1", para: 4, page: 27, action: corrected,
+     printed: "प्राप्त है", corrected: "प्राप्त नहीं है",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the functions of over 50 per cent of the discovered genes are known, जानकारी प्राप्त है (crop p27 x190-536 y485-520 at zoom 4; the decoded layer's lines y488 and y504 agree); the English row says the functions are unknown for over 50 per cent of the discovered genes, the reverse; by the founder's ruling of 2026-10-10 the row writes the meaning: नहीं before है"}
+  - {book: bio12, lang: hi, chapter: 5, section: "5.9.1", para: 9, page: 27, action: corrected,
+     printed: "करोड़", corrected: "मिलियन",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that scientists have identified about 1.4 करोड़ locations of single-base differences, SNPs (crop p27 x190-536 y653-671 at zoom 4; the decoded layer's line y656 agrees): 14 million; the English row says about 1.4 million locations; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own unit (मिलियन, ch 6 §6.9, ch 13 §13.1.1), as bio11's 10 लाख गुना became 10 मिलियन गुना"}
+  - {book: bio12, lang: hi, chapter: 6, section: "6.1", para: 4, page: 3, action: corrected,
+     printed: "आदि की कमी वाली", corrected: "आदि वाली",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the early earth's atmosphere was lacking (की कमी वाली) methane, ammonia etc. (crop p3 x41-404 y386-420 at zoom 5; the decoded layer's line y404 agrees), the opposite of the theory the paragraph then tests by putting methane and ammonia in Miller's flask; the English row says a reducing atmosphere containing CH_4, NH_3, etc.; by the founder's ruling of 2026-10-10 the row writes the meaning: the false 'lacking' is removed, nothing typed"}
+  - {book: bio12, lang: hi, chapter: 6, section: "6.3", para: 3, page: 6, action: kept,
+     printed: "(चित्र 6.3) है।", corrected: "no figure: Figure 6.3 shows homologous organs",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a wrong cross-reference: the page cites Figure 6.3 after the sweet potato and potato analogy example (crop p6 x174-494 y699-721 at zoom 4), where the page's Figure 6.3 shows examples of homologous organs (caption crop p6 x75-330 y528-548 at zoom 4); kept as printed by the correction rule of 2026-10-17 (bio12 Hindi round two, its align number lines)"}
+  - {book: bio12, lang: hi, chapter: 6, section: "6.5", para: 3, page: 10, action: kept,
+     printed: "शारबनी अवरोहण", corrected: "Branching descent (the English row)",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a garbled scientific term: the page prints the bold शारबनी अवरोहण, no Hindi word, for branching descent (crop p10 x320-420 y250-268 at zoom 10, round one's misprint ruling's); kept as printed by the founder's answer C5 (2026-10-18) and logged under the correction rule as the founder revised it on 2026-10-18"}
+  - {book: bio12, lang: hi, chapter: 6, section: "6.5", para: 6, page: 10, action: corrected,
+     printed: "समष्टियाँ", corrected: "व्यष्टियाँ",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints no two populations are alike (crop p10 x174-535 y688-704; the decoded layer's line y689 agrees) inside a sentence about the members of a population, where the English row says no two individuals are alike: the row writes the meaning, व्यष्टि, the edition's word for individual, by the founder's answer C25 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 6, section: "6.7", para: 2, page: 11, action: corrected,
+     printed: "आवृत्तियाँ 1 होती हैं", corrected: "आवृत्तियों का योग 1 होता है",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page says every allele frequency is 1 (crop p11 x40-404 y632-716; the decoded layer's line y633 agrees), where the English row says the sum total of all the allelic frequencies is 1: the row writes the meaning, योग typed (the edition prints no word for sum), by the founder's answer C23 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 6, section: "6.7", para: 2, page: 11, action: corrected,
+     printed: "से की", corrected: "से aa की",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the frequency q² with no genotype before it (crop p11 x40-404 y632-716; the decoded layer's line y684 agrees), where the English row has the frequency of aa, q²: the row writes the meaning, one symbol added, by the founder's answer C24 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 6, section: "6.8", para: 2, page: 16, action: corrected,
+     printed: "महाद्वीपीय विचलन के कारण जब दक्षिणी एवं उत्तरी अमरीका एक दूसरे से जुड़े तो इन जीवों ने उत्तर अमरीका तक विस्तार बनाया और ये उत्तरी अमरीकी प्राणि जगत पर छा गए। महाद्वीपीय विस्थापन के कारण जब", corrected: "महाद्वीपीय विस्थापन के कारण जब",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page first says the South American mammals spread into North America and dominated its fauna, then that they came under pressure from the northern fauna (crop p16 x174-535 y133-200; the decoded layer's lines y134-y199 agree); the English row says only that they were overridden by North American fauna: the row writes the meaning by removing the false first sentence, nothing typed, the next sentence carrying the English meaning, by the founder's answer C26 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 6, section: "6.9", para: 1, page: 16, action: corrected,
+     printed: "1991", corrected: "1891",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the fossils discovered in Java in 1991 revealed Homo erectus (crop p16 x174-535 y610-626 at zoom 5; the decoded layer's line y611 agrees); the English row says fossils discovered in Java in 1891; a discovery's date is syllabus content (R2-3, 2026-10-17); by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: bio12, lang: hi, chapter: 7, section: "7.1", para: 2, page: 5, action: corrected,
+     printed: "(39^0 से 40^0", corrected: "(39° से 40°",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page sets the typhoid fever range with a raised zero after each number, 39 and 40 with a superscript 0 (crop p5 x230-300 y168-188 at zoom 12; the decoded layer's line y172 agrees), a raised zero where the degree sign belongs, which reads as an exponent (39 to the power 0); the English row says 39° to 40°C; by the F' class ruling (R2-1, 2026-10-17) the row writes the sign"}
+  - {book: bio12, lang: hi, chapter: 7, section: "7.1", para: 6, page: 7, action: corrected,
+     printed: "अविषालु", corrected: "आविषालु",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints अविषालु, with a short अ, the negated non-toxic, for the substance haemozoin released when the red cells burst, against its own gloss (टॉक्सिक) (crop p7 x42-259 y100-133 at zoom 6; the decoded layer's line y118 agrees); the English row says a toxic substance, haemozoin; a slip whose mark makes the sentence false (R2-2, 2026-10-17); by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own word for toxic, आविषालु (ch 10 §10.3 ¶6)"}
+  - {book: bio12, lang: hi, chapter: 7, section: "7.1", para: 6, page: 7, action: kept,
+     printed: "जीवन चक्र (चित्र 7.2)", corrected: "जीवन चक्र (चित्र 7.1)",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a wrong cross-reference: the page cites Figure 7.2 for the parasite's life cycle (crop p7 x42-258 y315-337 at zoom 5), where Figure 7.2 shows filarial inflammation of the lower limb (caption crop p7 x270-482 y358-378 at zoom 4) and the life cycle is Figure 7.1; kept as printed by the correction rule of 2026-10-17 (bio12 Hindi round two, its align number lines)"}
+  - {book: bio12, lang: hi, chapter: 7, section: "7.1", para: 12, page: 9, action: kept,
+     printed: "बारहवें अध्याय में", corrected: "दसवें अध्याय में",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a wrong cross-reference: the page sends the reader to the twelfth chapter for biotechnology (crop p9 x42-402 y94-116 at zoom 4), which is chapter 10 in this book; the older numbering; kept as printed by the correction rule of 2026-10-17 (bio12 Hindi round two, its align number lines)"}
+  - {book: bio12, lang: hi, chapter: 7, section: "7.2.2", para: 3, page: 10, action: corrected,
+     printed: "(एंटीबायोटिक्स)", corrected: "(एंटीबॉडी)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the proteins the B-lymphocytes produce as प्रतिरक्षी glossed (एंटीबायोटिक्स), antibiotics (crop p10 x377-535 y324-340 at zoom 7; the decoded layer's line y325 agrees); antibiotics are microbial drugs, and the English row says these proteins are called antibodies; by the founder's ruling of 2026-10-10 the row writes the meaning, with the edition's own gloss प्रतिरक्षी (एंटीबॉडी) (ch 2 §2.7 ¶2)"}
+  - {book: bio12, lang: hi, chapter: 7, section: "7.4", para: 4, page: 17, action: kept,
+     printed: "मैगनेटिक रेजोजेंस इमेजिंग", corrected: "magnetic resonance imaging (the English row)",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a garbled technical name: the page prints रेजोजेंस for resonance in MRI's name (crop p17 x140-250 y454-473 at zoom 11, round one's entry's); kept as printed (round one) and logged under the correction rule as the founder revised it on 2026-10-18"}
+  - {book: bio12, lang: hi, chapter: 7, section: "7.4", para: 6, page: 18, action: corrected,
+     printed: "Y-इंटरफेरॉन", corrected: "alpha-इंटरफेरॉन",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the biological response modifier as Y-इंटरफेरॉन, a Latin capital Y in the roman text face where a Greek letter belongs (crop p18 x174-300 y197-214 at zoom 10; the decoded layer's line y198 agrees); there is no Y-interferon, and the English row says alpha-interferon; a glyph standing in for a sign, by the founder's ruling of 2026-10-10 the row writes the meaning, in the transcriber's notation for Greek letters (alpha-ग्लोबिन, ch 4 §4.8.2)"}
+  - {book: bio12, lang: hi, chapter: 7, section: "7.5.1", para: 2, page: 21, action: corrected,
+     printed: "तथा मित्रों के दबाव का अभाव", corrected: "का अभाव तथा मित्रों का दबाव",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page lists a lack of peer pressure among the causes of drug and alcohol abuse (crop p21 x42-404 y140-200; the decoded layer's lines y149-y180 agree), where the English row lists the lack of mutual support and peer pressure itself: the row writes the meaning, the clause retyped in the page's own words, by the founder's answer C28 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 7, section: "7.5.3", para: 3, page: 22, action: kept,
+     printed: "एड्स पति/पत्नी द्वारा मैथुन से स्थानांतरित होता है, जबकि यकृतशोथ बी संक्रमित रुधिर द्वारा स्थानांतरित होता है।", corrected: "Both can be transmitted through sexual contact or infected blood (the English row)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a false statement kept as printed: the page says AIDS passes by sexual contact while hepatitis B passes by infected blood (crop p22 x175-535 y300-360), where the English row says both can be transmitted through sexual contact or infected blood; a fix would retype the sentence, so it is kept as printed by the founder's answer C27 (2026-10-18)"}
+  - {book: bio12, lang: hi, chapter: 7, section: "7.5.4", para: 2, page: 23, action: corrected,
+     printed: "(क) आवश्यक समकक्षी", corrected: "(क) अनावश्यक समकक्षी",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the first preventive measure as 'avoid आवश्यक (necessary) peer pressure' (crop p23 x42-404 y180-212 at zoom 5; the decoded layer's line y195 agrees); the paragraph itself says a child should not be put under अनावश्यक (undue) pressure, and the English row says avoid undue peer pressure; by the founder's ruling of 2026-10-10 the row writes the meaning, with this paragraph's own word अनावश्यक"}
+  - {book: bio12, lang: hi, chapter: 8, section: "8", para: 1, page: 1, action: corrected,
+     printed: "प्रायोन भी प्रोटीनीय संक्रमित कारक", corrected: "प्रोटीनीय संक्रमित कारक प्रायोन भी",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that viruses, viroids and prions are all proteinaceous infectious agents (crop p1 x230-538 y566-614 at zoom 4; the decoded layer's line y583 agrees), but a viroid is a free RNA without protein; the English row lists microbes as protozoa, bacteria, fungi and viruses, viroids and also prions that are proteinacious infectious agents, the gloss naming the prions alone; by the founder's ruling of 2026-10-10 the row writes the meaning, by moving the page's own word प्रायोन after its gloss (reordering the page's own words, as bio11's R2-2 and its Canidae/Felidae entry did)"}
+  - {book: bio12, lang: hi, chapter: 8, section: "8", para: 3, page: 3, action: kept,
+     printed: "पुस्तक के 8वें अध्याय में", corrected: "पुस्तक के 7वें अध्याय में",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a wrong cross-reference: the page sends the reader to the book's eighth chapter for diseases (crop p3 x192-534 y80-102 at zoom 4), which is this chapter; the diseases are chapter 7; kept as printed by the correction rule of 2026-10-17 (bio12 Hindi round two, its align number lines)"}
+  - {book: bio12, lang: hi, chapter: 8, section: "8.5", para: 2, page: 9, action: corrected,
+     printed: "असंभव", corrected: "संभव",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page says eradicating pests is not only impossible but also undesirable (crop p9 x152-538 y577-625; the decoded layer's line y594 agrees), where the English row says not only possible, but also undesirable: the row writes the meaning, one prefix removed, by the founder's answer C12 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 9, section: "9.2.1", para: 3, page: 6, action: corrected,
+     printed: "शब्द वंश व दूसरा एवं तीसरा शब्द", corrected: "वर्ण वंश व दूसरा एवं तीसरा वर्ण",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page says the first word of a restriction enzyme's name comes from the genus and the second and third words from the species (crop p6 x170-538 y128-165; the decoded layer's lines y132 and y148 agree), where the English row says letter, as the page's own next lines (EcoRI) show: the row writes the meaning, वर्ण, the paragraph's own word two lines down, by the founder's answer C14 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 9, section: "9.2.1", para: 6, page: 7, action: corrected,
+     printed: "5' (GAATTC)", corrected: "5' (CTTAAG)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page glosses the lower strand 3' — सी टी टी ए ए जी — 5' as (GAATTC) (crop p7 x40-260 y195-268; the decoded layer's line y253 agrees), where the English row and the Devanagari letters beside it spell CTTAAG: the row writes the meaning, by the founder's answer C13 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 9, section: "9.3.5", para: 4, page: 14, action: kept,
+     printed: "बायोरिटर के विकास", corrected: "बायोरिएक्टर के विकास (bioreactors)",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a garbled technical name: the page prints the bold बायोरिटर for bioreactor (crop p14 x174-534 y639-663 at zoom 3.5); kept as printed (round one's false_positive, round two's misprint) and logged under the correction rule as the founder revised it on 2026-10-18"}
+  - {book: bio12, lang: hi, chapter: 10, section: "10.1", para: 11, page: 3, action: kept,
+     printed: "लीथीडोप्टेशन", corrected: "lepidopterans (the English row)",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a garbled scientific name: the page prints लीथीडोप्टेशन for the lepidopterans (crop p3 x170-538 y583-636 at zoom 4.08); kept as printed and logged under the correction rule as the founder revised it on 2026-10-18 (the founder's example of the class)"}
+  - {book: bio12, lang: hi, chapter: 10, section: "10.1", para: 13, page: 4, action: corrected,
+     printed: "जीनों", corrected: "जीवों",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that RNA interference is a method of cellular defence in all eukaryotic जीनों, genes (crop p4 x20-406 y559-607 at zoom 4; the decoded layer's line y576 agrees), one letter from जीवों, organisms, and a gene has no cellular defence; the English row says RNAi takes place in all eukaryotic organisms as a method of cellular defense; a slip whose mark makes the sentence false is written as the meaning (R2-2, 2026-10-17; the founder's ruling of 2026-10-10)"}
+  - {book: bio12, lang: hi, chapter: 10, section: "10.1", para: 13, page: 4, action: corrected,
+     printed: "वर्धित होने", corrected: "बंधने",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the specific mRNA becomes inactive after being वर्धित, increased, by the complementary double-stranded RNA (crop p4 x20-406 y559-607 at zoom 4; the decoded layer's line y593 agrees), a mechanism RNAi does not have; the English row says silencing of a specific mRNA due to a complementary dsRNA molecule that binds to and prevents translation of the mRNA; by the founder's ruling of 2026-10-10 the row writes the meaning, with this book's own verb for binding (बंधता, बंधकर, ch 5 §5.7 ¶4 and §5.8.1 ¶4)"}
+  - {book: bio12, lang: hi, chapter: 10, section: "10.2.2", para: 2, page: 7, action: corrected,
+     printed: "से अलग करने", corrected: "में प्रवेश कराने",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that, the cells being mortal, the genetically engineered lymphocytes must periodically be removed from the patient's body, शरीर से अलग करने (crop p7 x153-539 y170-218 at zoom 4; the decoded layer's line y204 agrees), the reverse of the therapy the paragraph has just described; the English row says the patient requires periodic infusion of such genetically engineered lymphocytes; by the founder's ruling of 2026-10-10 the row writes the meaning, with the paragraph's own verb प्रवेश कराना"}
+  - {book: bio12, lang: hi, chapter: 10, section: "10.2.2", para: 2, page: 7, action: kept,
+     printed: "प्रारंभिक भ्रूणीय अवस्था की कोशिकाओं से उत्पादित एडीए में", corrected: "if the gene isolated from marrow cells producing ADA is introduced into cells at early embryonic stages (the English row)",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a garbled phrase: the page says the good genes are introduced into ADA produced by early embryonic cells (crop p7 x153-539 y204-252), where the English row says the gene from marrow cells producing ADA is introduced into cells at early embryonic stages; a fix would retype the clause, so it is kept as printed by the founder's answer C16 (2026-10-18)"}
+  - {book: bio12, lang: hi, chapter: 10, section: "10.2.3", para: 1, page: 7, action: corrected,
+     printed: "उपचार की", corrected: "निदान की",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page calls serum and urine analysis conventional methods of treatment (crop p7 x153-539 y322-342; the decoded layer's line y324 agrees), where the English row says diagnosis: the row writes the meaning, निदान, the chapter's own word (§10.3 ¶4), by the founder's answer C15 (2026-10-18) under the meaning ruling of 2026-10-10"}
+  - {book: bio12, lang: hi, chapter: 10, section: "10.3", para: 4, page: 8, action: corrected,
+     printed: "1977", corrected: "1997",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the year of the first transgenic cow Rosie as 1977 (crop p8 x65-406 y609-629 at zoom 5; the decoded layer's line y612 agrees); the English row says in 1997 the first transgenic cow, Rosie, produced human protein-enriched milk; in Biology a discovery's date is syllabus content (R2-3, 2026-10-17); by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: bio12, lang: hi, chapter: 10, section: "10.4", para: 6, page: 9, action: corrected,
+     printed: "1977", corrected: "1997",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the year an American company got patent rights on Basmati rice as 1977 (crop p9 x152-538 y675-695 at zoom 5; the decoded layer's line y678 agrees); the English row says in 1997, an American company got patent rights on Basmati rice through the US Patent and Trademark Office; the year is syllabus content (R2-3, 2026-10-17); by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: bio12, lang: hi, chapter: 10, section: "10.4", para: 8, page: 10, action: corrected,
+     printed: "विपरीत विकसित व", corrected: "विपरीत विकासशील व",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that, in contrast to the industrialised nations which lack biodiversity, the developed (विकसित) and underdeveloped world is rich in biodiversity and traditional knowledge (crop p10 x21-406 y222-270 at zoom 4; the decoded layer's line y239 agrees), so the developed nations both lack and possess it; the English row says the developing and the underdeveloped world is rich in biodiversity; by the founder's ruling of 2026-10-10 the row writes the meaning, with this chapter's own word for developing, विकासशील (§10.1 ¶1, §10.4 ¶9)"}
+  - {book: bio12, lang: hi, chapter: 11, section: "11.1.2", para: 10, page: 7, action: corrected,
+     printed: "में r' 'प्राकृतिक", corrected: "में r 'प्राकृतिक",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page sets the symbol as r followed by a straight tick (crop p7 x171-539 y569-589 at zoom 6; the decoded layer's line y572 agrees), which in the rows' notation reads r prime, a quantity the equation above (dN/dt = rN) does not have; the English row says in this equation r is called the 'intrinsic rate of natural increase'; a look-alike that reads as another symbol is written as the meaning (2026-10-12, the F′ class R2-1)"}
+  - {book: bio12, lang: hi, chapter: 11, section: "11.1.2", para: 12, page: 8, action: corrected,
+     printed: "N^t = No^(ert) N^t = समय t में समष्टि घनत्व N_O", corrected: "N_t = N_0 e^(rt) N_t = समय t में समष्टि घनत्व N_0",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page sets the integral form of the growth equation as N with a raised t, = N and a full-size o, then a raised ert, and its key as N with a raised t and N with a subscript capital O (crop p8 x55-215 y122-176 at zoom 8; the decoded layer's lines y134 to y171 agree by position): a raised t reads as a power, the subscript zero is a letter O and e, the base, is raised with its exponent, so the line reads as another formula; the English row has N_t = N_0 e^(rt), N_t and N_0, and the key under it on the page names the population density at time t and at time zero; a look-alike that reads as another symbol, written as the sign (R2-1, 2026-10-17), in the English row's notation, by the founder's answer C4 (2026-10-18, \"C4 (b)\")"}
+  - {book: bio12, lang: hi, chapter: 11, section: "11.1.2", para: 16, page: 9, action: kept,
+     printed: "(चित्र 11.2)", corrected: "(चित्र 11.3)",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a wrong cross-reference: the page cites Figure 11.2 for logistic growth (crop p9 x216-515 y163-185 at zoom 4), where Figure 11.2 is the diagram of natality, mortality, immigration and emigration and the growth curve is Figure 11.3 (caption crop p7 x58-175 y472-492 at zoom 4); kept as printed by the correction rule of 2026-10-17 (bio12 Hindi round two, its align number lines)"}
+  - {book: bio12, lang: hi, chapter: 11, section: "11.1.4", para: 5, page: 11, action: corrected,
+     printed: "आवास ऑस्ट्रेलिया", corrected: "आवास से ऑस्ट्रेलिया",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the cactus-feeding moth was brought to उसके प्राकृतिक आवास ऑस्ट्रेलिया, its natural habitat Australia, without से (crop p11 x199-538 y302-350 at zoom 4; the decoded layer's line y319 agrees), making Australia the moth's home, where the cactus was the invader; the English row says a cactus-feeding predator (a moth) from its natural habitat was introduced into the country; a dropped mark that makes the sentence false is written as the meaning (R2-2, 2026-10-17; the founder's ruling of 2026-10-10)"}
+  - {book: bio12, lang: hi, chapter: 11, section: "11.1.4", para: 8, page: 12, action: corrected,
+     printed: "आवश्यक है।", corrected: "आवश्यक नहीं है।",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints, as the second correction to the common belief, that resources must be limiting for competition (crop p12 x67-405 y463-511 at zoom 4; the decoded layer's line y480 agrees), which the next sentence (interference competition even when food and space are abundant) contradicts; the English row says secondly, resources need not be limiting for competition to occur; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: bio12, lang: hi, chapter: 12, section: "12.1", para: 1, page: 2, action: kept,
+     printed: "अध्याय 13 में", corrected: "अध्याय 11 में",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a wrong cross-reference: the page sends the reader to chapter 13 for the parts of the environment (crop p2 x42-402 y107-129 at zoom 4), a later chapter; they are chapter 11 in this book (the English row: in earlier classes); kept as printed by the correction rule of 2026-10-17 (bio12 Hindi round two, its align number lines)"}
+  - {book: bio12, lang: hi, chapter: 12, section: "12.2", para: 1, page: 3, action: corrected,
+     printed: "(g^-2)", corrected: "(gm^-2)",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the unit of primary production by weight as g with a superscript -2, without the m (crop p3 x340-420 y158-178 at zoom 10; the decoded layer's line y162 agrees), grams to the power -2 where grams per square metre is meant; the English row has weight (gm^-2), and the energy unit beside it on the page keeps its m^-2; by the founder's ruling of 2026-10-10 the row writes the meaning, in the English row's notation"}
+  - {book: bio12, lang: hi, chapter: 12, section: "12.2", para: 1, page: 3, action: corrected,
+     printed: "g^-2 yr^1", corrected: "gm^-2 yr^-1",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the unit of productivity as g with a superscript -2, then yr with a superscript 1 and no minus sign (crop p3 x172-340 y192-212 at zoom 9; the decoded layer's line y195 agrees): no m, and a rate multiplied by the year, while the energy form beside it on the same line prints yr^-1; the English row has gm^-2 yr^-1; by the founder's ruling of 2026-10-10 the row writes the meaning, in the English row's notation"}
+  - {book: bio12, lang: hi, chapter: 12, section: "12.2", para: 3, page: 3, action: corrected,
+     printed: "कुल", corrected: "नेट",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the annual कुल primary productivity of the whole biosphere is about 170 billion tons (crop p3 x153-539 y428-448 at zoom 5; the decoded layer's line y431 agrees), and ¶1 of the same section names gross primary productivity सकल या कुल; the English row says the annual net primary productivity of the whole biosphere is approximately 170 billion tons; by the founder's ruling of 2026-10-10 the row writes the meaning, with ¶1's own term नेट प्राथमिक उत्पादकता"}
+  - {book: bio12, lang: hi, chapter: 12, section: "12.4", para: 13, page: 7, action: corrected,
+     printed: "प्रतिशत कम होता", corrected: "प्रतिशत होता",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the transfer of energy flow is 10 per cent कम, less (crop p7 x153-539 y605-653 at zoom 4; the decoded layer's line y622 agrees), that is about 90 per cent transferred, which its own next clause (only 10 per cent of the energy flows to each higher level) contradicts; the English row says the transfer of energy follows 10 per cent law – only 10 per cent of the energy is transferred to each trophic level; by the founder's ruling of 2026-10-10 the row writes the meaning, by removing the false कम (as bio11's पानी की आवश्यकता entry did)"}
+  - {book: bio12, lang: hi, chapter: 12, section: "12.5", para: 7, page: 10, action: corrected,
+     printed: "समावेश भी होता", corrected: "समावेश नहीं होता",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page lists among the limitations of ecological pyramids that the pyramid also includes species belonging to two or more levels (crop p10 x38-406 y515-602 at zoom 4; the decoded layer's lines y535 and y551 agree), which is no limitation; the English row says it does not take into account the same species belonging to two or more trophic levels, and the page's next limitation is written the same way with नहीं; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: bio12, lang: hi, chapter: 13, section: "13.1", para: 4, page: 2, action: kept,
+     printed: "प्रवात्व भित्ति", corrected: "प्रवाल भित्ति (coral reef)",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "a garbled scientific name: the page prints प्रवात्व, no word, for प्रवाल, coral, beside the gloss (कोरल रीफ) (crop p2 x347-385 y295-316 at zoom 12, round one's entry's); kept as printed by the founder's answer C2 (2026-10-18) and logged under the correction rule as the founder revised it on 2026-10-18"}
+  - {book: bio12, lang: hi, chapter: 13, section: "13.1.1", para: 1, page: 2, action: corrected,
+     printed: "20-25", corrected: "20-50",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints the range of the extreme estimates of the earth's species as 20-25 million (crop p2 x20-406 y663-683 at zoom 6; the decoded layer's line y666 agrees); the English row says some extreme estimates range from 20 to 50 million; by the founder's ruling of 2026-10-10 the row writes the meaning"}
+  - {book: bio12, lang: hi, chapter: 13, section: "13.1.2", para: 1, page: 4, action: corrected,
+     printed: "कम 2 लाख", corrected: "कम 20 लाख",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that at least 2 lakh (200,000) insect species may await discovery in these rain forests (crop p4 x68-406 y673-693 at zoom 6; the decoded layer's line y676 agrees), a tenth of the figure; the English row says at least two million insect species waiting to be discovered and named; by the founder's ruling of 2026-10-10 the row writes the meaning, in lakh as this chapter writes millions (70 लाख (7 मिलियन), §13.1.1 ¶1)"}
+  - {book: bio12, lang: hi, chapter: 13, section: "13.1.2", para: 3, page: 5, action: corrected,
+     printed: "(अनावृत्तबीजी", corrected: "(आवृत्तबीजी",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints अनावृत्तबीजी पादप, gymnosperm plants, first among the taxa whose species-area relationship is a rectangular hyperbola (crop p5 x323-538 y367-387 at zoom 6; the decoded layer's line y370 agrees); the English row says angiosperm plants, birds, bats, freshwater fishes; by the founder's ruling of 2026-10-10 the row writes the meaning, with this chapter's own spelling आवृत्तबीजी (§13.1.1 ¶2)"}
+  - {book: bio12, lang: hi, chapter: 13, section: "13.1.4", para: 1, page: 7, action: corrected,
+     printed: "आवृत्तबीजी", corrected: "अनावृत्तबीजी",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that 31 per cent of आवृत्तबीजी, angiosperm, species face extinction (crop p7 x152-461 y344-364 at zoom 6; the decoded layer's line y347 agrees); the English row says 31 per cent of all gymnosperm species in the world face the threat of extinction; by the founder's ruling of 2026-10-10 the row writes the meaning, with the gymnosperm word this chapter prints, अनावृत्तबीजी (p5)"}
+  - {book: bio12, lang: hi, chapter: 13, section: "13.1.4", para: 2, page: 7, action: corrected,
+     printed: "करोड़", corrected: "अरब",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints about तीन करोड़, thirty million, years since the origin of life, glossed (3 बिलियन) (crop p7 x152-538 y396-416 at zoom 6; the decoded layer's line y399 agrees), the word a hundredth of its own gloss; the English row says during the long period (> 3 billion years) since the origin and diversification of life on earth; by the founder's ruling of 2026-10-10 the row writes the meaning, with this book's own word for three billion years, 3 अरब (ch 6 §6.1 ¶5)"}
+  - {book: bio12, lang: hi, chapter: 13, section: "13.1.4", para: 5, page: 8, action: corrected,
+     printed: "करोड़ों", corrected: "लाखों",
+     meaning_changing: true, flag_reviewed: false, round: "bio12 Hindi round one, approved 2026-10-18 (fd938d0)",
+     reason: "the page prints that the Amazon rain forest probably harbours करोड़ों, tens of millions of, species (crop p8 x68-406 y131-151 at zoom 5; the decoded layer's line y134 agrees), more than the chapter's own conservative global estimate of about 70 lakh (§13.1.1 ¶1); the English row says harbouring probably millions of species; by the founder's ruling of 2026-10-10 the row writes the meaning, with this chapter's own word for millions, लाखों (millions of years, §13.1.2 ¶1)"}
+  - {book: bio12, lang: hi, chapter: 13, section: "13.2.2", para: 2, page: 10, action: kept,
+     printed: "हॉट-स्पॉट हैं (चित्र 13.2)", corrected: "no figure: Figure 13.2 is the species-area relation",
+     meaning_changing: false, flag_reviewed: false, round: "bio12 Hindi round two, approved 2026-10-18 (64a4704)",
+     reason: "a wrong cross-reference: the page cites Figure 13.2 after the 34 hotspots (crop p10 x42-402 y298-320 at zoom 4), where Figure 13.2 shows the species-area relation (caption crop p5 x72-316 y569-589 at zoom 4); kept as printed by the correction rule of 2026-10-17 (bio12 Hindi round two, its align number lines)"}
   - {book: phy12-part2, lang: en, chapter: 10, section: "10.7", para: 6, page: 16, action: kept,
      printed: "passes through the polaroid P_2", corrected: "passes through the polaroid P_1",
      meaning_changing: true, flag_reviewed: false, round: "parked 2026-10-16",

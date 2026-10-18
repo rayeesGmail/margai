@@ -390,8 +390,8 @@ evidence land together.
 ### The freeze guard (D17, DECISIONS 2026-09-13)
 
 A book with embedded paragraphs is the **frozen corpus** — every canonical book is embedded, a scratch
-database's never is. A load (or a dry run) that would add or delete one of its rows, or rewrite or remove a
-row's **English** text, is refused, every such row named:
+database's never is. An English load (or its dry run) that would add or delete one of its English rows, or
+rewrite or remove a row's **English** text, is refused, every such row named:
 
 ```
 phy11-part1 is frozen (909 embedded paragraphs) and this load would change 1 row(s) of its corpus:
@@ -401,9 +401,12 @@ phy11-part1 is frozen (909 embedded paragraphs) and this load would change 1 row
 That is a **corpus event**, not a load: a second edition, or an English correction the founder rules on.
 Re-run with `--migrate "<reason>"`; the report records the event under `CORPUS EVENT (--migrate)` with
 every row it moved, the vectors of rewritten and deleted rows are dropped, and `ncert embed --book …`
-earns them back. Hindi text changes are not guarded — nothing embeds Hindi, so the D16 corrections still
-land as ordinary loads — and if a Hindi vector column is ever added, the guard covers Hindi text the same
-way (founder, DECISIONS 2026-10-18). Anchored rows (D23) stay refused even under `--migrate`: re-anchoring
+earns them back. A **Hindi load is not guarded**: it changes no English row and no vector — Hindi text on
+rows that keep their English, and Hindi-only rows added or deleted — so a first load as written (which puts
+Hindi rows at addresses the English lacks; phy11-part1's put 23 there) and the corrections block that
+deletes them again land as ordinary loads, as the D16 books did and the four Chemistry Hindi books will in the
+beta period (Claude's reading of the founder's Q2, DECISIONS 2026-10-18). If a Hindi vector column is ever added, the guard covers Hindi text the same way (founder,
+DECISIONS 2026-10-18). Anchored rows (D23) stay refused even under `--migrate`: re-anchoring
 is the migration's own step.
 
 ## 5. verify — the second read (D15, DECISIONS 2026-09-14 "the pair")
@@ -789,7 +792,8 @@ chapter numbers repeat across books, so an address without one would count the w
 right. Each query is filtered to its subject, as the doubt pipeline filters (Biology is one subject:
 botany and zoology together); then the acceptance set runs again with **no subject filter**, the
 founder's diagnostic of what a router's missing subject would cost. It embeds the queries and nothing
-else, writes nothing to the corpus, and refuses the fake client. Cost: a few paise.
+else, writes nothing to the corpus, and refuses the fake client. Cost: ₹0.51 by the ledger on the 2026-10-18
+run (51 query embeddings; the ledger rounds each call up to a paisa).
 
 The report opens with the corpus searched (paragraphs with and without a vector, per book — a row
 without one is invisible to the vector half), then **the founder's bar** read from the filtered

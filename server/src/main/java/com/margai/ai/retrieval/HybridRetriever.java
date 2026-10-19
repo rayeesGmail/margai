@@ -33,6 +33,9 @@ import org.springframework.stereotype.Component;
  * appear; it is not evidence that the passage is about the question, and letting a keyword
  * coincidence satisfy the grounding rule would make R2 ("no AI answer without retrieval
  * grounding") unfalsifiable — every query contains some word that appears somewhere in NCERT.
+ *
+ * <p>A question may come with an English search version of itself (D18, DECISIONS 2026-10-19): the
+ * halves then run for both texts and the four lists fuse the same way, never the rewrite alone.
  */
 @Component
 public class HybridRetriever {
@@ -58,22 +61,44 @@ public class HybridRetriever {
      * @param nodeId  the guessed syllabus node (D23 anchors), or null
      */
     public RetrievedPassages retrieve(String question, BookSubject subject, UUID nodeId, AiCallContext ctx) {
-        float[] query = embeddings.ofQuery(question, ctx);
-        RetrievedPassages first = search(question, query, subject, nodeId, false);
+        return retrieve(question, null, subject, nodeId, ctx);
+    }
+
+    /**
+     * Retrieve for one question and, when given, its English textbook-style search version (founder
+     * ruling 2026-10-18, DECISIONS 2026-10-19). Both halves run for the question and for the search
+     * version, and all four ranked lists are fused by the same reciprocal-rank fusion — never the
+     * search version alone, so a rewrite that drifts can add passages but cannot take the question's
+     * own away. A paragraph several lists found keeps its best rank in each half and its highest
+     * similarity, and grounding is judged on that highest similarity. A null or blank search version
+     * is the unfused retrieval, exactly.
+     *
+     * @param searchVersion the question rewritten for the textbooks ({@code query_rewrite}), or null
+     */
+    public RetrievedPassages retrieve(String question, String searchVersion, BookSubject subject, UUID nodeId,
+            AiCallContext ctx) {
+        List<Probe> probes = new ArrayList<>();
+        probes.add(new Probe(question, embeddings.ofQuery(question, ctx)));
+        if (searchVersion != null && !searchVersion.isBlank()) {
+            probes.add(new Probe(searchVersion, embeddings.ofQuery(searchVersion, ctx)));
+        }
+        RetrievedPassages first = search(probes, subject, nodeId, false);
         if (first.grounded() || nodeId == null) {
             return first;
         }
-        return search(question, query, subject, null, true);
+        return search(probes, subject, null, true);
     }
 
-    private RetrievedPassages search(String question, float[] query, BookSubject subject, UUID nodeId,
-            boolean nodeFilterDropped) {
-        List<ParagraphMatch> byVector = paragraphs.nearestByEmbedding(query, subject, nodeId, config.kVector());
-        List<ParagraphMatch> byText = paragraphs.matchingText(question, subject, nodeId, config.kText());
+    /** One text retrieval runs for, with its query-side vector. */
+    private record Probe(String text, float[] vector) {
+    }
 
+    private RetrievedPassages search(List<Probe> probes, BookSubject subject, UUID nodeId, boolean nodeFilterDropped) {
         Map<UUID, Fusing> fusing = new LinkedHashMap<>();
-        rank(byVector, fusing, true);
-        rank(byText, fusing, false);
+        for (Probe probe : probes) {
+            rank(paragraphs.nearestByEmbedding(probe.vector(), subject, nodeId, config.kVector()), fusing, true);
+            rank(paragraphs.matchingText(probe.text(), subject, nodeId, config.kText()), fusing, false);
+        }
 
         List<RetrievedPassages.Passage> fused = fusing.values().stream()
                 .map(Fusing::passage)
@@ -136,12 +161,13 @@ public class HybridRetriever {
             this.match = match;
         }
 
+        /** The best rank each half gave it and the highest similarity, over every list that found it. */
         private void add(int rank, Double similarity, boolean vector) {
             if (vector) {
-                this.vectorRank = rank;
-                this.similarity = similarity;
+                this.vectorRank = vectorRank == null ? rank : Math.min(vectorRank, rank);
+                this.similarity = this.similarity == null ? similarity : Math.max(this.similarity, similarity);
             } else {
-                this.textRank = rank;
+                this.textRank = textRank == null ? rank : Math.min(textRank, rank);
             }
         }
 

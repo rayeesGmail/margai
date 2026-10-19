@@ -189,13 +189,30 @@ class NcertRetrieveCommandTest {
                 .contains("| held-out queries | ≥ 3 of 4 | 0 of 0 | no |");
     }
 
-    /** The English acceptance queries rewritten too are scored apart, and never enter the bar. */
+    /**
+     * The English acceptance queries rewritten too are scored apart, and never enter the bar: here the
+     * Physics query is reached only through its search version, so the diagnostic counts it and the fused
+     * tick does not.
+     */
     @Test
     void scoresTheRewrittenEnglishAcceptanceQueriesApartFromTheBar() {
+        corpus.physicsOnlyBySearchVersion = true;
+
         assertThat(runRewrite()).isZero();
 
         assertThat(report()).contains("the English acceptance queries rewritten too (founder's diagnostic, not part of the bar)")
-                .contains("| in the answer set | ≥ 13 of 15 | 1 of 2 | no |");
+                .contains("| rewritten and fused | all | 1 | 1/1 (100%) |")
+                .contains("| unfused | all | 1 | 0/1 (0%) |");
+        assertThat(report().substring(report().indexOf("D17's tick, fused"), report().indexOf("the same checks, unfused")))
+                .contains("| in the answer set | ≥ 13 of 15 | 0 of 2 | no |");
+    }
+
+    /** Grounding in each mode beside the ranks, for the founder to see which queries a search version alone grounds. */
+    @Test
+    void showsGroundingInEachModeQueryByQuery() {
+        assertThat(runRewrite()).isZero();
+
+        assertThat(report()).contains("| grounded unfused | grounded fused |");
     }
 
     @Test
@@ -260,12 +277,17 @@ class NcertRetrieveCommandTest {
         final List<BookSubject> subjects = new ArrayList<>();
         /** When set, the text half finds the Biology query's expected paragraph for a search version only. */
         boolean reachedBySearchVersion;
+        /** When set, the Physics query's expected paragraph comes back only for its search version. */
+        boolean physicsOnlyBySearchVersion;
 
         @Override
         public List<ParagraphMatch> nearestByEmbedding(float[] query, BookSubject subject, UUID nodeId, int limit) {
             subjects.add(subject);
             if (subject == BookSubject.biology) {
                 return List.of(match("bio11", 1, "1.1", 2, "Cells divide."));
+            }
+            if (physicsOnlyBySearchVersion) {
+                return List.of(match("phy11-part1", 7, "7.9", 2, "A neighbouring paragraph."));
             }
             return List.of(match("phy11-part1", 7, "7.9", 1, "Energy of an orbiting satellite."));
         }
@@ -274,6 +296,9 @@ class NcertRetrieveCommandTest {
         public List<ParagraphMatch> matchingText(String query, BookSubject subject, UUID nodeId, int limit) {
             if (reachedBySearchVersion && subject == BookSubject.biology && query.startsWith("SV: ")) {
                 return List.of(match("bio11", 1, "1.1", 1, "Living things grow."));
+            }
+            if (physicsOnlyBySearchVersion && subject == BookSubject.physics && query.startsWith("SV: ")) {
+                return List.of(match("phy11-part1", 7, "7.9", 1, "Energy of an orbiting satellite."));
             }
             return List.of();
         }

@@ -352,11 +352,15 @@ final class RetrievalRun {
                             return List.of(entry.getKey(), query.language(), query.text(), entry.getValue());
                         }).toList());
 
+        // Grounding in each mode beside the ranks: fused, the search version's vector alone can ground a
+        // question whose own stayed under the floor, which is a choice for the founder to see query by query.
         report.section("per query").table(
-                List.of("id", "set", "subject", "lang", "rank unfused", "rank fused", "expected"),
+                List.of("id", "set", "subject", "lang", "rank unfused", "rank fused", "grounded unfused",
+                        "grounded fused", "expected"),
                 fused.stream().map(result -> List.of(result.query().id(), result.query().set().name(),
                         result.query().subject().name(), result.query().language(),
                         rankOf(unfused, result.query().id()), rank(result),
+                        groundedOf(unfused, result.query().id()), result.retrieved().grounded() ? "yes" : "no",
                         result.query().expect().toString())).toList());
 
         List<Result> misses = fused.stream().filter(result -> !result.inAnswerSet()).toList();
@@ -401,6 +405,11 @@ final class RetrievalRun {
     private static String rankOf(List<Result> results, String id) {
         return results.stream().filter(result -> result.query().id().equals(id)).findFirst()
                 .map(RetrievalRun::rank).orElse("not run");
+    }
+
+    private static String groundedOf(List<Result> results, String id) {
+        return results.stream().filter(result -> result.query().id().equals(id)).findFirst()
+                .map(result -> result.retrieved().grounded() ? "yes" : "no").orElse("not run");
     }
 
     private static RetrievalQuery queryOf(List<Result> results, String id) {

@@ -408,7 +408,7 @@
         { "book": "phy12-part1", "chapter": 7, "section": "7.5", "para": 5 },
         { "book": "phy12-part1", "chapter": 7, "section": "7.5", "para": 7 }
       ],
-      "note": "Held out by the founder, used as written. The book's only 'why' is the derivation: §7.5 ¶4 (i = dq/dt = omega C v_m cos omega t), ¶5 (cos omega t = sin(omega t + pi/2)), ¶7 (so the current is pi/2 ahead). ¶8 and ¶10 only describe the lead and are left out, by the founder's strict reading of 'kyu' (a01, DECISIONS 2026-10-19)."
+      "note": "Held out by the founder, used as written. The book's only 'why' is the derivation: §7.5 ¶4 (i = dq/dt = omega C v_m cos omega t), ¶5 (cos omega t = sin(omega t + pi/2)), ¶7 (so the current is pi/2 ahead). ¶8 and ¶10 only describe the lead; Claude left them out, applying to h03 the founder's strict reading of 'kyu' for a01 (DECISIONS 2026-10-19), for him to overrule."
     },
     {
       "id": "h04-okazaki-lagging-strand",

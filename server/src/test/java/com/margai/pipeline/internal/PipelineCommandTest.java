@@ -274,7 +274,7 @@ class PipelineCommandTest {
                 }
                 if (cls == NcertRetrieveCommand.class) {
                     return cls.cast(new NcertRetrieveCommand(imports, NcertEmbedCommandTest.noRetriever(),
-                            new NcertExtractCommandTest.StubSpend(),
+                            new NcertRetrieveCommandTest.StubRewriter(), new NcertExtractCommandTest.StubSpend(),
                             new com.margai.ai.api.AiClientInfo("cohere", List.of("ledger")), writer));
                 }
                 if (cls == NcertAlignCommand.class) {

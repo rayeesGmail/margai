@@ -4,11 +4,13 @@ import com.margai.ai.api.AiCallContext;
 import com.margai.ai.api.AiClientInfo;
 import com.margai.ai.api.AiSpend;
 import com.margai.ai.retrieval.HybridRetriever;
+import com.margai.ai.tasks.QueryRewriter;
 import com.margai.curriculum.api.AlignmentRow;
 import com.margai.curriculum.api.CurriculumImport;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,6 +32,12 @@ import picocli.CommandLine.Option;
  * <p>Separate from {@code ncert embed}'s closing run because that run is one book's, and D17's
  * question is the corpus's: whether a question finds its paragraph among all ten books of its
  * subject, Hindi and Hinglish included.
+ *
+ * <p>{@code --rewrite} is D18's measurement (DECISIONS 2026-10-19): every non-English query is
+ * rewritten into an English search version on the CHEAP tier and retrieved with the two fused, never
+ * the rewrite alone; D17's tick is read from that fused run — the bar on the acceptance set and at
+ * least 3 of the 4 held-out queries — with the unfused run beside it, and the English acceptance
+ * queries are rewritten too, scored apart from the bar.
  */
 @Component
 @Profile("pipeline")
@@ -44,18 +52,31 @@ class NcertRetrieveCommand extends InputFileCommand {
             description = "The concept queries (default: ${DEFAULT-VALUE}, relative to the working directory).")
     Path queriesFile;
 
+    @Option(names = "--rewrite",
+            description = "D18: also rewrite every non-English query into an English search version (CHEAP tier) and "
+                    + "retrieve with the two fused; the English acceptance queries are rewritten too, scored apart.")
+    boolean rewrite;
+
     private final CurriculumImport imports;
     private final HybridRetriever retriever;
+    private final QueryRewriter rewriter;
     private final AiSpend spend;
     private final AiClientInfo client;
 
-    NcertRetrieveCommand(CurriculumImport imports, HybridRetriever retriever, AiSpend spend, AiClientInfo client,
-            Reports reports) {
+    NcertRetrieveCommand(CurriculumImport imports, HybridRetriever retriever, QueryRewriter rewriter, AiSpend spend,
+            AiClientInfo client, Reports reports) {
         super(reports);
         this.imports = imports;
         this.retriever = retriever;
+        this.rewriter = rewriter;
         this.spend = spend;
         this.client = client;
+    }
+
+    /** The rewrite run's report is filed under its own name, beside the unfused run's. */
+    @Override
+    String reportTitle() {
+        return rewrite ? super.reportTitle() + " rewrite" : super.reportTitle();
     }
 
     @Override
@@ -87,17 +108,41 @@ class NcertRetrieveCommand extends InputFileCommand {
         AiCallContext ctx = AiCallContext.system(runId);
         List<RetrievalRun.Result> filtered = List.of();
         List<RetrievalRun.Result> unfiltered = List.of();
+        List<RetrievalRun.Result> fused = List.of();
+        List<RetrievalRun.Result> englishRewritten = List.of();
+        Map<String, String> searchVersions = new LinkedHashMap<>();
         try {
             filtered = RetrievalRun.run(queries, retriever, ctx);
             unfiltered = RetrievalRun.runUnfiltered(acceptance, retriever, ctx);
+            if (rewrite) {
+                // Every non-English query, and — the founder's diagnostic — the English acceptance ones.
+                List<RetrievalQuery> toRewrite = queries.stream()
+                        .filter(query -> !"en".equals(query.language()) || query.set() == RetrievalQuery.QuerySet.acceptance)
+                        .toList();
+                for (RetrievalQuery query : toRewrite) {
+                    searchVersions.put(query.id(), rewriter.run(query.text(), ctx).output().searchQuery());
+                }
+                List<RetrievalQuery> nonEnglish = queries.stream().filter(query -> !"en".equals(query.language())).toList();
+                Map<String, RetrievalRun.Result> fusedById = RetrievalRun.runFused(nonEnglish, searchVersions, retriever, ctx)
+                        .stream().collect(Collectors.toMap(result -> result.query().id(), Function.identity()));
+                // An English query is not rewritten for the bar, so its fused result is its unfused one.
+                fused = filtered.stream().map(result -> fusedById.getOrDefault(result.query().id(), result)).toList();
+                englishRewritten = RetrievalRun.runFused(acceptance.stream()
+                        .filter(query -> "en".equals(query.language())).toList(), searchVersions, retriever, ctx);
+            }
         } finally {
-            // The query embeddings are the whole bill; read from the ledger, never computed (§10.5).
+            // The query embeddings and rewrites are the whole bill; read from the ledger, never computed (§10.5).
             AiSpend.RunSpend bill = spend.of(runId);
             report.section("cost").table(List.of("calls", "input tokens", "spent"),
                     List.of(List.of(String.valueOf(bill.calls()),
                             String.valueOf(bill.usage().inputTokens()), bill.rupees())));
         }
-        RetrievalRun.reportCorpus(filtered, unfiltered, report, expectedText(filtered));
+        if (rewrite) {
+            RetrievalRun.reportFused(filtered, fused, englishRewritten, unfiltered, searchVersions, report,
+                    expectedText(fused));
+        } else {
+            RetrievalRun.reportCorpus(filtered, unfiltered, report, expectedText(filtered));
+        }
     }
 
     /**

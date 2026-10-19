@@ -2,9 +2,14 @@ package com.margai.pipeline.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.margai.ai.api.AiCallContext;
 import com.margai.ai.api.AiClientInfo;
+import com.margai.ai.api.AiResponse;
+import com.margai.ai.api.Usage;
 import com.margai.ai.internal.TestAiProperties;
 import com.margai.ai.retrieval.HybridRetriever;
+import com.margai.ai.tasks.QueryRewriter;
+import com.margai.ai.tasks.SearchQuery;
 import com.margai.curriculum.api.AlignmentRow;
 import com.margai.curriculum.api.BookSubject;
 import com.margai.curriculum.api.ParagraphMatch;
@@ -15,6 +20,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -42,6 +48,7 @@ class NcertRetrieveCommandTest {
     private final NcertEmbedCommandTest.StubEmbeddings embeddings = new NcertEmbedCommandTest.StubEmbeddings();
     private final StubCorpus corpus = new StubCorpus();
     private final CorpusImport imports = new CorpusImport();
+    private final StubRewriter rewriter = new StubRewriter();
     private AiClientInfo client = new AiClientInfo("cohere", List.of("ledger"));
     private Path queries;
 
@@ -154,9 +161,71 @@ class NcertRetrieveCommandTest {
         assertThat(embeddings.queries).isEmpty();
     }
 
+    // ── D18: --rewrite, the question fused with its English search version (DECISIONS 2026-10-19) ──
+
+    /** Every non-English query is rewritten, and the English acceptance ones for the diagnostic; not the English baseline. */
+    @Test
+    void rewritesTheNonEnglishQueriesAndTheEnglishAcceptanceOnes() {
+        assertThat(runRewrite()).isZero();
+
+        assertThat(rewriter.questions).containsExactly("orbit energy", "कोशिका क्या है");
+        assertThat(report()).contains("ncert retrieve rewrite")
+                .contains("the search versions the model wrote")
+                .contains("SV: कोशिका क्या है");
+    }
+
+    /** The Biology Hindi query misses on its own text and is reached through its search version, fused. */
+    @Test
+    void readsD17sTickFromTheFusedRunWithTheUnfusedBesideIt() {
+        corpus.reachedBySearchVersion = true;
+
+        assertThat(runRewrite()).isZero();
+
+        assertThat(report()).contains("D17's tick, fused (founder, DECISIONS 2026-10-19) — NOT MET")
+                .contains("| every Hindi query | all | 1 of 1 | yes |")
+                .contains("the same checks, unfused (for comparison)")
+                .contains("| every Hindi query | all | 0 of 1 | no |")
+                .contains("| held-out queries | ≥ 3 of 4 | 0 of 0 | no |");
+    }
+
+    /** The English acceptance queries rewritten too are scored apart, and never enter the bar. */
+    @Test
+    void scoresTheRewrittenEnglishAcceptanceQueriesApartFromTheBar() {
+        assertThat(runRewrite()).isZero();
+
+        assertThat(report()).contains("the English acceptance queries rewritten too (founder's diagnostic, not part of the bar)")
+                .contains("| in the answer set | ≥ 13 of 15 | 1 of 2 | no |");
+    }
+
+    @Test
+    void withoutRewriteNothingIsRewritten() {
+        assertThat(run()).isZero();
+
+        assertThat(rewriter.questions).isEmpty();
+        assertThat(report()).doesNotContain("D17's tick, fused");
+    }
+
     private int run() {
         return commandLine().execute("ncert", "retrieve", "--queries", queries.toString(),
                 "--inputs", inputs.toString(), "--reports", reports.toString());
+    }
+
+    private int runRewrite() {
+        return commandLine().execute("ncert", "retrieve", "--rewrite", "--queries", queries.toString(),
+                "--inputs", inputs.toString(), "--reports", reports.toString());
+    }
+
+    /** Answers "SV: " and the question, and records what it was asked to rewrite. */
+    static final class StubRewriter implements QueryRewriter {
+
+        final List<String> questions = new ArrayList<>();
+
+        @Override
+        public AiResponse<SearchQuery> run(String question, AiCallContext ctx) {
+            questions.add(question);
+            return new AiResponse<>(new SearchQuery("SV: " + question), new Usage(10, 5, 0, 0), "stub",
+                    Duration.ZERO, UUID.randomUUID());
+        }
     }
 
     private CommandLine commandLine() {
@@ -167,7 +236,7 @@ class NcertRetrieveCommandTest {
             public <K> K create(Class<K> cls) throws Exception {
                 if (cls == NcertRetrieveCommand.class) {
                     return cls.cast(new NcertRetrieveCommand(imports,
-                            new HybridRetriever(corpus, embeddings, TestAiProperties.standard()),
+                            new HybridRetriever(corpus, embeddings, TestAiProperties.standard()), rewriter,
                             new NcertExtractCommandTest.StubSpend(), client, writer));
                 }
                 return siblings.create(cls);
@@ -188,6 +257,8 @@ class NcertRetrieveCommandTest {
     static final class StubCorpus implements ParagraphRetrievalRepository {
 
         final List<BookSubject> subjects = new ArrayList<>();
+        /** When set, the text half finds the Biology query's expected paragraph for a search version only. */
+        boolean reachedBySearchVersion;
 
         @Override
         public List<ParagraphMatch> nearestByEmbedding(float[] query, BookSubject subject, UUID nodeId, int limit) {
@@ -200,6 +271,9 @@ class NcertRetrieveCommandTest {
 
         @Override
         public List<ParagraphMatch> matchingText(String query, BookSubject subject, UUID nodeId, int limit) {
+            if (reachedBySearchVersion && subject == BookSubject.biology && query.startsWith("SV: ")) {
+                return List.of(match("bio11", 1, "1.1", 1, "Living things grow."));
+            }
             return List.of();
         }
 

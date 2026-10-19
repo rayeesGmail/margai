@@ -370,6 +370,54 @@
       "text": "acid chloride ko aldehyde mein kaise badalte hain",
       "expect": [{ "book": "chem12-part2", "chapter": 8, "section": "8.2.2", "para": 1 }],
       "note": "Reaction-pass evidence. §8.2.2 ¶1, Rosenmund reduction."
+    },
+    {
+      "id": "h01-pressure-on-equilibrium-hi",
+      "set": "heldout",
+      "subject": "chemistry",
+      "language": "hi",
+      "text": "रासायनिक साम्य पर दाब बढ़ाने का क्या असर होता है",
+      "expect": [
+        { "book": "chem11-part1", "chapter": 6, "section": "6.8.2", "para": 1 },
+        { "book": "chem11-part1", "chapter": 6, "section": "6.8.2", "para": 2 }
+      ],
+      "note": "Held out by the founder after the first run, used as written (DECISIONS 2026-10-19). §6.8.2 ¶1 (a pressure change shifts a gaseous equilibrium where the moles of gas differ) and ¶2 (Le Chatelier's principle applied to a compressed mixture). No Chemistry book has Hindi rows."
+    },
+    {
+      "id": "h02-carbocation-stability",
+      "set": "heldout",
+      "subject": "chemistry",
+      "language": "hinglish",
+      "text": "carbocation ki stability tertiary > secondary > primary kyu hoti hai",
+      "expect": [
+        { "book": "chem11-part2", "chapter": 8, "section": "8.7.1", "para": 4 },
+        { "book": "chem11-part2", "chapter": 8, "section": "8.7.9", "para": 3 },
+        { "book": "chem11-part2", "chapter": 8, "section": "8.7.9", "para": 4 },
+        { "book": "chem11-part2", "chapter": 8, "section": "8.7.9", "para": 10 }
+      ],
+      "note": "Held out by the founder, used as written. The question is why, so the key is the reason: §8.7.1 ¶4 (the order, 'due to inductive and hyperconjugation effects'), §8.7.9 ¶3 (the overlap disperses the positive charge), ¶4 (more alkyl groups, more hyperconjugation), ¶10 (Problem 8.19's worked explanation)."
+    },
+    {
+      "id": "h03-capacitor-current-leads-hi",
+      "set": "heldout",
+      "subject": "physics",
+      "language": "hi",
+      "text": "प्रत्यावर्ती धारा में संधारित्र वाली धारा वोल्टता से आगे क्यों चलती है",
+      "expect": [
+        { "book": "phy12-part1", "chapter": 7, "section": "7.5", "para": 4 },
+        { "book": "phy12-part1", "chapter": 7, "section": "7.5", "para": 5 },
+        { "book": "phy12-part1", "chapter": 7, "section": "7.5", "para": 7 }
+      ],
+      "note": "Held out by the founder, used as written. The book's only 'why' is the derivation: §7.5 ¶4 (i = dq/dt = omega C v_m cos omega t), ¶5 (cos omega t = sin(omega t + pi/2)), ¶7 (so the current is pi/2 ahead). ¶8 and ¶10 only describe the lead and are left out, by the founder's strict reading of 'kyu' (a01, DECISIONS 2026-10-19)."
+    },
+    {
+      "id": "h04-okazaki-lagging-strand",
+      "set": "heldout",
+      "subject": "biology",
+      "language": "hinglish",
+      "text": "DNA replication me ek strand continuous aur dusra okazaki fragments me kyu banta hai",
+      "expect": [{ "book": "bio12", "chapter": 5, "section": "5.4.2", "para": 2 }],
+      "note": "Held out by the founder, used as written: 'okazaki' is coaching vocabulary the rows never print, kept on purpose so the rewrite must bridge it (founder, 2026-10-19). §5.4.2 ¶2: polymerase works only 5'->3', so replication is continuous on one template and discontinuous on the other, the fragments joined by DNA ligase."
     }
   ]
 }

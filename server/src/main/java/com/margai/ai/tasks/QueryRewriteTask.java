@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  * the client's decorator chain, so each writes its {@code ai_calls} row.
  */
 @Component
-public class QueryRewriteTask {
+public class QueryRewriteTask implements QueryRewriter {
 
     private final AiClient ai;
     private final PromptRef prompt;
@@ -34,6 +34,7 @@ public class QueryRewriteTask {
         this.prompt = prompts.require("query_rewrite");
     }
 
+    @Override
     public AiResponse<SearchQuery> run(String question, AiCallContext ctx) {
         return ai.complete(AiRequest.of(AiFeature.eval, Tier.cheap, prompt, Map.of("question", question),
                 SearchQuery.class, ctx));

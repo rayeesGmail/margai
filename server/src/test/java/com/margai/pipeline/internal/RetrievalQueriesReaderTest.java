@@ -67,6 +67,19 @@ class RetrievalQueriesReaderTest {
                 .noneMatch(address -> address.book().equals("phy11-part1")));
     }
 
+    /** The founder's four held-out queries (DECISIONS 2026-10-19), one per subject at least, none English. */
+    @Test
+    void theHeldOutSetIsTheFoundersFour() {
+        List<RetrievalQuery> heldOut = RetrievalQueriesReader.read(COMMITTED).stream()
+                .filter(query -> query.set() == RetrievalQuery.QuerySet.heldout).toList();
+
+        assertThat(heldOut).hasSize(RetrievalRun.HELD_OUT_SIZE);
+        assertThat(heldOut).extracting(RetrievalQuery::subject)
+                .contains(BookSubject.physics, BookSubject.chemistry, BookSubject.biology);
+        assertThat(heldOut).noneMatch(query -> query.language().equals("en"));
+        assertThat(heldOut).allSatisfy(query -> assertThat(query.note()).startsWith("Held out by the founder"));
+    }
+
     @Test
     void everyQueryRecordsHowItWasWritten() {
         assertThat(RetrievalQueriesReader.read(COMMITTED)).allSatisfy(query -> {

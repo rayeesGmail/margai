@@ -806,6 +806,15 @@ miss is diagnosed — answer key or retrieval — in a note committed beside the
 judged; a key is widened only by the D15 rule (DECISIONS 2026-09-20), and no retrieval setting changes
 on one run.
 
+**`--rewrite` (D18, DECISIONS 2026-10-19).** Every non-English query is rewritten into an English,
+textbook-style search version by `query_rewrite` on the CHEAP tier (`MARGAI_AI_ANTHROPIC_API_KEY` must be
+loaded), and retrieved with the question and the search version fused — never the search version alone. The
+English acceptance queries are rewritten too, scored apart from the bar (the founder's diagnostic). The report
+(`…-ncert-retrieve-rewrite.md`) opens with **D17's tick read from the fused run** — the bar on the acceptance
+set plus at least 3 of the founder's 4 held-out queries — with the same checks unfused beside it, then each set
+unfused against fused, every search version the model wrote, and the fused run's misses with their search
+versions. The rewrite calls are ledgered as `eval`.
+
 ## If something goes wrong
 
 | Symptom | Cause | Fix |

@@ -12,8 +12,10 @@ import java.util.List;
  * the neighbouring half of the same idea would make the number mean less, not more.
  *
  * @param set      which set the query belongs to: the D17 {@code acceptance} set its ✅ is read
- *                 from, the D15 {@code baseline} it is compared against, or a {@code diagnostic}
- *                 that is scored but decides nothing (DECISIONS 2026-10-18)
+ *                 from, the D15 {@code baseline} it is compared against, a {@code diagnostic}
+ *                 that is scored but decides nothing (DECISIONS 2026-10-18), or the founder's
+ *                 {@code heldout} queries, added after the first run and part of D17's tick with
+ *                 fusion on (DECISIONS 2026-10-19)
  * @param subject  the book subject retrieval is filtered to, as the doubt pipeline filters
  *                 (§4.3 stage 6) — Biology is one subject here, botany and zoology together
  * @param language {@code en}, {@code hi} or {@code hinglish}; a Hindi or Hinglish query is expected
@@ -25,8 +27,8 @@ import java.util.List;
 public record RetrievalQuery(String id, QuerySet set, BookSubject subject, String language, String text,
         List<Address> expect, String note) {
 
-    /** The three sets a query can belong to; only {@code acceptance} decides D17's ✅. */
-    public enum QuerySet { acceptance, baseline, diagnostic }
+    /** The sets a query can belong to; {@code acceptance} and, with fusion on, {@code heldout} decide D17's ✅. */
+    public enum QuerySet { acceptance, baseline, diagnostic, heldout }
 
     public RetrievalQuery {
         expect = List.copyOf(expect);

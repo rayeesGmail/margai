@@ -155,7 +155,14 @@ tools; your reviews focus on output quality.)*
   weightage chapters (TECH_PLAN §15.7), staged on one chapter first.*
 - **D23 —** Anchor-linking questions↔NCERT; seed the eval suite v1 (~60 questions
   across subjects). ✅ *Eval harness runs and reports.* *Amended 2026-10-18 (founder; DECISIONS
-  2026-10-18): the eval suite carries Hindi questions in every subject.*
+  2026-10-18): the eval suite carries Hindi questions in every subject.* *Amended 2026-10-19 (founder's
+  rulings A–D on the D17 rewrite run; DECISIONS 2026-10-19): the eval also (a) checks answer correctness
+  where the key chunk ranks low in the answer set (a01 at rank 12, h01 at 6 are the examples), rank and top-3
+  staying diagnostics, not gates; (b) carries at least one equation-heavy Hindi question per subject, and
+  revisits the Hindi vector column on what it shows (h03 is the known miss); (c) compares fused and unfused
+  retrieval on English questions, and if fusion lowers any English result the English search-version flag
+  goes off; (d) evaluates `query_rewrite` v2's drift guard (no topic the question does not contain) on this
+  eval set, not on D17's queries.*
 - **D24 —** Buffer + **Week-4 gate:** solved, tagged, anchored PYQ bank + eval suite
   running in CI. In the buffer (CS-1 §4, §7, §9.3; added 2026-09-12): `collective from-pyq`
   misconception drafts from the distractor maps; `collective from-inputs` over the F11

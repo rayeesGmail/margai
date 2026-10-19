@@ -203,11 +203,11 @@ final class RetrievalRun {
                 .table(SCORE_HEADER, breakdown(acceptance));
         report.section("acceptance — no subject filter (diagnostic: what a router's missing subject would cost)")
                 .table(SCORE_HEADER, breakdown(unfiltered))
-                .table(List.of("id", "subject", "rank filtered", "rank unfiltered"), acceptance.stream()
+                .table(List.of("id", "subject", "rank filtered", "rank unfiltered", "grounded via, unfiltered"),
+                        acceptance.stream()
                         .map(result -> List.of(result.query().id(), result.query().subject().name(),
-                                rank(result), unfiltered.stream()
-                                        .filter(other -> other.query().id().equals(result.query().id()))
-                                        .findFirst().map(RetrievalRun::rank).orElse("not run")))
+                                rank(result), rankOf(unfiltered, result.query().id()),
+                                groundedOf(unfiltered, result.query().id())))
                         .toList());
 
         List<Result> baseline = inSet(filtered, RetrievalQuery.QuerySet.baseline);
@@ -268,7 +268,8 @@ final class RetrievalRun {
 
     // ── D18: the question fused with its English search version (DECISIONS 2026-10-19) ─────────────
 
-    /* D17's held-out line: at least 3 of the founder's 4 held-out queries, "hit" read as in the answer set at any rank (Claude's reading, DECISIONS 2026-10-19, for the founder to confirm). */
+    /* D17's held-out line: at least 3 of the founder's 4 held-out queries, "hit" read as in the answer set at any
+       rank (the founder's ruling A, DECISIONS 2026-10-19). */
     static final int HELD_OUT_SIZE = 4;
     static final int HELD_OUT_IN_ANSWER_SET = 3;
 
@@ -338,12 +339,17 @@ final class RetrievalRun {
                             Stream.concat(labelled("unfused", breakdown(unfused.stream()
                                             .filter(result -> ids.contains(result.query().id())).toList())),
                                     labelled("rewritten and fused", breakdown(englishRewritten))).toList())
-                    .table(List.of("id", "rank unfused", "rank rewritten and fused"), englishRewritten.stream()
+                    .table(List.of("id", "rank unfused", "rank rewritten and fused", "grounded via, unfused",
+                                    "grounded via, rewritten and fused"), englishRewritten.stream()
                             .map(result -> List.of(result.query().id(), rankOf(unfused, result.query().id()),
-                                    rank(result))).toList());
+                                    rank(result), groundedOf(unfused, result.query().id()),
+                                    result.retrieved().groundedVia().name())).toList());
         }
         report.section("acceptance — no subject filter, unfused (diagnostic)")
-                .table(SCORE_HEADER, breakdown(unfiltered));
+                .table(SCORE_HEADER, breakdown(unfiltered))
+                .table(List.of("id", "rank", "grounded via"), unfiltered.stream()
+                        .map(result -> List.of(result.query().id(), rank(result),
+                                result.retrieved().groundedVia().name())).toList());
 
         report.section("the search versions the model wrote")
                 .table(List.of("id", "lang", "query", "search version"), searchVersions.entrySet().stream()
@@ -365,7 +371,8 @@ final class RetrievalRun {
 
         // The founder's hand-check (DECISIONS 2026-10-19): for every query only its search version grounded,
         // does the top passage answer the original question? Printed whole, for the verdict to be read from.
-        List<Result> viaSearchVersion = fused.stream()
+        // Every fused retrieval: the bar's, and the English acceptance queries rewritten for the diagnostic.
+        List<Result> viaSearchVersion = Stream.concat(fused.stream(), englishRewritten.stream())
                 .filter(result -> result.retrieved().groundedVia() == RetrievedPassages.GroundedVia.search_version)
                 .toList();
         report.section("grounded only through the search version — the top passage in full, for the hand-check ("
@@ -378,9 +385,15 @@ final class RetrievalRun {
             report.line("**" + result.query().id() + "** (" + result.query().set() + ", " + result.query().language()
                     + ") — " + result.query().text());
             report.line("  search version: " + searchVersions.get(result.query().id()));
-            RetrievedPassages.Passage top = result.retrieved().passages().getFirst();
+            List<RetrievedPassages.Passage> passages = result.retrieved().passages();
+            if (passages.isEmpty()) {
+                report.line("  top passage: none — grounded, but no passage fits under the token cap");
+                continue;
+            }
+            RetrievedPassages.Passage top = passages.getFirst();
+            String text = top.paragraph().text() == null ? "" : top.paragraph().text().replaceAll("\\s+", " ").strip();
             report.line("  top passage: " + top.paragraph().address() + (isExpected(result.query(), top) ? " ✅" : "")
-                    + " · " + top.paragraph().text().replaceAll("\\s+", " ").strip());
+                    + " · " + text);
         }
 
         List<Result> misses = fused.stream().filter(result -> !result.inAnswerSet()).toList();

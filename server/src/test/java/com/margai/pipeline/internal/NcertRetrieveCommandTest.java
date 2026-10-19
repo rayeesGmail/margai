@@ -98,6 +98,8 @@ class NcertRetrieveCommandTest {
         assertThat(embeddings.queries).containsExactly("orbit energy", "कोशिका क्या है", "escape speed",
                 "orbit energy", "कोशिका क्या है");
         assertThat(report()).contains("acceptance — no subject filter")
+                .contains("| id | subject | rank filtered | rank unfiltered | grounded via, unfiltered |")
+                .contains("| a1 | physics | 1 | 1 | question |")
                 .contains("baseline — D15's fifteen over the whole corpus")
                 .contains("3 concept queries — 2 acceptance, 1 baseline, 0 diagnostic, 0 heldout");
     }
@@ -216,7 +218,22 @@ class NcertRetrieveCommandTest {
         assertThat(report()).contains("| grounded via, unfused | grounded via, fused |")
                 .as("the Biology Hindi query misses in both modes, grounded by its question unfused and by both texts fused")
                 .contains("| a2 | acceptance | biology | hi | miss | miss | question | both |")
+                .as("and the unfiltered acceptance run names its grounding too")
+                .contains("| id | rank | grounded via |")
+                .contains("| a1 | 1 | question |")
                 .contains("grounded only through the search version — the top passage in full, for the hand-check (0)");
+    }
+
+    /** Grounded through its search version, but nothing fits the token cap: said so, not a crash on an empty list. */
+    @Test
+    void handChecksAQueryWhosePassagesAllExceedTheTokenCap() {
+        corpus.biologyVectorOnlyForSearchVersion = true;
+        corpus.biologyOversized = true;
+
+        assertThat(runRewrite()).isZero();
+
+        assertThat(report()).contains("for the hand-check (1)")
+                .contains("top passage: none — grounded, but no passage fits under the token cap");
     }
 
     /** A query only its search version grounds is printed with its top passage whole, for the founder's hand-check. */
@@ -230,6 +247,19 @@ class NcertRetrieveCommandTest {
                 .contains("for the hand-check (1)")
                 .contains("search version: SV: कोशिका क्या है")
                 .contains("top passage: bio11 ch 1 §1.1 ¶2 · Cells divide.");
+    }
+
+    /** The diagnostic's rewritten English queries are fused retrievals too, so they are hand-checked the same way. */
+    @Test
+    void handChecksARewrittenEnglishQueryOnlyItsSearchVersionGrounds() {
+        corpus.physicsVectorOnlyForSearchVersion = true;
+
+        assertThat(runRewrite()).isZero();
+
+        assertThat(report()).contains("| a1 | miss | 1 | none | search_version |")
+                .contains("for the hand-check (1)")
+                .contains("**a1** (acceptance, en) — orbit energy")
+                .contains("top passage: phy11-part1 ch 7 §7.9 ¶1 ✅ · Energy of an orbiting satellite.");
     }
 
     @Test
@@ -321,15 +351,24 @@ class NcertRetrieveCommandTest {
         boolean physicsOnlyBySearchVersion;
         /** When set, the Biology question's own vector finds nothing; its search version's does. */
         boolean biologyVectorOnlyForSearchVersion;
+        /** When set, the Physics question's own vector finds nothing; its search version's does. */
+        boolean physicsVectorOnlyForSearchVersion;
+        /** When set, the Biology paragraph the vector half finds is longer than the whole token cap. */
+        boolean biologyOversized;
 
         @Override
         public List<ParagraphMatch> nearestByEmbedding(float[] query, BookSubject subject, UUID nodeId, int limit) {
             subjects.add(subject);
+            if (physicsVectorOnlyForSearchVersion && subject == BookSubject.physics
+                    && !MarkingEmbeddings.isSearchVersion(query)) {
+                return List.of();
+            }
             if (subject == BookSubject.biology) {
                 if (biologyVectorOnlyForSearchVersion && !MarkingEmbeddings.isSearchVersion(query)) {
                     return List.of();
                 }
-                return List.of(match("bio11", 1, "1.1", 2, "Cells divide."));
+                String text = biologyOversized ? "Cells divide. ".repeat(1000) : "Cells divide.";
+                return List.of(match("bio11", 1, "1.1", 2, text));
             }
             if (physicsOnlyBySearchVersion) {
                 return List.of(match("phy11-part1", 7, "7.9", 2, "A neighbouring paragraph."));

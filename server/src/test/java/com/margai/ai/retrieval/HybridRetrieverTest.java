@@ -1,7 +1,11 @@
 package com.margai.ai.retrieval;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.margai.ai.api.AiCallContext;
 import com.margai.ai.internal.TestAiProperties;
 import com.margai.ai.tasks.EmbeddingService;
@@ -12,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
 /**
  * The fusion half of hybrid retrieval, with a stub repository in place of the SQL: rank fusion
@@ -232,6 +237,45 @@ class HybridRetrieverTest {
         assertThat(groundedVia(0.25, 0.45)).isEqualTo(RetrievedPassages.GroundedVia.search_version);
         assertThat(groundedVia(0.45, 0.50)).isEqualTo(RetrievedPassages.GroundedVia.both);
         assertThat(groundedVia(0.25, 0.20)).isEqualTo(RetrievedPassages.GroundedVia.none);
+    }
+
+    /** Production logs carry the same fact as the reports, keyed by the request id (founder ruling B). */
+    @Test
+    void logsGroundedViaWithTheRequestIdForEveryRetrieval() {
+        repository.vector = List.of(paragraph("7.9", 1, 0.62));
+        ListAppender<ILoggingEvent> log = new ListAppender<>();
+        log.start();
+        Logger logger = (Logger) LoggerFactory.getLogger(HybridRetriever.class);
+        logger.addAppender(log);
+        try {
+            retrieve();
+        } finally {
+            logger.detachAppender(log);
+        }
+
+        assertThat(log.list).singleElement().extracting(ILoggingEvent::getFormattedMessage).asString()
+                .contains("request_id=test grounded_via=question search_version=false");
+    }
+
+    /** The retry's own grounding is what the retrieval reports, not the filtered search's none. */
+    @Test
+    void namesGroundingAfterTheNodeFilterRetry() {
+        repository.vectorSequence = new ArrayList<>(List.of(List.of(), List.of(),
+                List.of(paragraph("7.1", 1, 0.25)), List.of(paragraph("7.9", 1, 0.45))));
+        repository.textSequence = new ArrayList<>(List.of(List.of(), List.of(), List.of(), List.of()));
+
+        RetrievedPassages retrieved = retriever().retrieve("q", "search version", BookSubject.physics, NODE, CTX);
+
+        assertThat(retrieved.nodeFilterDropped()).isTrue();
+        assertThat(retrieved.groundedVia()).isEqualTo(RetrievedPassages.GroundedVia.search_version);
+    }
+
+    @Test
+    void groundedAndGroundedViaCannotContradictEachOther() {
+        assertThatThrownBy(() -> new RetrievedPassages(List.of(), false, true, RetrievedPassages.GroundedVia.none))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new RetrievedPassages(List.of(), false, false, RetrievedPassages.GroundedVia.both))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     /** The question's and the search version's best vector similarity in; what the retrieval says grounded it out. */

@@ -117,6 +117,14 @@ class RetrievalRunTest {
         assertThat(rendered).contains("nothing above the similarity floor");
     }
 
+    /** Every retrieval in the report names the text that grounded it (founder ruling B). */
+    @Test
+    void namesWhichTextGroundedEachQuery() {
+        String rendered = render(List.of(result(query("q1", "en", address(7, "7.9", 1)), passage(7, "7.9", 1))));
+
+        assertThat(rendered).contains("grounded via question");
+    }
+
     @Test
     void marksTheExpectedParagraphInTheTop3Listing() {
         String rendered = render(List.of(result(query("q1", "en", address(7, "7.9", 1)),

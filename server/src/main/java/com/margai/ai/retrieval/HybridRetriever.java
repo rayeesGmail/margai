@@ -75,8 +75,9 @@ public class HybridRetriever {
      * search version alone, so a rewrite that drifts can add passages but cannot take the question's
      * own away. A paragraph several lists found keeps its best rank in each half and its highest
      * similarity, and grounding is judged on that highest similarity — so a search version alone can
-     * ground a question whose own vector is under the floor (Claude's choice, DECISIONS 2026-10-19, for
-     * the founder to overrule). A null or blank search version is the unfused retrieval, exactly.
+     * ground a question whose own vector is under the floor (Claude's choice, confirmed by the founder's
+     * ruling B with conditions, DECISIONS 2026-10-19). A null or blank search version is the unfused
+     * retrieval, exactly.
      *
      * @param searchVersion the question rewritten for the textbooks ({@code query_rewrite}), or null
      */

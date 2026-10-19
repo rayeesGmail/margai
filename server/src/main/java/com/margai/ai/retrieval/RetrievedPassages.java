@@ -2,6 +2,7 @@ package com.margai.ai.retrieval;
 
 import com.margai.curriculum.api.ParagraphMatch;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * What one retrieval returned (TECH_PLAN §4.3 stage 6): the fused passages, best first, and the
@@ -16,8 +17,9 @@ import java.util.List;
  *                          rule both say there is no AI answer without retrieval grounding, so the
  *                          caller owes the student an honest fallback and the audit queue a row —
  *                          never an answer from an empty evidence set
- * @param groundedVia       which text's vector cleared the floor (founder ruling, DECISIONS 2026-10-19):
- *                          the question's, the search version's, both, or none — logged for every
+ * @param groundedVia       which text's vector cleared the floor (founder ruling B, DECISIONS 2026-10-19:
+ *                          the question's, the search version's or both; {@code none} is Claude's name
+ *                          for a grounding failure, so that every retrieval names one) — logged for every
  *                          retrieval and shown in eval reports, because fused grounding is judged on
  *                          the higher similarity of the two and a search version alone can ground
  */
@@ -29,6 +31,10 @@ public record RetrievedPassages(List<Passage> passages, boolean nodeFilterDroppe
 
     public RetrievedPassages {
         passages = List.copyOf(passages);
+        Objects.requireNonNull(groundedVia, "groundedVia");
+        if (grounded == (groundedVia == GroundedVia.none)) {
+            throw new IllegalArgumentException("grounded=" + grounded + " contradicts groundedVia=" + groundedVia);
+        }
     }
 
     /** A retrieval on the question alone: grounded through it, or not at all. */

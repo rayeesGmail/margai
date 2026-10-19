@@ -898,7 +898,9 @@ they're built and stored):
    links between chapters; each node carries real-exam weightage computed from 15+
    years of NTA papers, and default learn-times that recalibrate from real student data.
 2. **NCERT layer** — the ~12 NEET-relevant NCERT books (EN + HI), addressable down to
-   the paragraph, powering every answer's “NCERT anchor.” Editions tracked; the app
+   the paragraph, powering every answer's “NCERT anchor.” Hindi text for the four
+   Chemistry books may follow public launch and gates Hindi-medium marketing; until then,
+   Hindi questions on Chemistry are grounded in the English text. Editions tracked; the app
    must always reflect the current edition. (Licensing conversation with NCERT is a
    founder workstream; the product only ever *explains and anchors*, never republishes
    pages.)

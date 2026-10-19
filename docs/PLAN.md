@@ -129,10 +129,16 @@ tools; your reviews focus on output quality.)*
 - **D17 —** Embeddings + hybrid retrieval over the whole corpus, on the pin settled at D15
   (amended 2026-09-19); the test harness widened to it. ✅ *15 hand-written concept queries
   return the right paragraphs.* *Amended 2026-10-18 (founder; DECISIONS 2026-10-18): at least one
-  of the ≥5 Hindi queries (TECH_PLAN §6.4) is in each subject, Chemistry included.*
+  of the ≥5 Hindi queries (TECH_PLAN §6.4) is in each subject, Chemistry included.* *Amended 2026-10-19
+  (founder; DECISIONS 2026-10-19): ticks if the query-rewrite test in D18's buffer meets the 2026-10-18 bar
+  with fusion on (the question and its English search version fused, never the rewrite alone) and the four
+  held-out queries hit at least 3 of 4.*
 - **D18 —** Buffer for extraction mess (there will be some). **Week-3 gate:** NCERT
   layer searchable in both languages. *Added 2026-10-01 (CS-2 §4.11): Bedrock configured as a
   completion fallback behind a flag — config only; embeddings stay on Bedrock as their primary.*
+  *Amended 2026-10-19 (founder; DECISIONS 2026-10-19): carries the standalone query-rewrite test, fused and
+  unfused, plus the English-rewrite diagnostic; the gate reads the fused run with the unfused numbers beside it;
+  if the rewrite work spills, the gate moves and the move goes in the slippage log.*
   *Amended 2026-10-18 (founder; DECISIONS 2026-10-18): the gate reads “searchable in both languages
   for the six books with Hindi text; for Chemistry, Hindi queries reach the English rows”.*
 - **D19 —** PYQ ingest: papers loaded, question records created, tagging pass.

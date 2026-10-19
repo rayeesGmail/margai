@@ -786,7 +786,8 @@ java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,liv
 ```
 
 Reads `eval/retrieval-queries.json` (`--queries` for another file). Each query names its **set** —
-`acceptance` (D17's ✅), `baseline` (D15's fifteen) or `diagnostic` (scored, deciding nothing) — its
+`acceptance` (D17's ✅), `baseline` (D15's fifteen), `diagnostic` (scored, deciding nothing) or `heldout`
+(the founder's four, added after the first run; part of D17's tick with fusion on, DECISIONS 2026-10-19) — its
 **subject**, its **language** (`en`, `hi` or `hinglish`) and, on every expected address, its **book**:
 chapter numbers repeat across books, so an address without one would count the wrong book's paragraph as
 right. Each query is filtered to its subject, as the doubt pipeline filters (Biology is one subject:

@@ -678,9 +678,9 @@ Pro+ student asking the same doubt get the identical verified solution. Public s
 show only what exists — until Pro+ ships, the app, site and store listing show Free and
 Pro only. Free users are our word-of-mouth engine, so Free stays genuinely useful.
 
-**Pricing (CS-2 §2).** *Beta (December 2026 → mid-January 2027):* free for every
-participant — six weeks of Pro at no cost, no payments collected. *Public launch (late
-January 2027):*
+**Pricing (CS-2 §2).** *Beta (from 30 December 2026, four weeks, to early February 2027):*
+free for every participant — Pro at no cost until public launch, no payments collected.
+*Public launch (early February 2027):*
 
 | Plan | Paywall display |
 |---|---|

@@ -97,7 +97,8 @@ class NcertRetrieveCommandTest {
         assertThat(embeddings.queries).containsExactly("orbit energy", "कोशिका क्या है", "escape speed",
                 "orbit energy", "कोशिका क्या है");
         assertThat(report()).contains("acceptance — no subject filter")
-                .contains("baseline — D15's fifteen over the whole corpus");
+                .contains("baseline — D15's fifteen over the whole corpus")
+                .contains("3 concept queries — 2 acceptance, 1 baseline, 0 diagnostic, 0 heldout");
     }
 
     /** A two-query set cannot meet a bar written for fifteen, however it scores. */

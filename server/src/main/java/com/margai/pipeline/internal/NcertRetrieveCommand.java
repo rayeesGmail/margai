@@ -9,6 +9,7 @@ import com.margai.curriculum.api.AlignmentRow;
 import com.margai.curriculum.api.CurriculumImport;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -97,9 +98,8 @@ class NcertRetrieveCommand extends InputFileCommand {
         RetrievalQueriesReader.checkBooks(inputFile, queries, books);
         List<RetrievalQuery> acceptance = queries.stream()
                 .filter(query -> query.set() == RetrievalQuery.QuerySet.acceptance).toList();
-        report.read(queries.size() + " concept queries — " + count(queries, RetrievalQuery.QuerySet.acceptance)
-                + " acceptance, " + count(queries, RetrievalQuery.QuerySet.baseline) + " baseline, "
-                + count(queries, RetrievalQuery.QuerySet.diagnostic) + " diagnostic");
+        report.read(queries.size() + " concept queries — " + Arrays.stream(RetrievalQuery.QuerySet.values())
+                .map(set -> count(queries, set) + " " + set).collect(Collectors.joining(", ")));
 
         corpus(books, report);
 

@@ -212,7 +212,9 @@ class NcertRetrieveCommandTest {
     void showsGroundingInEachModeQueryByQuery() {
         assertThat(runRewrite()).isZero();
 
-        assertThat(report()).contains("| grounded unfused | grounded fused |");
+        assertThat(report()).contains("| grounded unfused | grounded fused |")
+                .as("the Biology Hindi query misses in both modes but is grounded in both, at similarity 0.8")
+                .contains("| a2 | acceptance | biology | hi | miss | miss | yes | yes |");
     }
 
     @Test

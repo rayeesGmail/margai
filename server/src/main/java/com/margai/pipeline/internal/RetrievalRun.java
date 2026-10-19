@@ -268,7 +268,7 @@ final class RetrievalRun {
 
     // ── D18: the question fused with its English search version (DECISIONS 2026-10-19) ─────────────
 
-    /* The founder's held-out line of D17's tick: at least 3 of his 4 held-out queries in the answer set. */
+    /* D17's held-out line: at least 3 of the founder's 4 held-out queries, "hit" read as in the answer set at any rank (Claude's reading, DECISIONS 2026-10-19, for the founder to confirm). */
     static final int HELD_OUT_SIZE = 4;
     static final int HELD_OUT_IN_ANSWER_SET = 3;
 

@@ -16,15 +16,28 @@ import java.util.List;
  *                          rule both say there is no AI answer without retrieval grounding, so the
  *                          caller owes the student an honest fallback and the audit queue a row —
  *                          never an answer from an empty evidence set
+ * @param groundedVia       which text's vector cleared the floor (founder ruling, DECISIONS 2026-10-19):
+ *                          the question's, the search version's, both, or none — logged for every
+ *                          retrieval and shown in eval reports, because fused grounding is judged on
+ *                          the higher similarity of the two and a search version alone can ground
  */
-public record RetrievedPassages(List<Passage> passages, boolean nodeFilterDropped, boolean grounded) {
+public record RetrievedPassages(List<Passage> passages, boolean nodeFilterDropped, boolean grounded,
+        GroundedVia groundedVia) {
+
+    /** Which text grounded a retrieval: the names are what the logs and reports print. */
+    public enum GroundedVia { question, search_version, both, none }
 
     public RetrievedPassages {
         passages = List.copyOf(passages);
     }
 
+    /** A retrieval on the question alone: grounded through it, or not at all. */
+    public RetrievedPassages(List<Passage> passages, boolean nodeFilterDropped, boolean grounded) {
+        this(passages, nodeFilterDropped, grounded, grounded ? GroundedVia.question : GroundedVia.none);
+    }
+
     public static RetrievedPassages groundingFailure(boolean nodeFilterDropped) {
-        return new RetrievedPassages(List.of(), nodeFilterDropped, false);
+        return new RetrievedPassages(List.of(), nodeFilterDropped, false, GroundedVia.none);
     }
 
     /**

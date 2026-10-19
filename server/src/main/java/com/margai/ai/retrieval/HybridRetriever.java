@@ -11,6 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,6 +41,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class HybridRetriever {
+
+    private static final Logger log = LoggerFactory.getLogger(HybridRetriever.class);
 
     private final ParagraphRetrievalRepository paragraphs;
     private final EmbeddingService embeddings;
@@ -84,10 +88,13 @@ public class HybridRetriever {
             probes.add(new Probe(searchVersion, embeddings.ofQuery(searchVersion, ctx)));
         }
         RetrievedPassages first = search(probes, subject, nodeId, false);
-        if (first.grounded() || nodeId == null) {
-            return first;
-        }
-        return search(probes, subject, null, true);
+        RetrievedPassages result = first.grounded() || nodeId == null ? first : search(probes, subject, null, true);
+        // Every retrieval, in production as in the pipeline (founder ruling, DECISIONS 2026-10-19): which
+        // text grounded it, since a search version alone can ground a question.
+        log.info("retrieval request_id={} grounded_via={} search_version={} passages={} node_filter_dropped={}",
+                ctx.requestId(), result.groundedVia(), probes.size() > 1, result.passages().size(),
+                result.nodeFilterDropped());
+        return result;
     }
 
     /** One text retrieval runs for, with its query-side vector. */
@@ -96,8 +103,15 @@ public class HybridRetriever {
 
     private RetrievedPassages search(List<Probe> probes, BookSubject subject, UUID nodeId, boolean nodeFilterDropped) {
         Map<UUID, Fusing> fusing = new LinkedHashMap<>();
-        for (Probe probe : probes) {
-            rank(paragraphs.nearestByEmbedding(probe.vector(), subject, nodeId, config.kVector()), fusing, true);
+        // Which text's own vector cleared the floor: the question's is probe 0, the search version's probe 1.
+        boolean[] cleared = new boolean[probes.size()];
+        for (int index = 0; index < probes.size(); index++) {
+            Probe probe = probes.get(index);
+            List<ParagraphMatch> byVector = paragraphs.nearestByEmbedding(probe.vector(), subject, nodeId,
+                    config.kVector());
+            cleared[index] = byVector.stream()
+                    .anyMatch(match -> match.score() >= config.similarityFloor().doubleValue());
+            rank(byVector, fusing, true);
             rank(paragraphs.matchingText(probe.text(), subject, nodeId, config.kText()), fusing, false);
         }
 
@@ -107,13 +121,26 @@ public class HybridRetriever {
                 .toList();
 
         // Grounding is judged on everything retrieved, before the token cap: a corpus that holds
-        // the answer still holds it when the cap keeps the passage out of this particular prompt.
-        boolean grounded = fused.stream().anyMatch(passage -> passage.similarity() != null
-                && passage.similarity() >= config.similarityFloor().doubleValue());
-        if (!grounded) {
+        // the answer still holds it when the cap keeps the passage out of this particular prompt. A
+        // passage's similarity is the highest any vector list gave it, so this is "some text's vector
+        // cleared the floor".
+        RetrievedPassages.GroundedVia via = groundedVia(cleared);
+        if (via == RetrievedPassages.GroundedVia.none) {
             return RetrievedPassages.groundingFailure(nodeFilterDropped);
         }
-        return new RetrievedPassages(underTokenCap(fused), nodeFilterDropped, true);
+        return new RetrievedPassages(underTokenCap(fused), nodeFilterDropped, true, via);
+    }
+
+    private static RetrievedPassages.GroundedVia groundedVia(boolean[] cleared) {
+        boolean question = cleared[0];
+        boolean searchVersion = cleared.length > 1 && cleared[1];
+        if (question && searchVersion) {
+            return RetrievedPassages.GroundedVia.both;
+        }
+        if (question) {
+            return RetrievedPassages.GroundedVia.question;
+        }
+        return searchVersion ? RetrievedPassages.GroundedVia.search_version : RetrievedPassages.GroundedVia.none;
     }
 
     /** Deduplicated by paragraph as it goes: one paragraph found by both halves is one passage. */

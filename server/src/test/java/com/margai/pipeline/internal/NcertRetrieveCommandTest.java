@@ -8,6 +8,7 @@ import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.Usage;
 import com.margai.ai.internal.TestAiProperties;
 import com.margai.ai.retrieval.HybridRetriever;
+import com.margai.ai.tasks.EmbeddingService;
 import com.margai.ai.tasks.QueryRewriter;
 import com.margai.ai.tasks.SearchQuery;
 import com.margai.curriculum.api.AlignmentRow;
@@ -45,7 +46,7 @@ class NcertRetrieveCommandTest {
     Path reports;
 
     private final StringWriter out = new StringWriter();
-    private final NcertEmbedCommandTest.StubEmbeddings embeddings = new NcertEmbedCommandTest.StubEmbeddings();
+    private final MarkingEmbeddings embeddings = new MarkingEmbeddings();
     private final StubCorpus corpus = new StubCorpus();
     private final CorpusImport imports = new CorpusImport();
     private final StubRewriter rewriter = new StubRewriter();
@@ -212,9 +213,23 @@ class NcertRetrieveCommandTest {
     void showsGroundingInEachModeQueryByQuery() {
         assertThat(runRewrite()).isZero();
 
-        assertThat(report()).contains("| grounded unfused | grounded fused |")
-                .as("the Biology Hindi query misses in both modes but is grounded in both, at similarity 0.8")
-                .contains("| a2 | acceptance | biology | hi | miss | miss | yes | yes |");
+        assertThat(report()).contains("| grounded via, unfused | grounded via, fused |")
+                .as("the Biology Hindi query misses in both modes, grounded by its question unfused and by both texts fused")
+                .contains("| a2 | acceptance | biology | hi | miss | miss | question | both |")
+                .contains("grounded only through the search version — the top passage in full, for the hand-check (0)");
+    }
+
+    /** A query only its search version grounds is printed with its top passage whole, for the founder's hand-check. */
+    @Test
+    void printsTheTopPassageOfAQueryOnlyItsSearchVersionGrounds() {
+        corpus.biologyVectorOnlyForSearchVersion = true;
+
+        assertThat(runRewrite()).isZero();
+
+        assertThat(report()).contains("| a2 | acceptance | biology | hi | miss | miss | none | search_version |")
+                .contains("for the hand-check (1)")
+                .contains("search version: SV: कोशिका क्या है")
+                .contains("top passage: bio11 ch 1 §1.1 ¶2 · Cells divide.");
     }
 
     @Test
@@ -233,6 +248,29 @@ class NcertRetrieveCommandTest {
     private int runRewrite() {
         return commandLine().execute("ncert", "retrieve", "--rewrite", "--queries", queries.toString(),
                 "--inputs", inputs.toString(), "--reports", reports.toString());
+    }
+
+    /** Records the queries embedded and marks a search version's vector, so the stub corpus can tell the two apart. */
+    static final class MarkingEmbeddings implements EmbeddingService {
+
+        final List<String> queries = new ArrayList<>();
+
+        static boolean isSearchVersion(float[] vector) {
+            return vector[0] == 1f;
+        }
+
+        @Override
+        public float[] ofDocument(String text, AiCallContext ctx) {
+            return new float[1024];
+        }
+
+        @Override
+        public float[] ofQuery(String text, AiCallContext ctx) {
+            queries.add(text);
+            float[] vector = new float[1024];
+            vector[0] = text.startsWith("SV: ") ? 1f : 0f;
+            return vector;
+        }
     }
 
     /** Answers "SV: " and the question, and records what it was asked to rewrite. */
@@ -281,11 +319,16 @@ class NcertRetrieveCommandTest {
         boolean reachedBySearchVersion;
         /** When set, the Physics query's expected paragraph comes back only for its search version. */
         boolean physicsOnlyBySearchVersion;
+        /** When set, the Biology question's own vector finds nothing; its search version's does. */
+        boolean biologyVectorOnlyForSearchVersion;
 
         @Override
         public List<ParagraphMatch> nearestByEmbedding(float[] query, BookSubject subject, UUID nodeId, int limit) {
             subjects.add(subject);
             if (subject == BookSubject.biology) {
+                if (biologyVectorOnlyForSearchVersion && !MarkingEmbeddings.isSearchVersion(query)) {
+                    return List.of();
+                }
                 return List.of(match("bio11", 1, "1.1", 2, "Cells divide."));
             }
             if (physicsOnlyBySearchVersion) {

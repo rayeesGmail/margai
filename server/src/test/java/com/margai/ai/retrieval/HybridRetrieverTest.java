@@ -224,6 +224,32 @@ class HybridRetrieverTest {
         assertThat(retrieved.grounded()).isTrue();
     }
 
+    /** Which text grounded a retrieval is named for every one (founder ruling, DECISIONS 2026-10-19). */
+    @Test
+    void namesWhichTextGroundedTheRetrieval() {
+        assertThat(groundedVia(0.45, null)).isEqualTo(RetrievedPassages.GroundedVia.question);
+        assertThat(groundedVia(0.45, 0.20)).isEqualTo(RetrievedPassages.GroundedVia.question);
+        assertThat(groundedVia(0.25, 0.45)).isEqualTo(RetrievedPassages.GroundedVia.search_version);
+        assertThat(groundedVia(0.45, 0.50)).isEqualTo(RetrievedPassages.GroundedVia.both);
+        assertThat(groundedVia(0.25, 0.20)).isEqualTo(RetrievedPassages.GroundedVia.none);
+    }
+
+    /** The question's and the search version's best vector similarity in; what the retrieval says grounded it out. */
+    private RetrievedPassages.GroundedVia groundedVia(double question, Double searchVersion) {
+        StubRepository stub = new StubRepository();
+        List<List<ParagraphMatch>> vectors = new ArrayList<>(List.of(List.of(paragraph("7.1", 1, question))));
+        List<List<ParagraphMatch>> texts = new ArrayList<>(List.of(List.of()));
+        if (searchVersion != null) {
+            vectors.add(List.of(paragraph("7.9", 1, searchVersion)));
+            texts.add(List.of());
+        }
+        stub.vectorSequence = vectors;
+        stub.textSequence = texts;
+        return new HybridRetriever(stub, embeddings, TestAiProperties.standard())
+                .retrieve("q", searchVersion == null ? null : "search version", BookSubject.physics, null, CTX)
+                .groundedVia();
+    }
+
     @Test
     void aBlankSearchVersionIsTheUnfusedRetrieval() {
         repository.vector = List.of(paragraph("7.9", 1, 0.62));

@@ -108,7 +108,7 @@ final class RetrievalRun {
         for (Result result : results) {
             rows.add(List.of(result.query().id(), result.query().language(),
                     result.hitRank() == 0 ? "miss" : String.valueOf(result.hitRank()),
-                    result.retrieved().grounded() ? "" : "grounding failure",
+                    groundingNote(result),
                     result.query().expect().toString(),
                     result.query().text()));
         }
@@ -238,7 +238,7 @@ final class RetrievalRun {
                 List.of("id", "set", "subject", "lang", "rank of the expected paragraph", "note", "expected", "query"),
                 filtered.stream().map(result -> List.of(result.query().id(), result.query().set().name(),
                         result.query().subject().name(), result.query().language(), rank(result),
-                        result.retrieved().grounded() ? "" : "grounding failure",
+                        groundingNote(result),
                         result.query().expect().toString(), result.query().text())).toList());
 
         List<Result> misses = filtered.stream().filter(result -> !result.inAnswerSet()).toList();
@@ -352,16 +352,36 @@ final class RetrievalRun {
                             return List.of(entry.getKey(), query.language(), query.text(), entry.getValue());
                         }).toList());
 
-        // Grounding in each mode beside the ranks: fused, the search version's vector alone can ground a
-        // question whose own stayed under the floor, which is a choice for the founder to see query by query.
+        // Which text grounded each query, in each mode (founder ruling, DECISIONS 2026-10-19): fused, the
+        // search version's vector alone can ground a question whose own stayed under the floor.
         report.section("per query").table(
-                List.of("id", "set", "subject", "lang", "rank unfused", "rank fused", "grounded unfused",
-                        "grounded fused", "expected"),
+                List.of("id", "set", "subject", "lang", "rank unfused", "rank fused", "grounded via, unfused",
+                        "grounded via, fused", "expected"),
                 fused.stream().map(result -> List.of(result.query().id(), result.query().set().name(),
                         result.query().subject().name(), result.query().language(),
                         rankOf(unfused, result.query().id()), rank(result),
-                        groundedOf(unfused, result.query().id()), result.retrieved().grounded() ? "yes" : "no",
+                        groundedOf(unfused, result.query().id()), result.retrieved().groundedVia().name(),
                         result.query().expect().toString())).toList());
+
+        // The founder's hand-check (DECISIONS 2026-10-19): for every query only its search version grounded,
+        // does the top passage answer the original question? Printed whole, for the verdict to be read from.
+        List<Result> viaSearchVersion = fused.stream()
+                .filter(result -> result.retrieved().groundedVia() == RetrievedPassages.GroundedVia.search_version)
+                .toList();
+        report.section("grounded only through the search version — the top passage in full, for the hand-check ("
+                + viaSearchVersion.size() + ")");
+        if (viaSearchVersion.isEmpty()) {
+            report.line("none");
+        }
+        for (Result result : viaSearchVersion) {
+            report.line("");
+            report.line("**" + result.query().id() + "** (" + result.query().set() + ", " + result.query().language()
+                    + ") — " + result.query().text());
+            report.line("  search version: " + searchVersions.get(result.query().id()));
+            RetrievedPassages.Passage top = result.retrieved().passages().getFirst();
+            report.line("  top passage: " + top.paragraph().address() + (isExpected(result.query(), top) ? " ✅" : "")
+                    + " · " + top.paragraph().text().replaceAll("\\s+", " ").strip());
+        }
 
         List<Result> misses = fused.stream().filter(result -> !result.inAnswerSet()).toList();
         report.section("misses, fused — what was expected, and what came back (" + misses.size() + ")");
@@ -407,9 +427,14 @@ final class RetrievalRun {
                 .map(RetrievalRun::rank).orElse("not run");
     }
 
+    /** Every retrieval names what grounded it (DECISIONS 2026-10-19), or says plainly that nothing did. */
+    private static String groundingNote(Result result) {
+        return result.retrieved().grounded() ? "grounded via " + result.retrieved().groundedVia() : "grounding failure";
+    }
+
     private static String groundedOf(List<Result> results, String id) {
         return results.stream().filter(result -> result.query().id().equals(id)).findFirst()
-                .map(result -> result.retrieved().grounded() ? "yes" : "no").orElse("not run");
+                .map(result -> result.retrieved().groundedVia().name()).orElse("not run");
     }
 
     private static RetrievalQuery queryOf(List<Result> results, String id) {

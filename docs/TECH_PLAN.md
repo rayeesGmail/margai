@@ -3010,8 +3010,8 @@ client refuses an answer cut off at the output-token limit and does not repair a
 stop, as the Anthropic client does; the pipeline's two VISION tasks name the fallback's model under the flag,
 so `ncert extract` and `ncert verify` refuse to run on it; and the Bedrock runtime client both Bedrock
 configurations declare is conditional on both sides, so the wiring does not depend on scan order. The Bedrock
-rows are priced as Anthropic's list, every figure for the founder to confirm on the Bedrock page, the two
-disputed first; the switch, the smoke (`BedrockFallbackSmokeTest`) and the 500-user estimate are in
+rows carry the Bedrock pricing page's figures, which the founder read on 2026-10-20 (the same as Anthropic's
+list; batch N/A, so no batch rate); the switch, the smoke (`BedrockFallbackSmokeTest`) and the 500-user estimate are in
 docs/runbooks/bedrock-fallback.md.
 
 ### 15.13 WhatsApp, zero-API (CS-2 §4.9)

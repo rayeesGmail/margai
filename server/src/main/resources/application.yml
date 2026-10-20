@@ -127,10 +127,11 @@ margai:
     # under-bill ~4×. We send text only (EmbedRequest carries no image); using the model's image
     # side is PARKED as "diagram retrieval with multimodal embeddings" and needs a second price key
     # per model before it bills honestly (§4.9, TRACKER PARKED 2026-09-12). The completion fallback's
-    # two Bedrock global profiles are priced as Anthropic's own list (D18 T1): third-party copies of
-    # the Bedrock page agree on input and output, and differ on Haiku 5.5's long cache write (0.50 or
-    # 0.625) and Sonnet 5.5's cache read (0.10 or 0.20) — the founder confirms them from the page itself,
-    # which a Claude session cannot fetch, before the fallback's smoke (DECISIONS 2026-10-20).
+    # two Bedrock global profiles carry the Bedrock pricing page's own figures, read by the founder
+    # 2026-10-20 (Asia Pacific (Mumbai), global cross-region inference; DECISIONS 2026-10-20): the same
+    # as Anthropic's list, the 5-minute cache write the one billed, and no batch rate — the page shows
+    # batch as N/A, and the fallback never submits a batch. The long-context row's threshold is not on
+    # the page; it is Anthropic's 100,000 prompt tokens.
     prices-json: >-
       {"claude-haiku-4-5":
          {"input": 1.00, "output": 5.00, "cache_read": 0.10, "cache_write": 1.25,
@@ -155,13 +156,10 @@ margai:
                    "batch_input": 0.25, "batch_output": 1.25}},
        "global.anthropic.claude-haiku-5-5":
          {"input": 0.10, "output": 0.50, "cache_read": 0.01, "cache_write": 0.125,
-          "batch_input": 0.05, "batch_output": 0.25,
           "long_above": 100000,
-          "long": {"input": 0.50, "output": 2.50, "cache_read": 0.05, "cache_write": 0.625,
-                   "batch_input": 0.25, "batch_output": 1.25}},
+          "long": {"input": 0.50, "output": 2.50, "cache_read": 0.05, "cache_write": 0.625}},
        "global.anthropic.claude-sonnet-5-5":
-         {"input": 2.00, "output": 10.00, "cache_read": 0.10, "cache_write": 2.50,
-          "batch_input": 1.00, "batch_output": 5.00},
+         {"input": 2.00, "output": 10.00, "cache_read": 0.10, "cache_write": 2.50},
        "embed-v4.0":
          {"input": 0.12},
        "global.cohere.embed-v4:0":

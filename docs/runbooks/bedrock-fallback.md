@@ -24,11 +24,11 @@ whenever a primary model changes.
 
 ## Before it is called ready
 
-1. **Prices.** The two `global.anthropic.*` rows in `margai.ai.prices-json` are priced as Anthropic's own list.
-   Confirm every figure in them on the Bedrock pricing page (Asia Pacific (Mumbai), global cross-region
-   inference), the two that third-party copies of that page dispute first — Haiku 5.5's 5-minute cache write
-   above 100K prompt tokens (0.50 or 0.625 USD per million) and Sonnet 5.5's cache read (0.10 or 0.20) — and
-   correct the rows where they differ.
+1. **Prices — done 2026-10-20.** The founder read the Bedrock pricing page (Asia Pacific (Mumbai), global
+   cross-region inference): Haiku 5.5 0.10 / 0.50, 5-minute cache write 0.125, cache read 0.01, and long
+   context 0.50 / 2.50 / 0.625 / 0.05; Sonnet 5.5 2.00 / 10.00, 2.50, 0.10 — USD per million, batch N/A. The
+   two `global.anthropic.*` rows in `margai.ai.prices-json` carry exactly these (DECISIONS 2026-10-20). Read the
+   page again whenever a fallback id changes.
 2. **The task role.** The ECS task role's Bedrock statement (TECH_PLAN §7.4, amended 2026-10-01) must allow the
    two `global.anthropic.*` profiles; the laptop smoke below proves the SSO identity, not the task role.
 3. **The smoke** — one call per runtime tier, CHEAP and REASON (founder ruling, DECISIONS 2026-10-20), on the

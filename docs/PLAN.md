@@ -132,7 +132,11 @@ tools; your reviews focus on output quality.)*
   of the ≥5 Hindi queries (TECH_PLAN §6.4) is in each subject, Chemistry included.* *Amended 2026-10-19
   (founder; DECISIONS 2026-10-19): ticks if the query-rewrite test in D18's buffer meets the 2026-10-18 bar
   with fusion on (the question and its English search version fused, never the rewrite alone) and the four
-  held-out queries hit at least 3 of 4.*
+  held-out queries hit at least 3 of 4.* *Amended 2026-10-19 evening (founder's rulings A and B; DECISIONS
+  2026-10-19): a held-out "hit" is "in the answer set"; grounding is the higher similarity of the question and
+  its search version, with `grounded_via` logged for every retrieval; ticks if a rerun at temperature 0, the run
+  of record, meets the bar under A and B and the hand-check of every query grounded only through its search
+  version passes.*
 - **D18 —** Buffer for extraction mess (there will be some). **Week-3 gate:** NCERT
   layer searchable in both languages. *Added 2026-10-01 (CS-2 §4.11): Bedrock configured as a
   completion fallback behind a flag — config only; embeddings stay on Bedrock as their primary.*

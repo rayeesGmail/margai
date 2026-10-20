@@ -1153,29 +1153,34 @@ constants, each with a test: `RouteDecision.verification()` (the verifier always
 one, so "REASON only via the router" is a compile-time property plus the `TierPolicyAiClient` check.
 
 *Amended 2026-10-19 (D17/D18; founder ruling of 2026-10-18, DECISIONS 2026-10-19; measured in
-pipeline/reports/2026-10-19-ncert-retrieve-rewrite.md):* the router's schema gains **`search_query_en`** — an
+pipeline/reports/2026-10-19-ncert-retrieve-rewrite.md and its rerun at temperature 0, the run of record under the
+founder's ruling B, -rewrite-2.md, with the same counts):* the router's schema gains **`search_query_en`** — an
 English, textbook-style search version of the question, written for every **non-English** doubt (Hindi,
-Hinglish or mixed) in the NCERT books' own terms, never answering it — and stage 6 retrieves on the question and
-this version fused, never on the version alone — grounding judged on the higher similarity of the two (Claude's
-choice, confirmed by the founder's ruling B with conditions, DECISIONS 2026-10-19). The instruction is
-`query_rewrite` v1's, measured standalone on
-the CHEAP tier at D18: with fusion the acceptance set went from 12 to 15 of 15 in the answer set (Hindi 4 → 6 of
-6), the baseline from 13 to 15, the founder's held-out queries from 2 to 3 of 4 (in the answer set, Claude's reading of
-his "hit", confirmed by his ruling A), and none of the 19 fused queries ranked lower. In
-the router call the field costs output tokens only, no extra call; D23's eval and D37 re-measure it there, since
-the router's prompt carries more fields (C5). Whether English doubts get a search version too is the founder's:
-on six English queries the rewrite moved hit@1 from 5/6 to 6/6 and lowered none (the run's diagnostic) — a thin
-sample. Until D37, `ai.tasks.QueryRewriteTask` is the measuring stand-in, ledgered as `eval`.
+Hinglish or mixed; superseded 2026-10-19 by ruling D, below: every doubt) in the NCERT books' own terms, never
+answering it — and stage 6 retrieves on the question and this version fused, never on the version alone —
+grounding judged on the higher similarity of the two (Claude's choice, confirmed by the founder's ruling B with
+conditions, DECISIONS 2026-10-19). The instruction is `query_rewrite` v1's, measured standalone on the CHEAP tier
+at D18: with fusion the acceptance set went from 12 to 15 of 15 in the answer set (Hindi 4 → 6 of 6), the
+baseline from 13 to 15, the founder's held-out queries from 2 to 3 of 4 (in the answer set, Claude's reading of
+the founder's "hit", confirmed by ruling A), and none of the 19 fused queries ranked lower. In the router call
+the field costs output tokens only, no extra call; D23's eval and D37 re-measure it there, since the router's
+prompt carries more fields (C5). Whether English doubts get a search version too is the founder's (superseded
+2026-10-19 by ruling D, below): on six English queries the rewrite moved hit@1 from 5/6 to 6/6 and lowered none
+(the run's diagnostic) — a thin sample. Until D37, `ai.tasks.QueryRewriteTask` is the measuring stand-in,
+ledgered as `eval`.
 *Amended 2026-10-19 (founder's rulings A–D on the D17 rewrite run; DECISIONS 2026-10-19):* (1) **every** doubt
-gets a search version, English included, because the router's existing call produces it — no extra LLM call —
-behind a config flag for English; D23's eval compares fused and unfused on English questions, and if fusion lowers
-any English result the flag goes off for English (if English ever needed a separate LLM call, the flag would
-default off and the founder be told). (2) **Drift guard:** the search version must not add a topic the question
-does not contain — `query_rewrite` v2, measured on D23's eval set, not on D17's queries; v1 stays unchanged for
-D17 (in the D18 run four of its versions went past their question, a13 adding "blood groups"). (3) Grounding is the
-higher similarity of the question and its search version (ruling B), and **every retrieval logs `grounded_via`**
-— `question`, `search_version`, `both` or `none` — in eval reports and production logs (`RetrievedPassages`,
-`HybridRetriever`, 0efbac6). Rank and top-3 stay diagnostics, not gates (ruling A).
+gets a search version, English included, if the router's existing call produces it — no extra LLM call — behind a
+config flag; D23's eval compares fused and unfused on English questions, and if fusion lowers any English result
+the flag goes off for English; if English would need a separate LLM call, the flag defaults off and the founder is
+told. In this design the router's one call produces the field for every doubt, so the condition holds and the
+flag starts on for English (Claude's reading, DECISIONS 2026-10-19, for the founder to overrule). (2) **Drift
+guard:** the search version must not add a topic the question does not contain — `query_rewrite` v2, measured on
+D23's eval set, not on D17's queries; v1 stays unchanged for D17 (in the D18 run four of its versions went past
+their question, a13 adding "blood groups"). (3) Grounding is the higher similarity of the question and its search
+version (ruling B), and **every retrieval logs `grounded_via`** — `question`, `search_version` or `both` (the
+founder's three), or `none`, Claude's name for a grounding failure so that every retrieval logs a value — in eval
+reports and production logs (`RetrievedPassages`, `HybridRetriever`, 0efbac6; completed in fe831e7, the unfiltered
+and English-rewritten report tables). Rank and top-3 stay diagnostics, not gates (ruling A).
 
 ### 4.3 Doubt pipeline (D37–D46)
 

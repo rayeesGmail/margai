@@ -1584,7 +1584,10 @@ unchanged; the batch lane, the request shape and the region paragraph do not.*
   processing outside India. *Amended 2026-09-12: the calls now leave for the providers' own
   endpoints, so the disclosure still holds and the region is no longer ours to choose — except that
   the direct API exposes an `inference_geo` control Bedrock did not, which is PARKED against SPEC
-  §6.11's residency copy rather than used today.*
+  §6.11's residency copy rather than used today.* *Amended 2026-10-20 (founder's D18 rulings;
+  DECISIONS 2026-10-20): the completion fallback on Bedrock calls from ap-south-1 to global inference
+  profiles for the 5.5 models, which have no `in.*` profile yet (founder, 2026-10-20), and moves to an
+  `in.*` profile if one appears; the disclosure holds either way.*
 
 ### 4.12 Prompts
 
@@ -2941,6 +2944,17 @@ D70 outage drill. Bedrock model ids and prices come from config. Embeddings stay
 (`global.cohere.embed-v4:0`, the D15 pin) as their primary — the fallback-only rule is about
 completions. The fallback is called ready only after a founder-run one-call smoke of an Anthropic
 model through Bedrock, since CS-2's “access now restored” is not checkable from a Claude session.
+*Amended 2026-10-20 (founder's D18 rulings; DECISIONS 2026-10-20): the smoke is one call per runtime
+tier, CHEAP and REASON. The fallback ids mirror the tiers after T0's switch to the 5.5 models —
+`global.anthropic.claude-haiku-5-5` and `global.anthropic.claude-sonnet-5-5`, moving to an `in.*`
+profile if one appears for a 5.5 model — with prices from the Bedrock pricing page, prompt-cache read
+and write rates included, recorded in DECISIONS. The Bedrock client is brought up to the per-tier request
+settings the Anthropic client sends (so D18 is no longer config only) and sends cache_control the same way;
+a startup warning, not a refusal, fires when a tier's primary model changes but its fallback id does not.
+Batch work under the fallback runs sequentially, which is fine at beta scale — read as `completeBatch`'s
+on-demand loop at concurrency 4, never a batch submission on the Bedrock path (Claude's reading, DECISIONS
+2026-10-20, for the founder to overrule); the runbook notes roughly how long a nightly run takes that way
+at 500 users.*
 
 ### 15.13 WhatsApp, zero-API (CS-2 §4.9)
 

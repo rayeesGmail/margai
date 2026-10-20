@@ -145,6 +145,25 @@ tools; your reviews focus on output quality.)*
   if the rewrite work spills, the gate moves and the move goes in the slippage log.*
   *Amended 2026-10-18 (founder; DECISIONS 2026-10-18): the gate reads “searchable in both languages
   for the six books with Hindi text; for Chemistry, Hindi queries reach the English rows”.*
+  *Amended 2026-10-20 (founder's rulings on the D18 plan and the same day's change of plan; DECISIONS
+  2026-10-20): T0 comes first — the primary tiers move to the 5.5 models (CHEAP `claude-haiku-5-5`,
+  REASON `claude-sonnet-5-5`), smoked with one call per tier on the direct API and judged against the
+  current model on the same sets: the D17 acceptance and held-out sets rerun fused with Haiku 5.5 writing
+  the search versions, on the same bar, that run becoming the gate's run of record (the whole query file
+  runs, so the baseline and diagnostic sets stay in it — Claude's reading, DECISIONS 2026-10-20), and every
+  prompt in use rerun on its eval set, each judged against its score of record (D17's run of record for the
+  query rewrite; Claude's reading, DECISIONS 2026-10-20); a regression or a failed bar stops for the founder's choice, no
+  prompt edited to pass. The gate is then read book by book: each book-level gap in D17's run of record gets
+  one fresh probe query (six: phy12-part1 Hindi, phy11-part2 English, chem11-part2 English, and
+  Devanagari Hindi reaching the English rows for chem11-part2, chem12-part1 and chem12-part2), written
+  with its answer key from the book rows and committed before the run, in the held-out set, never used
+  for tuning; a probe miss is diagnosed and stops for the founder's ruling. The Bedrock fallback is no
+  longer config only: the Bedrock client is brought up to per-tier request settings; its ids mirror the
+  new tiers (`global.anthropic.claude-haiku-5-5`, `global.anthropic.claude-sonnet-5-5`, an `in.*`
+  profile if one appears), with prices including cache rates in a DECISIONS row, a startup warning when
+  a tier's primary model changes but its fallback id does not, and sequential batch under the fallback;
+  it is ready after the founder's smoke of one call per runtime tier (CHEAP and REASON). The
+  closed-book errata backfill waits for a later buffer.*
 - **D19 —** PYQ ingest: papers loaded, question records created, tagging pass.
   ✅ *Counts per year/subject match official papers.*
 - **D20 —** AI solution generation (batch) for one subject; verification pass wired.

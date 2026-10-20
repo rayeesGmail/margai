@@ -264,7 +264,10 @@ final class PyqPapersYamlReader {
         unknownKeys(file, node, MARKING_KEYS, label, "marking ");
         int correct = requiredInt(file, node, "correct", 1, 10, label);
         int wrong = requiredInt(file, node, "wrong", -10, 0, label);
-        int unanswered = requiredInt(file, node, "unanswered", -10, 10, label);
+        // Left out where the booklet does not print it, until the year's notice is sourced: a blank
+        // mark is never assumed (the founder's gap-4 rider, DECISIONS 2026-10-20).
+        Integer unanswered = node.get("unanswered") == null || node.get("unanswered").isNull()
+                ? null : requiredInt(file, node, "unanswered", -10, 10, label);
         String schemeSource = requiredString(file, node, "scheme_source", label);
         String dropped = optionalString(file, node, "dropped_rule", label);
         String multiple = optionalString(file, node, "multiple_rule", label);

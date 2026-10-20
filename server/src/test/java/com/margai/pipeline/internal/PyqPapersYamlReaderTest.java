@@ -27,8 +27,42 @@ class PyqPapersYamlReaderTest {
     private static final String SHA_A = "a".repeat(64);
     private static final String SHA_B = "b".repeat(64);
 
+    /** The founder's manifest beside the pack (tracked): every register file is held to it. */
+    static final Path MANIFEST = Path.of(InputsMixin.DEFAULT_INPUTS).resolve("../../neet-pyq-sources/MANIFEST.csv");
+
     @TempDir
     Path dir;
+
+    /**
+     * The committed register reads, and every booklet and key it names is a file of the founder's
+     * manifest with the manifest's sha256 — a hash mistyped into the register would otherwise only
+     * surface when a paid extraction refused the booklet.
+     */
+    @Test
+    void theCommittedRegisterNamesOnlyTheManifestsFilesWithTheirHashes() {
+        List<PaperDefinition> papers = PyqPapersYamlReader.read(Path.of(InputsMixin.DEFAULT_INPUTS).resolve(PyqPaperCommand.FILE));
+        // path → "sha256 kind year", the manifest's own columns, so a booklet slot naming a key, or another
+        // year's file with its true hash, fails as surely as a mistyped hash.
+        java.util.Map<String, String> manifest = new java.util.HashMap<>();
+        for (CsvInput.Row row : CsvInput.read(MANIFEST, "path", "year", "code", "kind", "languages", "form", "pages",
+                "sha256", "provenance", "key_check", "notes")) {
+            manifest.put(PyqPapersYamlReader.PACK + row.required("path"),
+                    row.required("sha256") + " " + row.required("kind") + " " + row.required("year").substring(0, 4));
+        }
+
+        assertThat(papers).extracting(PaperDefinition::code).contains("neet-2025-45");
+        for (PaperDefinition paper : papers) {
+            for (var booklet : paper.row().source()) {
+                assertThat(manifest).as("%s booklet", paper.code())
+                        .containsEntry(booklet.file(), booklet.sha256() + " booklet " + paper.row().year());
+            }
+            assertThat(manifest).as("%s key", paper.code()).containsEntry(paper.row().keySource().file(),
+                    paper.row().keySource().sha256() + " key " + paper.row().year());
+        }
+        PaperDefinition code45 = papers.stream().filter(paper -> paper.code().equals("neet-2025-45")).findFirst().orElseThrow();
+        assertThat(code45.row().questionCount()).isEqualTo((short) 180);
+        assertThat(code45.specials()).extracting(PaperDefinition.KeySpecial::question).containsExactly((short) 40, (short) 63);
+    }
 
     @Test
     void readsAPaperWithItsSectionsKeyAndSpecialEntries() throws IOException {
@@ -37,8 +71,8 @@ class PyqPapersYamlReaderTest {
         assertThat(papers).hasSize(1);
         PaperDefinition paper = papers.getFirst();
         PyqPaperRow row = paper.row();
-        assertThat(row.code()).isEqualTo("neet-2025-45");
-        assertThat(row.paperCode()).isEqualTo("45");
+        assertThat(row.code()).isEqualTo("test-2025-a");
+        assertThat(row.paperCode()).isEqualTo("Z9");
         assertThat(row.examDate()).isEqualTo(LocalDate.of(2025, 5, 4));
         assertThat(row.officialHindi()).isTrue();
         assertThat(row.sections()).extracting(PaperSection::subject)
@@ -96,9 +130,9 @@ class PyqPapersYamlReaderTest {
             an overlap between sections       | from: 46, to: 90          | from: 45, to: 90            | the chemistry section starts at question 45 but question 46
             a count the sections miss         | question_count: 180       | question_count: 181         | the sections end at question 180 but the booklet declares 181
             a publisher's key                 | tier: mirrored-official   | tier: publisher             | a publisher or coaching key is never a source
-            a file outside source/            | file: source/neet-pyq-sources/2025/neet-2025-final | file: keys/neet-2025-final | must be a .pdf of the founder's pack
-            a retired compilation as a key    | file: source/neet-pyq-sources/2025/neet-2025-final | file: source/pyq/papers/neet2023_with_answer_key.pdf\\n#  | compilations and publisher keys are never a source
-            the reference-only retype         | file: source/neet-pyq-sources/2025/neet-2025-45-booklet-hi-en.pdf | file: source/neet-pyq-sources/reference-only-do-not-load/retype.pdf | the pack's reference-only retype
+            a file outside source/            | file: source/neet-pyq-sources/2025/test-key | file: keys/test-key | must be a .pdf of the founder's pack
+            a retired compilation as a key    | file: source/neet-pyq-sources/2025/test-key | file: source/pyq/papers/neet2023_with_answer_key.pdf\\n#  | compilations and publisher keys are never a source
+            the reference-only retype         | file: source/neet-pyq-sources/2025/test-booklet.pdf | file: source/neet-pyq-sources/reference-only-do-not-load/retype.pdf | the pack's reference-only retype
             pages out of order                | pages: 2-46               | pages: [10-46, 2-9]         | lists page 2 after page 46
             an exam outside NEET and AIPMT    | exam: NEET                | exam: JEE                   | exam must be one of [AIPMT, NEET]
             Hindi denied on a bilingual file  | official_hindi: true      | official_hindi: false       | official_hindi is false but a booklet is hi-en
@@ -127,18 +161,18 @@ class PyqPapersYamlReaderTest {
 
         assertThatThrownBy(() -> PyqPapersYamlReader.read(file))
                 .isInstanceOf(InputFormatException.class)
-                .hasMessageContaining("paper neet-2025-45")
+                .hasMessageContaining("paper test-2025-a")
                 .hasMessageContaining(message);
     }
 
     @Test
     void refusesOneIdRegisteredTwice() throws IOException {
         String paper = paper2025().replace("papers:\n", "");
-        String yaml = "papers:\n" + paper + paper.replace("paper_code: \"45\"", "paper_code: \"46\"");
+        String yaml = "papers:\n" + paper + paper.replace("paper_code: \"Z9\"", "paper_code: \"Z8\"");
 
         assertThatThrownBy(() -> PyqPapersYamlReader.read(write(yaml)))
                 .isInstanceOf(InputFormatException.class)
-                .hasMessageContaining("paper 'neet-2025-45' appears twice");
+                .hasMessageContaining("paper 'test-2025-a' appears twice");
     }
 
     @Test
@@ -161,11 +195,11 @@ class PyqPapersYamlReaderTest {
     @Test
     void refusesOnePaperRegisteredTwiceUnderTwoIds() throws IOException {
         String paper = paper2025().replace("papers:\n", "");
-        String yaml = "papers:\n" + paper + paper.replace("code: neet-2025-45", "code: neet-2025-45-copy");
+        String yaml = "papers:\n" + paper + paper.replace("code: test-2025-a", "code: test-2025-a-copy");
 
         assertThatThrownBy(() -> PyqPapersYamlReader.read(write(yaml)))
                 .isInstanceOf(InputFormatException.class)
-                .hasMessageContaining("NEET 2025 code 45 is already registered under another id");
+                .hasMessageContaining("NEET 2025 code Z9 is already registered under another id");
     }
 
     private Path write(String yaml) throws IOException {
@@ -177,15 +211,15 @@ class PyqPapersYamlReaderTest {
     private static String paper2025() {
         return """
                 papers:
-                  - code: neet-2025-45
+                  - code: test-2025-a
                     exam: NEET
                     year: 2025
-                    paper_code: "45"
+                    paper_code: "Z9"
                     exam_date: 2025-05-04
                     official_hindi: true
                     question_count: 180
                     booklets:
-                      - file: source/neet-pyq-sources/2025/neet-2025-45-booklet-hi-en.pdf
+                      - file: source/neet-pyq-sources/2025/test-booklet.pdf
                         sha256: %1$s
                         languages: hi-en
                         pages: 2-46
@@ -200,7 +234,7 @@ class PyqPapersYamlReaderTest {
                       unanswered: 0
                       scheme_source: booklet p1, instruction 4
                     key:
-                      file: source/neet-pyq-sources/2025/neet-2025-final-key-nta-codes-45-48.pdf
+                      file: source/neet-pyq-sources/2025/test-key.pdf
                       sha256: %2$s
                       tier: mirrored-official
                       from: NTA final key, mirrored (MANIFEST.csv)

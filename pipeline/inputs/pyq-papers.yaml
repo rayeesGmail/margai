@@ -1,0 +1,57 @@
+# The register of official NEET (UG) papers the question bank is built from (D19). Founder-owned: built by
+# Claude from neet-pyq-sources/MANIFEST.csv and README.md (the founder's rulings and key table), with every
+# page range and section boundary read from the booklet itself; the pipeline only reads it
+# (.claude/rules/pipeline.md). `pyq extract`, `pyq tag` and `pyq load` take a paper by its `code`.
+#
+# Per paper:
+#   booklets  the booklet file(s) of the code in the content bucket (`source/` + the repo path), the sha256
+#             MANIFEST.csv records — `pyq extract` refuses a file whose bytes differ — and the 1-based pages that
+#             hold questions. Where the code has an English-only file, that file is transcribed and a bilingual
+#             one is kept for NTA's Hindi (the parked Hindi pass, README §1 ruling 1); where it has only a
+#             bilingual booklet, its English column is transcribed (DECISIONS 2026-10-20).
+#   sections  the paper's sections by question number — as the booklet prints them, or, where it prints no
+#             headings, as its cover declares the subjects and the questions turn (DECISIONS 2026-10-20); the
+#             declared question_count and these sections are what `pyq load` holds the bank to (PLAN D19 ✅).
+#             `attempt` only where a section is optional (Section B, 2021–2024).
+#   marking   the marks for a correct and an incorrect response, from the booklet's instructions; the mark for
+#             a blank where the booklet prints one; unanswered, dropped_rule, multiple_rule and rules_source
+#             otherwise stay empty until NTA's notice for the year is sourced (F18), and no mock scores the
+#             paper until then (DECISIONS 2026-10-20).
+#   key       NTA's final key for the code: its tier under README §2, where it came from, the download date, the
+#             file and its sha256; `special` lists the code's dropped and multiple-answer questions exactly as the
+#             founder's table in README §3 has them, and `pyq load` holds the approved paper file to it.
+
+papers:
+  - code: neet-2025-45
+    exam: NEET
+    year: 2025
+    paper_code: "45"
+    exam_date: 2025-05-04          # the key's header: "EXAM HELD ON 04.05.2025"
+    official_hindi: true
+    question_count: 180            # booklet p1, instruction 2: "180 multiple-choice questions"
+    booklets:
+      - file: source/neet-pyq-sources/2025/neet-2025-45-booklet-hi-en.pdf
+        sha256: b90c598ca1dced2d976119b96d1c214c6a007ac0676139f97d8dac53def0ff43
+        languages: hi-en           # English left, NTA's Hindi right, question by question
+        pages: 2-46                # p1 cover; Q1 on p2, Q180 on p46; p47 rough work; p48 back cover
+    # The booklet prints no subject headings. Instruction 2 names Physics, Chemistry and Biology (Botany and
+    # Zoology), and the questions turn at Q45/Q46 (p14/p15) and Q90/Q91 (p27/p28). Biology is one section:
+    # botany and zoology questions are interleaved through Q91–Q180 (Claude's reading on the pages, for the
+    # founder to overrule; DECISIONS 2026-10-20).
+    sections:
+      - {subject: physics, from: 1, to: 45}
+      - {subject: chemistry, from: 46, to: 90}
+      - {subject: biology, from: 91, to: 180}
+    marking:                       # instruction 4 prints no mark for a blank; that waits for NTA's notice (F18)
+      correct: 4
+      wrong: -1
+      scheme_source: booklet p1, instruction 4
+    key:
+      file: source/neet-pyq-sources/2025/neet-2025-final-key-nta-codes-45-48.pdf
+      sha256: 0f39fa779ce75ef5dd0767c4ad0dda26b46a3f821d7ea11bc6b5965e1e42c98a
+      tier: mirrored-official
+      from: NTA final answer key, NEET (UG) 2025, codes 45-48, a third-party mirror (MANIFEST.csv)
+      downloaded: 2026-10-20
+      special:                     # README §3: "45: Q40 = {1,2}, Q63 = {1,2}"; the key prints "1,2" for both
+        - {question: 40, accepted: [1, 2]}
+        - {question: 63, accepted: [1, 2]}

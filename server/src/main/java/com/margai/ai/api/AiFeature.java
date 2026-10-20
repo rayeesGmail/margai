@@ -24,6 +24,8 @@ public enum AiFeature {
     pipeline_difficulty,
     pipeline_trap,
     pipeline_generate,
+    /** {@code pyq tag} (D19, migration V9): a PYQ onto its syllabus node. */
+    pipeline_tag,
     eval,
     smoke
 }

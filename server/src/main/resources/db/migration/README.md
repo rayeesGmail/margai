@@ -42,3 +42,7 @@ which PLAN day lands which version is §2.9.
 | V3 `curriculum_core` | D4 | `syllabus_nodes`, `syllabus_prerequisites`, `archetype_tracks`, `archetype_track_steps`, `cutoffs` |
 | V4 `chapter_status` | D4 | `chapter_status` |
 | V5 `ai_calls` | D5 | `ai_calls` (append-only cost ledger) |
+| V6 `auth` | D7 | `otp_challenges`, `refresh_tokens`; `users.email` and its identifier check |
+| V7 `ncert` | D14 | `ncert_books`, `ncert_paragraphs` |
+| V8 `ncert_hnsw` | D15 | the HNSW index on `ncert_paragraphs.embedding` |
+| V9 `questions` | D19 | `pyq_papers`, `questions`, `question_topics`; the `ai_calls.feature` CHECK gains `pipeline_tag` |

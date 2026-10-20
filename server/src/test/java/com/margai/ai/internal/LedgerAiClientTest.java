@@ -146,6 +146,23 @@ class LedgerAiClientTest {
         assertThat(meters.counter("ai.calls", "feature", "doubt", "tier", "cheap", "status", "timeout").count()).isEqualTo(1);
     }
 
+    /**
+     * Under the completion fallback a call that fails never reports the model it used, so the row is
+     * stamped before the call with the fallback's id, not the primary's (TECH_PLAN §15.12).
+     */
+    @Test
+    void aFailedCallUnderTheFallbackIsRecordedAgainstTheFallbacksModel() {
+        AiProperties fallback = TestAiProperties.withFallback("global.p.cheap-model", "global.p.reason-model",
+                "global.p.vision-model");
+        LedgerAiClient underFallback = new LedgerAiClient(inner, ledger, new CostCalculator(prices, new BigDecimal("90")),
+                fallback, fallback::fallbackModelFor, prompts, meters);
+        inner.then(AiUnavailableException.retryable("ThrottlingException", "slow", null));
+
+        assertThatThrownBy(() -> underFallback.complete(request())).isInstanceOf(AiUnavailableException.class);
+
+        assertThat(recordedRow().getModelId()).isEqualTo("global.p.cheap-model");
+    }
+
     @Test
     void aProgrammingErrorIsStillARowNamedAfterTheException() {
         inner.then(new TierPolicyException("reason tier needs a RouteDecision"));

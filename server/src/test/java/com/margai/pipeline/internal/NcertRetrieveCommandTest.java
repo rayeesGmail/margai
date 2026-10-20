@@ -262,6 +262,81 @@ class NcertRetrieveCommandTest {
                 .contains("top passage: phy11-part1 ch 7 §7.9 ¶1 ✅ · Energy of an orbiting satellite.");
     }
 
+    // ── the Week-3 gate probes (founder, DECISIONS 2026-10-20) ──────────────────────────────────────────
+
+    /** Two probes beside the D17 sets: a Hindi Biology one (it misses, in the stub) and an English Physics one. */
+    private void writeGateProbes() throws IOException {
+        Files.writeString(queries, """
+                {"queries": [
+                  {"id": "a1", "set": "acceptance", "subject": "physics", "language": "en", "text": "orbit energy",
+                   "expect": [{"book": "phy11-part1", "chapter": 7, "section": "7.9", "para": 1}], "note": "n"},
+                  {"id": "h05", "set": "heldout", "subject": "biology", "language": "hi", "text": "कोशिका क्या है",
+                   "expect": [{"book": "bio11", "chapter": 1, "section": "1.1", "para": 1}], "note": "n", "gate": "week3"},
+                  {"id": "h06", "set": "heldout", "subject": "physics", "language": "en", "text": "satellite energy",
+                   "expect": [{"book": "phy11-part1", "chapter": 7, "section": "7.9", "para": 1}], "note": "n",
+                   "gate": "week3"}]}""");
+    }
+
+    /** The probes run alone and fused, Hindi rewritten, English on its own text, read book by book. */
+    @Test
+    void theGateRunsItsProbesAloneFusedAndReadsThemBookByBook() throws IOException {
+        writeGateProbes();
+
+        assertThat(runGate("week3")).isZero();
+
+        assertThat(rewriter.questions).containsExactly("कोशिका क्या है");
+        assertThat(embeddings.queries).as("the acceptance query is not embedded, so not billed")
+                .doesNotContain("orbit energy");
+        assertThat(corpus.subjects).as("no unfiltered acceptance run").doesNotContainNull();
+        assertThat(report()).contains("the Week-3 gate probes (gate week3) — 1 of 2 in the answer set; a miss stops")
+                .contains("| h05 | bio11 | biology | hi | miss | miss | question | both | NO |")
+                .contains("| h06 | phy11-part1 | physics | en | 1 | 1 | question | question | yes |")
+                .contains("came back, every passage:")
+                .doesNotContain("D17's tick")
+                .doesNotContain("| a1 |");
+    }
+
+    /** A missed probe lists every passage it returned, not three: what filled the answer set in its key's place. */
+    @Test
+    void aMissedProbeListsEveryPassageItReturned() throws IOException {
+        writeGateProbes();
+        corpus.biologyManyPassages = true;
+
+        assertThat(runGate("week3")).isZero();
+
+        // The stub's ids differ per list, so the question's and the search version's passages each appear:
+        // ¶5 is the last of four in each, so a top-three cut could never show it.
+        String everyPassage = report().substring(report().indexOf("came back, every passage:"),
+                report().indexOf("## top 3 passages per probe"));
+        assertThat(everyPassage).contains("bio11 ch 1 §1.1 ¶5 · vector");
+    }
+
+    /** In a whole-file fused run the probes stay out of D17's held-out line, and the misses read as before. */
+    @Test
+    void aRewriteRunKeepsTheProbesOutOfTheHeldOutLine() throws IOException {
+        writeGateProbes();
+
+        assertThat(runRewrite()).isZero();
+
+        assertThat(report()).contains("| held-out queries | ≥ 3 of 4 | 0 of 0 | no |")
+                .contains("the gate probes — unfused against fused")
+                .contains("misses, fused — what was expected, and what came back (1)")
+                .contains("  came back:\n");
+    }
+
+    @Test
+    void aGateNoQueryProbesFailsTheRun() throws IOException {
+        writeGateProbes();
+
+        assertThat(runGate("week9")).isEqualTo(1);
+        assertThat(report()).contains("no held-out query probes gate 'week9'");
+    }
+
+    private int runGate(String name) {
+        return commandLine().execute("ncert", "retrieve", "--gate", name, "--queries", queries.toString(),
+                "--inputs", inputs.toString(), "--reports", reports.toString());
+    }
+
     @Test
     void withoutRewriteNothingIsRewritten() {
         assertThat(run()).isZero();
@@ -353,6 +428,8 @@ class NcertRetrieveCommandTest {
         boolean biologyVectorOnlyForSearchVersion;
         /** When set, the Physics question's own vector finds nothing; its search version's does. */
         boolean physicsVectorOnlyForSearchVersion;
+        /** When set, the Biology vector half returns four paragraphs, none the expected one. */
+        boolean biologyManyPassages;
         /** When set, the Biology paragraph the vector half finds is longer than the whole token cap. */
         boolean biologyOversized;
 
@@ -366,6 +443,10 @@ class NcertRetrieveCommandTest {
             if (subject == BookSubject.biology) {
                 if (biologyVectorOnlyForSearchVersion && !MarkingEmbeddings.isSearchVersion(query)) {
                     return List.of();
+                }
+                if (biologyManyPassages) {
+                    return List.of(match("bio11", 1, "1.1", 2, "Cells divide."), match("bio11", 1, "1.1", 3, "Cells grow."),
+                            match("bio11", 1, "1.1", 4, "Cells respire."), match("bio11", 1, "1.1", 5, "Cells die."));
                 }
                 String text = biologyOversized ? "Cells divide. ".repeat(1000) : "Cells divide.";
                 return List.of(match("bio11", 1, "1.1", 2, text));

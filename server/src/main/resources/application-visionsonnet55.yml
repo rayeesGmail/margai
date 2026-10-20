@@ -4,7 +4,7 @@
 #
 # Added 2026-10-01 (D16) beside `visionsonnet`, to read the same uncorrected trial rows Claude Sonnet 5
 # reads, so the two verifiers' recall and precision are measured on one known defect list. Same price
-# as Sonnet 5 ($2 / $10 per million tokens, cache reads $0.20).
+# as Sonnet 5 ($2 / $10 per million tokens); cache reads $0.10 since 2026-10-20, Sonnet 5's stay $0.20.
 #
 # Request shape (the API reference for this model): a forced `tool_choice` is a 400, so the tool is
 # `auto` + strict and the user turn asks for it; `disabled` thinking is a 400 too, and this model's

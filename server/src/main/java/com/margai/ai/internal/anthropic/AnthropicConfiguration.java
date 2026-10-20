@@ -3,20 +3,23 @@ package com.margai.ai.internal.anthropic;
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.margai.ai.internal.AiProperties;
+import com.margai.ai.internal.CompletionRoute;
 import com.margai.ai.internal.CompositeAiClient;
 import com.margai.ai.internal.EmbeddingClient;
 import com.margai.ai.internal.InnerAiClient;
 import com.margai.ai.internal.PromptRegistry;
 import com.margai.ai.internal.StructuredOutput;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 
 /**
  * The completion provider in the {@code live} profile (TECH_PLAN §1.2): {@code AI_LIVE=1}
- * locally, the task definition in AWS, with {@code margai.ai.provider} choosing between this and
- * the dormant Bedrock client. The key is the whole auth model — it comes from SSM as a
+ * locally, the task definition in AWS, wherever {@link CompletionRoute} sends completions here —
+ * {@code margai.ai.provider}, unless {@code margai.flags.ai-fallback} switches them to the
+ * fallback provider (TECH_PLAN §15.12). The key is the whole auth model — it comes from SSM as a
  * SecureString, never from the repository — and the SDK does not retry, because the retry
  * decorator owns that policy (DECISIONS D5), so a failure is never retried twice over.
  *
@@ -25,7 +28,7 @@ import org.springframework.context.annotation.Profile;
  */
 @Configuration(proxyBeanMethods = false)
 @Profile("live")
-@ConditionalOnProperty(name = "margai.ai.provider", havingValue = AiProperties.ANTHROPIC, matchIfMissing = true)
+@Conditional(CompletionRoute.OnAnthropic.class)
 class AnthropicConfiguration {
 
     @Bean
@@ -39,9 +42,11 @@ class AnthropicConfiguration {
 
     @Bean
     InnerAiClient liveAiClient(AnthropicClient client, AiProperties properties, PromptRegistry prompts,
-            StructuredOutput codec, EmbeddingClient embeddings) {
-        return new InnerAiClient(AiProperties.Provider.anthropic.name(),
-                new CompositeAiClient(new AnthropicAiClient(client, properties, prompts, codec), embeddings));
+            StructuredOutput codec, EmbeddingClient embeddings, Environment environment) {
+        CompletionRoute route = CompletionRoute.of(environment);
+        AnthropicAiClient completions = new AnthropicAiClient(client, properties,
+                route.fallback() ? properties::fallbackModelOf : properties::modelOf, prompts, codec);
+        return new InnerAiClient(route.clientName(), new CompositeAiClient(completions, embeddings), route.fallback());
     }
 
     /** A live client without a key is a misconfiguration, not a runtime surprise. */

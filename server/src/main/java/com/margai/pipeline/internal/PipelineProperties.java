@@ -26,9 +26,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @param transcribeModel  the model the first read must run on (DECISIONS 2026-09-14 "the pair":
  *                         Opus 5 transcribes). {@code ncert extract} refuses when the VISION tier
  *                         is any other model — the mirror of {@code verifyModel}, and added on
- *                         2026-09-22 because it was missing: the VISION default is
+ *                         2026-09-22 because it was missing: the VISION default was then
  *                         {@code claude-haiku-4-5}, which the D15 dry runs put out of this job
- *                         after three runs and three layout failures, and only the
+ *                         after three runs and three layout failures (Claude Haiku 5.5 since
+ *                         2026-10-20, D18, untried on transcription), and only the
  *                         {@code visionopus} profile selects Opus. Without the guard a forgotten
  *                         profile does not fail — it spends a whole book's budget on the rejected
  *                         model and says so nowhere but the ledger. It is the English edition's.

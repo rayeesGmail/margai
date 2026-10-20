@@ -14,6 +14,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.util.OptionalInt;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -23,7 +24,8 @@ import java.util.function.Supplier;
  * {@code error} and {@code breaker} — with {@code cost_paise} computed at insert and the
  * §10.2 metrics {@code ai.calls}, {@code ai.cost.paise}, {@code ai.latency}, plus
  * {@code ai.attempts} (model calls per successful request: retries and the repair fold into the
- * one row, DECISIONS D5). The model id of a failed call is the tier's configured model; the
+ * one row, DECISIONS D5). The model id of a failed call is the tier's configured model — the
+ * fallback's, while the completion fallback serves (TECH_PLAN §15.12); the
  * prompt version is what the registry has active.
  */
 public final class LedgerAiClient implements AiClient {
@@ -32,15 +34,27 @@ public final class LedgerAiClient implements AiClient {
     private final AiCallLedger ledger;
     private final CostCalculator cost;
     private final AiProperties properties;
+    private final Function<Tier, String> modelIds;
     private final PromptRegistry prompts;
     private final MeterRegistry meters;
 
     public LedgerAiClient(AiClient inner, AiCallLedger ledger, CostCalculator cost, AiProperties properties,
             PromptRegistry prompts, MeterRegistry meters) {
+        this(inner, ledger, cost, properties, properties::modelFor, prompts, meters);
+    }
+
+    /**
+     * @param modelIds the model id a tier's call is stamped with before it is made — the fallback's ids
+     *                 while the completion fallback serves (TECH_PLAN §15.12), so a call that fails, and
+     *                 so never reports the model it used, is not recorded against the primary
+     */
+    public LedgerAiClient(AiClient inner, AiCallLedger ledger, CostCalculator cost, AiProperties properties,
+            Function<Tier, String> modelIds, PromptRegistry prompts, MeterRegistry meters) {
         this.inner = inner;
         this.ledger = ledger;
         this.cost = cost;
         this.properties = properties;
+        this.modelIds = modelIds;
         this.prompts = prompts;
         this.meters = meters;
     }
@@ -48,7 +62,7 @@ public final class LedgerAiClient implements AiClient {
     @Override
     public <T> AiResponse<T> complete(AiRequest<T> request) {
         OptionalInt version = prompts.versionIfKnown(request.prompt().name());
-        AiCall row = new AiCall(request.ctx().userId(), request.feature(), properties.modelFor(request.tier()),
+        AiCall row = new AiCall(request.ctx().userId(), request.feature(), modelIds.apply(request.tier()),
                 request.tier(), request.ctx().requestId())
                 .prompt(request.prompt().name(), version.isPresent() ? (short) version.getAsInt() : null);
         return recorded(row, () -> inner.complete(request));

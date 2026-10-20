@@ -100,13 +100,17 @@ AI_LIVE=1 AWS_PROFILE=margai MARGAI_AI_ANTHROPIC_API_KEY=… DB_URL=… \
 
 **`visionopus` is not optional.** Opus 5 transcribes by the pair ruling of 2026-09-14 (DECISIONS),
 and that profile is the only thing that selects it: the VISION tier's default in `application.yml`
-is `claude-haiku-4-5`, which the D15 dry runs put out of this job after three runs and three
-different layout failures on the two-column page. Unlike `ncert verify --read-pages`, which refuses
-to start unless the tier is `margai.pipeline.verify-model`, **`ncert extract` has no transcriber
-guard** — leave the profile off and the run spends a book's budget on the model that was rejected,
-and says so nowhere but the ledger. Until that guard exists, the startup log is the check: the
-`AiClient chain` must end in `anthropic` rather than `fake`, and the VISION tier must read
-`claude-opus-5`.
+is `claude-haiku-5-5` (since 2026-10-20; before that `claude-haiku-4-5`, which the D15 dry runs put
+out of this job after three runs and three different layout failures on the two-column page).
+**`ncert extract` has a transcriber guard** since 2026-09-22, the mirror of `ncert verify
+--read-pages`'s: it refuses to start unless the VISION tier is the edition's transcriber
+(`claude-opus-5` for English, `claude-opus-5-5` for Hindi — `margai.pipeline.transcribe-model` and
+`transcribe-model-hi`), so leaving the profile off stops the run before its first call rather than
+spending a book's budget on a rejected model. The startup log still shows what ran: the
+`AiClient chain` must end in `anthropic` rather than `fake`. Since D18 a vision profile also logs a
+startup warning that `margai.ai.fallback.tier.vision` does not name the tier's model — expected
+while the profile pins VISION for the run; and pipeline commands are never run with
+`margai.flags.ai-fallback` on, under which both guards refuse (docs/runbooks/bedrock-fallback.md).
 
 Start with one chapter (`--chapters 1`) and read its report before letting the book run: the cost
 line and the low-confidence list are both in it, and a prompt that is reading the pages wrongly is
@@ -787,7 +791,8 @@ java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,liv
 
 Reads `eval/retrieval-queries.json` (`--queries` for another file). Each query names its **set** —
 `acceptance` (D17's ✅), `baseline` (D15's fifteen), `diagnostic` (scored, deciding nothing) or `heldout`
-(the founder's four, added after the first run; part of D17's tick with fusion on, DECISIONS 2026-10-19) — its
+(the founder's four, added after the first run; part of D17's tick with fusion on, DECISIONS 2026-10-19 — and
+the six Week-3 gate probes the set also carries, marked `"gate": "week3"`, never counted by the tick) — its
 **subject**, its **language** (`en`, `hi` or `hinglish`) and, on every expected address, its **book**:
 chapter numbers repeat across books, so an address without one would count the wrong book's paragraph as
 right. Each query is filtered to its subject, as the doubt pipeline filters (Biology is one subject:
@@ -815,6 +820,13 @@ English acceptance queries are rewritten too, scored apart from the bar (the fou
 set plus at least 3 of the founder's 4 held-out queries — with the same checks unfused beside it, then each set
 unfused against fused, every search version the model wrote, and the fused run's misses with their search
 versions. The rewrite calls are ledgered as `eval`.
+
+**`--gate week3` (D18, DECISIONS 2026-10-20).** Runs only the held-out queries marked `"gate": "week3"` — the
+Week-3 gate's probes, one per book-level gap of D17's run of record — fused as `--rewrite` fuses, and nothing
+else: D17's sets and bar are not run, so the gate's run of record stays their only measurement. The report
+(`…-ncert-retrieve-gate.md`) lists each probe with the books its key is in, its unfused and fused ranks and its
+grounding, then the hand-check, and every passage a missed probe returned. D17's held-out line never counts the
+probes, in any run.
 
 ## If something goes wrong
 

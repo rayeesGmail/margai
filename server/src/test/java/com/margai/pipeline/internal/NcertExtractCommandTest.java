@@ -102,8 +102,9 @@ class NcertExtractCommandTest {
 
     /**
      * The mirror of {@code ncert verify --read-pages}'s guard, and the one this command went
-     * without until 2026-09-22. The VISION default is Haiku, which the D15 dry runs put out of
-     * transcription; only the {@code visionopus} profile selects Opus. A forgotten profile has to
+     * without until 2026-09-22. The VISION default was Haiku 4.5, which the D15 dry runs put out of
+     * transcription (Haiku 5.5 since 2026-10-20, refused the same way); only the {@code visionopus}
+     * profile selects Opus. A forgotten profile has to
      * fail before the first call, because the alternative is a book transcribed by the rejected
      * model with nothing but the ledger to say so.
      */

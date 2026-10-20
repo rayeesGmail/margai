@@ -205,7 +205,7 @@ provider it wires is `margai.ai.provider` — the switch outlives a provider cha
 | `nightly` | EventBridge → ECS RunTask at 00:30 IST; locally by hand | the `jobs` module's `NightlyRunner` (§1.3): §4.5 re-plan for every user active in 14 days, weekly trajectory + patterns on Sundays, purge job, ai spend rollup; exits when done | as above |
 | `pipeline` | Founder's laptop with AWS SSO, `java -jar server.jar --spring.profiles.active=pipeline <command>` | §6 content commands (picocli) | `live` (human-launched) |
 | `eval` | Founder's laptop, `AI_LIVE=1 ./mvnw -Peval verify` | §4.10 live eval suite | `live` |
-| `live` | Added by the environment (`AI_LIVE=1` locally; task definition in AWS) | Swaps `FakeAiClient` for the provider `margai.ai.provider` names; cost breaker stays on | — |
+| `live` | Added by the environment (`AI_LIVE=1` locally; task definition in AWS) | Swaps `FakeAiClient` for the provider `margai.ai.provider` names — or, with `margai.flags.ai-fallback` on, the fallback provider (§15.12, *amended 2026-10-20, D18*); cost breaker stays on | — |
 | `local` | Developer default | Compose db, seed migrations (§2.9), fake OTP (`margai.auth.otp.sender = log`, the sandbox inbox for email and, after F1, SMS) / FCM / Razorpay adapters that log | `fake` |
 
 ### 1.3 Modules and package layout
@@ -1096,8 +1096,8 @@ Implementations and decorators (innermost first):
 
 | Class | Role |
 |---|---|
-| `AnthropicAiClient` + `CohereEmbeddingClient` (`@Profile("live")`, chosen by `margai.ai.provider`) | *Added 2026-09-12:* Messages API with forced tool use for JSON output, a cached system prefix, model id and request shape per tier from config; embeddings from their own provider, so the innermost client is the two halves joined (`CompositeAiClient`) |
-| `BedrockAiClient` (`@Profile("live")`, `margai.ai.provider = bedrock`) | Converse API with forced tool-use for JSON output; prompt-cache checkpoint after the system prefix; model id per tier from config. *Dormant since 2026-09-12 — kept whole so the way back needs no code; its price rows come from the environment* |
+| `AnthropicAiClient` + `CohereEmbeddingClient` (`@Profile("live")`, chosen by `margai.ai.provider` — since D18 through `CompletionRoute`, §15.12) | *Added 2026-09-12:* Messages API with forced tool use for JSON output, a cached system prefix, model id and request shape per tier from config; embeddings from their own provider, so the innermost client is the two halves joined (`CompositeAiClient`) |
+| `BedrockAiClient` (`@Profile("live")`, `margai.ai.provider = bedrock`) | Converse API with forced tool-use for JSON output; prompt-cache checkpoint after the system prefix; model id per tier from config. *Dormant since 2026-09-12 — kept whole so the way back needs no code; its price rows come from the environment.* *Amended 2026-10-20 (D18 T1, §15.12): no longer dormant — it serves completions as the fallback under `margai.flags.ai-fallback` (wired by `CompletionRoute`), in each tier's request shape (temperature only where set, thinking and effort, forced or auto tool), joined to the pinned embedding client by `CompositeAiClient`; its fallback price rows are in config* |
 | `FakeAiClient` (default) | returns fixtures from `src/main/resources/ai-fixtures/<prompt>.<case>.json` (main resources: the fake is the runtime default in `local`/`api` profiles and ships in the image; tests add cases under `src/test/resources/ai-fixtures/`) chosen by a variable (`fixture_case`) or a deterministic hash; realistic token counts so the ledger and breaker are exercised |
 | `RetryingAiClient` | 2 retries with jitter on throttling/5xx; timeouts 20 s real-time, 10 min batch; maps failures to `AiUnavailableException` |
 | `SchemaValidatingAiClient` | validates the JSON against the record's schema; one repair retry with the validation error in context; then `InvalidOutputException` |
@@ -1403,7 +1403,14 @@ a re-learn block candidate.
   the rows priced on the old figure, never a backfill. The convention stands; the correction it was
   written for turned out not to be needed — the embedding rate was confirmed on the provider's own
   pricing page on 2026-09-12 as the same 0.12 the Bedrock page had given, so no row was ever
-  mispriced and nothing is outstanding.*
+  mispriced and nothing is outstanding.* *Amended 2026-10-20 (D18 T0 — the founder: Haiku 5.5's $0.10 /
+  $0.50 and the ledger applying the over-100K rate; Claude, for the founder to overrule: how the prompt
+  is counted, the other rates, Sonnet 5.5's $0.10 cache read; DECISIONS 2026-10-20): a model may price
+  long prompts higher, as Claude Haiku 5.5 does above 100,000 prompt tokens — its row
+  then carries `long_above` and a `long` block of the same rates, and a call whose prompt (input, cache
+  read and cache write tokens together, as the provider counts it) passes the threshold is billed
+  wholly at the long rates, output included (`ModelPrice.forPrompt`). Sonnet 5.5's cache-read price was
+  halved to $0.10, read 2026-10-20; its rows written before that were priced at $0.20 and stay so.*
 - **Measured 2026-09-12** (the D5 live re-run, TRACKER day log — first real numbers for this cost
   model): a reasoning call against a **cold** cache cost **232 paise**, of which 96% was the 9,860-token
   cache write; the same call **warm** is ≈ 28 paise. On the cheap model the write was 81 paise and each
@@ -1556,7 +1563,34 @@ unchanged; the batch lane, the request shape and the region paragraph do not.*
   and the 1,024-token output cap; **D23/D39 compare thinking-on against thinking-off on the
   hard-numericals subset before beta, and if thinking-on materially improves accuracy,
   `max-output-tokens` and `call-timeout` are raised then, on that evidence** (founder rider,
-  2026-09-12).
+  2026-09-12). *Amended 2026-10-20 (D18 T0 — the switch is the founder's; the request settings are
+  Claude's, for the founder to overrule; DECISIONS 2026-10-20): CHEAP runs Claude Haiku 5.5 and REASON
+  Claude Sonnet 5.5. Both reject any `temperature` but 1, so neither tier sends one; Haiku 5.5
+  sends `thinking: disabled` (valid at effort low to high) with no `effort`, so the provider's default,
+  medium, applies, and keeps the forced tool choice; Sonnet 5.5 answers `disabled` thinking and a forced
+  tool choice with a 400 (D16), so REASON sends `thinking: between_tools`, `effort: medium` and an `auto`
+  tool choice (a strict tool the user turn asks for). Both models' minimum cacheable prefix is 512 tokens,
+  so the cheap-model floor of 4,096 above is Haiku 4.5's, which no tier runs by default now. The D23/D39
+  thinking comparison stands, now on Sonnet 5.5. "Forced tool use is supported on both configured models"
+  above no longer holds for REASON, nor "the cheap model refuses `effort`" for CHEAP (Haiku 5.5 takes effort,
+  default medium). *Amended again the same day (the switch is the founder's — 2026-10-20: "change vision
+  model also to haiku 5.5"; CHEAP's request settings on VISION are Claude's, for the founder to overrule;
+  DECISIONS 2026-10-20):* VISION's default runs Claude Haiku 5.5 too, in CHEAP's settings; pipeline
+  profiles still pin VISION per run, and `ncert extract`'s guard refuses it as it refused Haiku 4.5. Haiku
+  5.5 reads images at a higher resolution tier — about 2.5× Haiku 4.5's image tokens for a 2,000×1,500
+  image (Anthropic's Haiku 5.5 migration guide) — at a tenth of the price per token under 100K-token
+  prompts (Anthropic's pricing documentation), both read through web search.* *Amended after T0's run
+  (founder's ruling; the token-count finding and the D37–D39 measurement are Claude's, for the founder to
+  overrule; DECISIONS 2026-10-20):* the 5.5 models stay. **Latency:** Sonnet 5.5 answered the REASON smoke in
+  4.9 s (Sonnet 5: 1.8 s), a 71-token answer, accepted inside the 20 s call budget, and noted for every
+  interactive REASON path: the REASON doubt — its answer and the independent numerical re-solve, two sequential
+  REASON calls against a p95 of 25 s — and the REASON verification of a CHEAP-routed option doubt (§4.3 stage 8),
+  one Sonnet 5.5 call inside the fresh CHEAP doubt's p95 of 8 s, the tighter budget (§10, DEV_SPEC §9); D37–D39
+  measure both with the real prompts and outputs. **Temperature:** the 5.5 models run only at temperature 1, so
+  runs repeat with variance; D23's eval handles it (PLAN D23). **Token counts:** no configuration value was sized
+  on Haiku 4.5's counts beyond the cache minimum T0 moved; PLAN D37's prompt-sizing guidance was, and carries a
+  note; the tripwire's estimate, 4% high on Haiku 4.5 above, runs low on Haiku 5.5 and warns sooner; the "+50%"
+  above compared Haiku 4.5 with Sonnet 5 (DECISIONS 2026-10-20).
 - **Batch inference**: *amended 2026-09-12.* The direct Batches API accepts the reasoning model, so
   the offline-reasoning lane is the same model as the real-time one — cheaper than the model the
   Bedrock allowlist had forced on it — at 50% off every token, cache reads and writes included,
@@ -1584,7 +1618,10 @@ unchanged; the batch lane, the request shape and the region paragraph do not.*
   processing outside India. *Amended 2026-09-12: the calls now leave for the providers' own
   endpoints, so the disclosure still holds and the region is no longer ours to choose — except that
   the direct API exposes an `inference_geo` control Bedrock did not, which is PARKED against SPEC
-  §6.11's residency copy rather than used today.*
+  §6.11's residency copy rather than used today.* *Amended 2026-10-20 (founder's D18 rulings;
+  DECISIONS 2026-10-20): the completion fallback on Bedrock calls from ap-south-1 to global inference
+  profiles for the 5.5 models, which have no `in.*` profile yet (founder, 2026-10-20), and moves to an
+  `in.*` profile if one appears; the disclosure holds either way.*
 
 ### 4.12 Prompts
 
@@ -1868,7 +1905,7 @@ added to this table on the day each is built.*
 | `ncert align --book [--chapters] [--sample] [--founder] [--seed]` | D16 | same key | EN↔HI pairs by section and order, embedding-similarity outliers listed for the 20-pair check. *Amended 2026-10-02 (D16, DECISIONS 2026-10-01): the English rows are canonical and the Hindi follows them, so the command changes nothing — it proposes. Each Hindi paragraph is embedded on the pin, compared in pgvector to the stored vectors of its section's English rows, and `Alignment` (a monotone dynamic programme whose pair, join, split and unpaired steps are scored on similarity above what strangers reach) maps one onto the other; the joins and splits it proposes are adjudicated into `hi` entries of `ncert-corrections.yaml` and applied by the next Hindi load. Refused on the fake client and while any English row of the chapters lacks a vector; a chapter with no Hindi row yet is named, not aligned; paced like `ncert embed`*; *since 2026-10-13 (D16) an English row with no Hindi before its section's last Hindi row — a number an `unprinted` entry left, since the load numbers the Hindi with no other gap — is named and set aside rather than proposed again, and each step names the rows' own numbers*; *since 2026-10-17 a section's last number an `unprinted` entry with `after: true` left is still aligned and proposed: the stored rows cannot tell it from a Hindi row short, and the load's report names it*. Reports: sections that do not pair one to one; the English paragraphs set aside as unprinted; the proposed Hindi joins and splits; weak pairs; numbers one edition of a pair carries and the other does not; **the ✅ sample** — 40 aligned pairs by default, seeded, weighted to matra and conjunct density, the densest 10 marked as the founder's (PLAN D16, raised from 20 by the 2026-09-13 ruling); cost from the ledger |
 | `ncert embed --book [--chapters] [--redo] [--queries]` | ~~D17~~ **D15** — *moved 2026-09-19/20 with the founder's re-order (DECISIONS; PLAN D15)* | paragraph id | embedded count; the 15 concept queries from `eval/retrieval-queries.json` run and print top-3. *Amended 2026-09-20 (D15, DECISIONS): the run is **scored**, not only printed — hit@1, hit@3 and MRR against the addresses each query was written to reach, with Hindi counted separately, because an unscored run gives D17 nothing to compare its ~9,000-paragraph re-run against and five Hindi misses would hide inside ten English hits. Embeds `text_en` only (§6.4), so `--lang hi` is refused; refuses the fake client, whose fixture vectors on real rows no check could ever see; refuses a missing query file rather than embedding a book and producing no acceptance evidence (`--queries none` to mean it). Resumes on the null-embedding rule, so a re-run re-scores for the price of the query embeddings* *Since 2026-10-18 (D17) a book's run scores only the queries with an expected paragraph in that book; the corpus-wide score is `ncert retrieve`'s.* |
 | `ncert errata` | D16 (*added 2026-10-17, DECISIONS*) | — (reads `ncert-errata.yaml` and the loaded rows; writes nothing) | per book and edition: entries corrected and kept, meaning-changing, flags not yet reviewed; every entry whose row is missing, off its page or without its span, or whose corrected row still carries the print, any of which fails the run. No model, ₹0; run after every reload |
-| `ncert retrieve [--queries]` | D17 (*added 2026-10-18, DECISIONS*) | — (reads `eval/retrieval-queries.json` and the corpus; embeds the queries only, writes nothing to the corpus) | the corpus searched (paragraphs with and without a vector, per book); each query filtered to its book subject as §4.3 stage 6 filters, the acceptance set again with no filter; the founder's D17 bar read from the filtered acceptance run; each set scored by language and subject (in the answer set, hit@1, hit@3, MRR); every miss beside the text it was expected to reach; cost from the ledger. Every expected address names its book, since chapter numbers repeat across books |
+| `ncert retrieve [--queries] [--rewrite] [--gate]` | D17 (*added 2026-10-18, DECISIONS*; `--rewrite` D18, 2026-10-19; `--gate week3` D18, 2026-10-20: the Week-3 gate's held-out probes alone, fused as `--rewrite` fuses — a non-English probe with its search version, an English probe on its own text — read book by book) | — (reads `eval/retrieval-queries.json` and the corpus; embeds the queries only, writes nothing to the corpus) | the corpus searched (paragraphs with and without a vector, per book); each query filtered to its book subject as §4.3 stage 6 filters, the acceptance set again with no filter; the founder's D17 bar read from the filtered acceptance run; each set scored by language and subject (in the answer set, hit@1, hit@3, MRR); every miss beside the text it was expected to reach; cost from the ledger. Every expected address names its book, since chapter numbers repeat across books |
 | `pyq load --paper` | D19 | `(source, exam, year, paper_code, question_no)` | **counts per year/subject** vs the paper's official count |
 | `pyq solve --year --subject` | D20 | question id; skips `verified = true` | solutions written, cost; 50-question audit sample listed |
 | `pyq verify --year --subject` | D20–D21 | question id | verified vs flagged; flagged → `audit_queue(pipeline_flag)` |
@@ -2011,6 +2048,8 @@ rebuilt from Terraform if it drifts.
 /margai/beta/fcm/service_account_json  SecureString
 /margai/beta/posthog/api_key           SecureString
 /margai/beta/ai/provider               String       anthropic | bedrock (2026-09-12)
+/margai/beta/ai/fallback_provider      String       bedrock — the completion fallback (§15.12, 2026-10-20)
+/margai/beta/ai/fallback/tier/…        String       the fallback's model id per tier, cheap, reason, vision (§15.12, 2026-10-20)
 /margai/beta/ai/anthropic/api_key      SecureString the model provider's key — the AI auth model (2026-09-12)
 /margai/beta/ai/cohere/api_key         SecureString the embedding provider's key (2026-09-12)
 /margai/beta/ai/tier/cheap/id          String       model id, pinned version
@@ -2941,6 +2980,48 @@ D70 outage drill. Bedrock model ids and prices come from config. Embeddings stay
 (`global.cohere.embed-v4:0`, the D15 pin) as their primary — the fallback-only rule is about
 completions. The fallback is called ready only after a founder-run one-call smoke of an Anthropic
 model through Bedrock, since CS-2's “access now restored” is not checkable from a Claude session.
+*Amended 2026-10-20 (founder's D18 rulings; DECISIONS 2026-10-20): the smoke is one call per runtime
+tier, CHEAP and REASON. The fallback ids mirror the tiers after T0's switch to the 5.5 models —
+`global.anthropic.claude-haiku-5-5` and `global.anthropic.claude-sonnet-5-5`, moving to an `in.*`
+profile if one appears for a 5.5 model — with prices from the Bedrock pricing page, prompt-cache read
+and write rates included, recorded in DECISIONS. The Bedrock client is brought up to the per-tier request
+settings the Anthropic client sends (so D18 is no longer config only) and sends cache_control the same way;
+a startup warning, not a refusal, fires when a tier's primary model changes but its fallback id does not.
+Batch work under the fallback runs sequentially, which is fine at beta scale — read as `completeBatch`'s
+on-demand loop at concurrency 4, never a batch submission on the Bedrock path (Claude's reading, DECISIONS
+2026-10-20, for the founder to overrule); the runbook notes roughly how long a nightly run takes that way
+at 500 users.*
+
+*Built at D18 T1 (DECISIONS 2026-10-20; the build choices are Claude's, for the founder to overrule unless
+noted):* the YAML keys are `margai.ai.fallback-provider`, `margai.ai.fallback.tier.{cheap,reason,vision}`
+(the founder's ids, VISION's included) and `margai.flags.ai-fallback`. `CompletionRoute` decides from the
+environment which provider configuration wires — the flag's fallback provider, else `margai.ai.provider` —
+and both provider configurations take each tier's model from it: the fallback's id in the primary tier's
+request shape. Bedrock completions are joined to the pinned embedding client by `CompositeAiClient`, as the
+Anthropic ones are, so the switch never touches embeddings. `ConverseRequestMapper` sends a tier's
+temperature only when set, `thinking` always and `output_config.effort` where set (both in
+`additionalModelRequestFields`, Converse having no field of its own), a forced or an `auto`-and-strict tool
+as the tier says, and keeps its cache point closing the system prompt. The ledger stamps a fallback call
+with the fallback's id before the call, so a failed call is not recorded against the primary. Startup
+(`AiConfiguration.checkFallback`) refuses the flag on with no ids, a fallback provider that is the primary
+and a fallback id without input, output and both cache prices, and warns when a fallback id no longer names
+its tier's primary model (the founder's warning, as a check of the configuration against itself). The Bedrock
+client refuses an answer cut off at the output-token limit and does not repair a refusal or a Bedrock filter
+stop, as the Anthropic client does; the pipeline's two VISION tasks name the fallback's model under the flag,
+so `ncert extract` and `ncert verify` refuse to run on it; and the Bedrock runtime client both Bedrock
+configurations declare is conditional on both sides, so the wiring does not depend on scan order. The Bedrock
+rows carry the Bedrock pricing page's figures, which the founder read on 2026-10-20 (the same as Anthropic's
+list; batch N/A, so no batch rate); the switch, the smoke (`BedrockFallbackSmokeTest`) and the 500-user estimate are in
+docs/runbooks/bedrock-fallback.md.
+
+*Amended 2026-10-20 (founder's ruling "tick D18 with T1 carried" and instruction to update the wording; the
+sentences Claude's, for the founder to overrule; DECISIONS 2026-10-20): the founder's smoke was refused by
+Bedrock for both 5.5 models (403 "not available for this account"), and the availability check reads the
+agreement NOT_AVAILABLE for Claude Haiku 5.5 and Haiku 4.5 while Cohere's reads AVAILABLE, so CS-2's
+"access now restored" does not hold for the Anthropic models; the embedding model, reachable throughout,
+has served embeddings since 2026-09-20 (CS-2 §4.11 reworded the same day). The fallback stays built and
+switched off; D18 ticked with T1's readiness carried until AWS lifts the refusal, on the founder's Support
+case; the same smoke reruns then.*
 
 ### 15.13 WhatsApp, zero-API (CS-2 §4.9)
 

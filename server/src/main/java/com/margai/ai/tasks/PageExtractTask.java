@@ -8,6 +8,7 @@ import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.ImagePart;
 import com.margai.ai.api.PromptRef;
 import com.margai.ai.api.Tier;
+import com.margai.ai.internal.AiFlags;
 import com.margai.ai.internal.AiProperties;
 import com.margai.ai.internal.PromptRegistry;
 import java.util.LinkedHashMap;
@@ -36,10 +37,12 @@ public class PageExtractTask implements NcertPageExtractor {
     private final AiClient ai;
     private final PromptRef prompt;
     private final AiProperties properties;
+    private final AiFlags flags;
 
-    PageExtractTask(AiClient ai, PromptRegistry prompts, AiProperties properties) {
+    PageExtractTask(AiClient ai, PromptRegistry prompts, AiProperties properties, AiFlags flags) {
         this.ai = ai;
         this.properties = properties;
+        this.flags = flags;
         this.prompt = prompts.require("ncert_extract");
     }
 
@@ -66,8 +69,13 @@ public class PageExtractTask implements NcertPageExtractor {
                 .withImages(images));
     }
 
+    /**
+     * The model the calls will reach: the fallback's VISION id while the completion fallback serves
+     * (TECH_PLAN §15.12), so `ncert extract`'s transcriber guard refuses a run the flag would otherwise
+     * send to a model the pair ruling ruled out.
+     */
     @Override
     public String model() {
-        return properties.modelFor(Tier.vision);
+        return flags.aiFallback() ? properties.fallbackModelFor(Tier.vision) : properties.modelFor(Tier.vision);
     }
 }

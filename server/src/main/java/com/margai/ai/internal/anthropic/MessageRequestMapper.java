@@ -41,8 +41,9 @@ import tools.jackson.databind.JsonNode;
  * description, repair message) come from {@code prompts/_protocol.v<N>.stg}, never from code.
  *
  * <p>Per-model request shape is configuration, not a code branch (§11.5): the reasoning models
- * of the current generation reject {@code temperature} with a 400 and the cheap model rejects
- * {@code effort}, so both fields are sent only when the tier configures them.
+ * (Sonnet 5, Opus 5) reject {@code temperature} with a 400, the 5.5 models any {@code temperature}
+ * but 1, and the 4.5 cheap model rejects {@code effort}, so both fields are sent only when the tier
+ * configures them.
  */
 final class MessageRequestMapper {
 

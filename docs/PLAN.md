@@ -145,6 +145,30 @@ tools; your reviews focus on output quality.)*
   if the rewrite work spills, the gate moves and the move goes in the slippage log.*
   *Amended 2026-10-18 (founder; DECISIONS 2026-10-18): the gate reads “searchable in both languages
   for the six books with Hindi text; for Chemistry, Hindi queries reach the English rows”.*
+  *Amended 2026-10-20 (founder's rulings on the D18 plan and the same day's change of plan; DECISIONS
+  2026-10-20): T0 comes first — the primary tiers move to the 5.5 models (CHEAP `claude-haiku-5-5`,
+  REASON `claude-sonnet-5-5`), smoked with one call per tier on the direct API and judged against the
+  current model on the same sets: the D17 acceptance and held-out sets rerun fused with Haiku 5.5 writing
+  the search versions, on the same bar, that run becoming the gate's run of record (the whole query file
+  runs, so the baseline and diagnostic sets stay in it — Claude's reading, DECISIONS 2026-10-20), and every
+  prompt in use rerun on its eval set, each judged against its score of record (D17's run of record for the
+  query rewrite; Claude's reading, DECISIONS 2026-10-20); a regression or a failed bar stops for the founder's choice, no
+  prompt edited to pass. The gate is then read book by book: each book-level gap in D17's run of record gets
+  one fresh probe query (six: phy12-part1 Hindi, phy11-part2 English, chem11-part2 English, and
+  Devanagari Hindi reaching the English rows for chem11-part2, chem12-part1 and chem12-part2), written
+  with its answer key from the book rows and committed before the run, in the held-out set, never used
+  for tuning; a probe miss is diagnosed and stops for the founder's ruling. The Bedrock fallback is no
+  longer config only: the Bedrock client is brought up to per-tier request settings; its ids mirror the
+  new tiers (`global.anthropic.claude-haiku-5-5`, `global.anthropic.claude-sonnet-5-5`, an `in.*`
+  profile if one appears), with prices including cache rates in a DECISIONS row, a startup warning when
+  a tier's primary model changes but its fallback id does not, and sequential batch under the fallback;
+  it is ready after the founder's smoke of one call per runtime tier (CHEAP and REASON). The
+  closed-book errata backfill waits for a later buffer.*
+  *Amended 2026-10-20 (founder's ruling "tick D18 with T1 carried"; the wording Claude's; DECISIONS
+  2026-10-20): D18 ticks with T1 carried — the founder's smoke was refused by Bedrock for this account
+  (the agreement for Claude Haiku 5.5 and Haiku 4.5 reads NOT_AVAILABLE; the cause is with AWS), so the
+  fallback's readiness waits on the founder's AWS Support case and the same smoke reruns when AWS lifts
+  the refusal.*
 - **D19 —** PYQ ingest: papers loaded, question records created, tagging pass.
   ✅ *Counts per year/subject match official papers.*
 - **D20 —** AI solution generation (batch) for one subject; verification pass wired.
@@ -166,7 +190,18 @@ tools; your reviews focus on output quality.)*
   revisits the Hindi vector column on what it shows (h03 is the known miss); (c) compares fused and unfused
   retrieval on English questions, and if fusion lowers any English result the English search-version flag
   goes off; (d) evaluates `query_rewrite` v2's drift guard (no topic the question does not contain) on this
-  eval set, not on D17's queries.*
+  eval set, not on D17's queries.* *Amended 2026-10-20 (founder's T0 ruling; DECISIONS 2026-10-20): the
+  eval also (e) measures drift in the search version — its length, the rate of added topics, and book
+  names in it (Haiku 5.5 drifts more than 4.5: a mean of 21.4 words against 12.6); (f) says how it handles
+  run-to-run variance, the 5.5 models running only at temperature 1 — the founder's default is two runs per
+  set, judged on the worse run, both reported; Claude's proposal, for the founder's approval at D23's plan:
+  every eval set runs twice on the same build, each bar line and each regression check (a query leaving
+  the answer set, a failing bar line — the clarified rule) is judged on the worse of the two runs, line by
+  line — which differs from judging the whole worse run: a line fails if it fails on either run — both runs'
+  reports are committed, a line that holds on one run and fails on the other is named unstable in the
+  report, and no third run breaks a tie; (g) reviews the shared `_protocol` fragments against 5.5 behaviour
+  once eval fixtures exist, any change judged on this set. Every new prompt from here on is written for
+  the 5.5 models.*
 - **D24 —** Buffer + **Week-4 gate:** solved, tagged, anchored PYQ bank + eval suite
   running in CI. In the buffer (CS-1 §4, §7, §9.3; added 2026-09-12): `collective from-pyq`
   misconception drafts from the distractor maps; `collective from-inputs` over the F11
@@ -244,7 +279,11 @@ tools; your reviews focus on output quality.)*
   retrieval grounding. Write the `doubt_answer` prefix with comfortable margin over the
   cheap tier's 4,096-token cache floor, and treat prompt length as a per-model cost
   variable — the two tiers tokenize the same prefix ~50% apart (`.claude/rules/ai-layer.md`;
-  measured 2026-09-12). ✅ *10 typed doubts answered with correct anchors.*
+  measured 2026-09-12). ✅ *10 typed doubts answered with correct anchors.* *Amended 2026-10-20
+  (founder's T0 ruling, point 7; the sizing correction is Claude's check under point 4, for the founder to
+  overrule; DECISIONS 2026-10-20): `doubt_answer` is written for the 5.5
+  models; the cheap tier's cache floor is 512 tokens on Haiku 5.5 (TECH_PLAN §4.11), not 4,096, and the
+  ~50% figure compared Haiku 4.5 with Sonnet 5, so both lines above describe the old tiers.*
 - **D38 —** Photo path: capture UI + vision extraction → same pipeline. ✅ *10 photographed
   printed questions extracted faithfully.* *Added 2026-10-01 (CS-3 §3.1–§3.2): the offline doubt
   queue (captured with no connection, sent automatically later, metered at send) and photo

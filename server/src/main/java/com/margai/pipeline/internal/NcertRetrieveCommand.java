@@ -39,6 +39,11 @@ import picocli.CommandLine.Option;
  * the rewrite alone; D17's tick is read from that fused run — the bar on the acceptance set and at
  * least 3 of the 4 held-out queries — with the unfused run beside it, and the English acceptance
  * queries are rewritten too, scored apart from the bar.
+ *
+ * <p>{@code --gate week3} runs the Week-3 gate's probes (the founder's gate ruling; run alone by Claude's
+ * reading, DECISIONS 2026-10-20): the held-out queries marked with that gate, one per book-level gap of
+ * D17's run of record, fused as {@code --rewrite} fuses — a non-English probe with its search version, an
+ * English probe on its own text — reported book by book with every passage a miss returned.
  */
 @Component
 @Profile("pipeline")
@@ -58,6 +63,11 @@ class NcertRetrieveCommand extends InputFileCommand {
                     + "retrieve with the two fused; the English acceptance queries are rewritten too, scored apart.")
     boolean rewrite;
 
+    @Option(names = "--gate", paramLabel = "NAME",
+            description = "D18: run only the held-out queries probing this gate (week3), fused as --rewrite fuses, and "
+                    + "report them book by book; D17's sets and bar are not run.")
+    String gate;
+
     private final CurriculumImport imports;
     private final HybridRetriever retriever;
     private final QueryRewriter rewriter;
@@ -74,9 +84,12 @@ class NcertRetrieveCommand extends InputFileCommand {
         this.client = client;
     }
 
-    /** The rewrite run's report is filed under its own name, beside the unfused run's. */
+    /** The rewrite run's and the gate probes' reports are filed under their own names, beside the unfused run's. */
     @Override
     String reportTitle() {
+        if (gate != null) {
+            return super.reportTitle() + " gate";
+        }
         return rewrite ? super.reportTitle() + " rewrite" : super.reportTitle();
     }
 
@@ -93,7 +106,15 @@ class NcertRetrieveCommand extends InputFileCommand {
     @Override
     void run(Path inputFile, Report report) {
         guardLiveClient(inputFile);
-        List<RetrievalQuery> queries = RetrievalQueriesReader.read(inputFile);
+        List<RetrievalQuery> all = RetrievalQueriesReader.read(inputFile);
+        // The gate probes alone (DECISIONS 2026-10-20), so the gate's run of record stays the only measurement
+        // of the other sets; read fused, as the run of record is.
+        List<RetrievalQuery> queries = gate == null ? all
+                : all.stream().filter(query -> gate.equals(query.gate())).toList();
+        if (queries.isEmpty()) {
+            throw new InputFormatException(inputFile, 0, "no held-out query probes gate '" + gate + "'");
+        }
+        boolean fuse = rewrite || gate != null;
         List<BookDefinition> books = BooksYamlReader.read(io.input(NcertRegisterCommand.FILE));
         RetrievalQueriesReader.checkBooks(inputFile, queries, books);
         List<RetrievalQuery> acceptance = queries.stream()
@@ -114,7 +135,7 @@ class NcertRetrieveCommand extends InputFileCommand {
         try {
             filtered = RetrievalRun.run(queries, retriever, ctx);
             unfiltered = RetrievalRun.runUnfiltered(acceptance, retriever, ctx);
-            if (rewrite) {
+            if (fuse) {
                 // Every non-English query, and — the founder's diagnostic — the English acceptance ones.
                 List<RetrievalQuery> toRewrite = queries.stream()
                         .filter(query -> !"en".equals(query.language()) || query.set() == RetrievalQuery.QuerySet.acceptance)
@@ -137,7 +158,9 @@ class NcertRetrieveCommand extends InputFileCommand {
                     List.of(List.of(String.valueOf(bill.calls()),
                             String.valueOf(bill.usage().inputTokens()), bill.rupees())));
         }
-        if (rewrite) {
+        if (gate != null) {
+            RetrievalRun.reportGate(gate, filtered, fused, searchVersions, report, expectedText(fused));
+        } else if (rewrite) {
             RetrievalRun.reportFused(filtered, fused, englishRewritten, unfiltered, searchVersions, report,
                     expectedText(fused));
         } else {

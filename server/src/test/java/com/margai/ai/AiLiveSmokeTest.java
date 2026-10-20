@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -87,9 +88,12 @@ class AiLiveSmokeTest {
 
         for (Tier tier : List.of(Tier.cheap, Tier.reason, Tier.vision)) {
             String configured = properties.modelFor(tier);
+            // The provider may answer an alias with the dated id it resolves to — `claude-haiku-4-5` came back as
+            // `claude-haiku-4-5-20251001` on 2026-10-20 — so the configured id, or it with a date suffix (DECISIONS
+            // 2026-10-20).
             assertThat(provider.models().retrieve(configured).id())
                     .as("%s tier model exists at the provider", tier)
-                    .isEqualTo(configured);
+                    .matches(Pattern.quote(configured) + "(-\\d{8})?");
         }
     }
 

@@ -30,30 +30,46 @@ server:
 margai:
   ai:
     # Completion provider (DECISIONS 2026-09-12): direct provider APIs, not a cloud reseller.
-    # `bedrock` keeps the dormant client reachable by configuration alone, nothing more.
+    # `bedrock` would make Bedrock the primary, which nothing sets — CS-2 §4.11 keeps it the fallback
+    # (below); the setting then needs another fallback provider, or startup refuses.
     provider: anthropic
-    # Tier defaults after the switch to the direct API: the 4.5 cheap model for CHEAP and VISION,
-    # the current Sonnet for REASON in both the real-time and the batch lane. Each tier also
-    # carries the request shape its model accepts (§4.11) — the reasoning model rejects
-    # `temperature` outright and the cheap one rejects `effort`, so an omitted key means
-    # "send nothing", never a default. `cache-min-tokens` is the model's minimum cacheable
-    # prefix: below it a cache point is a silent no-op, and AiConfiguration refuses that.
+    # The completion fallback (CS-2 §4.11, TECH_PLAN §15.12): where `margai.flags.ai-fallback` sends
+    # completions, with a restart, during an Anthropic outage — never the primary. Each tier names the
+    # same model as its primary on Bedrock's global inference profiles, the 5.5 models having no
+    # `in.*` profile yet (founder, DECISIONS 2026-10-20); the tier's request shape is the primary's.
+    # A fallback id that stops naming its primary is a startup warning (AiConfiguration).
+    fallback-provider: bedrock
+    fallback:
+      tier:
+        cheap: global.anthropic.claude-haiku-5-5
+        reason: global.anthropic.claude-sonnet-5-5
+        vision: global.anthropic.claude-haiku-5-5
+    # Tier defaults: the 5.5 models for CHEAP and REASON since 2026-10-20 (D18 T0, founder ruling,
+    # DECISIONS: build on the launch models rather than migrate later), in both the real-time and
+    # the batch lane, and Haiku 5.5 for VISION too (founder, the same day); pipeline profiles
+    # override VISION per run. Each tier
+    # also carries the request shape its model accepts (§4.11) — a rejected field is a 400, not a
+    # default, so an omitted key means "send nothing". Both 5.5 models reject any `temperature` but
+    # 1; Haiku 5.5 turns thinking off with `disabled` (at effort low to high; omitted effort is its
+    # default, medium); Sonnet 5.5 answers `disabled` and a forced tool choice with a 400, so it
+    # runs `between_tools` with an `auto` tool choice, as measured at D16. `cache-min-tokens` is the
+    # model's minimum cacheable prefix: below it a cache point is a silent no-op, and
+    # AiConfiguration warns about that at startup.
     tier:
       cheap:
-        id: claude-haiku-4-5
-        temperature: 0
+        id: claude-haiku-5-5
         thinking: disabled
-        cache-min-tokens: 4096
+        cache-min-tokens: 512
       reason:
-        id: claude-sonnet-5
-        thinking: disabled     # D23/D39 compare thinking-on on hard numericals before beta
+        id: claude-sonnet-5-5
+        thinking: between_tools   # D23/D39 compare thinking-on on hard numericals before beta
         effort: medium
-        cache-min-tokens: 1024
+        tool-choice: auto
+        cache-min-tokens: 512
       vision:
-        id: claude-haiku-4-5
-        temperature: 0
+        id: claude-haiku-5-5
         thinking: disabled
-        cache-min-tokens: 4096
+        cache-min-tokens: 512
     # The embedding pin (§4.9): provider, model and width move together — changing any of them
     # means re-embedding the corpus, so the D17 retrieval harness settles Hindi and Hinglish
     # quality before D16 fills the tables (DECISIONS 2026-09-12).
@@ -99,14 +115,23 @@ margai:
       region: ap-south-1
     # USD per 1M tokens at direct-API rates (DECISIONS 2026-09-12): cache reads are a tenth of
     # input (a twentieth on Claude Opus 5.5, $0.20 — added with Sonnet 5.5 at D16 from the API
-    # reference's price table, cached 2026-09-25), a 5-minute cache write 1.25× input — the rate
-    # the ledger's single cache_write key means (§4.8) — and every batch token half of on-demand. The embedding rate was confirmed on
+    # reference's price table, cached 2026-09-25 — and on Sonnet 5.5 since its cache-read price was
+    # halved to $0.10, read 2026-10-20), a 5-minute cache write 1.25× input — the rate the ledger's
+    # single cache_write key means (§4.8) — and every batch token half of on-demand. Claude Haiku
+    # 5.5 (D18 T0, read from Anthropic's pricing documentation 2026-10-20) is priced by prompt
+    # length: above 100,000 prompt tokens — input, cache read and cache write counted together —
+    # the whole call bills at its `long` rates, five times the standard. The embedding rate was confirmed on
     # the provider's own pricing page 2026-09-12 and is the same 0.12 the Bedrock page gave, so no
     # row was ever mispriced. That figure is the model's TEXT rate; the same model charges 0.47 for
     # image tokens, and this table has one input price per model — embedding an image would
     # under-bill ~4×. We send text only (EmbedRequest carries no image); using the model's image
     # side is PARKED as "diagram retrieval with multimodal embeddings" and needs a second price key
-    # per model before it bills honestly (§4.9, TRACKER PARKED 2026-09-12).
+    # per model before it bills honestly (§4.9, TRACKER PARKED 2026-09-12). The completion fallback's
+    # two Bedrock global profiles carry the Bedrock pricing page's own figures, read by the founder
+    # 2026-10-20 (Asia Pacific (Mumbai), global cross-region inference; DECISIONS 2026-10-20): the same
+    # as Anthropic's list, the 5-minute cache write the one billed, and no batch rate — the page shows
+    # batch as N/A, and the fallback never submits a batch. The long-context row's threshold is not on
+    # the page; it is Anthropic's 100,000 prompt tokens.
     prices-json: >-
       {"claude-haiku-4-5":
          {"input": 1.00, "output": 5.00, "cache_read": 0.10, "cache_write": 1.25,
@@ -121,8 +146,20 @@ margai:
          {"input": 4.00, "output": 20.00, "cache_read": 0.20, "cache_write": 5.00,
           "batch_input": 2.00, "batch_output": 10.00},
        "claude-sonnet-5-5":
-         {"input": 2.00, "output": 10.00, "cache_read": 0.20, "cache_write": 2.50,
+         {"input": 2.00, "output": 10.00, "cache_read": 0.10, "cache_write": 2.50,
           "batch_input": 1.00, "batch_output": 5.00},
+       "claude-haiku-5-5":
+         {"input": 0.10, "output": 0.50, "cache_read": 0.01, "cache_write": 0.125,
+          "batch_input": 0.05, "batch_output": 0.25,
+          "long_above": 100000,
+          "long": {"input": 0.50, "output": 2.50, "cache_read": 0.05, "cache_write": 0.625,
+                   "batch_input": 0.25, "batch_output": 1.25}},
+       "global.anthropic.claude-haiku-5-5":
+         {"input": 0.10, "output": 0.50, "cache_read": 0.01, "cache_write": 0.125,
+          "long_above": 100000,
+          "long": {"input": 0.50, "output": 2.50, "cache_read": 0.05, "cache_write": 0.625}},
+       "global.anthropic.claude-sonnet-5-5":
+         {"input": 2.00, "output": 10.00, "cache_read": 0.10, "cache_write": 2.50},
        "embed-v4.0":
          {"input": 0.12},
        "global.cohere.embed-v4:0":
@@ -177,6 +214,11 @@ margai:
     otp-request-per-ip-hourly: 10
     public-auth-per-ip-per-minute: 60   # verify + refresh per client address (§1.5 step 4)
     authenticated-per-minute: 60
+  # Feature flags (TECH_PLAN §11.6): booleans, a flip being a config change and a task restart.
+  flags:
+    # Completions to margai.ai.fallback-provider during an Anthropic outage (TECH_PLAN §15.12); the
+    # D70 drill exercises it, and it is ready only after the founder's smoke (DECISIONS 2026-10-20).
+    ai-fallback: false
 
 # health is public (the ALB check, component names only); metrics is the founder's raw view of every
 # Micrometer counter until CloudWatch (F8/D73) and needs an admin bearer — the security chain gates

@@ -181,7 +181,10 @@ tools; your reviews focus on output quality.)*
   ruling 5; DECISIONS 2026-10-20): every disagreement between the AI solution and NTA's key first triggers a check of
   that question's transcription against the page image, before anything else is judged, and the transcription
   errors found this way are logged per paper. For a key mirrored by a third party (README §2, tier 3), a cluster of
-  disagreements on one paper triggers a second-copy check of the key (README §2).*
+  disagreements on one paper triggers a second-copy check of the key (README §2).* *And (the founder, 2026-10-20;
+  DECISIONS): that check reads the page image the extraction call read, `pages/pyq/{paper}/{page}.png`, its sha256
+  checked against the page's line in `extract/pyq/{paper}.jsonl` (for 2025 code 45, a re-render marked as one —
+  not provably the bytes its calls read; Claude's row, DECISIONS 2026-10-20).*
 - **D21 —** Solutions for remaining subjects (batch overnight); distractor-map
   generation. ✅ *Second 50-question audit; error rate < agreed threshold.*
 - **D22 —** Weightage & difficulty statistics computed → syllabus nodes updated; the
@@ -273,7 +276,15 @@ tools; your reviews focus on output quality.)*
   buffer before D31, and no figure question is served without its crop.* *And (Claude's, DECISIONS 2026-10-20, for
   the founder to overrule): `accepted_keys` and `answer_status` are key carriers like `correct_key`, a
   multiple-answer question is judged on `accepted_keys`, and a tag's reason is checked for a hint at the answer
-  before D31 serves the question.*
+  before D31 serves the question.* *And (the founder, 2026-10-20; DECISIONS): the crop tool works from the saved page
+  images, `pages/pyq/{paper}/{page}.png`.* *Proposed 2026-10-20 (the founder's instruction, building on Claude's
+  recommendation: logged now, its details settled when the crop work starts; DECISIONS): each `figures` entry stores its crop box in PDF coordinates
+  (page + box), so any crop can be re-cut; display crops are cut from the PDF at a higher resolution than the
+  150-dpi reading images (up to a scanned booklet's native resolution), so small labels stay sharp on a phone;
+  crops are stored as `figures/pyq/{paper}/{question}-{stem|optionN}.{png|webp}`, sized and compressed for the
+  offline day-plan download, and travel in it; the figure's written description doubles as alt text (accessibility,
+  and the fallback when an image fails to load); and the rule stands — a figure question is never served without
+  its crop.*
 - **D32 —** Practice UI: timer, taps, verdict + solution sheet + NCERT anchor chip.
   ✅ *A 10-question timed set feels smooth on a mid-range phone.*
 - **D33 —** Session summary (accuracy, speed vs your norm, sent-to-notebook list);

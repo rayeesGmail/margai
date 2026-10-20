@@ -37,6 +37,7 @@ paths:
   with the pipeline's prefixes at its root — `source/{ncert,syllabus,pyq}/…` and, since D19, the
   founder's official pack at `source/neet-pyq-sources/…` (the only home of a PYQ booklet or key),
   `pages/{book}/{lang}/{chapter}/{page}.png`, `extract/{book}/{lang}.jsonl`,
-  `verify/{book}/{lang}.jsonl` (D15), `extract/pyq/{paper}.jsonl` and `tags/pyq/{paper}.jsonl` (D19),
+  `verify/{book}/{lang}.jsonl` (D15), `extract/pyq/{paper}.jsonl`, `tags/pyq/{paper}.jsonl` and the page images
+  each extraction call read, `pages/pyq/{paper}/{page}.png` (D19),
   `snapshots/<date>/` (DECISIONS 2026-09-12 F8, D14, 2026-10-20). Object access goes through `storage.api.ObjectStore`; only
   `storage.internal.s3` names the S3 SDK (TECH_PLAN §1.4). `pipeline/data/` stays gitignored.

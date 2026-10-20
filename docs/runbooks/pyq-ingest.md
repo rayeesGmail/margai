@@ -45,10 +45,26 @@ the first call), roughly ₹5–6 a page. It resumes from `extract/pyq/<code>.js
 paid for are kept and the bill is reported. It writes the draft `pipeline/data/pyq/<code>.draft.json` (answers
 empty) and the report `pipeline/reports/<date>-pyq-extract.md` with every flag.
 
+Each page image is kept at `pages/pyq/<code>/<page>.png` in the bucket and its JSONL line records the image's
+sha256, dpi and renderer version (the founder's acceptance, DECISIONS 2026-10-20). Claude's, in the same
+DECISIONS: the image is kept before its call, a copy goes under `pipeline/data/pyq/pages/<code>/`, the line also
+records the tiles, and the report lists every page's sha256. A paper read before images were kept (2025 code 45)
+gets them with no model call (the founder's), run twice (Claude's) — the first keeps them, the second shows they
+draw the same bytes again:
+
+```
+AWS_PROFILE=margai DB_URL=… java -jar <jar> --spring.profiles.active=pipeline pyq extract --paper <code> --images-only
+```
+
 ## 3. Review — Claude
 
 1. Every flag in the report, and **every question**, against the page images (README §7): stem, options,
-   figures, numbering. A corrected question keeps its `extraction` provenance; each change is listed in the
+   figures, numbering. The page images are the saved ones the model read (the founder's acceptance):
+   `pipeline/data/pyq/pages/<code>/`, each file's sha256 checked against the page-image table of the extract
+   report that kept it (for 2025 code 45, its `--images-only` report — and code 45's are re-renders, not
+   provably the bytes its calls read; DECISIONS 2026-10-20). Where a glyph is too small to settle at
+   150 dpi, a zoomed drawing of the same PDF region settles it and the review report says so (Claude's, for the
+   founder to overrule; DECISIONS 2026-10-20). A corrected question keeps its `extraction` provenance; each change is listed in the
    review report `pipeline/reports/<date>-pyq-review-<code>.md` with the page it was read on.
 2. The answers from NTA's final key for the code, read from the key PDF's own text layer by a script (no
    model), checked for 1..N once each and for exactly the register's special entries.

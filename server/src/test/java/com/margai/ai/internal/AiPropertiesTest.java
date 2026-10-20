@@ -32,7 +32,8 @@ class AiPropertiesTest {
                     .isEqualTo(AiProperties.Provider.anthropic);
             assertThat(AiProperties.Provider.valueOf(AiProperties.BEDROCK)).isEqualTo(AiProperties.Provider.bedrock);
             assertThat(properties.bedrock().region()).isEqualTo("ap-south-1");
-            assertThat(properties.modelFor(Tier.cheap)).isNotBlank().isEqualTo(properties.modelFor(Tier.vision));
+            // Since D18's T0 (DECISIONS 2026-10-20) CHEAP and REASON run the 5.5 models and VISION keeps its own.
+            assertThat(properties.modelFor(Tier.cheap)).isNotBlank().isNotEqualTo(properties.modelFor(Tier.vision));
             assertThat(properties.modelFor(Tier.reason)).isNotBlank().isNotEqualTo(properties.modelFor(Tier.cheap));
             assertThat(properties.embed().model()).isNotBlank();
             assertThat(properties.embed().provider()).isNotBlank();
@@ -66,8 +67,8 @@ class AiPropertiesTest {
     }
 
     /**
-     * §4.11: the request shape is per model, and "send nothing" has to be expressible — the
-     * reasoning model rejects a temperature outright and the cheap one rejects an effort.
+     * §4.11: the request shape is per model, and "send nothing" has to be expressible — the 5.5
+     * models reject a temperature but 1, and the cheap one is left at its default effort.
      */
     @Test
     void eachTierCarriesTheRequestShapeItsModelAccepts() {
@@ -76,12 +77,18 @@ class AiPropertiesTest {
             AiProperties.Model cheap = properties.modelOf(Tier.cheap);
             AiProperties.Model reason = properties.modelOf(Tier.reason);
 
-            assertThat(cheap.temperature()).isZero();
-            assertThat(cheap.effort()).isNull();
+            // The 5.5 models (D18 T0): both reject any temperature but 1, so neither tier sends one.
+            assertThat(cheap.temperature()).isNull();
+            assertThat(cheap.effort()).as("the provider's default effort").isNull();
+            assertThat(cheap.thinking()).isEqualTo(AiProperties.Thinking.disabled);
+            assertThat(cheap.forcesTheTool()).isTrue();
             assertThat(reason.temperature()).isNull();
             assertThat(reason.effort()).isEqualTo(AiProperties.Effort.medium);
-            assertThat(reason.thinking()).isEqualTo(AiProperties.Thinking.disabled);
-            assertThat(cheap.cacheMinTokens()).isGreaterThan(reason.cacheMinTokens());
+            // Sonnet 5.5 answers `disabled` thinking and a forced tool choice with a 400 (D16).
+            assertThat(reason.thinking()).isEqualTo(AiProperties.Thinking.between_tools);
+            assertThat(reason.forcesTheTool()).isFalse();
+            assertThat(cheap.cacheMinTokens()).isPositive();
+            assertThat(reason.cacheMinTokens()).isPositive();
         });
     }
 
@@ -114,7 +121,7 @@ class AiPropertiesTest {
 
     /**
      * The 5.5 measurement profiles (D16): the VISION tier leaves the tool to the model — a forced
-     * choice is a 400 on that generation — the model is priced, and the shipped tiers still force it.
+     * choice is a 400 on that generation — the model is priced, and the default VISION tier still forces it.
      */
     @Test
     void theFivePointFiveProfilesChooseTheToolAutomaticallyAndArePriced() {

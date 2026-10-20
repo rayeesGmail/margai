@@ -1403,7 +1403,14 @@ a re-learn block candidate.
   the rows priced on the old figure, never a backfill. The convention stands; the correction it was
   written for turned out not to be needed — the embedding rate was confirmed on the provider's own
   pricing page on 2026-09-12 as the same 0.12 the Bedrock page had given, so no row was ever
-  mispriced and nothing is outstanding.*
+  mispriced and nothing is outstanding.* *Amended 2026-10-20 (D18 T0 — the founder: Haiku 5.5's $0.10 /
+  $0.50 and the ledger applying the over-100K rate; Claude, for the founder to overrule: how the prompt
+  is counted, the other rates, Sonnet 5.5's $0.10 cache read; DECISIONS 2026-10-20): a model may price
+  long prompts higher, as Claude Haiku 5.5 does above 100,000 prompt tokens — its row
+  then carries `long_above` and a `long` block of the same rates, and a call whose prompt (input, cache
+  read and cache write tokens together, as the provider counts it) passes the threshold is billed
+  wholly at the long rates, output included (`ModelPrice.forPrompt`). Sonnet 5.5's cache-read price was
+  halved to $0.10, read 2026-10-20; its rows written before that were priced at $0.20 and stay so.*
 - **Measured 2026-09-12** (the D5 live re-run, TRACKER day log — first real numbers for this cost
   model): a reasoning call against a **cold** cache cost **232 paise**, of which 96% was the 9,860-token
   cache write; the same call **warm** is ≈ 28 paise. On the cheap model the write was 81 paise and each
@@ -1556,7 +1563,17 @@ unchanged; the batch lane, the request shape and the region paragraph do not.*
   and the 1,024-token output cap; **D23/D39 compare thinking-on against thinking-off on the
   hard-numericals subset before beta, and if thinking-on materially improves accuracy,
   `max-output-tokens` and `call-timeout` are raised then, on that evidence** (founder rider,
-  2026-09-12).
+  2026-09-12). *Amended 2026-10-20 (D18 T0 — the switch is the founder's; the request settings are
+  Claude's, for the founder to overrule; DECISIONS 2026-10-20): CHEAP runs Claude Haiku 5.5 and REASON
+  Claude Sonnet 5.5. Both reject any `temperature` but 1, so neither tier sends one; Haiku 5.5
+  sends `thinking: disabled` (valid at effort low to high) with no `effort`, so the provider's default,
+  medium, applies, and keeps the forced tool choice; Sonnet 5.5 answers `disabled` thinking and a forced
+  tool choice with a 400 (D16), so REASON sends `thinking: between_tools`, `effort: medium` and an `auto`
+  tool choice (a strict tool the user turn asks for). Both models' minimum cacheable prefix is 512 tokens,
+  so the cheap-model floor of 4,096 above is the VISION tier's alone now. The D23/D39 thinking comparison
+  stands, now on Sonnet 5.5. "Forced tool use is supported on both configured models" above no longer
+  holds for REASON, nor "the cheap model refuses `effort`" for CHEAP (Haiku 5.5 takes effort, default
+  medium); both still describe the VISION tier's Haiku 4.5.*
 - **Batch inference**: *amended 2026-09-12.* The direct Batches API accepts the reasoning model, so
   the offline-reasoning lane is the same model as the real-time one — cheaper than the model the
   Bedrock allowlist had forced on it — at 50% off every token, cache reads and writes included,

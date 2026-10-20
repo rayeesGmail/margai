@@ -78,4 +78,48 @@ class CostCalculatorTest {
         assertThatThrownBy(() -> PriceTable.parse("{\"m\": {\"input\": -1}}"))
                 .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("negative");
     }
+
+    // ── long-prompt rates (Claude Haiku 5.5 above 100,000 prompt tokens; DECISIONS 2026-10-20) ─────────
+
+    private final PriceTable tiered = PriceTable.parse("""
+            {"tiered": {"input": 0.10, "output": 0.50, "cache_read": 0.01, "cache_write": 0.125,
+                        "batch_input": 0.05, "batch_output": 0.25,
+                        "long_above": 100000,
+                        "long": {"input": 0.50, "output": 2.50, "cache_read": 0.05, "cache_write": 0.625,
+                                 "batch_input": 0.25, "batch_output": 1.25}}}
+            """);
+
+    private final CostCalculator tieredCalculator = new CostCalculator(tiered, new BigDecimal("90"));
+
+    /** At the threshold the prompt is not over it: the standard rates. */
+    @Test
+    void aPromptAtTheThresholdIsBilledAtTheStandardRates() {
+        // (100000×0.10 + 1000×0.50) / 1e6 = 0.0105 USD → 0.945 INR → 94.5 paise → 95
+        assertThat(tieredCalculator.paise("tiered", new Usage(100_000, 1000, 0, 0), false)).isEqualTo(95);
+    }
+
+    /** One token over, counting cached tokens, and the whole call — output included — is at the long rates. */
+    @Test
+    void aPromptOverTheThresholdIsBilledWhollyAtTheLongRatesCachedTokensCounting() {
+        // prompt = 1 + 90000 + 10000 = 100001 > 100000:
+        // (1×0.50 + 1000×2.50 + 90000×0.05 + 10000×0.625) / 1e6 = 0.0132505 USD → 1.192545 INR → 119.25 → 120
+        assertThat(tieredCalculator.paise("tiered", new Usage(1, 1000, 90_000, 10_000), false)).isEqualTo(120);
+    }
+
+    @Test
+    void aLongBatchCallUsesTheLongBatchRates() {
+        // (200000×0.25 + 1000×1.25) / 1e6 = 0.05125 USD → 4.6125 INR → 461.25 → 462
+        assertThat(tieredCalculator.paise("tiered", new Usage(200_000, 1000, 0, 0), true)).isEqualTo(462);
+    }
+
+    @Test
+    void longPromptRatesNeedBothTheThresholdAndTheRates() {
+        assertThatThrownBy(() -> PriceTable.parse("{\"m\": {\"input\": 1, \"output\": 1, \"long_above\": 100000}}"))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("long_above");
+        assertThatThrownBy(() -> PriceTable.parse("{\"m\": {\"input\": 1, \"output\": 1, \"long\": {\"input\": 2}}}"))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("long_above");
+        assertThatThrownBy(() -> PriceTable.parse(
+                "{\"m\": {\"input\": 1, \"output\": 1, \"long_above\": 10, \"long\": {\"input\": 2}}}"))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("no input and output price");
+    }
 }

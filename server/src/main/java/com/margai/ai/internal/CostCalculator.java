@@ -10,6 +10,8 @@ import java.math.RoundingMode;
  * Rounded up, so any call that consumed tokens costs at least one paisa: a breaker must never
  * let sub-paisa calls accumulate unseen (DECISIONS 2026-09-08, found on the Nova Lite smoke).
  * Batch rows use the batch input and output prices; cache tokens are priced the same either way.
+ * A call whose prompt passes a model's long-prompt threshold is billed wholly at that model's
+ * long-prompt rates ({@link ModelPrice#forPrompt}).
  * A price change never rewrites history because the value is stored, not derived.
  */
 public final class CostCalculator {
@@ -26,7 +28,8 @@ public final class CostCalculator {
     }
 
     public long paise(String modelId, Usage usage, boolean batch) {
-        ModelPrice price = prices.priceOf(modelId);
+        long prompt = (long) usage.inputTokens() + usage.cacheReadTokens() + usage.cacheWriteTokens();
+        ModelPrice price = prices.priceOf(modelId).forPrompt(prompt);
         BigDecimal input = batch ? price.batchInput() : price.input();
         BigDecimal output = batch ? price.batchOutput() : price.output();
         BigDecimal usd = BigDecimal.valueOf(usage.inputTokens()).multiply(input)

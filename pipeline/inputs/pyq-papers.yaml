@@ -55,3 +55,171 @@ papers:
       special:                     # README §3: "45: Q40 = {1,2}, Q63 = {1,2}"; the key prints "1,2" for both
         - {question: 40, accepted: [1, 2]}
         - {question: 63, accepted: [1, 2]}
+
+  - code: neet-2024-s6
+    exam: NEET
+    year: 2024
+    paper_code: S6
+    exam_date: 2024-05-05          # the key's S6 block: "EXAM HELD ON 05.05.2024"
+    official_hindi: true
+    question_count: 200            # booklet p2, instruction 2: "200 multiple-choice questions"
+    booklets:
+      - file: source/neet-pyq-sources/2024/neet-2024-S6-booklet-hi-en.pdf
+        sha256: 8c417b14a0a6fd58c3336fc1e318af722e4de8464249d3eee04092d35626feaf
+        languages: hi-en           # English left, NTA's Hindi right
+        pages: 3-47                # p1 AglaSem cover, p2 booklet cover; Q1 p3, Q200 p47; p48 rough, p49 back cover, p50 ad
+    sections:                      # printed "Physics : Section-A (Q. No. 1 to 35)" and so on; Section B: attempt any 10 of
+      - {subject: physics, section: A, from: 1, to: 35}                    # 15 (instruction 2(b))
+      - {subject: physics, section: B, from: 36, to: 50, attempt: 10}
+      - {subject: chemistry, section: A, from: 51, to: 85}
+      - {subject: chemistry, section: B, from: 86, to: 100, attempt: 10}
+      - {subject: botany, section: A, from: 101, to: 135}
+      - {subject: botany, section: B, from: 136, to: 150, attempt: 10}
+      - {subject: zoology, section: A, from: 151, to: 185}
+      - {subject: zoology, section: B, from: 186, to: 200, attempt: 10}
+    marking:
+      correct: 4
+      wrong: -1
+      scheme_source: booklet p2, instruction 3
+    key:
+      file: source/neet-pyq-sources/2024/neet-2024-final-key-nta-revised-2024-07-26-all-codes.pdf
+      sha256: 825de227fc838c7e8ef571cc531a0ebf7c7d4984ddedab0329a3ab2b0c540ab9
+      tier: mirrored-official
+      from: NTA final answer key revised 26.07.2024 per the Supreme Court order of 23.07.2024, all codes, a third-party mirror (MANIFEST.csv)
+      downloaded: 2026-10-20     # README §3: the revised key, never the earlier final key; no special entries for S6
+
+  - code: neet-2023-g6
+    exam: NEET
+    year: 2023
+    paper_code: G6
+    exam_date: 2023-05-07          # the key's G6 block: "DATE OF EXAM - 07.05.2023"
+    official_hindi: true
+    question_count: 200            # booklet p2, instruction 2: "200 multiple-choice questions"
+    booklets:
+      - file: source/neet-pyq-sources/2023/neet-2023-G6-booklet-hi-en.pdf
+        sha256: abb6075d1e357deebd6ffa849bd3cd9b4de058e43c81c44aef60d8492a93be71
+        languages: hi-en           # English left, NTA's Hindi right
+        pages: 3-47                # p1 AglaSem cover, p2 booklet cover; Q1 p3, Q200 p47; the rough page and back cover are absent
+    sections:                      # printed "Physics : Section-A (Q. No. 001 to 035)" and so on; Section B: attempt any 10 of
+      - {subject: physics, section: A, from: 1, to: 35}                    # 15 (instruction 2(b))
+      - {subject: physics, section: B, from: 36, to: 50, attempt: 10}
+      - {subject: chemistry, section: A, from: 51, to: 85}
+      - {subject: chemistry, section: B, from: 86, to: 100, attempt: 10}
+      - {subject: botany, section: A, from: 101, to: 135}
+      - {subject: botany, section: B, from: 136, to: 150, attempt: 10}
+      - {subject: zoology, section: A, from: 151, to: 185}
+      - {subject: zoology, section: B, from: 186, to: 200, attempt: 10}
+    marking:
+      correct: 4
+      wrong: -1
+      scheme_source: booklet p2, instruction 3
+    key:
+      file: source/neet-pyq-sources/2023/neet-2023-final-key-all-codes.pdf
+      sha256: 04ed02fd571f5596878f98c1b11ae33c3072f9748bab2aededa2f12e694994ca
+      tier: mirrored-official
+      from: final answer key, all codes, not on NTA letterhead (a Word print), a third-party mirror (MANIFEST.csv)
+      downloaded: 2026-10-20
+      special:                     # README §3: "Q32 dropped ("5"), Q141 = {2,4} ("E")"; legend 5 = dropped, E = 2&4
+        - {question: 32, dropped: true}
+        - {question: 141, accepted: [2, 4]}
+
+  - code: neet-2021-m4
+    exam: NEET
+    year: 2021
+    paper_code: M4
+    exam_date: 2021-09-12          # the key's M4 block: "EXAM DATE: 12.09.2021"
+    official_hindi: true
+    question_count: 200            # booklet p1, instruction 2: "200 multiple-choice questions"
+    booklets:
+      - file: source/neet-pyq-sources/2021/neet-2021-M4-booklet-en.pdf
+        sha256: e9acdfb29dfcff0a3a186819f7336330af4ce51855990d1081c78637b338587a
+        languages: en              # transcribed: the 2020 rule applied to 2021 too (DECISIONS 2026-10-20)
+        pages: 2-25                # p1 cover; Q1 p2, Q200 p25; p26–p28 rough work
+      - file: source/neet-pyq-sources/2021/neet-2021-M4-booklet-hi-en.pdf
+        sha256: 658be60cc2b57c7194e61fbbd8adafd11f4e27a352b69cd47fa8d4e02c860bfa
+        languages: hi-en           # NTA's Hindi, for the parked Hindi pass; Hindi left, English right
+        pages: 2-46                # p1 cover; Q1 p2, Q200 p46; p47 rough work, p48 back cover
+    sections:                      # printed "Section - A (Physics)" and so on; Section B: instruction 2(b), "attempt any 10
+      - {subject: physics, section: A, from: 1, to: 35}                    # (Ten) questions out of 15 (Fifteen)"
+      - {subject: physics, section: B, from: 36, to: 50, attempt: 10}
+      - {subject: chemistry, section: A, from: 51, to: 85}
+      - {subject: chemistry, section: B, from: 86, to: 100, attempt: 10}
+      - {subject: botany, section: A, from: 101, to: 135}
+      - {subject: botany, section: B, from: 136, to: 150, attempt: 10}
+      - {subject: zoology, section: A, from: 151, to: 185}
+      - {subject: zoology, section: B, from: 186, to: 200, attempt: 10}
+    marking:
+      correct: 4
+      wrong: -1
+      scheme_source: booklet p1, instruction 3
+    key:
+      file: source/neet-pyq-sources/2021/neet-2021-final-key-nta-all-codes.pdf
+      sha256: 838e0ba080eb6b9639f12a1dcfb7f36cd8fe80dd5be11ee0be6d725e4c6f3ca9
+      tier: mirrored-official
+      from: NTA final answer key (result 01.11.2021), all codes, a third-party mirror (MANIFEST.csv)
+      downloaded: 2026-10-20       # README §3: no special entries for M4
+
+  - code: neet-2020-e1
+    exam: NEET
+    year: 2020
+    paper_code: E1
+    exam_date: 2020-09-13          # the key: "EXAM DATE : 13.09.2020"
+    official_hindi: true
+    question_count: 180            # booklet p1, instruction 2: "contains 180 questions"
+    booklets:
+      - file: source/neet-pyq-sources/2020/neet-2020-E1-booklet-en.pdf
+        sha256: 44c28ebe28cb9465dca039790c3a5403d57415948e2bdef06b2ea04e675a04e1
+        languages: en              # transcribed: README §4, "take English from the English file's text layer"
+        pages: 2-21                # p1 cover; Q1 p2, Q180 p21; the printed rough-work pages are absent
+      - file: source/neet-pyq-sources/2020/neet-2020-E1-booklet-hi-en.pdf
+        sha256: 3ca6bcf7fecaaabe6476544929c181d362b3bee43ceb98ee2754afe26f6b03c7
+        languages: hi-en           # NTA's Hindi, for the parked Hindi pass; Hindi left, English right
+        pages: 2-41                # p1 cover; Q1 p2, Q180 p41
+    # No headings printed. Biology comes first in this paper (README §4): Q90 is biology (snow-blindness), Q91
+    # chemistry (He2), Q135 chemistry (anisole), Q136 physics (Bohr model) — read on the English text layer.
+    sections:
+      - {subject: biology, from: 1, to: 90}
+      - {subject: chemistry, from: 91, to: 135}
+      - {subject: physics, from: 136, to: 180}
+    marking:
+      correct: 4
+      wrong: -1
+      scheme_source: booklet p1, instruction 2
+    key:
+      file: source/neet-pyq-sources/2020/neet-2020-final-key-nta.pdf
+      sha256: a3920558b4aa9b02da1160bff00d2ba55f9fa8edf21ea28dead6a5857fd42b8e
+      tier: mirrored-official
+      from: NTA final answer key (result 16.10.2020), codes E1-E6, a third-party mirror (MANIFEST.csv)
+      downloaded: 2026-10-20       # README §3: no special entries for E1
+
+  - code: neet-2019-p1
+    exam: NEET
+    year: 2019
+    paper_code: P1
+    exam_date: 2019-05-05          # the key's P1 block: "Exam Date : 05.05.2019"
+    official_hindi: true
+    question_count: 180            # booklet p1, instruction 2: "contains 180 questions"
+    booklets:
+      - file: source/neet-pyq-sources/2019/neet-2019-P1-booklet-hi-en.pdf
+        sha256: 8b10964cf8bd9f11a31b86edc480094951d65aa37e10c650290f89a2630c8f42
+        languages: hi-en           # Hindi left, English right
+        pages: 2-41                # p1 cover; Q1 p2, Q180 p41; p42–p43 rough work, p44 back cover
+    # No headings printed: Q45 is physics (the field of a cylindrical conductor, p12), Q46 chemistry (sigma and pi
+    # bonds, p12), Q90 chemistry (basic strength of amines, p23), Q91 biology (the Earth Summit, p23).
+    sections:
+      - {subject: physics, from: 1, to: 45}
+      - {subject: chemistry, from: 46, to: 90}
+      - {subject: biology, from: 91, to: 180}
+    marking:
+      correct: 4
+      wrong: -1
+      scheme_source: booklet p1, instruction 2
+    key:
+      file: source/neet-pyq-sources/2019/neet-2019-final-key-nta.pdf
+      sha256: 46d683c4d22fa65b3a6e86f52524461e103728d7244e4437854330c5c3917279
+      tier: mirrored-official
+      from: NTA final answer key, NEET (UG) 2019, codes P1 P4 P6 Q5 R5 R6 F1, a third-party mirror (AglaSem watermark; MANIFEST.csv)
+      downloaded: 2026-10-20
+      special:                     # README §3: "Q6 = {3,4}, Q72 = {1,2}" — the key prints "F" and "A" (F = 3,4; A = 1,2)
+        - {question: 6, accepted: [3, 4]}
+        - {question: 72, accepted: [1, 2]}

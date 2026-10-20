@@ -1,0 +1,94 @@
+# Runbook — PYQ ingest (D19)
+
+How an official NEET paper becomes questions in the bank: `pyq extract` → review → approval → `pyq tag` →
+`pyq load`. The founder's rulings are in `neet-pyq-sources/README.md`; the decisions behind each step are the
+2026-10-20 · D19 rows of `docs/DECISIONS.md`. Commands run from `server/` with the jar built by
+`./mvnw -q -DskipTests package` (copy it out of `target/` before a long run, so a commit's verify cannot
+rebuild it underneath the run).
+
+| Variable | Why |
+|---|---|
+| `AI_LIVE=1` | the `live` profile; without it every call answers from a fixture, and `extract`/`tag` refuse to run |
+| `MARGAI_AI_ANTHROPIC_API_KEY` | exported in the shell beforehand, never written into a script (`ai-provider-keys.md`) |
+| `AWS_PROFILE=margai` | the content bucket, after `aws sso login --profile margai` |
+| `DB_URL=jdbc:postgresql://localhost:5432/margai_d15` | the pipeline database, where the NCERT corpus is — D23 anchors questions to its paragraphs |
+
+## 0. Once: the pack in the bucket, and the taxonomy in the pipeline database
+
+1. Upload the pack's booklets and keys to `source/neet-pyq-sources/…` (the founder; the reference-only retype
+   stays local — DECISIONS 2026-10-20). `pyq extract` refuses a booklet whose sha256 is not MANIFEST.csv's.
+2. Before the first `pyq load`, load the taxonomy into `margai_d15` (₹0, idempotent; it holds the NCERT corpus
+   but no syllabus nodes):
+
+   ```
+   DB_URL=… java -jar <jar> --spring.profiles.active=pipeline taxonomy load
+   DB_URL=… java -jar <jar> --spring.profiles.active=pipeline taxonomy prerequisites
+   ```
+
+## 1. Register the paper
+
+`pipeline/inputs/pyq-papers.yaml` (founder-owned; Claude builds each entry from MANIFEST.csv and the booklet's
+own pages): the booklet file(s) with their sha256 and the pages that hold questions, the sections as printed
+(or, with no headings, as the cover declares the subjects and the questions turn), the marking the booklet
+prints, and the key's provenance with the code's special entries from README §3. The reader refuses a paper
+that disagrees with itself; `PyqPapersYamlReaderTest` holds every file to MANIFEST.csv.
+
+## 2. `pyq extract` — the founder runs it
+
+```
+AI_LIVE=1 AWS_PROFILE=margai DB_URL=… caffeinate -i java -jar <jar> \
+  --spring.profiles.active=pipeline,live,visionopus55 pyq extract --paper <code>
+```
+
+One VISION call per register page on Claude Opus 5.5 at effort low (any other VISION model is refused before
+the first call), roughly ₹5–6 a page. It resumes from `extract/pyq/<code>.jsonl`; whatever stops it, the pages
+paid for are kept and the bill is reported. It writes the draft `pipeline/data/pyq/<code>.draft.json` (answers
+empty) and the report `pipeline/reports/<date>-pyq-extract.md` with every flag.
+
+## 3. Review — Claude
+
+1. Every flag in the report, and **every question**, against the page images (README §7): stem, options,
+   figures, numbering. A corrected question keeps its `extraction` provenance; each change is listed in the
+   review report `pipeline/reports/<date>-pyq-review-<code>.md` with the page it was read on.
+2. The answers from NTA's final key for the code, read from the key PDF's own text layer by a script (no
+   model), checked for 1..N once each and for exactly the register's special entries.
+3. For the Re-NEET (README §5): every question with `handwriting touches` checked against the image, and the
+   coaching retype of code 50 used only to cross-check the text, matched by content — never its answers or
+   figures, and never loaded.
+
+## 4. Approval — the founder
+
+The reviewed file goes to `pipeline/inputs/papers/<code>.json` only on the founder's approval and is committed
+with the review report. `pyq tag` and `pyq load` read only that file, and refuse it if it fails its register
+entry (every declared question once, options (1)–(4), an answer per question agreeing with the special entries).
+
+## 5. `pyq tag` — the founder runs it
+
+```
+AI_LIVE=1 AWS_PROFILE=margai DB_URL=… java -jar <jar> --spring.profiles.active=pipeline,live pyq tag --paper <code>
+```
+
+One REASON call per question (Claude Sonnet 5.5), the outline of the section's subject from `taxonomy.csv` as
+the cached prefix — any biology section (Biology, Botany or Zoology) gets botany and zoology together, and a
+section with no printed heading takes the subject the register gives it; every code is checked in Java and a
+bad tag is kept with its problem, never loaded. The report
+lists tags with problems (re-tag with `--redo --questions N`), the spread per chapter, every out-of-syllabus
+question and the founder's seeded sample of 40.
+
+## 6. `pyq load` — the D19 check, the founder runs it (it reads the tags from the content bucket)
+
+```
+AWS_PROFILE=margai DB_URL=… java -jar <jar> --spring.profiles.active=pipeline pyq load --paper <code>
+```
+
+No model. One transaction: the paper, its questions and their secondary topics; the paper's questions are read
+back and counted per printed section, and any section that does not hold what it declares rolls the load back.
+The report's first table is the D19 ✅ — declared against loaded per section, with the figure questions per
+section (founder's ruling 4) — and it names the marking values still waiting for NTA's notice (F18).
+
+## Order (README §7)
+
+2025 code 45 first — it is D19's tick — then 2024 S6, 2023 G6, 2022 R6, 2021 M4, 2020 E1, 2019 P1, and the
+Re-NEET (code 80) last. 2022 R6 and the Re-NEET are not in the register yet: the pack holds no marking for
+either (their covers are missing) and no exam date for 2022, so each is registered when F18 supplies them;
+until then the order skips them. 2018 AA is registered only if a fitting key turns up (README §6).

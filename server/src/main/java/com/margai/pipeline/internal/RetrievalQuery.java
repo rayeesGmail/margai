@@ -13,9 +13,10 @@ import java.util.List;
  *
  * @param set      which set the query belongs to: the D17 {@code acceptance} set its ✅ is read
  *                 from, the D15 {@code baseline} it is compared against, a {@code diagnostic}
- *                 that is scored but decides nothing (DECISIONS 2026-10-18), or the founder's
- *                 {@code heldout} queries, added after the first run and part of D17's tick with
- *                 fusion on (DECISIONS 2026-10-19)
+ *                 that is scored but decides nothing (DECISIONS 2026-10-18), or {@code heldout}: the
+ *                 founder's four, added after the first run and part of D17's tick with fusion on
+ *                 (DECISIONS 2026-10-19), and the Week-3 gate probes the set also carries, marked by
+ *                 {@code gate} and not counted by the tick (DECISIONS 2026-10-20)
  * @param subject  the book subject retrieval is filtered to, as the doubt pipeline filters
  *                 (§4.3 stage 6) — Biology is one subject here, botany and zoology together
  * @param language {@code en}, {@code hi} or {@code hinglish}; a Hindi or Hinglish query is expected
@@ -23,15 +24,24 @@ import java.util.List;
  *                 pin is cross-lingual (§6.4)
  * @param note     why this query is in the set, or what had to be changed about it — the record
  *                 of how it was written, which is what stops the set quietly flattering itself
+ * @param gate     the gate this held-out query probes ({@code week3}: one book-level gap of D17's run
+ *                 of record, founder ruling DECISIONS 2026-10-20), or null — a gate probe is run on
+ *                 its own by {@code ncert retrieve --gate}, and D17's held-out line does not count it
  */
 public record RetrievalQuery(String id, QuerySet set, BookSubject subject, String language, String text,
-        List<Address> expect, String note) {
+        List<Address> expect, String note, String gate) {
 
     /** The sets a query can belong to; {@code acceptance} and, with fusion on, {@code heldout} decide D17's ✅. */
     public enum QuerySet { acceptance, baseline, diagnostic, heldout }
 
     public RetrievalQuery {
         expect = List.copyOf(expect);
+    }
+
+    /** A query that probes no gate. */
+    public RetrievalQuery(String id, QuerySet set, BookSubject subject, String language, String text,
+            List<Address> expect, String note) {
+        this(id, set, subject, language, text, expect, note, null);
     }
 
     public boolean isHindi() {

@@ -19,7 +19,8 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * {@code eval/retrieval-queries.json} (TECH_PLAN §6.3) into {@link RetrievalQuery}s: a
  * {@code queries} list, each with {@code id}, {@code set}, {@code subject}, {@code language},
- * {@code text}, {@code expect} and {@code note}, every expected address naming its {@code book}.
+ * {@code text}, {@code expect} and {@code note}, every expected address naming its {@code book}, and
+ * on a held-out query an optional {@code gate} — the Week-3 gate probes (DECISIONS 2026-10-20).
  * Since D17 the file covers the whole corpus; at D15 it named one book at its root, and that key
  * is refused now rather than ignored.
  *
@@ -30,7 +31,9 @@ import tools.jackson.databind.json.JsonMapper;
 final class RetrievalQueriesReader {
 
     static final Set<String> ROOT_KEYS = Set.of("queries");
-    static final Set<String> QUERY_KEYS = Set.of("id", "set", "subject", "language", "text", "expect", "note");
+    static final Set<String> QUERY_KEYS = Set.of("id", "set", "subject", "language", "text", "expect", "note", "gate");
+    /** The gates a held-out query may probe: the Week-3 gate's book-level gaps (founder, DECISIONS 2026-10-20). */
+    static final Set<String> GATES = Set.of("week3");
     static final Set<String> ADDRESS_KEYS = Set.of("book", "chapter", "section", "para");
     static final Set<String> LANGUAGES = Set.of("en", "hi", "hinglish");
 
@@ -74,8 +77,13 @@ final class RetrievalQueriesReader {
                 throw new InputFormatException(file, 0,
                         where + " has language '" + language + "', not one of " + LANGUAGES);
             }
+            String gate = node.path("gate").asString(null);
+            if (gate != null && (querySet != RetrievalQuery.QuerySet.heldout || !GATES.contains(gate))) {
+                throw new InputFormatException(file, 0, where + " has gate '" + gate + "': a gate probe is a "
+                        + "held-out query, and the gates are " + GATES + " (DECISIONS 2026-10-20)");
+            }
             read.add(new RetrievalQuery(id, querySet, bookSubject, language, text(file, node, "text", where),
-                    addresses(file, node, id), node.path("note").asString(null)));
+                    addresses(file, node, id), node.path("note").asString(null), gate));
         }
         return read;
     }

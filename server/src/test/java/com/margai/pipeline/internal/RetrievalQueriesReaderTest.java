@@ -71,7 +71,7 @@ class RetrievalQueriesReaderTest {
     @Test
     void theHeldOutSetIsTheFoundersFour() {
         List<RetrievalQuery> heldOut = RetrievalQueriesReader.read(COMMITTED).stream()
-                .filter(query -> query.set() == RetrievalQuery.QuerySet.heldout).toList();
+                .filter(query -> query.set() == RetrievalQuery.QuerySet.heldout && query.gate() == null).toList();
 
         assertThat(heldOut).hasSize(RetrievalRun.HELD_OUT_SIZE);
         assertThat(heldOut).extracting(RetrievalQuery::subject)
@@ -186,6 +186,35 @@ class RetrievalQueriesReaderTest {
         assertThatThrownBy(() -> RetrievalQueriesReader.read(file))
                 .isInstanceOf(InputFormatException.class)
                 .hasMessageContaining("language 'fr'");
+    }
+
+    /** The six Week-3 gate probes: one per book-level gap of D17's run of record (founder, DECISIONS 2026-10-20). */
+    @Test
+    void theWeek3ProbesCoverTheSixBookLevelGaps() {
+        List<RetrievalQuery> probes = RetrievalQueriesReader.read(COMMITTED).stream()
+                .filter(query -> "week3".equals(query.gate())).toList();
+
+        assertThat(probes).allMatch(query -> query.set() == RetrievalQuery.QuerySet.heldout);
+        assertThat(probes).extracting(query -> query.expect().getFirst().book() + " " + query.language())
+                .containsExactlyInAnyOrder("phy12-part1 hi", "phy11-part2 en", "chem11-part2 en", "chem11-part2 hi",
+                        "chem12-part1 hi", "chem12-part2 hi");
+        assertThat(probes).allSatisfy(query -> assertThat(query.note()).startsWith("Week-3 gate probe"));
+    }
+
+    /** A gate probe is a held-out query naming a known gate (DECISIONS 2026-10-20). */
+    @Test
+    void readsAGateProbeAndRefusesOneOutsideTheHeldOutSetOrNamingNoKnownGate() throws IOException {
+        String probe = """
+                {"queries": [{"id": "h9", "set": "%s", "subject": "physics", "language": "en", "text": "why",
+                  "expect": [{"book": "phy11-part1", "chapter": 1, "section": "1.1", "para": 1}], "note": "n",
+                  "gate": "%s"}]}""";
+
+        assertThat(RetrievalQueriesReader.read(write(probe.formatted("heldout", "week3"))))
+                .singleElement().extracting(RetrievalQuery::gate).isEqualTo("week3");
+        assertThatThrownBy(() -> RetrievalQueriesReader.read(write(probe.formatted("acceptance", "week3"))))
+                .isInstanceOf(InputFormatException.class).hasMessageContaining("gate 'week3'");
+        assertThatThrownBy(() -> RetrievalQueriesReader.read(write(probe.formatted("heldout", "week9"))))
+                .isInstanceOf(InputFormatException.class).hasMessageContaining("gate 'week9'");
     }
 
     @Test

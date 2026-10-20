@@ -791,7 +791,8 @@ java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,liv
 
 Reads `eval/retrieval-queries.json` (`--queries` for another file). Each query names its **set** —
 `acceptance` (D17's ✅), `baseline` (D15's fifteen), `diagnostic` (scored, deciding nothing) or `heldout`
-(the founder's four, added after the first run; part of D17's tick with fusion on, DECISIONS 2026-10-19) — its
+(the founder's four, added after the first run; part of D17's tick with fusion on, DECISIONS 2026-10-19 — and
+the six Week-3 gate probes the set also carries, marked `"gate": "week3"`, never counted by the tick) — its
 **subject**, its **language** (`en`, `hi` or `hinglish`) and, on every expected address, its **book**:
 chapter numbers repeat across books, so an address without one would count the wrong book's paragraph as
 right. Each query is filtered to its subject, as the doubt pipeline filters (Biology is one subject:
@@ -819,6 +820,13 @@ English acceptance queries are rewritten too, scored apart from the bar (the fou
 set plus at least 3 of the founder's 4 held-out queries — with the same checks unfused beside it, then each set
 unfused against fused, every search version the model wrote, and the fused run's misses with their search
 versions. The rewrite calls are ledgered as `eval`.
+
+**`--gate week3` (D18, DECISIONS 2026-10-20).** Runs only the held-out queries marked `"gate": "week3"` — the
+Week-3 gate's probes, one per book-level gap of D17's run of record — fused as `--rewrite` fuses, and nothing
+else: D17's sets and bar are not run, so the gate's run of record stays their only measurement. The report
+(`…-ncert-retrieve-gate.md`) lists each probe with the books its key is in, its unfused and fused ranks and its
+grounding, then the hand-check, and every passage a missed probe returned. D17's held-out line never counts the
+probes, in any run.
 
 ## If something goes wrong
 

@@ -206,6 +206,25 @@ class RetrievalRunTest {
         return report.render(ReportTest.CLOCK.nowIst());
     }
 
+    /** D17's held-out line counts the founder's four; the gate probes the set also carries are not among them. */
+    @Test
+    void theHeldOutLineCountsTheFoundersQueriesNotTheGateProbes() {
+        List<RetrievalRun.Result> results = new java.util.ArrayList<>();
+        for (int index = 0; index < 4; index++) {
+            results.add(new RetrievalRun.Result(new RetrievalQuery("h" + index, RetrievalQuery.QuerySet.heldout,
+                    BookSubject.physics, "hi", "why", List.of(address(1, "1.1", 1)), "n"),
+                    new RetrievedPassages(List.of(), false, true), index < 3 ? 1 : 0));
+        }
+        results.add(new RetrievalRun.Result(new RetrievalQuery("p1", RetrievalQuery.QuerySet.heldout,
+                BookSubject.physics, "en", "why", List.of(address(1, "1.1", 1)), "n", "week3"),
+                new RetrievedPassages(List.of(), false, true), 0));
+
+        RetrievalRun.Check line = RetrievalRun.heldOut(RetrievalRun.foundersHeldOut(results));
+
+        assertThat(line.got()).isEqualTo("3 of 4");
+        assertThat(line.met()).isTrue();
+    }
+
     private static RetrievalRun.Result result(RetrievalQuery query, ParagraphMatch... found) {
         List<RetrievedPassages.Passage> passages = new java.util.ArrayList<>();
         for (int index = 0; index < found.length; index++) {

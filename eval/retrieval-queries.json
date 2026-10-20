@@ -418,6 +418,79 @@
       "text": "DNA replication me ek strand continuous aur dusra okazaki fragments me kyu banta hai",
       "expect": [{ "book": "bio12", "chapter": 5, "section": "5.4.2", "para": 2 }],
       "note": "Held out by the founder, used as written: 'okazaki' is coaching vocabulary the rows never print, kept on purpose so the rewrite must bridge it (founder, 2026-10-19). §5.4.2 ¶2: polymerase works only 5'->3', so replication is continuous on one template and discontinuous on the other, the fragments joined by DNA ligase."
+    },
+    {
+      "id": "h05-lenz-opposition-hi",
+      "set": "heldout",
+      "subject": "physics",
+      "language": "hi",
+      "text": "प्रेरित धारा हमेशा उसी परिवर्तन का विरोध क्यों करती है जिससे वह पैदा होती है?",
+      "expect": [
+        { "book": "phy12-part1", "chapter": 6, "section": "6.5", "para": 5 },
+        { "book": "phy12-part1", "chapter": 6, "section": "6.5", "para": 6 }
+      ],
+      "gate": "week3",
+      "note": "Week-3 gate probe (founder, DECISIONS 2026-10-20): phy12-part1 in Hindi, whose only Hindi query in D17's run of record was h03, the known miss. Written by Claude from the rows, keys read before any run. §6.5 ¶5-¶6 are the 'why': the energy-conservation argument for Lenz's law (a current the other way would accelerate the magnet for nothing, a perpetual-motion machine) and where the work goes; ¶2 states the law and ¶3 shows it in an experiment, left out on the founder's strict reading of 'kyu' for a01."
+    },
+    {
+      "id": "h06-capillary-rise",
+      "set": "heldout",
+      "subject": "physics",
+      "language": "en",
+      "text": "why does water climb up a very thin glass tube on its own even though gravity pulls it down",
+      "expect": [
+        { "book": "phy11-part2", "chapter": 9, "section": "9.6.5", "para": 1 },
+        { "book": "phy11-part2", "chapter": 9, "section": "9.6.5", "para": 2 },
+        { "book": "phy11-part2", "chapter": 9, "section": "9.6.5", "para": 3 }
+      ],
+      "gate": "week3",
+      "note": "Week-3 gate probe (founder, DECISIONS 2026-10-20): phy11-part2 in English, which had no English query in D17's run of record. Written by Claude from the rows, keys read before any run. §9.6.5 ¶1-¶3: the pressure difference across the curved meniscus, the pressure under it below atmospheric, and 'the capillary rise is due to surface tension'."
+    },
+    {
+      "id": "h07-ethyne-acidic",
+      "set": "heldout",
+      "subject": "chemistry",
+      "language": "en",
+      "text": "why is ethyne acidic when ethene and ethane are not",
+      "expect": [{ "book": "chem11-part2", "chapter": 9, "section": "9.4.4", "para": 3 }],
+      "gate": "week3",
+      "note": "Week-3 gate probe (founder, DECISIONS 2026-10-20): chem11-part2 in English, which had no English query in D17's run of record. Written by Claude from the rows, keys read before any run. §9.4.4 ¶3: the sp carbon's 50% s character makes it the most electronegative, so ethyne's hydrogens leave as protons more easily than ethene's or ethane's."
+    },
+    {
+      "id": "h08-redox-electron-transfer-hi",
+      "set": "heldout",
+      "subject": "chemistry",
+      "language": "hi",
+      "text": "ऑक्सीकरण और अपचयन को इलेक्ट्रॉन के लेन-देन से कैसे समझाया जाता है?",
+      "expect": [
+        { "book": "chem11-part2", "chapter": 7, "section": "7.2", "para": 2 },
+        { "book": "chem11-part2", "chapter": 7, "section": "7.2", "para": 3 }
+      ],
+      "gate": "week3",
+      "note": "Week-3 gate probe (founder, DECISIONS 2026-10-20): Devanagari Hindi reaching chem11-part2's English rows, which no Hindi query reached in D17's run of record. Written by Claude from the rows, keys read before any run. §7.2 ¶2-¶3: the reaction split into a half reaction losing electrons and one gaining them; oxidation is the loss of electrons, reduction the gain."
+    },
+    {
+      "id": "h09-transition-metal-colour-hi",
+      "set": "heldout",
+      "subject": "chemistry",
+      "language": "hi",
+      "text": "संक्रमण धातुओं के आयन रंगीन क्यों होते हैं?",
+      "expect": [
+        { "book": "chem12-part1", "chapter": 4, "section": "4.3.10", "para": 1 },
+        { "book": "chem12-part1", "chapter": 5, "section": "5.5.5", "para": 2 }
+      ],
+      "gate": "week3",
+      "note": "Week-3 gate probe (founder, DECISIONS 2026-10-20): Devanagari Hindi reaching chem12-part1's English rows, which no Hindi query reached in D17's run of record. Written by Claude from the rows, keys read before any run. §4.3.10 ¶1: an electron excited from a lower to a higher d orbital absorbs visible light, and the colour seen is its complement; §5.5.5 ¶2 explains the same by crystal field theory."
+    },
+    {
+      "id": "h10-egg-white-boiling-hi",
+      "set": "heldout",
+      "subject": "chemistry",
+      "language": "hi",
+      "text": "उबालने पर अंडे का सफ़ेद भाग जम क्यों जाता है?",
+      "expect": [{ "book": "chem12-part2", "chapter": 10, "section": "10.2.4", "para": 1 }],
+      "gate": "week3",
+      "note": "Week-3 gate probe (founder, DECISIONS 2026-10-20): Devanagari Hindi reaching chem12-part2's English rows, which no Hindi query reached in D17's run of record. Written by Claude from the rows, keys read before any run. §10.2.4 ¶1: heat disturbs the hydrogen bonds, the protein unfolds and loses its activity — denaturation — 'the coagulation of egg white on boiling' its example."
     }
   ]
 }

@@ -223,10 +223,15 @@ final class RetrievalRun {
             report.section("diagnostic queries — scored, deciding nothing")
                     .table(SCORE_HEADER, breakdown(diagnostic));
         }
-        List<Result> heldOut = inSet(filtered, RetrievalQuery.QuerySet.heldout);
+        List<Result> heldOut = foundersHeldOut(filtered);
         if (!heldOut.isEmpty()) {
             report.section("held-out queries, unfused (D17's tick reads them fused: ncert retrieve --rewrite)")
                     .table(SCORE_HEADER, breakdown(heldOut));
+        }
+        List<Result> probes = gateProbes(filtered);
+        if (!probes.isEmpty()) {
+            report.section("the gate probes, unfused (the gate reads them fused: ncert retrieve --gate)")
+                    .table(SCORE_HEADER, breakdown(probes));
         }
 
         report.section("which half of the hybrid actually fired (every filtered query)")
@@ -288,6 +293,20 @@ final class RetrievalRun {
         return results;
     }
 
+    /**
+     * The held-out queries D17's line counts: the founder's four, not the Week-3 gate probes the held-out
+     * set also carries (DECISIONS 2026-10-20).
+     */
+    static List<Result> foundersHeldOut(List<Result> results) {
+        return inSet(results, RetrievalQuery.QuerySet.heldout).stream()
+                .filter(result -> result.query().gate() == null).toList();
+    }
+
+    /** The held-out queries that probe a gate rather than D17's tick (DECISIONS 2026-10-20). */
+    private static List<Result> gateProbes(List<Result> results) {
+        return results.stream().filter(result -> result.query().gate() != null).toList();
+    }
+
     /** The held-out line: a set that is not the founder's four cannot meet it, however it scores. */
     static Check heldOut(List<Result> heldOut) {
         long in = heldOut.stream().filter(Result::inAnswerSet).count();
@@ -310,7 +329,7 @@ final class RetrievalRun {
             List<Result> unfiltered, Map<String, String> searchVersions, Report report,
             Function<RetrievalQuery.Address, String> expectedText) {
         List<Check> tick = new ArrayList<>(bar(inSet(fused, RetrievalQuery.QuerySet.acceptance)));
-        tick.add(heldOut(inSet(fused, RetrievalQuery.QuerySet.heldout)));
+        tick.add(heldOut(foundersHeldOut(fused)));
         boolean met = tick.stream().allMatch(Check::met);
         report.section("D17's tick, fused (founder, DECISIONS 2026-10-19) — " + (met ? "MET" : "NOT MET"))
                 .line("the bar on the acceptance set and the held-out line, each non-English query retrieved with "
@@ -318,19 +337,28 @@ final class RetrievalRun {
                         + "beside this report before the ✅ is judged")
                 .table(List.of("check", "needed", "got", "met"), rows(tick));
         List<Check> unfusedTick = new ArrayList<>(bar(inSet(unfused, RetrievalQuery.QuerySet.acceptance)));
-        unfusedTick.add(heldOut(inSet(unfused, RetrievalQuery.QuerySet.heldout)));
+        unfusedTick.add(heldOut(foundersHeldOut(unfused)));
         report.section("the same checks, unfused (for comparison)")
                 .table(List.of("check", "needed", "got", "met"), rows(unfusedTick));
 
         for (RetrievalQuery.QuerySet set : RetrievalQuery.QuerySet.values()) {
-            List<Result> setUnfused = inSet(unfused, set);
+            // The held-out set is the founder's four here; the gate probes it also carries get their own table.
+            Function<List<Result>, List<Result>> of = set == RetrievalQuery.QuerySet.heldout
+                    ? RetrievalRun::foundersHeldOut : results -> inSet(results, set);
+            List<Result> setUnfused = of.apply(unfused);
             if (setUnfused.isEmpty()) {
                 continue;
             }
             report.section(set + " — unfused against fused")
                     .table(List.of("mode", "set", "queries", "in the answer set", "hit@1", "hit@3", "MRR"),
                             Stream.concat(labelled("unfused", breakdown(setUnfused)),
-                                    labelled("fused", breakdown(inSet(fused, set)))).toList());
+                                    labelled("fused", breakdown(of.apply(fused)))).toList());
+        }
+        if (!gateProbes(unfused).isEmpty()) {
+            report.section("the gate probes — unfused against fused (the gate reads them alone: ncert retrieve --gate)")
+                    .table(List.of("mode", "set", "queries", "in the answer set", "hit@1", "hit@3", "MRR"),
+                            Stream.concat(labelled("unfused", breakdown(gateProbes(unfused))),
+                                    labelled("fused", breakdown(gateProbes(fused)))).toList());
         }
         if (!englishRewritten.isEmpty()) {
             List<String> ids = englishRewritten.stream().map(result -> result.query().id()).toList();
@@ -369,10 +397,62 @@ final class RetrievalRun {
                         groundedOf(unfused, result.query().id()), result.retrieved().groundedVia().name(),
                         result.query().expect().toString())).toList());
 
-        // The founder's hand-check (DECISIONS 2026-10-19): for every query only its search version grounded,
-        // does the top passage answer the original question? Printed whole, for the verdict to be read from.
         // Every fused retrieval: the bar's, and the English acceptance queries rewritten for the diagnostic.
-        List<Result> viaSearchVersion = Stream.concat(fused.stream(), englishRewritten.stream())
+        handCheck(Stream.concat(fused.stream(), englishRewritten.stream()).toList(), searchVersions, report);
+        misses(fused, searchVersions, report, expectedText, false);
+
+        report.section("top 3 passages per query, fused");
+        for (Result result : fused) {
+            report.line("");
+            report.line("**" + result.query().id() + "** (" + result.query().language() + ") — " + result.query().text());
+            topThree(result, report);
+        }
+    }
+
+    /**
+     * The Week-3 gate probes' report (D18; the founder's ruling, DECISIONS 2026-10-20): the gate is read
+     * book by book, each probe covering one book-level gap in D17's run of record, so each probe is listed
+     * with the books its key is in; a probe in the answer set closes its gap, and a miss stops for the
+     * founder's ruling. Read fused — a non-English probe with its English search version, never the rewrite
+     * alone; an English probe on its own text — with the unfused rank beside it. A miss lists its whole fused
+     * result, not the top three, so the paragraphs that ranked above the key are on the page.
+     */
+    static void reportGate(String gate, List<Result> unfused, List<Result> fused, Map<String, String> searchVersions,
+            Report report, Function<RetrievalQuery.Address, String> expectedText) {
+        long in = count(fused, Result::inAnswerSet);
+        report.section("the Week-3 gate probes (gate " + gate + ") — " + in + " of " + fused.size()
+                        + " in the answer set" + (in == fused.size() ? "" : "; a miss stops for the founder's ruling"))
+                .line("each probe read fused — a non-English probe retrieved with its English search version and "
+                        + "fused, never the rewrite alone; an English probe on its own text — the unfused rank beside it")
+                .table(List.of("id", "books", "subject", "lang", "rank unfused", "rank fused", "grounded via, unfused",
+                                "grounded via, fused", "in the answer set"),
+                        fused.stream().map(result -> List.of(result.query().id(), books(result.query()),
+                                result.query().subject().name(), result.query().language(),
+                                rankOf(unfused, result.query().id()), rank(result),
+                                groundedOf(unfused, result.query().id()), result.retrieved().groundedVia().name(),
+                                result.inAnswerSet() ? "yes" : "NO")).toList());
+        report.section("the search versions the model wrote")
+                .table(List.of("id", "lang", "query", "search version"), searchVersions.entrySet().stream()
+                        .map(entry -> {
+                            RetrievalQuery query = queryOf(unfused, entry.getKey());
+                            return List.of(entry.getKey(), query.language(), query.text(), entry.getValue());
+                        }).toList());
+        handCheck(fused, searchVersions, report);
+        misses(fused, searchVersions, report, expectedText, true);
+        report.section("top 3 passages per probe, fused");
+        for (Result result : fused) {
+            report.line("");
+            report.line("**" + result.query().id() + "** (" + result.query().language() + ") — " + result.query().text());
+            topThree(result, report);
+        }
+    }
+
+    /**
+     * The founder's hand-check (DECISIONS 2026-10-19): for every retrieval only its search version grounded,
+     * does the top passage answer the original question? Printed whole, for the verdict to be read from.
+     */
+    private static void handCheck(List<Result> fusedRetrievals, Map<String, String> searchVersions, Report report) {
+        List<Result> viaSearchVersion = fusedRetrievals.stream()
                 .filter(result -> result.retrieved().groundedVia() == RetrievedPassages.GroundedVia.search_version)
                 .toList();
         report.section("grounded only through the search version — the top passage in full, for the hand-check ("
@@ -395,7 +475,11 @@ final class RetrievalRun {
             report.line("  top passage: " + top.paragraph().address() + (isExpected(result.query(), top) ? " ✅" : "")
                     + " · " + text);
         }
+    }
 
+    /** Each fused miss beside the text it was expected to reach; with {@code everyPassage}, all it returned. */
+    private static void misses(List<Result> fused, Map<String, String> searchVersions, Report report,
+            Function<RetrievalQuery.Address, String> expectedText, boolean everyPassage) {
         List<Result> misses = fused.stream().filter(result -> !result.inAnswerSet()).toList();
         report.section("misses, fused — what was expected, and what came back (" + misses.size() + ")");
         if (misses.isEmpty()) {
@@ -413,16 +497,19 @@ final class RetrievalRun {
                 String text = expectedText.apply(address);
                 report.line("  - expected " + address + " · " + (text == null ? "NO ROW AT THIS ADDRESS" : excerpt(text)));
             }
-            report.line("  came back:");
-            topThree(miss, report);
+            report.line(everyPassage ? "  came back, every passage:" : "  came back:");
+            if (everyPassage) {
+                passages(miss, miss.retrieved().passages().size(), report);
+            } else {
+                topThree(miss, report);
+            }
         }
+    }
 
-        report.section("top 3 passages per query, fused");
-        for (Result result : fused) {
-            report.line("");
-            report.line("**" + result.query().id() + "** (" + result.query().language() + ") — " + result.query().text());
-            topThree(result, report);
-        }
+    /** The books a query's key is in, for the gate's book-by-book reading. */
+    private static String books(RetrievalQuery query) {
+        return query.expect().stream().map(RetrievalQuery.Address::book).distinct()
+                .collect(java.util.stream.Collectors.joining(", "));
     }
 
     private static List<List<String>> rows(List<Check> checks) {
@@ -492,7 +579,12 @@ final class RetrievalRun {
 
     /** A query's first three passages, the expected one marked; or why there are none. */
     private static void topThree(Result result, Report report) {
-        List<RetrievedPassages.Passage> top = result.retrieved().passages().stream().limit(3).toList();
+        passages(result, 3, report);
+    }
+
+    /** The first {@code limit} passages a retrieval returned, in rank order, the expected ones marked. */
+    private static void passages(Result result, int limit, Report report) {
+        List<RetrievedPassages.Passage> top = result.retrieved().passages().stream().limit(limit).toList();
         if (top.isEmpty()) {
             report.line("  - nothing above the similarity floor");
             return;

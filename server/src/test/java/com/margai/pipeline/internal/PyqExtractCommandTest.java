@@ -92,7 +92,8 @@ class PyqExtractCommandTest {
         assertThat(second.extraction().model()).isEqualTo("claude-opus-5-5");
         assertThat(second.extraction().promptVersion()).isEqualTo("pyq_extract.v1");
         assertThat(draft.questions()).allSatisfy(question -> assertThat(question.answer()).isNull());
-        assertThat(out.toString()).contains("| physics | — | 2 | 2 | 0 |").contains("| chemistry | — | 2 | 2 | 0 |")
+        assertThat(out.toString()).contains("- read: 1 paper(s) in the register")
+                .contains("| physics | — | 2 | 2 | 0 |").contains("| chemistry | — | 2 | 2 | 0 |")
                 .contains("4.41").contains("answers empty until NTA's key is filled in at review");
     }
 

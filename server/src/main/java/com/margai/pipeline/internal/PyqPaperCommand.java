@@ -29,6 +29,7 @@ abstract class PyqPaperCommand extends InputFileCommand {
     @Override
     final void run(Path inputFile, Report report) {
         List<PaperDefinition> papers = PyqPapersYamlReader.read(inputFile);
+        report.read(papers.size() + " paper(s) in the register");
         PaperDefinition paper = papers.stream().filter(candidate -> candidate.code().equals(paperCode)).findFirst()
                 .orElseThrow(() -> new InputFormatException(inputFile, 0, "has no paper '" + paperCode + "' — it registers "
                         + papers.stream().map(PaperDefinition::code).toList()));

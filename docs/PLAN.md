@@ -185,7 +185,18 @@ tools; your reviews focus on output quality.)*
   revisits the Hindi vector column on what it shows (h03 is the known miss); (c) compares fused and unfused
   retrieval on English questions, and if fusion lowers any English result the English search-version flag
   goes off; (d) evaluates `query_rewrite` v2's drift guard (no topic the question does not contain) on this
-  eval set, not on D17's queries.*
+  eval set, not on D17's queries.* *Amended 2026-10-20 (founder's T0 ruling; DECISIONS 2026-10-20): the
+  eval also (e) measures drift in the search version — its length, the rate of added topics, and book
+  names in it (Haiku 5.5 drifts more than 4.5: a mean of 21.4 words against 12.6); (f) says how it handles
+  run-to-run variance, the 5.5 models running only at temperature 1 — the founder's default is two runs per
+  set, judged on the worse run, both reported; Claude's proposal, for the founder's approval at D23's plan:
+  every eval set runs twice on the same build, each bar line and each regression check (a query leaving
+  the answer set, a failing bar line — the clarified rule) is judged on the worse of the two runs, line by
+  line — which differs from judging the whole worse run: a line fails if it fails on either run — both runs'
+  reports are committed, a line that holds on one run and fails on the other is named unstable in the
+  report, and no third run breaks a tie; (g) reviews the shared `_protocol` fragments against 5.5 behaviour
+  once eval fixtures exist, any change judged on this set. Every new prompt from here on is written for
+  the 5.5 models.*
 - **D24 —** Buffer + **Week-4 gate:** solved, tagged, anchored PYQ bank + eval suite
   running in CI. In the buffer (CS-1 §4, §7, §9.3; added 2026-09-12): `collective from-pyq`
   misconception drafts from the distractor maps; `collective from-inputs` over the F11
@@ -263,7 +274,11 @@ tools; your reviews focus on output quality.)*
   retrieval grounding. Write the `doubt_answer` prefix with comfortable margin over the
   cheap tier's 4,096-token cache floor, and treat prompt length as a per-model cost
   variable — the two tiers tokenize the same prefix ~50% apart (`.claude/rules/ai-layer.md`;
-  measured 2026-09-12). ✅ *10 typed doubts answered with correct anchors.*
+  measured 2026-09-12). ✅ *10 typed doubts answered with correct anchors.* *Amended 2026-10-20
+  (founder's T0 ruling, point 7; the sizing correction is Claude's check under point 4, for the founder to
+  overrule; DECISIONS 2026-10-20): `doubt_answer` is written for the 5.5
+  models; the cheap tier's cache floor is 512 tokens on Haiku 5.5 (TECH_PLAN §4.11), not 4,096, and the
+  ~50% figure compared Haiku 4.5 with Sonnet 5, so both lines above describe the old tiers.*
 - **D38 —** Photo path: capture UI + vision extraction → same pipeline. ✅ *10 photographed
   printed questions extracted faithfully.* *Added 2026-10-01 (CS-3 §3.1–§3.2): the offline doubt
   queue (captured with no connection, sent automatically later, metered at send) and photo

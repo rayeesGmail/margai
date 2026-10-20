@@ -1579,7 +1579,18 @@ unchanged; the batch lane, the request shape and the region paragraph do not.*
   profiles still pin VISION per run, and `ncert extract`'s guard refuses it as it refused Haiku 4.5. Haiku
   5.5 reads images at a higher resolution tier — about 2.5× Haiku 4.5's image tokens for a 2,000×1,500
   image (Anthropic's Haiku 5.5 migration guide) — at a tenth of the price per token under 100K-token
-  prompts (Anthropic's pricing documentation), both read through web search.*
+  prompts (Anthropic's pricing documentation), both read through web search.* *Amended after T0's run
+  (founder's ruling; the token-count finding and the D37–D39 measurement are Claude's, for the founder to
+  overrule; DECISIONS 2026-10-20):* the 5.5 models stay. **Latency:** Sonnet 5.5 answered the REASON smoke in
+  4.9 s (Sonnet 5: 1.8 s), a 71-token answer, accepted inside the 20 s call budget, and noted for every
+  interactive REASON path: the REASON doubt — its answer and the independent numerical re-solve, two sequential
+  REASON calls against a p95 of 25 s — and the REASON verification of a CHEAP-routed option doubt (§4.3 stage 8),
+  one Sonnet 5.5 call inside the fresh CHEAP doubt's p95 of 8 s, the tighter budget (§10, DEV_SPEC §9); D37–D39
+  measure both with the real prompts and outputs. **Temperature:** the 5.5 models run only at temperature 1, so
+  runs repeat with variance; D23's eval handles it (PLAN D23). **Token counts:** no configuration value was sized
+  on Haiku 4.5's counts beyond the cache minimum T0 moved; PLAN D37's prompt-sizing guidance was, and carries a
+  note; the tripwire's estimate, 4% high on Haiku 4.5 above, runs low on Haiku 5.5 and warns sooner; the "+50%"
+  above compared Haiku 4.5 with Sonnet 5 (DECISIONS 2026-10-20).
 - **Batch inference**: *amended 2026-09-12.* The direct Batches API accepts the reasoning model, so
   the offline-reasoning lane is the same model as the real-time one — cheaper than the model the
   Bedrock allowlist had forced on it — at 50% off every token, cache reads and writes included,

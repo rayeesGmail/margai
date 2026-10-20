@@ -16,6 +16,9 @@ import com.margai.curriculum.api.ParagraphEmbedding;
 import com.margai.curriculum.api.ParagraphToEmbed;
 import com.margai.curriculum.api.PrerequisiteLoadReport;
 import com.margai.curriculum.api.PrerequisiteRow;
+import com.margai.curriculum.api.PyqLoadReport;
+import com.margai.curriculum.api.PyqPaperRow;
+import com.margai.curriculum.api.PyqQuestionRow;
 import com.margai.curriculum.api.SyllabusNodeRow;
 import com.margai.curriculum.api.TaxonomyLoadReport;
 import java.util.Collection;
@@ -47,10 +50,11 @@ class CurriculumImportService implements CurriculumImport {
     private final NcertBookImporter ncertBooks;
     private final NcertParagraphImporter ncertParagraphs;
     private final NcertEmbeddings ncertEmbeddings;
+    private final PyqImporter pyq;
 
     CurriculumImportService(TaxonomyImporter taxonomy, PrerequisiteImporter prerequisites, BackboneImporter backbone,
             CutoffImporter cutoffs, NcertBookImporter ncertBooks, NcertParagraphImporter ncertParagraphs,
-            NcertEmbeddings ncertEmbeddings) {
+            NcertEmbeddings ncertEmbeddings, PyqImporter pyq) {
         this.taxonomy = taxonomy;
         this.prerequisites = prerequisites;
         this.backbone = backbone;
@@ -58,6 +62,12 @@ class CurriculumImportService implements CurriculumImport {
         this.ncertBooks = ncertBooks;
         this.ncertParagraphs = ncertParagraphs;
         this.ncertEmbeddings = ncertEmbeddings;
+        this.pyq = pyq;
+    }
+
+    @Override
+    public PyqLoadReport loadPaper(PyqPaperRow paper, List<PyqQuestionRow> questions) {
+        return pyq.load(paper, questions);
     }
 
     @Override

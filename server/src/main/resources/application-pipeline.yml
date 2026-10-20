@@ -45,6 +45,11 @@ margai:
     # founder's ruling; the `visionopus55` profile), and `pyq extract` refuses any other VISION model.
     pyq:
       transcribe-model: claude-opus-5-5
+      # `pyq tag` runs on Claude Sonnet 5.5 (the founder's ruling) and refuses any other REASON model; ten
+      # questions a `completeBatch`, the tags flushed after each, a failed batch retried question by question.
+      tag-model: claude-sonnet-5-5
+      tag-batch-size: 10
+      tag-low-confidence: 0.70
     # `ncert embed` commits its vectors every this many paragraphs. Embedding a book is cheap
     # (~900 calls at 0.12 USD/1M tokens) but not free, and a run interrupted late should keep what
     # it paid for — the next run embeds only rows whose embedding is still null.

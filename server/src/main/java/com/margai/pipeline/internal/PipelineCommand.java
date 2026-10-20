@@ -10,7 +10,7 @@ import picocli.CommandLine.Spec;
  * prerequisites}, {@code backbone load}, {@code cutoffs load}, D14's {@code ncert register},
  * {@code ncert render}, {@code ncert extract}, {@code ncert load}, D15's {@code ncert verify}
  * and {@code ncert embed}, D16's {@code ncert align} and {@code ncert errata}, D17's
- * {@code ncert retrieve}, and D19's {@code pyq extract}. The group commands
+ * {@code ncert retrieve}, and D19's {@code pyq extract}, {@code pyq tag} and {@code pyq load}. The group commands
  * only route; calling a group without a subcommand is a usage error.
  */
 @Command(name = PipelineRunner.COMMAND_NAME, mixinStandardHelpOptions = true,
@@ -90,8 +90,8 @@ final class PipelineCommand implements Runnable {
     }
 
     @Command(name = "pyq", mixinStandardHelpOptions = true,
-            description = "The official past papers: read a booklet into its draft paper file (D19).",
-            subcommands = {PyqExtractCommand.class})
+            description = "The official past papers: read a booklet into its draft paper file, tag and load an approved one (D19).",
+            subcommands = {PyqExtractCommand.class, PyqTagCommand.class, PyqLoadCommand.class})
     static final class Pyq implements Runnable {
 
         @Spec

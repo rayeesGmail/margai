@@ -73,6 +73,9 @@ class CurriculumImportTest {
 
     @BeforeEach
     void emptyTheCurriculumTables() {
+        jdbc.update("DELETE FROM question_topics");
+        jdbc.update("DELETE FROM questions");
+        jdbc.update("DELETE FROM pyq_papers");
         jdbc.update("DELETE FROM syllabus_prerequisites");
         jdbc.update("DELETE FROM archetype_track_steps");
         jdbc.update("DELETE FROM archetype_tracks");

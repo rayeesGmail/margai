@@ -283,6 +283,16 @@ class PipelineCommandTest {
                             new com.margai.ai.api.AiClientInfo("anthropic", List.of("ledger")),
                             PyqExtractCommandTest.properties(), PyqExtractCommandTest.pyq(), writer));
                 }
+                if (cls == PyqTagCommand.class) {
+                    return cls.cast(new PyqTagCommand(new NcertRenderCommandTest.RecordingStore(),
+                            new PyqTagCommandTest.RecordingTagger(), new NcertExtractCommandTest.StubSpend(),
+                            new com.margai.ai.api.AiClientInfo("anthropic", List.of("ledger")), PyqExtractCommandTest.pyq(),
+                            writer));
+                }
+                if (cls == PyqLoadCommand.class) {
+                    return cls.cast(new PyqLoadCommand(new NcertRenderCommandTest.RecordingStore(), imports,
+                            PyqExtractCommandTest.pyq(), writer));
+                }
                 if (cls == NcertAlignCommand.class) {
                     return cls.cast(new NcertAlignCommand(imports, new NcertEmbedCommandTest.StubEmbeddings(),
                             new NcertExtractCommandTest.StubSpend(),
@@ -412,6 +422,24 @@ class PipelineCommandTest {
         public int clearEmbeddings(String bookCode, Collection<java.util.UUID> paragraphIds) {
             clearedEmbeddings.addAll(paragraphIds);
             return paragraphIds.size();
+        }
+
+        /** What {@code pyq load} handed over, and the stored rows it answers with — its file's, in order. */
+        com.margai.curriculum.api.PyqPaperRow loadedPaper;
+        List<com.margai.curriculum.api.PyqQuestionRow> loadedQuestions;
+
+        @Override
+        public com.margai.curriculum.api.PyqLoadReport loadPaper(com.margai.curriculum.api.PyqPaperRow paper,
+                List<com.margai.curriculum.api.PyqQuestionRow> questions) {
+            if (failure != null) {
+                throw failure;
+            }
+            loadedPaper = paper;
+            loadedQuestions = questions;
+            return new com.margai.curriculum.api.PyqLoadReport(true, false, questions.size(), 0, 0,
+                    questions.stream().map(question -> new com.margai.curriculum.api.PyqLoadReport.StoredQuestion(
+                            question.questionNo(), question.nodeCode(), question.secondaryNodeCodes().size(),
+                            question.outOfSyllabus(), !question.figures().isEmpty(), question.answerStatus())).toList());
         }
 
         /** What {@link #paragraphs} answers: the rows `ncert verify` reads. */

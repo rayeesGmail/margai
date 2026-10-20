@@ -143,4 +143,14 @@ public interface CurriculumImport {
      * top k. Returns the rows cleared.
      */
     int clearEmbeddings(String bookCode, Collection<UUID> paragraphIds);
+
+    /**
+     * {@code pyq load} (D19): one official paper and its tagged questions, upserted by the paper's
+     * register id and each question's natural key, its secondary topics replaced. Refused — the whole
+     * call rolled back — when the register id names another paper, a question of the paper in the bank
+     * is missing from the file, a tag does not hold against the taxonomy, or the paper's questions in
+     * the database after the write differ from the count each printed section declares (PLAN D19 ✅).
+     * Unlike the D13 loads, it keeps no orphans: a question leaves the bank only deliberately.
+     */
+    PyqLoadReport loadPaper(PyqPaperRow paper, List<PyqQuestionRow> questions);
 }

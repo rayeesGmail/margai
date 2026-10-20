@@ -15,4 +15,12 @@ import java.util.UUID;
  * @param reason        why this node, and why out of syllabus when it is
  */
 public record QuestionTagging(UUID aiCallId, String model, String promptVersion, BigDecimal confidence, String reason) {
+
+    /**
+     * The confidence without trailing zeros: JSONB hands 0.90 back as 0.9, and a {@code BigDecimal}
+     * of another scale is not equal, so a reload of the same tag would otherwise count as a change.
+     */
+    public QuestionTagging {
+        confidence = confidence == null ? null : confidence.stripTrailingZeros();
+    }
 }

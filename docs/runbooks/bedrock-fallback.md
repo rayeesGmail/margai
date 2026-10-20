@@ -29,9 +29,7 @@ whenever a primary model changes.
    context 0.50 / 2.50 / 0.625 / 0.05; Sonnet 5.5 2.00 / 10.00, 2.50, 0.10 — USD per million, batch N/A. The
    two `global.anthropic.*` rows in `margai.ai.prices-json` carry exactly these (DECISIONS 2026-10-20). Read the
    page again whenever a fallback id changes.
-2. **The task role.** The ECS task role's Bedrock statement (TECH_PLAN §7.4, amended 2026-10-01) must allow the
-   two `global.anthropic.*` profiles; the laptop smoke below proves the SSO identity, not the task role.
-3. **The smoke** — one call per runtime tier, CHEAP and REASON (founder ruling, DECISIONS 2026-10-20), on the
+2. **The smoke** — one call per runtime tier, CHEAP and REASON (founder ruling, DECISIONS 2026-10-20), on the
    founder's laptop with Docker running (the smoke's ledger is a Testcontainers database):
 
    ```
@@ -43,6 +41,31 @@ whenever a primary model changes.
    It passes when the inner client is `bedrock (fallback)` and each tier writes one `ok` row on its fallback id,
    with tokens, a cached prefix and a cost. A stale `AWS_BEARER_TOKEN_BEDROCK` in the shell shadows the SSO
    profile for Bedrock and survives a refresh — hence the `unset`.
+
+   **First run, 2026-10-20: refused.** Bedrock answered both calls with 403 `AccessDeniedException:
+   anthropic.claude-haiku-5-5 is not available for this account … contact AWS Sales` (and the same for Sonnet 5.5).
+   It is not IAM: an IAM denial names the caller and the `bedrock:InvokeModel` action. The founder then ran the
+   availability check, a free control-plane call, on Haiku 5.5 (Sonnet 5.5 is unchecked):
+
+   ```
+   aws bedrock get-foundation-model-availability --model-id anthropic.claude-haiku-5-5 --region ap-south-1 --profile margai
+   ```
+
+   It read `authorizationStatus` AUTHORIZED, `entitlementAvailability` AVAILABLE and `regionAvailability` AVAILABLE,
+   but `agreementAvailability` NOT_AVAILABLE: no agreement is in place for the model. Claude's inference, drawn from
+   that status and the Marketplace block of 2026-09-08 (DECISIONS 2026-09-12: the payment instrument refused,
+   clearing it needs invoicing against a registered entity), for AWS Support to confirm: the missing agreement — the
+   AWS Marketplace terms Anthropic models are sold under — is what returns the 403, and that block is its root.
+   Before rerunning the smoke, run the check for both `anthropic.claude-haiku-5-5` and `anthropic.claude-sonnet-5-5`;
+   the smoke cannot pass while either reads NOT_AVAILABLE (TRACKER, D18 day log).
+
+Readiness is the smoke (PLAN D18, TECH_PLAN §15.12).
+
+## Before a deployed switch
+
+**The task role (carried to F8).** The ECS task role's Bedrock statement (TECH_PLAN §7.4, amended 2026-10-01) must
+allow the two `global.anthropic.*` profiles. F8 creates the task role. The laptop smoke above proves the SSO
+identity, not the task role.
 
 ## Switching (an Anthropic outage)
 

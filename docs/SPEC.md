@@ -500,7 +500,7 @@ demoralizing, never irrelevant — and never beyond real NEET patterns: “skipp
 exotic stuff — NTA has never asked it”); session summary with accuracy, speed vs
 your norm, and what went to the notebook. Works offline for the current day's blocks —
 their questions arrive with the prefetched plan (§6.1) — and results sync later. Question
-sources: 15+ years of PYQs with verified solutions + NCERT-style generated questions
+sources: NEET 2019–2026 PYQs with verified solutions + NCERT-style generated questions
 (verified), tagged to the syllabus.
 
 **Timing and skip-strategy drills (CS-4 §5.2):** short drills that train exam temperament —
@@ -895,8 +895,8 @@ Product-level description of the assets behind the features (Claude Code designs
 they're built and stored):
 
 1. **Syllabus map** — official NEET syllabus as a structured tree with prerequisite
-   links between chapters; each node carries real-exam weightage computed from 15+
-   years of NTA papers, and default learn-times that recalibrate from real student data.
+   links between chapters; each node carries real-exam weightage computed from NEET
+   2019–2026 NTA papers, and default learn-times that recalibrate from real student data.
 2. **NCERT layer** — the ~12 NEET-relevant NCERT books (EN + HI), addressable down to
    the paragraph, powering every answer's “NCERT anchor.” Hindi text for the four
    Chemistry books may follow public launch and gates Hindi-medium marketing; until then,

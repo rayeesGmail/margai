@@ -48,6 +48,10 @@ pipeline/data/
 ncert/**/*.pdf
 pyq/**/*.pdf
 syllabus/*.pdf
+# The founder's official PYQ pack (D19, F18): README.md (the founder's rulings) and MANIFEST.csv are
+# tracked; the booklets and keys go to `source/neet-pyq-sources/…`, and reference-only-do-not-load/
+# stays on this machine — the pipeline never reads it (DECISIONS 2026-10-20).
+neet-pyq-sources/**/*.pdf
 
 # Founder-collected public-discourse excerpts for the collective intelligence layer (CS-1 §3, F11):
 # third-party text never enters the repo; manifest.md and sources.csv beside them are tracked

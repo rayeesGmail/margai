@@ -288,7 +288,7 @@ tools; your reviews focus on output quality.)*
   2026-09-12). ✅ *Diagnostic shifts a seeded user's plan.* *Added 2026-10-01 (CS-2 §4.7, CS-4 §6):
   full NEET 2018–2026 past papers as timed mocks (`kind = mock`, TECH_PLAN §0.5 item 2), out-of-syllabus
   questions excluded from the score; every mock result captured for the later private percentile.
-  *Noted 2026-10-20 (D19): the bank holds 2019–2026, and 2018 only if a fitting key turns up (README §6); SPEC
+  *Noted 2026-10-20 (D19): the bank's span is NEET 2019–2026, 2018 only if a fitting key turns up (README §6); SPEC
   §7.1's "2018–2026" is put to the founder; and a mock refuses a paper whose marking is not yet sourced (Claude's
   reading of the founder's gap-4 rider, for the founder to overrule; DECISIONS 2026-10-20).*
   ✅ adds: at least one full past paper runs end to end as a timed mock (CS-2 §10).*

@@ -272,6 +272,11 @@ class PipelineCommandTest {
                             new com.margai.ai.api.AiClientInfo("cohere", List.of("ledger")),
                             new PipelineProperties(72, 10, 1, "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5", 100, 0, 40), writer));
                 }
+                if (cls == NcertRetrieveCommand.class) {
+                    return cls.cast(new NcertRetrieveCommand(imports, NcertEmbedCommandTest.noRetriever(),
+                            new NcertRetrieveCommandTest.StubRewriter(), new NcertExtractCommandTest.StubSpend(),
+                            new com.margai.ai.api.AiClientInfo("cohere", List.of("ledger")), writer));
+                }
                 if (cls == NcertAlignCommand.class) {
                     return cls.cast(new NcertAlignCommand(imports, new NcertEmbedCommandTest.StubEmbeddings(),
                             new NcertExtractCommandTest.StubSpend(),

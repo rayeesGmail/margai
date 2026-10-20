@@ -68,6 +68,11 @@ class NcertLoadCommand extends NcertBookCommand {
                     + "instead of the content store.")
     Path extraction;
 
+    @Option(names = "--migrate", paramLabel = "REASON",
+            description = "Let this load change a frozen (embedded) book's corpus — add or delete a row, or rewrite or "
+                    + "remove a row's English — as a corpus event; REASON goes in the report. Then run ncert embed.")
+    String migrate;
+
     @Option(names = "--pairs", paramLabel = "FILE",
             description = "With --dry-run: write each address's English and Hindi text to this local JSONL, to read "
                     + "the pairs the load would leave.")
@@ -197,6 +202,7 @@ class NcertLoadCommand extends NcertBookCommand {
                 .list(dimensioned.notes());
         report.section("figure_refs that are not figure or table labels — dropped")
                 .list(numbered.droppedRefs());
+        guardFrozenCorpus(definition, chapters, rows, report);
         NcertLoadReport result = dryRun ? imports.previewParagraphs(definition.code(), language, rows)
                 : imports.loadParagraphs(definition.code(), language, rows);
 
@@ -285,6 +291,52 @@ class NcertLoadCommand extends NcertBookCommand {
         report.section("rows the other edition still carries — this edition's text "
                         + (dryRun ? "a load would clear from them" : "cleared from them"))
                 .list(result.cleared());
+    }
+
+    /**
+     * The freeze guard (DECISIONS 2026-09-13; built at D17). A book with embedded paragraphs is the
+     * frozen corpus — every canonical book is embedded, a scratch database's never is — and an English
+     * load that would add or delete one of its English rows, or rewrite or remove a row's English text,
+     * is a corpus event: refused, every such row named, unless {@code --migrate} gives the reason, and
+     * then recorded in the report with the re-embedding it calls for. A Hindi load changes no English
+     * row and no vector, Hindi-only rows included, so it is not guarded (Claude's reading of the
+     * founder's Q2, DECISIONS 2026-10-18); once something embeds Hindi, Q2 guards Hindi text the same way. A dry run is refused the same way, so
+     * it still predicts the load. Anchored rows (D23) stay the importer's refusal even under
+     * {@code --migrate}: re-anchoring is that migration's own step.
+     */
+    private void guardFrozenCorpus(BookDefinition definition, Set<Short> chapters, List<NcertParagraphRow> rows,
+            Report report) {
+        long embedded = imports.embeddedParagraphs(definition.code());
+        if (embedded == 0) {
+            report.line("freeze guard: " + definition.code() + " has no embedded paragraph — not frozen yet"
+                    + (migrate == null ? "" : "; --migrate has nothing to permit"));
+            return;
+        }
+        if (language != BookLanguage.en) {
+            report.line("freeze guard: " + definition.code() + " is frozen (" + embedded + " embedded paragraphs); a "
+                    + language + " load changes no English row and no vector, so it is not guarded (DECISIONS "
+                    + "2026-10-18)" + (migrate == null ? "" : "; --migrate has nothing to permit"));
+            return;
+        }
+        List<String> changes = FrozenCorpus.changes(language, imports.alignmentRows(definition.code(), chapters), rows);
+        if (changes.isEmpty()) {
+            report.line("freeze guard: " + definition.code() + " is frozen (" + embedded + " embedded paragraphs) and "
+                    + "this load leaves its English rows and English text as they are"
+                    + (migrate == null ? "" : "; --migrate has nothing to permit"));
+            return;
+        }
+        if (migrate == null || migrate.isBlank()) {
+            throw new InputFormatException(Path.of(NcertRegisterCommand.FILE), 0, definition.code() + " is frozen ("
+                    + embedded + " embedded paragraphs) and this load would change " + changes.size()
+                    + " row(s) of its corpus:\n  " + String.join("\n  ", changes) + "\nA change to the frozen corpus "
+                    + "is a corpus event, not a load (DECISIONS 2026-09-13): re-run with --migrate \"<reason>\", "
+                    + "then `ncert embed --book " + definition.code() + "`; nothing was written");
+        }
+        report.section("CORPUS EVENT (--migrate): " + migrate)
+                .line(changes.size() + " row(s) of the frozen corpus move" + (dryRun ? " in this rehearsal" : "")
+                        + "; the vectors of rewritten and deleted rows are dropped below, and `ncert embed --book "
+                        + definition.code() + "` earns them back")
+                .list(changes);
     }
 
     /** Why a local file is not this edition's transcription: a Hindi one is Devanagari, an English one Latin. */

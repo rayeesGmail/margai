@@ -3,6 +3,7 @@ package com.margai.pipeline.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.ai.retrieval.RetrievedPassages;
+import com.margai.curriculum.api.BookSubject;
 import com.margai.curriculum.api.ParagraphMatch;
 import java.util.List;
 import java.util.UUID;
@@ -57,6 +58,19 @@ class RetrievalRunTest {
     }
 
     /**
+     * Chapter numbers repeat across books — phy11-part1 and phy12-part1 both open at chapter 1 — so
+     * over the whole corpus the same chapter, section and paragraph can come back from the wrong
+     * book. D15's scorer compared the three numbers alone, which the one-book set made harmless.
+     */
+    @Test
+    void theSameAddressInAnotherBookIsNotTheExpectedOne() {
+        RetrievalRun.Result result = result(query("q1", "en", address(1, "1.3.1", 2)),
+                match("phy12-part1", 1, "1.3.1", 2), match("phy11-part1", 1, "1.3.1", 2));
+
+        assertThat(result.hitRank()).isEqualTo(2);
+    }
+
+    /**
      * The reason Hindi is scored on its own line: folded into one average, five Hindi misses hide
      * inside ten English hits, which is the exact failure the cross-lingual pin was chosen to avoid.
      */
@@ -103,6 +117,14 @@ class RetrievalRunTest {
         assertThat(rendered).contains("nothing above the similarity floor");
     }
 
+    /** Every retrieval in the report names the text that grounded it (founder ruling B). */
+    @Test
+    void namesWhichTextGroundedEachQuery() {
+        String rendered = render(List.of(result(query("q1", "en", address(7, "7.9", 1)), passage(7, "7.9", 1))));
+
+        assertThat(rendered).contains("grounded via question");
+    }
+
     @Test
     void marksTheExpectedParagraphInTheTop3Listing() {
         String rendered = render(List.of(result(query("q1", "en", address(7, "7.9", 1)),
@@ -110,6 +132,64 @@ class RetrievalRunTest {
 
         assertThat(rendered).contains("2. ✅ phy11-part1 ch 7 §7.9 ¶1");
         assertThat(rendered).doesNotContain("1. ✅");
+    }
+
+    // ── D17: the founder's bar (DECISIONS 2026-10-18) ────────────────────────────────────────────
+
+    /** Thirteen of fifteen, every Hindi query in, no subject below four of five: met. */
+    @Test
+    void theBarIsMetAtThirteenWithEveryHindiQueryAndNoSubjectBelowFour() {
+        List<RetrievalRun.Result> acceptance = acceptance(List.of(
+                // physics: 5 of 5; chemistry: 4 of 5 (a Hinglish miss); biology: 4 of 5 (a Hinglish miss)
+                true, true, true, true, true, true, true, true, true, false, true, true, true, true, false));
+
+        assertThat(RetrievalRun.bar(acceptance)).allSatisfy(check ->
+                assertThat(check.met()).as(check.check()).isTrue());
+    }
+
+    @Test
+    void oneHindiMissFailsTheBarWhateverTheTotal() {
+        List<Boolean> hits = new java.util.ArrayList<>(java.util.Collections.nCopies(15, true));
+        hits.set(2, false);  // a Hindi query (positions 2 and 3 of each subject are Hindi)
+
+        List<RetrievalRun.Check> bar = RetrievalRun.bar(acceptance(hits));
+
+        assertThat(bar).filteredOn(check -> check.check().equals("in the answer set"))
+                .singleElement().satisfies(check -> assertThat(check.met()).isTrue());
+        assertThat(bar).filteredOn(check -> check.check().equals("every Hindi query"))
+                .singleElement().satisfies(check -> assertThat(check.got()).isEqualTo("5 of 6"));
+        assertThat(bar).anySatisfy(check -> assertThat(check.met()).isFalse());
+    }
+
+    @Test
+    void aSubjectAtThreeOfFiveFailsTheBarEvenAtThirteenOverall() {
+        List<RetrievalRun.Check> bar = RetrievalRun.bar(acceptance(List.of(
+                true, true, true, true, true, true, true, true, true, true, false, true, true, true, false)));
+
+        assertThat(bar).filteredOn(check -> check.check().equals("in the answer set"))
+                .singleElement().satisfies(check -> assertThat(check.met()).isTrue());
+        assertThat(bar).filteredOn(check -> check.check().equals("biology"))
+                .singleElement().satisfies(check -> {
+                    assertThat(check.got()).isEqualTo("3 of 5");
+                    assertThat(check.met()).isFalse();
+                });
+    }
+
+    /**
+     * Fifteen results in subject order, five each; within a subject positions 0–1 are English, 2–3
+     * Hindi and 4 Hinglish — the shape the D17 plan gives the acceptance set.
+     */
+    private static List<RetrievalRun.Result> acceptance(List<Boolean> hits) {
+        String[] languages = {"en", "en", "hi", "hi", "hinglish"};
+        BookSubject[] subjects = {BookSubject.physics, BookSubject.chemistry, BookSubject.biology};
+        List<RetrievalRun.Result> results = new java.util.ArrayList<>();
+        for (int index = 0; index < hits.size(); index++) {
+            RetrievalQuery query = new RetrievalQuery("a" + index, RetrievalQuery.QuerySet.acceptance,
+                    subjects[index / 5], languages[index % 5], "why", List.of(address(1, "1.1", 1)), "n");
+            results.add(new RetrievalRun.Result(query, new RetrievedPassages(List.of(), false, true),
+                    hits.get(index) ? 1 : 0));
+        }
+        return results;
     }
 
     @Test
@@ -137,11 +217,12 @@ class RetrievalRunTest {
     }
 
     private static RetrievalQuery query(String id, String language, RetrievalQuery.Address... expect) {
-        return new RetrievalQuery(id, language, "why", List.of(expect), "n");
+        return new RetrievalQuery(id, RetrievalQuery.QuerySet.acceptance, BookSubject.physics, language, "why",
+                List.of(expect), "n");
     }
 
     private static RetrievalQuery.Address address(int chapter, String section, int para) {
-        return new RetrievalQuery.Address((short) chapter, section, (short) para);
+        return new RetrievalQuery.Address("phy11-part1", (short) chapter, section, (short) para);
     }
 
     private static ParagraphMatch passage(int chapter, String section, int para) {
@@ -149,7 +230,11 @@ class RetrievalRunTest {
     }
 
     private static ParagraphMatch match(int chapter, String section, int para) {
-        return new ParagraphMatch(UUID.randomUUID(), "phy11-part1", (short) chapter, section, (short) para,
+        return match("phy11-part1", chapter, section, para);
+    }
+
+    private static ParagraphMatch match(String book, int chapter, String section, int para) {
+        return new ParagraphMatch(UUID.randomUUID(), book, (short) chapter, section, (short) para,
                 "Some text of the paragraph.", null, 0.9);
     }
 }

@@ -43,6 +43,8 @@ class NcertEmbedCommandTest {
 
     private final StringWriter out = new StringWriter();
     private final StubEmbeddings embeddings = new StubEmbeddings();
+    /** What the retriever embedded as queries, which is how a test sees which queries ran. */
+    private final StubEmbeddings retrieverEmbeddings = new StubEmbeddings();
     private final EmbeddingImport imports = new EmbeddingImport();
     private final NcertExtractCommandTest.StubSpend spend = new NcertExtractCommandTest.StubSpend();
     private AiClientInfo client = new AiClientInfo("cohere", List.of("ledger"));
@@ -195,6 +197,75 @@ class NcertEmbedCommandTest {
         assertThat(report()).contains("no concept queries at").contains("--queries none");
     }
 
+    // ── D17: the set covers the whole corpus, a book run scores what reaches the book ────────────
+
+    /** The corpus-wide set is scored by `ncert retrieve`; a book run takes only its own queries. */
+    @Test
+    void runsOnlyTheQueriesThatReachThisBook() throws IOException {
+        twoBooks();
+        Path queries = querySet("""
+                {"id": "p1", "set": "acceptance", "subject": "physics", "language": "en", "text": "orbit energy",
+                 "expect": [{"book": "phy11-part1", "chapter": 7, "section": "7.9", "para": 1}], "note": "n"},
+                {"id": "b1", "set": "acceptance", "subject": "biology", "language": "en", "text": "what is a cell",
+                 "expect": [{"book": "bio11", "chapter": 1, "section": "1.1", "para": 1}], "note": "n"}""");
+
+        assertThat(runWithQueries(queries)).isZero();
+
+        assertThat(retrieverEmbeddings.queries).containsExactly("orbit energy");
+        assertThat(report()).contains("1 of the 2 at");
+    }
+
+    @Test
+    void aBookNoQueryReachesIsEmbeddedAnywayAndSaysSo() throws IOException {
+        twoBooks();
+        Path queries = querySet("""
+                {"id": "b1", "set": "acceptance", "subject": "biology", "language": "en", "text": "what is a cell",
+                 "expect": [{"book": "bio11", "chapter": 1, "section": "1.1", "para": 1}], "note": "n"}""");
+
+        assertThat(runWithQueries(queries)).isZero();
+
+        assertThat(imports.stored).hasSize(3);
+        assertThat(retrieverEmbeddings.queries).isEmpty();
+        assertThat(report()).contains("expects a paragraph of 'phy11-part1' — not run");
+    }
+
+    private void twoBooks() throws IOException {
+        Files.writeString(inputs.resolve(NcertRegisterCommand.FILE), """
+                books:
+                  - code: phy11-part1
+                    subject: physics
+                    class_level: 11
+                    part: 1
+                    title_en: "Physics Part-I, Textbook for Class XI"
+                    edition_year: 2023
+                    source:
+                      en: source/ncert/2022-ed/en/phy11-part1/
+                    chapters:
+                      - {no: 6, en: keph106.pdf}
+                      - {no: 7, en: keph107.pdf}
+                  - code: bio11
+                    subject: biology
+                    class_level: 11
+                    title_en: "Biology, Textbook for Class XI"
+                    edition_year: 2023
+                    source:
+                      en: source/ncert/2022-ed/en/bio11/
+                    chapters:
+                      - {no: 1, en: kebo101.pdf}
+                """);
+    }
+
+    private Path querySet(String queries) throws IOException {
+        Path file = inputs.resolve("retrieval-queries.json");
+        Files.writeString(file, "{\"queries\": [" + queries + "]}");
+        return file;
+    }
+
+    private int runWithQueries(Path queries) {
+        return commandLine().execute("ncert", "embed", "--book", "phy11-part1", "--queries", queries.toString(),
+                "--inputs", inputs.toString(), "--reports", reports.toString());
+    }
+
     // ── the D15 experiment: --context section ───────────────────────────────────────────────────
 
     /** Default is §6.4 as written, so the spec'd behaviour runs unless the experiment is named. */
@@ -341,8 +412,8 @@ class NcertEmbedCommandTest {
             @Override
             public <K> K create(Class<K> cls) throws Exception {
                 if (cls == NcertEmbedCommand.class) {
-                    return cls.cast(new NcertEmbedCommand(imports, embeddings, noRetriever(), spend, client,
-                            properties, writer));
+                    return cls.cast(new NcertEmbedCommand(imports, embeddings, noRetriever(retrieverEmbeddings), spend,
+                            client, properties, writer));
                 }
                 return siblings.create(cls);
             }
@@ -361,6 +432,10 @@ class NcertEmbedCommandTest {
      * subject and the founder's scored run's.
      */
     static HybridRetriever noRetriever() {
+        return noRetriever(new StubEmbeddings());
+    }
+
+    static HybridRetriever noRetriever(StubEmbeddings queryEmbeddings) {
         return new HybridRetriever(new ParagraphRetrievalRepository() {
             @Override
             public List<com.margai.curriculum.api.ParagraphMatch> nearestByEmbedding(float[] query,
@@ -373,7 +448,7 @@ class NcertEmbedCommandTest {
                     com.margai.curriculum.api.BookSubject subject, UUID nodeId, int limit) {
                 return List.of();
             }
-        }, new StubEmbeddings(), TestAiProperties.standard());
+        }, queryEmbeddings, TestAiProperties.standard());
     }
 
     /** Records what was embedded and on which side of the space, and answers a 1,024-wide vector. */

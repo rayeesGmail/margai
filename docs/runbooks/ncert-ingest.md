@@ -387,6 +387,28 @@ working runs, pointed at a scratch directory with `--reports` and not committed;
 approves a block on is run into `pipeline/reports` and committed with the block**, so the approval and its
 evidence land together.
 
+### The freeze guard (D17, DECISIONS 2026-09-13)
+
+A book with embedded paragraphs is the **frozen corpus** — every canonical book is embedded, a scratch
+database's never is. An English load (or its dry run) that would add or delete one of its English rows, or
+rewrite or remove a row's **English** text, is refused, every such row named:
+
+```
+phy11-part1 is frozen (909 embedded paragraphs) and this load would change 1 row(s) of its corpus:
+  ch 7 §7.3 ¶1 — its English rewritten
+```
+
+That is a **corpus event**, not a load: a second edition, or an English correction the founder rules on.
+Re-run with `--migrate "<reason>"`; the report records the event under `CORPUS EVENT (--migrate)` with
+every row it moved, the vectors of rewritten and deleted rows are dropped, and `ncert embed --book …`
+earns them back. A **Hindi load is not guarded**: it changes no English row and no vector — Hindi text on
+rows that keep their English, and Hindi-only rows added or deleted — so a first load as written (which puts
+Hindi rows at addresses the English lacks; phy11-part1's put 23 there) and the corrections block that
+deletes them again land as ordinary loads, as the D16 books did and the four Chemistry Hindi books will in the
+beta period (Claude's reading of the founder's Q2, DECISIONS 2026-10-18). If a Hindi vector column is ever added, the guard covers Hindi text the same way (founder,
+DECISIONS 2026-10-18). Anchored rows (D23) stay refused even under `--migrate`: re-anchoring
+is the migration's own step.
+
 ## 5. verify — the second read (D15, DECISIONS 2026-09-14 "the pair")
 
 Claude Opus 5 transcribes; Claude Sonnet 5 reads every page again and judges each paragraph with one
@@ -723,8 +745,9 @@ a swap happens while it is still free, which is now and not after nine more book
 Cost for phy11-part1's 894 paragraphs: **well under ₹5** at the pinned model's 0.12 USD/1M tokens.
 
 `--chapters 7` embeds one chapter, for staging a book the way `extract` is staged.
-`--redo` re-embeds paragraphs that already have vectors. `--queries none` embeds without scoring —
-needed for any book the committed query set is not written against.
+`--redo` re-embeds paragraphs that already have vectors. `--queries none` embeds without scoring.
+Since D17 the query set covers the whole corpus, so a book's run scores only the queries with an
+expected paragraph in that book, and says so when there are none; the corpus-wide score is section 8's.
 
 ### The D15 chunk experiment: `--context section`
 
@@ -752,6 +775,46 @@ DB_URL=… AI_LIVE=1 java -jar target/server-0.1.0-SNAPSHOT.jar \
 About ₹9 and ten minutes. **The bar, set in advance:** adopt if q07 moves from rank 11 into the top
 three *and* nothing currently in the top three drops out. A one-hit swing on 15 queries is noise.
 Reverting is the same command without `--context section`, for another ₹9.
+
+## 8. retrieve — the concept queries over the whole corpus (D17)
+
+```
+DB_URL=jdbc:postgresql://localhost:5432/margai_d15 \
+AWS_PROFILE=margai AI_LIVE=1 \
+java -jar target/server-0.1.0-SNAPSHOT.jar --spring.profiles.active=pipeline,live \
+  ncert retrieve
+```
+
+Reads `eval/retrieval-queries.json` (`--queries` for another file). Each query names its **set** —
+`acceptance` (D17's ✅), `baseline` (D15's fifteen), `diagnostic` (scored, deciding nothing) or `heldout`
+(the founder's four, added after the first run; part of D17's tick with fusion on, DECISIONS 2026-10-19) — its
+**subject**, its **language** (`en`, `hi` or `hinglish`) and, on every expected address, its **book**:
+chapter numbers repeat across books, so an address without one would count the wrong book's paragraph as
+right. Each query is filtered to its subject, as the doubt pipeline filters (Biology is one subject:
+botany and zoology together); then the acceptance set runs again with **no subject filter**, the
+founder's diagnostic of what a router's missing subject would cost. It embeds the queries and nothing
+else, writes nothing to the corpus, and refuses the fake client. Cost: ₹0.51 by the ledger on the 2026-10-18
+run (51 query embeddings; the ledger rounds each call up to a paisa).
+
+The report opens with the corpus searched (paragraphs with and without a vector, per book — a row
+without one is invisible to the vector half), then **the founder's bar** read from the filtered
+acceptance run (DECISIONS 2026-10-18): at least 13 of 15 with an expected paragraph **in the answer set**
+— a hit at any rank, since what comes back is already the token-capped set the answer step reads —
+every Hindi query among them, and no subject below 4 of 5. Then each set scored by language and by
+subject (in the answer set, hit@1, hit@3, MRR), the unfiltered ranks query by query, the baseline beside
+its D15 figures, and **every miss with the text it was expected to reach** beside what came back. Each
+miss is diagnosed — answer key or retrieval — in a note committed beside the report before the ✅ is
+judged; a key is widened only by the D15 rule (DECISIONS 2026-09-20), and no retrieval setting changes
+on one run.
+
+**`--rewrite` (D18, DECISIONS 2026-10-19).** Every non-English query is rewritten into an English,
+textbook-style search version by `query_rewrite` on the CHEAP tier (`MARGAI_AI_ANTHROPIC_API_KEY` must be
+loaded), and retrieved with the question and the search version fused — never the search version alone. The
+English acceptance queries are rewritten too, scored apart from the bar (the founder's diagnostic). The report
+(`…-ncert-retrieve-rewrite.md`) opens with **D17's tick read from the fused run** — the bar on the acceptance
+set plus at least 3 of the founder's 4 held-out queries — with the same checks unfused beside it, then each set
+unfused against fused, every search version the model wrote, and the fused run's misses with their search
+versions. The rewrite calls are ledgered as `eval`.
 
 ## If something goes wrong
 

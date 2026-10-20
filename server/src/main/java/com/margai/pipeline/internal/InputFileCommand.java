@@ -43,6 +43,14 @@ abstract class InputFileCommand implements Callable<Integer> {
     /** The file under {@code --inputs} this command reads. */
     abstract String inputFileName();
 
+    /**
+     * Where that file is: under {@code --inputs} unless the command reads one kept elsewhere — the
+     * concept queries live in {@code eval/}, beside the eval suite, not among the pipeline's inputs.
+     */
+    Path inputPath() {
+        return io.input(inputFileName());
+    }
+
     /** The command's work over an existing input file, told to the report; throws when the run fails. */
     abstract void run(Path inputFile, Report report);
 
@@ -53,7 +61,7 @@ abstract class InputFileCommand implements Callable<Integer> {
 
     @Override
     public final Integer call() {
-        Path file = io.input(inputFileName());
+        Path file = inputPath();
         if (!Files.isRegularFile(file)) {
             spec.commandLine().getErr().println("input file not found: " + file.toAbsolutePath().normalize());
             log.warn("{}: input file not found: {}", spec.qualifiedName(), file.toAbsolutePath().normalize());

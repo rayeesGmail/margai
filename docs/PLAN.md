@@ -4,6 +4,9 @@
 **Builder:** you + Claude Code (you drive, review, and decide; Claude Code plans and writes).
 **Total:** 14 weeks (≈84 working days) from empty repo to a 50-student closed beta,
 plus 6 weeks of beta operation. Timeline assumes the Product Spec v2.0 is the contract.
+*Amended 2026-10-19 (founder's calendar ruling, option (c); DECISIONS 2026-10-19):* plus **4** weeks of beta
+operation, waves from D79 (≈2026-12-30), public launch ≈2027-02-02; a closed test of 12–15 adult testers from
+≈D65 (the founder's), placed on D66 (≈2026-12-15) by Claude for the founder to overrule.
 
 ---
 
@@ -126,10 +129,20 @@ tools; your reviews focus on output quality.)*
 - **D17 —** Embeddings + hybrid retrieval over the whole corpus, on the pin settled at D15
   (amended 2026-09-19); the test harness widened to it. ✅ *15 hand-written concept queries
   return the right paragraphs.* *Amended 2026-10-18 (founder; DECISIONS 2026-10-18): at least one
-  of the ≥5 Hindi queries (TECH_PLAN §6.4) is in each subject, Chemistry included.*
+  of the ≥5 Hindi queries (TECH_PLAN §6.4) is in each subject, Chemistry included.* *Amended 2026-10-19
+  (founder; DECISIONS 2026-10-19): ticks if the query-rewrite test in D18's buffer meets the 2026-10-18 bar
+  with fusion on (the question and its English search version fused, never the rewrite alone) and the four
+  held-out queries hit at least 3 of 4.* *Amended 2026-10-19 evening (founder's rulings A and B; DECISIONS
+  2026-10-19): a held-out "hit" is "in the answer set"; grounding is the higher similarity of the question and
+  its search version, with `grounded_via` logged for every retrieval; ticks if a rerun at temperature 0, the run
+  of record, meets the bar under A and B and the hand-check of every query grounded only through its search
+  version passes.*
 - **D18 —** Buffer for extraction mess (there will be some). **Week-3 gate:** NCERT
   layer searchable in both languages. *Added 2026-10-01 (CS-2 §4.11): Bedrock configured as a
   completion fallback behind a flag — config only; embeddings stay on Bedrock as their primary.*
+  *Amended 2026-10-19 (founder; DECISIONS 2026-10-19): carries the standalone query-rewrite test, fused and
+  unfused, plus the English-rewrite diagnostic; the gate reads the fused run with the unfused numbers beside it;
+  if the rewrite work spills, the gate moves and the move goes in the slippage log.*
   *Amended 2026-10-18 (founder; DECISIONS 2026-10-18): the gate reads “searchable in both languages
   for the six books with Hindi text; for Chemistry, Hindi queries reach the English rows”.*
 - **D19 —** PYQ ingest: papers loaded, question records created, tagging pass.
@@ -146,7 +159,14 @@ tools; your reviews focus on output quality.)*
   weightage chapters (TECH_PLAN §15.7), staged on one chapter first.*
 - **D23 —** Anchor-linking questions↔NCERT; seed the eval suite v1 (~60 questions
   across subjects). ✅ *Eval harness runs and reports.* *Amended 2026-10-18 (founder; DECISIONS
-  2026-10-18): the eval suite carries Hindi questions in every subject.*
+  2026-10-18): the eval suite carries Hindi questions in every subject.* *Amended 2026-10-19 (founder's
+  rulings A–D on the D17 rewrite run; DECISIONS 2026-10-19): the eval also (a) checks answer correctness
+  where the key chunk ranks low in the answer set (a01 at rank 12, h01 at 6 are the examples), rank and top-3
+  staying diagnostics, not gates; (b) carries at least one equation-heavy Hindi question per subject, and
+  revisits the Hindi vector column on what it shows (h03 is the known miss); (c) compares fused and unfused
+  retrieval on English questions, and if fusion lowers any English result the English search-version flag
+  goes off; (d) evaluates `query_rewrite` v2's drift guard (no topic the question does not contain) on this
+  eval set, not on D17's queries.*
 - **D24 —** Buffer + **Week-4 gate:** solved, tagged, anchored PYQ bank + eval suite
   running in CI. In the buffer (CS-1 §4, §7, §9.3; added 2026-09-12): `collective from-pyq`
   misconception drafts from the distractor maps; `collective from-inputs` over the F11
@@ -371,6 +391,9 @@ tools; your reviews focus on output quality.)*
   §9; at risk): terms (a subscription is personal; the one-active-phone rule in plain words), the
   WhatsApp click-to-chat link and share sheet, the legal entity name as configuration. What the
   share sheet shares in the committed build is open (TECH_PLAN §15.13; TRACKER day log).*
+  *Amended 2026-10-19 (founder's calendar ruling; DECISIONS 2026-10-19): the founder's review of the
+  crisis-protocol copy moves here from D67, so D59's copy reaches him by D64 — one of the two things the
+  closed test waits for (D66, Claude's placement of the founder's ≈D65).*
 - **D65 —** Per-user AI budget circuit breaker + daily spend alarms + cost dashboard
   (cache rate, cost/feature, cost/user); the breaker wiring includes the Pro queue path
   (accept + queue, never a refusal — TECH_PLAN §4.8, founder ruling 2026-09-12) and the
@@ -382,13 +405,26 @@ tools; your reviews focus on output quality.)*
   phone is blocked with a friendly message (CS-5 §6.3).*
 - **D66 —** **Week-11 gate:** money loop + trust promises all demonstrably true.
   (F5: marketing site drafted this week, evenings.)
+  *Amended 2026-10-19 (founder's calendar ruling, option (c); DECISIONS 2026-10-19; this day chosen by
+  Claude, since it carries only the gate while D65 is ⚠): D74's Play work comes here — listing assets,
+  data-safety form, and the upload to the **closed** testing track with TECH_PLAN §7.6's release signing key
+  and production API URL (TECH_PLAN §7.6 still names D74 and the internal track; it follows at the next
+  TECH_PLAN edit) — and the **closed test** opens: 12–15 adult testers the founder recruits
+  personally, each under a written tester agreement (F16). It opens only once D59's crisis protocol passes
+  every eval case and the founder has reviewed its copy (D64); it does not wait for the legal review (F9)
+  or the slow-network test, which still block D79 — the closed test is not "the beta" of SPEC §6.6 and §3.1.
+  If the crisis protocol is not passing, the closed test slips; it never runs without it. If the Play
+  account is personal, Play's tester rule needs 14 days of it, which then end ≈2026-12-29, before wave 1; an
+  organisation account (F14) is exempt (Claude's reading of the calendar report). ✅ adds: installable from
+  the closed track.*
 
 ### PHASE 8 — Hardening & polish (Weeks 12–13, Days 67–78) — M11
 
 - **D67 —** Full Hinglish/Hindi copy pass with a native-speaker read (mentor voice
   audit — no guilt, no fake-human). ✅ *String review sheet signed off.* *Added 2026-10-01 (CS-2
   §4.1, §4.5; CS-6 §2.4): the crisis-protocol copy (founder review), streak-repair copy and the
-  first-week ramp's mentor notes.*
+  first-week ramp's mentor notes.* *Amended 2026-10-19 (DECISIONS 2026-10-19): the crisis-protocol copy
+  review moved to D64, ahead of the closed test.*
 - **D68 —** Notification system final: caps (2/day), quiet hours, exam-protocol config.
   ✅ *A day of simulated triggers never exceeds caps.*
 - **D69 —** Performance pass: cold start, Today load, solver latency streaming, low-end
@@ -410,7 +446,9 @@ tools; your reviews focus on output quality.)*
   reliability metrics, the personal-fit measures by week of tenure, and the monthly curated-lecture
   check (TECH_PLAN §15.11).*
 - **D74 —** Play Store: listing assets, data-safety form, internal testing track upload.
-  ✅ *Installable from the testing track.*
+  ✅ *Installable from the testing track.* *Amended 2026-10-19 (DECISIONS 2026-10-19): the listing, the
+  data-safety form and the first upload moved to D66 with the closed test; D74 refreshes the build on the
+  track the beta installs from (Claude's choice, for the founder to overrule; DECISIONS 2026-10-19).*
 - **D75 —** Beta tooling: invite codes, founder admin peek (read-only), audit-queue
   review screen, feedback link in-app. ✅ *You can review flagged answers in 2 taps.*
 - **D76 —** Seed the answer cache: batch-solve the top ~500 predicted common doubts
@@ -436,7 +474,8 @@ tools; your reviews focus on output quality.)*
   *(2026-10-01: the beta itself collects no payment — CS-2 §2.1; these notes feed F13's
   pricing-evidence review.)*
 - **D84 —** **Beta gate & retro:** go/no-go criteria for the 6-week beta period; write
-  the weeks 15–20 operating plan (daily 1h ops + 3h fixes/Phase-2 prep).
+  the weeks 15–20 operating plan (daily 1h ops + 3h fixes/Phase-2 prep). *Amended 2026-10-19 (founder's
+  calendar ruling; DECISIONS 2026-10-19): a **4-week** beta period, weeks 15–18, public launch ≈2027-02-02.*
 
 ---
 
@@ -455,6 +494,13 @@ order, each behind a flag with its metric live, and only after the D60 gate pass
 deferred from D16, come first in the beta period's build hours, ahead of the §12.1 backlog and
 without waiting on the D60 gate condition, each after its decoder-check trigger ruling; and the exit
 criteria to public launch add **all Hindi books loaded and closed**.
+*Amended 2026-10-19 (founder's calendar ruling, option (c); DECISIONS 2026-10-19):* the beta period is
+**four weeks** (weeks 15–18, after D84), with Pro at no cost until public launch (the SPEC §6.9 amendment
+the founder instructed),
+public launch ≈2027-02-02; the ≈2027-02-16 six-week fallback is removed. **"All Hindi books loaded and
+closed" is no longer an exit criterion to public launch; it becomes the gate for Hindi-medium marketing**
+(the SPEC §9 amendment the founder instructed). The Chemistry Hindi books still come first in the beta period's build days, and any
+content-pipeline work runs only in beta build days or buffers, never on core days (slippage-log rule).
 
 ---
 
@@ -471,3 +517,7 @@ criteria to public launch add **all Hindi books loaded and closed**.
   bounded nuisance, not a disaster.
 - **Calendar note:** count backwards from NEET (early May). A mid-September start →
   beta in December → public launch in January, landing exactly in annual-plan season.
+  *Amended 2026-10-19 (founder's calendar ruling; DECISIONS 2026-10-19): after the 24-day content-pipeline
+  overrun, a closed test from ≈D65 (placed on D66, ≈2026-12-15, by Claude for the founder to overrule) → beta
+  waves from 2026-12-30 → public launch ≈2027-02-02 — which Claude reads as still inside SPEC §6.9's "from
+  January, annual is front-and-center" (left to the founder in the calendar report).*

@@ -1,7 +1,11 @@
 package com.margai.ai.retrieval;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.margai.ai.api.AiCallContext;
 import com.margai.ai.internal.TestAiProperties;
 import com.margai.ai.tasks.EmbeddingService;
@@ -12,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
 /**
  * The fusion half of hybrid retrieval, with a stub repository in place of the SQL: rank fusion
@@ -165,6 +170,140 @@ class HybridRetrieverTest {
         assertThat(repository.limitsAsked).containsExactly(8, 8);
     }
 
+    // ── the English search version, fused with the question (D18, DECISIONS 2026-10-19) ─────────────
+
+    /** Both halves run for both texts, question first; the search version never replaces the question. */
+    @Test
+    void aSearchVersionRunsBothHalvesBesideTheQuestion() {
+        repository.vector = List.of(paragraph("7.9", 1, 0.62));
+
+        retriever().retrieve("गुरुत्व हमें नीचे क्यों रखता है", "why gravity holds bodies to the earth",
+                BookSubject.physics, null, CTX);
+
+        assertThat(embeddings.queries)
+                .containsExactly("गुरुत्व हमें नीचे क्यों रखता है", "why gravity holds bodies to the earth");
+        assertThat(repository.textsAsked)
+                .containsExactly("गुरुत्व हमें नीचे क्यों रखता है", "why gravity holds bodies to the earth");
+    }
+
+    /** A paragraph only the search version reaches is added; one both reach is fused across all four lists. */
+    @Test
+    void aParagraphOnlyTheSearchVersionFindsIsAddedAndTheQuestionsOwnIsKept() {
+        ParagraphMatch questions = paragraph("7.1", 1, 0.41);
+        ParagraphMatch rewrites = paragraph("7.9", 1, 0.58);
+        repository.vectorSequence = new ArrayList<>(List.of(List.of(questions), List.of(rewrites)));
+        repository.textSequence = new ArrayList<>(List.of(List.of(), List.of(rewrites.withScore(9.0))));
+
+        List<RetrievedPassages.Passage> passages = retriever().retrieve("q", "search version",
+                BookSubject.physics, null, CTX).passages();
+
+        assertThat(passages).extracting(passage -> passage.paragraph().section())
+                .as("the rewrite's paragraph, found by two lists, ahead of the question's, found by one")
+                .containsExactly("7.9", "7.1");
+    }
+
+    @Test
+    void aParagraphSeveralListsFindKeepsItsBestRankAndHighestSimilarity() {
+        ParagraphMatch other = paragraph("7.2", 1, 0.50);
+        ParagraphMatch both = paragraph("7.9", 1, 0.40);
+        repository.vectorSequence = new ArrayList<>(List.of(List.of(other, both), List.of(both.withScore(0.55))));
+        repository.textSequence = new ArrayList<>(List.of(List.of(), List.of()));
+
+        RetrievedPassages.Passage fused = retriever().retrieve("q", "search version", BookSubject.physics, null, CTX)
+                .passages().stream().filter(passage -> passage.paragraph().section().equals("7.9")).findFirst()
+                .orElseThrow();
+
+        assertThat(fused.vectorRank()).isEqualTo(1);
+        assertThat(fused.similarity()).isEqualTo(0.55);
+    }
+
+    /** Grounding is judged on the highest similarity, so a question below the floor is lifted by its rewrite. */
+    @Test
+    void groundingTakesTheHigherSimilarityOfTheTwoTexts() {
+        repository.vectorSequence = new ArrayList<>(List.of(List.of(paragraph("7.1", 1, 0.25)),
+                List.of(paragraph("7.9", 1, 0.45))));
+        repository.textSequence = new ArrayList<>(List.of(List.of(), List.of()));
+
+        RetrievedPassages retrieved = retriever().retrieve("q", "search version", BookSubject.physics, null, CTX);
+
+        assertThat(retrieved.grounded()).isTrue();
+    }
+
+    /** Which text grounded a retrieval is named for every one (founder ruling, DECISIONS 2026-10-19). */
+    @Test
+    void namesWhichTextGroundedTheRetrieval() {
+        assertThat(groundedVia(0.45, null)).isEqualTo(RetrievedPassages.GroundedVia.question);
+        assertThat(groundedVia(0.45, 0.20)).isEqualTo(RetrievedPassages.GroundedVia.question);
+        assertThat(groundedVia(0.25, 0.45)).isEqualTo(RetrievedPassages.GroundedVia.search_version);
+        assertThat(groundedVia(0.45, 0.50)).isEqualTo(RetrievedPassages.GroundedVia.both);
+        assertThat(groundedVia(0.25, 0.20)).isEqualTo(RetrievedPassages.GroundedVia.none);
+    }
+
+    /** Production logs carry the same fact as the reports, keyed by the request id (founder ruling B). */
+    @Test
+    void logsGroundedViaWithTheRequestIdForEveryRetrieval() {
+        repository.vector = List.of(paragraph("7.9", 1, 0.62));
+        ListAppender<ILoggingEvent> log = new ListAppender<>();
+        log.start();
+        Logger logger = (Logger) LoggerFactory.getLogger(HybridRetriever.class);
+        logger.addAppender(log);
+        try {
+            retrieve();
+        } finally {
+            logger.detachAppender(log);
+        }
+
+        assertThat(log.list).singleElement().extracting(ILoggingEvent::getFormattedMessage).asString()
+                .contains("request_id=test grounded_via=question search_version=false");
+    }
+
+    /** The retry's own grounding is what the retrieval reports, not the filtered search's none. */
+    @Test
+    void namesGroundingAfterTheNodeFilterRetry() {
+        repository.vectorSequence = new ArrayList<>(List.of(List.of(), List.of(),
+                List.of(paragraph("7.1", 1, 0.25)), List.of(paragraph("7.9", 1, 0.45))));
+        repository.textSequence = new ArrayList<>(List.of(List.of(), List.of(), List.of(), List.of()));
+
+        RetrievedPassages retrieved = retriever().retrieve("q", "search version", BookSubject.physics, NODE, CTX);
+
+        assertThat(retrieved.nodeFilterDropped()).isTrue();
+        assertThat(retrieved.groundedVia()).isEqualTo(RetrievedPassages.GroundedVia.search_version);
+    }
+
+    @Test
+    void groundedAndGroundedViaCannotContradictEachOther() {
+        assertThatThrownBy(() -> new RetrievedPassages(List.of(), false, true, RetrievedPassages.GroundedVia.none))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new RetrievedPassages(List.of(), false, false, RetrievedPassages.GroundedVia.both))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    /** The question's and the search version's best vector similarity in; what the retrieval says grounded it out. */
+    private RetrievedPassages.GroundedVia groundedVia(double question, Double searchVersion) {
+        StubRepository stub = new StubRepository();
+        List<List<ParagraphMatch>> vectors = new ArrayList<>(List.of(List.of(paragraph("7.1", 1, question))));
+        List<List<ParagraphMatch>> texts = new ArrayList<>(List.of(List.of()));
+        if (searchVersion != null) {
+            vectors.add(List.of(paragraph("7.9", 1, searchVersion)));
+            texts.add(List.of());
+        }
+        stub.vectorSequence = vectors;
+        stub.textSequence = texts;
+        return new HybridRetriever(stub, embeddings, TestAiProperties.standard())
+                .retrieve("q", searchVersion == null ? null : "search version", BookSubject.physics, null, CTX)
+                .groundedVia();
+    }
+
+    @Test
+    void aBlankSearchVersionIsTheUnfusedRetrieval() {
+        repository.vector = List.of(paragraph("7.9", 1, 0.62));
+
+        retriever().retrieve("why does gravity hold us down", "  ", BookSubject.physics, null, CTX);
+
+        assertThat(embeddings.queries).containsExactly("why does gravity hold us down");
+        assertThat(repository.textsAsked).containsExactly("why does gravity hold us down");
+    }
+
     private RetrievedPassages retrieve() {
         return retriever().retrieve("why does gravity hold us down", BookSubject.physics, null, CTX);
     }
@@ -192,11 +331,18 @@ class HybridRetrieverTest {
         List<ParagraphMatch> underNode;
         final List<UUID> nodesAsked = new ArrayList<>();
         final List<Integer> limitsAsked = new ArrayList<>();
+        final List<String> textsAsked = new ArrayList<>();
+        /** One answer per call, in call order, when a test needs the question's and the rewrite's apart. */
+        List<List<ParagraphMatch>> vectorSequence;
+        List<List<ParagraphMatch>> textSequence;
 
         @Override
         public List<ParagraphMatch> nearestByEmbedding(float[] query, BookSubject subject, UUID nodeId, int limit) {
             nodesAsked.add(nodeId);
             limitsAsked.add(limit);
+            if (vectorSequence != null) {
+                return vectorSequence.removeFirst();
+            }
             return nodeId != null && underNode != null ? underNode : vector;
         }
 
@@ -204,6 +350,10 @@ class HybridRetrieverTest {
         public List<ParagraphMatch> matchingText(String query, BookSubject subject, UUID nodeId, int limit) {
             nodesAsked.add(nodeId);
             limitsAsked.add(limit);
+            textsAsked.add(query);
+            if (textSequence != null) {
+                return textSequence.removeFirst();
+            }
             return nodeId != null && underNode != null ? underNode : text;
         }
     }

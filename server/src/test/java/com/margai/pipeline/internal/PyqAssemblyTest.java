@@ -57,7 +57,7 @@ class PyqAssemblyTest {
                 List.of(new PyqPage.Figure("option:1", "a graph of v against t, a straight line through the origin")), true);
         PyqExtractedPage low = new PyqExtractedPage(2, new BigDecimal("0.70"), UUID.randomUUID(), "claude-opus-5-5",
                 "pyq_extract.v1", List.of(new PyqPage.Heading("CHEMISTRY", 3)),
-                List.of(item(1, false, "First, printed twice", 1, 4), drawn, item(4, false, "Fourth", 1, 3)));
+                List.of(item(1, false, "First, printed twice", 1, 4), drawn, item(4, false, "Fourth", 1, 3)), null);
 
         PyqAssembly.Draft draft = PyqAssembly.assemble(paper(4, List.of()), List.of(
                 page(1, List.of(item(1, false, "First", 1, 4))), low), Map.of());
@@ -152,7 +152,7 @@ class PyqAssemblyTest {
 
     private static PyqExtractedPage page(int page, List<PyqPage.Item> items) {
         return new PyqExtractedPage(page, new BigDecimal("0.97"), UUID.randomUUID(), "claude-opus-5-5", "pyq_extract.v1",
-                List.of(), items);
+                List.of(), items, null);
     }
 
     private static PyqPage.Item item(int number, boolean continues, String stem, int first, int count) {

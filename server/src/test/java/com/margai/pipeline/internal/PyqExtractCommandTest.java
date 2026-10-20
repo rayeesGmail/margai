@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -22,6 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
+import java.util.function.UnaryOperator;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -71,6 +75,7 @@ class PyqExtractCommandTest {
         extract.pages.put(2, new PyqPage(List.of(new PyqPage.Heading("CHEMISTRY", 3)),
                 List.of(item(2, true, "", 2, 3), item(3, false, "Third question", 4), item(4, false, "Fourth question", 4)),
                 new BigDecimal("0.95")));
+        extract.imageKept = page -> store.exists(ContentKeys.pyqPage("neet-2025-45", page));
         build();
     }
 
@@ -95,6 +100,100 @@ class PyqExtractCommandTest {
         assertThat(out.toString()).contains("- read: 1 paper(s) in the register")
                 .contains("| physics | — | 2 | 2 | 0 |").contains("| chemistry | — | 2 | 2 | 0 |")
                 .contains("4.41").contains("answers empty until NTA's key is filled in at review");
+    }
+
+    /** The picture each call read is kept before the call, and its line proves which picture it was. */
+    @Test
+    void keepsEveryPageImageTheModelReadAndRecordsItsHash() throws IOException {
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_OK);
+
+        assertThat(extract.imageKeptAtCall).containsExactly(true, true);
+        for (PyqExtractedPage line : lines()) {
+            String key = "pages/pyq/neet-2025-45/00" + line.page() + ".png";
+            byte[] stored = store.get(key);
+            assertThat(line.image().key()).isEqualTo(key);
+            assertThat(line.image().sha256()).isEqualTo(PyqExtractCommand.sha256(stored));
+            assertThat(line.image().dpi()).isEqualTo(72);
+            assertThat(line.image().renderer()).startsWith("PDFBox 3.").contains(", Java ");
+            assertThat(line.image().tiles()).isEqualTo(1);
+            assertThat(line.image().rerendered()).isFalse();
+            assertThat(Files.readAllBytes(drafts.resolve("pages/neet-2025-45/00" + line.page() + ".png"))).isEqualTo(stored);
+            assertThat(out.toString()).contains("| " + line.page() + " | " + line.image().sha256() + " | kept with this run's call |");
+        }
+    }
+
+    /** Code 45's case: lines with no image key, no image stored — kept with no model call, and a rerun proves them. */
+    @Test
+    void imagesOnlyKeepsTheImagesOfPagesReadBeforeAndCallsNoModel() throws IOException {
+        code45State(null);
+        client = new AiClientInfo(AiClientInfo.FAKE, List.of("ledger"));
+        build();
+        Map<Integer, String> drawn = drawn();
+
+        assertThat(run("--images-only")).isEqualTo(InputFileCommand.EXIT_OK);
+
+        assertThat(extract.calls).isEmpty();
+        assertThat(lines()).hasSize(2).allSatisfy(line -> {
+            assertThat(line.image().sha256()).isEqualTo(drawn.get(line.page()))
+                    .isEqualTo(PyqExtractCommand.sha256(store.get(line.image().key())));
+            assertThat(line.image().rerendered()).isTrue();
+        });
+        assertThat(Files.readAllBytes(drafts.resolve("pages/neet-2025-45/002.png")))
+                .isEqualTo(store.get("pages/pyq/neet-2025-45/002.png"));
+        assertThat(out.toString()).contains("kept now — re-rendered").contains("2 image(s) kept now, 0 checked");
+
+        assertThat(run("--images-only")).isEqualTo(InputFileCommand.EXIT_OK);
+        assertThat(out.toString()).contains("the same bytes as the image its line records (re-rendered)")
+                .contains("0 image(s) kept now, 2 checked").contains("(unchanged)");
+    }
+
+    @Test
+    void imagesOnlyRefusesALineWhoseImageIsMissingFromTheStore() throws IOException {
+        Map<Integer, String> drawn = drawn();
+        code45State(page -> new PyqExtractedPage.Image(ContentKeys.pyqPage("neet-2025-45", page), drawn.get(page), 72,
+                PdfPageRenderer.version(), 1, false));
+
+        assertThat(run("--images-only")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("page 1: the image in the store at pages/pyq/neet-2025-45/001.png is missing");
+    }
+
+    @Test
+    void imagesOnlyRefusesAPaperNotReadYet() {
+        assertThat(run("--images-only")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("no page of neet-2025-45 has been read yet");
+    }
+
+    @Test
+    void imagesOnlyRefusesAPageThatDrawsDifferentlyFromTheImageItsLineRecords() {
+        run();
+        rewrite(line -> line.page() == 1 ? line.withImage(new PyqExtractedPage.Image(line.image().key(), "0".repeat(64),
+                line.image().dpi(), line.image().renderer(), line.image().tiles(), false)) : line);
+
+        assertThat(run("--images-only")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("page 1 draws differently now").contains("could not prove");
+    }
+
+    /** A stop mid-run keeps and reports the images kept before it; the refused page keeps none. */
+    @Test
+    void imagesOnlyRefusesAStoredImageThatIsNotTheBookletsDrawing() {
+        code45State(null);
+        store.put("pages/pyq/neet-2025-45/002.png", new byte[] {1, 2, 3}, "image/png");
+
+        assertThat(run("--images-only")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("page 2: the image in the store").contains("is not what the booklet draws now")
+                .contains("page images handled before the run stopped").contains("rewritten with the 1 image record(s) kept");
+        assertThat(lines()).extracting(line -> line.image() != null).containsExactly(true, false);
+    }
+
+    @Test
+    void imagesOnlyIsNeverARedo() {
+        assertThat(run("--images-only", "--redo")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("--images-only calls no model");
     }
 
     @Test
@@ -198,6 +297,40 @@ class PyqExtractCommandTest {
 
         assertThat(extract.bilingual).containsExactly(false, false);
         assertThat(extract.pageTexts).allSatisfy(text -> assertThat(text).contains("the words that we use"));
+    }
+
+    /**
+     * Code 45's real state: the JSONL written before images were kept — its lines carry no {@code image}
+     * key at all — and no page image in the store; {@code image}, when given, puts a record on each line.
+     */
+    private void code45State(IntFunction<PyqExtractedPage.Image> image) {
+        List<PyqExtractedPage> written = new ArrayList<>();
+        for (int page = 1; page <= 2; page++) {
+            PyqPage read = extract.pages.get(page);
+            written.add(new PyqExtractedPage(page, read.confidence(), UUID.randomUUID(), "claude-opus-5-5", "pyq_extract.v1",
+                    read.headings(), read.questions(), image == null ? null : image.apply(page)));
+        }
+        String jsonl = new String(PyqExtractJsonl.write(written), StandardCharsets.UTF_8).replace(",\"image\":null", "");
+        if (image == null) {
+            assertThat(jsonl).doesNotContain("\"image\"");
+        }
+        store.put(ContentKeys.pyqExtract("neet-2025-45"), jsonl.getBytes(StandardCharsets.UTF_8), "application/jsonl");
+    }
+
+    /** Each register page's sha256 as the booklet draws it at the test's dpi. */
+    private Map<Integer, String> drawn() {
+        Map<Integer, String> shas = new HashMap<>();
+        new PdfPageRenderer(72).render(booklet, page -> page > 2, (png, page) -> shas.put(page, PyqExtractCommand.sha256(png)));
+        return shas;
+    }
+
+    private List<PyqExtractedPage> lines() {
+        return PyqExtractJsonl.read("k", store.get(ContentKeys.pyqExtract("neet-2025-45")));
+    }
+
+    private void rewrite(UnaryOperator<PyqExtractedPage> change) {
+        store.put(ContentKeys.pyqExtract("neet-2025-45"), PyqExtractJsonl.write(lines().stream().map(change).toList()),
+                "application/jsonl");
     }
 
     private int run(String... extra) {
@@ -308,12 +441,16 @@ class PyqExtractCommandTest {
         final List<Integer> inQuestion = new ArrayList<>();
         final List<Boolean> bilingual = new ArrayList<>();
         final List<String> pageTexts = new ArrayList<>();
+        /** Whether the page's image was already in the store when its call came. */
+        final List<Boolean> imageKeptAtCall = new ArrayList<>();
+        IntPredicate imageKept = page -> false;
         String model = "claude-opus-5-5";
 
         @Override
         public AiResponse<PyqPage> read(String paper, int page, List<ImagePart> images, boolean bilingual,
                 String pageText, Integer inQuestion, AiCallContext ctx) {
             calls.add(page);
+            imageKeptAtCall.add(imageKept.test(page));
             this.inQuestion.add(inQuestion);
             this.bilingual.add(bilingual);
             pageTexts.add(pageText);

@@ -16,6 +16,7 @@ import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.rendering.PageDrawer;
 import org.apache.pdfbox.rendering.PageDrawerParameters;
+import org.apache.pdfbox.util.Version;
 
 /**
  * One source PDF into page images (TECH_PLAN §6.1). The pages are handed to the caller one at a
@@ -39,6 +40,17 @@ final class PdfPageRenderer {
 
     PdfPageRenderer(int dpi) {
         this.dpi = dpi;
+    }
+
+    /**
+     * What draws the pixels, recorded with every page image a PYQ call read (D19): PDFBox rasterises
+     * the page — with the image decoders the same pom pins beside it (JPEG2000, JBIG2) and, for a font
+     * the PDF does not embed, a font installed on the machine — and the JDK's Java2D and PNG writer
+     * turn it into bytes. The string names the two that change most; a drift in anything is refused by
+     * the image's sha256, not by this string.
+     */
+    static String version() {
+        return "PDFBox " + Version.getVersion() + ", Java " + Runtime.version();
     }
 
     /**

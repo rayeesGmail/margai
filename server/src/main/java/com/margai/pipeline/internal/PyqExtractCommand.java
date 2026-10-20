@@ -50,6 +50,15 @@ import picocli.CommandLine.Option;
  * every {@code margai.pipeline.extract-batch-size} pages and again whatever stops the run, and the
  * ledger's bill is reported either way. The draft goes to {@code --drafts}, which may not lie inside
  * the inputs: approving it is a person's act (.claude/rules/pipeline.md).
+ *
+ * <p>Every page image a call reads is kept at {@code pages/pyq/{paper}/{page}.png} in the content
+ * bucket, as {@code ncert render} keeps a book's, and its line in the JSONL records the image's sha256,
+ * dpi and renderer, so any later check can prove it looks at the picture the model read; code 45's are
+ * re-rendered with no model call (founder, 2026-10-20). Keeping it before the call, the local copy
+ * under {@code --drafts}{@code /pages/{paper}/} for the review, the tiles in the record and the
+ * {@code --images-only} flag are Claude's (DECISIONS 2026-10-20): that flag draws the pages already
+ * read, keeping the image of a page read before images were kept (marked re-rendered) and checking
+ * every other against the hash its line records.
  */
 @Component
 @Profile("pipeline")
@@ -70,8 +79,13 @@ class PyqExtractCommand extends PyqPaperCommand {
     @Option(names = "--redo", description = "Call again for pages already in the JSONL, replacing them.")
     boolean redo;
 
+    @Option(names = "--images-only", description = "Call no model: keep the image of every page already read "
+            + "that has none (re-rendered), and check every kept image against a fresh drawing.")
+    boolean imagesOnly;
+
     @Option(names = "--drafts", paramLabel = "DIR", defaultValue = DEFAULT_DRAFTS,
-            description = "Where the draft paper file is written (default: ${DEFAULT-VALUE}); never the inputs.")
+            description = "Where the draft paper file and the local page images are written (default: ${DEFAULT-VALUE}); "
+                    + "never the inputs.")
     Path drafts;
 
     private final ObjectStore content;
@@ -94,8 +108,14 @@ class PyqExtractCommand extends PyqPaperCommand {
 
     @Override
     void run(PaperDefinition paper, Report report) {
-        guardLiveClient();
-        guardTranscribeModel();
+        if (imagesOnly && redo) {
+            throw new InputFormatException(Path.of(FILE), 0, "--images-only calls no model, so there is no page to "
+                    + "--redo; a page is read again, and its image kept again, by --redo alone");
+        }
+        if (!imagesOnly) {
+            guardLiveClient();
+            guardTranscribeModel();
+        }
         if (drafts.toAbsolutePath().normalize().startsWith(io.inputs.toAbsolutePath().normalize())) {
             throw new InputFormatException(drafts, 0, "is inside the founder's inputs — a draft is never written there; "
                     + "approving it and committing it to the inputs is a person's act (.claude/rules/pipeline.md)");
@@ -103,8 +123,12 @@ class PyqExtractCommand extends PyqPaperCommand {
         PaperSourceFile booklet = paper.transcribed();
         boolean bilingual = booklet.languages().equals(PyqPapersYamlReader.BILINGUAL);
         report.line("content store: " + content.describe());
-        report.line("transcriber: " + extract.model() + ", " + extract.promptVersion()
-                + " (the effort is the visionopus55 profile's)");
+        if (!imagesOnly) {
+            report.line("transcriber: " + extract.model() + ", " + extract.promptVersion()
+                    + " (the effort is the visionopus55 profile's)");
+        }
+        report.line("page images: " + properties.renderDpi() + " dpi, " + PdfPageRenderer.version() + ", "
+                + properties.pageTiles() + " tile(s) a page");
         report.line("booklet: " + booklet.file() + " (" + booklet.languages() + "; pages " + rangeOf(booklet.pages()) + ")");
 
         byte[] pdf = content.get(booklet.file());
@@ -121,6 +145,10 @@ class PyqExtractCommand extends PyqPaperCommand {
                 throw new InputFormatException(Path.of(FILE), 0, "the register reads page " + page + " of " + booklet.file()
                         + ", which has " + documentPages + " pages");
             }
+        }
+        if (imagesOnly) {
+            keepImagesOnly(paper, booklet, pdf, report);
+            return;
         }
         // The layer is judged over the whole booklet, as TECH_PLAN §6.1 judges an NCERT chapter's, and only
         // an English-only booklet's travels: a bilingual layer interleaves the Hindi, which README §4 found
@@ -197,6 +225,17 @@ class PyqExtractCommand extends PyqPaperCommand {
             report.line("PARTIAL: " + (booklet.pages().size() - ordered.size()) + " page(s) not read yet — the draft "
                     + "covers only the pages read");
         }
+        List<List<String>> imageRows = new ArrayList<>();
+        for (PyqExtractedPage line : ordered) {
+            PyqExtractedPage.Image image = line.image();
+            imageRows.add(List.of(String.valueOf(line.page()), image == null ? "—" : image.sha256(),
+                    image == null ? "none — read before images were kept; `pyq extract --images-only` keeps it"
+                            : toRead.contains(line.page()) ? "kept with this run's call"
+                            : "kept by an earlier run" + (image.rerendered() ? " (re-rendered)" : "")));
+        }
+        report.section("page images — what each call read, at pages/pyq/" + paper.code() + "/ and under "
+                + drafts.resolve("pages").resolve(paper.code()).normalize())
+                .table(List.of("page", "sha256", "image"), imageRows);
         report.section("questions per section — against the count the booklet declares").table(
                 List.of("subject", "section", "questions", "declared", "with a figure"),
                 sectionRows(paper, draft.file()));
@@ -217,11 +256,9 @@ class PyqExtractCommand extends PyqPaperCommand {
             AiCallContext ctx, int[] called, List<String> lowConfidence) {
         String paperName = paper.row().exam() + " (UG) " + paper.row().year() + ", booklet code " + paper.row().paperCode();
         new PdfPageRenderer(properties.renderDpi()).render(pdf, page -> !toRead.contains(page), (png, page) -> {
-            double ink = ink(png);
-            if (ink < MIN_INK) {
-                throw new IllegalStateException("page " + page + " of " + booklet.file() + " rendered as blank paper (ink "
-                        + "%.4f".formatted(ink) + ") — an image the renderer could not draw; nothing was sent for it");
-            }
+            refuseBlank(booklet, page, png);
+            // Kept before the call, so no page is ever paid for without the picture it was read from.
+            PyqExtractedPage.Image image = keep(paper.code(), page, png, false);
             List<ImagePart> images = PageTiles.split(png, properties.pageTiles()).stream()
                     .map(band -> new ImagePart(band, PdfPageRenderer.MEDIA_TYPE)).toList();
             Integer inQuestion = previousOf(booklet.pages(), page, done);
@@ -229,7 +266,7 @@ class PyqExtractCommand extends PyqPaperCommand {
                     inQuestion, ctx);
             PyqPage read = response.output();
             done.put(page, new PyqExtractedPage(page, read.confidence(), response.aiCallId(), response.modelId(),
-                    extract.promptVersion(), read.headings(), read.questions()));
+                    extract.promptVersion(), read.headings(), read.questions(), image));
             if (read.confidence() != null && read.confidence().compareTo(PyqAssembly.LOW_CONFIDENCE) < 0) {
                 lowConfidence.add("page " + page + " — confidence " + read.confidence());
             }
@@ -239,6 +276,109 @@ class PyqExtractCommand extends PyqPaperCommand {
                 log.info("pyq extract {}: {} pages called, flushed", paper.code(), called[0]);
             }
         });
+    }
+
+    /**
+     * {@code --images-only}: no model call. A page already read whose line has no image gets it now,
+     * marked re-rendered; a page whose line has one is drawn again and must give the same bytes, and
+     * so must the object in the store. Whatever stops the run, the images kept so far are recorded.
+     */
+    private void keepImagesOnly(PaperDefinition paper, PaperSourceFile booklet, byte[] pdf, Report report) {
+        String jsonlKey = ContentKeys.pyqExtract(paper.code());
+        if (!content.exists(jsonlKey)) {
+            throw new InputFormatException(Path.of(FILE), 0, "no page of " + paper.code() + " has been read yet ("
+                    + jsonlKey + " is not in the store) — there is no image a model read to keep");
+        }
+        TreeMap<Integer, PyqExtractedPage> done = new TreeMap<>();
+        PyqExtractJsonl.read(jsonlKey, content.get(jsonlKey)).forEach(page -> done.put(page.page(), page));
+        Set<Integer> wanted = new LinkedHashSet<>();
+        for (int page : booklet.pages()) {
+            if (done.containsKey(page) && (pages == null || pages.isEmpty() || pages.contains(page))) {
+                wanted.add(page);
+            }
+        }
+        List<List<String>> rows = new ArrayList<>();
+        int[] kept = {0};
+        try {
+            new PdfPageRenderer(properties.renderDpi()).render(pdf, page -> !wanted.contains(page), (png, page) -> {
+                refuseBlank(booklet, page, png);
+                String sha = sha256(png);
+                String key = ContentKeys.pyqPage(paper.code(), page);
+                String stored = content.exists(key) ? sha256(content.get(key)) : null;
+                PyqExtractedPage line = done.get(page);
+                PyqExtractedPage.Image recorded = line.image();
+                if (recorded == null) {
+                    if (stored != null && !stored.equals(sha)) {
+                        throw new IllegalStateException("page " + page + ": the image in the store at " + key + " ("
+                                + stored + ") is not what the booklet draws now (" + sha + ") — neither is kept until "
+                                + "the difference is understood");
+                    }
+                    done.put(page, line.withImage(keep(paper.code(), page, png, true)));
+                    kept[0]++;
+                    rows.add(List.of(String.valueOf(page), sha, "kept now — re-rendered, the page was read before images were kept"));
+                    return;
+                }
+                if (!recorded.sha256().equals(sha)) {
+                    throw new IllegalStateException("page " + page + " draws differently now (" + sha + ", "
+                            + properties.renderDpi() + " dpi, " + PdfPageRenderer.version() + ") than the image its line "
+                            + "records (" + recorded.sha256() + ", " + recorded.dpi() + " dpi, " + recorded.renderer()
+                            + ") — a later check could not prove it looks at what the model read");
+                }
+                if (!sha.equals(stored)) {
+                    throw new IllegalStateException("page " + page + ": the image in the store at " + key + " is "
+                            + (stored == null ? "missing" : stored) + ", not " + sha + ", the image its line records");
+                }
+                writeLocal(paper.code(), key, png);
+                rows.add(List.of(String.valueOf(page), sha, "the same bytes as the image its line records"
+                        + (recorded.rerendered() ? " (re-rendered)" : "")));
+            });
+        } catch (RuntimeException e) {
+            // The images kept before the stop are recorded and named, so the artefact never changes unreported.
+            if (kept[0] > 0) {
+                flush(jsonlKey, done);
+            }
+            report.section("page images handled before the run stopped (--images-only)")
+                    .table(List.of("page", "sha256", "image"), rows)
+                    .line("jsonl: " + jsonlKey + (kept[0] > 0 ? " (rewritten with the " + kept[0] + " image record(s) kept)"
+                            : " (unchanged)"));
+            throw e;
+        }
+        if (kept[0] > 0) {
+            flush(jsonlKey, done);
+        }
+        report.section("page images — no model call (--images-only)").table(List.of("page", "sha256", "image"), rows);
+        report.line(kept[0] + " image(s) kept now, " + (rows.size() - kept[0]) + " checked against their line; "
+                + (booklet.pages().size() - wanted.size()) + " register page(s) not read yet or not selected");
+        report.line("jsonl: " + jsonlKey + (kept[0] > 0 ? " (rewritten with the images' records)" : " (unchanged)"));
+        report.line("local copies: " + drafts.resolve("pages").resolve(paper.code()).normalize());
+    }
+
+    /** One page image into the content bucket and beside the draft, and the record its JSONL line keeps. */
+    private PyqExtractedPage.Image keep(String paper, int page, byte[] png, boolean rerendered) {
+        String key = ContentKeys.pyqPage(paper, page);
+        content.put(key, png, PdfPageRenderer.MEDIA_TYPE);
+        writeLocal(paper, key, png);
+        return new PyqExtractedPage.Image(key, sha256(png), properties.renderDpi(), PdfPageRenderer.version(),
+                properties.pageTiles(), rerendered);
+    }
+
+    /** The review's copy: {@code --drafts}{@code /pages/{paper}/{page}.png}, the bucket object's bytes. */
+    private void writeLocal(String paper, String key, byte[] png) {
+        Path local = drafts.resolve("pages").resolve(paper).resolve(Path.of(key).getFileName().toString());
+        try {
+            Files.createDirectories(local.getParent());
+            Files.write(local, png);
+        } catch (IOException e) {
+            throw new UncheckedIOException("cannot write the page image " + local, e);
+        }
+    }
+
+    private static void refuseBlank(PaperSourceFile booklet, int page, byte[] png) {
+        double ink = ink(png);
+        if (ink < MIN_INK) {
+            throw new IllegalStateException("page " + page + " of " + booklet.file() + " rendered as blank paper (ink "
+                    + "%.4f".formatted(ink) + ") — an image the renderer could not draw; nothing was sent for it");
+        }
     }
 
     private void reportCost(Report report, String runId) {

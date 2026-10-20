@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
  * <pre>
  * source/ncert/2022-ed/{lang}/{book}/{file}.pdf   the founder's upload, mirroring the local tree
  * pages/{book}/{lang}/{chapter}/{page}.png        `ncert render`
+ * pages/pyq/{paper}/{page}.png                    `pyq extract`, the image each page call read
  * extract/{book}/{lang}[.{tag}].jsonl             `ncert extract` (a tag: a scratch run's own)
  * verify/{book}/{lang}[.{tag}].jsonl              `ncert verify --read-pages`
  * </pre>
@@ -37,6 +38,14 @@ final class ContentKeys {
 
     static String extract(String book, BookLanguage language) {
         return extract(book, language, null);
+    }
+
+    /**
+     * A booklet page as {@code pyq extract} drew it for the model (D19, founder 2026-10-20), kept as
+     * {@code ncert render} keeps a book's: {@code pages/pyq/{paper}/{page}.png}.
+     */
+    static String pyqPage(String paper, int page) {
+        return "pages/pyq/" + paper + "/" + PAGE_FORMAT.formatted(page);
     }
 
     /** {@code pyq extract}'s artefact, one line per booklet page read (D19): {@code extract/pyq/{paper}.jsonl}. */

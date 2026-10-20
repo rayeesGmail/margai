@@ -206,7 +206,7 @@ class PyqExtractCommand extends PyqPaperCommand {
                 .list(lowConfidence);
         reportCost(report, runId);
         report.line("jsonl: " + jsonlKey + " (" + done.size() + " pages)");
-        report.line("draft: " + draftFile.toAbsolutePath().normalize() + " (" + draft.file().questions().size()
+        report.line("draft: " + draftFile.normalize() + " (" + draft.file().questions().size()
                 + " questions; answers empty until NTA's key is filled in at review"
                 + (replaced ? "; it replaced the earlier draft" : "") + ")");
     }

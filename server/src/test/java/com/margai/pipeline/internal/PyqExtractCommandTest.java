@@ -176,6 +176,18 @@ class PyqExtractCommandTest {
         assertThat(out.toString()).contains("is inside the founder's inputs");
     }
 
+    /** A committed report reads the same on every machine (Report): the draft is named as given, never made absolute. */
+    @Test
+    void theReportNamesTheDraftAsGiven() {
+        Path relative = Path.of("").toAbsolutePath().relativize(drafts);
+
+        int exit = commandLine.execute("pyq", "extract", "--paper", "neet-2025-45", "--inputs", inputs.toString(),
+                "--reports", reports.toString(), "--drafts", relative.toString());
+
+        assertThat(exit).isEqualTo(InputFileCommand.EXIT_OK);
+        assertThat(out.toString()).contains("draft: " + relative.resolve("neet-2025-45.draft.json").normalize() + " (4 questions");
+    }
+
     @Test
     void anEnglishBookletsLegibleTextLayerTravelsWithItsPage() throws IOException {
         register("en", "1-2", PyqExtractCommand.sha256(booklet));

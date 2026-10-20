@@ -217,14 +217,21 @@ The D17 PR merged (#20, 0da4675); `d18-fallback-gate` rebased on it (origin/main
   and `ncert_verify` run on VISION's pipeline profiles, unchanged, so they are listed, not rerun — each lower score diagnosed for its cause
   (English ranks in the bar's fused mode move by query-embedding variance, not the CHEAP model; the English-rewrite
   diagnostic's ranks can depend on it), the same-day old-model runs diagnostic only.
-  SURFACED: VISION, which the founder did not name, stays on `claude-haiku-4-5` (Claude's choice); Haiku 5.5
-  accepts no temperature but 1 (Anthropic's model documentation, read through web search; the T0 smoke sends none),
-  so T0's run of record cannot run at the temperature 0 ruling B required of D17's rerun.
+  SURFACED: VISION, which the founder did not name, stays on `claude-haiku-4-5` (Claude's choice) — RESOLVED the
+  same day, below; Haiku 5.5 accepts no temperature but 1 (Anthropic's model documentation, read through web
+  search; the T0 smoke sends none), so T0's run of record cannot run at the temperature 0 ruling B required of
+  D17's rerun.
   The T1 code begun before the change of plan is stashed (`git stash` "d18-t1-wip", and scratchpad b3c73b13
-  p2/d18-t1-wip.diff), to be resumed after T0.
-  NEXT: T0 — the tier ids, request settings and prices, the ledger's long-prompt rate, TECH_PLAN §4.8 and §4.11
-  amended in the same commit, eval stamp, changelog; the founder's smoke and regression run; the report; then T1,
-  the probes, the probe run, the gate docs.
+  p2/d18-t1-wip.diff), to be resumed after T0; its fallback record requires a VISION id, which will mirror Haiku
+  5.5 as its own recorded choice, since the founder's fallback rulings name CHEAP and REASON only.
+  T0 COMMITTED (611263f, after the approval docs 418bfff): CHEAP Haiku 5.5, REASON Sonnet 5.5, the ledger's
+  long-prompt rate. Then the founder: "change vision model also to haiku 5.5" — VISION's default moves to Haiku
+  5.5 too (DECISIONS 2026-10-20), in CHEAP's settings (Claude's choice), the run script's old-model control
+  restoring VISION to Haiku 4.5 as well; stale "VISION default is Haiku 4.5" comments in the pipeline code, the
+  extract test and the ncert-ingest runbook corrected (the runbook also still said `ncert extract` had no
+  transcriber guard, which it has had since 2026-09-22).
+  NEXT: the VISION commit (eval stamp first); the founder's smoke and regression run (scratchpad b3c73b13
+  `d18-t0-regression.sh`, NEW then OLD tiers); the T0 report; then T1, the probes, the probe run, the gate docs.
 
 D17 · 2026-10-19 (night) · the rerun, the run of record: the bar met, the hand-check passed; D17 DONE
 The founder's rerun of `ncert retrieve --rewrite` on the jar built at 0efbac6 (scratchpad b3c73b13

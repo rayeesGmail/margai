@@ -32,8 +32,8 @@ class AiPropertiesTest {
                     .isEqualTo(AiProperties.Provider.anthropic);
             assertThat(AiProperties.Provider.valueOf(AiProperties.BEDROCK)).isEqualTo(AiProperties.Provider.bedrock);
             assertThat(properties.bedrock().region()).isEqualTo("ap-south-1");
-            // Since D18's T0 (DECISIONS 2026-10-20) CHEAP and REASON run the 5.5 models and VISION keeps its own.
-            assertThat(properties.modelFor(Tier.cheap)).isNotBlank().isNotEqualTo(properties.modelFor(Tier.vision));
+            // Since D18's T0 (DECISIONS 2026-10-20) CHEAP and VISION run Haiku 5.5 and REASON Sonnet 5.5.
+            assertThat(properties.modelFor(Tier.cheap)).isNotBlank().isEqualTo(properties.modelFor(Tier.vision));
             assertThat(properties.modelFor(Tier.reason)).isNotBlank().isNotEqualTo(properties.modelFor(Tier.cheap));
             assertThat(properties.embed().model()).isNotBlank();
             assertThat(properties.embed().provider()).isNotBlank();
@@ -89,6 +89,11 @@ class AiPropertiesTest {
             assertThat(reason.forcesTheTool()).isFalse();
             assertThat(cheap.cacheMinTokens()).isPositive();
             assertThat(reason.cacheMinTokens()).isPositive();
+            // VISION runs Haiku 5.5 too, in CHEAP's settings: a temperature there would be a 400.
+            AiProperties.Model vision = properties.modelOf(Tier.vision);
+            assertThat(vision.temperature()).isNull();
+            assertThat(vision.thinking()).isEqualTo(AiProperties.Thinking.disabled);
+            assertThat(vision.cacheMinTokens()).isPositive();
         });
     }
 
@@ -121,7 +126,8 @@ class AiPropertiesTest {
 
     /**
      * The 5.5 measurement profiles (D16): the VISION tier leaves the tool to the model — a forced
-     * choice is a 400 on that generation — the model is priced, and the default VISION tier still forces it.
+     * choice is a 400 on Opus 5.5 and Sonnet 5.5 — the model is priced, and the default VISION tier,
+     * Haiku 5.5, still forces it (DECISIONS 2026-10-20: the T0 smoke decides).
      */
     @Test
     void theFivePointFiveProfilesChooseTheToolAutomaticallyAndArePriced() {

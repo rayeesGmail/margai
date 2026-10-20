@@ -34,7 +34,8 @@ margai:
     provider: anthropic
     # Tier defaults: the 5.5 models for CHEAP and REASON since 2026-10-20 (D18 T0, founder ruling,
     # DECISIONS: build on the launch models rather than migrate later), in both the real-time and
-    # the batch lane; VISION keeps the 4.5 cheap model, which pipeline profiles override. Each tier
+    # the batch lane, and Haiku 5.5 for VISION too (founder, the same day); pipeline profiles
+    # override VISION per run. Each tier
     # also carries the request shape its model accepts (§4.11) — a rejected field is a 400, not a
     # default, so an omitted key means "send nothing". Both 5.5 models reject any `temperature` but
     # 1; Haiku 5.5 turns thinking off with `disabled` (at effort low to high; omitted effort is its
@@ -54,10 +55,9 @@ margai:
         tool-choice: auto
         cache-min-tokens: 512
       vision:
-        id: claude-haiku-4-5
-        temperature: 0
+        id: claude-haiku-5-5
         thinking: disabled
-        cache-min-tokens: 4096
+        cache-min-tokens: 512
     # The embedding pin (§4.9): provider, model and width move together — changing any of them
     # means re-embedding the corpus, so the D17 retrieval harness settles Hindi and Hinglish
     # quality before D16 fills the tables (DECISIONS 2026-09-12).

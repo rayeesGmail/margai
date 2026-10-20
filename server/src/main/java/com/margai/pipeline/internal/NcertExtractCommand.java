@@ -335,9 +335,10 @@ class NcertExtractCommand extends NcertBookCommand {
      * The transcriber is the ruling's, or the run does not start (DECISIONS 2026-09-14 "the pair").
      *
      * <p>This is the mirror of {@code ncert verify --read-pages}'s guard and it was missing until
-     * 2026-09-22, which is not a symmetry point but a real hole: the VISION tier's default is
-     * {@code claude-haiku-4-5}, the D15 dry runs put that model out of transcription after three
-     * runs and three different layout failures on the two-column page, and the {@code visionopus}
+     * 2026-09-22, which is not a symmetry point but a real hole: the VISION tier's default was then
+     * {@code claude-haiku-4-5}, which the D15 dry runs put out of transcription after three runs and
+     * three different layout failures on the two-column page (the default is Claude Haiku 5.5 since
+     * 2026-10-20, refused the same way), and the {@code visionopus}
      * profile is the only thing that selects Opus. So a forgotten profile did not fail — it
      * transcribed a whole book on the rejected model, wrote it to the canonical JSONL, and said so
      * nowhere but the ledger. It has to refuse before the first call, because every page after the

@@ -31,9 +31,11 @@ margai:
     verify-model: claude-sonnet-5
     # The other half of the same ruling, and the guard that was missing until 2026-09-22: `ncert
     # extract` refuses unless the VISION tier is this model — the `visionopus` profile sets it. The
-    # VISION default is `claude-haiku-4-5`, which the D15 dry runs put out of transcription after
-    # three runs and three different layout failures on the two-column page, so a forgotten profile
-    # used to spend a whole book on the rejected model and say so nowhere but the ledger. It is the
+    # VISION default was `claude-haiku-4-5`, which the D15 dry runs put out of transcription after three
+    # runs and three different layout failures on the two-column page, so a forgotten profile used to
+    # spend a whole book on the rejected model and say so nowhere but the ledger. Since 2026-10-20 (D18)
+    # the default is Claude Haiku 5.5, which no run has tried on transcription, and the guard refuses it
+    # the same way. It is the
     # English edition's, frozen; the Hindi edition is cut on Claude Opus 5.5 at low, set by the
     # `visionopus55` profile (DECISIONS 2026-10-02, the 5.5 validation), so that profile can never
     # re-extract English.

@@ -1570,10 +1570,16 @@ unchanged; the batch lane, the request shape and the region paragraph do not.*
   medium, applies, and keeps the forced tool choice; Sonnet 5.5 answers `disabled` thinking and a forced
   tool choice with a 400 (D16), so REASON sends `thinking: between_tools`, `effort: medium` and an `auto`
   tool choice (a strict tool the user turn asks for). Both models' minimum cacheable prefix is 512 tokens,
-  so the cheap-model floor of 4,096 above is the VISION tier's alone now. The D23/D39 thinking comparison
-  stands, now on Sonnet 5.5. "Forced tool use is supported on both configured models" above no longer
-  holds for REASON, nor "the cheap model refuses `effort`" for CHEAP (Haiku 5.5 takes effort, default
-  medium); both still describe the VISION tier's Haiku 4.5.*
+  so the cheap-model floor of 4,096 above is Haiku 4.5's, which no tier runs by default now. The D23/D39
+  thinking comparison stands, now on Sonnet 5.5. "Forced tool use is supported on both configured models"
+  above no longer holds for REASON, nor "the cheap model refuses `effort`" for CHEAP (Haiku 5.5 takes effort,
+  default medium). *Amended again the same day (the switch is the founder's — 2026-10-20: "change vision
+  model also to haiku 5.5"; CHEAP's request settings on VISION are Claude's, for the founder to overrule;
+  DECISIONS 2026-10-20):* VISION's default runs Claude Haiku 5.5 too, in CHEAP's settings; pipeline
+  profiles still pin VISION per run, and `ncert extract`'s guard refuses it as it refused Haiku 4.5. Haiku
+  5.5 reads images at a higher resolution tier — about 2.5× Haiku 4.5's image tokens for a 2,000×1,500
+  image (Anthropic's Haiku 5.5 migration guide) — at a tenth of the price per token under 100K-token
+  prompts (Anthropic's pricing documentation), both read through web search.*
 - **Batch inference**: *amended 2026-09-12.* The direct Batches API accepts the reasoning model, so
   the offline-reasoning lane is the same model as the real-time one — cheaper than the model the
   Bedrock allowlist had forced on it — at 50% off every token, cache reads and writes included,

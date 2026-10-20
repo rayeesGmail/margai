@@ -9,14 +9,14 @@ import picocli.CommandLine.Spec;
  * The command tree of TECH_PLAN §6.3: D13's {@code taxonomy load}, {@code taxonomy
  * prerequisites}, {@code backbone load}, {@code cutoffs load}, D14's {@code ncert register},
  * {@code ncert render}, {@code ncert extract}, {@code ncert load}, D15's {@code ncert verify}
- * and {@code ncert embed}, D16's {@code ncert align} and {@code ncert errata}, and D17's
- * {@code ncert retrieve}. The group commands
+ * and {@code ncert embed}, D16's {@code ncert align} and {@code ncert errata}, D17's
+ * {@code ncert retrieve}, and D19's {@code pyq extract}. The group commands
  * only route; calling a group without a subcommand is a usage error.
  */
 @Command(name = PipelineRunner.COMMAND_NAME, mixinStandardHelpOptions = true,
         description = "MARG AI content pipeline (TECH_PLAN §6). Every command is idempotent and writes a report.",
         subcommands = {PipelineCommand.Taxonomy.class, PipelineCommand.Backbone.class, PipelineCommand.Cutoffs.class,
-                PipelineCommand.Ncert.class})
+                PipelineCommand.Ncert.class, PipelineCommand.Pyq.class})
 final class PipelineCommand implements Runnable {
 
     @Spec
@@ -79,6 +79,20 @@ final class PipelineCommand implements Runnable {
                     NcertLoadCommand.class, NcertVerifyCommand.class, NcertAlignCommand.class, NcertEmbedCommand.class,
                     NcertErrataCommand.class, NcertRetrieveCommand.class})
     static final class Ncert implements Runnable {
+
+        @Spec
+        CommandSpec spec;
+
+        @Override
+        public void run() {
+            throw missingSubcommand(spec);
+        }
+    }
+
+    @Command(name = "pyq", mixinStandardHelpOptions = true,
+            description = "The official past papers: read a booklet into its draft paper file (D19).",
+            subcommands = {PyqExtractCommand.class})
+    static final class Pyq implements Runnable {
 
         @Spec
         CommandSpec spec;

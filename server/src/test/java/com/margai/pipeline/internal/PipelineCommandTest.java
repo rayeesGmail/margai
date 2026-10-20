@@ -277,6 +277,12 @@ class PipelineCommandTest {
                             new NcertRetrieveCommandTest.StubRewriter(), new NcertExtractCommandTest.StubSpend(),
                             new com.margai.ai.api.AiClientInfo("cohere", List.of("ledger")), writer));
                 }
+                if (cls == PyqExtractCommand.class) {
+                    return cls.cast(new PyqExtractCommand(new NcertRenderCommandTest.RecordingStore(),
+                            new PyqExtractCommandTest.RecordingPyqExtract(), new NcertExtractCommandTest.StubSpend(),
+                            new com.margai.ai.api.AiClientInfo("anthropic", List.of("ledger")),
+                            PyqExtractCommandTest.properties(), PyqExtractCommandTest.pyq(), writer));
+                }
                 if (cls == NcertAlignCommand.class) {
                     return cls.cast(new NcertAlignCommand(imports, new NcertEmbedCommandTest.StubEmbeddings(),
                             new NcertExtractCommandTest.StubSpend(),

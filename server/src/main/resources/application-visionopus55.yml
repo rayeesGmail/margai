@@ -1,6 +1,8 @@
-# The Hindi transcriber's shape: the VISION tier on Claude Opus 5.5 at effort low.
+# The Hindi transcriber's shape: the VISION tier on Claude Opus 5.5 at effort low — and since D19
+# (2026-10-20, the founder's ruling) the PYQ booklets' transcriber too (margai.pipeline.pyq.transcribe-model).
 #
 #   java -jar server.jar --spring.profiles.active=pipeline,live,visionopus55 ncert extract --book <code> --lang hi …
+#   java -jar server.jar --spring.profiles.active=pipeline,live,visionopus55 pyq extract --paper <code>
 #
 # Added 2026-10-01 (D16) as a measurement when the founder asked to validate the 5.5 generation; since
 # 2026-10-02 it is how the Hindi corpus is cut (DECISIONS: on phy11-part1 Hindi ch 1 no Devanagari error

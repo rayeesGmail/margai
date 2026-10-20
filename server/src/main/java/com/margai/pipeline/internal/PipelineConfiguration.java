@@ -7,6 +7,6 @@ import org.springframework.context.annotation.Profile;
 /** The pipeline module's wiring: its knobs, under the profile that runs the §6 commands. */
 @Configuration(proxyBeanMethods = false)
 @Profile("pipeline")
-@EnableConfigurationProperties(PipelineProperties.class)
+@EnableConfigurationProperties({PipelineProperties.class, PyqProperties.class})
 class PipelineConfiguration {
 }

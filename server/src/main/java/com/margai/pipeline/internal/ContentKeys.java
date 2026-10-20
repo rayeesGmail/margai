@@ -39,6 +39,16 @@ final class ContentKeys {
         return extract(book, language, null);
     }
 
+    /** {@code pyq extract}'s artefact, one line per booklet page read (D19): {@code extract/pyq/{paper}.jsonl}. */
+    static String pyqExtract(String paper) {
+        return "extract/pyq/" + paper + ".jsonl";
+    }
+
+    /** {@code pyq tag}'s artefact, one line per question tagged (D19): {@code tags/pyq/{paper}.jsonl}. */
+    static String pyqTags(String paper) {
+        return "tags/pyq/" + paper + ".jsonl";
+    }
+
     /**
      * The same, under a tag for a scratch run — a model trial against the frozen corpus (D16, the 5.5
      * validation) must never write into, or resume from, the canonical artefact:

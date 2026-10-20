@@ -41,6 +41,10 @@ margai:
     # re-extract English.
     transcribe-model: claude-opus-5
     transcribe-model-hi: claude-opus-5-5
+    # D19: the official question booklets are transcribed on Claude Opus 5.5 at effort low (the
+    # founder's ruling; the `visionopus55` profile), and `pyq extract` refuses any other VISION model.
+    pyq:
+      transcribe-model: claude-opus-5-5
     # `ncert embed` commits its vectors every this many paragraphs. Embedding a book is cheap
     # (~900 calls at 0.12 USD/1M tokens) but not free, and a run interrupted late should keep what
     # it paid for — the next run embeds only rows whose embedding is still null.

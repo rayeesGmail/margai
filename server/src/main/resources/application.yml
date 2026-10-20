@@ -182,6 +182,10 @@ margai:
       # the doubt router's call.
       query_rewrite:
         version: 1
+      # D19: one official booklet page into its questions (VISION; Opus 5.5 at effort low by the
+      # founder's ruling, through the `visionopus55` profile at run time).
+      pyq_extract:
+        version: 1
   # Object storage (TECH_PLAN §1.3, §7.6; D14). Blank here on purpose: an unconfigured context
   # gets the in-memory store with a WARN, the way an unconfigured context gets FakeAiClient. The
   # pipeline profile names the content bucket, and a deployed environment gets it from SSM.

@@ -576,6 +576,26 @@ already-answered questions return it — the judged-answer response, answered qu
 session read, and notebook entries in any notebook view (§3.7, §0.4 #4) — plus the offline pack if
 Option A is chosen (§5.6).
 
+*Amended 2026-10-20 (D19; the founder's rulings on the D19 plan, `neet-pyq-sources/README.md` §1, with
+Claude's choices named at the end of the paragraph; built as V9).* **pyq_papers** — D19: one official paper, one booklet code of one sitting,
+`code` (the register's id) unique, `(exam, year, paper_code)` unique, `exam_date`, `official_hindi`,
+`question_count`, and JSONB `sections` ([{subject, section, from, to, attempt}], read whole by the D35 mock),
+`marking` (correct and wrong marks from the booklet; the blank mark and NTA's rules for dropped and
+multiple-answer questions from the year's notice, empty until sourced — no mock scores the paper until then),
+`key_source` (tier, where from, download date, file, sha256) and `source` (booklet files, sha256, pages). On
+**questions**: a PYQ reaches its paper by the composite foreign key `(exam, year, paper_code)`; option keys are
+"1"–"4" as NTA prints them; `correct_key` is nullable, and `answer_status` (single | multiple | dropped) with
+`accepted_keys VARCHAR(1)[]` holds NTA's final key — a CHECK ties each status to what the two hold, a
+multiple-answer question's `correct_key` being its lowest accepted key; `out_of_syllabus` (§15.6) keeps the
+nearest chapter as `node_id`; `figures` JSONB (recorded at D19, cropped before D31, a figure question never
+served without its crop); `extraction` and `tagging` JSONB provenance. **`accepted_keys` and `answer_status`
+are server-only exactly as `correct_key` is** — "multiple" or "dropped" is itself a hint — and judging a
+multiple-answer question reads `accepted_keys`. `question_topics` carries both timestamps. Claude's choices
+here, for the founder to overrule (DECISIONS 2026-10-20): the composite foreign key, the lowest accepted key as
+`correct_key`, `answer_status` and `accepted_keys` server-only, judging a multiple-answer question on
+`accepted_keys`, both timestamps on `question_topics`, and — its
+reading of the gap-4 rider — that no mock scores a paper whose marking is unsourced; the rest is the founder's.
+
 **question_topics** — D19: `question_id, node_id, PRIMARY KEY (question_id, node_id)` (secondary
 topics). **question_anchors** — D23: `question_id, paragraph_id, PRIMARY KEY`.
 
@@ -709,7 +729,7 @@ response_status SMALLINT, response_body JSONB, expires_at, PRIMARY KEY (key, use
 id, user_id (nullable), feature VARCHAR(24) NOT NULL CHECK (doubt|doubt_route|doubt_verify|
   doubt_render|doubt_extract|plan|mentor_message|classify|srs_variant|extract_document|embed|
   pipeline_extract|pipeline_solution|pipeline_verify|pipeline_distractor|pipeline_difficulty|
-  pipeline_trap|pipeline_generate|pipeline_collective|eval|smoke),   -- pipeline_collective: CS-1, with the D22 migration
+  pipeline_trap|pipeline_generate|pipeline_collective|pipeline_tag|eval|smoke),   -- pipeline_collective: CS-1, with the D22 migration; pipeline_tag: added 2026-10-20 (D19's `pyq tag`, in V9; DECISIONS 2026-10-20)
 model_id VARCHAR(120) NOT NULL, tier VARCHAR(8) NOT NULL CHECK (cheap|reason|vision|embed),
 prompt_name VARCHAR(64), prompt_version SMALLINT,
 input_tokens INTEGER, output_tokens INTEGER, cache_read_tokens INTEGER, cache_write_tokens INTEGER,
@@ -744,7 +764,7 @@ Numbers are indicative; the agent takes the next free integer.
 | V6 `auth` | D7 | otp_challenges, refresh_tokens; also `users.email` + `users_email_key` and the identifier check replacing `users_phone_status_check` (D7 ruling, §2.2) |
 | V7 `ncert` | D14 | ncert_books, ncert_paragraphs (embedding column nullable) |
 | V8 `ncert_hnsw` | ~~D17~~ **D15** — *moved 2026-09-19/20 with the founder's re-order (DECISIONS; PLAN D15)* | HNSW index on `ncert_paragraphs.embedding`. ~~(created once rows exist)~~ — *shipped 2026-09-20 on the empty column instead: a migration cannot wait for a pipeline run, HNSW accepts inserts after creation, and at ~900 rows now and ~9,000 at D17 the build-order difference is not measurable* |
-| V9 `questions` | D19 | questions, question_topics |
+| V9 `questions` | D19 | questions, question_topics; *pyq_papers and the `ai_calls.feature` value `pipeline_tag` too (2026-10-20, the founder's D19 rulings)* |
 | next free `collective_records` — *added 2026-09-12, CS-1* | D22 | collective_records (§2.3); the `ai_calls.feature` CHECK gains `pipeline_collective` (§2.8) |
 | V10 `question_anchors` | D23 | question_anchors; HNSW on `questions.embedding` |
 | V11 `batch_positions` | D25 | batch_positions (§0.5 item 3) |
@@ -810,7 +830,10 @@ the collected rollback scripts in reverse, and asserts only `flyway_schema_histo
 - `correct_key` is returned only for questions the student has already answered, through three
   carriers: the judged-answer response, answered questions inside a session read, and notebook
   entries in any notebook view (§3.7, §0.4 #4); the offline pack is a fourth under Option A (§5.6).
-  Question payloads before judging never contain it; a test enforces this (§8.3).
+  Question payloads before judging never contain it; a test enforces this (§8.3). *Amended 2026-10-20 (D19;
+  Claude's, DECISIONS 2026-10-20, for the founder to overrule): `accepted_keys` and `answer_status` (§2.3, V9) follow
+  the same rule through the same carriers — both carry the key — and a multiple-answer question is judged on
+  `accepted_keys`.*
 
 ### 3.2 Authentication and tokens
 
@@ -1126,6 +1149,8 @@ are the task classes in `ai.tasks`, each owning one prompt and one output record
 | `PyqSolveTask` | REASON | pipeline `pyq solve` |
 | `DistractorMapTask`, `DifficultyEstimateTask`, `TrapNoteTask` | CHEAP | pipeline `pyq distractors`, `stats compute`, `traps mine` |
 | `QuestionGenerateTask` | REASON (generation decision) | pipeline `questions generate` (feature `pipeline_generate`), verified by `NumericalVerifyTask` before save |
+| `PyqPageExtractTask` | VISION (Claude Opus 5.5 at effort low through `visionopus55`, refused otherwise) — *added 2026-10-20, D19* | pipeline `pyq extract` (feature `pipeline_extract`, prompt `pyq_extract`, output `PyqPage`): one official booklet page into its questions, English only, watermarks, stamps and handwriting never content |
+| `QuestionTagTask` | REASON with `RouteDecision.generation()` (Claude Sonnet 5.5, batched — the founder's ruling, which settles the tier table's "classification on CHEAP" for this task) — *added 2026-10-20, D19* | pipeline `pyq tag` (feature `pipeline_tag`, prompt `pyq_tag`, output `PyqTag`): a PYQ onto its syllabus node, the outline and question passed as data and rendered by the template, every code checked in Java |
 | `CollectiveMineTask` | CHEAP (batch) | pipeline `collective from-inputs` (feature `pipeline_collective`; CS-1 §3–§4): thematic mining of founder-collected excerpt files into draft struggle, pacing, season and strategy signals with source counts — derived signals only, never quotes. `collective from-pyq` is deterministic over `questions` and `distractor_map` and makes no model call |
 | `EmbeddingService` | EMBED | cache lookup, `HybridRetriever`, pipeline `ncert embed`, `anchors link` |
 
@@ -1142,7 +1167,7 @@ model.*
 |---|---|---|
 | CHEAP | `margai.ai.tier.cheap` | routing, answers judged routine, plan selection, mentor notes, classification, translation/rendering, document extraction text |
 | VISION | `margai.ai.tier.vision` | photo doubts, document images, pipeline page extraction (same model family as CHEAP with image input); *since 2026-09-14 (D15) pipeline page verification too — the pipeline runs VISION on the `visionopus` shape to transcribe and the `visionsonnet` shape to verify, each a separate process, and `ncert verify` refuses unless the tier is `margai.pipeline.verify-model`* |
-| REASON | `margai.ai.tier.reason` | hard or numerical doubt answers, independent numerical verification, variant generation, pipeline PYQ solutions |
+| REASON | `margai.ai.tier.reason` | hard or numerical doubt answers, independent numerical verification, variant generation, pipeline PYQ solutions; *since 2026-10-20 (D19) PYQ tagging — a classification, which this table puts on CHEAP, moved to REASON by the founder's ruling (Sonnet 5.5, batched) and routed by `RouteDecision.generation()` (DECISIONS 2026-10-20)* |
 | EMBED | `margai.ai.embed.model` | paragraphs, questions, doubt normal forms |
 
 `DifficultyRouter` (CHEAP, schema `{tier, is_numerical, subject, node_code_guess, answer_type:
@@ -1882,6 +1907,7 @@ JSONL plus Java ingest (two toolchains, and the AI calls would still need the Ja
 | `pipeline/inputs/ncert-corrections.yaml` | *added 2026-09-14 (D15)*: the founder's rulings on `ncert verify` flags — per entry `book, lang, chapter, page, kind (text \| join \| split \| figure_ref \| drop \| defer \| section \| move \| unprinted \| misprint \| false_positive \| noise), reason`, the kind's own fields (`transcribed` + `printed`, `at`, `at` + exactly one of `remove`/`add`, `at` + `section`, `at` + `after` + `after_page`, or `at` + `flag`) and an optional `address` for the reader; *the kinds that change no text were added 2026-09-15 (D15)*; *`defer` added 2026-10-02 (D16): the paragraph takes its number after the next one of its section, for a footnote the Hindi edition prints a page before the paragraph the English numbers first; `lang: hi` entries are how the Hindi is joined and split to the English rows*; *`section` added 2026-10-09 (D16): Hindi only, the section a heading opens takes the English number for all its paragraphs in the chapter, for a section the Hindi print numbers otherwise (phy11-part2's "8.5.6" for 8.5.5, its extra 13.8.1)*; *`move` added 2026-10-10 (D16), Hindi only: once page breaks are joined, a whole row is numbered right after the row it names, earlier or later, in that row's section — for a footnote or box the Hindi prints pages away from where the English numbers it*; *`unprinted` added 2026-10-13 (D16), Hindi only: the row named takes the number after an English paragraph the Hindi edition does not print, which keeps its English with no Hindi beside it; the load names each such address and counts it when it holds a section to the English (phy12-part1 §3.12 ¶5)*; *since 2026-10-17 (D16) an `unprinted` entry with `after: true` leaves the number after its row instead — a section's last English paragraph, which no row follows (bio11 §4.2.11.7 ¶3) — and a `section` entry named at a later paragraph of its section moves that one and the section's later ones, for a section the Hindi prints with no heading (bio11 §10.5)* | `ncert load` (applies `text`, `join`, `split`, `figure_ref`, `drop`, `defer`, `section`, `move`, `unprinted`); `ncert verify` (reads `misprint`, `false_positive`, `noise`) |
 | `pipeline/inputs/ncert-errata.yaml` | *added 2026-10-17 (D16, DECISIONS)*: the printing errors the books make, as their loaded rows stand — per entry `book, lang, chapter, section, para, page, printed, corrected, reason, round, meaning_changing, action (corrected \| kept), flag_reviewed`; every correction a row makes (a printing error that changes the meaning), every wrong cross-reference or garbled phrase it keeps as printed (an errata candidate) and the English errors, kept because the English rows are frozen. Keyed on the row's address and read against the loaded rows, never applied to them; `printed` quotes no more of the book than the wrong word or phrase (a missing or extra word, or a sign that reads as nothing alone, takes a neighbour on each side where it has one, and a span recurring in its row more neighbours, within the approved entry's own span, until it names its place; DECISIONS 2026-10-17, the working-rules row), read on a page-image crop or carried over from an approved entry, never from the decoded layer | `ncert errata` (D16); later the Phase 2 book errata notes (DECISIONS 2026-10-17) |
 | `pipeline/inputs/papers/<exam>-<year>.json` | PYQ papers as structured JSON (stem, options, key, paper code) | `pyq load` (D19) |
+| `pipeline/inputs/pyq-papers.yaml` | *added 2026-10-20 (D19; README line 5 and §1, DECISIONS 2026-10-20)*: the register of official papers, built by Claude from the founder's `neet-pyq-sources/MANIFEST.csv` and read on each booklet — per paper its booklet file(s) under `source/neet-pyq-sources/` with sha256 and the pages that hold questions, the sections as printed (or, with no headings, as the cover declares the subjects and the questions turn), the marking (sourced values only), and NTA's final key's provenance (tier, where from, download date, file, sha256) with the code's dropped and multiple-answer entries from README §3. The paper files above are named `papers/<paper>.json` after the register's id and hold the questions only: `pyq extract` writes each as a draft to `pipeline/data/pyq/`, Claude checks it against every page and fills NTA's key, and the founder's approval places it here | `pyq extract`, `pyq tag`, `pyq load` (D19) |
 | `pipeline/inputs/collective/excerpts/*.md` (ignored by git) + `manifest.md` + `sources.csv` | founder-collected public-discourse and study-advice excerpts (per file: source, date collected, node codes) and the curated source list — CS-1 §3, founder workstream F11. The exception to this table's "committed": third-party text never enters the repo — the excerpt files are ignored like the syllabus PDFs (D13), `manifest.md` commits their names and SHA-256 and `sources.csv` the source list (DECISIONS 2026-09-12); read by the pipeline, never stored, never crawled | `collective from-inputs` (D24 buffer or any later buffer) |
 | `pipeline/inputs/collective/review-<season>.csv` | the founder-edited review sheet: one row per node and field with the approved value and the evidence kept (CS-1 §4) | `collective load` (D24) |
 
@@ -1906,7 +1932,9 @@ added to this table on the day each is built.*
 | `ncert embed --book [--chapters] [--redo] [--queries]` | ~~D17~~ **D15** — *moved 2026-09-19/20 with the founder's re-order (DECISIONS; PLAN D15)* | paragraph id | embedded count; the 15 concept queries from `eval/retrieval-queries.json` run and print top-3. *Amended 2026-09-20 (D15, DECISIONS): the run is **scored**, not only printed — hit@1, hit@3 and MRR against the addresses each query was written to reach, with Hindi counted separately, because an unscored run gives D17 nothing to compare its ~9,000-paragraph re-run against and five Hindi misses would hide inside ten English hits. Embeds `text_en` only (§6.4), so `--lang hi` is refused; refuses the fake client, whose fixture vectors on real rows no check could ever see; refuses a missing query file rather than embedding a book and producing no acceptance evidence (`--queries none` to mean it). Resumes on the null-embedding rule, so a re-run re-scores for the price of the query embeddings* *Since 2026-10-18 (D17) a book's run scores only the queries with an expected paragraph in that book; the corpus-wide score is `ncert retrieve`'s.* |
 | `ncert errata` | D16 (*added 2026-10-17, DECISIONS*) | — (reads `ncert-errata.yaml` and the loaded rows; writes nothing) | per book and edition: entries corrected and kept, meaning-changing, flags not yet reviewed; every entry whose row is missing, off its page or without its span, or whose corrected row still carries the print, any of which fails the run. No model, ₹0; run after every reload |
 | `ncert retrieve [--queries] [--rewrite] [--gate]` | D17 (*added 2026-10-18, DECISIONS*; `--rewrite` D18, 2026-10-19; `--gate week3` D18, 2026-10-20: the Week-3 gate's held-out probes alone, fused as `--rewrite` fuses — a non-English probe with its search version, an English probe on its own text — read book by book) | — (reads `eval/retrieval-queries.json` and the corpus; embeds the queries only, writes nothing to the corpus) | the corpus searched (paragraphs with and without a vector, per book); each query filtered to its book subject as §4.3 stage 6 filters, the acceptance set again with no filter; the founder's D17 bar read from the filtered acceptance run; each set scored by language and subject (in the answer set, hit@1, hit@3, MRR); every miss beside the text it was expected to reach; cost from the ledger. Every expected address names its book, since chapter numbers repeat across books |
-| `pyq load --paper` | D19 | `(source, exam, year, paper_code, question_no)` | **counts per year/subject** vs the paper's official count |
+| `pyq extract --paper [--pages] [--redo] [--drafts]` | D19 (*added 2026-10-20, DECISIONS*) | JSONL `extract/pyq/{paper}.jsonl`, one line per booklet page | one VISION call per register page on the PYQ transcriber (refused otherwise, and on the fake client, and on a booklet whose sha256 is not the register's); renders strictly, refuses blank paper, never reads a page ahead of the one before it; the text layer only for an English-only booklet, judged over the whole booklet; assembles the draft to `pipeline/data/pyq/{paper}.draft.json` (never the inputs) with every mechanical check as a flag; pages kept and the bill reported whatever stops the run |
+| `pyq tag --paper [--questions] [--redo]` | D19 (*added 2026-10-20, DECISIONS*) | JSONL `tags/pyq/{paper}.jsonl`, one line per question | one REASON call per question of the approved file on the PYQ tagger (Sonnet 5.5, refused otherwise), batched; codes checked in Java, a bad tag kept with its problem; a tag tied to the hash of its question's words and the prompt version; the spread per chapter, out-of-syllabus questions, low-confidence tags, the founder's seeded 40; the bill whatever stops the run |
+| `pyq load --paper` | D19 | `(source, exam, year, paper_code, question_no)` | **counts per year/subject** vs the paper's official count — *since 2026-10-20 (DECISIONS) per printed section, read back from the database inside the load's transaction, a mismatch rolling it back; the figure questions per section; the marking values still waiting for NTA's notice. Refused: an approved file that fails its register entry, a question without a valid tag of its current words, a tag that does not hold against the database's taxonomy, and a question of the paper in the bank but not in the file* |
 | `pyq solve --year --subject` | D20 | question id; skips `verified = true` | solutions written, cost; 50-question audit sample listed |
 | `pyq verify --year --subject` | D20–D21 | question id | verified vs flagged; flagged → `audit_queue(pipeline_flag)` |
 | `pyq distractors --year --subject` | D21 | question id | distractor maps written; 10% sample listed |
@@ -1980,8 +2008,12 @@ Chemistry Hindi miss until those books load is open for the founder (TRACKER day
 ### 6.5 Stats and exam intelligence (D22)
 
 `weightage_marks_avg` per node = mean over the last 15 years of (questions tagged to the node or its
-descendants × 4 marks). `difficulty` for PYQs starts as a CHEAP-tier estimate on a 0–1 scale
-(`DifficultyEstimateTask`, feature `pipeline_difficulty`; an estimate does not warrant REASON), recalibrated from
+descendants × 4 marks). *Amended 2026-10-20 (the founder's D19 rulings, README §1): the bank holds NEET 2019–2026
+(and 2018 if a fitting key turns up), not 15 years, and Claude proposes a recency weighting at D22, since the 2024
+NMC syllabus revision makes older papers less representative (ruling 3); D22 runs on the papers loaded by then,
+reruns when all are in and names the papers used (the tick rule).* `difficulty` for PYQs starts as a CHEAP-tier estimate on a 0–1 scale
+(`DifficultyEstimateTask`, feature `pipeline_difficulty`; an estimate does not warrant REASON — *PYQ tagging, a
+judgement of the same kind, runs on REASON by the founder's D19 ruling, 2026-10-20 (§4.2)*), recalibrated from
 `practice_events` once students exist. `default_learn_minutes` comes from the
 taxonomy CSV. `traps mine` clusters a node's PYQs by distractor concept and asks the CHEAP tier for
 a one-line "how NTA twists this" note per cluster with ≥ 2 supporting questions; the note and its
@@ -2169,7 +2201,9 @@ and reusing the Spring context across module-flow tests.
   `GET /practice/sessions/{id}`, and `GET /notebook/entries` return the key only for questions with
   a recorded `practice_events` row by the caller, and for no other question. Under Option A the
   offline-pack test asserts the field appears only under `judging` and only for the caller's own
-  scheduled blocks.
+  scheduled blocks. *Amended 2026-10-20 (D19; Claude's, DECISIONS 2026-10-20, for the founder to overrule): the scan covers `accepted_keys` and
+  `answer_status` beside `correct_key` — both carry the key — and the carriers return them under the same rule;
+  the tag provenance (`questions.tagging`, its reason) is checked for a hint at the answer before D31 serves it.*
 - `IdempotencyReplayTest` for every **Idem** route: same key + same body → identical response,
   no second side effect; same key + different body → `IDEMPOTENCY_CONFLICT`.
 - `WebhookSignatureTest`: tampered body → 400, no `billing_events` row, one `billing.webhook.rejected`
@@ -2868,7 +2902,11 @@ history (derived from `plan_blocks`) for the ratio copy; exam-season retirement 
 
 - **Mocks** stay `kind = mock` sessions (§0.5 item 2) with `paper_year`; the paper's own questions
   in order, out-of-syllabus questions flagged at PYQ tagging (D19, `questions.out_of_syllabus`) and
-  excluded from the score, marking from the paper's scheme (`pyq_papers.marking`).
+  excluded from the score, marking from the paper's scheme (`pyq_papers.marking`). *Amended 2026-10-20 (D19): both
+  exist since V9, and mock scoring follows the register, never a default (the founder's gap-4 rider). By Claude's
+  reading of the rider, for the founder to overrule (DECISIONS 2026-10-20): a mark or rule the register has not
+  sourced is null, and the mock refuses to score a paper until `marking` holds the blank mark and NTA's dropped and
+  multiple-answer rules for that year; a multiple-answer question scores on `accepted_keys`.*
 - **Percentile.** `mock_results(user_id, paper_year, score, completed_at)` written from the first
   mock (D35) on; the percentile is computed over attempts at the same paper in a rolling window
   (`margai.mocks.percentile.window_days` 30, `.min_attempts` 50) and returned only above the

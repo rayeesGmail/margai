@@ -170,15 +170,27 @@ tools; your reviews focus on output quality.)*
   fallback's readiness waits on the founder's AWS Support case and the same smoke reruns when AWS lifts
   the refusal.*
 - **D19 —** PYQ ingest: papers loaded, question records created, tagging pass.
-  ✅ *Counts per year/subject match official papers.*
+  ✅ *Counts per year/subject match official papers.* *Amended 2026-10-20 (the founder's rulings on the D19 plan,
+  `neet-pyq-sources/README.md` §1; DECISIONS 2026-10-20): D19 ticks when its tasks T1–T8 are done and 2025 code 45
+  is loaded with every section count matching; every other paper of the founder's pack (F18) loads as its own
+  evidence line with the same check — loading these papers is D19's scope, not overflow, and anything that spills
+  past D22 goes to the slippage log; only official booklets in paper order and NTA's final keys are used, never a
+  compilation or a publisher's key.*
 - **D20 —** AI solution generation (batch) for one subject; verification pass wired.
-  ✅ *50-question audit sample: you personally check; note error rate.*
+  ✅ *50-question audit sample: you personally check; note error rate.* *Amended 2026-10-20 (the founder's D19
+  ruling 5; DECISIONS 2026-10-20): every disagreement between the AI solution and NTA's key first triggers a check of
+  that question's transcription against the page image, before anything else is judged, and the transcription
+  errors found this way are logged per paper. For a key mirrored by a third party (README §2, tier 3), a cluster of
+  disagreements on one paper triggers a second-copy check of the key (README §2).*
 - **D21 —** Solutions for remaining subjects (batch overnight); distractor-map
   generation. ✅ *Second 50-question audit; error rate < agreed threshold.*
 - **D22 —** Weightage & difficulty statistics computed → syllabus nodes updated; the
   `collective_records` migration and `collective from-pyq` momentum per node (CS-1 §2, §4;
   TECH_PLAN §2.3, §6.3 — added 2026-09-12).
-  ✅ *Top-10 weightage chapters match known NEET wisdom (sanity check).* *Added 2026-10-01
+  ✅ *Top-10 weightage chapters match known NEET wisdom (sanity check).* *Amended 2026-10-20 (the founder's D19
+  rulings, README §1): D22 runs on the papers loaded by then and reruns when all are in, its report naming the papers
+  used (the tick rule); weightage considers recency — the 2024 NMC syllabus revision makes older papers less
+  representative — and Claude proposes the weighting here (ruling 3).* *Added 2026-10-01
   (CS-4 §3; at risk): the `concept_primers` migration and `primers generate` begin for the top-50
   weightage chapters (TECH_PLAN §15.7), staged on one chapter first.*
 - **D23 —** Anchor-linking questions↔NCERT; seed the eval suite v1 (~60 questions
@@ -203,7 +215,8 @@ tools; your reviews focus on output quality.)*
   once eval fixtures exist, any change judged on this set. Every new prompt from here on is written for
   the 5.5 models.*
 - **D24 —** Buffer + **Week-4 gate:** solved, tagged, anchored PYQ bank + eval suite
-  running in CI. In the buffer (CS-1 §4, §7, §9.3; added 2026-09-12): `collective from-pyq`
+  running in CI. *Amended 2026-10-20 (the founder's D19 tick rule, README §1; DECISIONS 2026-10-20): the gate
+  needs every sourced paper loaded and any missing paper logged (F18).* In the buffer (CS-1 §4, §7, §9.3; added 2026-09-12): `collective from-pyq`
   misconception drafts from the distractor maps; `collective from-inputs` over the F11
   excerpt files if they exist; `collective review` (the founder-review sheet) and
   `collective load` of the founder-edited sheet — the last three with explicit permission
@@ -255,7 +268,12 @@ tools; your reviews focus on output quality.)*
 
 - **D31 —** Session backend: block → question set assembly (difficulty band + NEET
   relevance filter), server-side judging. ✅ *No correct answer in any payload before that
-  question is answered; judging server-side (TECH_PLAN §0.4 #4, decided at D3).*
+  question is answered; judging server-side (TECH_PLAN §0.4 #4, decided at D3).* *Amended 2026-10-20 (the
+  founder's D19 ruling 4; DECISIONS 2026-10-20): the PYQ figures recorded at D19 are cropped and checked in a
+  buffer before D31, and no figure question is served without its crop.* *And (Claude's, DECISIONS 2026-10-20, for
+  the founder to overrule): `accepted_keys` and `answer_status` are key carriers like `correct_key`, a
+  multiple-answer question is judged on `accepted_keys`, and a tag's reason is checked for a hint at the answer
+  before D31 serves the question.*
 - **D32 —** Practice UI: timer, taps, verdict + solution sheet + NCERT anchor chip.
   ✅ *A 10-question timed set feels smooth on a mid-range phone.*
 - **D33 —** Session summary (accuracy, speed vs your norm, sent-to-notebook list);
@@ -270,6 +288,9 @@ tools; your reviews focus on output quality.)*
   2026-09-12). ✅ *Diagnostic shifts a seeded user's plan.* *Added 2026-10-01 (CS-2 §4.7, CS-4 §6):
   full NEET 2018–2026 past papers as timed mocks (`kind = mock`, TECH_PLAN §0.5 item 2), out-of-syllabus
   questions excluded from the score; every mock result captured for the later private percentile.
+  *Noted 2026-10-20 (D19): the bank holds 2019–2026, and 2018 only if a fitting key turns up (README §6); SPEC
+  §7.1's "2018–2026" is put to the founder; and a mock refuses a paper whose marking is not yet sourced (Claude's
+  reading of the founder's gap-4 rider, for the founder to overrule; DECISIONS 2026-10-20).*
   ✅ adds: at least one full past paper runs end to end as a timed mock (CS-2 §10).*
 - **D36 —** Buffer + **Week-6 gate:** practice loop end-to-end incl. offline + diagnostic.
 

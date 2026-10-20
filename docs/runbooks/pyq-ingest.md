@@ -90,5 +90,5 @@ section (founder's ruling 4) — and it names the marking values still waiting f
 
 2025 code 45 first — it is D19's tick — then 2024 S6, 2023 G6, 2022 R6, 2021 M4, 2020 E1, 2019 P1, and the
 Re-NEET (code 80) last. 2022 R6 and the Re-NEET are not in the register yet: the pack holds no marking for
-either (their covers are missing) and no exam date for 2022, so each is registered when F18 supplies them;
-until then the order skips them. 2018 AA is registered only if a fitting key turns up (README §6).
+either (their covers are missing) and no exam date for 2022, so each is registered when F18 supplies them —
+Claude's call, for the founder to overrule (DECISIONS 2026-10-20); until then the order skips them. 2018 AA is registered only if a fitting key turns up (README §6).

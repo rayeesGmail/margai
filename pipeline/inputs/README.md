@@ -121,6 +121,25 @@ Sources: `syllabus/manifest.md` (the 2025 and 2026 syllabus PDFs: identical cont
 `ncert/2022-ed/en/manifest.md` (the 79 NCERT chapters; titles verified from each book's contents page
 and chapter headings), NTA result notices for the cut-offs.
 
+## pyq-papers.yaml and papers/
+
+The register of official NEET papers (D19), built by Claude from the founder's `neet-pyq-sources/MANIFEST.csv`
+and README, with every page range and section read on the booklet itself. Per paper: the booklet file(s) under
+`source/neet-pyq-sources/` with their sha256 (`pyq extract` refuses a file whose bytes differ, and a test holds
+every entry to the manifest's path, hash, kind and year), the pages that hold questions, the sections as
+printed — or, where a booklet prints no headings, as its cover declares the subjects and the questions turn —
+the marks the booklet prints, and NTA's final key's provenance with the code's dropped and multiple-answer
+entries from the founder's table. A value the pack does not print stays empty until NTA's notice for the year
+is sourced (F18): no mock scores a paper until then. Only official booklets and NTA keys, never compilations or
+publisher keys (the founder's ruling 1). 2022 R6 and the Re-NEET wait for what the pack lacks (Claude's call,
+for the founder to overrule; DECISIONS 2026-10-20), 2018 for a key (README §6).
+
+`papers/<paper>.json` holds one paper's questions — stem, options (1)–(4), figures, NTA's answer, and each
+question's transcription provenance. `pyq extract` writes it as a draft to `pipeline/data/pyq/`; Claude checks
+every question against the page images and fills the answers from NTA's key PDF by script; the reviewed file
+enters this folder only on the founder's approval, with its review report in `pipeline/reports/`. `pyq tag`
+and `pyq load` read only the approved file (runbook: `docs/runbooks/pyq-ingest.md`).
+
 ## taxonomy.csv
 
 Columns: `code, subject, class_level, parent_code, kind, name_en, name_hi, sort_order,

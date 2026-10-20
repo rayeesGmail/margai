@@ -181,9 +181,16 @@ change over rolling four-week windows for active users; share of doubts on previ
 concepts (relapse rate). Dashboards per SPEC §11.
 
 ### 4.11 AI provider resilience
-Direct Anthropic API remains primary. Bedrock (access now restored) is configured as a
+Direct Anthropic API remains primary. Bedrock (serving embeddings since 2026-09-20; Anthropic
+models refused for this account at D18 pending AWS) is configured as a
 **fallback provider only**, switchable by configuration during an outage. No primary switch.
 PARKED "revisit Bedrock" item closes as "resolved; fallback only."
+*Wording amended 2026-10-20 (founder's instruction; the sentences Claude's, for the founder to
+overrule; DECISIONS 2026-10-20): "access now restored" does not hold for the Anthropic models;
+Bedrock's embedding model, reachable throughout, has served embeddings since 2026-09-20. The D18
+smoke found Claude Haiku 5.5 and Sonnet 5.5 refused for this account, the availability check reads
+agreement NOT_AVAILABLE for Haiku 5.5 and Haiku 4.5 (Cohere's reads AVAILABLE), an AWS Support case
+is open, and the fallback is built and switched off until AWS lifts the refusal.*
 
 ## 5. Phase 1 — beta backlog (gated on the D60 gate)
 

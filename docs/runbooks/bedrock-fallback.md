@@ -52,12 +52,15 @@ whenever a primary model changes.
    ```
 
    It read `authorizationStatus` AUTHORIZED, `entitlementAvailability` AVAILABLE and `regionAvailability` AVAILABLE,
-   but `agreementAvailability` NOT_AVAILABLE: no agreement is in place for the model. Claude's inference, drawn from
-   that status and the Marketplace block of 2026-09-08 (DECISIONS 2026-09-12: the payment instrument refused,
-   clearing it needs invoicing against a registered entity), for AWS Support to confirm: the missing agreement — the
-   AWS Marketplace terms Anthropic models are sold under — is what returns the 403, and that block is its root.
-   Before rerunning the smoke, run the check for both `anthropic.claude-haiku-5-5` and `anthropic.claude-sonnet-5-5`;
-   the smoke cannot pass while either reads NOT_AVAILABLE (TRACKER, D18 day log).
+   but `agreementAvailability` NOT_AVAILABLE: no agreement is in place for the model. The same check reads
+   NOT_AVAILABLE for Claude Haiku 4.5 (`anthropic.claude-haiku-4-5-20251001-v1`), which answered on 2026-09-06, and
+   AVAILABLE for `cohere.embed-v4`, which has served every embedding since 2026-09-20 — so the account can hold and
+   pay for a Bedrock agreement; the missing agreement is on both Anthropic models checked, and the refusal was seen on
+   the two invoked (Haiku 5.5 and Sonnet 5.5). The console playground gives
+   the same AccessDeniedException and offers no use-case form. The cause is unknown; the founder raised an AWS
+   Support case the same day (TRACKER F17; DECISIONS 2026-10-20). Before rerunning the smoke, run the check for both
+   `anthropic.claude-haiku-5-5` and `anthropic.claude-sonnet-5-5`; while either reads NOT_AVAILABLE the smoke is
+   expected not to pass.
 
 Readiness is the smoke (PLAN D18, TECH_PLAN §15.12).
 

@@ -3014,6 +3014,15 @@ rows carry the Bedrock pricing page's figures, which the founder read on 2026-10
 list; batch N/A, so no batch rate); the switch, the smoke (`BedrockFallbackSmokeTest`) and the 500-user estimate are in
 docs/runbooks/bedrock-fallback.md.
 
+*Amended 2026-10-20 (founder's ruling "tick D18 with T1 carried" and instruction to update the wording; the
+sentences Claude's, for the founder to overrule; DECISIONS 2026-10-20): the founder's smoke was refused by
+Bedrock for both 5.5 models (403 "not available for this account"), and the availability check reads the
+agreement NOT_AVAILABLE for Claude Haiku 5.5 and Haiku 4.5 while Cohere's reads AVAILABLE, so CS-2's
+"access now restored" does not hold for the Anthropic models; the embedding model, reachable throughout,
+has served embeddings since 2026-09-20 (CS-2 §4.11 reworded the same day). The fallback stays built and
+switched off; D18 ticked with T1's readiness carried until AWS lifts the refusal, on the founder's Support
+case; the same smoke reruns then.*
+
 ### 15.13 WhatsApp, zero-API (CS-2 §4.9)
 
 A click-to-chat `wa.me` link (number in config) in Profile → Support, and sharing through the OS share

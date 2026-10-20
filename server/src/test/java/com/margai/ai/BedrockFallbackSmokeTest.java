@@ -27,8 +27,8 @@ import org.springframework.test.context.ActiveProfiles;
 /**
  * The completion fallback's smoke (CS-2 §4.11, TECH_PLAN §15.12): with `margai.flags.ai-fallback` on,
  * one call per runtime tier — CHEAP and REASON — through Bedrock on the fallback's inference profiles
- * (founder ruling, DECISIONS 2026-10-20). The fallback is called ready only when this passes, since
- * CS-2's "access now restored" cannot be checked from a Claude session.
+ * (founder ruling, DECISIONS 2026-10-20). The fallback is called ready only when this passes; its first
+ * run, on 2026-10-20, was refused for this account, pending AWS (DECISIONS 2026-10-20).
  *
  * <p>Founder-run only, behind the single switch of every live run, {@code AI_LIVE=1}, and a system
  * property naming this test, so neither can unlock spend alone. It needs AWS credentials in the SDK's

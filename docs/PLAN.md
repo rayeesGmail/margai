@@ -164,6 +164,11 @@ tools; your reviews focus on output quality.)*
   a tier's primary model changes but its fallback id does not, and sequential batch under the fallback;
   it is ready after the founder's smoke of one call per runtime tier (CHEAP and REASON). The
   closed-book errata backfill waits for a later buffer.*
+  *Amended 2026-10-20 (founder's ruling "tick D18 with T1 carried"; the wording Claude's; DECISIONS
+  2026-10-20): D18 ticks with T1 carried — the founder's smoke was refused by Bedrock for this account
+  (the agreement for Claude Haiku 5.5 and Haiku 4.5 reads NOT_AVAILABLE; the cause is with AWS), so the
+  fallback's readiness waits on the founder's AWS Support case and the same smoke reruns when AWS lifts
+  the refusal.*
 - **D19 —** PYQ ingest: papers loaded, question records created, tagging pass.
   ✅ *Counts per year/subject match official papers.*
 - **D20 —** AI solution generation (batch) for one subject; verification pass wired.

@@ -9,7 +9,8 @@ in your plan. If code and SPEC conflict, say so — do not silently pick one.
 - app/: Flutter (Android target), Riverpod, drift for offline
 - ai: provider APIs ONLY via AiClient interface (server/.../ai/) — Anthropic API direct for models;
   Cohere embed v4 on Bedrock for embeddings; Bedrock also a config-switched completion fallback,
-  never the primary. Model IDs from config.
+  never the primary (built; Anthropic models refused for this account until AWS lifts the block).
+  Model IDs from config.
 - infra: ap-south-1; secrets via SSM; never write AWS keys or provider API keys anywhere
 
 ## Commands
@@ -41,17 +42,20 @@ When compacting: preserve API contract changes + rationale, migration list,
 open TODOs from the current /week task list, eval gate status. Summarize exploration.
 
 ---
-The block above is DEV_SPEC §13.2 verbatim, except for four approved deviations. Its "SPEC §3–5"
+The block above is DEV_SPEC §13.2 verbatim, except for five approved deviations. Its "SPEC §3–5"
 citations now read "DEV_SPEC" (they were written when the Developer Spec was docs/SPEC.md). Hard
 rule 1 carries the D3 rewording the founder approved on 2026-09-04 (TECH_PLAN §0.4 #4: SPEC §6.2/§6.4
 verdicts show the correct option after an answer is recorded). And four lines carry the provider
 switch the founder approved on 2026-09-12 (DECISIONS, TECH_PLAN §4.11) — the AI stack line, the
 infra line (which now says "or provider API keys"), the ai_calls hard rule and the new API-key
 rule: Bedrock is blocked for this account, so model access is direct. And the AI stack line was
-updated again on 2026-10-01 (ruling Q5 on CS-2 §4.11, DECISIONS): that block is reported lifted
-(CS-2 §4.11; a founder smoke confirms it at D18), embeddings have run on Bedrock since 2026-09-20,
-and Bedrock is now the completion fallback. DEV_SPEC §13 keeps its original
-wording as the historical record.
+updated again on 2026-10-01 (ruling Q5 on CS-2 §4.11, DECISIONS): that block was reported lifted
+(CS-2 §4.11 as issued; reworded 2026-10-20), embeddings have run on Bedrock since 2026-09-20, and
+Bedrock became the completion fallback. And it was updated again on 2026-10-20 (founder's instruction;
+the sentences Claude's, for the founder to overrule; DECISIONS): the founder's D18 smoke found Claude
+Haiku 5.5 and Sonnet 5.5 refused for this account (agreement NOT_AVAILABLE for Haiku 5.5 and 4.5; AWS
+Support case raised the same day), so the completion fallback is built and switched off, its readiness
+carried until AWS lifts the block. DEV_SPEC §13 keeps its original wording as the historical record.
 
 ## Documents and precedence (read before proposing anything)
 1. docs/SPEC.md — Product Spec v2.0, **the contract**: behaviour, every screen and rule,

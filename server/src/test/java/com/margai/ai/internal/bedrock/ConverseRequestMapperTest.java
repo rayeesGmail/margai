@@ -9,9 +9,11 @@ import com.margai.ai.api.ImagePart;
 import com.margai.ai.api.PromptRef;
 import com.margai.ai.api.Repair;
 import com.margai.ai.api.Tier;
+import com.margai.ai.internal.AiProperties;
 import com.margai.ai.internal.PromptRegistry;
 import com.margai.ai.internal.RenderedPrompt;
 import com.margai.ai.internal.StructuredOutput;
+import com.margai.ai.internal.TestAiProperties;
 import com.margai.ai.tasks.SmokeAnswer;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +44,7 @@ class ConverseRequestMapperTest {
 
     @Test
     void systemPrefixThenCachePointThenTheUserTurn() {
-        ConverseRequest converse = mapper.toRequest("model-x", PROMPT, request());
+        ConverseRequest converse = mapper.toRequest(TestAiProperties.model("model-x"), PROMPT, request());
 
         assertThat(converse.modelId()).isEqualTo("model-x");
         assertThat(converse.system()).hasSize(2);
@@ -59,7 +61,7 @@ class ConverseRequestMapperTest {
 
     @Test
     void oneToolNamedAfterThePromptWithTheRecordSchemaForcedByToolChoice() {
-        ConverseRequest converse = mapper.toRequest("model-x", PROMPT, request());
+        ConverseRequest converse = mapper.toRequest(TestAiProperties.model("model-x"), PROMPT, request());
 
         assertThat(converse.toolConfig().tools()).hasSize(1);
         ToolSpecification spec = converse.toolConfig().tools().get(0).toolSpec();
@@ -75,7 +77,7 @@ class ConverseRequestMapperTest {
 
     @Test
     void imagesFollowTheTextInTheUserTurn() {
-        ConverseRequest converse = mapper.toRequest("model-v", PROMPT, request()
+        ConverseRequest converse = mapper.toRequest(TestAiProperties.model("model-v"), PROMPT, request()
                 .withImages(List.of(new ImagePart(new byte[] {1, 2}, "image/png"), new ImagePart(new byte[] {3}, "image/jpeg"))));
 
         List<ContentBlock> content = converse.messages().get(0).content();
@@ -87,7 +89,7 @@ class ConverseRequestMapperTest {
 
     @Test
     void aRepairAppendsTheRejectedToolCallAndAnErrorToolResult() {
-        ConverseRequest converse = mapper.toRequest("model-x", PROMPT, request()
+        ConverseRequest converse = mapper.toRequest(TestAiProperties.model("model-x"), PROMPT, request()
                 .withRepair(new Repair("{\"greeting\": 5}", List.of("$.number: required property 'number' not found"))));
 
         assertThat(converse.messages()).hasSize(3);
@@ -102,5 +104,59 @@ class ConverseRequestMapperTest {
         assertThat(result.content().get(0).toolResult().status()).isEqualTo(ToolResultStatus.ERROR);
         assertThat(result.content().get(0).toolResult().content().get(0).text())
                 .contains("required property 'number'").contains("Call the tool again");
+    }
+
+    // ── the per-tier request shape (TECH_PLAN §4.11, §15.12; DECISIONS 2026-10-20) ─────────────────────
+
+    /** A Sonnet-5.5-shaped tier: no temperature, thinking between tools, an effort, the tool left to the model. */
+    private static final AiProperties.Model AUTO_TIER = new AiProperties.Model("model-r", null,
+            AiProperties.Thinking.between_tools, AiProperties.Effort.medium, 512, AiProperties.ToolChoice.auto);
+
+    @Test
+    void aTierWithoutATemperatureSendsNone() {
+        ConverseRequest converse = mapper.toRequest(AUTO_TIER, PROMPT, request());
+
+        assertThat(converse.inferenceConfig().temperature()).isNull();
+        assertThat(converse.inferenceConfig().maxTokens()).isEqualTo(1024);
+    }
+
+    /** Converse has no field for either, so they go to the model in the body its own API takes. */
+    @Test
+    void thinkingAlwaysAndEffortWhereSetGoToTheModelsOwnFields() {
+        Map<String, Document> auto = mapper.toRequest(AUTO_TIER, PROMPT, request()).additionalModelRequestFields().asMap();
+        assertThat(auto.get("thinking").asMap().get("type").asString()).isEqualTo("between_tools");
+        assertThat(auto.get("output_config").asMap().get("effort").asString()).isEqualTo("medium");
+
+        Map<String, Document> forced = mapper.toRequest(TestAiProperties.model("model-x"), PROMPT, request())
+                .additionalModelRequestFields().asMap();
+        assertThat(forced.get("thinking").asMap().get("type").asString()).isEqualTo("disabled");
+        assertThat(forced).doesNotContainKey("output_config");
+    }
+
+    /** As the Anthropic client does on an `auto` tier (D16): a strict tool, and the user turn asks for it. */
+    @Test
+    void anAutoTierOffersAStrictToolAndAsksForItInTheUserTurn() {
+        ConverseRequest converse = mapper.toRequest(AUTO_TIER, PROMPT, request());
+
+        assertThat(converse.toolConfig().toolChoice().auto()).isNotNull();
+        assertThat(converse.toolConfig().toolChoice().tool()).isNull();
+        assertThat(converse.toolConfig().tools().get(0).toolSpec().strict()).isTrue();
+        List<ContentBlock> user = converse.messages().get(0).content();
+        assertThat(user).hasSize(2);
+        assertThat(user.get(1).text()).contains("smoke");
+    }
+
+    /**
+     * The cache marker sits where the Anthropic client puts `cache_control` — on the end of the system
+     * prompt, so the whole system text is the cached prefix — on every tier shape.
+     */
+    @Test
+    void theCachePointClosesTheSystemPromptOnEveryTier() {
+        for (AiProperties.Model model : List.of(TestAiProperties.model("model-x"), AUTO_TIER)) {
+            ConverseRequest converse = mapper.toRequest(model, PROMPT, request());
+            assertThat(converse.system()).hasSize(2);
+            assertThat(converse.system().get(0).text()).isEqualTo("SYSTEM PREFIX");
+            assertThat(converse.system().get(1).cachePoint().type()).isEqualTo(CachePointType.DEFAULT);
+        }
     }
 }

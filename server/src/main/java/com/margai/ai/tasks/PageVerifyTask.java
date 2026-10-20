@@ -8,6 +8,7 @@ import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.ImagePart;
 import com.margai.ai.api.PromptRef;
 import com.margai.ai.api.Tier;
+import com.margai.ai.internal.AiFlags;
 import com.margai.ai.internal.AiProperties;
 import com.margai.ai.internal.PromptRegistry;
 import java.util.LinkedHashMap;
@@ -34,11 +35,13 @@ public class PageVerifyTask implements NcertPageVerifier {
     private final PromptRef prompt;
     private final PromptRegistry prompts;
     private final AiProperties properties;
+    private final AiFlags flags;
 
-    PageVerifyTask(AiClient ai, PromptRegistry prompts, AiProperties properties) {
+    PageVerifyTask(AiClient ai, PromptRegistry prompts, AiProperties properties, AiFlags flags) {
         this.ai = ai;
         this.prompts = prompts;
         this.properties = properties;
+        this.flags = flags;
         this.prompt = prompts.require(PROMPT);
     }
 
@@ -56,9 +59,14 @@ public class PageVerifyTask implements NcertPageVerifier {
                 .withImages(images));
     }
 
+    /**
+     * The model the calls will reach: the fallback's VISION id while the completion fallback serves
+     * (TECH_PLAN §15.12), so `ncert verify`'s verifier guard and its independence check compare the
+     * model actually reading the page.
+     */
     @Override
     public String model() {
-        return properties.modelFor(Tier.vision);
+        return flags.aiFallback() ? properties.fallbackModelFor(Tier.vision) : properties.modelFor(Tier.vision);
     }
 
     @Override

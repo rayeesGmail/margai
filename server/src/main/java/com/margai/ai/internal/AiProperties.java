@@ -23,6 +23,11 @@ import org.springframework.validation.annotation.Validated;
  * code (.claude/rules/ai-layer.md).
  *
  * @param provider        completion provider: {@code anthropic} (default) or {@code bedrock}
+ * @param fallbackProvider the completion provider {@code margai.flags.ai-fallback} switches to, with a
+ *                        restart (CS-2 §4.11, TECH_PLAN §15.12): {@code bedrock}
+ * @param fallback        the fallback provider's model id per completion tier, or null where none is
+ *                        configured. Each names the same model as its primary tier, so a fallback tier
+ *                        takes its primary's request shape
  * @param tier            model and request shape per completion tier
  * @param embed           embedding provider, model and dimension — pinned together (§4.9)
  * @param retrieval       how many candidates each half of hybrid retrieval returns, how the two
@@ -38,13 +43,15 @@ import org.springframework.validation.annotation.Validated;
  * @param callTimeout     wall-clock limit of one real-time model call (§4.11: 20 s)
  * @param anthropic       completion provider connection settings
  * @param cohere          embedding provider connection settings
- * @param bedrock         settings only the dormant Bedrock client reads
+ * @param bedrock         the Bedrock client's region, for embeddings and the completion fallback
  * @param prompts         active version per prompt name (§4.12)
  */
 @ConfigurationProperties(prefix = "margai.ai")
 @Validated
 public record AiProperties(
         @NotNull Provider provider,
+        @NotNull Provider fallbackProvider,
+        @Valid Fallback fallback,
         @NotNull @Valid Tiers tier,
         @NotNull @Valid Embed embed,
         @NotNull @Valid Retrieval retrieval,
@@ -93,6 +100,24 @@ public record AiProperties(
         };
     }
 
+    /**
+     * The fallback's model and request shape for a tier: the primary tier's model, reached through
+     * the fallback provider under that provider's id (TECH_PLAN §15.12).
+     */
+    public Model fallbackModelOf(Tier tier) {
+        if (fallback == null) {
+            throw new IllegalStateException("margai.ai.fallback.tier is not configured");
+        }
+        Model primary = modelOf(tier);
+        return new Model(fallback.tier().of(tier), primary.temperature(), primary.thinking(), primary.effort(),
+                primary.cacheMinTokens(), primary.toolChoice());
+    }
+
+    /** The model id billed and stamped on the ledger row for this tier under the fallback. */
+    public String fallbackModelFor(Tier tier) {
+        return tier == Tier.embed ? embed.model() : fallbackModelOf(tier).id();
+    }
+
     /** Prompt name → configured active version, for prompts that configure one. */
     public Map<String, Integer> promptVersions() {
         Map<String, Integer> versions = new LinkedHashMap<>();
@@ -105,6 +130,27 @@ public record AiProperties(
     }
 
     public record Tiers(@NotNull @Valid Model cheap, @NotNull @Valid Model reason, @NotNull @Valid Model vision) {
+    }
+
+    /** The completion fallback's configuration (TECH_PLAN §15.12): its model id per tier. */
+    public record Fallback(@NotNull @Valid FallbackTiers tier) {
+    }
+
+    /**
+     * One fallback model id per completion tier, on the fallback provider — for Bedrock an inference
+     * profile: global for the 5.5 models, an {@code in.*} profile if one appears (founder, DECISIONS
+     * 2026-10-20). Ids only: the model is the primary tier's, so its request shape is too.
+     */
+    public record FallbackTiers(@NotBlank String cheap, @NotBlank String reason, @NotBlank String vision) {
+
+        public String of(Tier tier) {
+            return switch (tier) {
+                case cheap -> cheap;
+                case reason -> reason;
+                case vision -> vision;
+                case embed -> throw new IllegalArgumentException("embed has no fallback; embeddings keep their pin");
+            };
+        }
     }
 
     /**
@@ -227,7 +273,10 @@ public record AiProperties(
     public record Cohere(@NotNull String apiKey, @NotBlank String baseUrl) {
     }
 
-    /** Settings the dormant Bedrock client reads; unused while {@code provider = anthropic}. */
+    /**
+     * The Bedrock client's settings: the region its calls are made from, for the embeddings (the
+     * pin's provider since 2026-09-20) and for completions under the fallback.
+     */
     public record Bedrock(@NotBlank String region) {
     }
 

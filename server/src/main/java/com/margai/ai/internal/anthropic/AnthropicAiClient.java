@@ -18,6 +18,7 @@ import com.margai.ai.api.AiRequest;
 import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.AiUnavailableException;
 import com.margai.ai.api.InvalidOutputException;
+import com.margai.ai.api.Tier;
 import com.margai.ai.api.Usage;
 import com.margai.ai.internal.AiProperties;
 import com.margai.ai.internal.CompletionClient;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import tools.jackson.databind.JsonNode;
 
 /**
@@ -47,15 +49,24 @@ public final class AnthropicAiClient implements CompletionClient {
     static final String RETRY_AFTER_HEADER = "retry-after";
 
     private final AnthropicClient client;
-    private final AiProperties properties;
+    private final Function<Tier, AiProperties.Model> models;
     private final PromptRegistry prompts;
     private final StructuredOutput codec;
     private final MessageRequestMapper mapper;
 
     public AnthropicAiClient(AnthropicClient client, AiProperties properties, PromptRegistry prompts,
             StructuredOutput codec) {
+        this(client, properties, properties::modelOf, prompts, codec);
+    }
+
+    /**
+     * @param models each tier's model and request shape — the primary tiers, or the fallback's when
+     *               this provider serves as the fallback (TECH_PLAN §15.12)
+     */
+    public AnthropicAiClient(AnthropicClient client, AiProperties properties, Function<Tier, AiProperties.Model> models,
+            PromptRegistry prompts, StructuredOutput codec) {
         this.client = client;
-        this.properties = properties;
+        this.models = models;
         this.prompts = prompts;
         this.codec = codec;
         this.mapper = new MessageRequestMapper(codec, prompts, properties.maxOutputTokens());
@@ -65,7 +76,7 @@ public final class AnthropicAiClient implements CompletionClient {
     public <T> AiResponse<T> complete(AiRequest<T> request) {
         long started = System.nanoTime();
         RenderedPrompt prompt = prompts.render(request.prompt(), request.variables());
-        AiProperties.Model model = properties.modelOf(request.tier());
+        AiProperties.Model model = models.apply(request.tier());
         MessageCreateParams params = mapper.toRequest(model, prompt, request);
         Message response;
         try {

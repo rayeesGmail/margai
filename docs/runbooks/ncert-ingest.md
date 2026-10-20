@@ -107,7 +107,10 @@ out of this job after three runs and three different layout failures on the two-
 (`claude-opus-5` for English, `claude-opus-5-5` for Hindi — `margai.pipeline.transcribe-model` and
 `transcribe-model-hi`), so leaving the profile off stops the run before its first call rather than
 spending a book's budget on a rejected model. The startup log still shows what ran: the
-`AiClient chain` must end in `anthropic` rather than `fake`.
+`AiClient chain` must end in `anthropic` rather than `fake`. Since D18 a vision profile also logs a
+startup warning that `margai.ai.fallback.tier.vision` does not name the tier's model — expected
+while the profile pins VISION for the run; and pipeline commands are never run with
+`margai.flags.ai-fallback` on, under which both guards refuse (docs/runbooks/bedrock-fallback.md).
 
 Start with one chapter (`--chapters 1`) and read its report before letting the book run: the cost
 line and the low-confidence list are both in it, and a prompt that is reading the pages wrongly is

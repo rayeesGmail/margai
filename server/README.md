@@ -31,7 +31,7 @@ must be running; the compose db is not used by tests. What runs (TECH_PLAN §8):
 - `ModularityTest` — Spring Modulith verifies the §1.3–§1.4 module boundaries.
 - `ArchitectureTest` (ArchUnit) — every provider SDK in its own package: the model SDK only in
   `ai.internal.anthropic`, the embedding provider's HTTP calls only in `ai.internal.cohere`, the AWS
-  SDK only in `ai.internal.bedrock` (the dormant Bedrock client) and `auth.internal.email` (SES);
+  SDK only in `ai.internal.bedrock` (the embeddings and the completion fallback) and `auth.internal.email` (SES);
   only the `ai` module touches `AiClient`, only the difficulty router produces a routed
   `RouteDecision`, controllers live in `web` packages. `ModelIdLiteralTest` — no model id literal in
   `ai` sources. `EmbeddingDimensionTest` — the migrations' `vector(n)` matches
@@ -48,18 +48,21 @@ must be running; the compose db is not used by tests. What runs (TECH_PLAN §8):
 - `AiSeamFlowTest` and the `ai` unit tests — the AI seam on the fake: ledger row per outcome,
   breaker, tier policy, schema repair, retries, and each provider's request mapping and failure
   translation without a network.
-- `AiLiveSmokeTest` — skipped unless `AI_LIVE=1` (see below). `BedrockSmokeTest` — skipped unless
-  `BEDROCK_LIVE=1`, and it needs `margai.ai.provider=bedrock` plus that provider's ids and prices
-  from the environment; it exists so the dormant path stays proven.
+- `AiLiveSmokeTest` — skipped unless `AI_LIVE=1` (see below). `BedrockFallbackSmokeTest` — the
+  completion fallback's smoke, skipped unless `AI_LIVE=1` and `-Dbedrock.fallback.smoke=true`
+  (docs/runbooks/bedrock-fallback.md). `BedrockSmokeTest` — Bedrock as the primary, skipped unless
+  `AI_LIVE=1` and `-Dbedrock.smoke=true`, and it needs that provider's ids and prices from the
+  environment.
 
 ## AI seam (TECH_PLAN §4.1, §4.8, §4.11)
 
 `com.margai.ai` owns the one `AiClient` bean: a decorator chain, outermost first,
 `ledger > breaker > tier-policy > schema > retry` around an inner client — `FakeAiClient` by
-default, and in the `live` profile whichever provider `margai.ai.provider` names: the model
-provider's client joined to the embedding provider's (`CompositeAiClient`), or the dormant
-`BedrockAiClient`. The chain is logged at startup (`AiClient chain: …`) and the same breaker and
-ledger run in every profile, against every provider.
+default, and in the `live` profile whichever provider `margai.ai.provider` names — or, with
+`margai.flags.ai-fallback` on, Bedrock as the completion fallback (TECH_PLAN §15.12): the completion
+client joined to the embedding provider's (`CompositeAiClient`). The chain is logged at startup
+(`AiClient chain: … > anthropic`, or `> bedrock (fallback)`) and the same breaker and ledger run in
+every profile, against every provider.
 
 - **Ledger** — every call, every outcome, one `ai_calls` row (`ok`, `invalid_output`, `timeout`,
   `error`, `breaker`) with tokens and `cost_paise` computed at insert from `margai.ai.prices-json`
@@ -112,11 +115,11 @@ that model's own request shape, one `vision` call with an image, embeddings in E
 the pinned width, and a one-record batch on the reasoning model. `AI_LIVE` is unset again
 afterwards; without it the test is skipped and `./mvnw verify` reaches no provider.
 
-The dormant Bedrock path has its own founder-run smoke, `BedrockSmokeTest` under `BEDROCK_LIVE=1`,
-which additionally needs that provider's model ids and price rows from the environment — and
-`margai.ai.embed.provider` moved off the direct provider, because the Bedrock client embeds for
-itself and the direct embedding client would otherwise be built and refuse to start without a key it
-would never use. It uses the **IAM Identity Center (SSO) profile `margai`** created under
+Bedrock completions have their own founder-run smokes: `BedrockFallbackSmokeTest`, the fallback's
+(one call each on CHEAP and REASON with the flag on, the readiness check of the runbook), and
+`BedrockSmokeTest`, Bedrock as the primary, which needs that provider's model ids and price rows from
+the environment. Either way the Bedrock completion client is joined to the configured embedding
+client rather than embedding for itself. Both use the **IAM Identity Center (SSO) profile `margai`** created under
 founder workstream F8 on 2026-09-12 (TECH_PLAN §7.4, §7.6) — not the account root user — and the SDK
 resolves that profile only because the `sso` and `ssooidc` modules are on the runtime classpath
 beside `signin`; without them the chain refuses the profile with *"the `sso` service module must be
@@ -124,7 +127,9 @@ on the class path"* while the AWS CLI, which has its own resolver, works fine
 (`aws sso login --profile margai` when the cached token has expired).
 
 To run the API itself against a live provider: `AI_LIVE=1 ./mvnw spring-boot:run` (add
-`MARGAI_AI_PROVIDER=bedrock` and `AWS_PROFILE=margai` for the dormant path).
+`MARGAI_FLAGS_AI_FALLBACK=true` and `AWS_PROFILE=margai` for the Bedrock fallback; Bedrock as the
+primary, `MARGAI_AI_PROVIDER=bedrock`, also needs `MARGAI_AI_FALLBACK_PROVIDER=anthropic`, or startup
+refuses a fallback that is the primary).
 
 ## Auth (D7): OTP by email, tokens, rate limits
 

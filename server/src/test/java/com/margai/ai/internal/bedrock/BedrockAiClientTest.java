@@ -5,24 +5,31 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.margai.ai.api.AiCallContext;
 import com.margai.ai.api.AiFeature;
+import com.margai.ai.api.AiRequest;
+import com.margai.ai.api.AiResponse;
 import com.margai.ai.api.AiUnavailableException;
-import com.margai.ai.api.EmbedRequest;
 import com.margai.ai.api.InvalidOutputException;
+import com.margai.ai.api.PromptRef;
+import com.margai.ai.api.Tier;
 import com.margai.ai.api.Usage;
 import com.margai.ai.internal.AiProperties;
 import com.margai.ai.internal.PromptRegistry;
 import com.margai.ai.internal.StructuredOutput;
 import com.margai.ai.internal.TestAiProperties;
 import com.margai.ai.tasks.SmokeAnswer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import software.amazon.awssdk.core.document.Document;
 import software.amazon.awssdk.core.exception.ApiCallTimeoutException;
+import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.AccessDeniedException;
 import software.amazon.awssdk.services.bedrockruntime.model.BedrockRuntimeException;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseOutput;
+import software.amazon.awssdk.services.bedrockruntime.model.ConverseRequest;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseResponse;
 import software.amazon.awssdk.services.bedrockruntime.model.Message;
 import software.amazon.awssdk.services.bedrockruntime.model.ModelTimeoutException;
@@ -86,6 +93,41 @@ class BedrockAiClientTest {
                 .satisfies(e -> assertThat(((InvalidOutputException) e).usage()).isEqualTo(USAGE));
     }
 
+    /** As on the primary (D14): a truncated tool input can still validate, so the cut-off itself is refused. */
+    @Test
+    void aResponseCutOffAtTheTokenLimitIsInvalidOutputNamingTheKnobAndNotRepaired() {
+        ConverseResponse converse = ConverseResponse.builder()
+                .output(ConverseOutput.fromMessage(Message.builder().content(ContentBlock.fromToolUse(
+                        ToolUseBlock.builder().toolUseId("t1").name("smoke")
+                                .input(Document.fromMap(Map.of("greeting", Document.fromString("o"),
+                                        "number", Document.fromNumber(7))))
+                                .build())).build()))
+                .stopReason(StopReason.MAX_TOKENS)
+                .build();
+
+        assertThatThrownBy(() -> BedrockAiClient.toolInput(converse, USAGE, "m"))
+                .isInstanceOf(InvalidOutputException.class)
+                .hasMessageContaining("margai.ai.max-output-tokens")
+                .satisfies(e -> assertThat(((InvalidOutputException) e).repairable()).isFalse());
+    }
+
+    /** As on the primary (D16): a refusal or a filter is a decline, so it costs no paid repair call. */
+    @Test
+    void aRefusalOrAFilterIsInvalidOutputThatIsNotRepaired() {
+        for (String stop : List.of("content_filtered", "guardrail_intervened", "refusal")) {
+            ConverseResponse converse = ConverseResponse.builder()
+                    .output(ConverseOutput.fromMessage(Message.builder().content(ContentBlock.fromText("No.")).build()))
+                    .stopReason(stop)
+                    .build();
+
+            assertThatThrownBy(() -> BedrockAiClient.toolInput(converse, USAGE, "m"))
+                    .as(stop)
+                    .isInstanceOf(InvalidOutputException.class)
+                    .hasMessageContaining(stop)
+                    .satisfies(e -> assertThat(((InvalidOutputException) e).repairable()).isFalse());
+        }
+    }
+
     @Test
     void sdkFailuresAreClassifiedForTheRetryDecoratorAndTheLedger() {
         AiUnavailableException throttled = BedrockAiClient.translate(ThrottlingException.builder().message("slow").build());
@@ -108,19 +150,42 @@ class BedrockAiClientTest {
                 .isRetryable()).isFalse();
     }
 
-    /** The embed half now lives in {@link BedrockEmbeddingClient}; its tests moved with it. */
+    /**
+     * Under the fallback the tier's model is the fallback's (TECH_PLAN §15.12): the request goes to that
+     * profile and the response — and so the ledger row — names it.
+     */
     @Test
-    void embeddingIsDelegatedSoTheTwoWiringsCannotDrift() {
-        BedrockAiClient client = new BedrockAiClient(null, properties("cohere.embed-v4:0"), prompts(), codec);
+    void callsTheModelTheTiersModelFunctionNames() {
+        List<ConverseRequest> sent = new ArrayList<>();
+        BedrockRuntimeClient runtime = new BedrockRuntimeClient() {
+            @Override
+            public String serviceName() {
+                return "bedrock-runtime";
+            }
 
-        assertThat(client).extracting("embeddings").isInstanceOf(BedrockEmbeddingClient.class);
-    }
+            @Override
+            public void close() {
+            }
 
-    private static AiProperties properties(String embedModel) {
-        return TestAiProperties.withEmbed(embedModel, 1024);
-    }
+            @Override
+            public ConverseResponse converse(ConverseRequest request) {
+                sent.add(request);
+                return response(ContentBlock.fromToolUse(ToolUseBlock.builder().toolUseId("t1").name("echo")
+                        .input(Document.fromMap(Map.of("greeting", Document.fromString("ok"),
+                                "number", Document.fromNumber(7))))
+                        .build()));
+            }
+        };
+        AiProperties properties = TestAiProperties.withFallback("global.p.cheap-model", "global.p.reason-model",
+                "global.p.vision-model");
+        BedrockAiClient client = new BedrockAiClient(runtime, properties, properties::fallbackModelOf,
+                PromptRegistry.fromClasspath(new PathMatchingResourcePatternResolver(), Map.of()), codec);
 
-    private static PromptRegistry prompts() {
-        return new PromptRegistry(Map.of("echo.v1.stg", "system(v) ::= <<s>>\nuser(v) ::= <<u>>\n"), Map.of());
+        AiResponse<SmokeAnswer> answer = client.complete(AiRequest.of(AiFeature.smoke, Tier.reason,
+                PromptRef.named("smoke"), Map.of("number", 7), SmokeAnswer.class, AiCallContext.system("t")));
+
+        assertThat(sent).singleElement().extracting(ConverseRequest::modelId).isEqualTo("global.p.reason-model");
+        assertThat(answer.modelId()).isEqualTo("global.p.reason-model");
+        assertThat(answer.output()).isEqualTo(new SmokeAnswer("ok", 7));
     }
 }

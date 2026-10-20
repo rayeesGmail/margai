@@ -2,6 +2,7 @@ package com.margai.ai.internal;
 
 import com.margai.ai.api.Tier;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,7 +17,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
  * The client chain itself is wired in {@code AiClientConfiguration}.
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties(AiProperties.class)
+@EnableConfigurationProperties({AiProperties.class, AiFlags.class})
 class AiConfiguration {
 
     /** The completion tiers; {@code embed} is priced and checked separately. */
@@ -25,7 +26,7 @@ class AiConfiguration {
     private static final Logger log = LoggerFactory.getLogger(AiConfiguration.class);
 
     @Bean
-    PriceTable priceTable(AiProperties properties) {
+    PriceTable priceTable(AiProperties properties, AiFlags flags) {
         PriceTable table = PriceTable.parse(properties.pricesJson());
         for (Tier tier : COMPLETION_TIERS) {
             String modelId = properties.modelFor(tier);
@@ -39,7 +40,56 @@ class AiConfiguration {
             throw new IllegalStateException("margai.ai.embed.model = " + embedModel
                     + " has no input price in margai.ai.prices-json");
         }
+        checkFallback(properties, flags, table);
         return table;
+    }
+
+    /**
+     * The completion fallback (TECH_PLAN §15.12), checked at every start rather than at the outage
+     * that switches to it. Refused: the flag on with no fallback ids, a fallback provider that is the
+     * primary, and a fallback id without input, output and both cache prices — a cached call priced
+     * at zero would let the breaker under-count exactly when the fallback is carrying the traffic.
+     * Warned, not refused (founder ruling, DECISIONS 2026-10-20): the condition — a fallback id that no
+     * longer names its tier's primary model, which is what a primary switch leaves behind when the
+     * fallback is not moved with it — is Claude's reading of "when a tier's primary model changes". A
+     * pipeline profile that pins a tier for one run trips it by design.
+     */
+    static void checkFallback(AiProperties properties, AiFlags flags, PriceTable table) {
+        if (properties.fallback() == null) {
+            if (flags.aiFallback()) {
+                throw new IllegalStateException("margai.flags.ai-fallback is on but margai.ai.fallback.tier names"
+                        + " no model: the switch would have nothing to switch to (TECH_PLAN §15.12)");
+            }
+            return;
+        }
+        if (properties.fallbackProvider() == properties.provider()) {
+            throw new IllegalStateException("margai.ai.fallback-provider = " + properties.fallbackProvider()
+                    + " is margai.ai.provider too: a fallback must be another provider (CS-2 §4.11)");
+        }
+        for (Tier tier : COMPLETION_TIERS) {
+            String fallbackId = properties.fallbackModelFor(tier);
+            if (!table.has(fallbackId) || !table.priceOf(fallbackId).hasChatPrices()
+                    || !table.priceOf(fallbackId).hasCachePrices()) {
+                throw new IllegalStateException("margai.ai.fallback.tier." + tier + " = " + fallbackId
+                        + " has no input, output, cache_read and cache_write price in margai.ai.prices-json");
+            }
+            String primaryId = properties.modelFor(tier);
+            if (!mirrors(fallbackId, primaryId)) {
+                log.warn("margai.ai.fallback.tier.{} = {} does not name margai.ai.tier.{}.id = {}: under the fallback"
+                        + " that tier would answer on another model. Expected while a pipeline profile pins the tier"
+                        + " for a run; otherwise move the fallback id with the primary (DECISIONS 2026-10-20)",
+                        tier, fallbackId, tier, primaryId);
+            }
+        }
+    }
+
+    /**
+     * Whether a fallback id names the primary's model: the primary id at the start or after a dot (a
+     * provider's profile prefix), then nothing but a date or a version suffix — so a primary id is not
+     * mirrored by a longer id that merely begins with it.
+     */
+    static boolean mirrors(String fallbackId, String primaryId) {
+        return Pattern.matches("(.*\\.)?" + Pattern.quote(primaryId) + "(-\\d{8})?(-v\\d+(:\\d+)?)?", fallbackId);
     }
 
     @Bean

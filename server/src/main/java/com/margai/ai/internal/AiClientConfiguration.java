@@ -2,8 +2,10 @@ package com.margai.ai.internal;
 
 import com.margai.ai.api.AiClient;
 import com.margai.ai.api.AiClientInfo;
+import com.margai.ai.api.Tier;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -71,8 +73,13 @@ class AiClientConfiguration {
                                 new SchemaValidatingAiClient(
                                         new RetryingAiClient(inner.client()))),
                         ledger, properties.budget()),
-                ledger, cost, properties, prompts, meters);
+                ledger, cost, properties, ledgerModelIds(inner, properties), prompts, meters);
         log.info("AiClient chain: {}", info);
         return chain;
+    }
+
+    /** The ids the ledger stamps a tier's calls with: the fallback's while the inner client is the fallback. */
+    static Function<Tier, String> ledgerModelIds(InnerAiClient inner, AiProperties properties) {
+        return inner.fallback() ? properties::fallbackModelFor : properties::modelFor;
     }
 }

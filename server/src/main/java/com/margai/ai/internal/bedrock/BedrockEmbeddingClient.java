@@ -25,9 +25,9 @@ import tools.jackson.databind.JsonNode;
 /**
  * Embeddings over Bedrock's InvokeModel (TECH_PLAN §4.9), separable from {@link BedrockAiClient}
  * because the two halves of the seam are two providers: since 2026-09-20 completions come from
- * Anthropic's own API while embeddings come from here, joined by {@code CompositeAiClient}.
- * {@link BedrockAiClient} delegates to this, so {@code margai.ai.provider = bedrock} still embeds
- * for itself and the dormant single-provider path is unchanged.
+ * Anthropic's own API while embeddings come from here, joined by {@code CompositeAiClient} — and
+ * since D18 (TECH_PLAN §15.12) Bedrock completions, the fallback's, are joined to this the same
+ * way rather than embedding for themselves.
  *
  * <p>The wire shape is chosen by the model <em>family</em> prefix, never by an id: Titan takes
  * {@code inputText} and answers {@code embedding}, Cohere takes {@code texts} and answers

@@ -24,10 +24,12 @@ import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
  * It also removes a secret rather than adding one: embeddings authenticate by IAM and there is no
  * key to hold or rotate.
  *
- * <p>Note this is not the dormant Bedrock path of {@link BedrockConfiguration}, which is the whole
- * provider and is still unreachable — the Anthropic models there need a Marketplace subscription
- * the account cannot buy (DECISIONS 2026-09-12). Serverless embedding models are a different
- * mechanism and are reachable today.
+ * <p>Note this is not {@link BedrockConfiguration}, Bedrock serving completions — the fallback
+ * behind {@code margai.flags.ai-fallback} (TECH_PLAN §15.12). The Anthropic models there needed a
+ * Marketplace subscription the account could not buy (DECISIONS 2026-09-12); CS-2 §4.11 reports
+ * that access restored, and the founder's smoke confirms it before the fallback is called ready
+ * (DECISIONS 2026-10-20). Serverless embedding models are a different mechanism and have been
+ * reachable throughout.
  *
  * <p>Credentials come from the SDK's default chain — {@code AWS_PROFILE=margai} on a laptop
  * (TECH_PLAN §7.4), the task role in AWS — and the SDK does not retry, because the retry decorator

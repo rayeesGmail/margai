@@ -38,7 +38,18 @@ public final class TestAiProperties {
     }
 
     public static AiProperties withEmbed(String model, int dimensions, AiProperties.Retrieval retrieval) {
-        return new AiProperties(AiProperties.Provider.anthropic,
+        return build(model, dimensions, retrieval, null);
+    }
+
+    /** The standard tiers with a completion fallback on Bedrock naming these ids (TECH_PLAN §15.12). */
+    public static AiProperties withFallback(String cheap, String reason, String vision) {
+        return build(EMBED, DIMENSIONS, RETRIEVAL,
+                new AiProperties.Fallback(new AiProperties.FallbackTiers(cheap, reason, vision)));
+    }
+
+    private static AiProperties build(String model, int dimensions, AiProperties.Retrieval retrieval,
+            AiProperties.Fallback fallback) {
+        return new AiProperties(AiProperties.Provider.anthropic, AiProperties.Provider.bedrock, fallback,
                 new AiProperties.Tiers(model(CHEAP), model(REASON), model(VISION)),
                 new AiProperties.Embed("cohere", model, dimensions, true), retrieval,
                 "{}", BigDecimal.ONE, new AiProperties.Budget(1, 1), 100, 1024, Duration.ofSeconds(20),

@@ -24,6 +24,11 @@ public record ModelPrice(BigDecimal input, BigDecimal output, BigDecimal cacheRe
         return input.signum() > 0 && output.signum() > 0;
     }
 
+    /** Both prompt-cache rates set: a cached call priced at zero would under-bill silently. */
+    public boolean hasCachePrices() {
+        return cacheRead.signum() > 0 && cacheWrite.signum() > 0;
+    }
+
     /**
      * The rates one call is billed at: the long-prompt rates once its prompt passes the threshold,
      * these otherwise. The prompt is what the provider counts — input, cache-read and cache-write

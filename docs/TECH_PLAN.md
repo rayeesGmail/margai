@@ -205,7 +205,7 @@ provider it wires is `margai.ai.provider` — the switch outlives a provider cha
 | `nightly` | EventBridge → ECS RunTask at 00:30 IST; locally by hand | the `jobs` module's `NightlyRunner` (§1.3): §4.5 re-plan for every user active in 14 days, weekly trajectory + patterns on Sundays, purge job, ai spend rollup; exits when done | as above |
 | `pipeline` | Founder's laptop with AWS SSO, `java -jar server.jar --spring.profiles.active=pipeline <command>` | §6 content commands (picocli) | `live` (human-launched) |
 | `eval` | Founder's laptop, `AI_LIVE=1 ./mvnw -Peval verify` | §4.10 live eval suite | `live` |
-| `live` | Added by the environment (`AI_LIVE=1` locally; task definition in AWS) | Swaps `FakeAiClient` for the provider `margai.ai.provider` names; cost breaker stays on | — |
+| `live` | Added by the environment (`AI_LIVE=1` locally; task definition in AWS) | Swaps `FakeAiClient` for the provider `margai.ai.provider` names — or, with `margai.flags.ai-fallback` on, the fallback provider (§15.12, *amended 2026-10-20, D18*); cost breaker stays on | — |
 | `local` | Developer default | Compose db, seed migrations (§2.9), fake OTP (`margai.auth.otp.sender = log`, the sandbox inbox for email and, after F1, SMS) / FCM / Razorpay adapters that log | `fake` |
 
 ### 1.3 Modules and package layout
@@ -1096,8 +1096,8 @@ Implementations and decorators (innermost first):
 
 | Class | Role |
 |---|---|
-| `AnthropicAiClient` + `CohereEmbeddingClient` (`@Profile("live")`, chosen by `margai.ai.provider`) | *Added 2026-09-12:* Messages API with forced tool use for JSON output, a cached system prefix, model id and request shape per tier from config; embeddings from their own provider, so the innermost client is the two halves joined (`CompositeAiClient`) |
-| `BedrockAiClient` (`@Profile("live")`, `margai.ai.provider = bedrock`) | Converse API with forced tool-use for JSON output; prompt-cache checkpoint after the system prefix; model id per tier from config. *Dormant since 2026-09-12 — kept whole so the way back needs no code; its price rows come from the environment* |
+| `AnthropicAiClient` + `CohereEmbeddingClient` (`@Profile("live")`, chosen by `margai.ai.provider` — since D18 through `CompletionRoute`, §15.12) | *Added 2026-09-12:* Messages API with forced tool use for JSON output, a cached system prefix, model id and request shape per tier from config; embeddings from their own provider, so the innermost client is the two halves joined (`CompositeAiClient`) |
+| `BedrockAiClient` (`@Profile("live")`, `margai.ai.provider = bedrock`) | Converse API with forced tool-use for JSON output; prompt-cache checkpoint after the system prefix; model id per tier from config. *Dormant since 2026-09-12 — kept whole so the way back needs no code; its price rows come from the environment.* *Amended 2026-10-20 (D18 T1, §15.12): no longer dormant — it serves completions as the fallback under `margai.flags.ai-fallback` (wired by `CompletionRoute`), in each tier's request shape (temperature only where set, thinking and effort, forced or auto tool), joined to the pinned embedding client by `CompositeAiClient`; its fallback price rows are in config* |
 | `FakeAiClient` (default) | returns fixtures from `src/main/resources/ai-fixtures/<prompt>.<case>.json` (main resources: the fake is the runtime default in `local`/`api` profiles and ships in the image; tests add cases under `src/test/resources/ai-fixtures/`) chosen by a variable (`fixture_case`) or a deterministic hash; realistic token counts so the ledger and breaker are exercised |
 | `RetryingAiClient` | 2 retries with jitter on throttling/5xx; timeouts 20 s real-time, 10 min batch; maps failures to `AiUnavailableException` |
 | `SchemaValidatingAiClient` | validates the JSON against the record's schema; one repair retry with the validation error in context; then `InvalidOutputException` |
@@ -2048,6 +2048,8 @@ rebuilt from Terraform if it drifts.
 /margai/beta/fcm/service_account_json  SecureString
 /margai/beta/posthog/api_key           SecureString
 /margai/beta/ai/provider               String       anthropic | bedrock (2026-09-12)
+/margai/beta/ai/fallback_provider      String       bedrock — the completion fallback (§15.12, 2026-10-20)
+/margai/beta/ai/fallback/tier/…        String       the fallback's model id per tier, cheap, reason, vision (§15.12, 2026-10-20)
 /margai/beta/ai/anthropic/api_key      SecureString the model provider's key — the AI auth model (2026-09-12)
 /margai/beta/ai/cohere/api_key         SecureString the embedding provider's key (2026-09-12)
 /margai/beta/ai/tier/cheap/id          String       model id, pinned version
@@ -2989,6 +2991,28 @@ Batch work under the fallback runs sequentially, which is fine at beta scale —
 on-demand loop at concurrency 4, never a batch submission on the Bedrock path (Claude's reading, DECISIONS
 2026-10-20, for the founder to overrule); the runbook notes roughly how long a nightly run takes that way
 at 500 users.*
+
+*Built at D18 T1 (DECISIONS 2026-10-20; the build choices are Claude's, for the founder to overrule unless
+noted):* the YAML keys are `margai.ai.fallback-provider`, `margai.ai.fallback.tier.{cheap,reason,vision}`
+(the founder's ids, VISION's included) and `margai.flags.ai-fallback`. `CompletionRoute` decides from the
+environment which provider configuration wires — the flag's fallback provider, else `margai.ai.provider` —
+and both provider configurations take each tier's model from it: the fallback's id in the primary tier's
+request shape. Bedrock completions are joined to the pinned embedding client by `CompositeAiClient`, as the
+Anthropic ones are, so the switch never touches embeddings. `ConverseRequestMapper` sends a tier's
+temperature only when set, `thinking` always and `output_config.effort` where set (both in
+`additionalModelRequestFields`, Converse having no field of its own), a forced or an `auto`-and-strict tool
+as the tier says, and keeps its cache point closing the system prompt. The ledger stamps a fallback call
+with the fallback's id before the call, so a failed call is not recorded against the primary. Startup
+(`AiConfiguration.checkFallback`) refuses the flag on with no ids, a fallback provider that is the primary
+and a fallback id without input, output and both cache prices, and warns when a fallback id no longer names
+its tier's primary model (the founder's warning, as a check of the configuration against itself). The Bedrock
+client refuses an answer cut off at the output-token limit and does not repair a refusal or a Bedrock filter
+stop, as the Anthropic client does; the pipeline's two VISION tasks name the fallback's model under the flag,
+so `ncert extract` and `ncert verify` refuse to run on it; and the Bedrock runtime client both Bedrock
+configurations declare is conditional on both sides, so the wiring does not depend on scan order. The Bedrock
+rows are priced as Anthropic's list, every figure for the founder to confirm on the Bedrock page, the two
+disputed first; the switch, the smoke (`BedrockFallbackSmokeTest`) and the 500-user estimate are in
+docs/runbooks/bedrock-fallback.md.
 
 ### 15.13 WhatsApp, zero-API (CS-2 §4.9)
 

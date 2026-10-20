@@ -161,9 +161,9 @@
       <artifactId>anthropic-java</artifactId>
       <version>2.35.0</version>
     </dependency>
-    <!-- Bedrock Converse + InvokeModel behind BedrockAiClient — dormant since the 2026-09-12
-         provider switch: reachable only with margai.ai.provider=bedrock in the live profile, kept
-         whole so the way back needs no code (TECH_PLAN §1.2, §4.11). Credentials come from the
+    <!-- Bedrock Converse + InvokeModel: InvokeModel for the embeddings (the D15 pin), Converse for
+         the completion fallback behind margai.flags.ai-fallback (D18, TECH_PLAN §15.12; or
+         margai.ai.provider=bedrock, which nothing sets). Credentials come from the
          default chain (locally the Identity Center profile of TECH_PLAN §7.4, created at F8 on
          2026-09-12; the task role in AWS), never from configuration. -->
     <dependency>

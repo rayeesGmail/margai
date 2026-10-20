@@ -28,8 +28,9 @@ import org.springframework.test.context.ActiveProfiles;
  * The same smoke against the dormant provider (TECH_PLAN §4.11), kept so the way back is proven
  * rather than assumed: since the 2026-09-12 switch the live client is chosen by
  * {@code margai.ai.provider}, and this test is the only place that asks for {@code bedrock}. It
- * needs that provider's model ids and price rows supplied by environment, since the defaults
- * price the direct-API models; {@link AiLiveSmokeTest} is the D5 acceptance now.
+ * needs that provider's model ids for the tiers supplied by environment, with price rows for them
+ * and for the three fallback ids (cache rates included, or startup refuses); {@link AiLiveSmokeTest}
+ * is the D5 acceptance now.
  *
  * <p>Founder-run only, and behind the same single switch as every live run: {@code AI_LIVE=1} is
  * what unlocks billable calls anywhere (DECISIONS 2026-09-12 — it replaced {@code BEDROCK_LIVE=1}
@@ -41,17 +42,18 @@ import org.springframework.test.context.ActiveProfiles;
  * the prompt cache the first one wrote.
  *
  * <pre>
- * cd server && AWS_PROFILE=margai AI_LIVE=1 -Dbedrock.smoke=true \
+ * cd server && AWS_PROFILE=margai AI_LIVE=1 \
  *   MARGAI_AI_TIER_CHEAP_ID=… MARGAI_AI_PRICES_JSON=… \
- *   MARGAI_AI_EMBED_PROVIDER=bedrock MARGAI_AI_EMBED_MODEL=… \
- *   ./mvnw test -Dtest=BedrockSmokeTest -Dsurefire.failIfNoSpecifiedTests=false
+ *   ./mvnw test -Dtest=BedrockSmokeTest -Dbedrock.smoke=true -Dsurefire.failIfNoSpecifiedTests=false
  * </pre>
  *
- * <p>The embedding provider has to move with the completion provider: this client embeds for
- * itself, and leaving {@code margai.ai.embed.provider} on the direct one would build that client
- * too and refuse to start without a key it would never use.
+ * <p>Since D18 (TECH_PLAN §15.12) the Bedrock completion client is joined to whichever embedding
+ * client {@code margai.ai.embed.provider} configures — Bedrock by default — rather than embedding for
+ * itself; and with Bedrock the primary, the fallback provider must be another, so this test names
+ * Anthropic as the fallback for the startup check. The completion fallback's own smoke, the one the
+ * founder runs before calling it ready, is {@link BedrockFallbackSmokeTest}.
  */
-@SpringBootTest(properties = "margai.ai.provider=bedrock")
+@SpringBootTest(properties = {"margai.ai.provider=bedrock", "margai.ai.fallback-provider=anthropic"})
 @ActiveProfiles("live")
 @Import(TestcontainersConfiguration.class)
 @EnabledIfEnvironmentVariable(named = "AI_LIVE", matches = "1")

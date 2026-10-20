@@ -118,7 +118,7 @@ class BedrockEmbeddingClientTest {
 
     private BedrockEmbeddingClient client(String model, boolean sendWidth) {
         AiProperties base = TestAiProperties.withEmbed(model, 1024);
-        AiProperties properties = new AiProperties(base.provider(), base.tier(),
+        AiProperties properties = new AiProperties(base.provider(), base.fallbackProvider(), base.fallback(), base.tier(),
                 new AiProperties.Embed(AiProperties.BEDROCK, model, 1024, sendWidth), base.retrieval(),
                 base.pricesJson(), base.usdInr(), base.budget(), base.batchMinRecords(), base.maxOutputTokens(),
                 base.callTimeout(), base.anthropic(), base.cohere(), base.bedrock(), base.prompts());

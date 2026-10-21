@@ -97,6 +97,19 @@ class PyqLoadCommandTest {
         assertThat(out.toString()).contains("question 4 is dropped in the file but not among the register's special entries");
     }
 
+    /** A committed report reads the same on every machine (Report): the approved file is named as given. */
+    @Test
+    void namesTheApprovedFileAsGiven() {
+        Path relative = Path.of("").toAbsolutePath().relativize(inputs);
+
+        int exit = commandLine.execute("pyq", "load", "--paper", PyqTagCommandTest.CODE, "--inputs", relative.toString(),
+                "--reports", reports.toString());
+
+        assertThat(exit).isEqualTo(InputFileCommand.EXIT_OK);
+        assertThat(out.toString())
+                .contains("approved file: " + relative.resolve("papers").resolve(PyqTagCommandTest.CODE + ".json").normalize());
+    }
+
     private int run() {
         return commandLine.execute("pyq", "load", "--paper", PyqTagCommandTest.CODE, "--inputs", inputs.toString(),
                 "--reports", reports.toString());

@@ -85,7 +85,7 @@ class PyqLoadCommand extends PyqPaperCommand {
                     + String.join("; ", untagged) + " — re-tag them with `pyq tag --redo --questions N`");
         }
         report.line("content store: " + content.describe());
-        report.line("approved file: " + approved.toAbsolutePath().normalize());
+        report.line("approved file: " + approved.normalize());
         report.line("tags: " + tagsKey);
 
         List<PyqQuestionRow> rows = file.questions().stream().map(question -> row(question, tags.get(question.no()))).toList();

@@ -2217,6 +2217,9 @@ and reusing the Spring context across module-flow tests.
   scheduled blocks. *Amended 2026-10-20 (D19; Claude's, DECISIONS 2026-10-20, for the founder to overrule): the scan covers `accepted_keys` and
   `answer_status` beside `correct_key` — both carry the key — and the carriers return them under the same rule;
   the tag provenance (`questions.tagging`, its reason) is checked for a hint at the answer before D31 serves it.*
+  *Superseded in part 2026-10-21 (the founder; DECISIONS): a tag reason goes through the answer-hint check only if a
+  surface could show one. Claude confirmed that none can — nothing outside the pipeline reads `questions.tagging`
+  (same DECISIONS).*
 - `IdempotencyReplayTest` for every **Idem** route: same key + same body → identical response,
   no second side effect; same key + different body → `IDEMPOTENCY_CONFLICT`.
 - `WebhookSignatureTest`: tampered body → 400, no `billing_events` row, one `billing.webhook.rejected`

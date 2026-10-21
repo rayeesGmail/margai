@@ -281,7 +281,9 @@ tools; your reviews focus on output quality.)*
   buffer before D31, and no figure question is served without its crop.* *And (Claude's, DECISIONS 2026-10-20, for
   the founder to overrule): `accepted_keys` and `answer_status` are key carriers like `correct_key`, a
   multiple-answer question is judged on `accepted_keys`, and a tag's reason is checked for a hint at the answer
-  before D31 serves the question.* *And (Claude's, DECISIONS 2026-10-21, for the founder to overrule): so is every
+  before D31 serves the question.* *(Superseded in part 2026-10-21 (the founder; DECISIONS): a tag reason goes through the
+  answer-hint check only if a surface could show one. Claude confirmed that none can — nothing outside the pipeline
+  reads `questions.tagging` (same DECISIONS).)* *And (Claude's, DECISIONS 2026-10-21, for the founder to overrule): so is every
   figure description, before it serves as alt text, and the extraction's flags stored with the question.* *And (the founder, 2026-10-20; DECISIONS): the crop tool works from the saved page
   images, `pages/pyq/{paper}/{page}.png`.* *Proposed 2026-10-20 (the founder's instruction, building on Claude's
   recommendation: logged now, its details settled when the crop work starts; DECISIONS): each `figures` entry stores its crop box in PDF coordinates

@@ -109,6 +109,13 @@ bad tag is kept with its problem, never loaded. The report
 lists tags with problems (re-tag with `--redo --questions N`), the spread per chapter, every out-of-syllabus
 question and the founder's seeded sample of 40.
 
+*Since 2026-10-21 (the founder; DECISIONS):* out of syllabus means the topic is absent from the **current** NMC
+syllabus **and** the current NCERT books — topics cut in 2024, for instance, which will appear in the 2019–2023
+papers. A question NCERT teaches is in syllabus and tagged to that chapter. Where no taxonomy node fits it, it goes
+on the taxonomy-gap list with a proposed node — never the flag. *(Claude's, same DECISIONS, for the founder to
+overrule: before an out-of-syllabus flag stands, Claude looks for the question's NCERT anchor — in the corpus, and in
+the books' PDFs for the pages the corpus leaves out, unit openers and biography pages.)*
+
 ## 6. `pyq load` — the D19 check, the founder runs it (it reads the tags from the content bucket)
 
 ```

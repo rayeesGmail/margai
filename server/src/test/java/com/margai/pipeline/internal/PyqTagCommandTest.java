@@ -153,6 +153,19 @@ class PyqTagCommandTest {
                 .contains("cost (from the ai_calls ledger)").contains("AiBudgetExceededException");
     }
 
+    /** A committed report reads the same on every machine (Report): the approved file is named as given. */
+    @Test
+    void namesTheApprovedFileAsGiven() {
+        Path relative = Path.of("").toAbsolutePath().relativize(inputs);
+
+        int exit = commandLine.execute("pyq", "tag", "--paper", CODE, "--inputs", relative.toString(),
+                "--reports", reports.toString());
+
+        assertThat(exit).isEqualTo(InputFileCommand.EXIT_OK);
+        assertThat(out.toString())
+                .contains("approved file: " + relative.resolve("papers").resolve(CODE + ".json").normalize() + " (4 questions)");
+    }
+
     @Test
     void refusesAReasoningModelThatIsNotThePyqTagger() {
         tagger.model = "claude-haiku-5-5";

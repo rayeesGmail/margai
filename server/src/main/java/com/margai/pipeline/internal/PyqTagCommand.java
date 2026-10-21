@@ -100,7 +100,7 @@ class PyqTagCommand extends PyqPaperCommand {
         }
         TaxonomyOutline taxonomy = new TaxonomyOutline(TaxonomyCsvReader.read(io.input(TAXONOMY)));
         report.line("content store: " + content.describe());
-        report.line("approved file: " + approved.toAbsolutePath().normalize() + " (" + file.questions().size() + " questions)");
+        report.line("approved file: " + approved.normalize() + " (" + file.questions().size() + " questions)");
         report.line("tagger: " + tagger.model() + ", " + tagger.promptVersion());
 
         String tagsKey = ContentKeys.pyqTags(paper.code());

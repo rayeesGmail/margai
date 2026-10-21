@@ -186,7 +186,10 @@ tools; your reviews focus on output quality.)*
   checked against the page's line in `extract/pyq/{paper}.jsonl` (for 2025 code 45, a re-render marked as one —
   not provably the bytes its calls read; Claude's row, DECISIONS 2026-10-20).* *And (the founder, 2026-10-21;
   DECISIONS): the coaching file with solutions (`…Aakash-CROSSCHECK-ONLY.pdf`) is kept out of D20 and D21 entirely, and
-  neither it nor the PW code-45 retype is ever shown to a model that generates content.*
+  neither it nor the PW code-45 retype is ever shown to a model that generates content.* *And (the founder,
+  2026-10-21; DECISIONS): a character a review listed as "cause unsettled" that touches the keyed answer, a number, a
+  unit, a sign or a formula goes to the founder when the Hindi column, the second official copy and this
+  solve-vs-key check together still cannot settle it.*
 - **D21 —** Solutions for remaining subjects (batch overnight); distractor-map
   generation. ✅ *Second 50-question audit; error rate < agreed threshold.*
 - **D22 —** Weightage & difficulty statistics computed → syllabus nodes updated; the

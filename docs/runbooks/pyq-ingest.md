@@ -68,9 +68,15 @@ AWS_PROFILE=margai DB_URL=… java -jar <jar> --spring.profiles.active=pipeline 
    review report `pipeline/reports/<date>-pyq-review-<code>.md` with the page it was read on.
    Each misprint kept as printed (a wrong character the paper prints, as opposed to a stroke the scan lost —
    DECISIONS 2026-10-20 and 2026-10-21; one the English column alone prints included, by SPEC §6.2 (the founder,
-   2026-10-21), when a copy that cannot substitute glyphs shows it — a lossless copy or a scan that is not JBIG2
-   (Claude's, same DECISIONS); a case no copy settles is read as meant and listed in the review report as cause
-   unsettled, for the founder at the approval — Claude's proposal, put to the founder, same DECISIONS) is recorded with a one-line description of the intended reading, which the
+   2026-10-21). Whether the paper printed it: a wrong whole character in a JBIG2 or other lossy 1-bit scan is never
+   evidence on its own, and only a lossless copy, a non-JBIG2 scan or the other language column can settle it (the
+   founder, same DECISIONS) — the other column settles it where it prints the same wrong character, and a non-JBIG2
+   scan is read as one that is not lossy 1-bit (Claude's readings, same DECISIONS, for the founder to overrule); a
+   case nothing settles is read as
+   meant, with no as-printed note, and listed in the review report as "cause unsettled", with no per-item ruling — it
+   goes to the founder only when the intended reading itself is in doubt, or when the character touches the keyed
+   answer, a number, a unit, a sign or a formula and the Hindi column, the second official copy and D20's
+   solve-vs-key check together still cannot settle it; the founder, same DECISIONS) is recorded with a one-line description of the intended reading, which the
    app can show as an "as printed in the original paper" note (the founder, 2026-10-21; PLAN D31, D40) — as an
    `as_printed` entry of its question: the field (`stem` or `option:N`), the span as printed (no more than the wrong
    word or sign and what it needs to name its place), the intended reading, and the note (Claude's shape, DECISIONS

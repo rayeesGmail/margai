@@ -11,7 +11,9 @@ package com.margai.curriculum.api;
  * @param printed  the span as printed and kept in that text — no more of the paper than the wrong word or
  *                 sign and what it needs to name its place
  * @param intended what the paper meant there
- * @param note     one line describing the intended reading, shown to the student
+ * @param note     one line describing the intended reading
+ * @param display  whether the app shows the note ({@code show}) or only records it ({@code record_only}) — the
+ *                 founder's class, 2026-10-21
  */
-public record QuestionAsPrinted(String at, String printed, String intended, String note) {
+public record QuestionAsPrinted(String at, String printed, String intended, String note, AsPrintedDisplay display) {
 }

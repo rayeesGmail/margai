@@ -1,11 +1,13 @@
 package com.margai.curriculum.internal;
 
+import com.margai.curriculum.api.AsPrintedDisplay;
 import com.margai.curriculum.api.CurriculumImportException;
 import com.margai.curriculum.api.NodeKind;
 import com.margai.curriculum.api.PaperSection;
 import com.margai.curriculum.api.PyqLoadReport;
 import com.margai.curriculum.api.PyqPaperRow;
 import com.margai.curriculum.api.PyqQuestionRow;
+import com.margai.curriculum.api.QuestionAsPrinted;
 import com.margai.curriculum.api.QuestionSource;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -125,8 +127,14 @@ class PyqImporter {
         List<PyqLoadReport.StoredQuestion> stored = after.stream().map(question -> new PyqLoadReport.StoredQuestion(
                 question.getQuestionNo(), codes.get(question.getNodeId()),
                 topicCounts.getOrDefault(question.getId(), 0L).intValue(), question.isOutOfSyllabus(),
-                !question.getFigures().isEmpty(), question.getAnswerStatus(), question.getAsPrinted().size())).toList();
+                !question.getFigures().isEmpty(), question.getAnswerStatus(),
+                count(question.getAsPrinted(), AsPrintedDisplay.show),
+                count(question.getAsPrinted(), AsPrintedDisplay.record_only))).toList();
         return new PyqLoadReport(paperInserted, paperUpdated, inserted, updated, unchanged, stored);
+    }
+
+    private static int count(List<QuestionAsPrinted> kept, AsPrintedDisplay display) {
+        return (int) kept.stream().filter(entry -> entry.display() == display).count();
     }
 
     /** Every primary and secondary code of the file to its node, refusing the codes the taxonomy lacks. */

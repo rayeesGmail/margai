@@ -3,6 +3,7 @@ package com.margai.pipeline.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.curriculum.api.AnswerStatus;
+import com.margai.curriculum.api.AsPrintedDisplay;
 import com.margai.curriculum.api.PyqQuestionRow;
 import com.margai.curriculum.api.QuestionAsPrinted;
 import java.io.IOException;
@@ -88,14 +89,17 @@ class PyqLoadCommandTest {
         PaperFile.Question first = questions.getFirst();
         questions.set(0, new PaperFile.Question(first.no(), first.stemEn(), first.stemHi(), first.options(), first.figures(),
                 first.answer(), first.extraction(),
-                List.of(new QuestionAsPrinted("stem", "Question", "The question", "'The' is missing before 'Question'"))));
+                List.of(new QuestionAsPrinted("stem", "Question", "The question", "'The' is missing before 'Question'",
+                                AsPrintedDisplay.record_only),
+                        new QuestionAsPrinted("stem", "Question 1", "Question 2", "'1' is printed where '2' is meant",
+                                AsPrintedDisplay.show))));
         PyqTagCommandTest.writeInputs(inputs, new PaperFile(approved.paper(), approved.transcribedFrom(), questions));
 
         assertThat(run()).isEqualTo(InputFileCommand.EXIT_OK);
 
-        assertThat(imports.loadedQuestions.getFirst().asPrinted()).extracting(QuestionAsPrinted::intended)
-                .containsExactly("The question");
-        assertThat(out.toString()).contains("Q1: 1 note(s)");
+        assertThat(imports.loadedQuestions.getFirst().asPrinted()).extracting(QuestionAsPrinted::display)
+                .containsExactly(AsPrintedDisplay.record_only, AsPrintedDisplay.show);
+        assertThat(out.toString()).contains("Q1: 1 show, 1 record_only").contains("show 1, record_only 1");
     }
 
     /** A committed report reads the same on every machine (Report): the approved file is named as given. */

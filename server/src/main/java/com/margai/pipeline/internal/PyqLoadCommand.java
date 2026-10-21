@@ -107,10 +107,14 @@ class PyqLoadCommand extends PyqPaperCommand {
         report.section("load").table(List.of("paper", "inserted", "updated", "unchanged"),
                 List.of(List.of(result.paperInserted() ? "inserted" : result.paperUpdated() ? "updated" : "unchanged",
                         String.valueOf(result.inserted()), String.valueOf(result.updated()), String.valueOf(result.unchanged()))));
-        report.section("misprints kept as printed — each shown as an \"as printed in the original paper\" note (as the "
-                        + "database holds them)")
-                .list(result.stored().stream().filter(question -> question.asPrinted() > 0)
-                        .map(question -> "Q" + question.no() + ": " + question.asPrinted() + " note(s)").toList(), "none");
+        int shown = result.stored().stream().mapToInt(PyqLoadReport.StoredQuestion::asPrintedShow).sum();
+        int recorded = result.stored().stream().mapToInt(PyqLoadReport.StoredQuestion::asPrintedRecordOnly).sum();
+        report.section("misprints kept as printed — `show` ones the app can show as an \"as printed in the original "
+                        + "paper\" note, `record_only` ones kept without (as the database holds them)")
+                .list(result.stored().stream().filter(question -> question.asPrintedShow() + question.asPrintedRecordOnly() > 0)
+                        .map(question -> "Q" + question.no() + ": " + question.asPrintedShow() + " show, "
+                                + question.asPrintedRecordOnly() + " record_only").toList(), "none")
+                .line("show " + shown + ", record_only " + recorded);
         report.section("answers other than one key (NTA's final key; the register's special entries)")
                 .list(result.stored().stream().filter(question -> question.answerStatus() != AnswerStatus.single)
                         .map(question -> "Q" + question.no() + ": " + question.answerStatus()).toList(), "none");

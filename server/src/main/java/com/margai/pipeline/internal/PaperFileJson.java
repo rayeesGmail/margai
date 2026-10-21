@@ -30,7 +30,8 @@ import tools.jackson.databind.json.JsonMapper;
  * option; and an answer whose shape matches its status, agreeing with the special entries the
  * founder listed for the code — a key typed into the file can never differ from the one he checked
  * (README §3); and every misprint kept as printed quoting what its field prints, with an intended
- * reading and a one-line note. A draft passes the same checks except that its answers are empty.
+ * reading, a one-line note and its display class. A draft passes the same checks except that its
+ * answers are empty.
  */
 final class PaperFileJson {
 
@@ -131,9 +132,10 @@ final class PaperFileJson {
 
     /**
      * A misprint kept as printed names a field the question has, a span that field still prints, its
-     * intended reading, and the one line the app can show — the record the founder asked for
-     * (2026-10-21), in a shape and with checks that are Claude's (DECISIONS) — so a note can never
-     * point at words the question no longer carries.
+     * intended reading, a one-line note, and its display class — the app shows the note of a
+     * {@code show} entry and keeps a {@code record_only} one without it (the founder, 2026-10-21) — the
+     * record the founder asked for (2026-10-21), in a shape and with checks that are Claude's
+     * (DECISIONS) — so a note can never point at words the question no longer carries.
      */
     private static List<String> asPrintedProblems(String at, PaperFile.Question question) {
         List<String> problems = new ArrayList<>();
@@ -153,6 +155,9 @@ final class PaperFileJson {
             if (kept.note() == null || kept.note().isBlank() || kept.note().contains("\n")
                     || kept.note().length() > AS_PRINTED_NOTE_MAX) {
                 problems.add(where + " needs a one-line note of at most " + AS_PRINTED_NOTE_MAX + " characters");
+            }
+            if (kept.display() == null) {
+                problems.add(where + " has no display class — show, or record_only for a slip a student reads correctly");
             }
         }
         return problems;

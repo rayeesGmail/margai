@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.ai.tasks.PyqPage;
 import com.margai.curriculum.api.AnswerStatus;
+import com.margai.curriculum.api.AsPrintedDisplay;
 import com.margai.curriculum.api.KeyProvenance;
 import com.margai.curriculum.api.PaperMarking;
 import com.margai.curriculum.api.PaperSection;
@@ -118,32 +119,37 @@ class PyqAssemblyTest {
         PaperDefinition paper = paper(1, List.of());
         PaperFile.Question question = approved(PaperFile.Answer.single("2")).questions().getFirst();
         List<QuestionAsPrinted> kept = List.of(
-                new QuestionAsPrinted("stem", "Question", "The question", "'The' is missing before 'Question'"),
-                new QuestionAsPrinted("option:2", "b", "B", "'b' is printed for 'B'"));
+                new QuestionAsPrinted("stem", "Question", "The question", "'The' is missing before 'Question'",
+                        AsPrintedDisplay.record_only),
+                new QuestionAsPrinted("option:2", "b", "B", "'b' is printed for 'B'", AsPrintedDisplay.show));
         PaperFile file = withAsPrinted(question, kept);
         Path path = dir.resolve("neet-2025-45.json");
         Files.writeString(path, PaperFileJson.write(file));
 
         assertThat(PaperFileJson.read(path)).isEqualTo(file);
-        assertThat(Files.readString(path)).contains("\"as_printed\"").contains("\"intended\" : \"The question\"");
+        assertThat(Files.readString(path)).contains("\"as_printed\"").contains("\"intended\" : \"The question\"")
+                .contains("\"display\" : \"record_only\"").contains("\"display\" : \"show\"");
         assertThat(PaperFileJson.problems(file, paper, true)).isEmpty();
 
+        AsPrintedDisplay show = AsPrintedDisplay.show;
         PaperFile wrong = withAsPrinted(question, List.of(
-                new QuestionAsPrinted("option:7", "a", "A", "no such option"),
-                new QuestionAsPrinted("stem", "breaks", "brakes", "'breaks' is printed for 'brakes'"),
-                new QuestionAsPrinted("stem", " ", "The question", "a blank span names nothing"),
-                new QuestionAsPrinted("option:1", "a", "a", "the same"),
-                new QuestionAsPrinted("stem", "Question", "The question", "two\nlines"),
-                new QuestionAsPrinted("stem", "Question", "The question", "x".repeat(PaperFileJson.AS_PRINTED_NOTE_MAX + 1))));
+                new QuestionAsPrinted("option:7", "a", "A", "no such option", show),
+                new QuestionAsPrinted("stem", "breaks", "brakes", "'breaks' is printed for 'brakes'", show),
+                new QuestionAsPrinted("stem", " ", "The question", "a blank span names nothing", show),
+                new QuestionAsPrinted("option:1", "a", "a", "the same", show),
+                new QuestionAsPrinted("stem", "Question", "The question", "two\nlines", show),
+                new QuestionAsPrinted("stem", "Question", "The question", "x".repeat(PaperFileJson.AS_PRINTED_NOTE_MAX + 1), show),
+                new QuestionAsPrinted("stem", "Question", "The question", "no class", null)));
         assertThat(PaperFileJson.problems(wrong, paper, true)).containsExactly(
                 "question 1's as-printed note at option:7 names no stem or option text of the question",
                 "question 1's as-printed note at stem quotes 'breaks', which that text does not print",
                 "question 1's as-printed note at stem quotes ' ', which that text does not print",
                 "question 1's as-printed note at option:1 has no intended reading that differs from the print",
                 "question 1's as-printed note at stem needs a one-line note of at most 160 characters",
-                "question 1's as-printed note at stem needs a one-line note of at most 160 characters");
+                "question 1's as-printed note at stem needs a one-line note of at most 160 characters",
+                "question 1's as-printed note at stem has no display class — show, or record_only for a slip a student reads correctly");
         assertThat(PaperFileJson.problems(withAsPrinted(question, List.of(new QuestionAsPrinted("stem", "Question",
-                "The question", "x".repeat(PaperFileJson.AS_PRINTED_NOTE_MAX)))), paper, true)).isEmpty();
+                "The question", "x".repeat(PaperFileJson.AS_PRINTED_NOTE_MAX), show))), paper, true)).isEmpty();
     }
 
     private static PaperFile withAsPrinted(PaperFile.Question question, List<QuestionAsPrinted> kept) {

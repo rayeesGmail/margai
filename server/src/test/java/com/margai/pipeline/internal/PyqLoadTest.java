@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.margai.TestcontainersConfiguration;
 import com.margai.curriculum.api.AnswerStatus;
+import com.margai.curriculum.api.AsPrintedDisplay;
 import com.margai.curriculum.api.CurriculumImport;
 import com.margai.curriculum.api.CurriculumImportException;
 import com.margai.curriculum.api.PyqLoadReport;
@@ -75,9 +76,12 @@ class PyqLoadTest {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM question_topics", Integer.class)).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT accepted_keys::text FROM questions WHERE question_no = 2", String.class))
                 .isEqualTo("{1,2}");
-        assertThat(first.stored()).extracting(PyqLoadReport.StoredQuestion::asPrinted).containsExactly(1, 0, 0, 0);
+        assertThat(first.stored()).extracting(PyqLoadReport.StoredQuestion::asPrintedShow).containsExactly(1, 0, 0, 0);
+        assertThat(first.stored()).extracting(PyqLoadReport.StoredQuestion::asPrintedRecordOnly).containsExactly(1, 0, 0, 0);
         assertThat(jdbc.queryForObject("SELECT as_printed->0->>'intended' FROM questions WHERE question_no = 1", String.class))
                 .isEqualTo("The question");
+        assertThat(jdbc.queryForObject("SELECT as_printed->0->>'display' FROM questions WHERE question_no = 1", String.class))
+                .isEqualTo("record_only");
         assertThat(jdbc.queryForObject("SELECT as_printed::text FROM questions WHERE question_no = 2", String.class))
                 .isEqualTo("[]");
 
@@ -98,7 +102,8 @@ class PyqLoadTest {
         renoted.set(0, new PyqQuestionRow(first.questionNo(), first.nodeCode(), first.secondaryNodeCodes(), first.outOfSyllabus(),
                 first.stemEn(), first.stemHi(), first.options(), first.answerStatus(), first.correctKey(), first.acceptedKeys(),
                 first.figures(), first.extraction(), first.tagging(),
-                List.of(new QuestionAsPrinted("stem", "Question", "The question", "the article 'The' is missing"))));
+                List.of(new QuestionAsPrinted("stem", "Question", "The question", "the article 'The' is missing",
+                        AsPrintedDisplay.record_only))));
 
         PyqLoadReport again = imports.loadPaper(paper(), renoted);
 
@@ -221,7 +226,11 @@ class PyqLoadTest {
                 no == 1 ? List.of(new QuestionFigure("stem", 3, "a uniform rod pivoted at one end")) : List.of(),
                 new QuestionExtraction(List.of(3), List.of(PAGE_CALL), "claude-opus-5-5", "pyq_extract.v1", List.of()),
                 new QuestionTagging(TAG_CALL, "claude-sonnet-5-5", "pyq_tag.v1", new BigDecimal("0.90"), "a reason"),
-                no == 1 ? List.of(new QuestionAsPrinted("stem", "Question", "The question", "'The' is missing before 'Question'"))
+                no == 1 ? List.of(
+                        new QuestionAsPrinted("stem", "Question", "The question", "'The' is missing before 'Question'",
+                                AsPrintedDisplay.record_only),
+                        new QuestionAsPrinted("stem", "Question " + no, "Question 2", "'1' is printed where '2' is meant",
+                                AsPrintedDisplay.show))
                         : List.of());
     }
 }

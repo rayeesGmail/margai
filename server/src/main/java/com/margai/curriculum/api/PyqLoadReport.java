@@ -25,10 +25,11 @@ public record PyqLoadReport(
     /**
      * One question as stored, with what the report counts — never its text and never its key.
      *
-     * @param nodeCode  the primary node's code
-     * @param asPrinted how many misprints the question keeps as printed, each with its note
+     * @param nodeCode           the primary node's code
+     * @param asPrintedShow       the misprints kept as printed whose note the app shows
+     * @param asPrintedRecordOnly the misprints kept as printed and only recorded
      */
     public record StoredQuestion(short no, String nodeCode, int secondaryTopics, boolean outOfSyllabus, boolean hasFigure,
-            AnswerStatus answerStatus, int asPrinted) {
+            AnswerStatus answerStatus, int asPrintedShow, int asPrintedRecordOnly) {
     }
 }

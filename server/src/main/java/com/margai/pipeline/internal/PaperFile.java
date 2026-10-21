@@ -1,6 +1,8 @@
 package com.margai.pipeline.internal;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.margai.curriculum.api.AnswerStatus;
+import com.margai.curriculum.api.QuestionAsPrinted;
 import com.margai.curriculum.api.QuestionExtraction;
 import com.margai.curriculum.api.QuestionFigure;
 import com.margai.curriculum.api.QuestionOption;
@@ -31,6 +33,8 @@ record PaperFile(String paper, String transcribedFrom, List<Question> questions)
      * @param stemHi     NTA's Hindi stem; null until the parked Hindi pass reads it
      * @param answer     null in a draft; NTA's final key in an approved file
      * @param extraction the pages and calls it came from, and the checks' flags it carried into review
+     * @param asPrinted  the misprints the review keeps as printed, each with its intended reading (founder,
+     *                   2026-10-21) — written only when there are any, so a draft and its review diff cleanly
      */
     record Question(
             short no,
@@ -39,15 +43,17 @@ record PaperFile(String paper, String transcribedFrom, List<Question> questions)
             List<QuestionOption> options,
             List<QuestionFigure> figures,
             Answer answer,
-            QuestionExtraction extraction) {
+            QuestionExtraction extraction,
+            @JsonInclude(JsonInclude.Include.NON_EMPTY) List<QuestionAsPrinted> asPrinted) {
 
         Question {
             options = options == null ? List.of() : List.copyOf(options);
             figures = figures == null ? List.of() : List.copyOf(figures);
+            asPrinted = asPrinted == null ? List.of() : List.copyOf(asPrinted);
         }
 
         Question withAnswer(Answer answer) {
-            return new Question(no, stemEn, stemHi, options, figures, answer, extraction);
+            return new Question(no, stemEn, stemHi, options, figures, answer, extraction, asPrinted);
         }
     }
 

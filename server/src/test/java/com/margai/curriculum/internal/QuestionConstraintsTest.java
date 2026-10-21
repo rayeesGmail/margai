@@ -207,7 +207,8 @@ class QuestionConstraintsTest {
                 List.of(new QuestionFigure("stem", 3, "a wheel on a level road, P at the top, Q at the contact point")),
                 new QuestionExtraction(List.of(3), List.of(UUID.randomUUID()), "claude-opus-5-5", "pyq_extract.v1", List.of()),
                 new QuestionTagging(UUID.randomUUID(), "claude-sonnet-5-5", "pyq_tag.v1", new BigDecimal("0.92"),
-                        "rolling motion: velocity of points on a rolling wheel"));
+                        "rolling motion: velocity of points on a rolling wheel"),
+                List.of());
     }
 
     private static PyqPaperRow paper(String code, String paperCode) {

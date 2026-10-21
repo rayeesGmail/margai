@@ -107,6 +107,10 @@ class PyqLoadCommand extends PyqPaperCommand {
         report.section("load").table(List.of("paper", "inserted", "updated", "unchanged"),
                 List.of(List.of(result.paperInserted() ? "inserted" : result.paperUpdated() ? "updated" : "unchanged",
                         String.valueOf(result.inserted()), String.valueOf(result.updated()), String.valueOf(result.unchanged()))));
+        report.section("misprints kept as printed — each shown as an \"as printed in the original paper\" note (as the "
+                        + "database holds them)")
+                .list(result.stored().stream().filter(question -> question.asPrinted() > 0)
+                        .map(question -> "Q" + question.no() + ": " + question.asPrinted() + " note(s)").toList(), "none");
         report.section("answers other than one key (NTA's final key; the register's special entries)")
                 .list(result.stored().stream().filter(question -> question.answerStatus() != AnswerStatus.single)
                         .map(question -> "Q" + question.no() + ": " + question.answerStatus()).toList(), "none");
@@ -137,6 +141,7 @@ class PyqLoadCommand extends PyqPaperCommand {
         return new PyqQuestionRow(question.no(), tag.primary(), tag.secondary(), tag.outOfSyllabus(), question.stemEn(),
                 question.stemHi(), question.options(), answer.status(), correctKey, accepted, question.figures(),
                 question.extraction(),
-                new QuestionTagging(tag.aiCallId(), tag.model(), tag.prompt(), tag.confidence(), tag.reason()));
+                new QuestionTagging(tag.aiCallId(), tag.model(), tag.prompt(), tag.confidence(), tag.reason()),
+                question.asPrinted());
     }
 }

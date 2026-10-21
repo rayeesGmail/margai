@@ -3,6 +3,7 @@ package com.margai.curriculum.internal;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.margai.curriculum.api.AnswerStatus;
 import com.margai.curriculum.api.PyqQuestionRow;
+import com.margai.curriculum.api.QuestionAsPrinted;
 import com.margai.curriculum.api.QuestionExtraction;
 import com.margai.curriculum.api.QuestionFigure;
 import com.margai.curriculum.api.QuestionOption;
@@ -26,8 +27,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 /**
- * {@code questions} (TECH_PLAN §2.3, migration V9): the question bank of SPEC §9 item 3, PYQs
- * from D19. A PYQ is addressed by {@code (exam, year, paper_code, question_no)}, the upsert key
+ * {@code questions} (TECH_PLAN §2.3, migrations V9 and V10): the question bank of SPEC §9 item 3,
+ * PYQs from D19, with the misprints a paper makes kept as printed and noted in {@code as_printed}. A PYQ is addressed by {@code (exam, year, paper_code, question_no)}, the upsert key
  * of {@code pyq load}.
  *
  * <p><b>The answer is server-only</b> (TECH_PLAN §2.3, §0.4 #4, CLAUDE.md hard rule 1):
@@ -101,6 +102,10 @@ public class Question {
     private List<QuestionFigure> figures;
 
     @JdbcTypeCode(SqlTypes.JSON)
+    @Column(nullable = false)
+    private List<QuestionAsPrinted> asPrinted;
+
+    @JdbcTypeCode(SqlTypes.JSON)
     private QuestionExtraction extraction;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -149,6 +154,7 @@ public class Question {
                 || outOfSyllabus != row.outOfSyllabus()
                 || !Objects.equals(stemHi, row.stemHi())
                 || !Objects.equals(figures, row.figures())
+                || !Objects.equals(asPrinted, row.asPrinted())
                 || !Objects.equals(extraction, row.extraction())
                 || !Objects.equals(tagging, row.tagging());
         if (changed) {
@@ -161,6 +167,7 @@ public class Question {
             this.correctKey = row.correctKey();
             this.acceptedKeys = row.acceptedKeys() == null ? null : row.acceptedKeys().toArray(String[]::new);
             this.figures = row.figures();
+            this.asPrinted = row.asPrinted();
             this.extraction = row.extraction();
             this.tagging = row.tagging();
             if (askedChanged) {
@@ -231,6 +238,10 @@ public class Question {
 
     public List<QuestionFigure> getFigures() {
         return figures;
+    }
+
+    public List<QuestionAsPrinted> getAsPrinted() {
+        return asPrinted;
     }
 
     public QuestionExtraction getExtraction() {

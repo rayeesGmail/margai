@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.margai.curriculum.api.AnswerStatus;
 import com.margai.curriculum.api.PyqQuestionRow;
+import com.margai.curriculum.api.QuestionAsPrinted;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -74,7 +75,40 @@ class PyqLoadCommandTest {
                 .contains("| physics | — | 2 | 2 | 0 | 0 | yes |")
                 .contains("| chemistry | — | 2 | 2 | 0 | 0 | yes |")
                 .contains("Q2: multiple").contains("Q3: dropped")
-                .contains("PENDING — the dropped and multiple-answer rules: NTA's notice for 2025 is not sourced");
+                .contains("PENDING — the dropped and multiple-answer rules: NTA's notice for 2025 is not sourced")
+                .contains("misprints kept as printed");
+        assertThat(rows).allSatisfy(row -> assertThat(row.asPrinted()).isEmpty());
+    }
+
+    /** A misprint kept as printed goes over with its question, and the report counts it as the database holds it. */
+    @Test
+    void carriesTheMisprintsKeptAsPrinted() throws IOException {
+        PaperFile approved = PyqTagCommandTest.approved(PaperFile.Answer.single("2"));
+        List<PaperFile.Question> questions = new ArrayList<>(approved.questions());
+        PaperFile.Question first = questions.getFirst();
+        questions.set(0, new PaperFile.Question(first.no(), first.stemEn(), first.stemHi(), first.options(), first.figures(),
+                first.answer(), first.extraction(),
+                List.of(new QuestionAsPrinted("stem", "Question", "The question", "'The' is missing before 'Question'"))));
+        PyqTagCommandTest.writeInputs(inputs, new PaperFile(approved.paper(), approved.transcribedFrom(), questions));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_OK);
+
+        assertThat(imports.loadedQuestions.getFirst().asPrinted()).extracting(QuestionAsPrinted::intended)
+                .containsExactly("The question");
+        assertThat(out.toString()).contains("Q1: 1 note(s)");
+    }
+
+    /** A committed report reads the same on every machine (Report): the approved file is named as given. */
+    @Test
+    void namesTheApprovedFileAsGiven() {
+        Path relative = Path.of("").toAbsolutePath().relativize(inputs);
+
+        int exit = commandLine.execute("pyq", "load", "--paper", PyqTagCommandTest.CODE, "--inputs", relative.toString(),
+                "--reports", reports.toString());
+
+        assertThat(exit).isEqualTo(InputFileCommand.EXIT_OK);
+        assertThat(out.toString())
+                .contains("approved file: " + relative.resolve("papers").resolve(PyqTagCommandTest.CODE + ".json").normalize());
     }
 
     @Test
@@ -95,19 +129,6 @@ class PyqLoadCommandTest {
 
         assertThat(imports.loadedQuestions).isNull();
         assertThat(out.toString()).contains("question 4 is dropped in the file but not among the register's special entries");
-    }
-
-    /** A committed report reads the same on every machine (Report): the approved file is named as given. */
-    @Test
-    void namesTheApprovedFileAsGiven() {
-        Path relative = Path.of("").toAbsolutePath().relativize(inputs);
-
-        int exit = commandLine.execute("pyq", "load", "--paper", PyqTagCommandTest.CODE, "--inputs", relative.toString(),
-                "--reports", reports.toString());
-
-        assertThat(exit).isEqualTo(InputFileCommand.EXIT_OK);
-        assertThat(out.toString())
-                .contains("approved file: " + relative.resolve("papers").resolve(PyqTagCommandTest.CODE + ".json").normalize());
     }
 
     private int run() {

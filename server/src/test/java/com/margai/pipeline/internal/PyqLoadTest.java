@@ -10,6 +10,7 @@ import com.margai.curriculum.api.CurriculumImportException;
 import com.margai.curriculum.api.PyqLoadReport;
 import com.margai.curriculum.api.PyqPaperRow;
 import com.margai.curriculum.api.PyqQuestionRow;
+import com.margai.curriculum.api.QuestionAsPrinted;
 import com.margai.curriculum.api.QuestionExtraction;
 import com.margai.curriculum.api.QuestionFigure;
 import com.margai.curriculum.api.QuestionOption;
@@ -74,6 +75,11 @@ class PyqLoadTest {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM question_topics", Integer.class)).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT accepted_keys::text FROM questions WHERE question_no = 2", String.class))
                 .isEqualTo("{1,2}");
+        assertThat(first.stored()).extracting(PyqLoadReport.StoredQuestion::asPrinted).containsExactly(1, 0, 0, 0);
+        assertThat(jdbc.queryForObject("SELECT as_printed->0->>'intended' FROM questions WHERE question_no = 1", String.class))
+                .isEqualTo("The question");
+        assertThat(jdbc.queryForObject("SELECT as_printed::text FROM questions WHERE question_no = 2", String.class))
+                .isEqualTo("[]");
 
         PyqLoadReport second = imports.loadPaper(paper(), questions());
 
@@ -81,6 +87,24 @@ class PyqLoadTest {
         assertThat(second.paperUpdated()).isFalse();
         assertThat(second.unchanged()).isEqualTo(4);
         assertThat(second.updated()).isZero();
+    }
+
+    /** A note on a misprint kept as printed is the question's own data: a changed note updates the row. */
+    @Test
+    void aChangedAsPrintedNoteUpdatesTheQuestion() {
+        imports.loadPaper(paper(), questions());
+        List<PyqQuestionRow> renoted = new ArrayList<>(questions());
+        PyqQuestionRow first = renoted.getFirst();
+        renoted.set(0, new PyqQuestionRow(first.questionNo(), first.nodeCode(), first.secondaryNodeCodes(), first.outOfSyllabus(),
+                first.stemEn(), first.stemHi(), first.options(), first.answerStatus(), first.correctKey(), first.acceptedKeys(),
+                first.figures(), first.extraction(), first.tagging(),
+                List.of(new QuestionAsPrinted("stem", "Question", "The question", "the article 'The' is missing"))));
+
+        PyqLoadReport again = imports.loadPaper(paper(), renoted);
+
+        assertThat(again.updated()).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT as_printed->0->>'note' FROM questions WHERE question_no = 1", String.class))
+                .isEqualTo("the article 'The' is missing");
     }
 
     @Test
@@ -138,7 +162,7 @@ class PyqLoadTest {
         PyqQuestionRow first = question(1, "PHY.11.ROT.MOI", List.of(), AnswerStatus.single, "3", null);
         outOnATopic.set(0, new PyqQuestionRow(first.questionNo(), first.nodeCode(), first.secondaryNodeCodes(), true,
                 first.stemEn(), first.stemHi(), first.options(), first.answerStatus(), first.correctKey(), first.acceptedKeys(),
-                first.figures(), first.extraction(), first.tagging()));
+                first.figures(), first.extraction(), first.tagging(), first.asPrinted()));
         assertThatThrownBy(() -> imports.loadPaper(paper(), outOnATopic))
                 .isInstanceOf(CurriculumImportException.class).hasMessageContaining("it keeps the nearest chapter");
 
@@ -196,6 +220,8 @@ class PyqLoadTest {
                 status, key, accepted,
                 no == 1 ? List.of(new QuestionFigure("stem", 3, "a uniform rod pivoted at one end")) : List.of(),
                 new QuestionExtraction(List.of(3), List.of(PAGE_CALL), "claude-opus-5-5", "pyq_extract.v1", List.of()),
-                new QuestionTagging(TAG_CALL, "claude-sonnet-5-5", "pyq_tag.v1", new BigDecimal("0.90"), "a reason"));
+                new QuestionTagging(TAG_CALL, "claude-sonnet-5-5", "pyq_tag.v1", new BigDecimal("0.90"), "a reason"),
+                no == 1 ? List.of(new QuestionAsPrinted("stem", "Question", "The question", "'The' is missing before 'Question'"))
+                        : List.of());
     }
 }

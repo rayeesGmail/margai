@@ -13,6 +13,7 @@ import java.util.List;
  * {@code acceptedKeys} are server-only from here on (TECH_PLAN §2.3, CLAUDE.md hard rule 1).
  *
  * @param secondaryNodeCodes at most two further topics the question draws on
+ * @param asPrinted          the misprints kept as printed, each with its intended reading (V10)
  */
 public record PyqQuestionRow(
         short questionNo,
@@ -27,12 +28,14 @@ public record PyqQuestionRow(
         List<String> acceptedKeys,
         List<QuestionFigure> figures,
         QuestionExtraction extraction,
-        QuestionTagging tagging) {
+        QuestionTagging tagging,
+        List<QuestionAsPrinted> asPrinted) {
 
     public PyqQuestionRow {
         secondaryNodeCodes = secondaryNodeCodes == null ? List.of() : List.copyOf(secondaryNodeCodes);
         options = options == null ? List.of() : List.copyOf(options);
         acceptedKeys = acceptedKeys == null ? null : List.copyOf(acceptedKeys);
         figures = figures == null ? List.of() : List.copyOf(figures);
+        asPrinted = asPrinted == null ? List.of() : List.copyOf(asPrinted);
     }
 }

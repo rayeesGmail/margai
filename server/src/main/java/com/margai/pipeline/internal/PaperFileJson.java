@@ -2,6 +2,7 @@ package com.margai.pipeline.internal;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.margai.curriculum.api.AnswerStatus;
+import com.margai.curriculum.api.QuestionAsPrinted;
 import com.margai.curriculum.api.QuestionFigure;
 import com.margai.curriculum.api.QuestionOption;
 import java.io.IOException;
@@ -28,11 +29,14 @@ import tools.jackson.databind.json.JsonMapper;
  * once, in order; four options keyed 1 to 4; a stem; an option's text unless a figure is that
  * option; and an answer whose shape matches its status, agreeing with the special entries the
  * founder listed for the code — a key typed into the file can never differ from the one he checked
- * (README §3). A draft passes the same checks except that its answers are empty.
+ * (README §3); and every misprint kept as printed quoting what its field prints, with an intended
+ * reading and a one-line note. A draft passes the same checks except that its answers are empty.
  */
 final class PaperFileJson {
 
     static final Set<String> OPTION_KEYS = Set.of("1", "2", "3", "4");
+    /** An as-printed note is one line under the question on a phone. */
+    static final int AS_PRINTED_NOTE_MAX = 160;
 
     private static final JsonMapper MAPPER = JsonMapper.builder()
             .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
@@ -86,6 +90,7 @@ final class PaperFileJson {
                 problems.add(at + " has no stem");
             }
             problems.addAll(optionProblems(at, question));
+            problems.addAll(asPrintedProblems(at, question));
             if (approved) {
                 problems.addAll(answerProblems(at, question.answer()));
             }
@@ -119,6 +124,35 @@ final class PaperFileJson {
         for (QuestionOption option : question.options()) {
             if ((option.textEn() == null || option.textEn().isBlank()) && !drawn.contains(option.key())) {
                 problems.add(at + " option " + option.key() + " has no text and no figure");
+            }
+        }
+        return problems;
+    }
+
+    /**
+     * A misprint kept as printed names a field the question has, a span that field still prints, its
+     * intended reading, and the one line the app can show — the record the founder asked for
+     * (2026-10-21), in a shape and with checks that are Claude's (DECISIONS) — so a note can never
+     * point at words the question no longer carries.
+     */
+    private static List<String> asPrintedProblems(String at, PaperFile.Question question) {
+        List<String> problems = new ArrayList<>();
+        for (QuestionAsPrinted kept : question.asPrinted()) {
+            String text = kept.at() == null ? null : kept.at().equals("stem") ? question.stemEn()
+                    : question.options().stream().filter(option -> kept.at().equals("option:" + option.key()))
+                            .map(QuestionOption::textEn).findFirst().orElse(null);
+            String where = at + "'s as-printed note at " + kept.at();
+            if (text == null) {
+                problems.add(where + " names no stem or option text of the question");
+            } else if (kept.printed() == null || kept.printed().isBlank() || !text.contains(kept.printed())) {
+                problems.add(where + " quotes '" + kept.printed() + "', which that text does not print");
+            }
+            if (kept.intended() == null || kept.intended().isBlank() || kept.intended().equals(kept.printed())) {
+                problems.add(where + " has no intended reading that differs from the print");
+            }
+            if (kept.note() == null || kept.note().isBlank() || kept.note().contains("\n")
+                    || kept.note().length() > AS_PRINTED_NOTE_MAX) {
+                problems.add(where + " needs a one-line note of at most " + AS_PRINTED_NOTE_MAX + " characters");
             }
         }
         return problems;

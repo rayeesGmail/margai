@@ -125,7 +125,7 @@ class PyqImporter {
         List<PyqLoadReport.StoredQuestion> stored = after.stream().map(question -> new PyqLoadReport.StoredQuestion(
                 question.getQuestionNo(), codes.get(question.getNodeId()),
                 topicCounts.getOrDefault(question.getId(), 0L).intValue(), question.isOutOfSyllabus(),
-                !question.getFigures().isEmpty(), question.getAnswerStatus())).toList();
+                !question.getFigures().isEmpty(), question.getAnswerStatus(), question.getAsPrinted().size())).toList();
         return new PyqLoadReport(paperInserted, paperUpdated, inserted, updated, unchanged, stored);
     }
 

@@ -439,7 +439,8 @@ class PipelineCommandTest {
             return new com.margai.curriculum.api.PyqLoadReport(true, false, questions.size(), 0, 0,
                     questions.stream().map(question -> new com.margai.curriculum.api.PyqLoadReport.StoredQuestion(
                             question.questionNo(), question.nodeCode(), question.secondaryNodeCodes().size(),
-                            question.outOfSyllabus(), !question.figures().isEmpty(), question.answerStatus())).toList());
+                            question.outOfSyllabus(), !question.figures().isEmpty(), question.answerStatus(),
+                            question.asPrinted().size())).toList());
         }
 
         /** What {@link #paragraphs} answers: the rows `ncert verify` reads. */

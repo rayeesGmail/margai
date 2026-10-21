@@ -10,6 +10,7 @@ import com.margai.curriculum.api.PaperSection;
 import com.margai.curriculum.api.PaperSourceFile;
 import com.margai.curriculum.api.PaperSubject;
 import com.margai.curriculum.api.PyqPaperRow;
+import com.margai.curriculum.api.QuestionAsPrinted;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -107,7 +108,48 @@ class PyqAssemblyTest {
 
         assertThat(read).isEqualTo(file);
         assertThat(PaperFileJson.problems(read, paper, true)).isEmpty();
-        assertThat(Files.readString(path)).contains("\"stem_en\"").doesNotContain("stem_hi").doesNotContain("\"keys\" : null");
+        assertThat(Files.readString(path)).contains("\"stem_en\"").doesNotContain("stem_hi").doesNotContain("\"keys\" : null")
+                .doesNotContain("as_printed");
+    }
+
+    /** A misprint kept as printed rides with its question, and must quote what its field still prints (2026-10-21). */
+    @Test
+    void aMisprintKeptAsPrintedRoundTripsAndIsHeldToItsField() throws IOException {
+        PaperDefinition paper = paper(1, List.of());
+        PaperFile.Question question = approved(PaperFile.Answer.single("2")).questions().getFirst();
+        List<QuestionAsPrinted> kept = List.of(
+                new QuestionAsPrinted("stem", "Question", "The question", "'The' is missing before 'Question'"),
+                new QuestionAsPrinted("option:2", "b", "B", "'b' is printed for 'B'"));
+        PaperFile file = withAsPrinted(question, kept);
+        Path path = dir.resolve("neet-2025-45.json");
+        Files.writeString(path, PaperFileJson.write(file));
+
+        assertThat(PaperFileJson.read(path)).isEqualTo(file);
+        assertThat(Files.readString(path)).contains("\"as_printed\"").contains("\"intended\" : \"The question\"");
+        assertThat(PaperFileJson.problems(file, paper, true)).isEmpty();
+
+        PaperFile wrong = withAsPrinted(question, List.of(
+                new QuestionAsPrinted("option:7", "a", "A", "no such option"),
+                new QuestionAsPrinted("stem", "breaks", "brakes", "'breaks' is printed for 'brakes'"),
+                new QuestionAsPrinted("stem", " ", "The question", "a blank span names nothing"),
+                new QuestionAsPrinted("option:1", "a", "a", "the same"),
+                new QuestionAsPrinted("stem", "Question", "The question", "two\nlines"),
+                new QuestionAsPrinted("stem", "Question", "The question", "x".repeat(PaperFileJson.AS_PRINTED_NOTE_MAX + 1))));
+        assertThat(PaperFileJson.problems(wrong, paper, true)).containsExactly(
+                "question 1's as-printed note at option:7 names no stem or option text of the question",
+                "question 1's as-printed note at stem quotes 'breaks', which that text does not print",
+                "question 1's as-printed note at stem quotes ' ', which that text does not print",
+                "question 1's as-printed note at option:1 has no intended reading that differs from the print",
+                "question 1's as-printed note at stem needs a one-line note of at most 160 characters",
+                "question 1's as-printed note at stem needs a one-line note of at most 160 characters");
+        assertThat(PaperFileJson.problems(withAsPrinted(question, List.of(new QuestionAsPrinted("stem", "Question",
+                "The question", "x".repeat(PaperFileJson.AS_PRINTED_NOTE_MAX)))), paper, true)).isEmpty();
+    }
+
+    private static PaperFile withAsPrinted(PaperFile.Question question, List<QuestionAsPrinted> kept) {
+        return new PaperFile("neet-2025-45", "source/neet-pyq-sources/2025/booklet.pdf", List.of(new PaperFile.Question(
+                question.no(), question.stemEn(), question.stemHi(), question.options(), question.figures(), question.answer(),
+                question.extraction(), kept)));
     }
 
     @Test
@@ -145,7 +187,7 @@ class PyqAssemblyTest {
                             new com.margai.curriculum.api.QuestionOption("4", "d", null)),
                     List.of(), answers[no - 1],
                     new com.margai.curriculum.api.QuestionExtraction(List.of(1), List.of(), "claude-opus-5-5",
-                            "pyq_extract.v1", List.of())));
+                            "pyq_extract.v1", List.of()), null));
         }
         return new PaperFile("neet-2025-45", "source/neet-pyq-sources/2025/booklet.pdf", questions);
     }

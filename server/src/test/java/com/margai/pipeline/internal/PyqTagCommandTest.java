@@ -101,7 +101,7 @@ class PyqTagCommandTest {
         List<PaperFile.Question> questions = new ArrayList<>(corrected.questions());
         PaperFile.Question first = questions.getFirst();
         questions.set(0, new PaperFile.Question(first.no(), "Question 1, corrected against the page", null, first.options(),
-                first.figures(), first.answer(), first.extraction()));
+                first.figures(), first.answer(), first.extraction(), first.asPrinted()));
         writeInputs(inputs, new PaperFile(corrected.paper(), corrected.transcribedFrom(), questions));
 
         assertThat(run()).isEqualTo(InputFileCommand.EXIT_OK);
@@ -261,7 +261,7 @@ class PyqTagCommandTest {
                             new QuestionOption("3", "c", null), new QuestionOption("4", "d", null)),
                     List.of(), answers.get(no - 1),
                     new QuestionExtraction(List.of(1), List.of(UUID.fromString("00000000-0000-4000-8000-0000000000a1")),
-                            "claude-opus-5-5", "pyq_extract.v1", List.of())));
+                            "claude-opus-5-5", "pyq_extract.v1", List.of()), null));
         }
         return new PaperFile(CODE, "source/neet-pyq-sources/2025/test-booklet.pdf", questions);
     }

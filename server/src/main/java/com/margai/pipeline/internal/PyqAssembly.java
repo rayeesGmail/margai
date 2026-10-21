@@ -106,7 +106,7 @@ final class PyqAssembly {
             }
             built.add(new PaperFile.Question(question.no, question.stem, null, question.options, question.figures, null,
                     new QuestionExtraction(question.pages, question.aiCallIds, question.model, question.prompt,
-                            question.flags)));
+                            question.flags), null));
         }
         PaperFile file = new PaperFile(paper.code(), paper.transcribed().file(), built);
         paperFlags.addAll(PaperFileJson.problems(file, paper, false));

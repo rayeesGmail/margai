@@ -66,6 +66,12 @@ AWS_PROFILE=margai DB_URL=… java -jar <jar> --spring.profiles.active=pipeline 
    150 dpi, a zoomed drawing of the same PDF region settles it and the review report says so (Claude's, for the
    founder to overrule; DECISIONS 2026-10-20). A corrected question keeps its `extraction` provenance; each change is listed in the
    review report `pipeline/reports/<date>-pyq-review-<code>.md` with the page it was read on.
+   Each misprint kept as printed (a wrong character the paper prints, as opposed to a stroke the scan lost —
+   DECISIONS 2026-10-20 and 2026-10-21) is recorded with a one-line description of the intended reading, which the
+   app can show as an "as printed in the original paper" note (the founder, 2026-10-21; PLAN D31, D40) — as an
+   `as_printed` entry of its question: the field (`stem` or `option:N`), the span as printed (no more than the wrong
+   word or sign and what it needs to name its place), the intended reading, and the note (Claude's shape, DECISIONS
+   2026-10-21).
 2. The answers from NTA's final key for the code, read from the key PDF's own text layer by a script (no
    model), checked for 1..N once each and for exactly the register's special entries.
 3. For the Re-NEET (README §5): every question with `handwriting touches` checked against the image, and the

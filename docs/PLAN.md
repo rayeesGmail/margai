@@ -291,7 +291,12 @@ tools; your reviews focus on output quality.)*
   official copy is cleaner at that spot — the bilingual JBIG2 booklet or the English-only CCITT copy, whose coaching
   logo overlaps some figures — and only what is still illegible at phone size is redrawn.* *(Claude's reading, same
   DECISIONS, for the founder to overrule: the founder's "at D31" is ruling 4's crop work before D31; the CCITT copy has
-  no saved page images, so its crops come from its own scan, drawn without the logo overlays.)*
+  no saved page images, so its crops come from its own scan, drawn without the logo overlays.)* *And (the founder,
+  2026-10-21; DECISIONS): a PYQ's misprints kept as printed carry "a flag the app can show as an 'as printed in the
+  original paper' note, like the NCERT errata notes", each with a one-line description of the intended reading.
+  (Claude's, same DECISIONS, for the founder to overrule: held in `questions.as_printed` (V10); the notes travel with
+  the question in the session payload — they are not a key carrier — after the same answer-hint check as the figure
+  descriptions.)*
 - **D32 —** Practice UI: timer, taps, verdict + solution sheet + NCERT anchor chip.
   ✅ *A 10-question timed set feels smooth on a mid-range phone.*
 - **D33 —** Session summary (accuracy, speed vs your norm, sent-to-notebook list);
@@ -339,7 +344,14 @@ tools; your reviews focus on output quality.)*
   *Build note 2026-10-18 (founder; DECISIONS 2026-10-17, the correction rule as revised 2026-10-18): the
   anchor view never presents corrected text as the book's own words; it either shows the printed text
   with an errata note, or marks the corrected span as corrected. The same principle holds for the Phase 2
-  errata feature.*
+  errata feature.* *And (the founder, 2026-10-21; DECISIONS): a PYQ's misprint kept as printed carries "a flag the
+  app can show as an 'as printed in the original paper' note, like the NCERT errata notes"; the display rule is logged
+  here and at D31. (Claude's display rule, same DECISIONS, for the founder to overrule: one line under the question for
+  each `as_printed` entry — the label "As printed in the original paper" from the ARB (en/hi) and the entry's note,
+  English until the parked Hindi pass gives it a Hindi line — wherever a PYQ is shown, before and after answering: the
+  practice item (D32), the mock (D35) and this answer view; the question's text stays the paper's own words, never
+  corrected in place, by the errata principle above; the note quotes no more of the paper than the printed span and
+  its intended reading.)*
 - **D41 —** Cache write path (verified only) + semantic near-match; hit metrics.
   ✅ *Same question twice = instant second answer; near-duplicate hits logged.*
 - **D42 —** Buffer + mid-module audit: you review 30 real answers across subjects.

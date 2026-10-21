@@ -71,7 +71,10 @@ AWS_PROFILE=margai DB_URL=… java -jar <jar> --spring.profiles.active=pipeline 
    app can show as an "as printed in the original paper" note (the founder, 2026-10-21; PLAN D31, D40) — as an
    `as_printed` entry of its question: the field (`stem` or `option:N`), the span as printed (no more than the wrong
    word or sign and what it needs to name its place), the intended reading, and the note (Claude's shape, DECISIONS
-   2026-10-21).
+   2026-10-21). The review assigns every kept misprint its display class (the founder, 2026-10-21): `show` for one
+   that could change how a student reads the question — a wrong unit, symbol, number, sign or formula, or a
+   misspelling that forms a different real word — and `record_only` for a pure spelling or grammar slip a student
+   reads correctly; only `show` notes are displayed, and `pyq load`'s report counts both.
 2. The answers from NTA's final key for the code, read from the key PDF's own text layer by a script (no
    model), checked for 1..N once each and for exactly the register's special entries.
 3. For the Re-NEET (README §5): every question with `handwriting touches` checked against the image, and the

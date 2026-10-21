@@ -296,7 +296,8 @@ tools; your reviews focus on output quality.)*
   original paper' note, like the NCERT errata notes", each with a one-line description of the intended reading.
   (Claude's, same DECISIONS, for the founder to overrule: held in `questions.as_printed` (V10); the notes travel with
   the question in the session payload — they are not a key carrier — after the same answer-hint check as the figure
-  descriptions.)*
+  descriptions.)* *And (the founder, 2026-10-21; DECISIONS): only an entry classed `show` — a misprint that could change
+  how a student reads the question — is displayed; a `record_only` slip is kept and recorded, not surfaced.*
 - **D32 —** Practice UI: timer, taps, verdict + solution sheet + NCERT anchor chip.
   ✅ *A 10-question timed set feels smooth on a mid-range phone.*
 - **D33 —** Session summary (accuracy, speed vs your norm, sent-to-notebook list);
@@ -346,10 +347,12 @@ tools; your reviews focus on output quality.)*
   with an errata note, or marks the corrected span as corrected. The same principle holds for the Phase 2
   errata feature.* *And (the founder, 2026-10-21; DECISIONS): a PYQ's misprint kept as printed carries "a flag the
   app can show as an 'as printed in the original paper' note, like the NCERT errata notes"; the display rule is logged
-  here and at D31. (Claude's display rule, same DECISIONS, for the founder to overrule: one line under the question for
-  each `as_printed` entry — the label "As printed in the original paper" from the ARB (en/hi) and the entry's note,
-  English until the parked Hindi pass gives it a Hindi line — wherever a PYQ is shown, before and after answering: the
-  practice item (D32), the mock (D35) and this answer view; the question's text stays the paper's own words, never
+  here and at D31; and (the founder, 2026-10-21, his change to Claude's draft below) only for a misprint that could
+  change how a student reads the question — the entries classed `show`; a `record_only` slip is kept and recorded, not
+  surfaced. (Claude's display rule as the founder adopted it, same DECISIONS: one line under the question for each `show`
+  entry — the label "As printed in the original paper" from the ARB (en/hi) and the entry's note,
+  English until the parked Hindi pass gives it a Hindi line — wherever a PYQ appears, before and after answering: the
+  practice item (D32), the mock (D35), this answer view, and every other screen that shows one; the question's text stays the paper's own words, never
   corrected in place, by the errata principle above; the note quotes no more of the paper than the printed span and
   its intended reading.)*
 - **D41 —** Cache write path (verified only) + semantic near-match; hit metrics.

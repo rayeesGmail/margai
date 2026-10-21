@@ -503,6 +503,12 @@ their questions arrive with the prefetched plan (§6.1) — and results sync lat
 sources: NEET 2019–2026 PYQs with verified solutions + NCERT-style generated questions
 (verified), tagged to the syllabus.
 
+**As printed in the original paper:** a question from an official paper is shown in the paper's own words. Where a
+misprint in it could change how a student reads the question — a wrong unit, symbol, number, sign or formula, or a
+misspelling that forms a different real word — one line under the question says it is as printed in the original
+paper and gives the intended reading, wherever the question appears, before and after answering, and never hinting
+at the answer. A pure spelling or grammar slip a student reads correctly is kept as printed, without that line.
+
 **Timing and skip-strategy drills (CS-4 §5.2):** short drills that train exam temperament —
 pacing against the clock, deciding when to skip, negative-marking discipline — built from
 past-paper questions and the student's own gamble-score history from mock autopsies
@@ -534,6 +540,7 @@ step-by-step solution → “NCERT anchor: Class 11 Bio, Ch 6, §6.4” (tappabl
 tap-to-ask follow-ups. Numericals never shown unverified; on rare verification
 failure the app says honestly “I couldn't verify this one — flagged for review.”
 Every answer has a Report flag (feeds a human audit queue — the one founder-human loop).
+A question from an official paper shown with an answer carries the as-printed note of §6.2.
 
 **Memory behavior:** three Optics doubts this week → Thursday's plan grows an Optics
 block, and the mentor says why. **Free tier:** 5 solves/day (repeat/cached questions
@@ -831,6 +838,8 @@ bank run as full timed mocks under exam conditions, followed by the autopsy;
 out-of-syllabus questions (the post-2022 rationalisation) are labelled and excluded from
 the mock's score, and question count and marking follow each paper's own scheme where
 feasible. Free gets the full mock and an autopsy summary; Pro the full autopsy.
+
+A mock's questions carry the as-printed note of §6.2.
 
 **Mock percentile among app users (CS-4 §6; after public launch):** after a timed
 past-paper mock, the student privately sees her percentile among app users who took the

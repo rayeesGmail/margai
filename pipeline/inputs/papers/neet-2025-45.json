@@ -1,0 +1,5287 @@
+{
+  "paper" : "neet-2025-45",
+  "transcribed_from" : "source/neet-pyq-sources/2025/neet-2025-45-booklet-hi-en.pdf",
+  "questions" : [ {
+    "no" : 1,
+    "stem_en" : "Consider a water tank shown in the figure. It has one wall at x = L and can be taken to be very wide in the z direction. When filled with a liquid of surface tension S and density rho, the liquid surface makes angle theta_0 (theta_0 << 1) with the x-axis at x = L. If y(x) is the height of the surface then the equation for y(x) is :\n(take theta(x) = sin theta(x) = tan theta(x) = dy/dx, g is the acceleration due to gravity)",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "d^2y/dx^2 = (rho g / S) x"
+    }, {
+      "key" : "2",
+      "text_en" : "d^2y/dx^2 = (rho g / S) y"
+    }, {
+      "key" : "3",
+      "text_en" : "d^2y/dx^2 = sqrt(rho g / S)"
+    }, {
+      "key" : "4",
+      "text_en" : "dy/dx = sqrt(rho g / S) x"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 2,
+      "description" : "graph: y-axis vertical, x-axis horizontal; a curved liquid surface starting on the y-axis, dipping slightly then rising to cross a vertical line at x = L and continuing upward to the right; angle theta_0 marked at the crossing, between the curve's continuation and a short dashed horizontal line running right from the vertical line"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 2 ],
+      "ai_call_ids" : [ "1e6ba0a7-7407-477c-9a61-3a8557dd1c30" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 2 — graph: y-axis vertical, x-axis horizontal; a curved liquid surface starting on the y-axis, dipping slightly then rising to meet a vertical line at x = L; angle theta_0 marked between the curve and a dashed horizontal line at the meeting point" ]
+    }
+  }, {
+    "no" : 2,
+    "stem_en" : "A microscope has an objective of focal length 2 cm, eyepiece of focal length 4 cm and the tube length of 40 cm. If the distance of distinct vision of eye is 25 cm, the magnification in the microscope is",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "100"
+    }, {
+      "key" : "2",
+      "text_en" : "125"
+    }, {
+      "key" : "3",
+      "text_en" : "150"
+    }, {
+      "key" : "4",
+      "text_en" : "250"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 2 ],
+      "ai_call_ids" : [ "1e6ba0a7-7407-477c-9a61-3a8557dd1c30" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 3,
+    "stem_en" : "An electron (mass 9×10^(-31) kg and charge 1.6×10^(-19) C) moving with speed c/100 (c = speed of light) is injected into a magnetic field B_vec of magnitude 9×10^(-4) T perpendicular to its direction of motion. We wish to apply an uniform electric field E_vec together with the magnetic field so that the electron does not deflect from its path. Then (speed of light c = 3×10^8 ms^-1)",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "E_vec is perpendicular to B_vec and its magnitude is 27×10^4 V m^-1"
+    }, {
+      "key" : "2",
+      "text_en" : "E_vec is perpendicular to B_vec and its magnitude is 27×10^2 V m^-1"
+    }, {
+      "key" : "3",
+      "text_en" : "E_vec is parallel to B_vec and its magnitude is 27×10^2 V m^-1"
+    }, {
+      "key" : "4",
+      "text_en" : "E_vec is parallel to B_vec and its magnitude is 27×10^4 V m^-1"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 2 ],
+      "ai_call_ids" : [ "1e6ba0a7-7407-477c-9a61-3a8557dd1c30" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 4,
+    "stem_en" : "There are two inclined surfaces of equal length (L) and same angle of inclination 45° with the horizontal. One of them is rough and the other is perfectly smooth. A given body takes 2 times as much time to slide down on rough surface than on the smooth surface. The coefficient of kinetic friction (mu_k) between the object and the rough surface is close to",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "0.25"
+    }, {
+      "key" : "2",
+      "text_en" : "0.40"
+    }, {
+      "key" : "3",
+      "text_en" : "0.5"
+    }, {
+      "key" : "4",
+      "text_en" : "0.75"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 3 ],
+      "ai_call_ids" : [ "61128118-fc42-4dbe-823b-f3e712122c30" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 5,
+    "stem_en" : "The kinetic energies of two similar cars A and B are 100 J and 225 J respectively. On applying breaks, car A stops after 1000 m and car B stops after 1500 m. If F_A and F_B are the forces applied by the breaks on cars A and B, respectively, then the ratio F_A/F_B is",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "3/2"
+    }, {
+      "key" : "2",
+      "text_en" : "2/3"
+    }, {
+      "key" : "3",
+      "text_en" : "1/3"
+    }, {
+      "key" : "4",
+      "text_en" : "1/2"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 3 ],
+      "ai_call_ids" : [ "61128118-fc42-4dbe-823b-f3e712122c30" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    },
+    "as_printed" : [ {
+      "at" : "stem",
+      "printed" : "breaks",
+      "intended" : "brakes",
+      "note" : "'breaks' is printed twice where 'brakes' is meant: the brakes applied to the cars.",
+      "display" : "show"
+    } ]
+  }, {
+    "no" : 6,
+    "stem_en" : "The current passing through the battery in the given circuit, is:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "2.0 A"
+    }, {
+      "key" : "2",
+      "text_en" : "0.5 A"
+    }, {
+      "key" : "3",
+      "text_en" : "2.5 A"
+    }, {
+      "key" : "4",
+      "text_en" : "1.5 A"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 3,
+      "description" : "circuit: nodes A, B, C, D, E, F. A–B 5Ω; B–C 2.5Ω; A–D diagonal 6Ω; A–F wire; F–E 3Ω; E–D 1.5Ω; C–D wire; from B a wire up to a top branch carrying 1.5Ω, then right and down through 5.5Ω to a cell labelled 5 V; from the cell a wire left through 1/3 Ω and up to E."
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 3 ],
+      "ai_call_ids" : [ "61128118-fc42-4dbe-823b-f3e712122c30" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 3 — circuit: nodes A, B, C, D, E, F. A–B 5Ω; B–C 2.5Ω; A–D diagonal 6Ω; A–F wire; F–E 3Ω; E–D 1.5Ω; C–D wire; from B a branch with 1.5Ω going right then down through 5.5Ω to a 5 V battery; battery connected back to E through 1/3 Ω." ]
+    }
+  }, {
+    "no" : 7,
+    "stem_en" : "A bob of heavy mass m is suspended by a light string of length l. The bob is given a horizontal velocity v_0 as shown in figure. If the string gets slack at some point P making an angle theta from the horizontal, the ratio of the speed v of the bob at point P to its initial speed v_0 is:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "(sin theta)^(1/2)"
+    }, {
+      "key" : "2",
+      "text_en" : "(1 / (2 + 3 sin theta))^(1/2)"
+    }, {
+      "key" : "3",
+      "text_en" : "(cos theta / (2 + 3 sin theta))^(1/2)"
+    }, {
+      "key" : "4",
+      "text_en" : "(sin theta / (2 + 3 sin theta))^(1/2)"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 4,
+      "description" : "Vertical circle centred at O, drawn solid from about 9 o'clock over the top to about 1 o'clock and dashed from there through P and round the bottom; bob of mass m at bottom on string of length l (marked with double arrow) given horizontal velocity v_0 to the right; point P on circle in upper right, a line from O to P making angle theta above a horizontal dashed line drawn from O to the right."
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 4 ],
+      "ai_call_ids" : [ "7f9b3bd8-026c-432d-9302-52d50f55dc18" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 4 — Dashed vertical circle centred at O; bob of mass m at bottom on string of length l (marked with double arrow) given horizontal velocity v_0 to the right; point P on circle in upper right, string OP making angle theta above horizontal dashed line through O." ]
+    }
+  }, {
+    "no" : 8,
+    "stem_en" : "The output (Y) of the given logic implementation is similar to the output of an/a _______ gate.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "AND"
+    }, {
+      "key" : "2",
+      "text_en" : "NAND"
+    }, {
+      "key" : "3",
+      "text_en" : "OR"
+    }, {
+      "key" : "4",
+      "text_en" : "NOR"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 4,
+      "description" : "Logic circuit: inputs A and B into an OR-shaped gate with a bubble at its output (top); inputs B and A into a D-shaped gate with a bubble at its output (bottom); both outputs feed a D-shaped gate without a bubble, giving output Y."
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 4 ],
+      "ai_call_ids" : [ "7f9b3bd8-026c-432d-9302-52d50f55dc18" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 4 — Logic circuit: inputs A and B into a NOR gate (top); inputs B and A into a NAND gate (bottom); outputs of NOR and NAND feed an AND gate giving output Y." ]
+    }
+  }, {
+    "no" : 9,
+    "stem_en" : "The electric field in a plane electromagnetic wave is given by\nE_z = 60 cos (5x + 1.5 × 10^9 t) V/m.\nThen expression for the corresponding magnetic field is (here subscripts denote the direction of the field) :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "B_y = 2 × 10^(-7) cos (5x + 1.5 × 10^9 t) T"
+    }, {
+      "key" : "2",
+      "text_en" : "B_x = 2 × 10^(-7) cos (5x + 1.5 × 10^9 t) T"
+    }, {
+      "key" : "3",
+      "text_en" : "B_z = 60 cos (5x + 1.5 × 10^9 t) T"
+    }, {
+      "key" : "4",
+      "text_en" : "B_y = 60 sin (5x + 1.5 × 10^9 t) T"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 4 ],
+      "ai_call_ids" : [ "7f9b3bd8-026c-432d-9302-52d50f55dc18" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 10,
+    "stem_en" : "A ball of mass 0.5 kg is dropped from a height of 40 m. The ball hits the ground and rises to a height of 10 m. The impulse imparted to the ball during its collision with the ground is (Take g = 9.8 m/s^2)",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "21 NS"
+    }, {
+      "key" : "2",
+      "text_en" : "7 NS"
+    }, {
+      "key" : "3",
+      "text_en" : "0"
+    }, {
+      "key" : "4",
+      "text_en" : "84 NS"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 5 ],
+      "ai_call_ids" : [ "eee8285d-ef98-4f6f-9139-24fce8df4c88" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 11,
+    "stem_en" : "AB is a part of an electrical circuit (see figure). The potential difference \"V_A − V_B\", at the instant when current i = 2 A and is increasing at a rate of 1 amp / second is:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "5 volt"
+    }, {
+      "key" : "2",
+      "text_en" : "6 volt"
+    }, {
+      "key" : "3",
+      "text_en" : "9 volt"
+    }, {
+      "key" : "4",
+      "text_en" : "10 volt"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 5,
+      "description" : "circuit segment from A to B: current i arrow from A, inductor labelled 1H, cell labelled 5V, its longer plate on the A side (towards the inductor) and its shorter plate on the B side (towards the resistor), resistor labelled 2Ω, then point B"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 5 ],
+      "ai_call_ids" : [ "eee8285d-ef98-4f6f-9139-24fce8df4c88" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 5 — circuit segment from A to B: current i arrow from A, inductor labelled 1H, cell labelled 5V, resistor labelled 2Ω, then point B" ]
+    }
+  }, {
+    "no" : 12,
+    "stem_en" : "A 2 amp current is flowing through two different small circular copper coils having radii ratio 1:2. The ratio of their respective magnetic moments will be",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "1:4"
+    }, {
+      "key" : "2",
+      "text_en" : "1:2"
+    }, {
+      "key" : "3",
+      "text_en" : "2:1"
+    }, {
+      "key" : "4",
+      "text_en" : "4:1"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 5 ],
+      "ai_call_ids" : [ "eee8285d-ef98-4f6f-9139-24fce8df4c88" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 13,
+    "stem_en" : "In a certain camera, a combination of four similar thin convex lenses are arranged axially in contact. Then the power of the combination and the total magnification in comparison to the power (p) and magnification (m) for each lens will be, respectively –",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "4p and 4m"
+    }, {
+      "key" : "2",
+      "text_en" : "p^4 and 4m"
+    }, {
+      "key" : "3",
+      "text_en" : "4p and m^4"
+    }, {
+      "key" : "4",
+      "text_en" : "p^4 and m^4"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 5 ],
+      "ai_call_ids" : [ "eee8285d-ef98-4f6f-9139-24fce8df4c88" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 14,
+    "stem_en" : "An oxygen cylinder of volume 30 litre has 18.20 moles of oxygen. After some oxygen is withdrawn from the cylinder, its gauge pressure drops to 11 atmospheric pressure at temperature 27°C. The mass of the oxygen withdrawn from the cylinder is nearly equal to :\n[Given, R = 100/12 J mol^-1 K^-1, and molecular mass of O_2 = 32, 1 atm pressure = 1.01 × 10^5 N/m]",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "0.125 kg"
+    }, {
+      "key" : "2",
+      "text_en" : "0.144 kg"
+    }, {
+      "key" : "3",
+      "text_en" : "0.116 kg"
+    }, {
+      "key" : "4",
+      "text_en" : "0.156 kg"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 5 ],
+      "ai_call_ids" : [ "eee8285d-ef98-4f6f-9139-24fce8df4c88" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    },
+    "as_printed" : [ {
+      "at" : "stem",
+      "printed" : "N/m",
+      "intended" : "N/m^2",
+      "note" : "'N/m' is printed where 'N/m^2' is meant: pressure is in newtons per square metre.",
+      "display" : "show"
+    } ]
+  }, {
+    "no" : 15,
+    "stem_en" : "In some appropriate units, time (t) and position (x) relation of a moving particle is given by t = x^2 + x. The acceleration of the particle is",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "-2/(x+2)^3"
+    }, {
+      "key" : "2",
+      "text_en" : "-2/(2x+1)^3"
+    }, {
+      "key" : "3",
+      "text_en" : "+2/(x+1)^3"
+    }, {
+      "key" : "4",
+      "text_en" : "+2/(2x+1)"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 6 ],
+      "ai_call_ids" : [ "eff9f21c-6b66-49fd-a771-a63bc72ac24d" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 16,
+    "stem_en" : "To an ac power supply of 220 V at 50 Hz, a resistor of 20 Ω, a capacitor of reactance 25 Ω and an inductor of reactance 45 Ω are connected in series. The corresponding current in the circuit and the phase angle between the current and the voltage is, respectively -",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "7.8 A and 30°"
+    }, {
+      "key" : "2",
+      "text_en" : "7.8 A and 45°"
+    }, {
+      "key" : "3",
+      "text_en" : "15.6 A and 30°"
+    }, {
+      "key" : "4",
+      "text_en" : "15.6 A and 45°"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 6 ],
+      "ai_call_ids" : [ "eff9f21c-6b66-49fd-a771-a63bc72ac24d" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 17,
+    "stem_en" : "The Sun rotates around its centre once in 27 days. What will be the period of revolution if the Sun were to expand to twice its present radius without any external influence? Assume the Sun to be a sphere of uniform density.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "100 days"
+    }, {
+      "key" : "2",
+      "text_en" : "105 days"
+    }, {
+      "key" : "3",
+      "text_en" : "115 days"
+    }, {
+      "key" : "4",
+      "text_en" : "108 days"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 6 ],
+      "ai_call_ids" : [ "eff9f21c-6b66-49fd-a771-a63bc72ac24d" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 18,
+    "stem_en" : "A model for quantized motion of an electron in a uniform magnetic field B states that the flux passing through the orbit of the electron is n(h/e) where n is an integer, h is Planck's constant and e is the magnitude of electron's charge. According to the model, the magnetic moment of an electron in its lowest energy state will be (m is the mass of the electron)",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "he/(pi m)"
+    }, {
+      "key" : "2",
+      "text_en" : "he/(2 pi m)"
+    }, {
+      "key" : "3",
+      "text_en" : "heB/(pi m)"
+    }, {
+      "key" : "4",
+      "text_en" : "heB/(2 pi m)"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 6 ],
+      "ai_call_ids" : [ "eff9f21c-6b66-49fd-a771-a63bc72ac24d" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 19,
+    "stem_en" : "Three identical heat conducting rods are connected in series as shown in the figure. The rods on the sides have thermal conductivity 2K while that in the middle has thermal conductivity K. The left end of the combination is maintained at temperature 3T and the right end at T. The rods are thermally insulated from outside. In steady state, temperature at the left junction is T_1 and that at the right junction is T_2. The ratio T_1/T_2 is",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "3/2"
+    }, {
+      "key" : "2",
+      "text_en" : "4/3"
+    }, {
+      "key" : "3",
+      "text_en" : "5/3"
+    }, {
+      "key" : "4",
+      "text_en" : "5/4"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 7,
+      "description" : "Three rods in series between two hatched walls: left wall at 3T, right wall at T; rods labelled 2K, K, 2K from left to right; left junction marked T_1, right junction marked T_2."
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 7 ],
+      "ai_call_ids" : [ "4065a2e3-47d6-4e0a-a2ab-d053c9e8d0ab" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 7 — Three rods in series between two hatched walls: left wall at 3T, right wall at T; rods labelled 2K, K, 2K from left to right; left junction marked T_1, right junction marked T_2." ]
+    }
+  }, {
+    "no" : 20,
+    "stem_en" : "The plates of a parallel plate capacitor are separated by d. Two slabs of different dielectric constant K_1 and K_2 with thickness (3/8)d and d/2, respectively are inserted in the capacitor. Due to this, the capacitance becomes two times larger than when there is nothing between the plates. If K_1 = 1.25 K_2, the value of K_1 is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "2.66"
+    }, {
+      "key" : "2",
+      "text_en" : "2.33"
+    }, {
+      "key" : "3",
+      "text_en" : "1.60"
+    }, {
+      "key" : "4",
+      "text_en" : "1.33"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 7 ],
+      "ai_call_ids" : [ "4065a2e3-47d6-4e0a-a2ab-d053c9e8d0ab" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 21,
+    "stem_en" : "Two cities X and Y are connected by a regular bus service with a bus leaving in either direction every T min. A girl is driving scooty with a speed of 60 km/h in the direction X to Y notices that a bus goes past her every 30 minutes in the direction of her motion, and every 10 minutes in the opposite direction. Choose the correct option for the period T of the bus service and the speed (assumed constant) of the buses.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "9 min, 40 km/h"
+    }, {
+      "key" : "2",
+      "text_en" : "25 min, 100 km/h"
+    }, {
+      "key" : "3",
+      "text_en" : "10 min, 90 km/h"
+    }, {
+      "key" : "4",
+      "text_en" : "15 min, 120 km/h"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 7 ],
+      "ai_call_ids" : [ "4065a2e3-47d6-4e0a-a2ab-d053c9e8d0ab" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 22,
+    "stem_en" : "A uniform rod of mass 20 kg and length 5 m leans against a smooth vertical wall making an angle of 60° with it. The other end rests on a rough horizontal floor. The friction force that the floor exerts on the rod is (take g = 10 m/s^2)",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "100 N"
+    }, {
+      "key" : "2",
+      "text_en" : "100 sqrt(3) N"
+    }, {
+      "key" : "3",
+      "text_en" : "200 N"
+    }, {
+      "key" : "4",
+      "text_en" : "200 sqrt(3) N"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 7 ],
+      "ai_call_ids" : [ "4065a2e3-47d6-4e0a-a2ab-d053c9e8d0ab" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 23,
+    "stem_en" : "In an oscillating spring mass system, a spring is connected to a box filled with sand. As the box oscillates, sand leaks slowly out of the box vertically so that the average frequency omega(t) and average amplitude A(t) of the system change with time t. Which one of the following options schematically depicts these changes correctly?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : ""
+    }, {
+      "key" : "2",
+      "text_en" : ""
+    }, {
+      "key" : "3",
+      "text_en" : ""
+    }, {
+      "key" : "4",
+      "text_en" : ""
+    } ],
+    "figures" : [ {
+      "at" : "option:1",
+      "page" : 8,
+      "description" : "Two stacked graphs against t: upper ω(t) starts at a positive value and rises, levelling off to a constant; lower A(t) is a horizontal straight line (constant)."
+    }, {
+      "at" : "option:2",
+      "page" : 8,
+      "description" : "Two stacked graphs against t: upper ω(t) starts at a positive value and rises, levelling off; lower A(t) starts at a value and decreases, levelling off."
+    }, {
+      "at" : "option:3",
+      "page" : 8,
+      "description" : "Two stacked graphs against t: upper ω(t) rises and levels off; lower A(t) also rises and levels off."
+    }, {
+      "at" : "option:4",
+      "page" : 8,
+      "description" : "Two stacked graphs against t: upper ω(t) starts high and decreases, levelling off; lower A(t) starts high and decreases, levelling off."
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 8 ],
+      "ai_call_ids" : [ "ca41cb94-b7a3-4a63-b18d-a8b964e83a98" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at option:1 on page 8 — Two stacked graphs against t: upper ω(t) starts at a positive value and rises, levelling off to a constant; lower A(t) is a horizontal straight line (constant).", "figure at option:2 on page 8 — Two stacked graphs against t: upper ω(t) starts at a positive value and rises, levelling off; lower A(t) starts at a value and decreases, levelling off.", "figure at option:3 on page 8 — Two stacked graphs against t: upper ω(t) rises and levels off; lower A(t) also rises and levels off.", "figure at option:4 on page 8 — Two stacked graphs against t: upper ω(t) starts high and decreases, levelling off; lower A(t) starts high and decreases, levelling off." ]
+    }
+  }, {
+    "no" : 24,
+    "stem_en" : "A balloon is made of a material of surface tension S and its inflation outlet (from where gas is filled in it) has small area A. It is filled with a gas of density rho and takes a spherical shape of radius R. When the gas is allowed to flow freely out of it, its radius r changes from R to 0 (zero) in time T. If the speed v(r) of gas coming out of the balloon depends on r as r^a and T ∝ S^alpha A^beta rho^gamma R^delta then",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "a = 1/2, alpha = 1/2, beta = -1, gamma = +1, delta = 3/2"
+    }, {
+      "key" : "2",
+      "text_en" : "a = -1/2, alpha = -1/2, beta = -1, gamma = -1/2, delta = 5/2"
+    }, {
+      "key" : "3",
+      "text_en" : "a = -1/2, alpha = -1/2, beta = -1, gamma = 1/2, delta = 7/2"
+    }, {
+      "key" : "4",
+      "text_en" : "a = 1/2, alpha = 1/2, beta = -1/2, gamma = 1/2, delta = 7/2"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 9 ],
+      "ai_call_ids" : [ "e0cf5a24-7ea8-48a1-8b1c-6e78d68ccc21" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 25,
+    "stem_en" : "Consider the diameter of a spherical object being measured with the help of a Vernier callipers. Suppose its 10 Vernier Scale Divisions (V.S.D.) are equal to its 9 Main Scale Divisions (M.S.D.). The least division in the M.S. is 0.1 cm and the zero of V.S. is at x = 0.1 cm when the jaws of Vernier callipers are closed.\nIf the main scale reading for the diameter is M = 5 cm and the number of coinciding vernier division is 8, the measured diameter after zero error correction, is",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "5.18 cm"
+    }, {
+      "key" : "2",
+      "text_en" : "5.08 cm"
+    }, {
+      "key" : "3",
+      "text_en" : "4.98 cm"
+    }, {
+      "key" : "4",
+      "text_en" : "5.00 cm"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 9 ],
+      "ai_call_ids" : [ "e0cf5a24-7ea8-48a1-8b1c-6e78d68ccc21" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 26,
+    "stem_en" : "A parallel plate capacitor made of circular plates is being charged such that the surface charge density on its plates is increasing at a constant rate with time. The magnetic field arising due to displacement current is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "zero at all places"
+    }, {
+      "key" : "2",
+      "text_en" : "constant between the plates and zero outside the plates"
+    }, {
+      "key" : "3",
+      "text_en" : "non-zero everywhere with maximum at the imaginary cylindrical surface connecting peripheries of the plates"
+    }, {
+      "key" : "4",
+      "text_en" : "zero between the plates and non-zero outside"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 9 ],
+      "ai_call_ids" : [ "e0cf5a24-7ea8-48a1-8b1c-6e78d68ccc21" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 27,
+    "stem_en" : "An unpolarized light beam travelling in air is incident on a medium of refractive index 1.73 at Brewster's angle. Then-",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "reflected light is completely polarized and the angle of reflection is close to 60°"
+    }, {
+      "key" : "2",
+      "text_en" : "reflected light is partially polarized and the angle of reflection is close to 30°"
+    }, {
+      "key" : "3",
+      "text_en" : "both reflected and transmitted light are perfectly polarized with angles of reflection and refraction close to 60° and 30°, respectively."
+    }, {
+      "key" : "4",
+      "text_en" : "transmitted light is completely polarized with angle of refraction close to 30°"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 9 ],
+      "ai_call_ids" : [ "e0cf5a24-7ea8-48a1-8b1c-6e78d68ccc21" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 28,
+    "stem_en" : "Two identical charged conducting spheres A and B have their centres separated by a certain distance. Charge on each sphere is q and the force of repulsion between them is F. A third identical uncharged conducting sphere is brought in contact with sphere A first and then with B and finally removed from both. New force of repulsion between spheres A and B (Radii of A and B are negligible compared to the distance of separation so that for calculating force between them they can be considered as point charges) is best given as :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "3F/5"
+    }, {
+      "key" : "2",
+      "text_en" : "2F/3"
+    }, {
+      "key" : "3",
+      "text_en" : "F/2"
+    }, {
+      "key" : "4",
+      "text_en" : "3F/8"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 10 ],
+      "ai_call_ids" : [ "736f03ef-329b-4d1a-84ae-54f6506aaa6c" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 29,
+    "stem_en" : "A container has two chambers of volumes V_1 = 2 litres and V_2 = 3 litres separated by a partition made of a thermal insulator. The chambers contains n_1 = 5 and n_2 = 4 moles of ideal gas at pressures p_1 = 1 atm and p_2 = 2 atm, respectively. When the partition is removed, the mixture attains an equilibrium pressure of :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "1.3 atm"
+    }, {
+      "key" : "2",
+      "text_en" : "1.6 atm"
+    }, {
+      "key" : "3",
+      "text_en" : "1.4 atm"
+    }, {
+      "key" : "4",
+      "text_en" : "1.8 atm"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 10 ],
+      "ai_call_ids" : [ "736f03ef-329b-4d1a-84ae-54f6506aaa6c" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    },
+    "as_printed" : [ {
+      "at" : "stem",
+      "printed" : "contains",
+      "intended" : "contain",
+      "note" : "'contains' is printed where 'contain' is meant.",
+      "display" : "record_only"
+    } ]
+  }, {
+    "no" : 30,
+    "stem_en" : "A particle of mass m is moving around the origin with a constant force F pulling it towards the origin. If Bohr model is used to describe its motion, the radius r of the n^th orbit and the particle's speed v in the orbit depend on n as",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "r ∝ n^(1/3); v ∝ n^(1/3)"
+    }, {
+      "key" : "2",
+      "text_en" : "r ∝ n^(1/3); v ∝ n^(2/3)"
+    }, {
+      "key" : "3",
+      "text_en" : "r ∝ n^(2/3); v ∝ n^(1/3)"
+    }, {
+      "key" : "4",
+      "text_en" : "r ∝ n^(4/3); v ∝ n^(-1/3)"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 10 ],
+      "ai_call_ids" : [ "736f03ef-329b-4d1a-84ae-54f6506aaa6c" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 31,
+    "stem_en" : "The radius of Martian orbit around the Sun is about 4 times the radius of the orbit of Mercury. The Martian year is 687 Earth days. Then which of the following is the length of 1 year on Mercury ?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "88 earth days"
+    }, {
+      "key" : "2",
+      "text_en" : "225 earth days"
+    }, {
+      "key" : "3",
+      "text_en" : "172 earth days"
+    }, {
+      "key" : "4",
+      "text_en" : "124 earth days"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 10 ],
+      "ai_call_ids" : [ "736f03ef-329b-4d1a-84ae-54f6506aaa6c" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 32,
+    "stem_en" : "A body weighs 48 N on the surface of the earth. The gravitational force experienced by the body due to the earth at a height equal to one-third the radius of the earth from its surface is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "16 N"
+    }, {
+      "key" : "2",
+      "text_en" : "27 N"
+    }, {
+      "key" : "3",
+      "text_en" : "32 N"
+    }, {
+      "key" : "4",
+      "text_en" : "36 N"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 11 ],
+      "ai_call_ids" : [ "59fbf06a-2067-4bca-808f-e094c1960d5b" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 33,
+    "stem_en" : "A wire of resistance R is cut into 8 equal pieces. From these pieces two equivalent resistances are made by adding four of these together in parallel. Then these two sets are added in series. The net effective resistance of the combination is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "R/64"
+    }, {
+      "key" : "2",
+      "text_en" : "R/32"
+    }, {
+      "key" : "3",
+      "text_en" : "R/16"
+    }, {
+      "key" : "4",
+      "text_en" : "R/8"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 11 ],
+      "ai_call_ids" : [ "59fbf06a-2067-4bca-808f-e094c1960d5b" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 34,
+    "stem_en" : "De-Broglie wavelength of an electron orbiting in the n = 2 state of hydrogen atom is close to (Given Bohr radius = 0.052 nm)",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "0.067 nm"
+    }, {
+      "key" : "2",
+      "text_en" : "0.67 nm"
+    }, {
+      "key" : "3",
+      "text_en" : "1.67 nm"
+    }, {
+      "key" : "4",
+      "text_en" : "2.67 nm"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 11 ],
+      "ai_call_ids" : [ "59fbf06a-2067-4bca-808f-e094c1960d5b" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 35,
+    "stem_en" : "An electric dipole with dipole moment 5 × 10^(-6) Cm is aligned with the direction of a uniform electric field of magnitude 4 × 10^5 N/C. The dipole is then rotated through an angle of 60° with respect to the electric field. The change in the potential energy of the dipole is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "0.8 J"
+    }, {
+      "key" : "2",
+      "text_en" : "1.0 J"
+    }, {
+      "key" : "3",
+      "text_en" : "1.2 J"
+    }, {
+      "key" : "4",
+      "text_en" : "1.5 J"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 11 ],
+      "ai_call_ids" : [ "59fbf06a-2067-4bca-808f-e094c1960d5b" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 36,
+    "stem_en" : "A constant voltage of 50 V is maintained between the points A and B of the circuit shown in the figure. The current through the branch CD of the circuit is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "1.5 A"
+    }, {
+      "key" : "2",
+      "text_en" : "2.0 A"
+    }, {
+      "key" : "3",
+      "text_en" : "2.5 A"
+    }, {
+      "key" : "4",
+      "text_en" : "3.0 A"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 11,
+      "description" : "circuit: points A and B connected across a 50V cell; between A and B two parallel branches: upper branch 1Ω then point C then 2Ω; lower branch 3Ω then point D then 4Ω; a wire CD joins C and D"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 11 ],
+      "ai_call_ids" : [ "59fbf06a-2067-4bca-808f-e094c1960d5b" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 11 — circuit: points A and B connected across a 50V cell; between A and B two parallel branches: upper branch 1Ω then point C then 2Ω; lower branch 3Ω then point D then 4Ω; a wire CD joins C and D" ]
+    }
+  }, {
+    "no" : 37,
+    "stem_en" : "A photon and an electron (mass m) have the same energy E. The ratio (lambda_photon / lambda_electron) of their de Broglie wavelengths is: (c is the speed of light)",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "sqrt(E / (2m))"
+    }, {
+      "key" : "2",
+      "text_en" : "c sqrt(2mE)"
+    }, {
+      "key" : "3",
+      "text_en" : "c sqrt(2m / E)"
+    }, {
+      "key" : "4",
+      "text_en" : "(1/c) sqrt(E / (2m))"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 12 ],
+      "ai_call_ids" : [ "546b55af-d38c-4277-be70-7cf6c72335b9" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 38,
+    "stem_en" : "Which of the following options represent the variation of photoelectric current with property of light shown on the x-axis?\nA. [graph]\nB. [graph]\nC. [graph]\nD. [graph]",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A only"
+    }, {
+      "key" : "2",
+      "text_en" : "A and C"
+    }, {
+      "key" : "3",
+      "text_en" : "A and D"
+    }, {
+      "key" : "4",
+      "text_en" : "B and D"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 12,
+      "description" : "Graph A: y-axis 'Photoelectric current', x-axis 'Intensity of light', origin 0; straight line rising from the origin."
+    }, {
+      "at" : "stem",
+      "page" : 12,
+      "description" : "Graph B: y-axis 'Photoelectric current', x-axis 'Intensity of light', origin 0; horizontal line above the x-axis."
+    }, {
+      "at" : "stem",
+      "page" : 12,
+      "description" : "Graph C: y-axis 'Photoelectric current', x-axis 'Frequency of light', origin 0; straight line rising from the origin."
+    }, {
+      "at" : "stem",
+      "page" : 12,
+      "description" : "Graph D: y-axis 'Photoelectric current', x-axis 'Frequency of light', origin 0; straight line rising from a point on the x-axis to the right of the origin."
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 12 ],
+      "ai_call_ids" : [ "546b55af-d38c-4277-be70-7cf6c72335b9" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 12 — Graph A: y-axis 'Photoelectric current', x-axis 'Intensity of light', origin 0; straight line rising from the origin.", "figure at stem on page 12 — Graph B: y-axis 'Photoelectric current', x-axis 'Intensity of light', origin 0; horizontal line above the x-axis.", "figure at stem on page 12 — Graph C: y-axis 'Photoelectric current', x-axis 'Frequency of light', origin 0; straight line rising from the origin.", "figure at stem on page 12 — Graph D: y-axis 'Photoelectric current', x-axis 'Frequency of light', origin 0; straight line rising from a point on the x-axis to the right of the origin." ]
+    }
+  }, {
+    "no" : 39,
+    "stem_en" : "A sphere of radius R is cut from a larger solid sphere of radius 2R as shown in the figure. The ratio of the moment of inertia of the smaller sphere to that of the rest part of the sphere about the Y-axis is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "7/8"
+    }, {
+      "key" : "2",
+      "text_en" : "7/40"
+    }, {
+      "key" : "3",
+      "text_en" : "7/57"
+    }, {
+      "key" : "4",
+      "text_en" : "7/64"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 13,
+      "description" : "Figure: a large solid sphere (hatched) centred on the origin, with Y axis vertical and X axis horizontal; a smaller unhatched circle sits inside on the right, touching the Y-axis and the right edge of the large sphere; its diameter along the X axis is marked 2R"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 13 ],
+      "ai_call_ids" : [ "43277020-3863-4dc6-bd4e-8d88147d2b16" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 13 — Figure: a large solid sphere (hatched) centred on the origin, with Y axis vertical and X axis horizontal; a smaller unhatched circle sits inside on the right, touching the Y-axis and the right edge of the large sphere; its diameter along the X axis is marked 2R" ]
+    }
+  }, {
+    "no" : 40,
+    "stem_en" : "A full wave rectifier circuit with diodes (D_1) and (D_2) is shown in the figure. If input supply voltage V_in = 220sin (100 pi t) volt, then at t = 15 msec",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "D_1 is forward biased, D_2 is reverse biased"
+    }, {
+      "key" : "2",
+      "text_en" : "D_1 is reverse biased, D_2 is forward biased"
+    }, {
+      "key" : "3",
+      "text_en" : "D_1 and D_2 both are forward biased"
+    }, {
+      "key" : "4",
+      "text_en" : "D_1 and D_2 both are reverse biased"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 13,
+      "description" : "Circuit: AC source V_in across the primary coil of a transformer; an arrow points at the secondary coil, level with its lower loops; the top end of the secondary goes through diode D_1 and the bottom end goes through diode D_2, both diode symbols pointing toward the load (triangle on the secondary side, bar at the R_L junction); the two diodes join at the top of a load resistor R_L; output terminals are taken across R_L, with a wire from the arrow running down, hopping over D_2's lead, to the bottom of R_L"
+    } ],
+    "answer" : {
+      "status" : "multiple",
+      "keys" : [ "1", "2" ]
+    },
+    "extraction" : {
+      "pages" : [ 13 ],
+      "ai_call_ids" : [ "43277020-3863-4dc6-bd4e-8d88147d2b16" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 13 — Circuit: AC source V_in across the primary coil of a transformer; the secondary coil has a centre tap marked by an arrow; the top end of the secondary goes through diode D_1 and the bottom end goes through diode D_2; the two diodes join at the top of a load resistor R_L; output terminals are taken across R_L, with the centre tap wired to the bottom of R_L" ]
+    }
+  }, {
+    "no" : 41,
+    "stem_en" : "Two gases A and B are filled at the same pressure in separate cylinders with movable pistons of radius r_A and r_B, respectively. On supplying an equal amount of heat to both the systems reversibly under constant pressure, the pistons of gas A and B are displaced by 16 cm and 9 cm, respectively. If the change in their internal energy is the same, then the ratio r_A/r_B is equal to",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "4/3"
+    }, {
+      "key" : "2",
+      "text_en" : "3/4"
+    }, {
+      "key" : "3",
+      "text_en" : "2/sqrt(3)"
+    }, {
+      "key" : "4",
+      "text_en" : "sqrt(3)/2"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 13 ],
+      "ai_call_ids" : [ "43277020-3863-4dc6-bd4e-8d88147d2b16" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 42,
+    "stem_en" : "A physical quantity P is related to four observations a, b, c and d as follows:\nP = a^3 b^2 / (c sqrt(d))\nThe percentage errors of measurement in a, b, c and d are 1%, 3%, 2%, and 4% respectively. The percentage error in the quantity P is",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "10%"
+    }, {
+      "key" : "2",
+      "text_en" : "2%"
+    }, {
+      "key" : "3",
+      "text_en" : "13%"
+    }, {
+      "key" : "4",
+      "text_en" : "15%"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 14 ],
+      "ai_call_ids" : [ "9a48730c-ca20-4620-8fe5-840b67e5436f" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 43,
+    "stem_en" : "The intensity of transmitted light when a polaroid sheet, placed between two crossed polaroids at 22.5° from the polarization axis of one of the polaroid, is (I_0 is the intensity of polarised light after passing through the first polaroid):",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "I_0/2"
+    }, {
+      "key" : "2",
+      "text_en" : "I_0/4"
+    }, {
+      "key" : "3",
+      "text_en" : "I_0/8"
+    }, {
+      "key" : "4",
+      "text_en" : "I_0/16"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 14 ],
+      "ai_call_ids" : [ "9a48730c-ca20-4620-8fe5-840b67e5436f" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 44,
+    "stem_en" : "Two identical point masses P and Q, suspended from two separate massless springs of spring constants k_1 and k_2, respectively, oscillate vertically. If their maximum speeds are the same, the ratio (A_Q/A_P) of the amplitude A_Q of mass Q to the amplitude A_P of mass P is:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "k_2/k_1"
+    }, {
+      "key" : "2",
+      "text_en" : "k_1/k_2"
+    }, {
+      "key" : "3",
+      "text_en" : "sqrt(k_2/k_1)"
+    }, {
+      "key" : "4",
+      "text_en" : "sqrt(k_1/k_2)"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 14 ],
+      "ai_call_ids" : [ "9a48730c-ca20-4620-8fe5-840b67e5436f" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 45,
+    "stem_en" : "A pipe open at both ends has a fundamental frequency f in air. The pipe is now dipped vertically in a water drum to half of its length. The fundamental frequency of the air column is now equal to :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "f/2"
+    }, {
+      "key" : "2",
+      "text_en" : "f"
+    }, {
+      "key" : "3",
+      "text_en" : "3f/2"
+    }, {
+      "key" : "4",
+      "text_en" : "2f"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 14 ],
+      "ai_call_ids" : [ "9a48730c-ca20-4620-8fe5-840b67e5436f" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 46,
+    "stem_en" : "The ratio of the wavelengths of the light absorbed by a Hydrogen atom when it undergoes n = 2 -> n = 3 and n = 4 -> n = 6 transitions, respectively, is",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "1/36"
+    }, {
+      "key" : "2",
+      "text_en" : "1/16"
+    }, {
+      "key" : "3",
+      "text_en" : "1/9"
+    }, {
+      "key" : "4",
+      "text_en" : "1/4"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 15 ],
+      "ai_call_ids" : [ "e7b9f033-3fff-44e1-9ad8-5f5b3d978fbd" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 47,
+    "stem_en" : "Which of the following statements are true?\nA. Unlike Ga that has a very high melting point, Cs has a very low melting point.\nB. On Pauling scale, the electronegativity values of N and Cl are not the same.\nC. Ar, K^+, Cl^-, Ca^2+, and S^2- are all isoelectronic species.\nD. The correct order of the first ionization enthalpies of Na, Mg, Al, and Si is Si > Al > Mg > Na.\nE. The atomic radius of Cs is greater than that of Li and Rb.\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A, B, and E only"
+    }, {
+      "key" : "2",
+      "text_en" : "C and E only"
+    }, {
+      "key" : "3",
+      "text_en" : "C and D only"
+    }, {
+      "key" : "4",
+      "text_en" : "A, C, and E only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 15 ],
+      "ai_call_ids" : [ "e7b9f033-3fff-44e1-9ad8-5f5b3d978fbd" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 48,
+    "stem_en" : "Match List I with List II\n\n| List I (Ion) | List II (Group Number in Cation Analysis) |\n|---|---|\n| A. Co^2+ | I. Group-I |\n| B. Mg^2+ | II. Group-III |\n| C. Pb^2+ | III. Group-IV |\n| D. Al^3+ | IV. Group-VI |\n\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-III, B-IV, C-II, D-I"
+    }, {
+      "key" : "2",
+      "text_en" : "A-III, B-IV, C-I, D-II"
+    }, {
+      "key" : "3",
+      "text_en" : "A-III, B-II, C-IV, D-I"
+    }, {
+      "key" : "4",
+      "text_en" : "A-III, B-II, C-I, D-IV"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 15 ],
+      "ai_call_ids" : [ "e7b9f033-3fff-44e1-9ad8-5f5b3d978fbd" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 49,
+    "stem_en" : "Predict the major product 'P' in the following sequence of reactions -",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : ""
+    }, {
+      "key" : "2",
+      "text_en" : ""
+    }, {
+      "key" : "3",
+      "text_en" : ""
+    }, {
+      "key" : "4",
+      "text_en" : ""
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 16,
+      "description" : "Reaction scheme: 1-methylcyclopentene (cyclopentene ring with CH3 on the double-bond carbon) -> arrow with '(i) HBr, benzoyl peroxide' and '(ii) KCN' above it and '(iii) Na (Hg)/C2H5OH' below it -> P (Major)"
+    }, {
+      "at" : "option:1",
+      "page" : 16,
+      "description" : "Cyclopentane ring with CH3 on one carbon and CH2NH2 on the adjacent carbon"
+    }, {
+      "at" : "option:2",
+      "page" : 16,
+      "description" : "Cyclopentane ring with CH3 and CH2NH2 both on the same carbon"
+    }, {
+      "at" : "option:3",
+      "page" : 16,
+      "description" : "Cyclopentane ring with CH3 on one carbon and NC on the adjacent carbon"
+    }, {
+      "at" : "option:4",
+      "page" : 16,
+      "description" : "Cyclopentane ring with NC and CH3 both on the same carbon"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 16 ],
+      "ai_call_ids" : [ "ede10b4a-909b-43dd-a9e4-caeaf0f33fca" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 16 — Reaction scheme: 1-methylcyclopentene (cyclopentene ring with CH3 on the double-bond carbon) -> over arrow '(i) HBr, benzoyl peroxide (ii) KCN (iii) Na (Hg)/C2H5OH' -> P (Major)", "figure at option:1 on page 16 — Cyclopentane ring with CH3 on one carbon and CH2NH2 on the adjacent carbon", "figure at option:2 on page 16 — Cyclopentane ring with CH3 and CH2NH2 both on the same carbon", "figure at option:3 on page 16 — Cyclopentane ring with CH3 on one carbon and NC on the adjacent carbon", "figure at option:4 on page 16 — Cyclopentane ring with NC and CH3 both on the same carbon" ]
+    }
+  }, {
+    "no" : 50,
+    "stem_en" : "Energy and radius of first Bohr orbit of He^+ and Li^2+ are\n[Given R_H = 2.18 × 10^(-18) J, a_0 = 52.9 pm]",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "E_n(Li^2+) = -19.62×10^(-18) J; r_n(Li^2+) = 17.6 pm; E_n(He^+) = -8.72×10^(-18) J; r_n(He^+) = 26.4 pm"
+    }, {
+      "key" : "2",
+      "text_en" : "E_n(Li^2+) = -8.72×10^(-18) J; r_n(Li^2+) = 26.4 pm; E_n(He^+) = -19.62×10^(-18) J; r_n(He^+) = 17.6 pm"
+    }, {
+      "key" : "3",
+      "text_en" : "E_n(Li^2+) = -19.62×10^(-16) J; r_n(Li^2+) = 17.6 pm; E_n(He^+) = -8.72×10^(-16) J; r_n(He^+) = 26.4 pm"
+    }, {
+      "key" : "4",
+      "text_en" : "E_n(Li^2+) = -8.72×10^(-16) J; r_n(Li^2+) = 17.6 pm; E_n(He^+) = -19.62×10^(-16) J; r_n(He^+) = 17.6 pm"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 16 ],
+      "ai_call_ids" : [ "ede10b4a-909b-43dd-a9e4-caeaf0f33fca" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 51,
+    "stem_en" : "Which of the following are paramagnetic?\nA. [NiCl_4]^2-\nB. Ni(CO)_4\nC. [Ni(CN)_4]^2-\nD. [Ni(H_2O)_6]^2+\nE. Ni(PPh_3)_4\nChoose the correct answer from the options given below:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A and C only"
+    }, {
+      "key" : "2",
+      "text_en" : "B and E only"
+    }, {
+      "key" : "3",
+      "text_en" : "A and D only"
+    }, {
+      "key" : "4",
+      "text_en" : "A, D and E only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 16 ],
+      "ai_call_ids" : [ "ede10b4a-909b-43dd-a9e4-caeaf0f33fca" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 52,
+    "stem_en" : "Given below are two statements :\nStatement I : Like nitrogen that can form ammonia, arsenic can form arsine.\nStatement II : Antimony cannot form antimony pentoxide.\nIn the light of the above statements, choose the most appropriate answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both Statement I and Statement II are correct"
+    }, {
+      "key" : "2",
+      "text_en" : "Both Statement I and Statement II are incorrect"
+    }, {
+      "key" : "3",
+      "text_en" : "Statement I is correct but Statement II is incorrect"
+    }, {
+      "key" : "4",
+      "text_en" : "Statement I is incorrect but Statement II is correct"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 17 ],
+      "ai_call_ids" : [ "f3b4740c-36f1-4998-af7d-f1db57a88850" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 53,
+    "stem_en" : "Which among the following electronic configurations belong to main group elements?\nA. [Ne]3s^1\nB. [Ar]3d^3 4s^2\nC. [Kr]4d^10 5s^2 5p^5\nD. [Ar]3d^10 4s^1\nE. [Rn]5f^0 6d^2 7s^2\nChoose the correct answer from the option given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "B and E only"
+    }, {
+      "key" : "2",
+      "text_en" : "A and C only"
+    }, {
+      "key" : "3",
+      "text_en" : "D and E only"
+    }, {
+      "key" : "4",
+      "text_en" : "A, C and D only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 17 ],
+      "ai_call_ids" : [ "f3b4740c-36f1-4998-af7d-f1db57a88850" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 54,
+    "stem_en" : "Dalton's Atomic theory could not explain which of the following?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Law of conservation of mass"
+    }, {
+      "key" : "2",
+      "text_en" : "Law of constant proportion"
+    }, {
+      "key" : "3",
+      "text_en" : "Law of multiple proportion"
+    }, {
+      "key" : "4",
+      "text_en" : "Law of gaseous volume"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 17 ],
+      "ai_call_ids" : [ "f3b4740c-36f1-4998-af7d-f1db57a88850" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 55,
+    "stem_en" : "Consider the following compounds :\nKO_2, H_2O_2 and H_2SO_4 (underlined: K in KO_2, O in H_2O_2, S in H_2SO_4).\nThe oxidation states of the underlined elements in them are, respectively,",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "+1, -1, and +6"
+    }, {
+      "key" : "2",
+      "text_en" : "+2, -2, and +6"
+    }, {
+      "key" : "3",
+      "text_en" : "+1, -2, and +4"
+    }, {
+      "key" : "4",
+      "text_en" : "+4, -4, and +6"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 17 ],
+      "ai_call_ids" : [ "f3b4740c-36f1-4998-af7d-f1db57a88850" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 56,
+    "stem_en" : "If the half-life (t_(1/2)) for a first order reaction is 1 minute, then the time required for 99.9% completion of the reaction is closest to :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "2 minutes"
+    }, {
+      "key" : "2",
+      "text_en" : "4 minutes"
+    }, {
+      "key" : "3",
+      "text_en" : "5 minutes"
+    }, {
+      "key" : "4",
+      "text_en" : "10 minutes"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 17 ],
+      "ai_call_ids" : [ "f3b4740c-36f1-4998-af7d-f1db57a88850" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 57,
+    "stem_en" : "The correct order of the wavelength of light absorbed by the following complexes is,\nA. [Co(NH_3)_6]^3+\nB. [Co(CN)_6]^3-\nC. [Cu(H_2O)_4]^2+\nD. [Ti(H_2O)_6]^3+\nChoose the correct answer from the options given below:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "B < D < A < C"
+    }, {
+      "key" : "2",
+      "text_en" : "B < A < D < C"
+    }, {
+      "key" : "3",
+      "text_en" : "C < D < A < B"
+    }, {
+      "key" : "4",
+      "text_en" : "C < A < D < B"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 18 ],
+      "ai_call_ids" : [ "c7944f90-5e73-4a3b-aa5b-7c49439e9622" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 58,
+    "stem_en" : "Which one of the following compounds can exist as cis-trans isomers?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Pent-1-ene"
+    }, {
+      "key" : "2",
+      "text_en" : "2-Methylhex-2-ene"
+    }, {
+      "key" : "3",
+      "text_en" : "1,1-Dimethylcyclopropane"
+    }, {
+      "key" : "4",
+      "text_en" : "1,2-Dimethylcyclohexane"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 18 ],
+      "ai_call_ids" : [ "c7944f90-5e73-4a3b-aa5b-7c49439e9622" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 59,
+    "stem_en" : "Phosphoric acid ionizes in three steps with their ionization constant values K_(a_1), K_(a_2) and K_(a_3), respectively, while K is the overall ionization constant. Which of the following statements are true?\nA. log K = log K_(a_1) + log K_(a_2) + log K_(a_3)\nB. H_3PO_4 is a stronger acid than H_2PO_4^- and HPO_4^2-.\nC. K_(a_1) > K_(a_2) > K_(a_3)\nD. K_(a_1) = (K_(a_3) + K_(a_2)) / 2\nChoose the correct answer from the options given below:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A and B only"
+    }, {
+      "key" : "2",
+      "text_en" : "A and C only"
+    }, {
+      "key" : "3",
+      "text_en" : "B, C and D only"
+    }, {
+      "key" : "4",
+      "text_en" : "A, B and C only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 18 ],
+      "ai_call_ids" : [ "c7944f90-5e73-4a3b-aa5b-7c49439e9622" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 60,
+    "stem_en" : "Which one of the following reactions does NOT give benzene as the product ?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : ""
+    }, {
+      "key" : "2",
+      "text_en" : ""
+    }, {
+      "key" : "3",
+      "text_en" : ""
+    }, {
+      "key" : "4",
+      "text_en" : ""
+    } ],
+    "figures" : [ {
+      "at" : "option:1",
+      "page" : 18,
+      "description" : "benzene ring attached to C(=O)–O Na; arrow labelled 'sodalime' above and 'Δ' below"
+    }, {
+      "at" : "option:2",
+      "page" : 18,
+      "description" : "zigzag chain labelled n-hexane; arrow with 'Mo_2O_3' above and '773K, 10 - 20 atm.' below"
+    }, {
+      "at" : "option:3",
+      "page" : 18,
+      "description" : "H–C≡C–H; arrow with 'red hot Iron Tube' above and 'at 873 K' below"
+    }, {
+      "at" : "option:4",
+      "page" : 18,
+      "description" : "benzene ring attached to N(+)≡N with Cl(-); arrow with 'H_2O' above and 'warm' below"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 18 ],
+      "ai_call_ids" : [ "c7944f90-5e73-4a3b-aa5b-7c49439e9622" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at option:1 on page 18 — benzene ring attached to C(=O)–O Na; arrow labelled 'sodalime' above and 'Δ' below", "figure at option:2 on page 18 — zigzag chain labelled n-hexane; arrow with 'Mo_2O_3' above and '773K, 10 - 20 atm.' below", "figure at option:3 on page 18 — H–C≡C–H; arrow with 'red hot Iron Tube' above and 'at 873 K' below", "figure at option:4 on page 18 — benzene ring attached to N(+)≡N with Cl(-); arrow with 'H_2O' above and 'warm' below" ]
+    }
+  }, {
+    "no" : 61,
+    "stem_en" : "If the molar conductivity (Lambda_m) of a 0.050 mol L^-1 solution of a monobasic weak acid is 90 S cm^2 mol^-1, its extent (degree) of dissociation will be\n[Assume Lambda°_+ = 349.6 S cm^2 mol^-1 and Lambda°_- = 50.4 S cm^2 mol^-1.]",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "0.115"
+    }, {
+      "key" : "2",
+      "text_en" : "0.125"
+    }, {
+      "key" : "3",
+      "text_en" : "0.225"
+    }, {
+      "key" : "4",
+      "text_en" : "0.215"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 19 ],
+      "ai_call_ids" : [ "3da6315f-de66-42a8-b34a-44b7aaf7acbe" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 62,
+    "stem_en" : "Given below are two statements :\nStatement I : A hypothetical diatomic molecule with bond order zero is quite stable.\nStatement II : As bond order increases, the bond length increases.\nIn the light of the above statements, choose the most appropriate answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both Statement I and Statement II are true"
+    }, {
+      "key" : "2",
+      "text_en" : "Both Statement I and Statement II are false"
+    }, {
+      "key" : "3",
+      "text_en" : "Statement I is true but Statement II is false"
+    }, {
+      "key" : "4",
+      "text_en" : "Statement I is false but Statement II is true"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 19 ],
+      "ai_call_ids" : [ "3da6315f-de66-42a8-b34a-44b7aaf7acbe" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 63,
+    "stem_en" : "Out of the following complex compounds, which of the compound will be having the minimum conductance in solution?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "[Co(NH_3)_3Cl_3]"
+    }, {
+      "key" : "2",
+      "text_en" : "[Co(NH_3)_4Cl_2]"
+    }, {
+      "key" : "3",
+      "text_en" : "[Co(NH_3)_6]Cl_3"
+    }, {
+      "key" : "4",
+      "text_en" : "[Co(NH_3)_5Cl]Cl"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "multiple",
+      "keys" : [ "1", "2" ]
+    },
+    "extraction" : {
+      "pages" : [ 19 ],
+      "ai_call_ids" : [ "3da6315f-de66-42a8-b34a-44b7aaf7acbe" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 64,
+    "stem_en" : "Match List - I with List - II\n\n| List-I | List-II |\n|---|---|\n| A. XeO_3 | I. sp^3d; linear |\n| B. XeF_2 | II. sp^3; pyramidal |\n| C. XeOF_4 | III. sp^3d^3; distorted octahedral |\n| D. XeF_6 | IV. sp^3d^2; square pyramidal |\n\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-II, B-I, C-IV, D-III"
+    }, {
+      "key" : "2",
+      "text_en" : "A-II, B-I, C-III, D-IV"
+    }, {
+      "key" : "3",
+      "text_en" : "A-IV, B-II, C-III, D-I"
+    }, {
+      "key" : "4",
+      "text_en" : "A-IV, B-II, C-I, D-III"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 19 ],
+      "ai_call_ids" : [ "3da6315f-de66-42a8-b34a-44b7aaf7acbe" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 65,
+    "stem_en" : "C(s) + 2H_2(g) -> CH_4(g); Delta H = -74.8 kJ mol^-1\nWhich of the following diagrams gives an accurate representation of the above reaction?\n[R -> reactants; P -> products]",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : ""
+    }, {
+      "key" : "2",
+      "text_en" : ""
+    }, {
+      "key" : "3",
+      "text_en" : ""
+    }, {
+      "key" : "4",
+      "text_en" : ""
+    } ],
+    "figures" : [ {
+      "at" : "option:1",
+      "page" : 20,
+      "description" : "Energy profile: y-axis 'Energy (kJ mol^-1)', x-axis 'Reaction progress'; R level higher, hump, P level lower; double arrow between R and P labelled 74.8"
+    }, {
+      "at" : "option:2",
+      "page" : 20,
+      "description" : "Energy profile: y-axis 'Energy (kJ mol^-1)', x-axis 'Reaction progress'; R low, rising to peak, then falling to P, which lies a little more than halfway down from the peak towards R; double arrow from just under the peak down to the R level labelled 74.8 (P lies above R)"
+    }, {
+      "at" : "option:3",
+      "page" : 20,
+      "description" : "Energy profile: y-axis 'Energy (kJ mol^-1)', x-axis 'Reaction progress'; R level, hump, P lower; double arrow inside the hump from peak down to R level labelled 74.8"
+    }, {
+      "at" : "option:4",
+      "page" : 20,
+      "description" : "Energy profile: y-axis 'Energy (kJ mol^-1)', x-axis 'Reaction progress'; R low, hump, P higher than R; double arrow between R level and P level labelled 74.8"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 20 ],
+      "ai_call_ids" : [ "3e8dbaa5-1600-49c9-a6a0-fd1e87b774e0" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at option:1 on page 20 — Energy profile: y-axis 'Energy (kJ mol^-1)', x-axis 'Reaction progress'; R level higher, hump, P level lower; double arrow between R and P labelled 74.8", "figure at option:2 on page 20 — Energy profile: y-axis 'Energy (kJ mol^-1)', x-axis 'Reaction progress'; R low, rising to peak, P slightly below peak; double arrow from peak to P level labelled 74.8", "figure at option:3 on page 20 — Energy profile: y-axis 'Energy (kJ mol^-1)', x-axis 'Reaction progress'; R level, hump, P lower; double arrow inside the hump from peak down labelled 74.8", "figure at option:4 on page 20 — Energy profile: y-axis 'Energy (kJ mol^-1)', x-axis 'Reaction progress'; R low, hump, P higher than R; double arrow between R level and P level labelled 74.8" ]
+    }
+  }, {
+    "no" : 66,
+    "stem_en" : "Match List - I with List - II\n\n| List-I (Example) | List-II (Type of Solution) |\n|---|---|\n| A. Humidity | I. Solid in solid |\n| B. Alloys | II. Liquid in gas |\n| C. Amalgams | III. Solid in gas |\n| D. Smoke | IV. Liquid in solid |\n\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-II, B-IV, C-I, D-III"
+    }, {
+      "key" : "2",
+      "text_en" : "A-II, B-I, C-IV, D-III"
+    }, {
+      "key" : "3",
+      "text_en" : "A-III, B-I, C-IV, D-II"
+    }, {
+      "key" : "4",
+      "text_en" : "A-III, B-II, C-I, D-IV"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 20 ],
+      "ai_call_ids" : [ "3e8dbaa5-1600-49c9-a6a0-fd1e87b774e0" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 67,
+    "stem_en" : "The correct order of decreasing basic strength of the given amines is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "N-methylaniline > benzenamine > ethanamine > N-ethylethanamine"
+    }, {
+      "key" : "2",
+      "text_en" : "N-ethylethanamine > ethanamine > benzenamine > N-methylaniline"
+    }, {
+      "key" : "3",
+      "text_en" : "N-ethylethanamine > ethanamine > N-methylaniline > benzenamine"
+    }, {
+      "key" : "4",
+      "text_en" : "benzenamine > ethanamine > N-methylaniline > N-ethylethanamine"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 21 ],
+      "ai_call_ids" : [ "8528f168-026f-48f5-b0c4-5e99b39e0694" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 68,
+    "stem_en" : "Among the following, choose the ones with equal number of atoms.\nA. 212 g of Na_2CO_3 (s) [molar mass = 106 g]\nB. 248 g of Na_2O (s) [molar mass = 62 g]\nC. 240 g of NaOH (s) [molar mass = 40 g]\nD. 12 g of H_2 (g) [molar mass = 2 g]\nE. 220 g of CO_2(g) [molar mass = 44 g]\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A, B, and C only"
+    }, {
+      "key" : "2",
+      "text_en" : "A, B, and D only"
+    }, {
+      "key" : "3",
+      "text_en" : "B, C, and D only"
+    }, {
+      "key" : "4",
+      "text_en" : "B, D, and E only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 21 ],
+      "ai_call_ids" : [ "8528f168-026f-48f5-b0c4-5e99b39e0694" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 69,
+    "stem_en" : "Match List I with List II.\n| List I (Name of Vitamin) | List II (Deficiency disease) |\n|---|---|\n| A. Vitamin B_12 | I. Cheilosis |\n| B. Vitamin D | II. Convulsions |\n| C. Vitamin B_2 | III. Rickets |\n| D. Vitamin B_6 | IV. Pernicious anaemia |\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-I, B-III, C-II, D-IV"
+    }, {
+      "key" : "2",
+      "text_en" : "A-IV, B-III, C-I, D-II"
+    }, {
+      "key" : "3",
+      "text_en" : "A-II, B-III, C-I, D-IV"
+    }, {
+      "key" : "4",
+      "text_en" : "A-IV, B-III, C-II, D-I"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 21 ],
+      "ai_call_ids" : [ "8528f168-026f-48f5-b0c4-5e99b39e0694" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 70,
+    "stem_en" : "The correct order of decreasing acidity of the following aliphatic acids is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "(CH_3)_3CCOOH > (CH_3)_2CHCOOH > CH_3COOH > HCOOH"
+    }, {
+      "key" : "2",
+      "text_en" : "CH_3COOH > (CH_3)_2CHCOOH > (CH_3)_3CCOOH > HCOOH"
+    }, {
+      "key" : "3",
+      "text_en" : "HCOOH > CH_3COOH > (CH_3)_2CHCOOH > (CH_3)_3CCOOH"
+    }, {
+      "key" : "4",
+      "text_en" : "HCOOH > (CH_3)_3CCOOH > (CH_3)_2CHCOOH > CH_3COOH"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 22 ],
+      "ai_call_ids" : [ "c451b7e8-6918-4107-8f54-9dbf4145a668" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 71,
+    "stem_en" : "Given below are two statements :\nStatement I : Ferromagnetism is considered as an extreme form of paramagnetism.\nStatement II : The number of unpaired electrons in a Cr^2+ ion (Z = 24) is the same as that of a Nd^3+ ion (Z = 60).\nIn the light of the above statements, choose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both Statement I and Statement II are true"
+    }, {
+      "key" : "2",
+      "text_en" : "Both Statement I and Statement II are false"
+    }, {
+      "key" : "3",
+      "text_en" : "Statement I is true but Statement II is false"
+    }, {
+      "key" : "4",
+      "text_en" : "Statement I is false but Statement II is true"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 22 ],
+      "ai_call_ids" : [ "c451b7e8-6918-4107-8f54-9dbf4145a668" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 72,
+    "stem_en" : "Match List I with List II\n\n| List I (Mixture) | List II (Method of Separation) |\n|---|---|\n| A. CHCl_3 + C_6H_5NH_2 | I. Distillation under reduced pressure |\n| B. Crude oil in petroleum industry | II. Steam distillation |\n| C. Glycerol from spent-lye | III. Fractional distillation |\n| D. Aniline - water | IV. Simple distillation |\n\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-IV, B-III, C-I, D-II"
+    }, {
+      "key" : "2",
+      "text_en" : "A-IV, B-III, C-II, D-I"
+    }, {
+      "key" : "3",
+      "text_en" : "A-III, B-IV, C-I, D-II"
+    }, {
+      "key" : "4",
+      "text_en" : "A-III, B-IV, C-II, D-I"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 22 ],
+      "ai_call_ids" : [ "c451b7e8-6918-4107-8f54-9dbf4145a668" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 73,
+    "stem_en" : "For the reaction A(g) ⇌ 2B(g), the backward reaction rate constant is higher than the forward reaction rate constant by a factor of 2500, at 1000 K.\n[Given : R = 0.0831 L atm mol^-1 K^-1]\nK_p for the reaction at 1000 K is",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "83.1"
+    }, {
+      "key" : "2",
+      "text_en" : "2.077 × 10^5"
+    }, {
+      "key" : "3",
+      "text_en" : "0.033"
+    }, {
+      "key" : "4",
+      "text_en" : "0.021"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 23 ],
+      "ai_call_ids" : [ "f1dc9e20-9bfb-4170-8b5c-d1bfeda19db2" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 74,
+    "stem_en" : "Given below are two statements :\nStatement I : Benzenediazonium salt is prepared by the reaction of aniline with nitrous acid at 273 - 278 K. It decomposes easily in the dry state.\nStatement II : Insertion of iodine into the benzene ring is difficult and hence iodobenzene is prepared through the reaction of benzenediazonium salt with KI.\nIn the light of the above statements, choose the most appropriate answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both Statement I and Statement II are correct"
+    }, {
+      "key" : "2",
+      "text_en" : "Both Statement I and Statement II are incorrect"
+    }, {
+      "key" : "3",
+      "text_en" : "Statement I is correct but Statement II is incorrect"
+    }, {
+      "key" : "4",
+      "text_en" : "Statement I is incorrect but Statement II is correct"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 23 ],
+      "ai_call_ids" : [ "f1dc9e20-9bfb-4170-8b5c-d1bfeda19db2" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 75,
+    "stem_en" : "How many products (including stereoisomers) are expected from monochlorination of the following compound?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "2"
+    }, {
+      "key" : "2",
+      "text_en" : "3"
+    }, {
+      "key" : "3",
+      "text_en" : "5"
+    }, {
+      "key" : "4",
+      "text_en" : "6"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 23,
+      "description" : "Structural formula: two H_3C groups attached to CH, which is bonded to CH_2 - CH_3, i.e. (H_3C)_2CH-CH_2-CH_3"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 23 ],
+      "ai_call_ids" : [ "f1dc9e20-9bfb-4170-8b5c-d1bfeda19db2" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 23 — Structural formula: two H_3C groups attached to CH, which is bonded to CH_2 - CH_3, i.e. (H_3C)_2CH-CH_2-CH_3" ]
+    }
+  }, {
+    "no" : 76,
+    "stem_en" : "Among the given compounds I-III, the correct order of bond dissociation energy of C–H bond marked with * is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "II > I > III"
+    }, {
+      "key" : "2",
+      "text_en" : "I > II > III"
+    }, {
+      "key" : "3",
+      "text_en" : "III > II > I"
+    }, {
+      "key" : "4",
+      "text_en" : "II > III > I"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 23,
+      "description" : "Three structures: I benzene ring with H marked * on ring carbon; II phenyl-C≡C-H with the terminal alkyne C-H marked *; III a three-membered ring with a double bond on one side, its third carbon bearing two H, one C-H marked *"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 23 ],
+      "ai_call_ids" : [ "f1dc9e20-9bfb-4170-8b5c-d1bfeda19db2" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 23 — Three structures: I benzene ring with H marked * on ring carbon; II phenyl-C≡C-H with the terminal alkyne C-H marked *; III cyclopropene with the sp3 CH_2 carbon bearing two H, one C-H marked *" ]
+    }
+  }, {
+    "no" : 77,
+    "stem_en" : "Which one of the following compounds does not decolourize bromine water?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : ""
+    }, {
+      "key" : "2",
+      "text_en" : ""
+    }, {
+      "key" : "3",
+      "text_en" : ""
+    }, {
+      "key" : "4",
+      "text_en" : ""
+    } ],
+    "figures" : [ {
+      "at" : "option:1",
+      "page" : 24,
+      "description" : "skeletal structure: cyclohexane ring (plain hexagon)"
+    }, {
+      "at" : "option:2",
+      "page" : 24,
+      "description" : "benzene ring (hexagon with inner circle) bonded to OH"
+    }, {
+      "at" : "option:3",
+      "page" : 24,
+      "description" : "benzene ring (hexagon with inner circle) bonded to CH=CH_2"
+    }, {
+      "at" : "option:4",
+      "page" : 24,
+      "description" : "benzene ring (hexagon with inner circle) bonded to NH_2"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 24 ],
+      "ai_call_ids" : [ "1af30439-99d1-469a-b8ea-a006ba8d2e30" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at option:1 on page 24 — skeletal structure: cyclohexane ring (plain hexagon)", "figure at option:2 on page 24 — benzene ring (hexagon with inner circle) bonded to OH", "figure at option:3 on page 24 — benzene ring (hexagon with inner circle) bonded to CH=CH_2", "figure at option:4 on page 24 — benzene ring (hexagon with inner circle) bonded to NH_2" ]
+    }
+  }, {
+    "no" : 78,
+    "stem_en" : "The major product of the following reaction is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : ""
+    }, {
+      "key" : "2",
+      "text_en" : ""
+    }, {
+      "key" : "3",
+      "text_en" : ""
+    }, {
+      "key" : "4",
+      "text_en" : ""
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 24,
+      "description" : "reaction: phenyl ketone C6H5-C(=O)-CH2-CH2-CN; arrow with (i) CH_3MgBr (excess) above and (ii) H_3O^+ below"
+    }, {
+      "at" : "option:1",
+      "page" : 24,
+      "description" : "structure: carbon bearing CH_3, OH and a benzene ring (hexagon with inner circle), attached to CH2-CH2-CN"
+    }, {
+      "at" : "option:2",
+      "page" : 24,
+      "description" : "structure: phenyl-C(CH_3)(OH)-CH2-CH2-C(=O)-CH_3"
+    }, {
+      "at" : "option:3",
+      "page" : 24,
+      "description" : "structure: phenyl-C(H_3C)(OH)-CH2-CH2-C(OH)(CH_3)(CH_3)"
+    }, {
+      "at" : "option:4",
+      "page" : 24,
+      "description" : "structure: phenyl-C(=O)-CH2-CH2-C(=O)-CH_3"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 24 ],
+      "ai_call_ids" : [ "1af30439-99d1-469a-b8ea-a006ba8d2e30" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 24 — reaction: phenyl ketone C6H5-C(=O)-CH2-CH2-CN; arrow with (i) CH_3MgBr (excess) above and (ii) H_3O^+ below", "figure at option:1 on page 24 — structure: carbon bearing CH_3, OH and a ring drawn as hexagon (no inner circle shown clearly), attached to CH2-CH2-CN", "figure at option:2 on page 24 — structure: phenyl-C(CH_3)(OH)-CH2-CH2-C(=O)-CH_3", "figure at option:3 on page 24 — structure: phenyl-C(H_3C)(OH)-CH2-CH2-C(OH)(CH_3)(CH_3)", "figure at option:4 on page 24 — structure: phenyl-C(=O)-CH2-CH2-C(=O)-CH_3" ]
+    }
+  }, {
+    "no" : 79,
+    "stem_en" : "Which of the following aqueous solution will exhibit highest boiling point?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "0.01M Urea"
+    }, {
+      "key" : "2",
+      "text_en" : "0.01M KNO_3"
+    }, {
+      "key" : "3",
+      "text_en" : "0.01M Na_2SO_4"
+    }, {
+      "key" : "4",
+      "text_en" : "0.015M C_6H_12O_6"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 24 ],
+      "ai_call_ids" : [ "1af30439-99d1-469a-b8ea-a006ba8d2e30" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 80,
+    "stem_en" : "Match List - I with List - II\n\n| List-I | List-II |\n|---|---|\n| A. Haber process | I. Fe catalyst |\n| B. Wacker oxidation | II. PdCl_2 |\n| C. Wilkinson catalyst | III. [(PPh_3)_3RhCl] |\n| D. Ziegler catalyst | IV. TiCl_4 with Al(CH_3)_3 |\n\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-I, B-II, C-IV, D-III"
+    }, {
+      "key" : "2",
+      "text_en" : "A-II, B-III, C-I, D-IV"
+    }, {
+      "key" : "3",
+      "text_en" : "A-I, B-II, C-III, D-IV"
+    }, {
+      "key" : "4",
+      "text_en" : "A-I, B-IV, C-III, D-II"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 25 ],
+      "ai_call_ids" : [ "048f1e35-8118-494f-9f13-69c2d5fa98fa" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 81,
+    "stem_en" : "5 moles of liquid X and 10 moles of liquid Y make a solution having a vapour pressure of 70 torr. The vapour pressures of pure X and Y are 63 torr and 78 torr respectively. Which of the following is true regarding the described solution?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "The solution shows positive deviation."
+    }, {
+      "key" : "2",
+      "text_en" : "The solution shows negative deviation."
+    }, {
+      "key" : "3",
+      "text_en" : "The solution is ideal."
+    }, {
+      "key" : "4",
+      "text_en" : "The solution has volume greater than the sum of individual volumes."
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 25 ],
+      "ai_call_ids" : [ "048f1e35-8118-494f-9f13-69c2d5fa98fa" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 82,
+    "stem_en" : "Sugar 'X'\nA. is found in honey.\nB. is a keto sugar.\nC. exists in alpha and beta - anomeric forms.\nD. is laevorotatory.\n'X' is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "D-Glucose"
+    }, {
+      "key" : "2",
+      "text_en" : "D-Fructose"
+    }, {
+      "key" : "3",
+      "text_en" : "Maltose"
+    }, {
+      "key" : "4",
+      "text_en" : "Sucrose"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 25 ],
+      "ai_call_ids" : [ "048f1e35-8118-494f-9f13-69c2d5fa98fa" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 83,
+    "stem_en" : "Identify the suitable reagent for the following conversion.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "(i) LiAlH_4, (ii) H^+/H_2O"
+    }, {
+      "key" : "2",
+      "text_en" : "(i) AlH(iBu)_2 (ii) H_2O"
+    }, {
+      "key" : "3",
+      "text_en" : "(i) NaBH_4, (ii) H^+/H_2O"
+    }, {
+      "key" : "4",
+      "text_en" : "H_2 / Pd-BaSO_4"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 26,
+      "description" : "reaction scheme: methyl benzoate (benzene ring bearing C(=O)OCH3, drawn with C=O labelled O and OCH3) -> benzaldehyde (benzene ring bearing CHO)"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 26 ],
+      "ai_call_ids" : [ "fcd0e5cc-b428-4188-98ad-16d6860725c6" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 26 — reaction scheme: methyl benzoate (benzene ring bearing C(=O)OCH3, drawn with C=O labelled O and OCH3) -> benzaldehyde (benzene ring bearing CHO)" ]
+    }
+  }, {
+    "no" : 84,
+    "stem_en" : "Given below are two statements : one is labelled as Assertion (A) and the other is labelled as Reason (R).\nAssertion (A) : [zigzag chain]-I undergoes S_N2 reaction faster than [zigzag chain]-Cl.\nReason (R) : Iodine is a better leaving group because of its large size.\nIn the light of the above statements, choose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both A and R are true and R is the correct explanation of A"
+    }, {
+      "key" : "2",
+      "text_en" : "Both A and R are true but R is not the correct explanation of A"
+    }, {
+      "key" : "3",
+      "text_en" : "A is true but R is false"
+    }, {
+      "key" : "4",
+      "text_en" : "A is false but R is true"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 26,
+      "description" : "Assertion A: skeletal (zigzag) chain of four carbons ending in I undergoes S_N2 faster than the same four-carbon zigzag chain ending in Cl"
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 26 ],
+      "ai_call_ids" : [ "fcd0e5cc-b428-4188-98ad-16d6860725c6" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 26 — Assertion A: skeletal (zigzag) structure of an alkyl chain ending in I (iodoalkane) undergoes SN2 faster than the same zigzag chain ending in Cl (chloroalkane)" ]
+    }
+  }, {
+    "no" : 85,
+    "stem_en" : "The standard heat of formation, in kcal/mol of Ba^2+ is :\n[Given : standard heat of formation of SO_4^2- ion (aq) = - 216 kcal/mol, standard heat of crystallisation of BaSO_4(s) = - 4.5 kcal/mol, standard heat of formation of BaSO_4(s) = - 349 kcal/mol]",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "- 128.5"
+    }, {
+      "key" : "2",
+      "text_en" : "- 133.0"
+    }, {
+      "key" : "3",
+      "text_en" : "+ 133.0"
+    }, {
+      "key" : "4",
+      "text_en" : "+ 220.5"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 26 ],
+      "ai_call_ids" : [ "fcd0e5cc-b428-4188-98ad-16d6860725c6" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 86,
+    "stem_en" : "Total number of possible isomers (both structural as well as stereoisomers) of cyclic ethers of molecular formula C_4H_8O is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "6"
+    }, {
+      "key" : "2",
+      "text_en" : "8"
+    }, {
+      "key" : "3",
+      "text_en" : "10"
+    }, {
+      "key" : "4",
+      "text_en" : "11"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 26 ],
+      "ai_call_ids" : [ "fcd0e5cc-b428-4188-98ad-16d6860725c6" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 87,
+    "stem_en" : "Identify the correct orders against the property mentioned\nA. H_2O > NH_3 > CHCl_3 – dipole moment\nB. XeF_4 > XeO_3 > XeF_2 – number of lone pairs on central atom\nC. O–H > C–H > N–O – bond length\nD. N_2 > O_2 > H_2 – bond enthalpy\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A, D only"
+    }, {
+      "key" : "2",
+      "text_en" : "B, D only"
+    }, {
+      "key" : "3",
+      "text_en" : "A, C only"
+    }, {
+      "key" : "4",
+      "text_en" : "B, C only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 27 ],
+      "ai_call_ids" : [ "0ba1a875-2b58-47f5-922e-daaf9f64c248" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 88,
+    "stem_en" : "Higher yield of NO in N_2(g) + O_2(g) ⇌ 2NO(g) can be obtained at\n[Delta H of the reaction = + 180.7 kJ mol^-1]\nA. higher temperature\nB. lower temperature\nC. higher concentration of N_2\nD. higher concentration of O_2\nChoose the correct answer from the options given below:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A, D only"
+    }, {
+      "key" : "2",
+      "text_en" : "B, C only"
+    }, {
+      "key" : "3",
+      "text_en" : "B, C, D only"
+    }, {
+      "key" : "4",
+      "text_en" : "A, C, D only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 27 ],
+      "ai_call_ids" : [ "0ba1a875-2b58-47f5-922e-daaf9f64c248" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 89,
+    "stem_en" : "If the rate constant of a reaction is 0.03 s^-1, how much time does it take for 7.2 mol L^-1 concentration of the reactant to get reduced to 0.9 mol L^-1?\n(Given: log 2 = 0.301)",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "69.3 s"
+    }, {
+      "key" : "2",
+      "text_en" : "23.1 s"
+    }, {
+      "key" : "3",
+      "text_en" : "210 s"
+    }, {
+      "key" : "4",
+      "text_en" : "21.0 s"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 27 ],
+      "ai_call_ids" : [ "0ba1a875-2b58-47f5-922e-daaf9f64c248" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 90,
+    "stem_en" : "Which one of the following reactions does NOT belong to \"Lassaigne's test\"?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Na + C + N -> NaCN (Delta)"
+    }, {
+      "key" : "2",
+      "text_en" : "2Na + S -> Na_2S (Delta)"
+    }, {
+      "key" : "3",
+      "text_en" : "Na + X -> + NaX (Delta)"
+    }, {
+      "key" : "4",
+      "text_en" : "2CuO + C -> 2Cu + CO_2 (Delta)"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 27 ],
+      "ai_call_ids" : [ "0ba1a875-2b58-47f5-922e-daaf9f64c248" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    },
+    "as_printed" : [ {
+      "at" : "option:3",
+      "printed" : "-> + NaX",
+      "intended" : "-> NaX",
+      "note" : "A stray '+' is printed after the arrow: '-> NaX' is meant.",
+      "display" : "show"
+    } ]
+  }, {
+    "no" : 91,
+    "stem_en" : "The complex II of mitochondrial electron transport chain is also known as",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Cytochrome bc_1"
+    }, {
+      "key" : "2",
+      "text_en" : "Succinate dehydrogenase"
+    }, {
+      "key" : "3",
+      "text_en" : "Cytochrome c oxidase"
+    }, {
+      "key" : "4",
+      "text_en" : "NADH dehydrogenase"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 28 ],
+      "ai_call_ids" : [ "3b704a29-c517-4ece-a39a-7f2fc693cd8c" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 92,
+    "stem_en" : "Polymerase chain reaction (PCR) amplifies DNA following the equation.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "N^2"
+    }, {
+      "key" : "2",
+      "text_en" : "2^n"
+    }, {
+      "key" : "3",
+      "text_en" : "2n + 1"
+    }, {
+      "key" : "4",
+      "text_en" : "2N^2"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 28 ],
+      "ai_call_ids" : [ "3b704a29-c517-4ece-a39a-7f2fc693cd8c" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 93,
+    "stem_en" : "What are the potential drawbacks in adoption of the IVF method?\nA. High fatality risk to mother\nB. Expensive instruments and reagents\nC. Husband/wife necessary for being donors\nD. Less adoption of orphans\nE. Not available in India\nF. Possibility that the early embryo does not survive\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "B, D, F only"
+    }, {
+      "key" : "2",
+      "text_en" : "A, C, D, F only"
+    }, {
+      "key" : "3",
+      "text_en" : "A, B, C, D only"
+    }, {
+      "key" : "4",
+      "text_en" : "A, B, C, E, F only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 28 ],
+      "ai_call_ids" : [ "3b704a29-c517-4ece-a39a-7f2fc693cd8c" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 94,
+    "stem_en" : "What is the name of the blood vessel that carries deoxygenated blood from the body to the heart in a frog ?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Aorta"
+    }, {
+      "key" : "2",
+      "text_en" : "Pulmonary artery"
+    }, {
+      "key" : "3",
+      "text_en" : "Pulmonary vein"
+    }, {
+      "key" : "4",
+      "text_en" : "Vena cava"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 28 ],
+      "ai_call_ids" : [ "3b704a29-c517-4ece-a39a-7f2fc693cd8c" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 95,
+    "stem_en" : "Which one of the following statements refers to Reductionist Biology?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Physico-chemical approach to study and understand living organisms."
+    }, {
+      "key" : "2",
+      "text_en" : "Physiological approach to study and understand living organisms."
+    }, {
+      "key" : "3",
+      "text_en" : "Chemical approach to study and understand living organisms."
+    }, {
+      "key" : "4",
+      "text_en" : "Behavioural approach to study and understand living organisms."
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 28 ],
+      "ai_call_ids" : [ "3b704a29-c517-4ece-a39a-7f2fc693cd8c" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 96,
+    "stem_en" : "Given below are two statements :\nStatement I : In the RNA world, RNA is considered the first genetic material evolved to carry out essential life processes. RNA acts as a genetic material and also as a catalyst for some important biochemical reactions in living systems. Being reactive, RNA is unstable.\nStatement II : DNA evolved from RNA and is a more stable genetic material. Its double helical strands being complementary, resist changes by evolving repairing mechanism.\nIn the light of the above statements, choose the most appropriate answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both statement I and statement II are correct"
+    }, {
+      "key" : "2",
+      "text_en" : "Both statement I and statement II are incorrect"
+    }, {
+      "key" : "3",
+      "text_en" : "Statement I is correct but statement II is incorrect"
+    }, {
+      "key" : "4",
+      "text_en" : "Statement I is incorrect but statement II is correct"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 28 ],
+      "ai_call_ids" : [ "3b704a29-c517-4ece-a39a-7f2fc693cd8c" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 97,
+    "stem_en" : "Epiphytes that are growing on a mango branch is an example of which of the following?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Commensalism"
+    }, {
+      "key" : "2",
+      "text_en" : "Mutualism"
+    }, {
+      "key" : "3",
+      "text_en" : "Predation"
+    }, {
+      "key" : "4",
+      "text_en" : "Amensalism"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 29 ],
+      "ai_call_ids" : [ "b082dc43-1724-43f5-a9a7-84c76bb2ab7f" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 98,
+    "stem_en" : "From the statements given below choose the correct option :\nA. The eukaryotic ribosomes are 80S and prokaryotic ribosomes are 70S.\nB. Each ribosome has two sub-units.\nC. The two sub-units of 80S ribosome are 60S and 40S while that of 70S are 50S and 30S.\nD. The two sub-units of 80S ribosome are 60S and 20S and that of 70S are 50S and 20S.\nE. The two sub-units of 80S are 60S and 30S and that of 70S are 50S and 30S.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A, B, C are true"
+    }, {
+      "key" : "2",
+      "text_en" : "A, B, D are true"
+    }, {
+      "key" : "3",
+      "text_en" : "A, B, E are true"
+    }, {
+      "key" : "4",
+      "text_en" : "B, D, E are true"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 29 ],
+      "ai_call_ids" : [ "b082dc43-1724-43f5-a9a7-84c76bb2ab7f" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 99,
+    "stem_en" : "Which one of the following is an example of ex-situ conservation?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "National Park"
+    }, {
+      "key" : "2",
+      "text_en" : "Wildlife Sanctuary"
+    }, {
+      "key" : "3",
+      "text_en" : "Zoos and botanical gardens"
+    }, {
+      "key" : "4",
+      "text_en" : "Protected areas"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 29 ],
+      "ai_call_ids" : [ "b082dc43-1724-43f5-a9a7-84c76bb2ab7f" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 100,
+    "stem_en" : "Given below are two statements :\nStatement I : The primary source of energy in an ecosystem is solar energy.\nStatement II : The rate of production of organic matter during photosynthesis in an ecosystem is called net primary productivity (NPP).\nIn the light of the above statements, choose the most appropriate answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both statement I and statement II are correct"
+    }, {
+      "key" : "2",
+      "text_en" : "Both statement I and statement II are incorrect"
+    }, {
+      "key" : "3",
+      "text_en" : "Statement I is correct but statement II is incorrect"
+    }, {
+      "key" : "4",
+      "text_en" : "Statement I is incorrect but statement II is correct"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 29 ],
+      "ai_call_ids" : [ "b082dc43-1724-43f5-a9a7-84c76bb2ab7f" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 101,
+    "stem_en" : "Match List - I with List - II.\n\n| List - I | List - II |\n|---|---|\n| A. Emphysema | I. Rapid spasms in muscle due to low Ca^++ in body fluid |\n| B. Angina Pectoris | II. Damaged alveolar walls and decreased respiratory surface |\n| C. Glomerulonephritis | III. Acute chest pain when not enough oxygen is reaching to heart muscle |\n| D. Tetany | IV. Inflammation of glomeruli of kidney |\n\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-III, B-I, C-IV, D-II"
+    }, {
+      "key" : "2",
+      "text_en" : "A-III, B-I, C-II, D-IV"
+    }, {
+      "key" : "3",
+      "text_en" : "A-II, B-IV, C-III, D-I"
+    }, {
+      "key" : "4",
+      "text_en" : "A-II, B-III, C-IV, D-I"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 30 ],
+      "ai_call_ids" : [ "86a591f9-cf9b-47ab-a0ea-6c2d4d2452d2" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 102,
+    "stem_en" : "Given below are two statements : One is labelled as Assertion (A) and the other is labelled as Reason (R).\nAssertion (A) : Both wind and water pollinated flowers are not very colourful and do not produce nectar.\nReason (R) : The flowers produce enormous amount of pollen grains in wind and water pollinated flowers.\nIn the light of the above statements, choose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both A and R are true and R is the correct explanation of A"
+    }, {
+      "key" : "2",
+      "text_en" : "Both A and R are true but R is NOT the correct explanation of A"
+    }, {
+      "key" : "3",
+      "text_en" : "A is true but R is false"
+    }, {
+      "key" : "4",
+      "text_en" : "A is false but R is true"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 30 ],
+      "ai_call_ids" : [ "86a591f9-cf9b-47ab-a0ea-6c2d4d2452d2" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 103,
+    "stem_en" : "Which of the following is an example of non-distilled alcoholic beverage produced by yeast?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Whisky"
+    }, {
+      "key" : "2",
+      "text_en" : "Brandy"
+    }, {
+      "key" : "3",
+      "text_en" : "Beer"
+    }, {
+      "key" : "4",
+      "text_en" : "Rum"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 30 ],
+      "ai_call_ids" : [ "86a591f9-cf9b-47ab-a0ea-6c2d4d2452d2" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 104,
+    "stem_en" : "Given below are two statements :\nStatement I : In a floral formula ⊕ stands for zygomorphic nature of the flower, and G_underline stands for inferior ovary.\nStatement II : In a floral formula ⊕ stands for actinomorphic nature of the flower and G_underline stands for superior ovary.\nIn the light of the above statements, choose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both Statement I and Statement II are correct"
+    }, {
+      "key" : "2",
+      "text_en" : "Both Statement I and Statement II are incorrect"
+    }, {
+      "key" : "3",
+      "text_en" : "Statement I is correct but Statement II is incorrect"
+    }, {
+      "key" : "4",
+      "text_en" : "Statement I is incorrect but Statement II is correct"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 30 ],
+      "ai_call_ids" : [ "86a591f9-cf9b-47ab-a0ea-6c2d4d2452d2" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 105,
+    "stem_en" : "Streptokinase produced by bacterium Streptococcus is used for",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Curd production"
+    }, {
+      "key" : "2",
+      "text_en" : "Ethanol production"
+    }, {
+      "key" : "3",
+      "text_en" : "Liver disease treatment"
+    }, {
+      "key" : "4",
+      "text_en" : "Removing clots from blood vessels"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 31 ],
+      "ai_call_ids" : [ "f1369442-2ad0-484e-b3f5-8be9bedefb48" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 106,
+    "stem_en" : "Which chromosome in the human genome has the highest number of genes?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Chromosome X"
+    }, {
+      "key" : "2",
+      "text_en" : "Chromosome Y"
+    }, {
+      "key" : "3",
+      "text_en" : "Chromosome 1"
+    }, {
+      "key" : "4",
+      "text_en" : "Chromosome 10"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 31 ],
+      "ai_call_ids" : [ "f1369442-2ad0-484e-b3f5-8be9bedefb48" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 107,
+    "stem_en" : "Which of the following statement is correct about location of the male frog copulatory pad ?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "First and Second digit of fore limb"
+    }, {
+      "key" : "2",
+      "text_en" : "First digit of hind limb"
+    }, {
+      "key" : "3",
+      "text_en" : "Second digit of fore limb"
+    }, {
+      "key" : "4",
+      "text_en" : "First digit of the fore limb"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 31 ],
+      "ai_call_ids" : [ "f1369442-2ad0-484e-b3f5-8be9bedefb48" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 108,
+    "stem_en" : "Which one of the following phytohormones promotes nutrient mobilization which helps in the delay of leaf senescence in plants?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Ethylene"
+    }, {
+      "key" : "2",
+      "text_en" : "Abscisic acid"
+    }, {
+      "key" : "3",
+      "text_en" : "Gibberellin"
+    }, {
+      "key" : "4",
+      "text_en" : "Cytokinin"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 31 ],
+      "ai_call_ids" : [ "f1369442-2ad0-484e-b3f5-8be9bedefb48" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 109,
+    "stem_en" : "While trying to find out the characteristic of a newly found animal, a researcher did the histology of adult animal and observed a cavity with presence of mesodermal tissue towards the body wall but no mesodermal tissue was observed towards the alimentary canal. What could be the possible coelome of that animal ?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Acoelomate"
+    }, {
+      "key" : "2",
+      "text_en" : "Pseudocoelomate"
+    }, {
+      "key" : "3",
+      "text_en" : "Schizocoelomate"
+    }, {
+      "key" : "4",
+      "text_en" : "Spongocoelomate"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 31 ],
+      "ai_call_ids" : [ "f1369442-2ad0-484e-b3f5-8be9bedefb48" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 110,
+    "stem_en" : "Match List - I with List - II.\n\n| List - I | List - II |\n|---|---|\n| A. Head | I. Enzymes |\n| B. Middle piece | II. Sperm motility |\n| C. Acrosome | III. Energy |\n| D. Tail | IV. Genetic material |\n\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-IV, B-III, C-I, D-II"
+    }, {
+      "key" : "2",
+      "text_en" : "A-IV, B-III, C-II, D-I"
+    }, {
+      "key" : "3",
+      "text_en" : "A-III, B-IV, C-II, D-I"
+    }, {
+      "key" : "4",
+      "text_en" : "A-III, B-II, C-I, D-IV"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 31 ],
+      "ai_call_ids" : [ "f1369442-2ad0-484e-b3f5-8be9bedefb48" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 111,
+    "stem_en" : "Given below are the stages in the life cycle of pteridophytes. Arrange the following stages in the correct sequence.\nA. Prothallus stage\nB. Meiosis in spore mother cells\nC. Fertilisation\nD. Formation of archegonia and antheridia in gametophyte.\nE. Transfer of antherozoids to the archegonia in presence of water.\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "B, A, D, E, C"
+    }, {
+      "key" : "2",
+      "text_en" : "B, A, E, C, D"
+    }, {
+      "key" : "3",
+      "text_en" : "D, E, C, A, B"
+    }, {
+      "key" : "4",
+      "text_en" : "E, D, C, B, A"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 31 ],
+      "ai_call_ids" : [ "f1369442-2ad0-484e-b3f5-8be9bedefb48" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 112,
+    "stem_en" : "Cardiac activities of the heart are regulated by :\nA. Nodal tissue\nB. A special neural centre in the medulla oblongata\nC. Adrenal medullary hormones\nD. Adrenal cortical hormones\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A, B and C Only"
+    }, {
+      "key" : "2",
+      "text_en" : "A, B, C and D"
+    }, {
+      "key" : "3",
+      "text_en" : "A, C and D Only"
+    }, {
+      "key" : "4",
+      "text_en" : "A, B and D Only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 32 ],
+      "ai_call_ids" : [ "5afc585c-e918-4d61-a924-75ec51337ffb" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 113,
+    "stem_en" : "Which of following organisms cannot fix nitrogen?\nA. Azotobacter\nB. Oscillatoria\nC. Anabaena\nD. Volvox\nE. Nostoc\nChoose the correct answer from the options given below:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A only"
+    }, {
+      "key" : "2",
+      "text_en" : "D only"
+    }, {
+      "key" : "3",
+      "text_en" : "B only"
+    }, {
+      "key" : "4",
+      "text_en" : "E only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 32 ],
+      "ai_call_ids" : [ "5afc585c-e918-4d61-a924-75ec51337ffb" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    },
+    "as_printed" : [ {
+      "at" : "stem",
+      "printed" : "of following",
+      "intended" : "of the following",
+      "note" : "'the' is missing: 'of the following' is meant.",
+      "display" : "record_only"
+    } ]
+  }, {
+    "no" : 114,
+    "stem_en" : "Given below are two statements :\nStatement I : Transfer RNAs and ribosomal RNA do not interact with mRNA.\nStatement II : RNA interference (RNAi) takes place in all eukaryotic organisms as a method of cellular defence.\nIn the light of the above statements, choose the most appropriate answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both Statement I and Statement II are correct"
+    }, {
+      "key" : "2",
+      "text_en" : "Both Statement I and Statement II are incorrect"
+    }, {
+      "key" : "3",
+      "text_en" : "Statement I is correct but Statement II is incorrect"
+    }, {
+      "key" : "4",
+      "text_en" : "Statement I is incorrect but Statement II is correct"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 32 ],
+      "ai_call_ids" : [ "5afc585c-e918-4d61-a924-75ec51337ffb" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 115,
+    "stem_en" : "In the above represented plasmid an alien piece of DNA is inserted at EcoRI site. Which of the following strategies will be chosen to select the recombinant colonies?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Using ampicillin & tetracyclin containing medium plate."
+    }, {
+      "key" : "2",
+      "text_en" : "Blue color colonies will be selected."
+    }, {
+      "key" : "3",
+      "text_en" : "White color colonies will be selected."
+    }, {
+      "key" : "4",
+      "text_en" : "Blue color colonies grown on ampicillin plates can be selected."
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 32,
+      "description" : "Circular plasmid map labelled: BamHI site at top, Tet R (hatched segment) at top right, EcoRI site within β Galactosidase segment on right, amp (hatched segment) at bottom, Ori (striped block) on left."
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 32 ],
+      "ai_call_ids" : [ "5afc585c-e918-4d61-a924-75ec51337ffb" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 32 — Circular plasmid map labelled: BamHI site at top, Tet R (hatched segment) at top right, EcoRI site within β Galactosidase segment on right, amp (hatched segment) at bottom, Ori (striped block) on left." ]
+    }
+  }, {
+    "no" : 116,
+    "stem_en" : "Which of the following genetically engineered organisms was used by Eli Lilly to prepare human insulin?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Bacterium"
+    }, {
+      "key" : "2",
+      "text_en" : "Yeast"
+    }, {
+      "key" : "3",
+      "text_en" : "Virus"
+    }, {
+      "key" : "4",
+      "text_en" : "Phage"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 33 ],
+      "ai_call_ids" : [ "fdfa0594-addb-491a-afc0-ae0ea8ff5b59" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 117,
+    "stem_en" : "Name the class of enzyme that usually catalyze the following reaction :\nS - G + S^# -> S + S^# - G\nWhere, G -> a group other than hydrogen\nS -> a substrate\nS^# -> another substrate",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Hydrolase"
+    }, {
+      "key" : "2",
+      "text_en" : "Lyase"
+    }, {
+      "key" : "3",
+      "text_en" : "Transferase"
+    }, {
+      "key" : "4",
+      "text_en" : "Ligase"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 33 ],
+      "ai_call_ids" : [ "fdfa0594-addb-491a-afc0-ae0ea8ff5b59" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 118,
+    "stem_en" : "Find the statement that is NOT correct with regard to the structure of monocot stem.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Hypodermis is parenchymatous."
+    }, {
+      "key" : "2",
+      "text_en" : "Vascular bundles are scattered."
+    }, {
+      "key" : "3",
+      "text_en" : "Vascular bundles are conjoint and closed."
+    }, {
+      "key" : "4",
+      "text_en" : "Phloem parenchyma is absent."
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 33 ],
+      "ai_call_ids" : [ "fdfa0594-addb-491a-afc0-ae0ea8ff5b59" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 119,
+    "stem_en" : "The correct sequence of events in the life cycle of bryophytes is\nA. Fusion of antherozoid with egg.\nB. Attachment of gametophyte to substratum.\nC. Reduction division to produce haploid spores.\nD. Formation of sporophyte.\nE. Release of antherozoids into water.\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "D, E, A, C, B"
+    }, {
+      "key" : "2",
+      "text_en" : "B, E, A, C, D"
+    }, {
+      "key" : "3",
+      "text_en" : "B, E, A, D, C"
+    }, {
+      "key" : "4",
+      "text_en" : "D, E, A, B, C"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 33 ],
+      "ai_call_ids" : [ "fdfa0594-addb-491a-afc0-ae0ea8ff5b59" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 120,
+    "stem_en" : "Which are correct:\nA. Computed tomography and magnetic resonance imaging detect cancers of internal organs.\nB. Chemotherapeutics drugs are used to kill non-cancerous cells.\nC. alpha-interferon activate the cancer patients' immune system and helps in destroying the tumour.\nD. Chemotherapeutic drugs are biological response modifiers.\nE. In the case of leukaemia blood cell counts are decreased.\nChoose the correct answer from the options given below:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "B and D only"
+    }, {
+      "key" : "2",
+      "text_en" : "D and E only"
+    }, {
+      "key" : "3",
+      "text_en" : "C and D only"
+    }, {
+      "key" : "4",
+      "text_en" : "A and C only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 33 ],
+      "ai_call_ids" : [ "fdfa0594-addb-491a-afc0-ae0ea8ff5b59" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 121,
+    "stem_en" : "Match List - I with List - II.\n\n| List - I | List - II |\n|---|---|\n| A. Centromere | I. Mitochondrion |\n| B. Cilium | II. Cell division |\n| C. Cristae | III. Cell movement |\n| D. Cell membrane | IV. Phospholipid Bilayer |\n\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-I, B-II, C-III, D-IV"
+    }, {
+      "key" : "2",
+      "text_en" : "A-II, B-I, C-IV, D-III"
+    }, {
+      "key" : "3",
+      "text_en" : "A-IV, B-II, C-III, D-I"
+    }, {
+      "key" : "4",
+      "text_en" : "A-II, B-III, C-I, D-IV"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 34 ],
+      "ai_call_ids" : [ "b0a47db3-1f42-4cde-b7da-25287fd5dd95" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 122,
+    "stem_en" : "Match List I with List II :\n\n| List I | List II |\n|---|---|\n| A. Chlorophyll a | I. Yellow-green |\n| B. Chlorophyll b | II. Yellow |\n| C. Xanthophylls | III. Blue-green |\n| D. Carotenoids | IV. Yellow to Yellow-orange |\n\nChoose the option with all correct matches.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-III, B-IV, C-II, D-I"
+    }, {
+      "key" : "2",
+      "text_en" : "A-III, B-I, C-II, D-IV"
+    }, {
+      "key" : "3",
+      "text_en" : "A-I, B-II, C-IV, D-III"
+    }, {
+      "key" : "4",
+      "text_en" : "A-I, B-IV, C-III, D-II"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 34 ],
+      "ai_call_ids" : [ "b0a47db3-1f42-4cde-b7da-25287fd5dd95" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 123,
+    "stem_en" : "Find the correct statements :\nA. In human pregnancy, the major organ systems are formed at the end of 12 weeks.\nB. In human pregnancy the major organ systems are formed at the end of 8 weeks.\nC. In human pregnancy heart is formed after one month of gestation.\nD. In human pregnancy, limbs and digits develop by the end of second month.\nE. In human pregnancy the appearance of hair is usually observed in the fifth month.\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A and E Only"
+    }, {
+      "key" : "2",
+      "text_en" : "B and C Only"
+    }, {
+      "key" : "3",
+      "text_en" : "B, C, D and E Only"
+    }, {
+      "key" : "4",
+      "text_en" : "A, C, D and E Only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 34 ],
+      "ai_call_ids" : [ "b0a47db3-1f42-4cde-b7da-25287fd5dd95" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 124,
+    "stem_en" : "In the seeds of cereals, the outer covering of endosperm separates the embryo by a protein-rich layer called :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Coleoptile"
+    }, {
+      "key" : "2",
+      "text_en" : "Coleorhiza"
+    }, {
+      "key" : "3",
+      "text_en" : "Integument"
+    }, {
+      "key" : "4",
+      "text_en" : "Aleurone layer"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 34 ],
+      "ai_call_ids" : [ "b0a47db3-1f42-4cde-b7da-25287fd5dd95" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 125,
+    "stem_en" : "Which of the following diagrams is correct with regard to the proximal (P) and distal (D) tubule of the Nephron.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : ""
+    }, {
+      "key" : "2",
+      "text_en" : ""
+    }, {
+      "key" : "3",
+      "text_en" : ""
+    }, {
+      "key" : "4",
+      "text_en" : ""
+    } ],
+    "figures" : [ {
+      "at" : "option:1",
+      "page" : 35,
+      "description" : "Nephron tubule diagram with P and D segments. P: arrows out labelled HCO_3^- and NaCl at top; arrows in from bottom labelled H^+ and H_2O. D: top arrows NaCl, H_2O, HCO_3^-; bottom arrows K^+ and H^+."
+    }, {
+      "at" : "option:2",
+      "page" : 35,
+      "description" : "P: top arrows HCO_3^-, NaCl, H_2O; bottom H^+, NH_3. D: top NaCl, H_2O, HCO_3^-; bottom K^+, H^+."
+    }, {
+      "at" : "option:3",
+      "page" : 35,
+      "description" : "P: top HCO_3^-, NaCl, H_2O; bottom H^+, NH_3. D: top H_2O, HCO_3^-; bottom NaCl, H^+."
+    }, {
+      "at" : "option:4",
+      "page" : 35,
+      "description" : "P: top NaCl, HCO_3^-; bottom H^+, H_2O. D: top NaCl, NH_3; bottom K^+, H_2O."
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 35 ],
+      "ai_call_ids" : [ "ae6b9114-93c8-4ab7-babc-7e86d798844d" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at option:1 on page 35 — Nephron tubule diagram with P and D segments. P: arrows out labelled HCO_3^- and NaCl at top; arrows in from bottom labelled H^+ and H_2O. D: top arrows NaCl, H_2O, HCO_3^-; bottom arrows K^+ and H^+.", "figure at option:2 on page 35 — P: top arrows HCO_3^-, NaCl, H_2O; bottom H^+, NH_3. D: top NaCl, H_2O, HCO_3^-; bottom K^+, H^+.", "figure at option:3 on page 35 — P: top HCO_3^-, NaCl, H_2O; bottom H^+, NH_3. D: top H_2O, HCO_3^-; bottom NaCl, H^+.", "figure at option:4 on page 35 — P: top NaCl, HCO_3^-; bottom H^+, H_2O. D: top NaCl, NH_3; bottom K^+, H_2O." ]
+    }
+  }, {
+    "no" : 126,
+    "stem_en" : "Identify the part of a bio-reactor which is used as a foam braker from the given figure.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A"
+    }, {
+      "key" : "2",
+      "text_en" : "B"
+    }, {
+      "key" : "3",
+      "text_en" : "D"
+    }, {
+      "key" : "4",
+      "text_en" : "C"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 35,
+      "description" : "Bioreactor diagram: a vessel with a central shaft carrying discs with blades; label B points to a fitting on the shaft above the lid, C to the uppermost disc with blades near the top, A to the next disc with blades below it, D to the L-shaped pipe outside the vessel at its bottom right (a large ring inside at the bottom is unlabelled)."
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 35 ],
+      "ai_call_ids" : [ "ae6b9114-93c8-4ab7-babc-7e86d798844d" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 35 — Stirred-tank bioreactor diagram with central shaft and impellers; label B points to top fitting above vessel, C to upper disc near top, A to impeller below it, D to bottom sparger ring with tube." ]
+    },
+    "as_printed" : [ {
+      "at" : "stem",
+      "printed" : "braker",
+      "intended" : "breaker",
+      "note" : "'braker' is printed where 'breaker' is meant.",
+      "display" : "record_only"
+    } ]
+  }, {
+    "no" : 127,
+    "stem_en" : "Given below are two statements : One is labelled as Assertion (A) and the other is labelled as Reason (R).\nAssertion (A) : A typical unfertilised, angiosperm embryo sac at maturity is 8 nucleate and 7-celled.\nReason (R) : The egg apparatus has 2 polar nuclei.\nIn the light of the above statements, choose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both A and R are true and R is the correct explanation of A"
+    }, {
+      "key" : "2",
+      "text_en" : "Both A and R are true but R is NOT the correct explanation of A"
+    }, {
+      "key" : "3",
+      "text_en" : "A is true but R is false"
+    }, {
+      "key" : "4",
+      "text_en" : "A is false but R is true"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 35 ],
+      "ai_call_ids" : [ "ae6b9114-93c8-4ab7-babc-7e86d798844d" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 128,
+    "stem_en" : "A specialised membranous structure in a prokaryotic cell which helps in cell wall formation, DNA replication and respiration is :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Mesosome"
+    }, {
+      "key" : "2",
+      "text_en" : "Chromatophores"
+    }, {
+      "key" : "3",
+      "text_en" : "Cristae"
+    }, {
+      "key" : "4",
+      "text_en" : "Endoplasmic Reticulum"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 36 ],
+      "ai_call_ids" : [ "66c6febc-e82b-461d-b114-75d21b7e58db" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 129,
+    "stem_en" : "Which of the following are the post-transcriptional events in an eukaryotic cell?\nA. Transport of pre-mRNA to cytoplasm prior to splicing.\nB. Removal of introns and joining of exons.\nC. Addition of methyl group at 5' end of hnRNA.\nD. Addition of adenine residues at 3' end of hnRNA.\nE. Base pairing of two complementary RNAs.\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A, B, C only"
+    }, {
+      "key" : "2",
+      "text_en" : "B, C, D only"
+    }, {
+      "key" : "3",
+      "text_en" : "B, C, E only"
+    }, {
+      "key" : "4",
+      "text_en" : "C, D, E only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 36 ],
+      "ai_call_ids" : [ "66c6febc-e82b-461d-b114-75d21b7e58db" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 130,
+    "stem_en" : "What is the pattern of inheritance for polygenic trait?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Mendelian inheritance pattern"
+    }, {
+      "key" : "2",
+      "text_en" : "Non-mendelian inheritance pattern"
+    }, {
+      "key" : "3",
+      "text_en" : "Autosomal dominant pattern"
+    }, {
+      "key" : "4",
+      "text_en" : "X-linked recessive inheritance pattern"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 36 ],
+      "ai_call_ids" : [ "66c6febc-e82b-461d-b114-75d21b7e58db" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 131,
+    "stem_en" : "Which one of the following enzymes contains 'Haem' as the prosthetic group?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "RuBisCo"
+    }, {
+      "key" : "2",
+      "text_en" : "Carbonic anhydrase"
+    }, {
+      "key" : "3",
+      "text_en" : "Succinate dehydrogenase"
+    }, {
+      "key" : "4",
+      "text_en" : "Catalase"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 36 ],
+      "ai_call_ids" : [ "66c6febc-e82b-461d-b114-75d21b7e58db" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 132,
+    "stem_en" : "Each of the following characteristics represent a Kingdom proposed by Whittaker. Arrange the following in increasing order of complexity of body organization.\nA. Multicellular heterotrophs with cell wall made of chitin.\nB. Heterotrophs with tissue/organ/organ system level of body organization.\nC. Prokaryotes with cell wall made of polysaccharides and amino acids.\nD. Eukaryotic autotrophs with tissue/organ level of body organization.\nE. Eukaryotes with cellular body organization.\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A, C, E, B, D"
+    }, {
+      "key" : "2",
+      "text_en" : "C, E, A, D, B"
+    }, {
+      "key" : "3",
+      "text_en" : "A, C, E, D, B"
+    }, {
+      "key" : "4",
+      "text_en" : "C, E, A, B, D"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 36 ],
+      "ai_call_ids" : [ "66c6febc-e82b-461d-b114-75d21b7e58db" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 133,
+    "stem_en" : "Who is known as the father of Ecology in India?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "S. R. Kashyap"
+    }, {
+      "key" : "2",
+      "text_en" : "Ramdeo Misra"
+    }, {
+      "key" : "3",
+      "text_en" : "Ram Udar"
+    }, {
+      "key" : "4",
+      "text_en" : "Birbal Sahni"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 36 ],
+      "ai_call_ids" : [ "66c6febc-e82b-461d-b114-75d21b7e58db" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 134,
+    "stem_en" : "Match List I with List II :\n\n| List-I | List-II |\n|---|---|\n| A. Alfred Hershey and Martha Chase | I. Streptococcus pneumoniae |\n| B. Euchromatin | II. Densely packed and dark-stained |\n| C. Frederick Griffith | III. Loosely packed and light-stained |\n| D. Heterochromatin | IV. DNA as genetic material confirmation |\n\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-II, B-IV, C-I, D-III"
+    }, {
+      "key" : "2",
+      "text_en" : "A-IV, B-II, C-I, D-III"
+    }, {
+      "key" : "3",
+      "text_en" : "A-IV, B-III, C-I, D-II"
+    }, {
+      "key" : "4",
+      "text_en" : "A-III, B-II, C-IV, D-I"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 37 ],
+      "ai_call_ids" : [ "50201869-669b-48c2-beeb-470eafb3e206" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 135,
+    "stem_en" : "Neoplastic characteristics of cells refer to :\nA. A mass of proliferating cell\nB. Rapid growth of cells\nC. Invasion and damage to the surrounding tissue\nD. Those confined to original location\nChoose the correct answer from the options given below:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A, B only"
+    }, {
+      "key" : "2",
+      "text_en" : "A, B, C only"
+    }, {
+      "key" : "3",
+      "text_en" : "A, B, D only"
+    }, {
+      "key" : "4",
+      "text_en" : "B, C, D only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 37 ],
+      "ai_call_ids" : [ "50201869-669b-48c2-beeb-470eafb3e206" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 136,
+    "stem_en" : "Given below are two statements :\nStatement I : The DNA fragments extracted from gel electrophoresis can be used in construction of recombinant DNA.\nStatement II : Smaller size DNA fragments are observed near anode while larger fragments are found near the wells in an agarose gel.\nIn the light of the above statements, choose the most appropriate answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both statement I and statement II are correct"
+    }, {
+      "key" : "2",
+      "text_en" : "Both statement I and statement II are incorrect"
+    }, {
+      "key" : "3",
+      "text_en" : "Statement I is correct but statement II is incorrect"
+    }, {
+      "key" : "4",
+      "text_en" : "Statement I is incorrect but statement II is correct"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 37 ],
+      "ai_call_ids" : [ "50201869-669b-48c2-beeb-470eafb3e206" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 137,
+    "stem_en" : "Match List I with List II.\n\n| List I | List II |\n|---|---|\n| A. Adenosine | I. Nitrogen base |\n| B. Adenylic acid | II. Nucleotide |\n| C. Adenine | III. Nucleoside |\n| D. Alanine | IV. Amino acid |\n\nChoose the option with all correct matches.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-III, B-IV, C-II, D-I"
+    }, {
+      "key" : "2",
+      "text_en" : "A-III, B-II, C-IV, D-I"
+    }, {
+      "key" : "3",
+      "text_en" : "A-III, B-II, C-I, D-IV"
+    }, {
+      "key" : "4",
+      "text_en" : "A-II, B-III, C-I, D-IV"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 37 ],
+      "ai_call_ids" : [ "50201869-669b-48c2-beeb-470eafb3e206" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 138,
+    "stem_en" : "Consider the following :\nA. The reductive division for the human female gametogenesis starts earlier than that of the male gametogenesis.\nB. The gap between the first meiotic division and the second meiotic division is much shorter for males compared to females.\nC. The first polar body is associated with the formation of the primary oocyte.\nD. Luteinizing Hormone (LH) surge leads to disintegration of the endometrium and onset of menstrual bleeding.\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A and B are true"
+    }, {
+      "key" : "2",
+      "text_en" : "A and C are true"
+    }, {
+      "key" : "3",
+      "text_en" : "B and D are true"
+    }, {
+      "key" : "4",
+      "text_en" : "B and C are true"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 38 ],
+      "ai_call_ids" : [ "c166b745-93ce-490f-9f24-303bc150cfc7" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 139,
+    "stem_en" : "All living members of the class Cyclostomata are:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Free living"
+    }, {
+      "key" : "2",
+      "text_en" : "Endoparasite"
+    }, {
+      "key" : "3",
+      "text_en" : "Symbiotic"
+    }, {
+      "key" : "4",
+      "text_en" : "Ectoparasite"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 38 ],
+      "ai_call_ids" : [ "c166b745-93ce-490f-9f24-303bc150cfc7" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 140,
+    "stem_en" : "Given below are two statements : one is labelled as Assertion (A) and the other is labelled as Reason (R).\nAssertion (A) : The primary function of the Golgi apparatus is to package the materials made by the endoplasmic reticulum and deliver it to intracellular targets and outside the cell.\nReason (R) : Vesicles containing materials made by the endoplasmic reticulum fuse with the cis face of the Golgi apparatus, and they are modified and released from the trans face of the Golgi apparatus.\nIn the light of the above statements, choose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both A and R are true and R is the correct explanation of A"
+    }, {
+      "key" : "2",
+      "text_en" : "Both A and R are true but R is not the correct explanation of A"
+    }, {
+      "key" : "3",
+      "text_en" : "A is true but R is false"
+    }, {
+      "key" : "4",
+      "text_en" : "A is false but R is true"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 38 ],
+      "ai_call_ids" : [ "c166b745-93ce-490f-9f24-303bc150cfc7" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 141,
+    "stem_en" : "Match List I with List II :\n\n| List I | List II |\n|---|---|\n| A. Scutellum | I. Persistent nucellus |\n| B. Non-albuminous seed | II. Cotyledon of Monocot seed |\n| C. Epiblast | III. Groundnut |\n| D. Perisperm | IV. Rudimentary cotyledon |\n\nChoose the option with all correct matches.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-II, B-III, C-IV, D-I"
+    }, {
+      "key" : "2",
+      "text_en" : "A-IV, B-III, C-II, D-I"
+    }, {
+      "key" : "3",
+      "text_en" : "A-IV, B-III, C-I, D-II"
+    }, {
+      "key" : "4",
+      "text_en" : "A-II, B-IV, C-III, D-I"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 38 ],
+      "ai_call_ids" : [ "c166b745-93ce-490f-9f24-303bc150cfc7" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 142,
+    "stem_en" : "Given below are two statements : one is labelled as Assertion (A) and the other is labelled as Reason (R).\nAssertion (A) : All vertebrates are chordates but all chordates are not vertebrate.\nReason (R) : The members of subphylum vertebrata possess notochord during the embryonic period, the notochord is replaced by a cartilaginous or bony vertebral column in adults.\nIn the light of the above statements, choose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both A and R are true and R is the correct explanation of A"
+    }, {
+      "key" : "2",
+      "text_en" : "Both A and R are true but R is not the correct explanation of A"
+    }, {
+      "key" : "3",
+      "text_en" : "A is true but R is false"
+    }, {
+      "key" : "4",
+      "text_en" : "A is false but R is true"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 39 ],
+      "ai_call_ids" : [ "1ccd1b85-0048-4261-a54b-6bf74268fbaf" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 143,
+    "stem_en" : "Identify the statement that is NOT correct.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Each antibody has two light and two heavy chains."
+    }, {
+      "key" : "2",
+      "text_en" : "The heavy and light chains are held together by disulfide bonds."
+    }, {
+      "key" : "3",
+      "text_en" : "Antigen binding site is located at C-terminal region of antibody molecules."
+    }, {
+      "key" : "4",
+      "text_en" : "Constant region of heavy and light chains are located at C-terminus of antibody molecules."
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 39 ],
+      "ai_call_ids" : [ "1ccd1b85-0048-4261-a54b-6bf74268fbaf" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 144,
+    "stem_en" : "Silencing of specific mRNA is possible via RNAi because of -",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Complementary dsRNA"
+    }, {
+      "key" : "2",
+      "text_en" : "Inhibitory ssRNA"
+    }, {
+      "key" : "3",
+      "text_en" : "Complementary tRNA"
+    }, {
+      "key" : "4",
+      "text_en" : "Non-complementary ssRNA"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 39 ],
+      "ai_call_ids" : [ "1ccd1b85-0048-4261-a54b-6bf74268fbaf" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 145,
+    "stem_en" : "Genes R and Y follow independent assortment. If RRYY produce round yellow seeds and rryy produce wrinkled green seeds, what will be the phenotypic ratio of the F2 generation?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Phenotypic ratio - 1 : 2 : 1"
+    }, {
+      "key" : "2",
+      "text_en" : "Phenotypic ratio - 3 : 1"
+    }, {
+      "key" : "3",
+      "text_en" : "Phenotypic ratio - 9 : 3 : 3 : 1"
+    }, {
+      "key" : "4",
+      "text_en" : "Phenotypic ratio - 9 : 7"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 39 ],
+      "ai_call_ids" : [ "1ccd1b85-0048-4261-a54b-6bf74268fbaf" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 146,
+    "stem_en" : "Histones are enriched with -",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Lysine & Arginine"
+    }, {
+      "key" : "2",
+      "text_en" : "Leucine & Lysine"
+    }, {
+      "key" : "3",
+      "text_en" : "Phenylalanine & Leucine"
+    }, {
+      "key" : "4",
+      "text_en" : "Phenylalanine & Arginine"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 39 ],
+      "ai_call_ids" : [ "1ccd1b85-0048-4261-a54b-6bf74268fbaf" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 147,
+    "stem_en" : "The first menstruation is called :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Menopause"
+    }, {
+      "key" : "2",
+      "text_en" : "Menarche"
+    }, {
+      "key" : "3",
+      "text_en" : "Diapause"
+    }, {
+      "key" : "4",
+      "text_en" : "Ovulation"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 39 ],
+      "ai_call_ids" : [ "1ccd1b85-0048-4261-a54b-6bf74268fbaf" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 148,
+    "stem_en" : "Match List - I with List - II.\n\n| List - I | List - II |\n|---|---|\n| A. Heart | I. Erythropoietin |\n| B. Kidney | II. Aldosterone |\n| C. Gastro-intestinal tract | III. Atrial natriuretic factor |\n| D. Adrenal Cortex | IV. Secretin |\n\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-II, B-I, C-III, D-IV"
+    }, {
+      "key" : "2",
+      "text_en" : "A-IV, B-III, C-II, D-I"
+    }, {
+      "key" : "3",
+      "text_en" : "A-I, B-III, C-IV, D-II"
+    }, {
+      "key" : "4",
+      "text_en" : "A-III, B-I, C-IV, D-II"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 40 ],
+      "ai_call_ids" : [ "23e63d14-25ee-4d5d-948f-309113b2f210" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 149,
+    "stem_en" : "The protein portion of an enzyme is called :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Cofactor"
+    }, {
+      "key" : "2",
+      "text_en" : "Coenzyme"
+    }, {
+      "key" : "3",
+      "text_en" : "Apoenzyme"
+    }, {
+      "key" : "4",
+      "text_en" : "Prosthetic group"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 40 ],
+      "ai_call_ids" : [ "23e63d14-25ee-4d5d-948f-309113b2f210" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 150,
+    "stem_en" : "Which of the following is the unit of productivity of an Ecosystem?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "gm^-2"
+    }, {
+      "key" : "2",
+      "text_en" : "KCal m^-2"
+    }, {
+      "key" : "3",
+      "text_en" : "KCal m^-3"
+    }, {
+      "key" : "4",
+      "text_en" : "(KCal m^-2)yr^-1"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 40 ],
+      "ai_call_ids" : [ "23e63d14-25ee-4d5d-948f-309113b2f210" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 151,
+    "stem_en" : "Sweet potato and potato represent a certain type of evolution. Select the correct combination of terms to explain the evolution.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Analogy, convergent"
+    }, {
+      "key" : "2",
+      "text_en" : "Homology, divergent"
+    }, {
+      "key" : "3",
+      "text_en" : "Homology, convergent"
+    }, {
+      "key" : "4",
+      "text_en" : "Analogy, divergent"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 40 ],
+      "ai_call_ids" : [ "23e63d14-25ee-4d5d-948f-309113b2f210" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 152,
+    "stem_en" : "With the help of given pedigree, find out the probability for the birth of a child having no disease and being a carrier (has the disease mutation in one allele of the gene) in F_3 generation.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "1/4"
+    }, {
+      "key" : "2",
+      "text_en" : "1/2"
+    }, {
+      "key" : "3",
+      "text_en" : "1/8"
+    }, {
+      "key" : "4",
+      "text_en" : "Zero"
+    } ],
+    "figures" : [ {
+      "at" : "stem",
+      "page" : 40,
+      "description" : "Pedigree chart: F0 unaffected male × affected female (filled circle). F1: carrier female (dotted circle) married to unaffected male (left), and carrier female married to unaffected male (right). F2: from left couple, two carrier females; from right couple, affected male (filled square) and unaffected female. Left F2 second carrier female in consanguineous marriage (double line) with affected male. F3: four children marked ? — square, circle, circle, square. Legend: unaffected male, affected male, carrier female, unaffected female, affected female."
+    } ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 40 ],
+      "ai_call_ids" : [ "23e63d14-25ee-4d5d-948f-309113b2f210" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ "figure at stem on page 40 — Pedigree chart: F0 unaffected male × affected female (filled circle). F1: carrier female (dotted circle) married to unaffected male (left), and carrier female married to unaffected male (right). F2: from left couple, two carrier females; from right couple, affected male (filled square) and unaffected female. Left F2 second carrier female in consanguineous marriage (double line) with affected male. F3: four children marked ? — square, circle, circle, square. Legend: unaffected male, affected male, carrier female, unaffected female, affected female." ]
+    }
+  }, {
+    "no" : 153,
+    "stem_en" : "Given below are two statements : One is labelled as Assertion (A) and the other is labelled as Reason (R).\nAssertion (A) : Cells of the tapetum possess dense cytoplasm and generally have more than one nucleus.\nReason (R) : Presence of more than one nucleus in the tapetum increases the efficiency of nourishing the developing microspore mother cells.\nIn light of the above statements, choose the most appropriate answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both A and R are true and R is the correct explanation of A"
+    }, {
+      "key" : "2",
+      "text_en" : "Both A and R are true but R is NOT the correct explanation of A"
+    }, {
+      "key" : "3",
+      "text_en" : "A is true but R is false"
+    }, {
+      "key" : "4",
+      "text_en" : "A is false but R is true"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 41 ],
+      "ai_call_ids" : [ "c6cc0893-5ddb-4c7b-ae4a-37a63fc05609" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 154,
+    "stem_en" : "How many meiotic and mitotic divisions need to occur for the development of a mature female gametophyte from the megaspore mother cell in an angiosperm plant?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "2 Meiosis and 3 Mitosis"
+    }, {
+      "key" : "2",
+      "text_en" : "1 Meiosis and 2 Mitosis"
+    }, {
+      "key" : "3",
+      "text_en" : "1 Meiosis and 3 Mitosis"
+    }, {
+      "key" : "4",
+      "text_en" : "No Meiosis and 2 Mitosis"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 41 ],
+      "ai_call_ids" : [ "c6cc0893-5ddb-4c7b-ae4a-37a63fc05609" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 155,
+    "stem_en" : "Which of the following is an example of a zygomorphic flower?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Petunia"
+    }, {
+      "key" : "2",
+      "text_en" : "Datura"
+    }, {
+      "key" : "3",
+      "text_en" : "Pea"
+    }, {
+      "key" : "4",
+      "text_en" : "Chilli"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 41 ],
+      "ai_call_ids" : [ "c6cc0893-5ddb-4c7b-ae4a-37a63fc05609" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 156,
+    "stem_en" : "After maturation, in primary lymphoid organs, the lymphocytes migrate for interaction with antigens to secondary lymphoid organ(s) / tissue(s) like:\nA. thymus\nB. bone marrow\nC. spleen\nD. lymph nodes\nE. Peyer's patches\nChoose the correct answer from the options given below:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "B, C, D only"
+    }, {
+      "key" : "2",
+      "text_en" : "A, B, C only"
+    }, {
+      "key" : "3",
+      "text_en" : "E, A, B only"
+    }, {
+      "key" : "4",
+      "text_en" : "C, D, E only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 41 ],
+      "ai_call_ids" : [ "c6cc0893-5ddb-4c7b-ae4a-37a63fc05609" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 157,
+    "stem_en" : "Given below are two statements :\nStatement I : Fig fruit is a non-vegetarian fruit as it has enclosed fig wasps in it.\nStatement II : Fig wasp and fig tree exhibit mutual relationship as fig wasp completes its life cycle in fig fruit and fig fruit gets pollinated by fig wasp.\nIn the light of the above statements, choose the most appropriate answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both statement I and statement II are correct"
+    }, {
+      "key" : "2",
+      "text_en" : "Both statement I and statement II are incorrect"
+    }, {
+      "key" : "3",
+      "text_en" : "Statement I is correct but statement II is incorrect"
+    }, {
+      "key" : "4",
+      "text_en" : "Statement I is incorrect but statement II is correct"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 41 ],
+      "ai_call_ids" : [ "c6cc0893-5ddb-4c7b-ae4a-37a63fc05609" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 158,
+    "stem_en" : "What is the main function of the spindle fibers during mitosis ?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "To separate the chromosomes"
+    }, {
+      "key" : "2",
+      "text_en" : "To synthesize new DNA"
+    }, {
+      "key" : "3",
+      "text_en" : "To repair damaged DNA"
+    }, {
+      "key" : "4",
+      "text_en" : "To regulate cell growth"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 42 ],
+      "ai_call_ids" : [ "0dd90817-dccb-4f1d-8f35-97bb0b8f20ca" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 159,
+    "stem_en" : "Which one of the following is the characteristic feature of gymnosperms?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Seeds are enclosed in fruits."
+    }, {
+      "key" : "2",
+      "text_en" : "Seeds are naked."
+    }, {
+      "key" : "3",
+      "text_en" : "Seeds are absent."
+    }, {
+      "key" : "4",
+      "text_en" : "Gymnosperms have flowers for reproduction."
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 42 ],
+      "ai_call_ids" : [ "0dd90817-dccb-4f1d-8f35-97bb0b8f20ca" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 160,
+    "stem_en" : "Consider the following statements regarding function of adrenal medullary hormones :\nA. It causes pupilary constriction\nB. It is a hyperglycemic hormone\nC. It causes piloerection\nD. It increases strength of heart contraction\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "C and D Only"
+    }, {
+      "key" : "2",
+      "text_en" : "B, C and D Only"
+    }, {
+      "key" : "3",
+      "text_en" : "A, C and D Only"
+    }, {
+      "key" : "4",
+      "text_en" : "D Only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 42 ],
+      "ai_call_ids" : [ "0dd90817-dccb-4f1d-8f35-97bb0b8f20ca" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 161,
+    "stem_en" : "Why can't insulin be given orally to diabetic patients?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Human body will elicit strong immune response"
+    }, {
+      "key" : "2",
+      "text_en" : "It will be digested in Gastro-Intestinal (GI) tract"
+    }, {
+      "key" : "3",
+      "text_en" : "Because of structural variation"
+    }, {
+      "key" : "4",
+      "text_en" : "Its bioavailability will be increased"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 42 ],
+      "ai_call_ids" : [ "0dd90817-dccb-4f1d-8f35-97bb0b8f20ca" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 162,
+    "stem_en" : "Match List I with List II.\n\n| List I | List II |\n|---|---|\n| A. Pteridophyte | I. Salvia |\n| B. Bryophyte | II. Ginkgo |\n| C. Angiosperm | III. Polytrichum |\n| D. Gymnosperm | IV. Salvinia |\n\nChoose the option with all correct matches.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-III, B-IV, C-II, D-I"
+    }, {
+      "key" : "2",
+      "text_en" : "A-IV, B-III, C-I, D-II"
+    }, {
+      "key" : "3",
+      "text_en" : "A-III, B-IV, C-I, D-II"
+    }, {
+      "key" : "4",
+      "text_en" : "A-IV, B-III, C-II, D-I"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 42 ],
+      "ai_call_ids" : [ "0dd90817-dccb-4f1d-8f35-97bb0b8f20ca" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 163,
+    "stem_en" : "Who proposed that the genetic code for amino acids should be made up of three nucleotides?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "George Gamow"
+    }, {
+      "key" : "2",
+      "text_en" : "Francis Crick"
+    }, {
+      "key" : "3",
+      "text_en" : "Jacque Monod"
+    }, {
+      "key" : "4",
+      "text_en" : "Franklin Stahl"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 42 ],
+      "ai_call_ids" : [ "0dd90817-dccb-4f1d-8f35-97bb0b8f20ca" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 164,
+    "stem_en" : "Match List I with List II :\n\n| List I | List II |\n|---|---|\n| A. The Evil Quartet | I. Cryopreservation |\n| B. Ex situ conservation | II. Alien species invasion |\n| C. Lantana camara | III. Causes of biodiversity losses |\n| D. Dodo | IV. Extinction |\n\nChoose the option with all correct matches.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-III, B-II, C-I, D-IV"
+    }, {
+      "key" : "2",
+      "text_en" : "A-III, B-I, C-II, D-IV"
+    }, {
+      "key" : "3",
+      "text_en" : "A-III, B-IV, C-II, D-I"
+    }, {
+      "key" : "4",
+      "text_en" : "A-III, B-II, C-IV, D-I"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 43 ],
+      "ai_call_ids" : [ "503d6c00-cbdc-435f-add2-6dc9c5130045" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 165,
+    "stem_en" : "Which of the following hormones released from the pituitary is actually synthesized in the hypothalamus ?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Luteinizing hormone (LH)"
+    }, {
+      "key" : "2",
+      "text_en" : "Anti-diuretic hormone (ADH)"
+    }, {
+      "key" : "3",
+      "text_en" : "Follicle-stimulating hormone (FSH)"
+    }, {
+      "key" : "4",
+      "text_en" : "Adenocorticotrophic hormone (ACTH)"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 43 ],
+      "ai_call_ids" : [ "503d6c00-cbdc-435f-add2-6dc9c5130045" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 166,
+    "stem_en" : "Role of the water vascular system in Echinoderms is :\nA. Respiration and Locomotion\nB. Excretion and Locomotion\nC. Capture and transport of food\nD. Digestion and Respiration\nE. Digestion and Excretion\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A and B Only"
+    }, {
+      "key" : "2",
+      "text_en" : "A and C Only"
+    }, {
+      "key" : "3",
+      "text_en" : "B and C Only"
+    }, {
+      "key" : "4",
+      "text_en" : "B, D and E Only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 43 ],
+      "ai_call_ids" : [ "503d6c00-cbdc-435f-add2-6dc9c5130045" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 167,
+    "stem_en" : "Which of the following type of immunity is present at the time of birth and is a non-specific type of defence in the human body?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Acquired Immunity"
+    }, {
+      "key" : "2",
+      "text_en" : "Innate Immunity"
+    }, {
+      "key" : "3",
+      "text_en" : "Cell-mediated Immunity"
+    }, {
+      "key" : "4",
+      "text_en" : "Humoral Immunity"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 43 ],
+      "ai_call_ids" : [ "503d6c00-cbdc-435f-add2-6dc9c5130045" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 168,
+    "stem_en" : "In bryophytes, the gemmae help in which one of the following?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Sexual reproduction"
+    }, {
+      "key" : "2",
+      "text_en" : "Asexual reproduction"
+    }, {
+      "key" : "3",
+      "text_en" : "Nutrient absorption"
+    }, {
+      "key" : "4",
+      "text_en" : "Gaseous exchange"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 43 ],
+      "ai_call_ids" : [ "503d6c00-cbdc-435f-add2-6dc9c5130045" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 169,
+    "stem_en" : "In frog, the Renal portal system is a special venous connection that acts to link :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Liver and intestine"
+    }, {
+      "key" : "2",
+      "text_en" : "Liver and kidney"
+    }, {
+      "key" : "3",
+      "text_en" : "Kidney and intestine"
+    }, {
+      "key" : "4",
+      "text_en" : "Kidney and lower part of body"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 44 ],
+      "ai_call_ids" : [ "4515c37a-4f24-478b-96ae-ecdd637ce844" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 170,
+    "stem_en" : "Given below are two statements :\nStatement I : In ecosystem, there is unidirectional flow of energy of sun from producers to consumers.\nStatement II : Ecosystems are exempted from 2^nd law of thermodynamics.\nIn the light of the above statements, choose the most appropriate answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both statement I and statement II are correct"
+    }, {
+      "key" : "2",
+      "text_en" : "Both statement I and statement II are incorrect"
+    }, {
+      "key" : "3",
+      "text_en" : "Statement I is correct but statement II is incorrect"
+    }, {
+      "key" : "4",
+      "text_en" : "Statement I is incorrect but statement II is correct"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 44 ],
+      "ai_call_ids" : [ "4515c37a-4f24-478b-96ae-ecdd637ce844" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 171,
+    "stem_en" : "Which of the following statements about RuBisCO is true?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "It is active only in the dark."
+    }, {
+      "key" : "2",
+      "text_en" : "It has higher affinity for oxygen than carbon dioxide."
+    }, {
+      "key" : "3",
+      "text_en" : "It is an enzyme involved in the photolysis of water."
+    }, {
+      "key" : "4",
+      "text_en" : "It catalyzes the carboxylation of RuBP."
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 44 ],
+      "ai_call_ids" : [ "4515c37a-4f24-478b-96ae-ecdd637ce844" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 172,
+    "stem_en" : "Which of the following enzyme(s) are NOT essential for gene cloning?\nA. Restriction enzymes\nB. DNA ligase\nC. DNA mutase\nD. DNA recombinase\nE. DNA polymerase\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "C and D only"
+    }, {
+      "key" : "2",
+      "text_en" : "A and B only"
+    }, {
+      "key" : "3",
+      "text_en" : "D and E only"
+    }, {
+      "key" : "4",
+      "text_en" : "B and C only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 44 ],
+      "ai_call_ids" : [ "4515c37a-4f24-478b-96ae-ecdd637ce844" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 173,
+    "stem_en" : "Read the following statements on plant growth and development.\nA. Parthenocarpy can be induced by auxins.\nB. Plant growth regulators can be involved in promotion as well as inhibition of growth.\nC. Dedifferentiation is a pre-requisite for re-differentiation.\nD. Abscisic acid is a plant growth promoter.\nE. Apical dominance promotes the growth of lateral buds.\nChoose the option with all correct statements.",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A, B, C only"
+    }, {
+      "key" : "2",
+      "text_en" : "A, C, E only"
+    }, {
+      "key" : "3",
+      "text_en" : "A, D, E only"
+    }, {
+      "key" : "4",
+      "text_en" : "B, D, E only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 45 ],
+      "ai_call_ids" : [ "cfffc55b-dd9f-49c1-b2d7-beacab0a9b41" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 174,
+    "stem_en" : "Which factor is important for termination of transcription?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "alpha (alpha)"
+    }, {
+      "key" : "2",
+      "text_en" : "sigma (sigma)"
+    }, {
+      "key" : "3",
+      "text_en" : "rho (rho)"
+    }, {
+      "key" : "4",
+      "text_en" : "gamma (gamma)"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 45 ],
+      "ai_call_ids" : [ "cfffc55b-dd9f-49c1-b2d7-beacab0a9b41" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 175,
+    "stem_en" : "Frogs respire in water by skin and buccal cavity and on land by skin, buccal cavity and lungs.\nChoose the correct answer from the following :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "The statement is true for water but false for land"
+    }, {
+      "key" : "2",
+      "text_en" : "The statement is true for both the environment"
+    }, {
+      "key" : "3",
+      "text_en" : "The statement is false for water but true for land"
+    }, {
+      "key" : "4",
+      "text_en" : "The statement is false for both the environment"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "3"
+    },
+    "extraction" : {
+      "pages" : [ 45 ],
+      "ai_call_ids" : [ "cfffc55b-dd9f-49c1-b2d7-beacab0a9b41" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 176,
+    "stem_en" : "Twins are born to a family that lives next door to you. The twins are a boy and a girl. Which of the following must be true?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "They are monozygotic twins."
+    }, {
+      "key" : "2",
+      "text_en" : "They are fraternal twins."
+    }, {
+      "key" : "3",
+      "text_en" : "They were conceived through in vitro fertilization."
+    }, {
+      "key" : "4",
+      "text_en" : "They have 75% identical genetic content."
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 45 ],
+      "ai_call_ids" : [ "cfffc55b-dd9f-49c1-b2d7-beacab0a9b41" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 177,
+    "stem_en" : "Which of the following microbes is NOT involved in the preparation of household products?\nA. Aspergillus niger\nB. Lactobacillus\nC. Trichoderma polysporum\nD. Saccharomyces cerevisiae\nE. Propionibacterium sharmanii\nChoose the correct answer from the options given below:",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A and B only"
+    }, {
+      "key" : "2",
+      "text_en" : "A and C only"
+    }, {
+      "key" : "3",
+      "text_en" : "C and D only"
+    }, {
+      "key" : "4",
+      "text_en" : "C and E only"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 45 ],
+      "ai_call_ids" : [ "cfffc55b-dd9f-49c1-b2d7-beacab0a9b41" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 178,
+    "stem_en" : "Match List - I with List - II.\n\n| List - I | List - II |\n|---|---|\n| A. Progesterone | I. Pars intermedia |\n| B. Relaxin | II. Ovary |\n| C. Melanocyte stimulating hormone | III. Adrenal Medulla |\n| D. Catecholamines | IV. Corpus luteum |\n\nChoose the correct answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "A-IV, B-II, C-I, D-III"
+    }, {
+      "key" : "2",
+      "text_en" : "A-IV, B-II, C-III, D-I"
+    }, {
+      "key" : "3",
+      "text_en" : "A-II, B-IV, C-I, D-III"
+    }, {
+      "key" : "4",
+      "text_en" : "A-III, B-II, C-IV, D-I"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "1"
+    },
+    "extraction" : {
+      "pages" : [ 46 ],
+      "ai_call_ids" : [ "f96df47a-0dbf-4392-8f30-2b11c1bcaabf" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 179,
+    "stem_en" : "The blue and white selectable markers have been developed which differentiate recombinant colonies from non-recombinant colonies on the basis of their ability to produce colour in the presence of a chromogenic substrate.\nGiven below are two statements about this method:\nStatement I : The blue coloured colonies have DNA insert in the plasmid and they are identified as recombinant colonies.\nStatement II : The colonies without blue colour have DNA insert in the plasmid and are identified as recombinant colonies.\nIn the light of the above statements, choose the most appropriate answer from the options given below :",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "Both Statement I and Statement II are correct"
+    }, {
+      "key" : "2",
+      "text_en" : "Both Statement I and Statement II are incorrect"
+    }, {
+      "key" : "3",
+      "text_en" : "Statement I is correct but Statement II is incorrect"
+    }, {
+      "key" : "4",
+      "text_en" : "Statement I is incorrect but Statement II is correct"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "4"
+    },
+    "extraction" : {
+      "pages" : [ 46 ],
+      "ai_call_ids" : [ "f96df47a-0dbf-4392-8f30-2b11c1bcaabf" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  }, {
+    "no" : 180,
+    "stem_en" : "Which one of the following equations represents the Verhulst-Pearl Logistic Growth of population?",
+    "options" : [ {
+      "key" : "1",
+      "text_en" : "dN/dt = r((K - N)/K)"
+    }, {
+      "key" : "2",
+      "text_en" : "dN/dt = rN((K - N)/K)"
+    }, {
+      "key" : "3",
+      "text_en" : "dN/dt = rN((N - K)/N)"
+    }, {
+      "key" : "4",
+      "text_en" : "dN/dt = N((r - K)/K)"
+    } ],
+    "figures" : [ ],
+    "answer" : {
+      "status" : "single",
+      "key" : "2"
+    },
+    "extraction" : {
+      "pages" : [ 46 ],
+      "ai_call_ids" : [ "f96df47a-0dbf-4392-8f30-2b11c1bcaabf" ],
+      "model" : "claude-opus-5-5",
+      "prompt_version" : "pyq_extract.v1",
+      "flags" : [ ]
+    }
+  } ]
+}

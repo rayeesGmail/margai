@@ -603,7 +603,10 @@ day for the founder's classes, `show` or `record_only` (V10's comment, committed
 calls `note` the line shown to the student, which now holds for a `show` entry only); not a
 key carrier, and checked for an answer hint before D31 serves it, with the figure descriptions. *And (the founder,
 2026-10-21; DECISIONS): only a misprint that could change how a student reads the question is shown (`show`); a pure
-spelling or grammar slip a student reads correctly is recorded only (`record_only`).*
+spelling or grammar slip a student reads correctly is recorded only (`record_only`).* *And (the founder, 2026-10-21;
+DECISIONS): a Hindi line for `show` entries before D40 serves the note — Claude's, same DECISIONS, for the founder to
+overrule: a Hindi note beside the English one on each `show` entry, added in the crop work before D31, its shape settled
+then.*
 
 **question_topics** — D19: `question_id, node_id, PRIMARY KEY (question_id, node_id)` (secondary
 topics). **question_anchors** — D23: `question_id, paragraph_id, PRIMARY KEY`.

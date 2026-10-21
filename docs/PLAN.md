@@ -297,7 +297,11 @@ tools; your reviews focus on output quality.)*
   (Claude's, same DECISIONS, for the founder to overrule: held in `questions.as_printed` (V10); the notes travel with
   the question in the session payload — they are not a key carrier — after the same answer-hint check as the figure
   descriptions.)* *And (the founder, 2026-10-21; DECISIONS): only an entry classed `show` — a misprint that could change
-  how a student reads the question — is displayed; a `record_only` slip is kept and recorded, not surfaced.*
+  how a student reads the question — is displayed; a `record_only` slip is kept and recorded, not surfaced.* *And
+  (the founder, 2026-10-21; DECISIONS): a Hindi line for `show` entries before D40 serves the note. (Claude's, same
+  DECISIONS, for the founder to overrule: written in this crop work — which, if the crop design is adopted as logged,
+  amends every approved paper file with its crop boxes anyway — as a Hindi note beside the English one on each `show`
+  entry, required from then.)*
 - **D32 —** Practice UI: timer, taps, verdict + solution sheet + NCERT anchor chip.
   ✅ *A 10-question timed set feels smooth on a mid-range phone.*
 - **D33 —** Session summary (accuracy, speed vs your norm, sent-to-notebook list);
@@ -351,7 +355,8 @@ tools; your reviews focus on output quality.)*
   change how a student reads the question — the entries classed `show`; a `record_only` slip is kept and recorded, not
   surfaced. (Claude's display rule as the founder adopted it, same DECISIONS: one line under the question for each `show`
   entry — the label "As printed in the original paper" from the ARB (en/hi) and the entry's note,
-  English until the parked Hindi pass gives it a Hindi line — wherever a PYQ appears, before and after answering: the
+  English until the parked Hindi pass gives it a Hindi line (*superseded in part 2026-10-21: the founder's Hindi line
+  for `show` entries before D40 — written in D31's crop work, Claude's — so the note is in the student's language here*) — wherever a PYQ appears, before and after answering: the
   practice item (D32), the mock (D35), this answer view, and every other screen that shows one; the question's text stays the paper's own words, never
   corrected in place, by the errata principle above; the note quotes no more of the paper than the printed span and
   its intended reading.)*

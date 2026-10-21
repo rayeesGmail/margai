@@ -6,9 +6,11 @@
 # Per paper:
 #   booklets  the booklet file(s) of the code in the content bucket (`source/` + the repo path), the sha256
 #             MANIFEST.csv records — `pyq extract` refuses a file whose bytes differ — and the 1-based pages that
-#             hold questions. Where the code has an English-only file, that file is transcribed and a bilingual
-#             one is kept for NTA's Hindi (the parked Hindi pass, README §1 ruling 1); where it has only a
-#             bilingual booklet, its English column is transcribed (DECISIONS 2026-10-20).
+#             hold questions. Where the code has an English-only file listed here, that file is transcribed and a
+#             bilingual one is kept for NTA's Hindi (the parked Hindi pass, README §1 ruling 1); where it has only a
+#             bilingual booklet, its English column is transcribed (DECISIONS 2026-10-20). An English-only copy
+#             that is a cross-check reference is not listed here — 2025 code 45's CCITT copy (the founder's
+#             ruling and DECISIONS 2026-10-21).
 #   sections  the paper's sections by question number — as the booklet prints them, or, where it prints no
 #             headings, as its cover declares the subjects and the questions turn (DECISIONS 2026-10-20); the
 #             declared question_count and these sections are what `pyq load` holds the bank to (PLAN D19 ✅).

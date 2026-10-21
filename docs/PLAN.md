@@ -184,7 +184,9 @@ tools; your reviews focus on output quality.)*
   disagreements on one paper triggers a second-copy check of the key (README §2).* *And (the founder, 2026-10-20;
   DECISIONS): that check reads the page image the extraction call read, `pages/pyq/{paper}/{page}.png`, its sha256
   checked against the page's line in `extract/pyq/{paper}.jsonl` (for 2025 code 45, a re-render marked as one —
-  not provably the bytes its calls read; Claude's row, DECISIONS 2026-10-20).*
+  not provably the bytes its calls read; Claude's row, DECISIONS 2026-10-20).* *And (the founder, 2026-10-21;
+  DECISIONS): the coaching file with solutions (`…Aakash-CROSSCHECK-ONLY.pdf`) is kept out of D20 and D21 entirely, and
+  neither it nor the PW code-45 retype is ever shown to a model that generates content.*
 - **D21 —** Solutions for remaining subjects (batch overnight); distractor-map
   generation. ✅ *Second 50-question audit; error rate < agreed threshold.*
 - **D22 —** Weightage & difficulty statistics computed → syllabus nodes updated; the
@@ -285,7 +287,11 @@ tools; your reviews focus on output quality.)*
   crops are stored as `figures/pyq/{paper}/{question}-{stem|optionN}.{png|webp}`, sized and compressed for the
   offline day-plan download, and travel in it; the figure's written description doubles as alt text (accessibility,
   and the fallback when an image fails to load); and the rule stands — a figure question is never served without
-  its crop.*
+  its crop.* *And (the founder, 2026-10-21; DECISIONS): for 2025 code 45, each figure is cropped from whichever
+  official copy is cleaner at that spot — the bilingual JBIG2 booklet or the English-only CCITT copy, whose coaching
+  logo overlaps some figures — and only what is still illegible at phone size is redrawn.* *(Claude's reading, same
+  DECISIONS, for the founder to overrule: the founder's "at D31" is ruling 4's crop work before D31; the CCITT copy has
+  no saved page images, so its crops come from its own scan, drawn without the logo overlays.)*
 - **D32 —** Practice UI: timer, taps, verdict + solution sheet + NCERT anchor chip.
   ✅ *A 10-question timed set feels smooth on a mid-range phone.*
 - **D33 —** Session summary (accuracy, speed vs your norm, sent-to-notebook list);

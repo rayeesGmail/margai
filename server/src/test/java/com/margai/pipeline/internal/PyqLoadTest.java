@@ -106,8 +106,8 @@ class PyqLoadTest {
         List<PyqQuestionRow> ruled = new ArrayList<>(questions());
         PyqQuestionRow first = ruled.getFirst();
         QuestionTagging tagging = new QuestionTagging(TAG_CALL, "claude-sonnet-5-5", "pyq_tag.v2", new BigDecimal("0.40"),
-                "a reason", new TagRuling("2026-10-21", "the chapter", "none", "PHY.11.ROT.NEW — a node", "PHY.11.ROT.MOI",
-                        List.of("PHY.11.ROT.COM"), true));
+                "the chapter", new TagRuling("2026-10-21", "the chapter", "none", "PHY.11.ROT.NEW — a node", "PHY.11.ROT.MOI",
+                        List.of("PHY.11.ROT.COM"), true, "the tagger's reason"));
         ruled.set(0, new PyqQuestionRow(first.questionNo(), "PHY.11.ROT", List.of(), false, first.stemEn(), first.stemHi(),
                 first.options(), first.answerStatus(), first.correctKey(), first.acceptedKeys(), first.figures(),
                 first.extraction(), tagging, first.asPrinted(), TagStatus.founder));
@@ -122,6 +122,8 @@ class PyqLoadTest {
                 String.class)).isEqualTo("none");
         assertThat(jdbc.queryForObject("SELECT tagging->'ruling'->>'replacedPrimary' FROM questions WHERE question_no = 1",
                 String.class)).isEqualTo("PHY.11.ROT.MOI");
+        assertThat(jdbc.queryForObject("SELECT tagging->'ruling'->>'replacedReason' FROM questions WHERE question_no = 1",
+                String.class)).isEqualTo("the tagger's reason");
     }
 
     /** A note on a misprint kept as printed is the question's own data: a changed note updates the row. */

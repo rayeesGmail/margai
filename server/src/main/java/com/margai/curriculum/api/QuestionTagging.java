@@ -9,13 +9,13 @@ import java.util.UUID;
  * reason — so a disputed tag is traced to the call that made it; and, for a tag the founder ruled, his ruling
  * beside the tagger's tag it replaced.
  *
- * @param aiCallId      the tagging call's ledger row; null for a fake-client run, and — with the model, prompt,
- *                      confidence and reason — for a question the founder ruled that has no tagger's tag of its
- *                      current words
+ * @param aiCallId      the tagging call's ledger row; null for a fake-client run, and — with the model, prompt and
+ *                      confidence — for a question the founder ruled that has no tagger's tag of its current words
  * @param model         the tagging model
  * @param promptVersion e.g. {@code pyq_tag.v1}
  * @param confidence    the model's own confidence, 0–1, a review-routing signal only
- * @param reason        why this node, and why out of syllabus when it is
+ * @param reason        why this node, and why out of syllabus when it is: the tagger's, or for a tag the founder
+ *                      ruled, his ruling's note, the tagger's kept as {@code ruling.replacedReason}
  * @param ruling        the founder's ruling the tag comes from instead, with the tagger's tag it replaced; null
  *                      for the tagger's own tag (V11's {@code tag_status} {@code model} or {@code review})
  */

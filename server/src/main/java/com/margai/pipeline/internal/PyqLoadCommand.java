@@ -181,16 +181,17 @@ class PyqLoadCommand extends PyqPaperCommand {
     }
 
     /**
-     * The approved question with the founder's ruling in place of the tagger's tag, stored as {@code founder}; the
-     * tagger's tag of its current words ({@code current}, null when it has none) is kept beside the ruling.
+     * The approved question with the founder's ruling in place of the tagger's tag, stored as {@code founder}, its
+     * note the tag's reason; the tagger's tag of its current words ({@code current}, null when it has none), reason
+     * included, is kept beside the ruling (DECISIONS 2026-10-22).
      */
     static PyqQuestionRow ruled(PaperFile.Question question, PyqTagLine current, PyqTagRuling ruling) {
         TagRuling kept = new TagRuling(ruling.ruled().toString(), ruling.note(), ruling.anchor(), ruling.gap(),
                 current == null ? null : current.primary(), current == null ? List.of() : current.secondary(),
-                current == null ? null : current.outOfSyllabus());
-        QuestionTagging tagging = current == null ? new QuestionTagging(null, null, null, null, null, kept)
+                current == null ? null : current.outOfSyllabus(), current == null ? null : current.reason());
+        QuestionTagging tagging = current == null ? new QuestionTagging(null, null, null, null, ruling.note(), kept)
                 : new QuestionTagging(current.aiCallId(), current.model(), current.prompt(), current.confidence(),
-                        current.reason(), kept);
+                        ruling.note(), kept);
         return row(question, ruling.primary(), ruling.secondary(), ruling.outOfSyllabus(), tagging, TagStatus.founder);
     }
 

@@ -15,9 +15,11 @@ import java.util.List;
  *                               of its current words
  * @param replacedSecondary      the tagger's secondary codes it replaced
  * @param replacedOutOfSyllabus  the tagger's flag it replaced, null with {@code replacedPrimary}
+ * @param replacedReason         the tagger's one-line reason it replaced, null with {@code replacedPrimary}; the
+ *                               tag's own reason is the ruling's note (the founder, DECISIONS 2026-10-22)
  */
 public record TagRuling(String ruled, String note, String anchor, String gap, String replacedPrimary,
-        List<String> replacedSecondary, Boolean replacedOutOfSyllabus) {
+        List<String> replacedSecondary, Boolean replacedOutOfSyllabus, String replacedReason) {
 
     public TagRuling {
         replacedSecondary = replacedSecondary == null ? List.of() : List.copyOf(replacedSecondary);

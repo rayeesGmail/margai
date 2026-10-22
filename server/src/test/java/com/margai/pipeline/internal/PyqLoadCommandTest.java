@@ -125,9 +125,10 @@ class PyqLoadCommandTest {
     }
 
     /**
-     * A question the founder ruled loads his ruling as {@code founder}, whole, with the tagger's tag of its current
-     * words kept beside it; a ruled question needs no valid tag of its own; the report lists the rulings, the
-     * taxonomy-gap list and the questions with no NCERT anchor (DECISIONS 2026-10-21).
+     * A question the founder ruled loads his ruling as {@code founder}, whole — its note the tag's reason — with the
+     * tagger's tag of its current words, reason included, kept beside it; a ruled question needs no valid tag of its
+     * own; the report lists the rulings, the taxonomy-gap list and the questions with no NCERT anchor (DECISIONS
+     * 2026-10-21, 2026-10-22).
      */
     @Test
     void aRulingLoadsInPlaceOfTheTaggersTag() throws IOException {
@@ -163,8 +164,12 @@ class PyqLoadCommandTest {
         assertThat(kept.replacedOutOfSyllabus()).isFalse();
         assertThat(kept.anchor()).isEqualTo("phy11-part1 ch 6 §6.1");
         assertThat(kept.ruled()).isEqualTo("2026-10-21");
+        assertThat(rows.getFirst().tagging().reason()).isEqualTo("the chapter, not the topic");
+        assertThat(kept.replacedReason()).isEqualTo("r");
         assertThat(rows.getFirst().tagging().aiCallId()).isNotNull();
         assertThat(rows.get(3).tagging().ruling().replacedPrimary()).isNull();
+        assertThat(rows.get(3).tagging().ruling().replacedReason()).isNull();
+        assertThat(rows.get(3).tagging().reason()).isEqualTo("NCERT cut it and the syllabus lists it");
         assertThat(rows.get(3).tagging().aiCallId()).isNull();
         String report = out.toString();
         assertThat(report).contains("(2 for this paper)").contains("model 2, review 0, founder 2")

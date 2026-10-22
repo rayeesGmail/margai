@@ -193,10 +193,12 @@ The founder ran scratchpad 2c619964 `d19-redo-figures-2025-45.sh` on a jar built
   load` — physics 45/45, chemistry 45/45, biology 90/90, 180 of 180, 28 updated (24 re-tags, the three rulings,
   Q101's status), tag status model 176, review 1, founder 3, out of syllabus 0 (pipeline/reports/2026-10-22-pyq-tag.md,
   -pyq-load.md).
-Claude read the 24 new tags against their figures: 22 right; Q49 0.1 → 0.6 and Q78 0.1 → 0.8, both off the review
-  list; Q6 moved from Semiconductors (v1, 0.4) to the combination of resistors (0.8); Q115 tagged BIOTECHP.PROCESS
-  where NCERT teaches insertional inactivation under §9.2, Tools (bio12 ch 9; Q179 on the same idea is TOOLS) —
-  proposed to the founder as a ruling, not added; the founder's review list holds Q101 alone (0.4: four disorders
+Claude read the 24 new tags against their figures, from margai_d15 after the load (the reports list only tags below
+  0.7): 23 primaries right; Q49 0.1 → 0.6 and Q78 0.1 → 0.8, both off the review list; Q6 moved from Semiconductors
+  (v1, 0.4) to PHY.12.CURR.COMBINE (0.8); Q115's primary is wrong — BIOTECHP.PROCESS where NCERT teaches insertional
+  inactivation under §9.2, Tools (bio12 ch 9; Q179 on the same idea is TOOLS) — proposed to the founder as a ruling,
+  not added; Q77's second secondary, AMINES.BASIC, is a stretch, since no topic names aniline's electrophilic
+  substitution; the founder's review list holds Q101 alone (0.4: four disorders
   across four chapters, a tag holding three codes).
 NEXT: the founder's 40-sample corrections (and Q115, if he takes it) into the rulings file; his ruling on Q101 and on
   the SPEC wording; push and the PR.

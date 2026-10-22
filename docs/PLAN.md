@@ -189,7 +189,13 @@ tools; your reviews focus on output quality.)*
   neither it nor the PW code-45 retype is ever shown to a model that generates content.* *And (the founder,
   2026-10-21; DECISIONS): a character a review listed as "cause unsettled" that touches the keyed answer, a number, a
   unit, a sign or a formula goes to the founder when the Hindi column, the second official copy and this
-  solve-vs-key check together still cannot settle it.*
+  solve-vs-key check together still cannot settle it.* *And (the founder, 2026-10-21; DECISIONS): a question whose
+  topic NCERT has cut but the NMC syllabus still lists is marked "no NCERT anchor", so its solution never cites an
+  NCERT page that doesn't exist. (Claude's, same DECISIONS, for the founder to overrule: the mark is a tag ruling's
+  `anchor: none` in `pipeline/inputs/pyq-tag-rulings.yaml`; 2025 code 45's Q95 and Q133 are solved once the D24 buffer
+  has brought their pages into the corpus. Surfaced with it: CLAUDE.md hard rule 2 and DEV_SPEC R2 allow no AI
+  solution without NCERT retrieval grounding, so until the founder rules, D20 generates no solution for a question
+  marked "no NCERT anchor" and lists it for him.)*
 - **D21 —** Solutions for remaining subjects (batch overnight); distractor-map
   generation. ✅ *Second 50-question audit; error rate < agreed threshold.*
 - **D22 —** Weightage & difficulty statistics computed → syllabus nodes updated; the
@@ -200,7 +206,8 @@ tools; your reviews focus on output quality.)*
   used (the tick rule); weightage considers recency — the 2024 NMC syllabus revision makes older papers less
   representative — and Claude proposes the weighting here (ruling 3).* *Added 2026-10-01
   (CS-4 §3; at risk): the `concept_primers` migration and `primers generate` begin for the top-50
-  weightage chapters (TECH_PLAN §15.7), staged on one chapter first.*
+  weightage chapters (TECH_PLAN §15.7), staged on one chapter first.* *Added 2026-10-21 (the founder; DECISIONS): a
+  question whose tag is marked `review` (below the tag floor, 0.5) counts toward no topic's weightage until he rules.*
 - **D23 —** Anchor-linking questions↔NCERT; seed the eval suite v1 (~60 questions
   across subjects). ✅ *Eval harness runs and reports.* *Amended 2026-10-18 (founder; DECISIONS
   2026-10-18): the eval suite carries Hindi questions in every subject.* *Amended 2026-10-19 (founder's
@@ -234,6 +241,10 @@ tools; your reviews focus on output quality.)*
   threshold; the review sheet is founder-signed; every record carries `season_version`.*
   *Added 2026-10-01 (CS-4 §3; at risk): primers for the top-50 chapters finish here and `primers sample`
   writes the founder's 30-primer sheet; the remaining topics go to a later buffer before D74.*
+  *Added 2026-10-21 (the founder; DECISIONS), under the slippage rule (content-pipeline work in buffers only): the
+  Biology unit-opening essays and biography pages come into the corpus, English and Hindi (~₹250) — 2025 code 45's
+  Q95 and Q133 are answered from them. Proposed with it (Claude, for the founder to rule; DECISIONS 2026-10-21): table
+  coverage — about 145 NCERT tables, none of them in the corpus today, at ≈₹1,300.*
 
 ### PHASE 3 — Onboarding & first plan (Week 5, Days 25–30) — Modules M2 + M4(v0)
 
@@ -306,7 +317,8 @@ tools; your reviews focus on output quality.)*
   (the founder, 2026-10-21; DECISIONS): a Hindi line for `show` entries before D40 serves the note. (Claude's, same
   DECISIONS, for the founder to overrule: written in this crop work — which, if the crop design is adopted as logged,
   amends every approved paper file with its crop boxes anyway — as a Hindi note beside the English one on each `show`
-  entry, required from then.)*
+  entry, required from then.)* *And (the founder, 2026-10-21; DECISIONS): a question whose tag is marked `review` is
+  not picked for topic practice until he rules; full past-paper mocks still serve it (D35).*
 - **D32 —** Practice UI: timer, taps, verdict + solution sheet + NCERT anchor chip.
   ✅ *A 10-question timed set feels smooth on a mid-range phone.*
 - **D33 —** Session summary (accuracy, speed vs your norm, sent-to-notebook list);
@@ -323,7 +335,9 @@ tools; your reviews focus on output quality.)*
   questions excluded from the score; every mock result captured for the later private percentile.
   *Noted 2026-10-20 (D19): the bank's span is NEET 2019–2026, 2018 only if a fitting key turns up (README §6); SPEC
   §7.1's "2018–2026" is put to the founder; and a mock refuses a paper whose marking is not yet sourced (Claude's
-  reading of the founder's gap-4 rider, for the founder to overrule; DECISIONS 2026-10-20).*
+  reading of the founder's gap-4 rider, for the founder to overrule; DECISIONS 2026-10-20).* *Noted 2026-10-21 (the
+  founder; DECISIONS): out of syllabus is SPEC §7.1's amended definition, and a question whose tag is marked `review`
+  is still served in a full past-paper mock.*
   ✅ adds: at least one full past paper runs end to end as a timed mock (CS-2 §10).*
 - **D36 —** Buffer + **Week-6 gate:** practice loop end-to-end incl. offline + diagnostic.
 

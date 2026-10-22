@@ -3,12 +3,17 @@ package com.margai.pipeline.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.margai.ai.tasks.PyqTag;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -120,6 +125,40 @@ class PyqTagRulingsYamlReaderTest {
                 .hasMessageContaining("set approved_file_sha256 to " + sha());
         assertThat(PyqTagRulingsYamlReader.forPaper(write(rulingsFor("neet-2025-45", sha(), 1)), paper,
                 Set.of(paper.code()), approvedFile())).containsOnlyKeys((short) 1);
+    }
+
+    /**
+     * The founder's committed file reads against the committed register and approved files, and every ruling holds
+     * against the taxonomy for the subject its question is printed under — so an edit that would fail {@code pyq tag}
+     * or {@code pyq load} fails the commit instead.
+     */
+    @Test
+    void theCommittedFileHoldsAgainstTheRegisterAndTheTaxonomy() {
+        Path inputs = InputReadersTest.INPUTS;
+        List<PaperDefinition> papers = PyqPapersYamlReader.read(inputs.resolve(PyqPaperCommand.FILE));
+        Set<String> registered = papers.stream().map(PaperDefinition::code).collect(Collectors.toSet());
+        TaxonomyOutline taxonomy = new TaxonomyOutline(TaxonomyCsvReader.read(inputs.resolve(TaxonomyLoadCommand.FILE)));
+        Path file = inputs.resolve(PyqTagRulingsYamlReader.FILE);
+
+        List<String> problems = new ArrayList<>();
+        int rulings = 0;
+        for (PaperDefinition paper : papers) {
+            Path approved = inputs.resolve("papers").resolve(paper.code() + ".json");
+            if (!Files.isRegularFile(approved)) {
+                continue;
+            }
+            for (PyqTagRuling ruling : PyqTagRulingsYamlReader.forPaper(file, paper, registered, approved).values()) {
+                rulings++;
+                String problem = taxonomy.problem(paper.row().sectionOf(ruling.question()).subject(), new PyqTag(
+                        ruling.primary(), ruling.secondary(), ruling.outOfSyllabus(), BigDecimal.ONE, ruling.note()));
+                if (problem != null) {
+                    problems.add(paper.code() + " Q" + ruling.question() + ": " + problem);
+                }
+            }
+        }
+
+        assertThat(rulings).isPositive();
+        assertThat(problems).isEmpty();
     }
 
     private PaperDefinition paper() throws IOException {

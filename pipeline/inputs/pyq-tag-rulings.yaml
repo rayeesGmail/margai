@@ -1,0 +1,48 @@
+# The founder's rulings on PYQ tags (D19; DECISIONS 2026-10-21). Founder-owned: Claude drafts entries from the
+# founder's rulings and the tag review, the founder approves them, and the pipeline only reads this file
+# (.claude/rules/pipeline.md). `pyq load --paper` puts a paper's rulings in place of the model's tags — the question
+# is stored with `tag_status = founder` and both tags kept in its provenance — and `pyq tag` reports each ruling
+# beside the model's tag. A ruling replaces the whole tag: a field it leaves out is empty, never the model's.
+#
+# Per paper: `code`, the register's (pipeline/inputs/pyq-papers.yaml) — a code the register lacks is refused, so a
+# typo cannot leave rulings unapplied; `approved_file_sha256`, the sha256 of the approved paper file
+# (pipeline/inputs/papers/<code>.json) the rulings were made against — once that file changes, `pyq tag` and
+# `pyq load` refuse the paper's rulings until each is confirmed against the new file and this line is updated, so a
+# ruling on a question since corrected is never applied unread (Claude fills it); and one entry per ruled question:
+#   question         the question number as printed
+#   primary          the topic or chapter code of pipeline/inputs/taxonomy.csv the question tests
+#   secondary        at most two further codes it needs (optional)
+#   out_of_syllabus  true only when its topic is absent from both the current NMC syllabus and the current NCERT
+#                    books (SPEC §7.1); false unless set
+#   anchor           where NCERT teaches it; `none` marks "no NCERT anchor" — a topic NCERT has cut but the NMC
+#                    syllabus still lists — and no AI solution is written for it (hard rule 2; DECISIONS) (optional)
+#   gap              a taxonomy node proposed for it where none fits, code and name — the taxonomy-gap list
+#                    (optional; the founder rules on each before it goes into taxonomy.csv)
+#   ruled            the date of the founder's ruling
+#   note             the ruling, in a line
+
+papers:
+  - code: neet-2025-45
+    approved_file_sha256: cab6884f4595d4a2520c68e696d89a1ab980a55aad39cade24cf71f2c894f8ee   # 8e92468, the founder's approval
+    rulings:
+      - question: 66
+        primary: CHE.12.SOLN
+        out_of_syllabus: false
+        anchor: chem12-part1 ch 1 §1.1 ¶1, which cites Table 1.1 (Types of Solutions); the table is not corpus text
+        gap: CHE.12.SOLN.TYPES — Types of solutions
+        ruled: 2026-10-21
+        note: Not out of syllabus — NTA set it under the 2025 syllabus, and it comes from the Solutions chapter.
+      - question: 95
+        primary: BOT.11.CELL
+        out_of_syllabus: false
+        anchor: bio11 Unit 3's opening essay, printed with chapter 8 (kebo108.pdf p1); not in the corpus until D24
+        gap: BOT.11.CELL.OPENER — Unit opening, the physico-chemical (reductionist) approach to living organisms
+        ruled: 2026-10-21
+        note: Not out of syllabus — NTA set it under the 2025 syllabus, from NCERT's introductory text on reductionist biology.
+      - question: 133
+        primary: BOT.12.ORGPOP
+        out_of_syllabus: false
+        anchor: bio12's Ecology unit opening, the Ramdeo Misra biography printed with chapter 11 (lebo111.pdf p2); not in the corpus until D24
+        gap: BOT.12.ORGPOP.OPENER — Unit opening, Ramdeo Misra and ecology in India
+        ruled: 2026-10-21
+        note: Not out of syllabus — NTA set it under the 2025 syllabus, from the Ramdeo Misra profile box in the Ecology unit.

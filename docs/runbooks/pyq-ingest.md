@@ -116,6 +116,17 @@ on the taxonomy-gap list with a proposed node — never the flag. *(Claude's, sa
 overrule: before an out-of-syllabus flag stands, Claude looks for the question's NCERT anchor — in the corpus, and in
 the books' PDFs for the pages the corpus leaves out, unit openers and biography pages.)*
 
+*Since 2026-10-22 (the founder's approval of 2026-10-21; DECISIONS):* `pyq_tag.v2` reads each figure's description
+where the booklet prints it. A tag strictly below the review floor (0.5) is on **the founder's review list** in the
+report and loads as `review`, never as a normal tag, until he rules. **His rulings** go in
+`pipeline/inputs/pyq-tag-rulings.yaml` — Claude drafts each entry (from his rulings, the review list, his 40-question
+sample and the out-of-syllabus check above), he approves the file, and it is committed — and the report lists each
+ruling beside the tagger's tag, naming any the taxonomy would refuse. *(Claude's, same DECISIONS, for the founder to
+overrule: the file's shape; its per-paper `approved_file_sha256`, which Claude fills, so the rulings are refused once
+the approved file changes until each is confirmed again; a paper code the register lacks refused.)* `pyq tag` re-tags
+a tag of another prompt version, so a paper tagged under v1 is redone by naming its questions, `--redo --questions
+N,…`, never by a bare run.
+
 ## 6. `pyq load` — the D19 check, the founder runs it (it reads the tags from the content bucket)
 
 ```
@@ -126,6 +137,13 @@ No model. One transaction: the paper, its questions and their secondary topics; 
 back and counted per printed section, and any section that does not hold what it declares rolls the load back.
 The report's first table is the D19 ✅ — declared against loaded per section, with the figure questions per
 section (founder's ruling 4) — and it names the marking values still waiting for NTA's notice (F18).
+
+*Since 2026-10-22 (the founder's approval of 2026-10-21; DECISIONS):* a question the founder ruled loads his ruling
+as `tag_status = founder`; a tagger's tag below the floor loads as `review`. *(Claude's, same DECISIONS, for the
+founder to overrule: the tagger's tag is kept beside a ruling, and a ruled question needs no valid tag of its own;
+the report counts the three statuses and lists the review questions, the rulings, the taxonomy-gap list and any
+question with no NCERT anchor, which D20 does not solve until the founder rules; a paper loaded before V11 reads
+`model` for every question until it is loaded again.)*
 
 ## Order (README §7)
 

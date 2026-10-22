@@ -6,11 +6,13 @@ import com.margai.curriculum.api.AnswerStatus;
 import com.margai.curriculum.api.AsPrintedDisplay;
 import com.margai.curriculum.api.PyqQuestionRow;
 import com.margai.curriculum.api.QuestionAsPrinted;
+import com.margai.curriculum.api.TagRuling;
 import com.margai.curriculum.api.TagStatus;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,6 +122,56 @@ class PyqLoadCommandTest {
                 .containsExactly(TagStatus.review, TagStatus.model, TagStatus.model, TagStatus.model);
         assertThat(out.toString()).contains("whose tag each question carries").contains("model 3, review 1, founder 0")
                 .contains("Q1 → PHY.11.ROT.MOI: review");
+    }
+
+    /**
+     * A question the founder ruled loads his ruling as {@code founder}, whole, with the tagger's tag of its current
+     * words kept beside it; a ruled question needs no valid tag of its own; the report lists the rulings, the
+     * taxonomy-gap list and the questions with no NCERT anchor (DECISIONS 2026-10-21).
+     */
+    @Test
+    void aRulingLoadsInPlaceOfTheTaggersTag() throws IOException {
+        tags(false);
+        Files.writeString(inputs.resolve(PyqTagRulingsYamlReader.FILE), """
+                papers:
+                  - code: neet-2025-45
+                    approved_file_sha256: %s
+                    rulings:
+                      - question: 1
+                        primary: PHY.11.ROT
+                        anchor: phy11-part1 ch 6 §6.1
+                        gap: PHY.11.ROT.NEW — a proposed node
+                        ruled: 2026-10-21
+                        note: the chapter, not the topic
+                      - question: 4
+                        primary: CHE.11.BASICS
+                        anchor: none
+                        ruled: 2026-10-22
+                        note: NCERT cut it and the syllabus lists it
+                """.formatted(Report.sha256(inputs.resolve("papers").resolve(PyqTagCommandTest.CODE + ".json"))));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_OK);
+
+        List<PyqQuestionRow> rows = imports.loadedQuestions;
+        assertThat(rows).extracting(PyqQuestionRow::tagStatus)
+                .containsExactly(TagStatus.founder, TagStatus.model, TagStatus.model, TagStatus.founder);
+        assertThat(rows.getFirst().nodeCode()).isEqualTo("PHY.11.ROT");
+        assertThat(rows.getFirst().secondaryNodeCodes()).isEmpty();
+        TagRuling kept = rows.getFirst().tagging().ruling();
+        assertThat(kept.replacedPrimary()).isEqualTo("PHY.11.ROT.MOI");
+        assertThat(kept.replacedSecondary()).containsExactly("PHY.11.ROT.COM");
+        assertThat(kept.replacedOutOfSyllabus()).isFalse();
+        assertThat(kept.anchor()).isEqualTo("phy11-part1 ch 6 §6.1");
+        assertThat(kept.ruled()).isEqualTo("2026-10-21");
+        assertThat(rows.getFirst().tagging().aiCallId()).isNotNull();
+        assertThat(rows.get(3).tagging().ruling().replacedPrimary()).isNull();
+        assertThat(rows.get(3).tagging().aiCallId()).isNull();
+        String report = out.toString();
+        assertThat(report).contains("(2 for this paper)").contains("model 2, review 0, founder 2")
+                .contains("- Q1 → PHY.11.ROT (ruled 2026-10-21; the tagger's PHY.11.ROT.MOI, 0.9): the chapter, not the topic")
+                .contains("- Q4 → CHE.11.BASICS (ruled 2026-10-22; the tagger has no tag of its current words)")
+                .contains("- Q1: PHY.11.ROT.NEW — a proposed node");
+        assertThat(report.substring(report.indexOf("## no NCERT anchor"))).startsWith("## no NCERT anchor").contains("- Q4");
     }
 
     private static PyqTagLine confidence(PyqTagLine line, String confidence) {

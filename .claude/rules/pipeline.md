@@ -17,7 +17,8 @@ paths:
   `anchors link`, `eval snapshot` (D23) → seed generation and trap mining (unscheduled, §12.2) →
   `cache seed` (D76). A step must fail loudly, never half-write: one transaction per natural-key batch.
 - Founder-owned inputs live in `pipeline/inputs/` (taxonomy CSV, prerequisites CSV, archetypes YAML,
-  cutoffs CSV, books YAML, the PYQ register `pyq-papers.yaml` and the approved paper files `papers/<paper>.json`
+  cutoffs CSV, books YAML, the PYQ register `pyq-papers.yaml`, the approved paper files `papers/<paper>.json` and
+  the founder's tag rulings `pyq-tag-rulings.yaml`
   — TECH_PLAN §6.2) as data files in the repo; the pipeline never edits them — `pyq extract` writes its
   draft to `pipeline/data/pyq/`, and only the founder's approval puts a paper file in the inputs. Every command writes `pipeline/reports/<date>-<command>.md`, committed as the
   day's evidence (§6.3); a second run of the same command on the same day writes `-2.md`, a third

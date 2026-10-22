@@ -12,6 +12,7 @@ import com.margai.curriculum.api.PaperSubject;
 import com.margai.curriculum.api.QuestionFigure;
 import com.margai.curriculum.api.QuestionOption;
 import com.margai.storage.api.ObjectStore;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -106,6 +107,8 @@ class PyqTagCommand extends PyqPaperCommand {
         report.line("content store: " + content.describe());
         report.line("approved file: " + approved.normalize() + " (" + file.questions().size() + " questions)");
         report.line("tagger: " + tagger.model() + ", " + tagger.promptVersion());
+        // Read before any call, so a malformed rulings file costs nothing.
+        Map<Short, PyqTagRuling> rulings = rulings(pyq, paper, report);
 
         String tagsKey = ContentKeys.pyqTags(paper.code());
         TreeMap<Short, PyqTagLine> done = new TreeMap<>();
@@ -162,9 +165,15 @@ class PyqTagCommand extends PyqPaperCommand {
         report.section("out of syllabus — for the founder to check")
                 .list(valid.stream().filter(PyqTagLine::outOfSyllabus)
                         .map(line -> "Q" + line.question() + " → " + line.primary() + ": " + line.reason()).toList(), "none");
+        report.section("ruled by the founder — `pyq load` puts each ruling in place of the tagger's tag")
+                .list(rulings.values().stream().map(ruling -> "Q" + ruling.question() + ": "
+                        + tagged(done.get(ruling.question())) + " → ruled " + ruling.primary()
+                        + (ruling.outOfSyllabus() ? ", out of syllabus" : ", in syllabus")
+                        + problem(taxonomy, paper.row().sectionOf(ruling.question()).subject(), ruling)).toList(), "none");
         report.section("the founder's review list — below the review floor (" + pyq.tagReviewFloor() + "): each loads as "
                         + "`review`, never as a normal tag, until he rules")
-                .list(valid.stream().filter(line -> line.belowFloor(pyq.tagReviewFloor()))
+                .list(valid.stream().filter(line -> !rulings.containsKey(line.question()))
+                        .filter(line -> line.belowFloor(pyq.tagReviewFloor()))
                         .map(line -> "Q" + line.question() + " → " + line.primary() + " (" + line.confidence() + "): "
                                 + line.reason()).toList(), "none");
         report.section("low-confidence tags (below " + pyq.tagLowConfidence() + ") — a routing signal, not a guarantee")
@@ -223,6 +232,19 @@ class PyqTagCommand extends PyqPaperCommand {
         return new PyqTagLine(question.no(), tag.primary(), tag.secondary(), tag.outOfSyllabus(), tag.confidence(),
                 tag.reason(), response.aiCallId(), response.modelId(), tagger.promptVersion(), textSha(question),
                 taxonomy.problem(printed, tag));
+    }
+
+    /** The tagger's tag as the ruled-questions list shows it. */
+    private static String tagged(PyqTagLine line) {
+        return line == null ? "not tagged" : !line.valid() ? "no valid tag" : "tagged " + line.primary()
+                + (line.outOfSyllabus() ? ", out of syllabus" : "") + " (" + line.confidence() + ")";
+    }
+
+    /** What the taxonomy says against a ruling, so the founder sees it before {@code pyq load} refuses it. */
+    private static String problem(TaxonomyOutline taxonomy, PaperSubject printed, PyqTagRuling ruling) {
+        String problem = taxonomy.problem(printed, new PyqTag(ruling.primary(), ruling.secondary(), ruling.outOfSyllabus(),
+                BigDecimal.ONE, ruling.note()));
+        return problem == null ? "" : " — PROBLEM: " + problem;
     }
 
     /** A valid tag of this question's current words under the current prompt. */

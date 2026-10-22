@@ -16,6 +16,7 @@ import com.margai.curriculum.api.QuestionExtraction;
 import com.margai.curriculum.api.QuestionFigure;
 import com.margai.curriculum.api.QuestionOption;
 import com.margai.curriculum.api.QuestionTagging;
+import com.margai.curriculum.api.TagRuling;
 import com.margai.curriculum.api.TagStatus;
 import java.math.BigDecimal;
 import java.nio.file.Path;
@@ -96,6 +97,30 @@ class PyqLoadTest {
         assertThat(second.paperUpdated()).isFalse();
         assertThat(second.unchanged()).isEqualTo(4);
         assertThat(second.updated()).isZero();
+    }
+
+    /** The founder's ruling travels in `tagging` beside the tagger's tag it replaced, and a reload changes nothing. */
+    @Test
+    void aRuledTagRoundTripsAndAReloadChangesNothing() {
+        List<PyqQuestionRow> ruled = new ArrayList<>(questions());
+        PyqQuestionRow first = ruled.getFirst();
+        QuestionTagging tagging = new QuestionTagging(TAG_CALL, "claude-sonnet-5-5", "pyq_tag.v2", new BigDecimal("0.40"),
+                "a reason", new TagRuling("2026-10-21", "the chapter", "none", "PHY.11.ROT.NEW — a node", "PHY.11.ROT.MOI",
+                        List.of("PHY.11.ROT.COM"), true));
+        ruled.set(0, new PyqQuestionRow(first.questionNo(), "PHY.11.ROT", List.of(), false, first.stemEn(), first.stemHi(),
+                first.options(), first.answerStatus(), first.correctKey(), first.acceptedKeys(), first.figures(),
+                first.extraction(), tagging, first.asPrinted(), TagStatus.founder));
+
+        imports.loadPaper(paper(), ruled);
+        PyqLoadReport again = imports.loadPaper(paper(), ruled);
+
+        assertThat(again.unchanged()).isEqualTo(4);
+        assertThat(jdbc.queryForObject("SELECT tag_status FROM questions WHERE question_no = 1", String.class))
+                .isEqualTo("founder");
+        assertThat(jdbc.queryForObject("SELECT tagging->'ruling'->>'anchor' FROM questions WHERE question_no = 1",
+                String.class)).isEqualTo("none");
+        assertThat(jdbc.queryForObject("SELECT tagging->'ruling'->>'replacedPrimary' FROM questions WHERE question_no = 1",
+                String.class)).isEqualTo("PHY.11.ROT.MOI");
     }
 
     /** A note on a misprint kept as printed is the question's own data: a changed note updates the row. */

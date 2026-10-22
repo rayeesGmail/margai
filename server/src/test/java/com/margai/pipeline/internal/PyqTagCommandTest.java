@@ -78,6 +78,38 @@ class PyqTagCommandTest {
                 .contains("the founder's sample");
     }
 
+    /**
+     * The founder's rulings are listed beside the tagger's tags, a ruling the taxonomy would refuse is named before
+     * {@code pyq load} refuses it, and a ruled question is off the review list (DECISIONS 2026-10-21).
+     */
+    @Test
+    void listsTheFoundersRulingsAndKeepsThemOffTheReviewList() throws IOException {
+        tagger.tags.put(2, new PyqTag("PHY.11.ROT", List.of(), true, new BigDecimal("0.4"), "a topic since removed"));
+        Files.writeString(inputs.resolve(PyqTagRulingsYamlReader.FILE), """
+                papers:
+                  - code: neet-2025-45
+                    approved_file_sha256: %s
+                    rulings:
+                      - question: 2
+                        primary: PHY.11.ROT
+                        ruled: 2026-10-21
+                        note: in syllabus
+                      - question: 3
+                        primary: PHY.11.ROT
+                        ruled: 2026-10-21
+                        note: a slip in the ruling
+                """.formatted(Report.sha256(inputs.resolve("papers").resolve(CODE + ".json"))));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_OK);
+
+        String report = out.toString();
+        assertThat(report).contains("- Q2: tagged PHY.11.ROT, out of syllabus (0.4) → ruled PHY.11.ROT, in syllabus\n")
+                .contains("- Q3: tagged CHE.11.BASICS.MOLE (0.9) → ruled PHY.11.ROT, in syllabus — PROBLEM: the primary "
+                        + "PHY.11.ROT is physics");
+        String reviewList = report.substring(report.indexOf("the founder's review list"), report.indexOf("low-confidence tags"));
+        assertThat(reviewList).doesNotContain("Q2");
+    }
+
     /** A tag strictly below the review floor is on the founder's review list; one at the floor is not. */
     @Test
     void listsATagBelowTheReviewFloorForTheFounder() {

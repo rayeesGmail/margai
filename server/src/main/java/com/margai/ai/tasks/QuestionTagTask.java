@@ -55,12 +55,23 @@ public class QuestionTagTask implements QuestionTagger {
             variables.put("subject", question.subject());
             variables.put("number", question.number());
             variables.put("stem", question.stem());
-            variables.put("options", question.options().stream()
-                    .map(option -> Map.<String, Object>of("key", option.key(), "text", option.text())).toList());
+            variables.put("stemFigures", question.stemFigures());
+            variables.put("options", question.options().stream().map(QuestionTagTask::option).toList());
             return AiRequest.of(AiFeature.pipeline_tag, Tier.reason, prompt, variables, PyqTag.class, ctx)
                     .withRoute(RouteDecision.generation());
         }).toList();
         return ai.completeBatch(requests);
+    }
+
+    /** One option as the template reads it: no {@code text} when it prints no words, so the template writes none. */
+    static Map<String, Object> option(Option option) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("key", option.key());
+        if (option.text() != null && !option.text().isBlank()) {
+            map.put("text", option.text());
+        }
+        map.put("figures", option.figures());
+        return map;
     }
 
     /** One outline line as the template reads it: its depth as flags, its kind as a flag, its code and name. */

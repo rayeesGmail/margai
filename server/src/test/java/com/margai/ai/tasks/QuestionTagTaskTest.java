@@ -56,7 +56,7 @@ class QuestionTagTaskTest {
         assertThat(tags).hasSize(2);
         assertThat(tags.getFirst().output().primary()).isEqualTo("PHY.11.ROT.MOI");
         assertThat(tags.getFirst().output().confidence()).isEqualByComparingTo(new BigDecimal("0.91"));
-        assertThat(task.promptVersion()).isEqualTo("pyq_tag.v1");
+        assertThat(task.promptVersion()).isEqualTo("pyq_tag.v2");
         List<Map<String, Object>> rows = jdbc.queryForList(
                 "SELECT feature, tier, prompt_name, status FROM ai_calls WHERE request_id = ?", requestId.toString());
         assertThat(rows).hasSize(2).allSatisfy(row -> {
@@ -78,7 +78,9 @@ class QuestionTagTaskTest {
         variables.put("subject", "physics");
         variables.put("number", 7);
         variables.put("stem", "Which point of a rolling wheel moves fastest?");
-        variables.put("options", List.of(Map.of("key", "1", "text", "the top"), Map.of("key", "2", "text", "the centre")));
+        variables.put("stemFigures", List.of());
+        variables.put("options", List.of(Map.of("key", "1", "text", "the top", "figures", List.of()),
+                Map.of("key", "2", "text", "the centre", "figures", List.of())));
 
         var rendered = prompts.render(PromptRef.named("pyq_tag"), variables);
 
@@ -87,7 +89,35 @@ class QuestionTagTaskTest {
                 .contains("codes from that list only").contains("Never state or hint at the correct option")
                 .doesNotContain("nearest chapter, with your reason");
         assertThat(rendered.user()).contains("Question 7, printed under physics")
-                .contains("Which point of a rolling wheel moves fastest?\n(1) the top\n(2) the centre");
+                .contains("Which point of a rolling wheel moves fastest?\n(1) the top\n(2) the centre\n");
+    }
+
+    /**
+     * v2: the figures' descriptions reach the model where the booklet prints them — under the stem, and as or
+     * beside an option — and out of syllabus is the founder's definition (SPEC §7.1, amended 2026-10-21).
+     */
+    @Test
+    void theTemplateRendersEachFigureWhereItIsPrintedAndTheFoundersDefinition() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("outline", List.of(Map.of("depth0", true, "subject", true, "name", "Chemistry")));
+        variables.put("subject", "chemistry");
+        variables.put("number", 9);
+        variables.put("stem", "The major product P is");
+        variables.put("stemFigures", List.of("a reaction scheme: an alkene with HBr"));
+        variables.put("options", List.of(
+                QuestionTagTask.option(new QuestionTagger.Option("1", "", List.of("a cyclopentane ring with CH3"))),
+                QuestionTagTask.option(new QuestionTagger.Option("2", "propene", List.of("its skeletal formula"))),
+                QuestionTagTask.option(new QuestionTagger.Option("3", "ethene", List.of())),
+                QuestionTagTask.option(new QuestionTagger.Option("4", " ", List.of("a ring", "a chain")))));
+
+        var rendered = prompts.render(PromptRef.named("pyq_tag"), variables);
+
+        assertThat(rendered.user()).contains("The major product P is\n[Figure: a reaction scheme: an alkene with HBr]\n"
+                + "(1) [Figure: a cyclopentane ring with CH3]\n(2) propene [Figure: its skeletal formula]\n(3) ethene\n"
+                + "(4) [Figure: a ring] [Figure: a chain]\n\nTag this question.");
+        assertThat(rendered.system()).contains("described in words, in square brackets")
+                .contains("absent from both the current NEET\n  syllabus — the list below — and the current NCERT textbooks")
+                .contains("a unit's opening pages, a biography or profile box, a table");
     }
 
     @Test
@@ -99,7 +129,8 @@ class QuestionTagTaskTest {
     }
 
     private static QuestionTagger.Question question(int number, String stem) {
-        return new QuestionTagger.Question(number, "physics", stem, List.of(new QuestionTagger.Option("1", "a"),
-                new QuestionTagger.Option("2", "b"), new QuestionTagger.Option("3", "c"), new QuestionTagger.Option("4", "d")));
+        return new QuestionTagger.Question(number, "physics", stem, List.of(), List.of(new QuestionTagger.Option("1", "a", List.of()),
+                new QuestionTagger.Option("2", "b", List.of()), new QuestionTagger.Option("3", "c", List.of()),
+                new QuestionTagger.Option("4", "d", List.of())));
     }
 }

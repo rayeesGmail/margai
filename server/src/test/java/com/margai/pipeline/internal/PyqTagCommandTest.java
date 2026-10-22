@@ -10,6 +10,7 @@ import com.margai.ai.tasks.PyqTag;
 import com.margai.ai.tasks.QuestionTagger;
 import com.margai.curriculum.api.AnswerStatus;
 import com.margai.curriculum.api.QuestionExtraction;
+import com.margai.curriculum.api.QuestionFigure;
 import com.margai.curriculum.api.QuestionOption;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -107,6 +108,34 @@ class PyqTagCommandTest {
         assertThat(run()).isEqualTo(InputFileCommand.EXIT_OK);
 
         assertThat(tagger.numbers).containsExactly(List.of(1), List.of(4));
+    }
+
+    /**
+     * {@code pyq_tag.v2}: a figure question reaches the tagger with each figure's description where the booklet
+     * prints it, and only a question that prints figures changes its fingerprint — a figure-free question hashes
+     * as under v1, so its tag stays current and only the figure questions are re-tagged.
+     */
+    @Test
+    void aFigureQuestionReachesTheTaggerWithItsFiguresAndOnlyItsFingerprintChanges() throws IOException {
+        PaperFile file = approved(PaperFile.Answer.single("2"));
+        List<PaperFile.Question> questions = new ArrayList<>(file.questions());
+        PaperFile.Question first = questions.getFirst();
+        String before = PyqTagCommand.textSha(first);
+        PaperFile.Question figured = new PaperFile.Question(first.no(), first.stemEn(), null, first.options(),
+                List.of(new QuestionFigure("stem", 1, "a rod pivoted at one end"), new QuestionFigure("option:2", 1, "a disc")),
+                first.answer(), first.extraction(), first.asPrinted());
+        questions.set(0, figured);
+        writeInputs(inputs, new PaperFile(file.paper(), file.transcribedFrom(), questions));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_OK);
+
+        QuestionTagger.Question asked = tagger.asked.getFirst();
+        assertThat(asked.stemFigures()).containsExactly("a rod pivoted at one end");
+        assertThat(asked.options()).extracting(QuestionTagger.Option::figures)
+                .containsExactly(List.of(), List.of("a disc"), List.of(), List.of());
+        assertThat(PyqTagCommand.textSha(figured)).isNotEqualTo(before);
+        assertThat(PyqTagCommand.textSha(questions.get(1))).isEqualTo(PyqExtractCommand.sha256(
+                "Question 2\n1\ta\n2\tb\n3\tc\n4\td".getBytes(java.nio.charset.StandardCharsets.UTF_8)));
     }
 
     /**
@@ -283,6 +312,7 @@ class PyqTagCommandTest {
 
         final Map<Integer, PyqTag> tags = new HashMap<>();
         final List<List<Integer>> numbers = new ArrayList<>();
+        final List<Question> asked = new ArrayList<>();
         final List<List<OutlineLine>> outlines = new ArrayList<>();
         /** Questions whose answer can never be decoded, failing any batch they are in, as completeBatch rethrows. */
         final java.util.Set<Integer> failing = new java.util.HashSet<>();
@@ -294,6 +324,7 @@ class PyqTagCommandTest {
         public List<AiResponse<PyqTag>> tag(List<OutlineLine> outline, List<Question> questions, AiCallContext ctx) {
             outlines.add(outline);
             numbers.add(questions.stream().map(Question::number).toList());
+            asked.addAll(questions);
             questions.stream().filter(question -> failing.contains(question.number())).findFirst().ifPresent(question -> {
                 throw new com.margai.ai.api.InvalidOutputException(List.of("no tag for " + question.number()), "{}",
                         new Usage(10, 5, 0, 0), "claude-sonnet-5-5");

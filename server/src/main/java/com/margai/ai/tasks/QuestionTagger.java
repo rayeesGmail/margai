@@ -24,7 +24,7 @@ public interface QuestionTagger {
     /** The model the REASON tier will reach, for the guard and each tag's provenance. */
     String model();
 
-    /** The active prompt as the ledger names it, {@code pyq_tag.v1}. */
+    /** The active prompt as the ledger names it, {@code pyq_tag.v2}. */
     String promptVersion();
 
     /**
@@ -40,16 +40,27 @@ public interface QuestionTagger {
     /**
      * One question as the tagger sees it: never its answer.
      *
-     * @param subject the subject the booklet prints it under
+     * @param subject     the subject the booklet prints it under
+     * @param stemFigures the descriptions of the figures printed with the stem, in order
      */
-    record Question(int number, String subject, String stem, List<Option> options) {
+    record Question(int number, String subject, String stem, List<String> stemFigures, List<Option> options) {
 
         public Question {
+            stemFigures = stemFigures == null ? List.of() : List.copyOf(stemFigures);
             options = List.copyOf(options);
         }
     }
 
-    /** An option as printed. */
-    record Option(String key, String text) {
+    /**
+     * An option as printed.
+     *
+     * @param text    blank for an option that is only a figure
+     * @param figures the descriptions of the figures the option prints, in order
+     */
+    record Option(String key, String text, List<String> figures) {
+
+        public Option {
+            figures = figures == null ? List.of() : List.copyOf(figures);
+        }
     }
 }

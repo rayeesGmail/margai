@@ -9,6 +9,7 @@ import com.margai.ai.tasks.PyqTag;
 import com.margai.ai.tasks.QuestionTagger;
 import com.margai.curriculum.api.PaperSection;
 import com.margai.curriculum.api.PaperSubject;
+import com.margai.curriculum.api.QuestionFigure;
 import com.margai.curriculum.api.QuestionOption;
 import com.margai.storage.api.ObjectStore;
 import java.nio.charset.StandardCharsets;
@@ -54,6 +55,9 @@ class PyqTagCommand extends PyqPaperCommand {
 
     static final int SAMPLE = 40;
     static final String TAXONOMY = "taxonomy.csv";
+    /** Where a figure is printed ({@code questions.figures.at}): with the stem, or as or beside option N. */
+    static final String STEM = "stem";
+    static final String OPTION = "option:";
 
     @Option(names = "--questions", paramLabel = "N[,N…]", split = ",",
             description = "Only these question numbers (default: every question without a current valid tag).")
@@ -222,16 +226,29 @@ class PyqTagCommand extends PyqPaperCommand {
                 && tagger.promptVersion().equals(line.prompt());
     }
 
-    private static QuestionTagger.Question asked(PaperSubject printed, PaperFile.Question question) {
-        return new QuestionTagger.Question(question.no(), printed.name(), question.stemEn(), question.options().stream()
-                .map(option -> new QuestionTagger.Option(option.key(), option.textEn())).toList());
+    /** The question as the tagger reads it: the stem and options, each figure's description where it is printed. */
+    static QuestionTagger.Question asked(PaperSubject printed, PaperFile.Question question) {
+        return new QuestionTagger.Question(question.no(), printed.name(), question.stemEn(), figuresAt(question, STEM),
+                question.options().stream().map(option -> new QuestionTagger.Option(option.key(), option.textEn(),
+                        figuresAt(question, OPTION + option.key()))).toList());
     }
 
-    /** The sha256 of the words the tagger reads — the stem and each option — so a corrected question is re-tagged. */
+    private static List<String> figuresAt(PaperFile.Question question, String at) {
+        return question.figures().stream().filter(figure -> at.equals(figure.at())).map(QuestionFigure::description).toList();
+    }
+
+    /**
+     * The sha256 of the words the tagger reads — the stem, each option and, for a question that prints figures,
+     * each figure's place and description — so a corrected question is re-tagged. A question without figures
+     * hashes as it did before the figures were read ({@code pyq_tag.v1}), so its tag stays current.
+     */
     static String textSha(PaperFile.Question question) {
         StringBuilder text = new StringBuilder(question.stemEn());
         for (QuestionOption option : question.options()) {
             text.append('\n').append(option.key()).append('\t').append(option.textEn());
+        }
+        for (QuestionFigure figure : question.figures()) {
+            text.append('\n').append(figure.at()).append('\t').append(figure.description());
         }
         return PyqExtractCommand.sha256(text.toString().getBytes(StandardCharsets.UTF_8));
     }

@@ -164,12 +164,18 @@ class PyqTagCommand extends PyqPaperCommand {
         report.section("primary tags per chapter").table(List.of("section", "chapter", "questions"), perSection);
         report.section("out of syllabus — for the founder to check")
                 .list(valid.stream().filter(PyqTagLine::outOfSyllabus)
-                        .map(line -> "Q" + line.question() + " → " + line.primary() + ": " + line.reason()).toList(), "none");
+                        .map(line -> "Q" + line.question() + " → " + line.primary() + ": " + line.reason()
+                                + (rulings.containsKey(line.question()) ? " (ruled — below)" : "")).toList(), "none");
         report.section("ruled by the founder — `pyq load` puts each ruling in place of the tagger's tag")
                 .list(rulings.values().stream().map(ruling -> "Q" + ruling.question() + ": "
                         + tagged(done.get(ruling.question())) + " → ruled " + ruling.primary()
                         + (ruling.outOfSyllabus() ? ", out of syllabus" : ", in syllabus")
                         + problem(taxonomy, paper.row().sectionOf(ruling.question()).subject(), ruling)).toList(), "none");
+        List<String> noAnchor = rulings.values().stream().filter(PyqTagRuling::noNcertAnchor)
+                .map(ruling -> "Q" + ruling.question()).toList();
+        report.section("no NCERT anchor (the founder's rulings) — no AI solution is written for these")
+                .line("this paper: " + share(noAnchor.size(), file.questions().size()))
+                .list(noAnchor, "none");
         report.section("the founder's review list — below the review floor (" + pyq.tagReviewFloor() + "): each loads as "
                         + "`review`, never as a normal tag, until he rules")
                 .list(valid.stream().filter(line -> !rulings.containsKey(line.question()))

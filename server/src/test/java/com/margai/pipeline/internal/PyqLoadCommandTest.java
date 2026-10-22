@@ -171,7 +171,20 @@ class PyqLoadCommandTest {
                 .contains("- Q1 → PHY.11.ROT (ruled 2026-10-21; the tagger's PHY.11.ROT.MOI, 0.9): the chapter, not the topic")
                 .contains("- Q4 → CHE.11.BASICS (ruled 2026-10-22; the tagger has no tag of its current words)")
                 .contains("- Q1: PHY.11.ROT.NEW — a proposed node");
-        assertThat(report.substring(report.indexOf("## no NCERT anchor"))).startsWith("## no NCERT anchor").contains("- Q4");
+        assertThat(report.substring(report.indexOf("## no NCERT anchor"))).startsWith("## no NCERT anchor")
+                .contains("this paper: 1 of 4 (25.0%)").contains("- Q4")
+                .contains("the bank: 1 of 4 (25.0%) — ABOVE the founder's ~2% line: for him to revisit the policy");
+    }
+
+    /** The founder's ~2% line (2026-10-22): flagged strictly above it, within it otherwise. */
+    @Test
+    void theBankLineFlagsNoAnchorQuestionsAboveTheFoundersShare() {
+        BigDecimal share = new BigDecimal("0.02");
+
+        assertThat(PyqLoadCommand.bankLine(1, 180, share)).isEqualTo("the bank: 1 of 180 (0.6%) — within the founder's ~2% line");
+        assertThat(PyqLoadCommand.bankLine(36, 1800, share)).contains("36 of 1800 (2.0%) — within");
+        assertThat(PyqLoadCommand.bankLine(37, 1800, share)).contains("ABOVE the founder's ~2% line");
+        assertThat(PyqLoadCommand.bankLine(0, 0, share)).isEqualTo("the bank: 0 of 0 (0%) — within the founder's ~2% line");
     }
 
     private static PyqTagLine confidence(PyqTagLine line, String confidence) {

@@ -363,7 +363,7 @@ class PyqExtractCommandTest {
 
     static PyqProperties pyq() {
         return new PyqProperties("claude-opus-5-5", "claude-sonnet-5-5", 2, new BigDecimal("0.70"), new BigDecimal("0.50"),
-                "papers");
+                new BigDecimal("0.02"), "papers");
     }
 
     private void register(String languages, String pages, String sha256) throws IOException {

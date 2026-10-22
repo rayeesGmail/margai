@@ -76,6 +76,12 @@ final class PyqTagRulingsYamlReader {
         return rulings.byQuestion();
     }
 
+    /** The rulings across every paper that mark "no NCERT anchor" — the numerator of the founder's ~2% line. */
+    static long noNcertAnchorCount(Path file) {
+        return read(file).values().stream().flatMap(paper -> paper.byQuestion().values().stream())
+                .filter(PyqTagRuling::noNcertAnchor).count();
+    }
+
     static Map<String, PaperRulings> read(Path file) {
         JsonNode root;
         try (InputStream in = Files.newInputStream(file)) {

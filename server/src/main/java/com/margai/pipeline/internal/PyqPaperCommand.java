@@ -33,6 +33,15 @@ abstract class PyqPaperCommand extends InputFileCommand {
     /** The register's paper codes, which the tag rulings file may name and no other. */
     private Set<String> registered = Set.of();
 
+    /** The rulings across every paper that mark "no NCERT anchor", once {@link #rulings} has read the file. */
+    long noAnchorRulings;
+
+    /** {@code part} of {@code whole} as the reports print it: "1 of 180 (0.6%)". */
+    static String share(long part, long whole) {
+        return part + " of " + whole + " (" + (whole == 0 ? "0" : String.format(java.util.Locale.ROOT, "%.1f",
+                100.0 * part / whole)) + "%)";
+    }
+
     @Override
     final void run(Path inputFile, Report report) {
         List<PaperDefinition> papers = PyqPapersYamlReader.read(inputFile);
@@ -66,6 +75,7 @@ abstract class PyqPaperCommand extends InputFileCommand {
         }
         Map<Short, PyqTagRuling> rulings = PyqTagRulingsYamlReader.forPaper(file, paper, registered,
                 approvedFile(pyq, paper));
+        noAnchorRulings = PyqTagRulingsYamlReader.noNcertAnchorCount(file);
         report.line("tag rulings: " + file.normalize() + " sha256 " + Report.sha256(file) + " (" + rulings.size()
                 + " for this paper)");
         return rulings;

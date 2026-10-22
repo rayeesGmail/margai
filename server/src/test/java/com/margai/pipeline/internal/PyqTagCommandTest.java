@@ -92,8 +92,9 @@ class PyqTagCommandTest {
                     rulings:
                       - question: 2
                         primary: PHY.11.ROT
+                        anchor: none
                         ruled: 2026-10-21
-                        note: in syllabus
+                        note: in syllabus, but NCERT cut it
                       - question: 3
                         primary: PHY.11.ROT
                         ruled: 2026-10-21
@@ -108,6 +109,9 @@ class PyqTagCommandTest {
                         + "PHY.11.ROT is physics");
         String reviewList = report.substring(report.indexOf("the founder's review list"), report.indexOf("low-confidence tags"));
         assertThat(reviewList).doesNotContain("Q2");
+        assertThat(report).contains("- Q2 → PHY.11.ROT: a topic since removed (ruled — below)");
+        assertThat(report.substring(report.indexOf("## no NCERT anchor"))).contains("this paper: 1 of 4 (25.0%)")
+                .contains("- Q2");
     }
 
     /** A tag strictly below the review floor is on the founder's review list; one at the floor is not. */

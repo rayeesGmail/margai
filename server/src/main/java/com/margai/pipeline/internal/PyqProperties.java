@@ -20,17 +20,21 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @param tagReviewFloor    below this a tag never loads as a normal one: {@code pyq load} stores it as
  *                          {@code review} and the tag report lists it for the founder (his ruling of 2026-10-21:
  *                          0.5, strictly below)
+ * @param noAnchorRevisitShare above this share of the PYQ bank, the questions ruled "no NCERT anchor" are flagged
+ *                          in {@code pyq load}'s report for the founder to revisit his policy (his ruling of
+ *                          2026-10-22: ~2%)
  * @param papersDirectory   where the approved paper files live under {@code --inputs}
  *                          ({@code papers/}, TECH_PLAN §6.2)
  */
 @ConfigurationProperties(prefix = "margai.pipeline.pyq")
 public record PyqProperties(String transcribeModel, String tagModel, int tagBatchSize, BigDecimal tagLowConfidence,
-        BigDecimal tagReviewFloor, String papersDirectory) {
+        BigDecimal tagReviewFloor, BigDecimal noAnchorRevisitShare, String papersDirectory) {
 
     public PyqProperties {
         tagBatchSize = tagBatchSize <= 0 ? 10 : tagBatchSize;
         tagLowConfidence = tagLowConfidence == null ? new BigDecimal("0.70") : tagLowConfidence;
         tagReviewFloor = tagReviewFloor == null ? new BigDecimal("0.50") : tagReviewFloor;
+        noAnchorRevisitShare = noAnchorRevisitShare == null ? new BigDecimal("0.02") : noAnchorRevisitShare;
         papersDirectory = papersDirectory == null || papersDirectory.isBlank() ? "papers" : papersDirectory;
     }
 }

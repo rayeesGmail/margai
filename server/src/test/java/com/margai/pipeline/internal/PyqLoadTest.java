@@ -88,6 +88,7 @@ class PyqLoadTest {
                 .isEqualTo("[]");
         assertThat(first.stored()).extracting(PyqLoadReport.StoredQuestion::tagStatus)
                 .containsExactly(TagStatus.model, TagStatus.model, TagStatus.model, TagStatus.review);
+        assertThat(first.bankQuestions()).isEqualTo(4);
         assertThat(jdbc.queryForList("SELECT tag_status FROM questions ORDER BY question_no", String.class))
                 .containsExactly("model", "model", "model", "review");
 

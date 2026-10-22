@@ -8,7 +8,9 @@ import java.util.List;
  * inside the load's transaction, so the D19 ✅ counts the bank and not the file. There is no orphan
  * list: a question of the paper in the bank but not in the file refuses the load.
  *
- * @param stored the paper's questions in the database after the load, in question order
+ * @param stored        the paper's questions in the database after the load, in question order
+ * @param bankQuestions every PYQ in the bank after the load, across papers — the denominator of the founder's
+ *                      ~2% line for questions with no NCERT anchor (DECISIONS 2026-10-22)
  */
 public record PyqLoadReport(
         boolean paperInserted,
@@ -16,7 +18,8 @@ public record PyqLoadReport(
         int inserted,
         int updated,
         int unchanged,
-        List<StoredQuestion> stored) {
+        List<StoredQuestion> stored,
+        long bankQuestions) {
 
     public PyqLoadReport {
         stored = List.copyOf(stored);

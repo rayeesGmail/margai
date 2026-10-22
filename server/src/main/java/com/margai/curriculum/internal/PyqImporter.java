@@ -130,7 +130,8 @@ class PyqImporter {
                 !question.getFigures().isEmpty(), question.getAnswerStatus(),
                 count(question.getAsPrinted(), AsPrintedDisplay.show),
                 count(question.getAsPrinted(), AsPrintedDisplay.record_only), question.getTagStatus())).toList();
-        return new PyqLoadReport(paperInserted, paperUpdated, inserted, updated, unchanged, stored);
+        return new PyqLoadReport(paperInserted, paperUpdated, inserted, updated, unchanged, stored,
+                questions.countBySource(QuestionSource.pyq));
     }
 
     private static int count(List<QuestionAsPrinted> kept, AsPrintedDisplay display) {

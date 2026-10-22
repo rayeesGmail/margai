@@ -143,7 +143,9 @@ as `tag_status = founder`; a tagger's tag below the floor loads as `review`. *(C
 founder to overrule: the tagger's tag is kept beside a ruling, and a ruled question needs no valid tag of its own;
 the report counts the three statuses and lists the review questions, the rulings, the taxonomy-gap list and any
 question with no NCERT anchor, which D20 does not solve until the founder rules; a paper loaded before V11 reads
-`model` for every question until it is loaded again.)*
+`model` for every question until it is loaded again.)* *Since 2026-10-22 (the founder; DECISIONS):* no AI solution
+is written for a "no NCERT anchor" question; the load report counts them for the paper and against the whole PYQ
+bank, and flags the bank's share above ~2% for the founder to revisit — tell him when it does.
 
 ## Order (README §7)
 

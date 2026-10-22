@@ -444,7 +444,7 @@ class PipelineCommandTest {
                                     .filter(kept -> kept.display() == com.margai.curriculum.api.AsPrintedDisplay.show).count(),
                             (int) question.asPrinted().stream()
                                     .filter(kept -> kept.display() == com.margai.curriculum.api.AsPrintedDisplay.record_only)
-                                    .count(), question.tagStatus())).toList());
+                                    .count(), question.tagStatus())).toList(), questions.size());
         }
 
         /** What {@link #paragraphs} answers: the rows `ncert verify` reads. */

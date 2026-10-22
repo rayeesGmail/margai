@@ -144,9 +144,14 @@ class PyqLoadCommand extends PyqPaperCommand {
         report.section("the taxonomy-gap list — a node proposed for each, for the founder to rule")
                 .list(rulings.values().stream().filter(ruling -> ruling.gap() != null)
                         .map(ruling -> "Q" + ruling.question() + ": " + ruling.gap()).toList(), "none");
-        report.section("no NCERT anchor — D20 writes no solution for these until the founder rules (DECISIONS 2026-10-21)")
-                .list(rulings.values().stream().filter(PyqTagRuling::noNcertAnchor)
-                        .map(ruling -> "Q" + ruling.question()).toList(), "none");
+        List<String> noAnchor = rulings.values().stream().filter(PyqTagRuling::noNcertAnchor)
+                .map(ruling -> "Q" + ruling.question()).toList();
+        report.section("no NCERT anchor — no AI solution is written for these (hard rule 2; the founder, DECISIONS "
+                        + "2026-10-22); they count toward weightage, stay out of topic practice, and a mock serves them "
+                        + "with NTA's key and one line")
+                .line("this paper: " + share(noAnchor.size(), file.questions().size()))
+                .list(noAnchor, "none")
+                .line(bankLine(noAnchorRulings, result.bankQuestions(), pyq.noAnchorRevisitShare()));
         report.section("answers other than one key (NTA's final key; the register's special entries)")
                 .list(result.stored().stream().filter(question -> question.answerStatus() != AnswerStatus.single)
                         .map(question -> "Q" + question.no() + ": " + question.answerStatus()).toList(), "none");
@@ -210,6 +215,18 @@ class PyqLoadCommand extends PyqPaperCommand {
 
     private static PaperFile.Question question(PaperFile file, short no) {
         return file.questions().stream().filter(question -> question.no() == no).findFirst().orElseThrow();
+    }
+
+    /**
+     * The bank's share of questions with no NCERT anchor against the founder's revisit line: the rulings file's
+     * {@code anchor: none} entries across papers over the PYQs in the bank after the load.
+     */
+    static String bankLine(long noAnchor, long bank, BigDecimal revisitShare) {
+        boolean above = bank > 0 && BigDecimal.valueOf(noAnchor).compareTo(revisitShare.multiply(BigDecimal.valueOf(bank))) > 0;
+        return "the bank: " + share(noAnchor, bank) + " — " + (above
+                ? "ABOVE the founder's ~" + revisitShare.movePointRight(2).stripTrailingZeros().toPlainString()
+                        + "% line: for him to revisit the policy (DECISIONS 2026-10-22)"
+                : "within the founder's ~" + revisitShare.movePointRight(2).stripTrailingZeros().toPlainString() + "% line");
     }
 
     /** What a ruling replaced, for the report. */

@@ -835,9 +835,11 @@ flowchart LR
 
 **Full past papers as timed mocks (CS-2 §4.7):** the NEET 2018–2026 papers from the PYQ
 bank run as full timed mocks under exam conditions, followed by the autopsy;
-out-of-syllabus questions (the post-2022 rationalisation) are labelled and excluded from
-the mock's score, and question count and marking follow each paper's own scheme where
-feasible. Free gets the full mock and an autopsy summary; Pro the full autopsy.
+out-of-syllabus questions are labelled and excluded from the mock's score, and question
+count and marking follow each paper's own scheme where feasible. A question is out of
+syllabus when its topic is absent from both the current NMC syllabus and the current NCERT
+books; a topic NCERT has cut but the NMC syllabus still lists is in syllabus. Free gets the
+full mock and an autopsy summary; Pro the full autopsy.
 
 A mock's questions carry the as-printed note of §6.2.
 

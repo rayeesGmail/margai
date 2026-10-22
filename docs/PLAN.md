@@ -195,7 +195,8 @@ tools; your reviews focus on output quality.)*
   `anchor: none` in `pipeline/inputs/pyq-tag-rulings.yaml`; 2025 code 45's Q95 and Q133 are solved once the D24 buffer
   has brought their pages into the corpus. Surfaced with it: CLAUDE.md hard rule 2 and DEV_SPEC R2 allow no AI
   solution without NCERT retrieval grounding, so until the founder rules, D20 generates no solution for a question
-  marked "no NCERT anchor" and lists it for him.)*
+  marked "no NCERT anchor" and lists it for him.)* *Decided 2026-10-22 (the founder; DECISIONS): D20 and D21 write no
+  AI solution for a question with `anchor: none` — hard rule 2 stands.*
 - **D21 —** Solutions for remaining subjects (batch overnight); distractor-map
   generation. ✅ *Second 50-question audit; error rate < agreed threshold.*
 - **D22 —** Weightage & difficulty statistics computed → syllabus nodes updated; the
@@ -208,6 +209,8 @@ tools; your reviews focus on output quality.)*
   (CS-4 §3; at risk): the `concept_primers` migration and `primers generate` begin for the top-50
   weightage chapters (TECH_PLAN §15.7), staged on one chapter first.* *Added 2026-10-21 (the founder; DECISIONS): a
   question whose tag is marked `review` (below the tag floor, 0.5) counts toward no topic's weightage until he rules.*
+  *And (the founder, 2026-10-22; DECISIONS): a question marked "no NCERT anchor" does count toward its topic's
+  weightage — NTA asked it.*
 - **D23 —** Anchor-linking questions↔NCERT; seed the eval suite v1 (~60 questions
   across subjects). ✅ *Eval harness runs and reports.* *Amended 2026-10-18 (founder; DECISIONS
   2026-10-18): the eval suite carries Hindi questions in every subject.* *Amended 2026-10-19 (founder's
@@ -244,7 +247,13 @@ tools; your reviews focus on output quality.)*
   *Added 2026-10-21 (the founder; DECISIONS), under the slippage rule (content-pipeline work in buffers only): the
   Biology unit-opening essays and biography pages come into the corpus, English and Hindi (~₹250) — 2025 code 45's
   Q95 and Q133 are answered from them. Proposed with it (Claude, for the founder to rule; DECISIONS 2026-10-21): table
-  coverage — about 145 NCERT tables, none of them in the corpus today, at ≈₹1,300.*
+  coverage — about 145 NCERT tables, none of them in the corpus today, at ≈₹1,300.* *Approved 2026-10-22 (the
+  founder; DECISIONS): table coverage, both editions, ~₹1,300 plus the eval gate and a retrieval rerun; tables stored
+  so retrieval can hit individual rows; Biology first, then Chemistry, then Physics; what does not fit D24 beside the
+  Biology unit openers moves to the next buffer under the slippage rule.* *The split (Claude's estimate, same
+  DECISIONS, for the founder to overrule): D24 builds the table pass and runs it on Biology, both editions (18
+  tables); Chemistry and Physics move to D36 — logged there and in TRACKER's slippage log — and if Biology's tables
+  do not fit D24 either, they move with them.*
 
 ### PHASE 3 — Onboarding & first plan (Week 5, Days 25–30) — Modules M2 + M4(v0)
 
@@ -318,7 +327,9 @@ tools; your reviews focus on output quality.)*
   DECISIONS, for the founder to overrule: written in this crop work — which, if the crop design is adopted as logged,
   amends every approved paper file with its crop boxes anyway — as a Hindi note beside the English one on each `show`
   entry, required from then.)* *And (the founder, 2026-10-21; DECISIONS): a question whose tag is marked `review` is
-  not picked for topic practice until he rules; full past-paper mocks still serve it (D35).*
+  not picked for topic practice until he rules; full past-paper mocks still serve it (D35).* *And (the founder,
+  2026-10-22; DECISIONS): a question marked "no NCERT anchor" is never picked for topic practice. (Claude's, same
+  DECISIONS, for the founder to overrule: the mark gets a column here, the first reader that filters on it.)*
 - **D32 —** Practice UI: timer, taps, verdict + solution sheet + NCERT anchor chip.
   ✅ *A 10-question timed set feels smooth on a mid-range phone.*
 - **D33 —** Session summary (accuracy, speed vs your norm, sent-to-notebook list);
@@ -337,9 +348,15 @@ tools; your reviews focus on output quality.)*
   §7.1's "2018–2026" is put to the founder; and a mock refuses a paper whose marking is not yet sourced (Claude's
   reading of the founder's gap-4 rider, for the founder to overrule; DECISIONS 2026-10-20).* *Noted 2026-10-21 (the
   founder; DECISIONS): out of syllabus is SPEC §7.1's amended definition, and a question whose tag is marked `review`
-  is still served in a full past-paper mock.*
+  is still served in a full past-paper mock.* *And (the founder, 2026-10-22; DECISIONS): a mock serves a question
+  marked "no NCERT anchor" with the official key only and one line, "This topic isn't in your current NCERT book;
+  answer as per NTA's key." (in English and Hindi from the ARB files — Claude's, same DECISIONS).*
   ✅ adds: at least one full past paper runs end to end as a timed mock (CS-2 §10).*
-- **D36 —** Buffer + **Week-6 gate:** practice loop end-to-end incl. offline + diagnostic.
+- **D36 —** Buffer + **Week-6 gate:** practice loop end-to-end incl. offline + diagnostic. *Moved here 2026-10-22
+  from D24 under the slippage rule (the founder's table ruling; the split Claude's, DECISIONS 2026-10-22): the NCERT
+  table pass on Chemistry, English — its Hindi following the four Chemistry Hindi books in the beta period — then
+  Physics, both editions, each table stored so retrieval can hit its rows; the gate never waits on it (Claude's, same
+  DECISIONS).*
 
 ### PHASE 5 — Doubt solver (Weeks 7–8, Days 37–48) — Module M6 (the hero)
 

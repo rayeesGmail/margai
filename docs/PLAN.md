@@ -210,7 +210,10 @@ tools; your reviews focus on output quality.)*
   weightage chapters (TECH_PLAN §15.7), staged on one chapter first.* *Added 2026-10-21 (the founder; DECISIONS): a
   question whose tag is marked `review` (below the tag floor, 0.5) counts toward no topic's weightage until he rules.*
   *And (the founder, 2026-10-22; DECISIONS): a question marked "no NCERT anchor" does count toward its topic's
-  weightage — NTA asked it.*
+  weightage — NTA asked it.* *And (the founder, 2026-10-22; DECISIONS): a multi-topic question shares its weightage
+  credit across its primary and secondary tags, not the primary alone. (Proposed by Claude, same DECISIONS, for the
+  founder to rule: one unit a question — 1.0 to a lone primary, 0.7/0.3 with one secondary, 0.6/0.2/0.2 with two; a
+  chapter-coded tag credits the chapter.)*
 - **D23 —** Anchor-linking questions↔NCERT; seed the eval suite v1 (~60 questions
   across subjects). ✅ *Eval harness runs and reports.* *Amended 2026-10-18 (founder; DECISIONS
   2026-10-18): the eval suite carries Hindi questions in every subject.* *Amended 2026-10-19 (founder's
@@ -342,10 +345,11 @@ tools; your reviews focus on output quality.)*
   ability estimates update chapter status; the intro names the diagnostic as the fastest
   way to shift the weight from “students like you” to “you” (SPEC §6.1, CS-1 §5.6 — added
   2026-09-12). ✅ *Diagnostic shifts a seeded user's plan.* *Added 2026-10-01 (CS-2 §4.7, CS-4 §6):
-  full NEET 2018–2026 past papers as timed mocks (`kind = mock`, TECH_PLAN §0.5 item 2), out-of-syllabus
+  full NEET 2018–2026 past papers (*since 2026-10-22, SPEC §7.1: the papers in the PYQ bank, currently 2019–2026*) as timed mocks (`kind = mock`, TECH_PLAN §0.5 item 2), out-of-syllabus
   questions excluded from the score; every mock result captured for the later private percentile.
   *Noted 2026-10-20 (D19): the bank's span is NEET 2019–2026, 2018 only if a fitting key turns up (README §6); SPEC
-  §7.1's "2018–2026" is put to the founder; and a mock refuses a paper whose marking is not yet sourced (Claude's
+  §7.1's "2018–2026" is put to the founder (decided 2026-10-22: "the NEET papers in the PYQ bank (currently
+  2019–2026)"; DECISIONS); and a mock refuses a paper whose marking is not yet sourced (Claude's
   reading of the founder's gap-4 rider, for the founder to overrule; DECISIONS 2026-10-20).* *Noted 2026-10-21 (the
   founder; DECISIONS): out of syllabus is SPEC §7.1's amended definition, and a question whose tag is marked `review`
   is still served in a full past-paper mock.* *And (the founder, 2026-10-22; DECISIONS): a mock serves a question

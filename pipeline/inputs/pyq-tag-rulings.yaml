@@ -40,6 +40,20 @@ papers:
         gap: CHE.12.AMINES.ANILINE — Reactions of aniline, electrophilic substitution (e.g. bromination)
         ruled: 2026-10-22
         note: The tagger's v2 tag without its weak secondary, basic character of amines; aniline's electrophilic substitution has no topic, so it goes on the taxonomy-gap list.
+      - question: 83
+        primary: CHE.12.CARBONYL
+        out_of_syllabus: false
+        anchor: chem12-part2 ch 8 §8.2.2 ¶4 (preparation of aldehydes — "esters are also reduced to aldehydes with DIBAL-H")
+        gap: CHE.12.CARBONYL.PREP — Preparation of aldehydes and ketones (e.g. esters to aldehydes with DIBAL-H)
+        ruled: 2026-10-22
+        note: 40-sample correction — the question tests the preparation of an aldehyde from an ester, not oxidation and reduction (REDOX); the taxonomy has no preparation topic, so the chapter, without the chapter-level secondary, and a gap.
+      - question: 90
+        primary: CHE.11.GOCTECH.QUALIT
+        secondary: [CHE.11.GOCTECH.QUANTIT]
+        out_of_syllabus: false
+        anchor: chem11-part2 ch 8 §8.9.2 ¶1 (Lassaigne's test)
+        ruled: 2026-10-22
+        note: 40-sample correction — the primary kept; CHE.00.PRACTICAL.ELEMENTS dropped as a duplicate of the primary, CHE.11.GOCTECH.QUANTIT the only secondary.
       - question: 95
         primary: BOT.11.CELL
         out_of_syllabus: false
@@ -47,6 +61,19 @@ papers:
         gap: BOT.11.CELL.OPENER — Unit opening, the physico-chemical (reductionist) approach to living organisms
         ruled: 2026-10-21
         note: Not out of syllabus — NTA set it under the 2025 syllabus, from NCERT's introductory text on reductionist biology.
+      - question: 101
+        primary: ZOO.11.BREATH.DISORDER
+        secondary: [ZOO.11.EXCRET.DISORDER, ZOO.11.CIRC.DISORDER]
+        out_of_syllabus: false
+        anchor: bio11 ch 14 §14.6 ¶2 (emphysema); ch 15 §15.6 ¶3 (angina pectoris); ch 16 §16.8 ¶4 (glomerulonephritis); ch 17 §17.5 ¶3 (tetany)
+        ruled: 2026-10-22
+        note: Approved as tagged — four disorders across four chapters, a tag holding three codes, so ZOO.11.LOCOMOT.DISORDER is left out.
+      - question: 115
+        primary: BOT.12.BIOTECHP.TOOLS
+        out_of_syllabus: false
+        anchor: bio12 ch 9 §9.2.2 ¶6 (Cloning Vectors — insertional inactivation, blue and white colonies)
+        ruled: 2026-10-22
+        note: NCERT teaches insertional inactivation under 9.2 Tools (Cloning Vectors), not 9.3 Processes; one idea, no secondary.
       - question: 133
         primary: BOT.12.ORGPOP
         out_of_syllabus: false

@@ -162,6 +162,11 @@ class PyqTagCommand extends PyqPaperCommand {
         report.section("out of syllabus — for the founder to check")
                 .list(valid.stream().filter(PyqTagLine::outOfSyllabus)
                         .map(line -> "Q" + line.question() + " → " + line.primary() + ": " + line.reason()).toList(), "none");
+        report.section("the founder's review list — below the review floor (" + pyq.tagReviewFloor() + "): each loads as "
+                        + "`review`, never as a normal tag, until he rules")
+                .list(valid.stream().filter(line -> line.belowFloor(pyq.tagReviewFloor()))
+                        .map(line -> "Q" + line.question() + " → " + line.primary() + " (" + line.confidence() + "): "
+                                + line.reason()).toList(), "none");
         report.section("low-confidence tags (below " + pyq.tagLowConfidence() + ") — a routing signal, not a guarantee")
                 .list(valid.stream().filter(line -> line.confidence() != null
                                 && line.confidence().compareTo(pyq.tagLowConfidence()) < 0)
@@ -240,7 +245,9 @@ class PyqTagCommand extends PyqPaperCommand {
     /**
      * The sha256 of the words the tagger reads — the stem, each option and, for a question that prints figures,
      * each figure's place and description — so a corrected question is re-tagged. A question without figures
-     * hashes as it did before the figures were read ({@code pyq_tag.v1}), so its tag stays current.
+     * hashes as it did before the figures were read ({@code pyq_tag.v1}), so {@code pyq load} still takes its v1
+     * tag; {@code pyq tag} re-tags a tag of another prompt version, so a v2 run over a v1 paper names its
+     * questions ({@code --redo --questions}).
      */
     static String textSha(PaperFile.Question question) {
         StringBuilder text = new StringBuilder(question.stemEn());

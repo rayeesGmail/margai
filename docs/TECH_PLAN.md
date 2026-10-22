@@ -606,7 +606,13 @@ key carrier, and checked for an answer hint before D31 serves it, with the figur
 spelling or grammar slip a student reads correctly is recorded only (`record_only`).* *And (the founder, 2026-10-21;
 DECISIONS): a Hindi line for `show` entries before D40 serves the note — Claude's, same DECISIONS, for the founder to
 overrule: a Hindi note beside the English one on each `show` entry, added in the crop work before D31, its shape settled
-then.*
+then.* *Amended 2026-10-22 (the founder's approval of 2026-10-21 — "a tag below a confidence floor … never loads as a
+normal tag. It loads flagged for review"; DECISIONS):* `tag_status VARCHAR(16) NOT NULL DEFAULT 'model' CHECK (model |
+review | founder)` (V11) — `review` for a tagger's tag below `margai.pipeline.pyq.tag-review-floor` (0.5, strictly
+below), `founder` for a tag the founder ruled in `pipeline/inputs/pyq-tag-rulings.yaml`. A `review` question counts
+toward no topic's weightage (D22) and is not picked for topic practice (D31) until he rules; a full past-paper mock
+still serves it (D35) — the founder's. A column rather than a key of `tagging`, since those readers filter on it (§2.1)
+— Claude's, for the founder to overrule.
 
 **question_topics** — D19: `question_id, node_id, PRIMARY KEY (question_id, node_id)` (secondary
 topics). **question_anchors** — D23: `question_id, paragraph_id, PRIMARY KEY`.
@@ -778,6 +784,7 @@ Numbers are indicative; the agent takes the next free integer.
 | V8 `ncert_hnsw` | ~~D17~~ **D15** — *moved 2026-09-19/20 with the founder's re-order (DECISIONS; PLAN D15)* | HNSW index on `ncert_paragraphs.embedding`. ~~(created once rows exist)~~ — *shipped 2026-09-20 on the empty column instead: a migration cannot wait for a pipeline run, HNSW accepts inserts after creation, and at ~900 rows now and ~9,000 at D17 the build-order difference is not measurable* |
 | V9 `questions` | D19 | questions, question_topics; *pyq_papers and the `ai_calls.feature` value `pipeline_tag` too (2026-10-20, the founder's D19 rulings)* |
 | V10 `question_as_printed` | D19 — *added 2026-10-21 (Claude's, for the founder's instruction on as-printed notes; DECISIONS)* | `questions.as_printed` (§2.3) — *a second D19 migration, against "one migration per PLAN day", because V9 is applied and never edited; it takes the number planned below for D23's anchors, each planned migration taking the next free number when it ships (the numbers are indicative, as the `collective_records` row already shows); the applied V8 and V9 still say "V10" for D23's HNSW index, as history* |
+| V11 `question_tag_status` | D19 — *added 2026-10-22 (the founder's approval of the tag review floor, 2026-10-21; DECISIONS)* | `questions.tag_status` (§2.3) — *a third D19 migration, for the same reason as V10* |
 | next free `collective_records` — *added 2026-09-12, CS-1* | D22 | collective_records (§2.3); the `ai_calls.feature` CHECK gains `pipeline_collective` (§2.8) |
 | V10 `question_anchors` | D23 | question_anchors; HNSW on `questions.embedding` |
 | V11 `batch_positions` | D25 | batch_positions (§0.5 item 3) |

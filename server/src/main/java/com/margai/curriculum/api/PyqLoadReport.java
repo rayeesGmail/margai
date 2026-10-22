@@ -28,8 +28,9 @@ public record PyqLoadReport(
      * @param nodeCode           the primary node's code
      * @param asPrintedShow       the misprints kept as printed whose note the app shows
      * @param asPrintedRecordOnly the misprints kept as printed and only recorded
+     * @param tagStatus           whose tag it carries (V11)
      */
     public record StoredQuestion(short no, String nodeCode, int secondaryTopics, boolean outOfSyllabus, boolean hasFigure,
-            AnswerStatus answerStatus, int asPrintedShow, int asPrintedRecordOnly) {
+            AnswerStatus answerStatus, int asPrintedShow, int asPrintedRecordOnly, TagStatus tagStatus) {
     }
 }

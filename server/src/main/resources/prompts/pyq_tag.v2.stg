@@ -52,7 +52,8 @@ HOW TO TAG
   Then primary is the code of the chapter the question would belong to, the nearest chapter on the
   list. A topic the NCERT textbooks teach is in syllabus even where no topic on the list names it —
   a unit's opening pages, a biography or profile box, a table — and then primary is the chapter whose
-  pages teach it. A topic on the list in different words is in syllabus. When in doubt, it is in
+  pages teach it. A topic the syllabus still lists but the NCERT textbooks no longer teach is in
+  syllabus too. A topic on the list in different words is in syllabus. When in doubt, it is in
   syllabus and your reason says what you doubted.
 - confidence: from 0 to 1, how sure you are of the primary code. A low confidence sends the question
   to a person.

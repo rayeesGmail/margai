@@ -16,6 +16,7 @@ import com.margai.curriculum.api.QuestionExtraction;
 import com.margai.curriculum.api.QuestionFigure;
 import com.margai.curriculum.api.QuestionOption;
 import com.margai.curriculum.api.QuestionTagging;
+import com.margai.curriculum.api.TagStatus;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -84,6 +85,10 @@ class PyqLoadTest {
                 .isEqualTo("record_only");
         assertThat(jdbc.queryForObject("SELECT as_printed::text FROM questions WHERE question_no = 2", String.class))
                 .isEqualTo("[]");
+        assertThat(first.stored()).extracting(PyqLoadReport.StoredQuestion::tagStatus)
+                .containsExactly(TagStatus.model, TagStatus.model, TagStatus.model, TagStatus.review);
+        assertThat(jdbc.queryForList("SELECT tag_status FROM questions ORDER BY question_no", String.class))
+                .containsExactly("model", "model", "model", "review");
 
         PyqLoadReport second = imports.loadPaper(paper(), questions());
 
@@ -103,7 +108,7 @@ class PyqLoadTest {
                 first.stemEn(), first.stemHi(), first.options(), first.answerStatus(), first.correctKey(), first.acceptedKeys(),
                 first.figures(), first.extraction(), first.tagging(),
                 List.of(new QuestionAsPrinted("stem", "Question", "The question", "the article 'The' is missing",
-                        AsPrintedDisplay.record_only))));
+                        AsPrintedDisplay.record_only)), first.tagStatus()));
 
         PyqLoadReport again = imports.loadPaper(paper(), renoted);
 
@@ -167,7 +172,7 @@ class PyqLoadTest {
         PyqQuestionRow first = question(1, "PHY.11.ROT.MOI", List.of(), AnswerStatus.single, "3", null);
         outOnATopic.set(0, new PyqQuestionRow(first.questionNo(), first.nodeCode(), first.secondaryNodeCodes(), true,
                 first.stemEn(), first.stemHi(), first.options(), first.answerStatus(), first.correctKey(), first.acceptedKeys(),
-                first.figures(), first.extraction(), first.tagging(), first.asPrinted()));
+                first.figures(), first.extraction(), first.tagging(), first.asPrinted(), first.tagStatus()));
         assertThatThrownBy(() -> imports.loadPaper(paper(), outOnATopic))
                 .isInstanceOf(CurriculumImportException.class).hasMessageContaining("it keeps the nearest chapter");
 
@@ -231,6 +236,7 @@ class PyqLoadTest {
                                 AsPrintedDisplay.record_only),
                         new QuestionAsPrinted("stem", "Question " + no, "Question 2", "'1' is printed where '2' is meant",
                                 AsPrintedDisplay.show))
-                        : List.of());
+                        : List.of(),
+                no == 4 ? TagStatus.review : TagStatus.model);
     }
 }

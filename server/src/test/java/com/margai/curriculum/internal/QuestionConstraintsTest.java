@@ -19,6 +19,7 @@ import com.margai.curriculum.api.QuestionOption;
 import com.margai.curriculum.api.QuestionSource;
 import com.margai.curriculum.api.QuestionTagging;
 import com.margai.curriculum.api.Subject;
+import com.margai.curriculum.api.TagStatus;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -40,7 +41,7 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * Repository slice (TECH_PLAN §8.1): migration V9 applies and its constraints hold — the paper's
  * identity, the PYQ natural key and its paper, the answer-status check in every direction the
- * founder's D19 rulings gave it, the '1'–'4' key domain, and the secondary-topic key. The JSONB
+ * founder's D19 rulings gave it, the '1'–'4' key domain, and the secondary-topic key — and V11's tag status. The JSONB
  * columns round-trip as their records, and the answer never serialises from the entity.
  */
 @DataJpaTest
@@ -169,6 +170,25 @@ class QuestionConstraintsTest {
         assertThat(read.apply(otherChapter, row)).isTrue();
     }
 
+    /** V11: whose tag a question carries is one of three values, and a changed status is a change. */
+    @Test
+    void theTagStatusIsOneOfThreeAndAChangeIsAnUpdate() {
+        PyqQuestionRow row = single((short) 1, "3");
+        Question saved = questions.saveAndFlush(pyq("45", row));
+        entityManager.clear();
+
+        Question read = questions.findAll().getFirst();
+        assertThat(read.getTagStatus()).isEqualTo(TagStatus.model);
+        assertThat(read.apply(chapter, new PyqQuestionRow(row.questionNo(), row.nodeCode(), row.secondaryNodeCodes(),
+                row.outOfSyllabus(), row.stemEn(), row.stemHi(), row.options(), row.answerStatus(), row.correctKey(),
+                row.acceptedKeys(), row.figures(), row.extraction(), row.tagging(), row.asPrinted(), TagStatus.review)))
+                .isTrue();
+        assertThat(read.getTagStatus()).isEqualTo(TagStatus.review);
+        assertThatThrownBy(() -> entityManager.createNativeQuery("UPDATE questions SET tag_status = 'guessed' WHERE id = ?1")
+                .setParameter(1, saved.getId()).executeUpdate())
+                .hasStackTraceContaining("questions_tag_status_check");
+    }
+
     @Test
     void aSecondaryTopicIsKeyedOnTheQuestionAndNode() {
         Question question = questions.saveAndFlush(pyq("45", single((short) 1, "3")));
@@ -208,7 +228,7 @@ class QuestionConstraintsTest {
                 new QuestionExtraction(List.of(3), List.of(UUID.randomUUID()), "claude-opus-5-5", "pyq_extract.v1", List.of()),
                 new QuestionTagging(UUID.randomUUID(), "claude-sonnet-5-5", "pyq_tag.v1", new BigDecimal("0.92"),
                         "rolling motion: velocity of points on a rolling wheel"),
-                List.of());
+                List.of(), TagStatus.model);
     }
 
     private static PyqPaperRow paper(String code, String paperCode) {

@@ -129,7 +129,7 @@ class PyqImporter {
                 topicCounts.getOrDefault(question.getId(), 0L).intValue(), question.isOutOfSyllabus(),
                 !question.getFigures().isEmpty(), question.getAnswerStatus(),
                 count(question.getAsPrinted(), AsPrintedDisplay.show),
-                count(question.getAsPrinted(), AsPrintedDisplay.record_only))).toList();
+                count(question.getAsPrinted(), AsPrintedDisplay.record_only), question.getTagStatus())).toList();
         return new PyqLoadReport(paperInserted, paperUpdated, inserted, updated, unchanged, stored);
     }
 

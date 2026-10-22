@@ -35,6 +35,11 @@ record PyqTagLine(
         return problem == null;
     }
 
+    /** Below the review floor: such a tag loads as {@code review}, never as a normal tag (the founder, 2026-10-21). */
+    boolean belowFloor(BigDecimal floor) {
+        return confidence == null || confidence.compareTo(floor) < 0;
+    }
+
     /** A line for a question whose call failed every time: no tag, the failure as its problem. */
     static PyqTagLine failed(short question, String questionSha256, String prompt, String failure) {
         return new PyqTagLine(question, null, List.of(), false, null, null, null, null, prompt, questionSha256,

@@ -78,6 +78,20 @@ class PyqTagCommandTest {
                 .contains("the founder's sample");
     }
 
+    /** A tag strictly below the review floor is on the founder's review list; one at the floor is not. */
+    @Test
+    void listsATagBelowTheReviewFloorForTheFounder() {
+        tagger.tags.put(1, new PyqTag("PHY.11.ROT.MOI", List.of(), false, new BigDecimal("0.1"), "the figure was not shown"));
+        tagger.tags.put(3, new PyqTag("CHE.11.BASICS.MOLE", List.of(), false, new BigDecimal("0.5"), "the mole"));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_OK);
+
+        String report = out.toString();
+        String reviewList = report.substring(report.indexOf("the founder's review list"), report.indexOf("low-confidence tags"));
+        assertThat(reviewList).contains("below the review floor (0.50)")
+                .contains("Q1 → PHY.11.ROT.MOI (0.1): the figure was not shown").doesNotContain("Q3");
+    }
+
     @Test
     void aSecondRunCallsOnlyForTheQuestionWithoutAValidTag() {
         run();
@@ -113,7 +127,7 @@ class PyqTagCommandTest {
     /**
      * {@code pyq_tag.v2}: a figure question reaches the tagger with each figure's description where the booklet
      * prints it, and only a question that prints figures changes its fingerprint — a figure-free question hashes
-     * as under v1, so its tag stays current and only the figure questions are re-tagged.
+     * as under v1, so {@code pyq load} still takes its v1 tag.
      */
     @Test
     void aFigureQuestionReachesTheTaggerWithItsFiguresAndOnlyItsFingerprintChanges() throws IOException {

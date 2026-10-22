@@ -6,10 +6,13 @@ import com.margai.curriculum.api.PaperSection;
 import com.margai.curriculum.api.PyqLoadReport;
 import com.margai.curriculum.api.PyqQuestionRow;
 import com.margai.curriculum.api.QuestionTagging;
+import com.margai.curriculum.api.TagStatus;
 import com.margai.storage.api.ObjectStore;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -88,7 +91,8 @@ class PyqLoadCommand extends PyqPaperCommand {
         report.line("approved file: " + approved.normalize());
         report.line("tags: " + tagsKey);
 
-        List<PyqQuestionRow> rows = file.questions().stream().map(question -> row(question, tags.get(question.no()))).toList();
+        List<PyqQuestionRow> rows = file.questions().stream()
+                .map(question -> row(question, tags.get(question.no()), pyq.tagReviewFloor())).toList();
         PyqLoadReport result = imports.loadPaper(paper.row(), rows);
 
         List<List<String>> counts = new ArrayList<>();
@@ -115,6 +119,12 @@ class PyqLoadCommand extends PyqPaperCommand {
                         .map(question -> "Q" + question.no() + ": " + question.asPrintedShow() + " show, "
                                 + question.asPrintedRecordOnly() + " record_only").toList(), "none")
                 .line("show " + shown + ", record_only " + recorded);
+        report.section("whose tag each question carries (questions.tag_status) — a `review` tag counts toward no topic's "
+                        + "weightage and is not picked for topic practice until the founder rules")
+                .line(Arrays.stream(TagStatus.values()).map(status -> status + " " + result.stored().stream()
+                        .filter(question -> question.tagStatus() == status).count()).collect(Collectors.joining(", ")))
+                .list(result.stored().stream().filter(question -> question.tagStatus() == TagStatus.review)
+                        .map(question -> "Q" + question.no() + " → " + question.nodeCode() + ": review").toList(), "none");
         report.section("answers other than one key (NTA's final key; the register's special entries)")
                 .list(result.stored().stream().filter(question -> question.answerStatus() != AnswerStatus.single)
                         .map(question -> "Q" + question.no() + ": " + question.answerStatus()).toList(), "none");
@@ -133,8 +143,11 @@ class PyqLoadCommand extends PyqPaperCommand {
         report.line("official Hindi in the booklet: " + (paper.row().officialHindi() ? "yes — for the parked Hindi pass" : "no"));
     }
 
-    /** The approved question with its tag, the answer in the shape the database's check holds. */
-    static PyqQuestionRow row(PaperFile.Question question, PyqTagLine tag) {
+    /**
+     * The approved question with its tag, the answer in the shape the database's check holds; a tag below the
+     * review floor is stored as {@code review}.
+     */
+    static PyqQuestionRow row(PaperFile.Question question, PyqTagLine tag, BigDecimal reviewFloor) {
         PaperFile.Answer answer = question.answer();
         String correctKey = switch (answer.status()) {
             case single -> answer.key();
@@ -146,6 +159,6 @@ class PyqLoadCommand extends PyqPaperCommand {
                 question.stemHi(), question.options(), answer.status(), correctKey, accepted, question.figures(),
                 question.extraction(),
                 new QuestionTagging(tag.aiCallId(), tag.model(), tag.prompt(), tag.confidence(), tag.reason()),
-                question.asPrinted());
+                question.asPrinted(), tag.belowFloor(reviewFloor) ? TagStatus.review : TagStatus.model);
     }
 }

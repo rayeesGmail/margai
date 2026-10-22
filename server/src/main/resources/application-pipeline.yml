@@ -50,6 +50,9 @@ margai:
       tag-model: claude-sonnet-5-5
       tag-batch-size: 10
       tag-low-confidence: 0.70
+      # A tag strictly below this loads as `review`, never as a normal tag, and the tag report lists it for the
+      # founder (his ruling, 2026-10-21; DECISIONS).
+      tag-review-floor: 0.50
     # `ncert embed` commits its vectors every this many paragraphs. Embedding a book is cheap
     # (~900 calls at 0.12 USD/1M tokens) but not free, and a run interrupted late should keep what
     # it paid for — the next run embeds only rows whose embedding is still null.

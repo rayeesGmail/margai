@@ -9,6 +9,7 @@ import com.margai.curriculum.api.QuestionFigure;
 import com.margai.curriculum.api.QuestionOption;
 import com.margai.curriculum.api.QuestionSource;
 import com.margai.curriculum.api.QuestionTagging;
+import com.margai.curriculum.api.TagStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -27,8 +28,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 /**
- * {@code questions} (TECH_PLAN §2.3, migrations V9 and V10): the question bank of SPEC §9 item 3,
- * PYQs from D19, with the misprints a paper makes kept as printed and noted in {@code as_printed}. A PYQ is addressed by {@code (exam, year, paper_code, question_no)}, the upsert key
+ * {@code questions} (TECH_PLAN §2.3, migrations V9 to V11): the question bank of SPEC §9 item 3,
+ * PYQs from D19, with the misprints a paper makes kept as printed and noted in {@code as_printed}, and whose
+ * tag it carries in {@code tag_status}. A PYQ is addressed by {@code (exam, year, paper_code, question_no)}, the upsert key
  * of {@code pyq load}.
  *
  * <p><b>The answer is server-only</b> (TECH_PLAN §2.3, §0.4 #4, CLAUDE.md hard rule 1):
@@ -111,6 +113,10 @@ public class Question {
     @JdbcTypeCode(SqlTypes.JSON)
     private QuestionTagging tagging;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 16)
+    private TagStatus tagStatus;
+
     @Column(nullable = false)
     private boolean verified;
 
@@ -156,7 +162,8 @@ public class Question {
                 || !Objects.equals(figures, row.figures())
                 || !Objects.equals(asPrinted, row.asPrinted())
                 || !Objects.equals(extraction, row.extraction())
-                || !Objects.equals(tagging, row.tagging());
+                || !Objects.equals(tagging, row.tagging())
+                || tagStatus != row.tagStatus();
         if (changed) {
             this.nodeId = nodeId;
             this.outOfSyllabus = row.outOfSyllabus();
@@ -170,6 +177,7 @@ public class Question {
             this.asPrinted = row.asPrinted();
             this.extraction = row.extraction();
             this.tagging = row.tagging();
+            this.tagStatus = row.tagStatus();
             if (askedChanged) {
                 this.verified = false;
             }
@@ -250,6 +258,10 @@ public class Question {
 
     public QuestionTagging getTagging() {
         return tagging;
+    }
+
+    public TagStatus getTagStatus() {
+        return tagStatus;
     }
 
     public boolean isVerified() {

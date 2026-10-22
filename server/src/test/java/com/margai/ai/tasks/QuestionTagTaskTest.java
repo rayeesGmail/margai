@@ -117,7 +117,8 @@ class QuestionTagTaskTest {
                 + "(4) [Figure: a ring] [Figure: a chain]\n\nTag this question.");
         assertThat(rendered.system()).contains("described in words, in square brackets")
                 .contains("absent from both the current NEET\n  syllabus — the list below — and the current NCERT textbooks")
-                .contains("a unit's opening pages, a biography or profile box, a table");
+                .contains("a unit's opening pages, a biography or profile box, a table")
+                .contains("A topic the syllabus still lists but the NCERT textbooks no longer teach is in\n  syllabus too.");
     }
 
     @Test

@@ -17,16 +17,20 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @param tagBatchSize      how many questions one {@code completeBatch} carries before the tags are
  *                          flushed; a failed batch is retried question by question
  * @param tagLowConfidence  below this a tag is listed for the founder to look at — a routing signal
+ * @param tagReviewFloor    below this a tag never loads as a normal one: {@code pyq load} stores it as
+ *                          {@code review} and the tag report lists it for the founder (his ruling of 2026-10-21:
+ *                          0.5, strictly below)
  * @param papersDirectory   where the approved paper files live under {@code --inputs}
  *                          ({@code papers/}, TECH_PLAN §6.2)
  */
 @ConfigurationProperties(prefix = "margai.pipeline.pyq")
 public record PyqProperties(String transcribeModel, String tagModel, int tagBatchSize, BigDecimal tagLowConfidence,
-        String papersDirectory) {
+        BigDecimal tagReviewFloor, String papersDirectory) {
 
     public PyqProperties {
         tagBatchSize = tagBatchSize <= 0 ? 10 : tagBatchSize;
         tagLowConfidence = tagLowConfidence == null ? new BigDecimal("0.70") : tagLowConfidence;
+        tagReviewFloor = tagReviewFloor == null ? new BigDecimal("0.50") : tagReviewFloor;
         papersDirectory = papersDirectory == null || papersDirectory.isBlank() ? "papers" : papersDirectory;
     }
 }

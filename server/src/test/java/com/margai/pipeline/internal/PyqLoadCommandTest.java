@@ -6,6 +6,7 @@ import com.margai.curriculum.api.AnswerStatus;
 import com.margai.curriculum.api.AsPrintedDisplay;
 import com.margai.curriculum.api.PyqQuestionRow;
 import com.margai.curriculum.api.QuestionAsPrinted;
+import com.margai.curriculum.api.TagStatus;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -100,6 +101,30 @@ class PyqLoadCommandTest {
         assertThat(imports.loadedQuestions.getFirst().asPrinted()).extracting(QuestionAsPrinted::display)
                 .containsExactly(AsPrintedDisplay.record_only, AsPrintedDisplay.show);
         assertThat(out.toString()).contains("Q1: 1 show, 1 record_only").contains("show 1, record_only 1");
+    }
+
+    /**
+     * A tag strictly below the review floor (0.5, the founder's ruling of 2026-10-21) loads as {@code review}, never as
+     * a normal tag; a tag at the floor is the tagger's; the report counts both and lists the review ones.
+     */
+    @Test
+    void aTagBelowTheReviewFloorLoadsAsReview() {
+        List<PyqTagLine> lines = new ArrayList<>(PyqTagJsonl.read("k", store.get(ContentKeys.pyqTags(PyqTagCommandTest.CODE))));
+        lines.set(0, confidence(lines.get(0), "0.49"));
+        lines.set(1, confidence(lines.get(1), "0.5"));
+        store.put(ContentKeys.pyqTags(PyqTagCommandTest.CODE), PyqTagJsonl.write(lines), "application/jsonl");
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_OK);
+
+        assertThat(imports.loadedQuestions).extracting(PyqQuestionRow::tagStatus)
+                .containsExactly(TagStatus.review, TagStatus.model, TagStatus.model, TagStatus.model);
+        assertThat(out.toString()).contains("whose tag each question carries").contains("model 3, review 1, founder 0")
+                .contains("Q1 → PHY.11.ROT.MOI: review");
+    }
+
+    private static PyqTagLine confidence(PyqTagLine line, String confidence) {
+        return new PyqTagLine(line.question(), line.primary(), line.secondary(), line.outOfSyllabus(), new BigDecimal(confidence),
+                line.reason(), line.aiCallId(), line.model(), line.prompt(), line.questionSha256(), line.problem());
     }
 
     /** A committed report reads the same on every machine (Report): the approved file is named as given. */

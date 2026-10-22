@@ -1,6 +1,7 @@
 package com.margai.curriculum.api;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * One question of an approved paper file ({@code pipeline/inputs/papers/<paper>.json}) joined
@@ -14,6 +15,8 @@ import java.util.List;
  *
  * @param secondaryNodeCodes at most two further topics the question draws on
  * @param asPrinted          the misprints kept as printed, each with its intended reading (V10)
+ * @param tagStatus          whose tag it carries — the tagger's, the tagger's below the review floor, or the
+ *                           founder's ruling (V11)
  */
 public record PyqQuestionRow(
         short questionNo,
@@ -29,9 +32,11 @@ public record PyqQuestionRow(
         List<QuestionFigure> figures,
         QuestionExtraction extraction,
         QuestionTagging tagging,
-        List<QuestionAsPrinted> asPrinted) {
+        List<QuestionAsPrinted> asPrinted,
+        TagStatus tagStatus) {
 
     public PyqQuestionRow {
+        Objects.requireNonNull(tagStatus, "tagStatus");
         secondaryNodeCodes = secondaryNodeCodes == null ? List.of() : List.copyOf(secondaryNodeCodes);
         options = options == null ? List.of() : List.copyOf(options);
         acceptedKeys = acceptedKeys == null ? null : List.copyOf(acceptedKeys);

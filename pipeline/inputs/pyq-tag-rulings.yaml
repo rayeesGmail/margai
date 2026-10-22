@@ -32,6 +32,14 @@ papers:
         gap: CHE.12.SOLN.TYPES — Types of solutions
         ruled: 2026-10-21
         note: Not out of syllabus — NTA set it under the 2025 syllabus, and it comes from the Solutions chapter.
+      - question: 77
+        primary: CHE.11.HYDROC
+        secondary: [CHE.12.ALCPHE.PHENOLS]
+        out_of_syllabus: false
+        anchor: chem11-part2 ch 9 §9.3.5 ¶4 (bromine adds to an unsaturation site, a test for unsaturation); chem12-part2 ch 7 §7.4.4 ¶52 (phenol and bromine water); chem12-part2 ch 9 §9.6 ¶35 (aniline and bromine water)
+        gap: CHE.12.AMINES.ANILINE — Reactions of aniline, electrophilic substitution (e.g. bromination)
+        ruled: 2026-10-22
+        note: The tagger's v2 tag without its weak secondary, basic character of amines; aniline's electrophilic substitution has no topic, so it goes on the taxonomy-gap list.
       - question: 95
         primary: BOT.11.CELL
         out_of_syllabus: false

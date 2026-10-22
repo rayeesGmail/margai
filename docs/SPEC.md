@@ -501,7 +501,9 @@ exotic stuff — NTA has never asked it”); session summary with accuracy, spee
 your norm, and what went to the notebook. Works offline for the current day's blocks —
 their questions arrive with the prefetched plan (§6.1) — and results sync later. Question
 sources: NEET 2019–2026 PYQs with verified solutions + NCERT-style generated questions
-(verified), tagged to the syllabus.
+(verified), tagged to the syllabus. Topic practice never serves a question without a
+verified solution: questions marked "no NCERT anchor" (§7.1) and questions whose tag is
+marked for review are excluded until ruled.
 
 **As printed in the original paper:** a question from an official paper is shown in the paper's own words. Where a
 misprint in it could change how a student reads the question — a wrong unit, symbol, number, sign or formula, or a
@@ -833,13 +835,15 @@ flowchart LR
     A --> T[Trajectory update vs\npersonal cutoff]
 ```
 
-**Full past papers as timed mocks (CS-2 §4.7):** the NEET 2018–2026 papers from the PYQ
-bank run as full timed mocks under exam conditions, followed by the autopsy;
+**Full past papers as timed mocks (CS-2 §4.7):** the NEET papers in the PYQ bank
+(currently 2019–2026) run as full timed mocks under exam conditions, followed by the autopsy;
 out-of-syllabus questions are labelled and excluded from the mock's score, and question
 count and marking follow each paper's own scheme where feasible. A question is out of
 syllabus when its topic is absent from both the current NMC syllabus and the current NCERT
-books; a topic NCERT has cut but the NMC syllabus still lists is in syllabus. Free gets the
-full mock and an autopsy summary; Pro the full autopsy.
+books; a topic NCERT has cut but the NMC syllabus still lists is in syllabus. A question on
+such a topic has no NCERT page to ground a solution on, so none is written: a mock serves it
+with NTA's key only and one line, "This topic isn't in your current NCERT book; answer as
+per NTA's key." Free gets the full mock and an autopsy summary; Pro the full autopsy.
 
 A mock's questions carry the as-printed note of §6.2.
 
@@ -917,8 +921,10 @@ they're built and stored):
    pages.)
 3. **Question bank** — all official PYQs with step-by-step verified solutions we own,
    linked to NCERT paragraphs and tagged with what each wrong option reveals (this is
-   what makes error diagnosis smart); plus verified NCERT-style generated questions to
-   guarantee ≥30 usable questions per topic across difficulty bands.
+   what makes error diagnosis smart) — except a question whose topic NCERT has cut but
+   the NMC syllabus still lists, which carries NTA's key alone (§7.1); plus verified
+   NCERT-style generated questions to guarantee ≥30 usable questions per topic across
+   difficulty bands.
 4. **Exam intelligence** — per-topic weightage, repeat-pattern (“NTA trap”) notes backed
    by actual PYQs, and cutoff tables by year/category/state for the personal target.
 5. **Plan backbone** — archetype tracks (2-year, 1-year fresher, dropper, repeater)

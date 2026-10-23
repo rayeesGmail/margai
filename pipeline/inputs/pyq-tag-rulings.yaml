@@ -25,6 +25,12 @@ papers:
   - code: neet-2025-45
     approved_file_sha256: cab6884f4595d4a2520c68e696d89a1ab980a55aad39cade24cf71f2c894f8ee   # 8e92468, the founder's approval
     rulings:
+      - question: 8
+        primary: PHY.12.SEMI.LOGIC
+        out_of_syllabus: false
+        anchor: none
+        ruled: 2026-10-23
+        note: In syllabus with no NCERT anchor — logic gates, which the NMC syllabus lists and the current NCERT does not teach (phy12-part2 ch 14 ends at §14.7, the rectifier).
       - question: 66
         primary: CHE.12.SOLN
         out_of_syllabus: false
@@ -84,11 +90,25 @@ papers:
   - code: neet-2024-s6
     approved_file_sha256: 6a064676197a084e3866c514b186460dc01a3d46799450b27fc097554ef326bb   # 69ead53, the founder's approval
     rulings:
+      - question: 5
+        primary: PHY.12.SEMI.SPECIAL
+        secondary: [PHY.12.SEMI.SEMIC]
+        out_of_syllabus: false
+        anchor: none
+        ruled: 2026-10-23
+        note: In syllabus with no NCERT anchor — statement A, a solar cell's I-V characteristic, has no ground in the current NCERT, which does not teach the special-purpose diodes; statement B's reverse current is in phy12-part2 ch 14 §14.6.2.
       - question: 11
         primary: PHY.12.SEMI.LOGIC
         out_of_syllabus: false
+        anchor: none
         ruled: 2026-10-23
-        note: Combination of logic gates (a NAND and a NOR, each with its inputs joined to act as NOT, feeding a NOR) and identifying the equivalent gate.
+        note: Combination of logic gates (a NAND and a NOR, each with its inputs joined to act as NOT, feeding a NOR) and identifying the equivalent gate; in syllabus with no NCERT anchor — the current NCERT does not teach logic gates.
+      - question: 16
+        primary: PHY.12.SEMI.LOGIC
+        out_of_syllabus: false
+        anchor: none
+        ruled: 2026-10-23
+        note: In syllabus with no NCERT anchor — the Boolean expression of a logic circuit from its truth table; the current NCERT does not teach logic gates.
       - question: 67
         primary: CHE.12.CARBONYL
         out_of_syllabus: false

@@ -389,10 +389,10 @@ tools; your reviews focus on output quality.)*
   topic lookup list says the current book doesn't teach the topic, variant B otherwise — with what the app can do
   instead, from `docs/copy/doubt-no-grounding.md` (English approved; Hindi after his D64 review); the topic lookup
   list is drafted by Claude from the 2026-10-23 note's diff for the founder's approval before this day; such a doubt
-  never counts against the free doubts.* *(Claude's, same DECISIONS: the Hinglish is reviewed with the Hindi at D64;
-  the copy file's two display rules — the earlier-edition line only where such a source is planned, the free-doubts
-  line only to a Free student — and its two open points, a Lab Manual line and the syllabus chip's target, for the
-  founder before this day.)*
+  never counts against the free doubts.* *(Claude's, same DECISIONS: the Hinglish is reviewed with the Hindi at D64.)*
+  *And (the founder, 2026-10-23; DECISIONS): the "We're adding …" line only where a source of that kind is planned —
+  the earlier-edition line or the Lab Manual line; the free-doubts line only to a Free student; the syllabus chip
+  dropped, variant A keeping its "Explain {nearby concept}" chip.*
 - **D38 —** Photo path: capture UI + vision extraction → same pipeline. ✅ *10 photographed
   printed questions extracted faithfully.* *Added 2026-10-01 (CS-3 §3.1–§3.2): the offline doubt
   queue (captured with no connection, sent automatically later, metered at send) and photo

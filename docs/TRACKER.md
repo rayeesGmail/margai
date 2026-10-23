@@ -198,9 +198,10 @@ The founder (DECISIONS 2026-10-23): `pending` also for 2024 S6 Q189 (Table 4.1) 
 Claude checked the Hindi he saw broken: the file is intact Unicode (every vowel sign present) — the gaps were his
   paste's rendering. Rulings, code wording, SPEC (four rows), `docs/copy/doubt-no-grounding.md`, PLAN (D20, D24, D37,
   D44, D64), TECH_PLAN §6.2 and this TRACKER carry the rest.
-  The copy file's display rules are Claude's (the earlier-edition line only where such a source is planned; the
-  free-doubts line only to a Free student), and two points wait on the founder before D37: a Lab Manual line, and
-  what the "[See where {topic} sits in your syllabus]" chip opens (SPEC §8 lists no such screen).
+  The copy file's display rules were Claude's (the earlier-edition line only where such a source is planned; the
+  free-doubts line only to a Free student), with two points for the founder: a Lab Manual line, and what the
+  "[See where {topic} sits in your syllabus]" chip opens (SPEC §8 lists no such screen). *Ruled the same night
+  (DECISIONS 2026-10-23): both display rules and the Lab Manual line approved; the syllabus chip dropped.*
 NEXT: the founder's single ₹0 reload (`d19-reload-2024-s6.sh`, carrying every ruling of today); 2023 G6's extract;
   the pre-D20 batch; the topic lookup list before D37; the mixed-dpi guard before any G6 resume.
 

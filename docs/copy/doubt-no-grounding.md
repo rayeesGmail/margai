@@ -12,14 +12,15 @@ reply's copy until D37 builds it into the server's `messages_{en,hi,hinglish}.pr
 **When it is shown.** Retrieval finds no paragraph above the floor, even after the retry without the node filter (TECH_PLAN §4.3 stage 6, a grounding failure).
 - **Variant A:** the doubt's topic, as the router classifies it, is on the topic lookup list. The list holds the NMC 2026 clauses the current NCERT does not teach, drafted by Claude from the 2026-10-23 note's diff for the founder's approval before D37. Each entry gives what the book teaches nearby and whether an extension source is planned.
 - **Variant B:** anything else.
-- **The "We're adding …" line** of variant A shows only where an earlier-edition source is planned. It names the earlier edition, so it is not shown for a Lab Manual topic, such as salt analysis or the vernier. *Claude's display rule, for the founder to overrule.*
+- **The "We're adding …" line** of variant A shows only where a source of that kind is planned (the founder, 2026-10-23):
+  - the earlier-edition line, where an earlier-edition section is planned;
+  - the Lab Manual line, where a Lab Manual experiment is (salt analysis, the vernier);
+  - neither, where no source is planned.
 
 **The product rule** (the founder, 2026-10-23): a doubt the app cannot ground never counts against the free doubts.
-- The line "This didn't use one of today's free doubts" is shown only to a student whose doubts are limited, the Free tier. Pro has no free-doubt limit (SPEC §6.9), and in the beta every student has Pro. *Claude's display rule, for the founder to overrule.*
+- The line "This didn't use one of today's free doubts" is shown only to a student whose doubts are limited, the Free tier. Pro has no free-doubt limit (SPEC §6.9), and in the beta every student has Pro (the founder, 2026-10-23).
 
-**Open for the founder before D37:**
-- **A Lab Manual line.** Variant A's English has no line for a topic the Lab Manuals will cover. Claude's proposal: "We're adding NCERT's Lab Manual text for topics like this, so I'll be able to answer from it later."
-- **The syllabus chip's target.** "[See where {topic} sits in your syllabus]" has no screen to open in SPEC §8's catalog; the only syllabus surface is onboarding's syllabus grid. Either it opens that grid at the topic, which is a screen use SPEC §8 does not list, or the chip is dropped.
+**The syllabus chip** ("See where {topic} sits in your syllabus") is dropped (the founder, 2026-10-23); variant A keeps its one chip.
 
 Braces mark the values filled in: `{topic}` is the topic's name, and `{nearby concept}` is what the book teaches nearby, both from the lookup list. Square brackets mark tappable chips.
 
@@ -31,9 +32,11 @@ Braces mark the values filled in: `{topic}` is the topic's name, and `{nearby co
 > give you a step-by-step answer backed by your textbook, and I won't guess.
 >
 > What I can do now:
-> [Explain {nearby concept} — it's in your book]  [See where {topic} sits in your syllabus]
+> [Explain {nearby concept} — it's in your book]
 >
 > We're adding NCERT's earlier-edition text for topics like this, so I'll be able to answer from it later.
+> *(or, for a Lab Manual topic:)* We're adding NCERT's Lab Manual text for topics like this, so I'll be able to
+> answer from it later.
 > This didn't use one of today's free doubts.
 
 **Hindi (draft — for the founder's review at D64)**
@@ -42,9 +45,11 @@ Braces mark the values filled in: `{topic}` is the topic's name, and `{nearby co
 > आपकी पाठ्यपुस्तक के आधार पर इसका step-by-step हल नहीं दिया जा सकता, और अंदाज़े से जवाब नहीं दिया जाएगा।
 >
 > अभी यह हो सकता है:
-> [{nearby concept} समझें — यह आपकी किताब में है]  [देखें कि {topic} आपके सिलेबस में कहाँ है]
+> [{nearby concept} समझें — यह आपकी किताब में है]
 >
 > ऐसे विषयों के लिए NCERT के पिछले संस्करण का पाठ जोड़ा जा रहा है, ताकि आगे इनका जवाब उसी से दिया जा सके।
+> *(या, प्रयोगशाला पुस्तिका वाले विषय के लिए:)* ऐसे विषयों के लिए NCERT की प्रयोगशाला पुस्तिका का पाठ जोड़ा जा रहा है,
+> ताकि आगे इनका जवाब उसी से दिया जा सके।
 > यह सवाल आज के मुफ़्त सवालों में नहीं गिना गया।
 
 **Hinglish (draft — for review at D64)**
@@ -54,9 +59,11 @@ Braces mark the values filled in: `{topic}` is the topic's name, and `{nearby co
 > nahi diya jayega.
 >
 > Abhi yeh ho sakta hai:
-> [{nearby concept} samjhein — yeh aapki book mein hai]  [Dekhein ki {topic} aapke syllabus mein kahan hai]
+> [{nearby concept} samjhein — yeh aapki book mein hai]
 >
 > Aise topics ke liye NCERT ke pichhle edition ka text joda ja raha hai, taaki aage inka jawab usi se diya ja sake.
+> *(ya, Lab Manual wale topic ke liye:)* Aise topics ke liye NCERT ke Lab Manual ka text joda ja raha hai, taaki aage
+> inka jawab usi se diya ja sake.
 > Yeh sawaal aaj ke free doubts mein nahi gina gaya.
 
 ## Variant B — not found in the NCERT books

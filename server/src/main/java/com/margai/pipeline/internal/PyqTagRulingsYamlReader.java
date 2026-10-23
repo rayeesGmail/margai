@@ -20,7 +20,8 @@ import tools.jackson.dataformat.yaml.YAMLMapper;
  * {@code pyq-tag-rulings.yaml}, the founder's rulings on PYQ tags (D19; DECISIONS 2026-10-21), into each paper's
  * {@link PyqTagRuling}s by question. Founder-owned, so strict as {@link PyqPapersYamlReader}: an unknown key, a
  * paper listed twice or not in the register, a question ruled twice, more than two secondary codes, a blank primary,
- * ruling date or note, or a ruling for a question the paper does not have is refused, naming the file. Each paper's
+ * ruling date or note, a one-word anchor other than the marks {@code none} and {@code pending} (DECISIONS
+ * 2026-10-23), or a ruling for a question the paper does not have is refused, naming the file. Each paper's
  * rulings name the sha256 of the approved paper file they were made against, and are refused once the file has
  * changed, until they are confirmed against it again — a corrected question's ruling is never applied unread.
  * Whether each code is a node of the right kind and subject is the curriculum module's check, inside
@@ -175,9 +176,16 @@ final class PyqTagRulingsYamlReader {
         } catch (DateTimeParseException e) {
             throw new InputFormatException(file, 0, label + ": ruled '" + ruled + "' must be a date like 2026-10-21");
         }
+        String anchor = optionalString(file, ruling, "anchor", label);
+        // A place in NCERT is words ("bio12 ch 10 §10.1 ¶4"); a single word is one of the two marks, or a slip.
+        if (anchor != null && !anchor.contains(" ") && !anchor.equals(PyqTagRuling.NO_NCERT_ANCHOR)
+                && !anchor.equals(PyqTagRuling.NOT_YET_IN_CORPUS)) {
+            throw new InputFormatException(file, 0, label + ": anchor '" + anchor + "' is neither a place in NCERT nor '"
+                    + PyqTagRuling.NO_NCERT_ANCHOR + "' or '" + PyqTagRuling.NOT_YET_IN_CORPUS + "'");
+        }
         return new PyqTagRuling((short) number.intValue(), requiredString(file, ruling, "primary", label), secondary,
-                outOfSyllabus, optionalString(file, ruling, "anchor", label), optionalString(file, ruling, "gap", label),
-                date, requiredString(file, ruling, "note", label));
+                outOfSyllabus, anchor, optionalString(file, ruling, "gap", label), date,
+                requiredString(file, ruling, "note", label));
     }
 
     private static void unknownKeys(Path file, JsonNode node, Set<String> allowed, String label, String what) {

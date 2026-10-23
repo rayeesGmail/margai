@@ -19,7 +19,8 @@ import org.junit.jupiter.api.io.TempDir;
 
 /**
  * The founder's tag rulings file (DECISIONS 2026-10-21) read strictly: each paper's rulings by question, a field
- * left out empty rather than the model's, {@code anchor: none} as "no NCERT anchor", every malformed entry refused
+ * left out empty rather than the model's, {@code anchor: none} as "no NCERT anchor" and {@code anchor: pending} as
+ * "not yet in the corpus", every malformed entry — a mistyped mark among them — refused
  * with the file named — and a paper's rulings applied only to the approved file they were made against, and only
  * for a paper the register lists.
  */
@@ -50,11 +51,19 @@ class PyqTagRulingsYamlReaderTest {
                         anchor: none
                         ruled: 2026-10-22
                         note: NCERT cut it; the syllabus lists it.
+                      - question: 9
+                        primary: PHY.11.ROT.MOI
+                        anchor: pending
+                        ruled: 2026-10-23
+                        note: Only in a table the corpus does not hold yet.
                 """.formatted(SHA)));
 
         assertThat(read.get("neet-2025-45").approvedFileSha256()).isEqualTo(SHA);
         Map<Short, PyqTagRuling> rulings = read.get("neet-2025-45").byQuestion();
-        assertThat(rulings).containsOnlyKeys((short) 7, (short) 95);
+        assertThat(rulings).containsOnlyKeys((short) 7, (short) 9, (short) 95);
+        assertThat(rulings.get((short) 9).notYetInCorpus()).isTrue();
+        assertThat(rulings.get((short) 9).noNcertAnchor()).isFalse();
+        assertThat(rulings.get((short) 7).notYetInCorpus()).isFalse();
         PyqTagRuling cell = rulings.get((short) 95);
         assertThat(cell.primary()).isEqualTo("BOT.11.CELL");
         assertThat(cell.secondary()).isEmpty();
@@ -68,6 +77,29 @@ class PyqTagRulingsYamlReaderTest {
         assertThat(cut.noNcertAnchor()).isTrue();
     }
 
+    /** Only "no NCERT anchor" counts toward the founder's ~2% line; "not yet in the corpus" does not (DECISIONS 2026-10-23). */
+    @Test
+    void countsOnlyNoAnchorRulingsTowardTheFoundersLine() throws IOException {
+        Path file = write("""
+                papers:
+                  - code: neet-2025-45
+                    approved_file_sha256: %s
+                    rulings:
+                      - question: 7
+                        primary: PHY.11.ROT
+                        anchor: none
+                        ruled: 2026-10-22
+                        note: NCERT cut it; the syllabus lists it.
+                      - question: 9
+                        primary: PHY.11.ROT.MOI
+                        anchor: pending
+                        ruled: 2026-10-23
+                        note: Only in a table the corpus does not hold yet.
+                """.formatted(SHA));
+
+        assertThat(PyqTagRulingsYamlReader.noNcertAnchorCount(file)).isEqualTo(1);
+    }
+
     @Test
     void refusesWhatTheFounderCouldMistype() throws IOException {
         String ok = """
@@ -78,6 +110,8 @@ class PyqTagRulingsYamlReaderTest {
                 """;
         assertRefused(ok + "        tagged: by hand\n", "unknown key 'tagged'");
         assertRefused(ok + ok, "question 1 is ruled twice");
+        assertRefused(ok + "        anchor: pendng\n", "anchor 'pendng' is neither a place in NCERT nor 'none' or 'pending'");
+        assertRefused(ok + "        anchor: None\n", "anchor 'None' is neither a place in NCERT");
         assertRefused(ok.replace("primary: PHY.11.ROT", "primary: PHY.11.ROT\n        secondary: [A, B, C]"),
                 "3 secondary codes; at most two");
         assertRefused(ok.replace("        note: a ruling\n", ""), "'note' is required");

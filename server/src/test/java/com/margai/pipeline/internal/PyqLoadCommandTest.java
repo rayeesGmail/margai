@@ -181,6 +181,40 @@ class PyqLoadCommandTest {
                 .contains("the bank: 1 of 4 (25.0%) — ABOVE the founder's ~2% line: for him to revisit the policy");
     }
 
+    /**
+     * A question ruled "not yet in the corpus" is listed in its own section, apart from the questions with no NCERT
+     * anchor, and stays out of the founder's ~2% line (DECISIONS 2026-10-23).
+     */
+    @Test
+    void aNotYetInCorpusRulingIsListedApartFromNoAnchor() throws IOException {
+        tags(false);
+        Files.writeString(inputs.resolve(PyqTagRulingsYamlReader.FILE), """
+                papers:
+                  - code: neet-2025-45
+                    approved_file_sha256: %s
+                    rulings:
+                      - question: 2
+                        primary: PHY.11.ROT
+                        anchor: pending
+                        ruled: 2026-10-23
+                        note: only in a table the corpus does not hold yet
+                      - question: 4
+                        primary: CHE.11.BASICS
+                        anchor: none
+                        ruled: 2026-10-22
+                        note: NCERT cut it and the syllabus lists it
+                """.formatted(Report.sha256(inputs.resolve("papers").resolve(PyqTagCommandTest.CODE + ".json"))));
+
+        assertThat(run()).isEqualTo(InputFileCommand.EXIT_OK);
+
+        String report = out.toString();
+        String noAnchor = report.substring(report.indexOf("## no NCERT anchor"), report.indexOf("## not yet in the corpus"));
+        assertThat(noAnchor).contains("this paper: 1 of 4 (25.0%)").contains("- Q4").doesNotContain("- Q2")
+                .contains("the bank: 1 of 4 (25.0%)");
+        assertThat(report.substring(report.indexOf("## not yet in the corpus"), report.indexOf("## answers other than")))
+                .contains("- Q2").doesNotContain("- Q4");
+    }
+
     /** The founder's ~2% line (2026-10-22): flagged strictly above it, within it otherwise. */
     @Test
     void theBankLineFlagsNoAnchorQuestionsAboveTheFoundersShare() {

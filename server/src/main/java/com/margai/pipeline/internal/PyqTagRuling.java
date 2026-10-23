@@ -8,15 +8,19 @@ import java.util.List;
  * 2026-10-21): the tag {@code pyq load} puts in place of the model's, whole — a field it leaves out is empty,
  * never the model's — with where NCERT teaches the question and the taxonomy node proposed for it.
  *
- * @param anchor where NCERT teaches it; {@value #NO_NCERT_ANCHOR} marks "no NCERT anchor" — a topic NCERT has
- *               cut but the NMC syllabus still lists, which D20 does not solve until the founder rules; null when
- *               the ruling records none
+ * @param anchor where NCERT teaches it; {@value #NO_NCERT_ANCHOR} marks "no NCERT anchor" — a topic the NMC
+ *               syllabus lists that the current NCERT textbooks do not teach, cut or never taught, which D20 does not
+ *               solve until the founder rules; {@value #NOT_YET_IN_CORPUS} marks "not yet in the corpus" — a topic
+ *               the current book prints only in a table or figure the corpus does not hold yet, which D20 skips until
+ *               the table and figure pass brings it in (the founder, DECISIONS 2026-10-23); null when the ruling
+ *               records none
  * @param gap    the taxonomy node proposed for it where none fits (the taxonomy-gap list), or null
  */
 record PyqTagRuling(short question, String primary, List<String> secondary, boolean outOfSyllabus, String anchor,
         String gap, LocalDate ruled, String note) {
 
     static final String NO_NCERT_ANCHOR = "none";
+    static final String NOT_YET_IN_CORPUS = "pending";
 
     PyqTagRuling {
         secondary = secondary == null ? List.of() : List.copyOf(secondary);
@@ -24,5 +28,9 @@ record PyqTagRuling(short question, String primary, List<String> secondary, bool
 
     boolean noNcertAnchor() {
         return NO_NCERT_ANCHOR.equals(anchor);
+    }
+
+    boolean notYetInCorpus() {
+        return NOT_YET_IN_CORPUS.equals(anchor);
     }
 }

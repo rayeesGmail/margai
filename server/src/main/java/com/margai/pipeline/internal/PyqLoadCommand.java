@@ -152,9 +152,9 @@ class PyqLoadCommand extends PyqPaperCommand {
                 .line("this paper: " + share(noAnchor.size(), file.questions().size()))
                 .list(noAnchor, "none")
                 .line(bankLine(noAnchorRulings, result.bankQuestions(), pyq.noAnchorRevisitShare()));
-        report.section("not yet in the corpus — the current book prints it only in a table or figure the corpus does "
-                        + "not hold yet; no AI solution until the table and figure pass brings it in, and a mock serves it "
-                        + "with NTA's key alone, without the no-anchor line (the founder, DECISIONS 2026-10-23)")
+        report.section("not yet in the corpus — printed in the current book but not yet held in the app (a table, a "
+                        + "figure, or pages not yet ingested); no AI solution until that material comes in, and a mock serves "
+                        + "it with NTA's key alone, without the no-anchor line (the founder, DECISIONS 2026-10-23)")
                 .list(rulings.values().stream().filter(PyqTagRuling::notYetInCorpus)
                         .map(ruling -> "Q" + ruling.question()).toList(), "none");
         report.section("answers other than one key (NTA's final key; the register's special entries)")

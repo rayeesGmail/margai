@@ -176,8 +176,8 @@ class PyqTagCommand extends PyqPaperCommand {
         report.section("no NCERT anchor (the founder's rulings) — no AI solution is written for these")
                 .line("this paper: " + share(noAnchor.size(), file.questions().size()))
                 .list(noAnchor, "none");
-        report.section("not yet in the corpus (the founder's rulings) — the current book prints it only in a table or "
-                        + "figure the corpus does not hold yet; no AI solution until the table and figure pass brings it in")
+        report.section("not yet in the corpus (the founder's rulings) — printed in the current book but not yet held in "
+                        + "the app (a table, a figure, or pages not yet ingested); no AI solution until that material comes in")
                 .list(rulings.values().stream().filter(PyqTagRuling::notYetInCorpus)
                         .map(ruling -> "Q" + ruling.question()).toList(), "none");
         report.section("the founder's review list — below the review floor (" + pyq.tagReviewFloor() + "): each loads as "

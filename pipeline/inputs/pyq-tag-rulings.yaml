@@ -107,11 +107,20 @@ papers:
         primary: ZOO.11.STRUCTANI
         out_of_syllabus: false
         anchor: none
-        ruled: 2026-10-22
+        gap: ZOO.11.STRUCTANI.INSECT — Morphology and anatomy of an insect (cockroach)
+        ruled: 2026-10-23
         note: In syllabus with no NCERT anchor — cockroach morphology, which NTA set under this syllabus ("of an insect (Frog)") and kept in its revised key; the current NCERT does not teach the cockroach.
+      - question: 189
+        primary: ZOO.11.ANIMALK.NONCHORD
+        secondary: [ZOO.11.ANIMALK.CHORD]
+        out_of_syllabus: false
+        anchor: bio11 ch 4 §4.2.11 ¶2, which cites Table 4.1 (Comparison of Chordates and Non-chordates); the table is not corpus text
+        ruled: 2026-10-23
+        note: 40-sample correction — the five statements are the rows of NCERT's comparison of chordates and non-chordates (Table 4.1), so non-chordates with chordates, in place of the tagger's basis of classification.
       - question: 194
         primary: ZOO.11.STRUCTANI
         out_of_syllabus: false
         anchor: none
-        ruled: 2026-10-22
+        gap: ZOO.11.STRUCTANI.INSECT — Morphology and anatomy of an insect (cockroach)
+        ruled: 2026-10-23
         note: In syllabus with no NCERT anchor — the cockroach's digestive system, as Q179; the current NCERT names its Malpighian tubules only in passing (bio11 ch 16).

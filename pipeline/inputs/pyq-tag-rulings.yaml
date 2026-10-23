@@ -17,9 +17,9 @@
 #   anchor           where NCERT teaches it, as `<book> ch <n> §<section> ¶<para>` where D20 is to ground on it — in
 #                    the other subject's book too (DECISIONS 2026-10-23); `none` marks "no NCERT anchor" — a topic the
 #                    NMC syllabus lists that the current textbooks do not teach, cut or never taught — and no AI solution
-#                    is written for it (hard rule 2; DECISIONS); `pending` marks "not yet in the corpus" — a topic the
-#                    current book prints only in a table or figure the corpus does not hold yet — and D20 skips it until
-#                    the table and figure pass brings it in (DECISIONS 2026-10-23) (optional)
+#                    is written for it (hard rule 2; DECISIONS); `pending` marks "not yet in the corpus" — a topic
+#                    printed in the current book but not yet held in the app (a table, a figure, or pages not yet
+#                    ingested) — and D20 skips it until that material comes in (DECISIONS 2026-10-23) (optional)
 #   gap              a taxonomy node proposed for it where none fits, code and name — the taxonomy-gap list
 #                    (optional; the founder rules on each before it goes into taxonomy.csv)
 #   ruled            the date of the founder's ruling
@@ -35,13 +35,6 @@ papers:
         anchor: none
         ruled: 2026-10-23
         note: In syllabus with no NCERT anchor — logic gates, which the NMC syllabus lists and the current NCERT does not teach (phy12-part2 ch 14 ends at §14.7, the rectifier).
-      - question: 17
-        primary: PHY.11.ROT.CONSANG
-        secondary: [PHY.11.ROT.MOI]
-        out_of_syllabus: false
-        anchor: pending
-        ruled: 2026-10-23
-        note: Not yet in the corpus — a uniform sphere's moment of inertia is only in Table 6.1 (phy11-part1 ch 6), which §6.9 ¶12 cites.
       - question: 66
         primary: CHE.12.SOLN
         out_of_syllabus: false
@@ -80,10 +73,10 @@ papers:
       - question: 95
         primary: BOT.11.CELL
         out_of_syllabus: false
-        anchor: bio11 Unit 3's opening essay, printed with chapter 8 (kebo108.pdf p1); not in the corpus until D24
+        anchor: pending
         gap: BOT.11.CELL.OPENER — Unit opening, the physico-chemical (reductionist) approach to living organisms
-        ruled: 2026-10-21
-        note: Not out of syllabus — NTA set it under the 2025 syllabus, from NCERT's introductory text on reductionist biology.
+        ruled: 2026-10-23
+        note: Not out of syllabus — NTA set it under the 2025 syllabus, from NCERT's introductory text on reductionist biology; not yet in the corpus — bio11 Unit 3's opening essay, printed with chapter 8 (kebo108.pdf p1), comes in at D24.
       - question: 101
         primary: ZOO.11.BREATH.DISORDER
         secondary: [ZOO.11.EXCRET.DISORDER, ZOO.11.CIRC.DISORDER]
@@ -100,10 +93,10 @@ papers:
       - question: 133
         primary: BOT.12.ORGPOP
         out_of_syllabus: false
-        anchor: bio12's Ecology unit opening, the Ramdeo Misra biography printed with chapter 11 (lebo111.pdf p2); not in the corpus until D24
+        anchor: pending
         gap: BOT.12.ORGPOP.OPENER — Unit opening, Ramdeo Misra and ecology in India
-        ruled: 2026-10-21
-        note: Not out of syllabus — NTA set it under the 2025 syllabus, from the Ramdeo Misra profile box in the Ecology unit.
+        ruled: 2026-10-23
+        note: Not out of syllabus — NTA set it under the 2025 syllabus, from the Ramdeo Misra profile box in the Ecology unit; not yet in the corpus — bio12's Ecology unit opening, printed with chapter 11 (lebo111.pdf p2), comes in at D24.
   - code: neet-2024-s6
     approved_file_sha256: 6a064676197a084e3866c514b186460dc01a3d46799450b27fc097554ef326bb   # 69ead53, the founder's approval
     rulings:
@@ -174,7 +167,7 @@ papers:
         primary: ZOO.11.ANIMALK.NONCHORD
         secondary: [ZOO.11.ANIMALK.CHORD]
         out_of_syllabus: false
-        anchor: bio11 ch 4 §4.2.11 ¶2, which cites Table 4.1 (Comparison of Chordates and Non-chordates); the table is not corpus text
+        anchor: pending
         ruled: 2026-10-23
         note: "Refined for anchor precision: the five statements are the rows of NCERT's chordate/non-chordate comparison (Table 4.1); the tagger's basis-of-classification tag was defensible."
       - question: 193

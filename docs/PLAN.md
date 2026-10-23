@@ -197,9 +197,12 @@ tools; your reviews focus on output quality.)*
   solution without NCERT retrieval grounding, so until the founder rules, D20 generates no solution for a question
   marked "no NCERT anchor" and lists it for him.)* *Decided 2026-10-22 (the founder; DECISIONS): D20 and D21 write no
   AI solution for a question with `anchor: none` — hard rule 2 stands.* *Added 2026-10-23 (the founder; DECISIONS):
-  D20 also skips a question marked `anchor: pending` ("not yet in the corpus": its topic printed only in a current
-  table or figure); for a ruled anchor — a paragraph address in the rulings file, in either subject's book (2024 S6
-  Q1 and Q55) — D20's solver puts that paragraph into the retrieved set; 2024 S6 Q10 grounds on phy11-part1 §6.9 ¶12.*
+  D20 also skips a question marked `anchor: pending` ("not yet in the corpus": its topic printed in the current book
+  but not yet held in the app — a table, a figure, or pages not yet ingested); for a ruled anchor — a paragraph
+  address in the rulings file, in either subject's book (2024 S6 Q1 and Q55) — D20's solver puts that paragraph into
+  the retrieved set; 2024 S6 Q10 grounds on phy11-part1 §6.9 ¶12, and 2025 code 45's Q17 on §6.12.1 with §6.9 ¶12
+  (the k ∝ R scaling of a uniformly expanding sphere is reasoning from taught principles), solved and verified as
+  normal.*
   *(Claude's, same DECISIONS: the ruled-anchor change is a retrieval change, so it passes the eval gate — `eval/run.sh`
   and its prompt-changelog line.)*
 - **D21 —** Solutions for remaining subjects (batch overnight); distractor-map
@@ -264,6 +267,8 @@ tools; your reviews focus on output quality.)*
   do not fit D24 either, they move with them.* *Added 2026-10-23 (the founder; DECISIONS): the table pass also reads
   the printed text of Figs 6.9–6.10 (bio12 ch 6, the geological eras), 5.16 and 13.8 (bio11 ch 5 and 13), here with
   Biology's tables (Claude's placement), lifting the `pending` mark of the questions that need them (2024 S6 Q193).*
+  *And (the founder, 2026-10-23; DECISIONS): Biology's Table 4.1 lifts 2024 S6 Q189's `pending` mark, and the unit
+  openers lift 2025 code 45's Q95 and Q133's.*
 
 ### PHASE 3 — Onboarding & first plan (Week 5, Days 25–30) — Modules M2 + M4(v0)
 
@@ -379,7 +384,15 @@ tools; your reviews focus on output quality.)*
   (founder's T0 ruling, point 7; the sizing correction is Claude's check under point 4, for the founder to
   overrule; DECISIONS 2026-10-20): `doubt_answer` is written for the 5.5
   models; the cheap tier's cache floor is 512 tokens on Haiku 5.5 (TECH_PLAN §4.11), not 4,096, and the
-  ~50% figure compared Haiku 4.5 with Sonnet 5, so both lines above describe the old tiers.*
+  ~50% figure compared Haiku 4.5 with Sonnet 5, so both lines above describe the old tiers.* *Added 2026-10-23
+  (the founder; DECISIONS; SPEC §6.3): a doubt with no NCERT grounding gets an honest reply — variant A where the
+  topic lookup list says the current book doesn't teach the topic, variant B otherwise — with what the app can do
+  instead, from `docs/copy/doubt-no-grounding.md` (English approved; Hindi after his D64 review); the topic lookup
+  list is drafted by Claude from the 2026-10-23 note's diff for the founder's approval before this day; such a doubt
+  never counts against the free doubts.* *(Claude's, same DECISIONS: the Hinglish is reviewed with the Hindi at D64;
+  the copy file's two display rules — the earlier-edition line only where such a source is planned, the free-doubts
+  line only to a Free student — and its two open points, a Lab Manual line and the syllabus chip's target, for the
+  founder before this day.)*
 - **D38 —** Photo path: capture UI + vision extraction → same pipeline. ✅ *10 photographed
   printed questions extracted faithfully.* *Added 2026-10-01 (CS-3 §3.1–§3.2): the offline doubt
   queue (captured with no connection, sent automatically later, metered at send) and photo
@@ -425,7 +438,8 @@ tools; your reviews focus on output quality.)*
   stop stays free-tier only. ✅ *Limit math correct across day boundary (IST).* *Added 2026-10-01
   (CS-5 §4): the free allowance is also counted per phone (install id), so switching free accounts
   never multiplies it; Pro on a shared phone is unaffected. ✅ adds: switching between free accounts
-  on one phone does not raise that phone's daily free doubts (CS-5 §6.3).*
+  on one phone does not raise that phone's daily free doubts (CS-5 §6.3).* *Added 2026-10-23 (the founder;
+  DECISIONS): a doubt the app cannot ground never counts against the free doubts.*
 - **D45 —** Doubt → student-state write-back (concept weak-signals) with visible effect
   in next plan (“because you asked 3 Optics doubts…”). ✅ *Seeded doubts change
   tomorrow's plan with the reason line.*
@@ -541,7 +555,9 @@ tools; your reviews focus on output quality.)*
   share sheet shares in the committed build is open (TECH_PLAN §15.13; TRACKER day log).*
   *Amended 2026-10-19 (founder's calendar ruling; DECISIONS 2026-10-19): the founder's review of the
   crisis-protocol copy moves here from D67, so D59's copy reaches him by D64 — one of the two things the
-  closed test waits for (D66, Claude's placement of the founder's ≈D65).*
+  closed test waits for (D66, Claude's placement of the founder's ≈D65).* *Added 2026-10-23 (the founder;
+  DECISIONS): his native-reader review of the no-grounding doubt reply's two Hindi variants
+  (`docs/copy/doubt-no-grounding.md`) before they ship — with its two Hinglish variants (Claude's placement).*
 - **D65 —** Per-user AI budget circuit breaker + daily spend alarms + cost dashboard
   (cache rate, cost/feature, cost/user); the breaker wiring includes the Pro queue path
   (accept + queue, never a refusal — TECH_PLAN §4.8, founder ruling 2026-09-12) and the

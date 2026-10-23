@@ -22,7 +22,9 @@ in your plan. If code and SPEC conflict, say so — do not silently pick one.
 ## Hard rules
 - correct_key is never sent before that student's answer to the question is recorded server-side;
   judging is server-side (DEV_SPEC §5, TECH_PLAN §0.4 #4)
-- no AI answer path without retrieval grounding + numerical verification (DEV_SPEC §4.2, R2)
+- no AI answer path without retrieval grounding + numerical verification (DEV_SPEC §4.2, R2); grounding is NCERT
+  text — the current edition, or, where it does not teach a topic the NMC syllabus lists, the labelled NCERT
+  extension (the earlier edition's cut sections, NCERT's Laboratory Manuals), never in place of current text
 - every model call logs an ai_calls row (DEV_SPEC §3.4)
 - provider API keys are the auth model for AI: SSM SecureString in a deployed environment, an
   untracked local file on a laptop, never in code, config, logs or a repo file. Rotation:
@@ -42,7 +44,7 @@ When compacting: preserve API contract changes + rationale, migration list,
 open TODOs from the current /week task list, eval gate status. Summarize exploration.
 
 ---
-The block above is DEV_SPEC §13.2 verbatim, except for five approved deviations. Its "SPEC §3–5"
+The block above is DEV_SPEC §13.2 verbatim, except for six approved deviations. Its "SPEC §3–5"
 citations now read "DEV_SPEC" (they were written when the Developer Spec was docs/SPEC.md). Hard
 rule 1 carries the D3 rewording the founder approved on 2026-09-04 (TECH_PLAN §0.4 #4: SPEC §6.2/§6.4
 verdicts show the correct option after an answer is recorded). And four lines carry the provider
@@ -55,7 +57,10 @@ Bedrock became the completion fallback. And it was updated again on 2026-10-20 (
 the sentences Claude's, for the founder to overrule; DECISIONS): the founder's D18 smoke found Claude
 Haiku 5.5 and Sonnet 5.5 refused for this account (agreement NOT_AVAILABLE for Haiku 5.5 and 4.5; AWS
 Support case raised the same day), so the completion fallback is built and switched off, its readiness
-carried until AWS lifts the block. DEV_SPEC §13 keeps its original wording as the historical record.
+carried until AWS lifts the block. And hard rule 2 carries the NCERT-extension clarification the founder
+approved on 2026-10-23 (DECISIONS): grounding may use the earlier NCERT edition's cut sections and NCERT's
+Laboratory Manuals, labelled, where the current edition does not teach the topic. DEV_SPEC §13 keeps its
+original wording as the historical record.
 
 ## Documents and precedence (read before proposing anything)
 1. docs/SPEC.md — Product Spec v2.0, **the contract**: behaviour, every screen and rule,

@@ -44,8 +44,10 @@ paths:
 - REASON-tier calls carry a `RouteDecision`, produced only by the difficulty router,
   `RouteDecision.verification()` or `RouteDecision.generation()` (TECH_PLAN §4.2);
   `TierPolicyAiClient` rejects any other REASON request. Direct tier selection is a bug.
-- No answer without NCERT retrieval grounding. Numericals are verified by an independent
-  re-solve; mismatch → one regeneration → honest fallback + audit queue. Never render unverified.
+- No answer without NCERT retrieval grounding. (NCERT includes the labelled extension — the earlier edition's cut
+  sections and the Laboratory Manuals — never in place of current text; DECISIONS 2026-10-23.) Numericals are
+  verified by an independent re-solve; mismatch → one regeneration → honest fallback + audit queue. Never render
+  unverified.
 - Cache writes only after `verified=true`. Lookup: exact hash, then vector similarity >0.93
   within the same subject.
 - Every call writes an `ai_calls` row (tokens from the response, cost from the config price table).

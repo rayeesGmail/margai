@@ -360,7 +360,8 @@ flowchart LR
     NIGHT --> T2[Tomorrow's plan\nwith reasons]
 ```
 
-**Block types:** Learn (directs outside study: chapter + NCERT sections + why today),
+**Block types:** Learn (directs outside study: chapter + NCERT sections + why today; a
+section from the earlier NCERT edition or an NCERT Lab Manual is named as such, §6.3),
 Practice (timed in-app MCQ set), Revise (notebook variants due), and later Mock.
 A learn block carries teaching support (CS-4): for self-study students, the topic's
 **concept primer** (“Read the primer, then 10 recall questions”, §9); for every student,
@@ -495,7 +496,8 @@ accuracy up 9 points — the Optics drills worked”).
 inside the app.
 
 Rules: per-question timer; one-hand answer taps; instant verdict + step solution +
-NCERT anchor chip; question difficulty served in the student's stretch band (never
+NCERT anchor chip (naming the earlier NCERT edition or the NCERT Lab Manual when the anchor
+is from one, §6.3); question difficulty served in the student's stretch band (never
 demoralizing, never irrelevant — and never beyond real NEET patterns: “skipping the
 exotic stuff — NTA has never asked it”); session summary with accuracy, speed vs
 your norm, and what went to the notebook. Works offline for the current day's blocks —
@@ -537,7 +539,10 @@ flowchart TD
 ```
 
 **Answer contract (what the student sees, always in their language):**
-step-by-step solution → “NCERT anchor: Class 11 Bio, Ch 6, §6.4” (tappable) →
+step-by-step solution → “NCERT anchor: Class 11 Bio, Ch 6, §6.4” (tappable) — when the
+anchor is from the earlier NCERT edition or an NCERT Lab Manual, one line under it says so
+(“From the earlier NCERT edition — not in your current book”); such text never stands in for
+the current book where the current book covers the point — →
 “How NTA twists this” (only when a real PYQ backs it — Evidence rule) → two
 tap-to-ask follow-ups. Numericals never shown unverified; on rare verification
 failure the app says honestly “I couldn't verify this one — flagged for review.”
@@ -841,9 +846,14 @@ out-of-syllabus questions are labelled and excluded from the mock's score, and q
 count and marking follow each paper's own scheme where feasible. A question is out of
 syllabus when its topic is absent from both the current NMC syllabus and the current NCERT
 books; a topic NCERT has cut but the NMC syllabus still lists is in syllabus. A question on
-such a topic has no NCERT page to ground a solution on, so none is written: a mock serves it
-with NTA's key only and one line, "This topic isn't in your current NCERT book; answer as
-per NTA's key." Free gets the full mock and an autopsy summary; Pro the full autopsy.
+such a topic, or on a practical the NMC syllabus lists that the textbooks never taught, is
+solved from the earlier NCERT edition or NCERT's Lab Manuals where they teach it, its anchor
+labelled as such (§6.3); where neither does, it has no NCERT page to ground a solution on, so
+none is written: a mock serves it with NTA's key only and one line, "This topic isn't in your
+current NCERT book; answer as per NTA's key." A question marked "not yet in the corpus" — its
+topic printed only in a current table or figure the app does not yet hold — is served with
+NTA's key alone, without that line, until the mark is lifted. Free gets the full mock and an
+autopsy summary; Pro the full autopsy.
 
 A mock's questions carry the as-printed note of §6.2.
 
@@ -916,13 +926,20 @@ they're built and stored):
    the paragraph, powering every answer's “NCERT anchor.” Hindi text for the four
    Chemistry books may follow public launch and gates Hindi-medium marketing; until then,
    Hindi questions on Chemistry are grounded in the English text. Editions tracked; the app
-   must always reflect the current edition. (Licensing conversation with NCERT is a
+   must always reflect the current edition. Where the NMC syllabus lists a topic the current
+   edition does not teach — a section it cut, or a practical the textbooks never carried —
+   answers may ground on the earlier edition's text or NCERT's Laboratory Manuals, ingested in
+   both languages, labelled with their source wherever they are cited, and never in place of
+   the current edition's text where it covers the point. Until a source's Hindi is ingested,
+   Hindi questions on it are grounded in its English text. (Licensing conversation with NCERT is a
    founder workstream; the product only ever *explains and anchors*, never republishes
    pages.)
 3. **Question bank** — all official PYQs with step-by-step verified solutions we own,
    linked to NCERT paragraphs and tagged with what each wrong option reveals (this is
-   what makes error diagnosis smart) — except a question whose topic NCERT has cut but
-   the NMC syllabus still lists, which carries NTA's key alone (§7.1); plus verified
+   what makes error diagnosis smart) — except an in-syllabus question (§7.1) whose topic
+   neither the current NCERT books, the earlier NCERT edition nor NCERT's Lab Manuals teach,
+   which carries NTA's key alone; and, while its mark stands, a question marked "not yet in
+   the corpus", which carries NTA's key alone (§7.1); plus verified
    NCERT-style generated questions to guarantee ≥30 usable questions per topic across
    difficulty bands.
 4. **Exam intelligence** — per-topic weightage, repeat-pattern (“NTA trap”) notes backed
@@ -948,7 +965,8 @@ they're built and stored):
    (roughly 200–400 words) a self-learner reads before practising: what the concept is,
    why it matters, the core formula or idea, one worked mini-example, and the most common
    misconception. Written from the NCERT retrieval layer in our own words — never verbatim
-   — with an NCERT chapter/section reference as a pointer; numerical examples pass the
+   — with an NCERT chapter/section reference as a pointer, labelled when it is the earlier
+   edition or a Lab Manual (§6.3); numerical examples pass the
    standard verification; generated through the content pipeline, sampled by the founder
    like PYQ solutions, and covered by the eval suite. English at launch; Hindi and
    Hinglish as the Hindi corpus lands. Acceptance: primers for every topic in the top-50

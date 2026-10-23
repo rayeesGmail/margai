@@ -84,6 +84,11 @@ papers:
   - code: neet-2024-s6
     approved_file_sha256: 6a064676197a084e3866c514b186460dc01a3d46799450b27fc097554ef326bb   # 69ead53, the founder's approval
     rulings:
+      - question: 11
+        primary: PHY.12.SEMI.LOGIC
+        out_of_syllabus: false
+        ruled: 2026-10-23
+        note: Combination of logic gates (a NAND and a NOR, each with its inputs joined to act as NOT, feeding a NOR) and identifying the equivalent gate.
       - question: 67
         primary: CHE.12.CARBONYL
         out_of_syllabus: false
@@ -116,7 +121,7 @@ papers:
         out_of_syllabus: false
         anchor: bio11 ch 4 §4.2.11 ¶2, which cites Table 4.1 (Comparison of Chordates and Non-chordates); the table is not corpus text
         ruled: 2026-10-23
-        note: 40-sample correction — the five statements are the rows of NCERT's comparison of chordates and non-chordates (Table 4.1), so non-chordates with chordates, in place of the tagger's basis of classification.
+        note: "Refined for anchor precision: the five statements are the rows of NCERT's chordate/non-chordate comparison (Table 4.1); the tagger's basis-of-classification tag was defensible."
       - question: 194
         primary: ZOO.11.STRUCTANI
         out_of_syllabus: false

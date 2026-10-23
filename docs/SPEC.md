@@ -546,6 +546,8 @@ the current book where the current book covers the point — →
 “How NTA twists this” (only when a real PYQ backs it — Evidence rule) → two
 tap-to-ask follow-ups. Numericals never shown unverified; on rare verification
 failure the app says honestly “I couldn't verify this one — flagged for review.”
+When a doubt finds no NCERT grounding, the app says so honestly, naming, where it knows, that
+the current book doesn't teach the topic, and offers what it can do instead.
 Every answer has a Report flag (feeds a human audit queue — the one founder-human loop).
 A question from an official paper shown with an answer carries the as-printed note of §6.2.
 
@@ -850,9 +852,11 @@ such a topic, or on a practical the NMC syllabus lists that the textbooks never 
 solved from the earlier NCERT edition or NCERT's Lab Manuals where they teach it, its anchor
 labelled as such (§6.3); where neither does, it has no NCERT page to ground a solution on, so
 none is written: a mock serves it with NTA's key only and one line, "This topic isn't in your
-current NCERT book; answer as per NTA's key." A question marked "not yet in the corpus" — its
-topic printed only in a current table or figure the app does not yet hold — is served with
-NTA's key alone, without that line, until the mark is lifted. Free gets the full mock and an
+current NCERT book; answer as per NTA's key." Until those sources are in the app, such a
+question is served with NTA's key and that line. A question marked "not yet in the corpus" —
+its topic printed in the current book but not yet held in the app (a table, a figure, or pages
+not yet ingested) — is served with NTA's key alone, without that line, until the mark is
+lifted. Free gets the full mock and an
 autopsy summary; Pro the full autopsy.
 
 A mock's questions carry the as-printed note of §6.2.
@@ -938,8 +942,9 @@ they're built and stored):
    linked to NCERT paragraphs and tagged with what each wrong option reveals (this is
    what makes error diagnosis smart) — except an in-syllabus question (§7.1) whose topic
    neither the current NCERT books, the earlier NCERT edition nor NCERT's Lab Manuals teach,
-   which carries NTA's key alone; and, while its mark stands, a question marked "not yet in
-   the corpus", which carries NTA's key alone (§7.1); plus verified
+   which carries NTA's key alone; and, until those sources are in the app, a question they
+   teach, which carries NTA's key alone; and, while its mark stands, a question marked "not
+   yet in the corpus", which carries NTA's key alone (§7.1); plus verified
    NCERT-style generated questions to guarantee ≥30 usable questions per topic across
    difficulty bands.
 4. **Exam intelligence** — per-topic weightage, repeat-pattern (“NTA trap”) notes backed

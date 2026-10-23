@@ -196,7 +196,12 @@ tools; your reviews focus on output quality.)*
   has brought their pages into the corpus. Surfaced with it: CLAUDE.md hard rule 2 and DEV_SPEC R2 allow no AI
   solution without NCERT retrieval grounding, so until the founder rules, D20 generates no solution for a question
   marked "no NCERT anchor" and lists it for him.)* *Decided 2026-10-22 (the founder; DECISIONS): D20 and D21 write no
-  AI solution for a question with `anchor: none` — hard rule 2 stands.*
+  AI solution for a question with `anchor: none` — hard rule 2 stands.* *Added 2026-10-23 (the founder; DECISIONS):
+  D20 also skips a question marked `anchor: pending` ("not yet in the corpus": its topic printed only in a current
+  table or figure); for a ruled anchor — a paragraph address in the rulings file, in either subject's book (2024 S6
+  Q1 and Q55) — D20's solver puts that paragraph into the retrieved set; 2024 S6 Q10 grounds on phy11-part1 §6.9 ¶12.*
+  *(Claude's, same DECISIONS: the ruled-anchor change is a retrieval change, so it passes the eval gate — `eval/run.sh`
+  and its prompt-changelog line.)*
 - **D21 —** Solutions for remaining subjects (batch overnight); distractor-map
   generation. ✅ *Second 50-question audit; error rate < agreed threshold.*
 - **D22 —** Weightage & difficulty statistics computed → syllabus nodes updated; the
@@ -256,7 +261,9 @@ tools; your reviews focus on output quality.)*
   Biology unit openers moves to the next buffer under the slippage rule.* *The split (Claude's estimate, same
   DECISIONS, for the founder to overrule): D24 builds the table pass and runs it on Biology, both editions (18
   tables); Chemistry and Physics move to D36 — logged there and in TRACKER's slippage log — and if Biology's tables
-  do not fit D24 either, they move with them.*
+  do not fit D24 either, they move with them.* *Added 2026-10-23 (the founder; DECISIONS): the table pass also reads
+  the printed text of Figs 6.9–6.10 (bio12 ch 6, the geological eras), 5.16 and 13.8 (bio11 ch 5 and 13), here with
+  Biology's tables (Claude's placement), lifting the `pending` mark of the questions that need them (2024 S6 Q193).*
 
 ### PHASE 3 — Onboarding & first plan (Week 5, Days 25–30) — Modules M2 + M4(v0)
 
@@ -389,7 +396,10 @@ tools; your reviews focus on output quality.)*
   *Build note 2026-10-18 (founder; DECISIONS 2026-10-17, the correction rule as revised 2026-10-18): the
   anchor view never presents corrected text as the book's own words; it either shows the printed text
   with an errata note, or marks the corrected span as corrected. The same principle holds for the Phase 2
-  errata feature.* *And (the founder, 2026-10-21; DECISIONS): a PYQ's misprint kept as printed carries "a flag the
+  errata feature.* *And (the founder, 2026-10-23; DECISIONS): an anchor from the NCERT extension carries one line under
+  the chip — "From the earlier NCERT edition — not in your current book" / "From the NCERT Lab Manual — not in your
+  textbook" — and the reference view shows such a paragraph with that line; built with the extension's code in the
+  beta build days (Claude's placement), not here.* *And (the founder, 2026-10-21; DECISIONS): a PYQ's misprint kept as printed carries "a flag the
   app can show as an 'as printed in the original paper' note, like the NCERT errata notes"; the display rule is logged
   here and at D31; and (the founder, 2026-10-21, his change to Claude's draft below) only for a misprint that could
   change how a student reads the question — the entries classed `show`; a `record_only` slip is kept and recorded, not
@@ -554,7 +564,8 @@ tools; your reviews focus on output quality.)*
   If the crisis protocol is not passing, the closed test slips; it never runs without it. If the Play
   account is personal, Play's tester rule needs 14 days of it, which then end ≈2026-12-29, before wave 1; an
   organisation account (F14) is exempt (Claude's reading of the calendar report). ✅ adds: installable from
-  the closed track.*
+  the closed track.* *Added 2026-10-23 (the founder; DECISIONS): the closed test runs without the NCERT extension,
+  built in the beta's build days; the questions it would anchor stay key-only.*
 
 ### PHASE 8 — Hardening & polish (Weeks 12–13, Days 67–78) — M11
 
@@ -637,8 +648,17 @@ criteria to public launch add **all Hindi books loaded and closed**.
 the founder instructed),
 public launch ≈2027-02-02; the ≈2027-02-16 six-week fallback is removed. **"All Hindi books loaded and
 closed" is no longer an exit criterion to public launch; it becomes the gate for Hindi-medium marketing**
-(the SPEC §9 amendment the founder instructed). The Chemistry Hindi books still come first in the beta period's build days, and any
+(the SPEC §9 amendment the founder instructed). The Chemistry Hindi books still come first in the beta period's build days
+(*superseded 2026-10-23: they come third, in the order below*), and any
 content-pipeline work runs only in beta build days or buffers, never on core days (slippage-log rule).
+*Amended 2026-10-23 (founder; DECISIONS 2026-10-23) — a founder-approved reordering of the beta build days, not a
+scope trade or an overrun:* the build days run in this order — (1) the NCERT extension's code (migration V12, the
+assembler's margin rule, the anchor's source field, the labels, the fixtures), its English earlier-edition sections
+and the backfill of the questions they anchor; (2) the English Lab Manuals; (3) the four Chemistry Hindi books, any
+of which may slip past public launch under SPEC §9's allowance (Hindi questions on Chemistry grounded in the English
+text meanwhile); (4) the §12.1 backlog. The extension's Hindi follows launch, with English grounding meanwhile; its
+earlier-edition sections come into the beta if days remain. F19's files are due by 2027-01-05 (D84), before the
+first build day.
 
 ---
 

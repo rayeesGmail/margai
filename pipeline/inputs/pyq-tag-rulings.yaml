@@ -14,8 +14,12 @@
 #   secondary        at most two further codes it needs (optional)
 #   out_of_syllabus  true only when its topic is absent from both the current NMC syllabus and the current NCERT
 #                    books (SPEC §7.1); false unless set
-#   anchor           where NCERT teaches it; `none` marks "no NCERT anchor" — a topic NCERT has cut but the NMC
-#                    syllabus still lists — and no AI solution is written for it (hard rule 2; DECISIONS) (optional)
+#   anchor           where NCERT teaches it, as `<book> ch <n> §<section> ¶<para>` where D20 is to ground on it — in
+#                    the other subject's book too (DECISIONS 2026-10-23); `none` marks "no NCERT anchor" — a topic the
+#                    NMC syllabus lists that the current textbooks do not teach, cut or never taught — and no AI solution
+#                    is written for it (hard rule 2; DECISIONS); `pending` marks "not yet in the corpus" — a topic the
+#                    current book prints only in a table or figure the corpus does not hold yet — and D20 skips it until
+#                    the table and figure pass brings it in (DECISIONS 2026-10-23) (optional)
 #   gap              a taxonomy node proposed for it where none fits, code and name — the taxonomy-gap list
 #                    (optional; the founder rules on each before it goes into taxonomy.csv)
 #   ruled            the date of the founder's ruling
@@ -31,13 +35,26 @@ papers:
         anchor: none
         ruled: 2026-10-23
         note: In syllabus with no NCERT anchor — logic gates, which the NMC syllabus lists and the current NCERT does not teach (phy12-part2 ch 14 ends at §14.7, the rectifier).
+      - question: 17
+        primary: PHY.11.ROT.CONSANG
+        secondary: [PHY.11.ROT.MOI]
+        out_of_syllabus: false
+        anchor: pending
+        ruled: 2026-10-23
+        note: Not yet in the corpus — a uniform sphere's moment of inertia is only in Table 6.1 (phy11-part1 ch 6), which §6.9 ¶12 cites.
       - question: 66
         primary: CHE.12.SOLN
         out_of_syllabus: false
-        anchor: chem12-part1 ch 1 §1.1 ¶1, which cites Table 1.1 (Types of Solutions); the table is not corpus text
+        anchor: pending
         gap: CHE.12.SOLN.TYPES — Types of solutions
-        ruled: 2026-10-21
-        note: Not out of syllabus — NTA set it under the 2025 syllabus, and it comes from the Solutions chapter.
+        ruled: 2026-10-23
+        note: Not out of syllabus — NTA set it under the 2025 syllabus, from the Solutions chapter; not yet in the corpus — its facts are in Table 1.1 (chem12-part1 ch 1), which §1.1 ¶1 only cites.
+      - question: 69
+        primary: CHE.12.BIOMOL.VITAMINS
+        out_of_syllabus: false
+        anchor: pending
+        ruled: 2026-10-23
+        note: Not yet in the corpus — the vitamins' deficiency diseases are only in Table 10.3 (chem12-part2 ch 10), which §10.4.1 ¶4 cites.
       - question: 77
         primary: CHE.11.HYDROC
         secondary: [CHE.12.ALCPHE.PHENOLS]
@@ -90,6 +107,12 @@ papers:
   - code: neet-2024-s6
     approved_file_sha256: 6a064676197a084e3866c514b186460dc01a3d46799450b27fc097554ef326bb   # 69ead53, the founder's approval
     rulings:
+      - question: 1
+        primary: PHY.12.ATOMS.BOHR
+        out_of_syllabus: false
+        anchor: chem11-part1 ch 2 §2.3.3 ¶9, ¶10
+        ruled: 2026-10-23
+        note: Cross-subject anchor — the Rydberg formula and the hydrogen series are taught in current Chemistry (chem11-part1 §2.3.3), not in current Physics.
       - question: 5
         primary: PHY.12.SEMI.SPECIAL
         secondary: [PHY.12.SEMI.SEMIC]
@@ -109,6 +132,18 @@ papers:
         anchor: none
         ruled: 2026-10-23
         note: In syllabus with no NCERT anchor — the Boolean expression of a logic circuit from its truth table; the current NCERT does not teach logic gates.
+      - question: 52
+        primary: CHE.11.BOND.VSEPR
+        out_of_syllabus: false
+        anchor: pending
+        ruled: 2026-10-23
+        note: Not yet in the corpus — BrF5's and XeF4's shapes are only in Table 4.7 (chem11-part1 ch 4), which §4.4 ¶12 cites.
+      - question: 55
+        primary: CHE.11.THERMO.BASICS
+        out_of_syllabus: false
+        anchor: phy11-part2 ch 11 §11.8.4 ¶1, §11.8.5 ¶1, ¶2
+        ruled: 2026-10-23
+        note: Cross-subject anchor — isochoric and isobaric processes are taught in current Physics (phy11-part2 §11.8.4–11.8.5), not in current Chemistry.
       - question: 67
         primary: CHE.12.CARBONYL
         out_of_syllabus: false
@@ -142,6 +177,13 @@ papers:
         anchor: bio11 ch 4 §4.2.11 ¶2, which cites Table 4.1 (Comparison of Chordates and Non-chordates); the table is not corpus text
         ruled: 2026-10-23
         note: "Refined for anchor precision: the five statements are the rows of NCERT's chordate/non-chordate comparison (Table 4.1); the tagger's basis-of-classification tag was defensible."
+      - question: 193
+        primary: ZOO.12.EVOL.EVIDENCE
+        secondary: [ZOO.12.EVOL.ORIGIN]
+        out_of_syllabus: false
+        anchor: pending
+        ruled: 2026-10-23
+        note: Not yet in the corpus — the geological eras are only in Figs 6.9–6.10 (bio12 ch 6), images whose printed text the table and figure pass reads.
       - question: 194
         primary: ZOO.11.STRUCTANI
         out_of_syllabus: false

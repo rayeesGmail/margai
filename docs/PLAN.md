@@ -247,7 +247,8 @@ tools; your reviews focus on output quality.)*
   weightage — NTA asked it.* *And (the founder, 2026-10-22; DECISIONS): a multi-topic question shares its weightage
   credit across its primary and secondary tags, not the primary alone. (Proposed by Claude, same DECISIONS, for the
   founder to rule: one unit a question — 1.0 to a lone primary, 0.7/0.3 with one secondary, 0.6/0.2/0.2 with two; a
-  chapter-coded tag credits the chapter.)*
+  chapter-coded tag credits the chapter.)* *And (the founder, 2026-10-24; DECISIONS): an out-of-syllabus question
+  counts toward no topic's weightage, whatever chapter it is filed under.*
 - **D23 —** Anchor-linking questions↔NCERT; seed the eval suite v1 (~60 questions
   across subjects). ✅ *Eval harness runs and reports.* *Amended 2026-10-18 (founder; DECISIONS
   2026-10-18): the eval suite carries Hindi questions in every subject.* *Amended 2026-10-19 (founder's
@@ -373,7 +374,9 @@ tools; your reviews focus on output quality.)*
   entry, required from then.)* *And (the founder, 2026-10-21; DECISIONS): a question whose tag is marked `review` is
   not picked for topic practice until he rules; full past-paper mocks still serve it (D35).* *And (the founder,
   2026-10-22; DECISIONS): a question marked "no NCERT anchor" is never picked for topic practice. (Claude's, same
-  DECISIONS, for the founder to overrule: the mark gets a column here, the first reader that filters on it.)*
+  DECISIONS, for the founder to overrule: the mark gets a column here, the first reader that filters on it.)* *And
+  (the founder, 2026-10-24; DECISIONS): an out-of-syllabus question is never picked for topic practice, whatever
+  chapter it is filed under.*
 - **D32 —** Practice UI: timer, taps, verdict + solution sheet + NCERT anchor chip.
   ✅ *A 10-question timed set feels smooth on a mid-range phone.*
 - **D33 —** Session summary (accuracy, speed vs your norm, sent-to-notebook list);

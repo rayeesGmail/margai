@@ -2,8 +2,8 @@
 
 Flutter stable (3.47) · Riverpod for state · go_router · dio through the one `ApiClient` · drift/sqlite
 for the offline store (arrives D34) · ARB strings for en / hi / hi_Latn (Hinglish, authored). Screens
-are the SPEC §8 catalog; do not invent screens. Android applicationId `com.margai.app` (see
-docs/DECISIONS.md). Layout per docs/TECH_PLAN.md §5.1: `lib/core/` (api, auth, config, l10n, router,
+are the SPEC §8 catalog; do not invent screens. Android applicationId `com.hauslalearning.app`, tied to the
+domain rather than to an app name (see docs/DECISIONS.md 2026-10-24). Layout per docs/TECH_PLAN.md §5.1: `lib/core/` (api, auth, config, l10n, router,
 theme, widgets) and `lib/features/<feature>/` (models, repository, providers, screens).
 
 ## Run
@@ -47,7 +47,7 @@ flutter run -d <phone-id> --dart-define=API_BASE_URL=http://127.0.0.1:8081
 Mobile data needs a public endpoint (the beta stack, TRACKER F8). The stored session lives in the
 Android Keystore and survives a kill and reopen; an expired access token is refreshed on the first
 call (D10). Log out from Profile (the person icon on Today) to sign the device out;
-`adb shell pm clear com.margai.app` wipes it for a fresh-install test.
+`adb shell pm clear com.hauslalearning.app` wipes it for a fresh-install test.
 
 ### Device proofs
 

@@ -19,7 +19,7 @@
 #
 # Environment: ADB (default: adb on PATH, else the Homebrew platform-tools path), UI_SHOTS
 # (screenshot directory, default $TMPDIR/margai-ui — never the tree, the commit gate scans untracked
-# files), UI_PKG (default com.margai.app), ANDROID_SERIAL (adb's own device selector when more than
+# files), UI_PKG (default com.hauslalearning.app), ANDROID_SERIAL (adb's own device selector when more than
 # one is attached).
 #
 # Three things learnt the hard way: right after `launch` the first dump can still show the previous
@@ -30,7 +30,7 @@ set -euo pipefail
 
 ADB="${ADB:-$(command -v adb || echo /opt/homebrew/share/android-commandlinetools/platform-tools/adb)}"
 UI_SHOTS="${UI_SHOTS:-${TMPDIR:-/tmp}/margai-ui}"
-PKG="${UI_PKG:-com.margai.app}"
+PKG="${UI_PKG:-com.hauslalearning.app}"
 
 usage() {
   sed -n '2,/^set -euo/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//'

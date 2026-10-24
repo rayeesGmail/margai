@@ -1,4 +1,4 @@
-package com.margai.app
+package com.hauslalearning.app
 
 import io.flutter.embedding.android.FlutterActivity
 

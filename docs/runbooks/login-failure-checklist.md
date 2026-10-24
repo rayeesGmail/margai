@@ -25,7 +25,7 @@ cd server && SERVER_PORT=8082 ./mvnw spring-boot:run
 # 2. the app on the AVD (scripts/dev-setup.sh --emulator), pointed at that port
 cd app && flutter build apk --debug --dart-define=API_BASE_URL=http://10.0.2.2:8082 \
   && adb install -r build/app/outputs/flutter-apk/app-debug.apk
-adb shell pm clear com.margai.app          # a signed-out device between rows
+adb shell pm clear com.hauslalearning.app  # a signed-out device between rows
 # 3. curl for the server-only rows; the database through the compose container
 docker compose exec -T db psql -U margai -d margai -c "select count(*) from users where email = '…'"
 ```

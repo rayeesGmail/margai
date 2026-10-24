@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.margai.app"
+    namespace = "com.hauslalearning.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -15,8 +15,9 @@ android {
     }
 
     defaultConfig {
-        // Permanent once the first build reaches Play (D74); revisit with the final name (TRACKER F6/F7).
-        applicationId = "com.margai.app"
+        // Permanent once the first build reaches Play (the internal-testing upload on the Play-account day, TRACKER
+        // F14). Tied to the domain we own, not to an app name; F21 covers only the display name (DECISIONS 2026-10-24).
+        applicationId = "com.hauslalearning.app"
         // minSdk/targetSdk follow the Flutter SDK defaults (https://flutter.dev/to/review-gradle-config).
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
@@ -27,8 +28,8 @@ android {
 
     buildTypes {
         release {
-            // Release signing arrives with the Play internal track (D74); debug keys keep
-            // `flutter run --release` working until then.
+            // Release signing arrives on the Play-account day (TRACKER F14, F20): an upload key read from the
+            // untracked key.properties (DECISIONS 2026-10-24); debug keys keep `flutter run --release` working until then.
             signingConfig = signingConfigs.getByName("debug")
         }
     }

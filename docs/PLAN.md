@@ -228,7 +228,9 @@ tools; your reviews focus on output quality.)*
   (the k ∝ R scaling of a uniformly expanding sphere is reasoning from taught principles), solved and verified as
   normal.*
   *(Claude's, same DECISIONS: the ruled-anchor change is a retrieval change, so it passes the eval gate — `eval/run.sh`
-  and its prompt-changelog line.)*
+  and its prompt-changelog line.)* *Added 2026-10-24 (the founder; DECISIONS): the solver records the grounding kind of
+  every solution it writes — stated, derived, elimination or plain word — as the pre-D20 batch's rulings record it in
+  their notes, so a solution reached only by elimination is known to verification and to the doubt explanations.*
 - **D21 —** Solutions for remaining subjects (batch overnight); distractor-map
   generation. ✅ *Second 50-question audit; error rate < agreed threshold.*
 - **D22 —** Weightage & difficulty statistics computed → syllabus nodes updated; the
@@ -292,7 +294,9 @@ tools; your reviews focus on output quality.)*
   the printed text of Figs 6.9–6.10 (bio12 ch 6, the geological eras), 5.16 and 13.8 (bio11 ch 5 and 13), here with
   Biology's tables (Claude's placement), lifting the `pending` mark of the questions that need them (2024 S6 Q193).*
   *And (the founder, 2026-10-23; DECISIONS): Biology's Table 4.1 lifts 2024 S6 Q189's `pending` mark, and the unit
-  openers lift 2025 code 45's Q95 and Q133's.*
+  openers lift 2025 code 45's Q95 and Q133's.* *Added 2026-10-24 (the founder; DECISIONS): the figure reading also
+  covers chem11-part1 Fig. 3.2 (the periodic table; 2023 G6 Q51) and the labels of phy12-part2 Fig. 10.12(b) (G6 Q24),
+  with D36's Chemistry and Physics tables (Claude's placement).*
 
 ### PHASE 3 — Onboarding & first plan (Week 5, Days 25–30) — Modules M2 + M4(v0)
 
@@ -397,7 +401,8 @@ tools; your reviews focus on output quality.)*
   from D24 under the slippage rule (the founder's table ruling; the split Claude's, DECISIONS 2026-10-22): the NCERT
   table pass on Chemistry, English — its Hindi following the four Chemistry Hindi books in the beta period — then
   Physics, both editions, each table stored so retrieval can hit its rows; the gate never waits on it (Claude's, same
-  DECISIONS).*
+  DECISIONS).* *Added 2026-10-24 (the founder's figures, Claude's placement; DECISIONS): with them, the printed text of
+  chem11-part1 Fig. 3.2 and the labels of phy12-part2 Fig. 10.12(b), lifting 2023 G6 Q51's and Q24's `pending` marks.*
 
 ### PHASE 5 — Doubt solver (Weeks 7–8, Days 37–48) — Module M6 (the hero)
 

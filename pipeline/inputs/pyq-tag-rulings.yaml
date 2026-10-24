@@ -34,7 +34,7 @@ papers:
         out_of_syllabus: false
         anchor: none
         ruled: 2026-10-23
-        note: In syllabus with no NCERT anchor — logic gates, which the NMC syllabus lists and the current NCERT does not teach (phy12-part2 ch 14 ends at §14.7, the rectifier).
+        note: In syllabus with no NCERT anchor — logic gates, which the NMC syllabus lists and the current NCERT does not teach (phy12-part2 ch 14 ends at §14.7, the rectifier). Grounding — none.
       - question: 21
         primary: PHY.11.KIN2D.RELVEL
         secondary: [PHY.11.KIN1D.ACCEL]
@@ -101,7 +101,7 @@ papers:
         anchor: pending
         gap: CHE.12.SOLN.TYPES — Types of solutions
         ruled: 2026-10-23
-        note: Not out of syllabus — NTA set it under the 2025 syllabus, from the Solutions chapter; not yet in the corpus — its facts are in Table 1.1 (chem12-part1 ch 1), which §1.1 ¶1 only cites.
+        note: Not out of syllabus — NTA set it under the 2025 syllabus, from the Solutions chapter; not yet in the corpus — its facts are in Table 1.1 (chem12-part1 ch 1), which §1.1 ¶1 only cites. Grounding — plain word, once Table 1.1 is in.
       - question: 69
         primary: CHE.12.BIOMOL.VITAMINS
         out_of_syllabus: false
@@ -115,7 +115,7 @@ papers:
         anchor: chem11-part2 ch 9 §9.3.5 ¶4 (bromine adds to an unsaturation site, a test for unsaturation); chem12-part2 ch 7 §7.4.4 ¶52 (phenol and bromine water); chem12-part2 ch 9 §9.6 ¶35 (aniline and bromine water)
         gap: CHE.12.AMINES.ANILINE — Reactions of aniline, electrophilic substitution (e.g. bromination)
         ruled: 2026-10-22
-        note: The tagger's v2 tag without its weak secondary, basic character of amines; aniline's electrophilic substitution has no topic, so it goes on the taxonomy-gap list.
+        note: The tagger's v2 tag without its weak secondary, basic character of amines; aniline's electrophilic substitution has no topic, so it goes on the taxonomy-gap list. Grounding — derived, with a caveat (phenol and aniline are stated to react with bromine water, not to decolourise it, and that cyclohexane needs light or heat is not stated).
       - question: 83
         primary: CHE.12.CARBONYL
         out_of_syllabus: false
@@ -185,13 +185,13 @@ papers:
         out_of_syllabus: false
         anchor: none
         ruled: 2026-10-23
-        note: In syllabus with no NCERT anchor — statement A, a solar cell's I-V characteristic, has no ground in the current NCERT, which does not teach the special-purpose diodes; statement B's reverse current is in phy12-part2 ch 14 §14.6.2.
+        note: In syllabus with no NCERT anchor — statement A, a solar cell's I-V characteristic, has no ground in the current NCERT, which does not teach the special-purpose diodes; statement B's reverse current is in phy12-part2 ch 14 §14.6.2. Grounding — none.
       - question: 11
         primary: PHY.12.SEMI.LOGIC
         out_of_syllabus: false
         anchor: none
         ruled: 2026-10-23
-        note: Combination of logic gates (a NAND and a NOR, each with its inputs joined to act as NOT, feeding a NOR) and identifying the equivalent gate; in syllabus with no NCERT anchor — the current NCERT does not teach logic gates.
+        note: Combination of logic gates (a NAND and a NOR, each with its inputs joined to act as NOT, feeding a NOR) and identifying the equivalent gate; in syllabus with no NCERT anchor — the current NCERT does not teach logic gates. Grounding — none.
       - question: 12
         primary: PHY.00.EXPSKILL.VERNIER
         secondary: [PHY.11.UNITS.ERRORS]
@@ -204,7 +204,7 @@ papers:
         out_of_syllabus: false
         anchor: none
         ruled: 2026-10-23
-        note: In syllabus with no NCERT anchor — the Boolean expression of a logic circuit from its truth table; the current NCERT does not teach logic gates.
+        note: In syllabus with no NCERT anchor — the Boolean expression of a logic circuit from its truth table; the current NCERT does not teach logic gates. Grounding — none.
       - question: 35
         primary: PHY.12.WAVOPT.INTERF
         out_of_syllabus: false
@@ -223,13 +223,13 @@ papers:
         out_of_syllabus: false
         anchor: pending
         ruled: 2026-10-23
-        note: Not yet in the corpus — BrF5's and XeF4's shapes are only in Table 4.7 (chem11-part1 ch 4), which §4.4 ¶12 cites.
+        note: Not yet in the corpus — BrF5's and XeF4's shapes are only in Table 4.7 (chem11-part1 ch 4), which §4.4 ¶12 cites. Grounding — stated, once Table 4.7 is in.
       - question: 55
         primary: CHE.11.THERMO.BASICS
         out_of_syllabus: false
-        anchor: phy11-part2 ch 11 §11.8.4 ¶1, §11.8.5 ¶1, ¶2
-        ruled: 2026-10-23
-        note: Cross-subject anchor — isochoric and isobaric processes are taught in current Physics (phy11-part2 §11.8.4–11.8.5), not in current Chemistry. Grounding — stated.
+        anchor: phy11-part2 ch 11 §11.8.1 ¶5, §11.8.4 ¶1, §11.8.5 ¶1, ¶2
+        ruled: 2026-10-24
+        note: Cross-subject anchor — isochoric and isobaric processes are taught in current Physics (phy11-part2 §11.8.1 ¶5, which defines the four processes, and §11.8.4–11.8.5), not in current Chemistry; §11.8.1 ¶5 added to the anchor 2026-10-24. Grounding — stated.
       - question: 58
         primary: CHE.00.PBLOCK.CONFIG
         secondary: [CHE.11.PERIOD.VALENCE]
@@ -287,7 +287,7 @@ papers:
         anchor: none
         gap: ZOO.11.STRUCTANI.INSECT — Morphology and anatomy of an insect (cockroach)
         ruled: 2026-10-23
-        note: In syllabus with no NCERT anchor — cockroach morphology, which NTA set under this syllabus ("of an insect (Frog)") and kept in its revised key; the current NCERT does not teach the cockroach.
+        note: In syllabus with no NCERT anchor — cockroach morphology, which NTA set under this syllabus ("of an insect (Frog)") and kept in its revised key; the current NCERT does not teach the cockroach. Grounding — none.
       - question: 189
         primary: ZOO.11.ANIMALK.NONCHORD
         secondary: [ZOO.11.ANIMALK.CHORD]
@@ -307,14 +307,14 @@ papers:
         out_of_syllabus: false
         anchor: pending
         ruled: 2026-10-23
-        note: Not yet in the corpus — the geological eras are only in Figs 6.9–6.10 (bio12 ch 6), images whose printed text the table and figure pass reads.
+        note: Not yet in the corpus — the geological eras are only in Figs 6.9–6.10 (bio12 ch 6), images whose printed text the table and figure pass reads. Grounding — elimination, once the figures are in.
       - question: 194
         primary: ZOO.11.STRUCTANI
         out_of_syllabus: false
         anchor: none
         gap: ZOO.11.STRUCTANI.INSECT — Morphology and anatomy of an insect (cockroach)
         ruled: 2026-10-23
-        note: In syllabus with no NCERT anchor — the cockroach's digestive system, as Q179; the current NCERT names its Malpighian tubules only in passing (bio11 ch 16).
+        note: In syllabus with no NCERT anchor — the cockroach's digestive system, as Q179; the current NCERT names its Malpighian tubules only in passing (bio11 ch 16). Grounding — none.
   - code: neet-2023-g6
     approved_file_sha256: 75aeca06723d19384bc6119f90d1835630eb1d1a49bb00f4b2a025665b68872c   # 14c890a, the founder's approval
     rulings:
@@ -401,7 +401,7 @@ papers:
         out_of_syllabus: false
         anchor: chem12-part1 ch 4 §4.3.12 ¶1 (catalysts at a solid surface; finely divided iron in Haber's process); chem12-part1 ch 3 §3.4.1 ¶1 (what a catalyst is)
         ruled: 2026-10-24
-        note: In syllabus — the d-block's catalytic behaviour (the NMC syllabus's "catalytic property"); NCERT teaches a solid catalyst with Haber's iron, though not the words homogeneous and heterogeneous catalysis, which were the earlier edition's Surface Chemistry.
+        note: In syllabus — the d-block's catalytic behaviour (the NMC syllabus's "catalytic property"); NCERT teaches a solid catalyst with Haber's iron, though not the words homogeneous and heterogeneous catalysis, which were the earlier edition's Surface Chemistry. Grounding — plain word.
       - question: 67
         primary: CHE.11.PERIOD
         out_of_syllabus: true

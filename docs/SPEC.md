@@ -285,7 +285,7 @@ Then the notification permission ask — tied to that promise, not abstract.
 
 ```
 ┌──────────────────────────┐   ┌──────────────────────────┐   ┌──────────────────────────┐
-│  ●●○ MARG AI             │   │  Syllabus check-in  (2/3)│   │  Scorecard — confirm      │
+│  ●●○ Mentorbit           │   │  Syllabus check-in  (2/3)│   │  Scorecard — confirm      │
 │                          │   │  [Physics][Chem][Bio]    │   │                          │
 │  🎓 “Hi! I'm your NEET   │   │  Kinematics      [Done]  │   │  Total marks      512    │
 │  mentor. 90 seconds of   │   │  Laws of Motion  [Done]  │   │  AIR           88,412    │
@@ -331,7 +331,7 @@ day; free accounts per phone are capped (§6.9); unusual use follows the gentle 
 **Minors in the beta:** the beta cohort is recruited **18+**; DOB is still asked, with an
 18+ gate for the beta. The parent-consent flow (§5.1: parent phone + consent OTP) is built
 but stays switched off for the beta — unless the D60 revisit below switches it on — and
-goes live at public launch. Someone under 18 who reaches the gate is stopped kindly (“MARG
+goes live at public launch. Someone under 18 who reaches the gate is stopped kindly (“Mentorbit
 opens to under-18s at launch”) and their account, phone number and answers are deleted at
 once — nothing that identifies them is kept, not even for a waitlist. At the D60 gate the 18+ rule is revisited once: if the consent SMS template is
 live and the legal review has cleared parental consent and the rules on monitoring

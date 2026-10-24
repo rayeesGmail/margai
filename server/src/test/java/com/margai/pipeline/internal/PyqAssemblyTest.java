@@ -155,7 +155,7 @@ class PyqAssemblyTest {
     /**
      * Words printed run together are a typesetting fault: the text carries them spaced and a record_only note keeps
      * the printed form, which the text no longer prints (the founder, 2026-10-24); only spaces between letters count,
-     * and a single missing space is read the same way (Claude's, for him to confirm).
+     * and a single missing space is read the same way (the founder, 2026-10-24).
      */
     @Test
     void wordsPrintedRunTogetherAreSpacedInTheTextAndOnlyRecorded() {

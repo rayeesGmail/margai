@@ -32,8 +32,8 @@ import tools.jackson.databind.json.JsonMapper;
  * founder listed for the code — a key typed into the file can never differ from the one he checked
  * (README §3); and every misprint kept as printed quoting what its field prints, with an intended
  * reading, a one-line note and its display class — save words printed run together, which the field
- * carries spaced and a record_only note keeps (the founder, 2026-10-24; a single missing space, Claude's
- * application, for him to confirm — DECISIONS). A draft passes the same checks
+ * carries spaced and a record_only note keeps (the founder, 2026-10-24, a single missing space included —
+ * DECISIONS). A draft passes the same checks
  * except that its answers are empty.
  */
 final class PaperFileJson {
@@ -140,8 +140,8 @@ final class PaperFileJson {
      * record the founder asked for (2026-10-21), in a shape and with checks that are Claude's
      * (DECISIONS) — so a note can never point at words the question no longer carries. One exception: words
      * the paper runs together with no spaces are a typesetting fault, so the text carries them normally spaced
-     * and a {@code record_only} note keeps the printed form (the founder, 2026-10-24; a single missing space and
-     * the letters-only and left-in-the-text checks are Claude's, DECISIONS, for him to confirm) — the entry's intended
+     * and a {@code record_only} note keeps the printed form (the founder, 2026-10-24, a single missing space
+     * included; the letters-only and left-in-the-text checks are Claude's, DECISIONS) — the entry's intended
      * reading is then what the field prints.
      */
     private static List<String> asPrintedProblems(String at, PaperFile.Question question) {

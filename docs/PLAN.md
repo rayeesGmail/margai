@@ -94,25 +94,39 @@ DLT registration is possible under the Udyam proprietorship (founder, 2026-10-01
 - **D11 —** DLT template live check (if F1 approved; else stay sandbox), delivery-rate
   logging, OTP metrics dashboard stub. ✅ *OTP success metric visible.*
 - **D12 —** Buffer + **Week-2 gate:** a stranger's phone can sign in first try.
-- **Floating — phone OTP live** *(founder decision 2026-10-01; placement proposed, to confirm)*:
+- **Floating — phone OTP live** *(founder decision 2026-10-01; placed at D48 under his rule of 2026-10-24 —
+  the day Claude's application of it, for him to overrule)*:
   phone OTP by SMS is the only sign-in method (SPEC §5.7). The MSG91 adapter on the two DLT
   templates (login, parent consent), number entry with OTP auto-read, and email OTP moved behind
-  its flag land in the first buffer after F1's DLT templates are approved — and **D60 is the
+  its flag land in the first buffer after F1's DLT templates are approved *(superseded 2026-10-24 by the
+  placement below)* — and **D60 is the
   decision point**: if the templates are not live by then, the beta runs on the email fallback
   flag (which needs F10's SES production access). The same item builds the phone attach for an
   account begun on the email fallback (`POST /me/phone/otp/request|verify`, TECH_PLAN §15.1) and
   gives D27's consent flow its live SMS proof. ✅ *A real phone signs in by SMS first try; the
   email path only with its flag on; an email-begun account attaches a phone and stays one user,
   and a number already in use is refused, never merged (CS-2 §10, SPEC §5.7).*
-  *Amended 2026-10-24 (the founder; DECISIONS 2026-10-24): F1's DLT registration is done, and this item gets
-  its own day before D27, replacing the first-buffer rule — the slot is Claude's proposal, awaiting his approval.
-  The day builds on MSG91's Flow API, the server still generating, storing and expiring the code; the app uses
-  smart_auth's SMS Retriever with the SMS User Consent fallback and logs the app hash in debug builds; auto-read is
-  never tested on Internal app sharing builds. One DLT template per signing key: the dev-key template now, the
-  Play-key template before D66's upload. A day before D27 cannot give D27's consent flow its live proof, as this
-  item said: Claude's proposal (with the slot, for his approval) is that the day proves the login path live, and D27
-  takes its consent flow live itself through the adapter this day builds if the parent-consent template is approved
-  by then, or at the first buffer after it is; D27's text and TECH_PLAN §15's schedule row follow his approval.*
+  *Amended 2026-10-24 (the founder; DECISIONS 2026-10-24): F1's DLT registration is done, and the founder's own
+  curl test checks DLT delivery as soon as Jio approves the dev-key template, so what is left is ordinary code. It
+  lands in the first buffer after D27 that is not already committed, provided that is before D60 — no slip for
+  it, and a day before D27 (D26a) only as the fallback, if no such buffer existed. D27 builds the consent flow with
+  SMS faked, as planned, and the consent flow is proven live on that buffer day. The work runs on MSG91's Flow
+  API, the server still generating, storing and expiring the code; the app uses smart_auth's SMS Retriever with
+  the SMS User Consent fallback and logs the app hash in debug builds; auto-read is never tested on Internal app
+  sharing builds. One DLT template per signing key: the dev-key template now; the Play-key template from the
+  app-signing certificate of one internal-testing-track upload made as soon as the Play account exists (F14) —
+  Google generates that key — its text to the founder the same day; until Jio approves it, closed testers sign in
+  through the SMS User Consent fallback or by typing the code, so it does not block D66.* *Claude's application,
+  for the founder to overrule: that buffer is **D48** — D36 carries the NCERT table pass and D42 the 30-answer
+  audit, the compression retro-fit and any D38 overflow; nothing is committed to D48 itself. With D36 and D48 both
+  taken, D72 is the only plain buffer left before D74 for the items allowed to slip to "a later buffer" (CS-1's
+  collective review and load, the primers beyond the top 50, the errata backfill). D48's consent proof also needs
+  the parent-consent DLT template, still being drafted, approved by then; if it is not, the check moves with the
+  proof to the next buffer after its approval that is not already committed, D60 at the latest, and D48 ticks on
+  the rest (for him to rule). Open for the founder: the internal-testing upload on the
+  Play-account day needs a release-signed bundle (Play refuses one signed with the debug key), so the upload key
+  would be made that day rather than at D66 as his answer has it; and that first upload fixes the applicationId for
+  good, while F21 holds `com.margai.app` until the trademark advice (F9, December).*
 
 ### PHASE 2 — Content pipeline v1 (Weeks 3–4, Days 13–24) — Module M3
 
@@ -296,7 +310,8 @@ tools; your reviews focus on output quality.)*
   the account, number and answers at once (founder ruling 2026-10-01) — a purge built here, not D64's
   anonymise-then-purge (TECH_PLAN §15.1); D60 revisits the 18+ rule. The
   consent flow is built against the OTP sender port with SMS faked in tests — its live proof comes
-  with the floating phone-OTP item, where the MSG91 adapter lands. ✅ adds: with the beta flag on,
+  with the floating phone-OTP item, where the MSG91 adapter lands (D48 since 2026-10-24, Claude's application of
+  the founder's rule). ✅ adds: with the beta flag on,
   an under-18 DOB meets the gate and leaves no row that identifies them (the cost ledgers keep their
   rows, unlinked); with the consent flag on, the original ✅ holds.*
 - **D28 —** Scorecard upload: capture UI with frame guide → AI extraction → confirm/edit
@@ -461,7 +476,12 @@ tools; your reviews focus on output quality.)*
   reasons, the AI reason lines joining at D56 (CS-1 §7; TECH_PLAN §4.10 — added 2026-09-12).
   ✅ *Gate demonstrably blocks a prompt change that fails.*
 - **D48 —** Buffer + **Week-8 gate:** hero feature demo-ready; eval ≥ target; founder
-  audit error list empty or ticketed.
+  audit error list empty or ticketed. *Added 2026-10-24 (the founder's rule; this day Claude's application of it,
+  for him to overrule; DECISIONS): phone OTP live (the floating item after D12) lands in this buffer, the first
+  after D27 not already committed, and proves D27's consent flow live there (the founder). ✅ as the floating
+  item's, plus D27's consent OTP reaching a real phone.* *Claude's note, for him to rule: that last check needs the
+  parent-consent template, still being drafted, approved by D48; if it is not, the check moves with the proof to the
+  next buffer after its approval that is not already committed, D60 at the latest, and D48 ticks on the rest.*
 
 ### PHASE 6 — Notebook, SRS & the nightly brain (Weeks 9–10, Days 49–60) — M7 + M8
 
@@ -581,8 +601,9 @@ tools; your reviews focus on output quality.)*
   *Amended 2026-10-19 (founder's calendar ruling, option (c); DECISIONS 2026-10-19; this day chosen by
   Claude, since it carries only the gate while D65 is ⚠): D74's Play work comes here — listing assets,
   data-safety form, and the upload to the **closed** testing track with TECH_PLAN §7.6's release signing key
-  and production API URL (TECH_PLAN §7.6 followed on 2026-10-24; the key is an upload key, made before D66 — the
-  founder's OTP decision 7, DECISIONS 2026-10-24) — and the **closed test** opens: 12–15 adult testers the founder recruits
+  and production API URL (TECH_PLAN §7.6 updated to match on 2026-10-24; the key is an upload key, made here before
+  the upload — the founder's OTP decision 7 and his answer of 2026-10-24, DECISIONS — unless the earlier
+  internal-testing upload of the floating phone-OTP item needs it first, open for him) — and the **closed test** opens: 12–15 adult testers the founder recruits
   personally, each under a written tester agreement (F16). It opens only once D59's crisis protocol passes
   every eval case and the founder has reviewed its copy (D64); it does not wait for the legal review (F9)
   or the slow-network test, which still block D79 — the closed test is not "the beta" of SPEC §6.6 and §3.1.
@@ -622,7 +643,9 @@ tools; your reviews focus on output quality.)*
 - **D74 —** Play Store: listing assets, data-safety form, internal testing track upload.
   ✅ *Installable from the testing track.* *Amended 2026-10-19 (DECISIONS 2026-10-19): the listing, the
   data-safety form and the first upload moved to D66 with the closed test; D74 refreshes the build on the
-  track the beta installs from (Claude's choice, for the founder to overrule; DECISIONS 2026-10-19).*
+  track the beta installs from (Claude's choice, for the founder to overrule; DECISIONS 2026-10-19).* *Since
+  2026-10-24 (the founder's answer 4; DECISIONS): the first upload is the internal-testing upload on the
+  Play-account day (F14), for the Play-key OTP template, not D66's.*
 - **D75 —** Beta tooling: invite codes, founder admin peek (read-only), audit-queue
   review screen, feedback link in-app. ✅ *You can review flagged answers in 2 taps.*
 - **D76 —** Seed the answer cache: batch-solve the top ~500 predicted common doubts

@@ -73,9 +73,12 @@ AWS_PROFILE=margai DB_URL=… java -jar <jar> --spring.profiles.active=pipeline 
 1. Every flag in the report, and **every question**, against the page images (README §7): stem, options,
    figures, numbering. Every reader works from `pyq-review-reader-rules.md` beside this runbook (Claude's brief,
    kept with the rulings since 2026-10-24 so each paper is read the same way). *Since 2026-10-24 (the founder;
-   DECISIONS): words printed run together with no spaces are a typesetting fault, not content — the text shows them
-   normally spaced and a `record_only` as-printed entry keeps the printed form, the one entry whose printed span its
-   field does not carry.* The page images are the saved ones the model read (the founder's acceptance):
+   DECISIONS; SPEC §6.2): words printed run together with no spaces, a single missing space between two words
+   included, are a typesetting fault, not content — the text shows them normally spaced and a `record_only`
+   as-printed entry keeps the printed form. A paper already approved takes the rule at its next reload, not a
+   reload of its own for this (2024 S6's Q124 "waterlily"), and any three-word joins a scan missed are fixed when
+   found, at that paper's next reload.* *(Claude's, DECISIONS 2026-10-24: that entry is the one whose printed span
+   its field does not carry, which `PaperFileJson` accepts only so.)* The page images are the saved ones the model read (the founder's acceptance):
    `pipeline/data/pyq/pages/<code>/`, each file's sha256 checked against the page-image table of the extract
    report that kept it (for 2025 code 45, its `--images-only` report — and code 45's are re-renders, not
    provably the bytes its calls read; DECISIONS 2026-10-20). Where a glyph is too small to settle at

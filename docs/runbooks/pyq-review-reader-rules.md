@@ -2,7 +2,7 @@
 
 The brief each reader of a PYQ review gets (runbook `pyq-ingest.md` §3; README §7 of the founder's pack). It gathers
 the founder's rulings and Claude's approved readings on how a paper is read (DECISIONS 2026-10-20 to 2026-10-24), so
-that every paper is read the same way; where a line is Claude's and not yet confirmed, it says so. The crops a reader
+that every paper is read the same way. The crops a reader
 works from are cut from the saved page images each extraction call read. They are the only source: never the PDF,
 and never memory of the paper.
 
@@ -16,8 +16,9 @@ and never memory of the paper.
    - **Exponents.** An expression's exponent of more than one character is bracketed, as the prompt says:
      `10^(-5)`, `e^(-E/kT)`, `(1.52)^(3/2)`, `sin^(-1)`. Two exceptions:
      - **A unit's power is never bracketed.** It stays as the prompt's units line writes it: `m s^-1`,
-       `J mol^-1 K^-1`, `N m^-2` (the founder, 2026-10-24: "only powers of ten are bracketed"; Claude reads that as
-       units against powers of ten, for him to confirm, so an expression's exponent stays bracketed).
+       `J mol^-1 K^-1`, `N m^-2`. The founder's words, 2026-10-24, are about negative powers: "Unit powers are not
+       bracketed, powers of ten are, and expression exponents such as sin^(-1) stay bracketed" — `10^(-4)`, never
+       `10^-4`.
      - **A positive whole-number power and a nuclide stay unbracketed**, as the corpus writes them: `10^11`,
        `2^10`, `^235_92U` (DECISIONS 2026-10-22). A fractional or compound positive exponent is still bracketed, so
        it reads as one: `(1.52)^(3/2)`.
@@ -49,9 +50,9 @@ and never memory of the paper.
 
   It applies where the page shows no gap a lost letter would leave. Report it with what is printed and what is
   meant. A missing letter at the end of a line, where spacing cannot show a gap, is not settled this way.
-- **Words printed run together with no spaces** are a typesetting fault, not content. The text shows them normally
-  spaced, and the printed form is kept in a record-only note (the founder, 2026-10-24). Report the run-together form.
-  A single missing space between two words is read the same way (Claude's application, for the founder to confirm).
+- **Words printed run together with no spaces** are a typesetting fault, not content. This includes a single missing
+  space between two words. The text shows them normally spaced, and the printed form is kept in a record-only note
+  (the founder, 2026-10-24; SPEC §6.2). Report the run-together form.
 - **A word NCERT itself spells so** is not a misprint. A word NCERT spells two ways is held to the right one. Report
   it with the NCERT spelling you know, and the reviewer checks the corpus.
 - **Cause unsettled.** These are read as meant:

@@ -517,3 +517,22 @@ papers:
         anchor: bio11 ch 15 §15.1 ¶1; bio11 ch 17 §17.1 ¶3; bio11 ch 14 §14.1.1 ¶1; bio11 ch 16 §16.3 ¶1
         ruled: 2026-10-24
         note: In syllabus, grounded by elimination — blood as a special connective tissue (bio11 ch 15 §15.1 ¶1) leaves options 2 and 4, and the bronchiole's ciliated lining (ch 17 §17.1 ¶3 with ch 14 §14.1.1 ¶1) only option 4; the PCT's cuboidal lining is stated (ch 16 §16.3 ¶1), but mast cells in areolar tissue are in no current paragraph. Grounding — elimination.
+  - code: neet-2021-m4
+    approved_file_sha256: 84f361af9bd1d3e58360d3fcbccd9b0797e3e10f55f4e09c36c7e59c4a9f707a   # d3fc237, the founder's approval
+    rulings:
+      - question: 66
+        primary: CHE.12.DFBLOCK
+        out_of_syllabus: true
+        ruled: 2026-10-24
+        note: Out of syllabus — the blast furnace's highest temperature (the cut chapter on the isolation of elements), which no NMC clause covers; no current paragraph names a blast furnace, and CHE.12.COORD.IMPORT's extraction of metals is the use of complexes in it, not furnace temperatures. Precedent G6 Q95 (blast-furnace reactions, out of syllabus under CHE.12.DFBLOCK), so cut metallurgy sits in one place (the founder, 2026-10-24). The tagger's out-of-syllabus topic replaced by that chapter. Grounding — none.
+      - question: 92
+        primary: CHE.11.BASICS.MOLE
+        out_of_syllabus: false
+        anchor: phy11-part2 ch 12 §12.3 ¶9
+        ruled: 2026-10-24
+        note: In syllabus, cross-subject anchor — Dalton's law of partial pressures, P = (mu_1 + mu_2) RT/V, is stated in current Physics (phy11-part2 ch 12 §12.3 ¶9, under NMC Physics Unit 9's equation of state of a perfect gas), and the moles follow from the masses (the mole concept), so 0.125 mol O_2 and 1 mol H_2 in one litre at 273 K give 25.18 atm, NTA's key. Precedent G6 Q77 (gas laws taught in Physics, in syllabus under a Chemistry node); the loader takes only a node of the printed section's subject, so no Physics secondary. The tagger's out-of-syllabus tag replaced. Grounding — derived.
+      - question: 165
+        primary: BOT.12.BIOTECHA
+        out_of_syllabus: true
+        ruled: 2026-10-24
+        note: Out of syllabus — the objectives of biofortification (the cut chapter on strategies for enhancement in food production), which no NMC clause covers; the current books never use the word, and the nearest text lists GM crops' uses, enhanced nutritional value among them (bio12 ch 10 §10.1 ¶8, golden rice), not breeding for nutrient content. The tagger's out-of-syllabus topic replaced by its chapter, as the loader requires. Grounding — none.

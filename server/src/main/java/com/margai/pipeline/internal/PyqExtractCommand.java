@@ -42,7 +42,10 @@ import picocli.CommandLine.Option;
  * (D19; the founder's rulings, README §1, §7). This is the command that spends — one call per page.
  *
  * <p>Before the first call it refuses the fake client, a VISION model that is not the PYQ
- * transcriber, and a booklet whose bytes are not the file the founder's MANIFEST names (sha256).
+ * transcriber, a booklet whose bytes are not the file the founder's MANIFEST names (sha256), and a run
+ * whose dpi or tiling is not the one the paper's pages were drawn at — one paper is read at one
+ * resolution (DECISIONS 2026-10-22), changed only by re-reading, with {@code --change-resolution}, every
+ * page drawn at another.
  * Every page is rendered strictly — a missing image decoder stops the run, as at D14 — and a page
  * that renders as blank paper is refused rather than sent; a page is never read ahead of the page
  * before it, since the call is told whether that one ended inside a question. It resumes: a page
@@ -83,6 +86,10 @@ class PyqExtractCommand extends PyqPaperCommand {
             + "that has none (re-rendered), and check every kept image against a fresh drawing.")
     boolean imagesOnly;
 
+    @Option(names = "--change-resolution", description = "With --redo: read again, at this run's dpi and tiling, "
+            + "pages whose image was drawn at another; every such page must be among those read again.")
+    boolean changeResolution;
+
     @Option(names = "--drafts", paramLabel = "DIR", defaultValue = DEFAULT_DRAFTS,
             description = "Where the draft paper file and the local page images are written (default: ${DEFAULT-VALUE}); "
                     + "never the inputs.")
@@ -111,6 +118,10 @@ class PyqExtractCommand extends PyqPaperCommand {
         if (imagesOnly && redo) {
             throw new InputFormatException(Path.of(FILE), 0, "--images-only calls no model, so there is no page to "
                     + "--redo; a page is read again, and its image kept again, by --redo alone");
+        }
+        if (changeResolution && !redo) {
+            throw new InputFormatException(Path.of(FILE), 0, "--change-resolution reads pages again, so it goes with "
+                    + "--redo");
         }
         if (!imagesOnly) {
             guardLiveClient();
@@ -188,6 +199,7 @@ class PyqExtractCommand extends PyqPaperCommand {
                 }
             }
         }
+        refuseMixedResolution(paper.code(), done, toRead);
         String runId = "pipeline-pyq-extract-" + UUID.randomUUID();
         report.line("request id: " + runId);
         AiCallContext ctx = AiCallContext.system(runId);
@@ -291,6 +303,7 @@ class PyqExtractCommand extends PyqPaperCommand {
         }
         TreeMap<Integer, PyqExtractedPage> done = new TreeMap<>();
         PyqExtractJsonl.read(jsonlKey, content.get(jsonlKey)).forEach(page -> done.put(page.page(), page));
+        refuseMixedResolution(paper.code(), done, Set.of());
         Set<Integer> wanted = new LinkedHashSet<>();
         for (int page : booklet.pages()) {
             if (done.containsKey(page) && (pages == null || pages.isEmpty() || pages.contains(page))) {
@@ -351,6 +364,34 @@ class PyqExtractCommand extends PyqPaperCommand {
                 + (booklet.pages().size() - wanted.size()) + " register page(s) not read yet or not selected");
         report.line("jsonl: " + jsonlKey + (kept[0] > 0 ? " (rewritten with the images' records)" : " (unchanged)"));
         report.line("local copies: " + drafts.resolve("pages").resolve(paper.code()).normalize());
+    }
+
+    /**
+     * One paper is read at one resolution (DECISIONS 2026-10-22, the 200-dpi G6 row). Pages whose image was drawn at
+     * another dpi or tiling than this run's are refused unless {@code --change-resolution} reads every one of them again
+     * ({@code readAgain}), so no run — a resume, a {@code --redo} of some pages or of all, {@code --images-only} — leaves
+     * a paper drawn at two resolutions or quietly reads it again at another. A line read before images were kept
+     * records neither, and is not judged.
+     */
+    private void refuseMixedResolution(String paper, TreeMap<Integer, PyqExtractedPage> done, Set<Integer> readAgain) {
+        List<PyqExtractedPage> other = done.values().stream().filter(line -> line.image() != null
+                && (line.image().dpi() != properties.renderDpi() || line.image().tiles() != properties.pageTiles())).toList();
+        if (other.isEmpty() || changeResolution && other.stream().allMatch(line -> readAgain.contains(line.page()))) {
+            return;
+        }
+        Map<String, List<Integer>> byResolution = new TreeMap<>();
+        other.forEach(line -> byResolution.computeIfAbsent(line.image().dpi() + " dpi, " + line.image().tiles() + " tile(s)",
+                resolution -> new ArrayList<>()).add(line.page()));
+        // The paper's resolution is worth naming only when every page drawn so far shares it.
+        PyqExtractedPage.Image first = other.getFirst().image();
+        boolean onePaperResolution = byResolution.size() == 1
+                && other.size() == done.values().stream().filter(line -> line.image() != null).count();
+        String keep = onePaperResolution ? "keep the paper's with -Dmargai.pipeline.render-dpi=" + first.dpi()
+                + " -Dmargai.pipeline.page-tiles=" + first.tiles() + ", or " : "";
+        throw new InputFormatException(Path.of(ContentKeys.pyqExtract(paper)), 0, "pages drawn at another resolution than "
+                + "this run's " + properties.renderDpi() + " dpi, " + properties.pageTiles() + " tile(s): " + byResolution
+                + " — one paper is read at one resolution: " + keep + "read them again at this run's with --redo "
+                + "--change-resolution --pages " + String.join(",", other.stream().map(line -> String.valueOf(line.page())).toList()));
     }
 
     /** One page image into the content bucket and beside the draft, and the record its JSONL line keeps. */

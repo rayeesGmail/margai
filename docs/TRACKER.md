@@ -198,6 +198,13 @@ The founder ran scratchpad a6d5db10 `d19-reload-2024-s6.sh` at 8f7e5c5 (pipeline
   2025 Q17 back on the tagger's tag (PHY.11.ROT.CONSANG, model).
 NEXT: 2023 G6's extract (the founder runs `d19-extract-2023-g6.sh`, ≈₹190–200, its report's "page images" line to
   read 200 dpi); Claude reviews it as S6; the pre-D20 batch; the mixed-dpi guard before any G6 resume or redo.
+  *2026-10-23 23:00: the founder started G6's extract (its jar copied out at 200 dpi); Claude built the mixed-dpi
+  guard meanwhile — `pyq extract` refuses any run whose dpi or tiling is not that of the paper's pages drawn so far
+  (a resume, a `--redo` of some pages or of all, `--images-only`), naming the property to set where its pages share
+  one resolution, and the pages to read again; only `--redo --change-resolution` (Claude's flag) over every such
+  page reads a paper again at another (PyqExtractCommandTest 22 of 22; spec
+  audit FAIL — a full `--redo` without the property had passed — fixed); every G6 run still sets
+  `-Dmargai.pipeline.render-dpi=200`.*
 
 D19 follow-up · 2026-10-23 (late night) · the four questions ruled; the no-grounding doubt reply
 The founder (DECISIONS 2026-10-23): `pending` also for 2024 S6 Q189 (Table 4.1) and 2025 Q95 and Q133 (unit

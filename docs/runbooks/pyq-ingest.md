@@ -45,6 +45,18 @@ the first call), roughly ₹5–6 a page. It resumes from `extract/pyq/<code>.js
 paid for are kept and the bill is reported. It writes the draft `pipeline/data/pyq/<code>.draft.json` (answers
 empty) and the report `pipeline/reports/<date>-pyq-extract.md` with every flag.
 
+**Resolution.**
+- **The default:** pages are drawn at the configured 150 dpi, in two tiles.
+- **Finer scans:** a booklet scanned finer than 150 dpi is read at its scan's own dpi, set with a system property *before* `-jar`, since the runner hands every non-`--spring.` argument to the command parser (DECISIONS 2026-10-22; 2023 G6 is 200 dpi):
+
+  ```
+  … java -Dmargai.pipeline.render-dpi=200 -jar <jar> --spring.profiles.active=pipeline,live,visionopus55 pyq extract --paper neet-2023-g6
+  ```
+
+- **One paper, one resolution:** every later run on that paper sets the same property — a resume, a `--redo`, an `--images-only`. A run whose dpi or tiling is not the one its pages were drawn at is refused before any call. The refusal names the property to set where all the pages share one resolution, and always the pages to read again.
+- **Changing a paper's resolution:** use `--redo --change-resolution` over every page drawn at the other one; the refusal names those pages.
+- **Check every report:** its "page images:" line shows the dpi the run used.
+
 Each page image is kept at `pages/pyq/<code>/<page>.png` in the bucket and its JSONL line records the image's
 sha256, dpi and renderer version (the founder's acceptance, DECISIONS 2026-10-20). Claude's, in the same
 DECISIONS: the image is kept before its call, a copy goes under `pipeline/data/pyq/pages/<code>/`, the line also

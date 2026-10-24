@@ -41,8 +41,9 @@ import picocli.CommandLine;
  * page is called once, a question running onto the next page is joined with the next call told the
  * number it ended inside, the JSONL is one line per page, the draft carries every question with its
  * answer empty, a second run calls for nothing, and nothing is called before the fake client, a
- * VISION model that is not the transcriber, a booklet whose bytes are not the manifest's, or a page
- * that renders as blank paper is refused.
+ * VISION model that is not the transcriber, a booklet whose bytes are not the manifest's, a page
+ * that renders as blank paper, or a run at another resolution than the paper's pages were drawn at
+ * is refused.
  */
 class PyqExtractCommandTest {
 
@@ -187,6 +188,86 @@ class PyqExtractCommandTest {
         assertThat(out.toString()).contains("page 2: the image in the store").contains("is not what the booklet draws now")
                 .contains("page images handled before the run stopped").contains("rewritten with the 1 image record(s) kept");
         assertThat(lines()).extracting(line -> line.image() != null).containsExactly(true, false);
+    }
+
+    /**
+     * One paper at one resolution (DECISIONS 2026-10-22): a run that would keep a page drawn at another dpi is
+     * refused before any call, naming the pages to read again; with a paper already at two resolutions — a change
+     * that stopped part-way — reading just those pages again with --change-resolution brings it back to one.
+     */
+    @Test
+    void refusesToKeepAPageDrawnAtAnotherResolution() {
+        run();
+        rewrite(line -> line.page() == 1 ? line.withImage(new PyqExtractedPage.Image(line.image().key(), line.image().sha256(),
+                150, line.image().renderer(), line.image().tiles(), false)) : line);
+        extract.calls.clear();
+
+        assertThat(run("--redo", "--pages", "2")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(extract.calls).isEmpty();
+        assertThat(out.toString()).contains("pages drawn at another resolution than this run's 72 dpi, 1 tile(s): "
+                        + "{150 dpi, 1 tile(s)=[1]}")
+                .doesNotContain("keep the paper's").contains("--redo --change-resolution --pages 1");
+
+        assertThat(run("--redo", "--change-resolution", "--pages", "1")).isEqualTo(InputFileCommand.EXIT_OK);
+        assertThat(extract.calls).containsExactly(1);
+        assertThat(lines()).allSatisfy(line -> assertThat(line.image().dpi()).isEqualTo(72));
+    }
+
+    /** Not even a --redo of every page reads a paper again at another resolution unless --change-resolution says so. */
+    @Test
+    void aFullRedoAtAnotherResolutionNeedsChangeResolution() {
+        run();
+        rewrite(line -> line.withImage(new PyqExtractedPage.Image(line.image().key(), line.image().sha256(), 150,
+                line.image().renderer(), line.image().tiles(), false)));
+        extract.calls.clear();
+
+        assertThat(run("--redo")).isEqualTo(InputFileCommand.EXIT_FAILED);
+        assertThat(extract.calls).isEmpty();
+        assertThat(out.toString()).contains("{150 dpi, 1 tile(s)=[1, 2]}")
+                .contains("keep the paper's with -Dmargai.pipeline.render-dpi=150 -Dmargai.pipeline.page-tiles=1");
+
+        assertThat(run("--redo", "--change-resolution", "--pages", "1")).isEqualTo(InputFileCommand.EXIT_FAILED);
+        assertThat(extract.calls).isEmpty();
+
+        assertThat(run("--redo", "--change-resolution")).isEqualTo(InputFileCommand.EXIT_OK);
+        assertThat(extract.calls).containsExactly(1, 2);
+        assertThat(lines()).allSatisfy(line -> assertThat(line.image().dpi()).isEqualTo(72));
+    }
+
+    /** The tiling counts as the resolution does: a page cut into other bands than this run's is refused too. */
+    @Test
+    void refusesToKeepAPageDrawnAtAnotherTiling() {
+        run();
+        rewrite(line -> line.page() == 2 ? line.withImage(new PyqExtractedPage.Image(line.image().key(), line.image().sha256(),
+                line.image().dpi(), line.image().renderer(), 2, false)) : line);
+        extract.calls.clear();
+
+        assertThat(run("--redo", "--pages", "1")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(extract.calls).isEmpty();
+        assertThat(out.toString()).contains("{72 dpi, 2 tile(s)=[2]}").contains("--redo --change-resolution --pages 2")
+                .doesNotContain("keep the paper's");
+    }
+
+    @Test
+    void changeResolutionGoesWithRedo() {
+        assertThat(run("--change-resolution")).isEqualTo(InputFileCommand.EXIT_FAILED);
+        assertThat(run("--images-only", "--change-resolution")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("--change-resolution reads pages again, so it goes with --redo");
+        assertThat(extract.calls).isEmpty();
+    }
+
+    @Test
+    void imagesOnlyRefusesAPaperReadAtAnotherResolution() {
+        Map<Integer, String> drawn = drawn();
+        code45State(page -> new PyqExtractedPage.Image(ContentKeys.pyqPage("neet-2025-45", page), drawn.get(page), 150,
+                PdfPageRenderer.version(), 1, false));
+
+        assertThat(run("--images-only")).isEqualTo(InputFileCommand.EXIT_FAILED);
+
+        assertThat(out.toString()).contains("{150 dpi, 1 tile(s)=[1, 2]}").contains("one paper is read at one resolution");
     }
 
     @Test

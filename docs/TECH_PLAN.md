@@ -2859,7 +2859,7 @@ sections above carry a dated pointer where they change. It incorporates the foun
 - **Minors.** `margai.flags.beta_adults_only` (on for the beta) turns the DOB step into an 18+ gate;
   `margai.flags.parent_consent` (off for the beta, on at public launch) enables the consent flow D27
   builds in full on the `parent_consent` SMS template. An under-18 DOB at the gate ends onboarding
-  on the “MARG opens to under-18s at launch” screen and **hard-deletes** in the same request (founder
+  on the “Mentorbit opens to under-18s at launch” screen and **hard-deletes** in the same request (founder
   ruling 2026-10-01, SPEC §5.7) — not D64's `DELETE /me`, which anonymises now and purges in 30 days
   under a tombstone (§2.10) and lands 37 days later. `UserPurge.underage(userId)`, built at D27, runs
   one transaction: the `users` row and everything keyed to it (profile, interview answers, refresh

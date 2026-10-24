@@ -2,6 +2,7 @@ package com.margai.pipeline.internal;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.margai.curriculum.api.AnswerStatus;
+import com.margai.curriculum.api.AsPrintedDisplay;
 import com.margai.curriculum.api.QuestionAsPrinted;
 import com.margai.curriculum.api.QuestionFigure;
 import com.margai.curriculum.api.QuestionOption;
@@ -30,8 +31,10 @@ import tools.jackson.databind.json.JsonMapper;
  * option; and an answer whose shape matches its status, agreeing with the special entries the
  * founder listed for the code — a key typed into the file can never differ from the one he checked
  * (README §3); and every misprint kept as printed quoting what its field prints, with an intended
- * reading, a one-line note and its display class. A draft passes the same checks except that its
- * answers are empty.
+ * reading, a one-line note and its display class — save words printed run together, which the field
+ * carries spaced and a record_only note keeps (the founder, 2026-10-24; a single missing space, Claude's
+ * application, for him to confirm — DECISIONS). A draft passes the same checks
+ * except that its answers are empty.
  */
 final class PaperFileJson {
 
@@ -135,7 +138,11 @@ final class PaperFileJson {
      * intended reading, a one-line note, and its display class — the app shows the note of a
      * {@code show} entry and keeps a {@code record_only} one without it (the founder, 2026-10-21) — the
      * record the founder asked for (2026-10-21), in a shape and with checks that are Claude's
-     * (DECISIONS) — so a note can never point at words the question no longer carries.
+     * (DECISIONS) — so a note can never point at words the question no longer carries. One exception: words
+     * the paper runs together with no spaces are a typesetting fault, so the text carries them normally spaced
+     * and a {@code record_only} note keeps the printed form (the founder, 2026-10-24; a single missing space and
+     * the letters-only and left-in-the-text checks are Claude's, DECISIONS, for him to confirm) — the entry's intended
+     * reading is then what the field prints.
      */
     private static List<String> asPrintedProblems(String at, PaperFile.Question question) {
         List<String> problems = new ArrayList<>();
@@ -146,8 +153,13 @@ final class PaperFileJson {
             String where = at + "'s as-printed note at " + kept.at();
             if (text == null) {
                 problems.add(where + " names no stem or option text of the question");
-            } else if (kept.printed() == null || kept.printed().isBlank() || !text.contains(kept.printed())) {
+            } else if (kept.printed() == null || kept.printed().isBlank()
+                    || !text.contains(kept.printed()) && !runTogether(kept, text)) {
                 problems.add(where + " quotes '" + kept.printed() + "', which that text does not print");
+            } else if (spacesDropped(kept.printed(), kept.intended()) && text.contains(kept.printed())) {
+                problems.add(where + " keeps words printed run together in the text, which shows them spaced");
+            } else if (!text.contains(kept.printed()) && kept.display() != AsPrintedDisplay.record_only) {
+                problems.add(where + " records words printed run together, which only a record_only note keeps");
             }
             if (kept.intended() == null || kept.intended().isBlank() || kept.intended().equals(kept.printed())) {
                 problems.add(where + " has no intended reading that differs from the print");
@@ -161,6 +173,32 @@ final class PaperFileJson {
             }
         }
         return problems;
+    }
+
+    /** The field prints the intended reading, and the printed form is that reading with some of its spaces gone. */
+    private static boolean runTogether(QuestionAsPrinted kept, String text) {
+        return kept.intended() != null && text.contains(kept.intended()) && spacesDropped(kept.printed(), kept.intended());
+    }
+
+    /**
+     * {@code printed} is {@code intended} with one or more of its spaces between two letters deleted and nothing
+     * else changed — words run together, never a number or a sign.
+     */
+    static boolean spacesDropped(String printed, String intended) {
+        if (printed == null || intended == null || printed.length() >= intended.length()) {
+            return false;
+        }
+        int at = 0;
+        for (int i = 0; i < intended.length(); i++) {
+            char c = intended.charAt(i);
+            if (at < printed.length() && printed.charAt(at) == c) {
+                at++;
+            } else if (c != ' ' || i == 0 || i == intended.length() - 1
+                    || !Character.isLetter(intended.charAt(i - 1)) || !Character.isLetter(intended.charAt(i + 1))) {
+                return false;
+            }
+        }
+        return at == printed.length();
     }
 
     private static List<String> answerProblems(String at, PaperFile.Answer answer) {

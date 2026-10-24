@@ -152,6 +152,48 @@ class PyqAssemblyTest {
                 "The question", "x".repeat(PaperFileJson.AS_PRINTED_NOTE_MAX), show))), paper, true)).isEmpty();
     }
 
+    /**
+     * Words printed run together are a typesetting fault: the text carries them spaced and a record_only note keeps
+     * the printed form, which the text no longer prints (the founder, 2026-10-24); only spaces between letters count,
+     * and a single missing space is read the same way (Claude's, for him to confirm).
+     */
+    @Test
+    void wordsPrintedRunTogetherAreSpacedInTheTextAndOnlyRecorded() {
+        PaperDefinition paper = paper(1, List.of());
+        PaperFile.Question approved = approved(PaperFile.Answer.single("2")).questions().getFirst();
+        PaperFile.Question question = withStem(approved, "Presence of paired gill slits in a single character of 10 5.");
+        AsPrintedDisplay recordOnly = AsPrintedDisplay.record_only;
+
+        assertThat(PaperFileJson.problems(withAsPrinted(question, List.of(
+                new QuestionAsPrinted("stem", "gillslits", "gill slits", "Printed with no space", recordOnly),
+                new QuestionAsPrinted("stem", "asinglecharacter", "a single character", "Printed with no spaces",
+                        recordOnly))), paper, true)).isEmpty();
+        assertThat(PaperFileJson.problems(withAsPrinted(question, List.of(
+                new QuestionAsPrinted("stem", "105.", "10 5.", "a number, not words", recordOnly))), paper, true))
+                .containsExactly("question 1's as-printed note at stem quotes '105.', which that text does not print");
+        assertThat(PaperFileJson.problems(withAsPrinted(question, List.of(
+                new QuestionAsPrinted("stem", "gillslits", "gill slits", "shown, not recorded", AsPrintedDisplay.show),
+                new QuestionAsPrinted("stem", "gilslits", "gill slits", "letters differ, not spaces", recordOnly),
+                new QuestionAsPrinted("stem", "gillslits", "gil lslits", "the field does not print the intended", recordOnly),
+                new QuestionAsPrinted("stem", "as inglecharacter", "a single character", "a space moved", recordOnly),
+                new QuestionAsPrinted("stem", "gi ll slits", "gill slits", "a space more, not fewer", recordOnly))),
+                paper, true)).containsExactly(
+                "question 1's as-printed note at stem records words printed run together, which only a record_only note keeps",
+                "question 1's as-printed note at stem quotes 'gilslits', which that text does not print",
+                "question 1's as-printed note at stem quotes 'gillslits', which that text does not print",
+                "question 1's as-printed note at stem quotes 'as inglecharacter', which that text does not print",
+                "question 1's as-printed note at stem quotes 'gi ll slits', which that text does not print");
+        assertThat(PaperFileJson.problems(withAsPrinted(withStem(approved, "Presence of paired gillslits."), List.of(
+                new QuestionAsPrinted("stem", "gillslits", "gill slits", "Printed with no space", recordOnly))),
+                paper, true)).containsExactly(
+                "question 1's as-printed note at stem keeps words printed run together in the text, which shows them spaced");
+    }
+
+    private static PaperFile.Question withStem(PaperFile.Question question, String stem) {
+        return new PaperFile.Question(question.no(), stem, question.stemHi(), question.options(), question.figures(),
+                question.answer(), question.extraction(), question.asPrinted());
+    }
+
     private static PaperFile withAsPrinted(PaperFile.Question question, List<QuestionAsPrinted> kept) {
         return new PaperFile("neet-2025-45", "source/neet-pyq-sources/2025/booklet.pdf", List.of(new PaperFile.Question(
                 question.no(), question.stemEn(), question.stemHi(), question.options(), question.figures(), question.answer(),

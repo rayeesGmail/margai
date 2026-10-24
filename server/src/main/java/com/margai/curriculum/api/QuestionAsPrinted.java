@@ -9,7 +9,10 @@ package com.margai.curriculum.api;
  *
  * @param at       {@code stem}, or {@code option:<key>} for a misprint in an option
  * @param printed  the span as printed and kept in that text — no more of the paper than the wrong word or
- *                 sign and what it needs to name its place
+ *                 sign and what it needs to name its place; for words the paper runs together with no spaces, a
+ *                 typesetting fault, the run-together form, while the text carries them normally spaced and the
+ *                 entry is {@code record_only} (the founder, 2026-10-24; a single missing space read the same way
+ *                 is Claude's application, DECISIONS 2026-10-24, for him to confirm)
  * @param intended what the paper meant there
  * @param note     one line describing the intended reading
  * @param display  whether the app shows the note ({@code show}) or only records it ({@code record_only}) — the

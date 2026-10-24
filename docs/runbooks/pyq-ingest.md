@@ -71,7 +71,11 @@ AWS_PROFILE=margai DB_URL=… java -jar <jar> --spring.profiles.active=pipeline 
 ## 3. Review — Claude
 
 1. Every flag in the report, and **every question**, against the page images (README §7): stem, options,
-   figures, numbering. The page images are the saved ones the model read (the founder's acceptance):
+   figures, numbering. Every reader works from `pyq-review-reader-rules.md` beside this runbook (Claude's brief,
+   kept with the rulings since 2026-10-24 so each paper is read the same way). *Since 2026-10-24 (the founder;
+   DECISIONS): words printed run together with no spaces are a typesetting fault, not content — the text shows them
+   normally spaced and a `record_only` as-printed entry keeps the printed form, the one entry whose printed span its
+   field does not carry.* The page images are the saved ones the model read (the founder's acceptance):
    `pipeline/data/pyq/pages/<code>/`, each file's sha256 checked against the page-image table of the extract
    report that kept it (for 2025 code 45, its `--images-only` report — and code 45's are re-renders, not
    provably the bytes its calls read; DECISIONS 2026-10-20). Where a glyph is too small to settle at
@@ -83,8 +87,8 @@ AWS_PROFILE=margai DB_URL=… java -jar <jar> --spring.profiles.active=pipeline 
    2026-10-21). Whether the paper printed it: a wrong whole character in a JBIG2 or other lossy 1-bit scan is never
    evidence on its own, and only a lossless copy, a non-JBIG2 scan or the other language column can settle it (the
    founder, same DECISIONS) — the other column settles it where it prints the same wrong character (a Latin glyph in
-   the other column of the same JBIG2 page only where no substitution could have produced it; Claude's, DECISIONS
-   2026-10-24, for the founder to overrule), and a non-JBIG2
+   the other column of the same JBIG2 page only where no substitution could have produced it; Claude's, approved
+   by the founder with 2023 G6's review, DECISIONS 2026-10-24), and a non-JBIG2
    scan is read as one that is not lossy 1-bit (Claude's readings, same DECISIONS, for the founder to overrule); a
    case nothing settles is read as
    meant, with no as-printed note, and listed in the review report as "cause unsettled", with no per-item ruling — it

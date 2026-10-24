@@ -104,6 +104,15 @@ DLT registration is possible under the Udyam proprietorship (founder, 2026-10-01
   gives D27's consent flow its live SMS proof. ✅ *A real phone signs in by SMS first try; the
   email path only with its flag on; an email-begun account attaches a phone and stays one user,
   and a number already in use is refused, never merged (CS-2 §10, SPEC §5.7).*
+  *Amended 2026-10-24 (the founder; DECISIONS 2026-10-24): F1's DLT registration is done, and this item gets
+  its own day before D27, replacing the first-buffer rule — the slot is Claude's proposal, awaiting his approval.
+  The day builds on MSG91's Flow API, the server still generating, storing and expiring the code; the app uses
+  smart_auth's SMS Retriever with the SMS User Consent fallback and logs the app hash in debug builds; auto-read is
+  never tested on Internal app sharing builds. One DLT template per signing key: the dev-key template now, the
+  Play-key template before D66's upload. A day before D27 cannot give D27's consent flow its live proof, as this
+  item said: Claude's proposal (with the slot, for his approval) is that the day proves the login path live, and D27
+  takes its consent flow live itself through the adapter this day builds if the parent-consent template is approved
+  by then, or at the first buffer after it is; D27's text and TECH_PLAN §15's schedule row follow his approval.*
 
 ### PHASE 2 — Content pipeline v1 (Weeks 3–4, Days 13–24) — Module M3
 
@@ -572,8 +581,8 @@ tools; your reviews focus on output quality.)*
   *Amended 2026-10-19 (founder's calendar ruling, option (c); DECISIONS 2026-10-19; this day chosen by
   Claude, since it carries only the gate while D65 is ⚠): D74's Play work comes here — listing assets,
   data-safety form, and the upload to the **closed** testing track with TECH_PLAN §7.6's release signing key
-  and production API URL (TECH_PLAN §7.6 still names D74 and the internal track; it follows at the next
-  TECH_PLAN edit) — and the **closed test** opens: 12–15 adult testers the founder recruits
+  and production API URL (TECH_PLAN §7.6 followed on 2026-10-24; the key is an upload key, made before D66 — the
+  founder's OTP decision 7, DECISIONS 2026-10-24) — and the **closed test** opens: 12–15 adult testers the founder recruits
   personally, each under a written tester agreement (F16). It opens only once D59's crisis protocol passes
   every eval case and the founder has reviewed its copy (D64); it does not wait for the legal review (F9)
   or the slow-network test, which still block D79 — the closed test is not "the beta" of SPEC §6.6 and §3.1.

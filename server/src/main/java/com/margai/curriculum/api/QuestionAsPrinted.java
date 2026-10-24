@@ -7,7 +7,10 @@ package com.margai.curriculum.api;
  * PLAN D31, D40; the shape is Claude's, DECISIONS 2026-10-21). A wrong character the paper prints is a misprint and kept; a stroke the scan lost is read as
  * meant and never lands here (DECISIONS 2026-10-20, 2026-10-21).
  *
- * @param at       {@code stem}, or {@code option:<key>} for a misprint in an option
+ * @param at       {@code stem}, or {@code option:<key>} for a misprint in an option, or {@code figure:stem} or
+ *                 {@code figure:option:<key>} for one drawn in a figure there, held to that figure's description
+ *                 (the founder, 2026-10-24: a wrong formula in a figure teaches as much as one in an option; the
+ *                 V10 comment, written before, names the first two only — TECH_PLAN §2.3)
  * @param printed  the span as printed and kept in that text — no more of the paper than the wrong word or
  *                 sign and what it needs to name its place; for words the paper runs together with no spaces, a
  *                 typesetting fault, the run-together form, while the text carries them normally spaced and the

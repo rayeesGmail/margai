@@ -134,7 +134,8 @@ final class PaperFileJson {
     }
 
     /**
-     * A misprint kept as printed names a field the question has, a span that field still prints, its
+     * A misprint kept as printed names a field the question has — its stem, an option, or a figure's description
+     * (the founder, 2026-10-24) — a span that field still prints, its
      * intended reading, a one-line note, and its display class — the app shows the note of a
      * {@code show} entry and keeps a {@code record_only} one without it (the founder, 2026-10-21) — the
      * record the founder asked for (2026-10-21), in a shape and with checks that are Claude's
@@ -147,14 +148,12 @@ final class PaperFileJson {
     private static List<String> asPrintedProblems(String at, PaperFile.Question question) {
         List<String> problems = new ArrayList<>();
         for (QuestionAsPrinted kept : question.asPrinted()) {
-            String text = kept.at() == null ? null : kept.at().equals("stem") ? question.stemEn()
-                    : question.options().stream().filter(option -> kept.at().equals("option:" + option.key()))
-                            .map(QuestionOption::textEn).findFirst().orElse(null);
+            String text = textAt(kept, question);
             String where = at + "'s as-printed note at " + kept.at();
             if (text == null) {
-                problems.add(where + " names no stem or option text of the question");
+                problems.add(where + " names no stem, option or figure text of the question");
             } else if (kept.printed() == null || kept.printed().isBlank()
-                    || !text.contains(kept.printed()) && !runTogether(kept, text)) {
+                    || !text.contains(kept.printed()) && (kept.at().startsWith("figure:") || !runTogether(kept, text))) {
                 problems.add(where + " quotes '" + kept.printed() + "', which that text does not print");
             } else if (spacesDropped(kept.printed(), kept.intended()) && text.contains(kept.printed())) {
                 problems.add(where + " keeps words printed run together in the text, which shows them spaced");
@@ -173,6 +172,34 @@ final class PaperFileJson {
             }
         }
         return problems;
+    }
+
+    /**
+     * The text an entry's place names: the stem, an option ({@code option:<key>}), or the description of a figure
+     * drawn there ({@code figure:stem}, {@code figure:option:<key>}) — a wrong formula drawn in a figure teaches as
+     * much as one printed in an option (the founder, 2026-10-24). Claude's, DECISIONS, for the founder to overrule:
+     * where more than one figure sits at that place, the one whose description prints the span; and a figure's entry
+     * quotes what the description prints, never words run together, since a crop cannot be shown spaced.
+     */
+    private static String textAt(QuestionAsPrinted kept, PaperFile.Question question) {
+        String at = kept.at();
+        if (at == null) {
+            return null;
+        }
+        if (at.equals("stem")) {
+            return question.stemEn();
+        }
+        if (at.startsWith("figure:")) {
+            String place = at.substring("figure:".length());
+            List<String> descriptions = question.figures().stream().filter(figure -> place.equals(figure.at()))
+                    .map(QuestionFigure::description).filter(description -> description != null).toList();
+            return descriptions.stream()
+                    .filter(description -> kept.printed() != null && !kept.printed().isBlank()
+                            && description.contains(kept.printed()))
+                    .findFirst().orElse(descriptions.isEmpty() ? null : descriptions.getFirst());
+        }
+        return question.options().stream().filter(option -> at.equals("option:" + option.key()))
+                .map(QuestionOption::textEn).findFirst().orElse(null);
     }
 
     /** The field prints the intended reading, and the printed form is that reading with some of its spaces gone. */

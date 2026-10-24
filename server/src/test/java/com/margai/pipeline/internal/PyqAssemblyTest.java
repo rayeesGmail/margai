@@ -12,6 +12,7 @@ import com.margai.curriculum.api.PaperSourceFile;
 import com.margai.curriculum.api.PaperSubject;
 import com.margai.curriculum.api.PyqPaperRow;
 import com.margai.curriculum.api.QuestionAsPrinted;
+import com.margai.curriculum.api.QuestionFigure;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -141,7 +142,7 @@ class PyqAssemblyTest {
                 new QuestionAsPrinted("stem", "Question", "The question", "x".repeat(PaperFileJson.AS_PRINTED_NOTE_MAX + 1), show),
                 new QuestionAsPrinted("stem", "Question", "The question", "no class", null)));
         assertThat(PaperFileJson.problems(wrong, paper, true)).containsExactly(
-                "question 1's as-printed note at option:7 names no stem or option text of the question",
+                "question 1's as-printed note at option:7 names no stem, option or figure text of the question",
                 "question 1's as-printed note at stem quotes 'breaks', which that text does not print",
                 "question 1's as-printed note at stem quotes ' ', which that text does not print",
                 "question 1's as-printed note at option:1 has no intended reading that differs from the print",
@@ -187,6 +188,48 @@ class PyqAssemblyTest {
                 new QuestionAsPrinted("stem", "gillslits", "gill slits", "Printed with no space", recordOnly))),
                 paper, true)).containsExactly(
                 "question 1's as-printed note at stem keeps words printed run together in the text, which shows them spaced");
+    }
+
+    /**
+     * A misprint drawn in a figure — a wrong sign in a floral formula — is noted on that figure's description, the
+     * span held to the figure at the place named (the founder, 2026-10-24); where two figures share it, the one that
+     * prints the span, and never words run together, which a crop cannot show spaced (Claude's, DECISIONS).
+     */
+    @Test
+    void aMisprintInAFigureIsHeldToThatFiguresDescription() {
+        PaperDefinition paper = paper(1, List.of());
+        PaperFile.Question approved = approved(PaperFile.Answer.single("2")).questions().getFirst();
+        PaperFile.Question question = withFigures(approved, List.of(
+                new QuestionFigure("stem", 1, "(b) K_(5) C_(5) A_5 G_2"),
+                new QuestionFigure("stem", 1, "(d) K_2+2 C_4 A_2-4 G_(2)"),
+                new QuestionFigure("option:3", 1, "a curve rising to a peak")));
+        AsPrintedDisplay show = AsPrintedDisplay.show;
+
+        assertThat(PaperFileJson.problems(withAsPrinted(question, List.of(
+                new QuestionAsPrinted("figure:stem", "A_2-4", "A_2+4", "Printed \"A_2-4\"; A_2+4 is meant.", show),
+                new QuestionAsPrinted("figure:stem", "A_5 G_2", "A_5 G_(2)", "Printed \"G_2\"; G_(2) is meant.", show),
+                new QuestionAsPrinted("figure:option:3", "peak", "trough", "Printed \"peak\"; trough is meant.", show))),
+                paper, true)).isEmpty();
+        assertThat(PaperFileJson.problems(withAsPrinted(question, List.of(
+                new QuestionAsPrinted("figure:option:2", "a", "A", "no figure is drawn at option 2", show),
+                new QuestionAsPrinted("figure:stem", "A_2+4", "A_2-4", "neither description prints it", show),
+                new QuestionAsPrinted("figure:", "G_2", "G_(2)", "no place named", show),
+                new QuestionAsPrinted("stem", "A_2-4", "A_2+4", "the stem does not print the figure's words", show))),
+                paper, true)).containsExactly(
+                "question 1's as-printed note at figure:option:2 names no stem, option or figure text of the question",
+                "question 1's as-printed note at figure:stem quotes 'A_2+4', which that text does not print",
+                "question 1's as-printed note at figure: names no stem, option or figure text of the question",
+                "question 1's as-printed note at stem quotes 'A_2-4', which that text does not print");
+        assertThat(PaperFileJson.problems(withAsPrinted(withFigures(approved, List.of(
+                new QuestionFigure("stem", 1, "a curve labelled rising current"))), List.of(
+                new QuestionAsPrinted("figure:stem", "risingcurrent", "rising current", "Printed with no space",
+                        AsPrintedDisplay.record_only))), paper, true)).containsExactly(
+                "question 1's as-printed note at figure:stem quotes 'risingcurrent', which that text does not print");
+    }
+
+    private static PaperFile.Question withFigures(PaperFile.Question question, List<QuestionFigure> figures) {
+        return new PaperFile.Question(question.no(), question.stemEn(), question.stemHi(), question.options(), figures,
+                question.answer(), question.extraction(), question.asPrinted());
     }
 
     private static PaperFile.Question withStem(PaperFile.Question question, String stem) {

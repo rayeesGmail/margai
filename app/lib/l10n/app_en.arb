@@ -1,8 +1,8 @@
 {
   "@@locale": "en",
-  "appTitle": "MARG AI",
+  "appTitle": "Mentorbit",
   "@appTitle": {
-    "description": "Application name shown in the launcher, app bar and task switcher. Brand name; not translated."
+    "description": "Application name shown on the splash, in the app bar and in the task switcher (the launcher label is AndroidManifest.xml's). Brand name; not translated: \"Mentorbit\" in Latin script in every language. The founder ruled the label and logo stay Latin (2026-10-24); keeping this title Latin too is Claude's reading of that ruling (DECISIONS)."
   },
 
   "loginHeadline": "Hi! I'm your NEET mentor.",

@@ -152,7 +152,7 @@ SERVER_PORT=8081 ./mvnw spring-boot:run
 curl -s -X POST localhost:8081/api/v1/auth/otp/request -H 'Content-Type: application/json' \
      -d '{"email":"you@example.com"}'
 # → {"challenge_id":"…","resend_after_s":30,"channel":"email"}; the server log shows
-#   [sandbox email] to y***@example.com — Your MARG AI sign-in code is 123456. …
+#   [sandbox email] to y***@example.com — Your Mentorbit sign-in code is 123456. …
 curl -s -X POST localhost:8081/api/v1/auth/otp/verify -H 'Content-Type: application/json' \
      -d '{"challenge_id":"…","code":"123456"}'
 curl -s -X POST localhost:8081/api/v1/auth/refresh -H 'Content-Type: application/json' \

@@ -10,7 +10,7 @@ class AppLocalizationsHi extends AppLocalizations {
   AppLocalizationsHi([String locale = 'hi']) : super(locale);
 
   @override
-  String get appTitle => 'MARG AI';
+  String get appTitle => 'Mentorbit';
 
   @override
   String get loginHeadline => 'नमस्ते! मैं आपका NEET मेंटर हूँ।';
@@ -250,7 +250,7 @@ class AppLocalizationsHiLatn extends AppLocalizationsHi {
   AppLocalizationsHiLatn() : super('hi_Latn');
 
   @override
-  String get appTitle => 'MARG AI';
+  String get appTitle => 'Mentorbit';
 
   @override
   String get loginHeadline => 'Hi! Main aapka NEET mentor hoon.';

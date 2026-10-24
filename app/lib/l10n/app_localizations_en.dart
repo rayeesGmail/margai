@@ -10,7 +10,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'MARG AI';
+  String get appTitle => 'Mentorbit';
 
   @override
   String get loginHeadline => 'Hi! I\'m your NEET mentor.';

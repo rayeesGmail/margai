@@ -3,7 +3,7 @@
          this, so a release build could not have signed in. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="MARG AI"
+        android:label="Mentorbit"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -32,7 +32,7 @@ flutter build apk --debug --dart-define=API_BASE_URL=http://10.0.2.2:8081 && \
   adb install -r build/app/outputs/flutter-apk/app-debug.apk
 ```
 
-Sign in with any email: the code is in the server log (`[sandbox email] to y***@… — Your MARG AI
+Sign in with any email: the code is in the server log (`[sandbox email] to y***@… — Your Mentorbit
 sign-in code is 123456`). For a real inbox start the server with the SES variant in the server
 README (`MARGAI_AUTH_OTP_SENDER=ses MARGAI_AUTH_OTP_EMAIL_FROM=<verified identity>`; the
 recipient must be verified too while the account is in the SES sandbox, TRACKER F10).

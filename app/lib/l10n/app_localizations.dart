@@ -99,10 +99,10 @@ abstract class AppLocalizations {
     Locale.fromSubtags(languageCode: 'hi', scriptCode: 'Latn'),
   ];
 
-  /// Application name shown in the launcher, app bar and task switcher. Brand name; not translated.
+  /// Application name shown on the splash, in the app bar and in the task switcher (the launcher label is AndroidManifest.xml's). Brand name; not translated: "Mentorbit" in Latin script in every language. The founder ruled the label and logo stay Latin (2026-10-24); keeping this title Latin too is Claude's reading of that ruling (DECISIONS).
   ///
   /// In en, this message translates to:
-  /// **'MARG AI'**
+  /// **'Mentorbit'**
   String get appTitle;
 
   /// Login screen headline (SPEC §8 screen 1). Mentor voice: warm, direct, proudly AI.

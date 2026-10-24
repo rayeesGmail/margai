@@ -220,8 +220,12 @@ The founder ruled the five and S6 Q55 as recommended (DECISIONS 2026-10-24): 202
   in", Q77 "derived, with a caveat"; S6 Q52 "stated, once Table 4.7 is in", Q193 "elimination, once the figures are
   in" (F19: no known source; check the earlier edition for "Proterozoic"); G6 Q66 "plain word"; S6 Q55's anchor gains
   phy11-part2 §11.8.1 ¶5. The six earlier `none` rulings carry "Grounding — none." too: all 77 rulings name a kind.
-NEXT: the founder runs the ₹0 reload (scratchpad a6d5db10 `d19-reload-pre-d20.sh`) so the database keeps the new
-  notes and Q55's anchor; 2021 M4's extract when he starts it; the topic lookup list before D37.
+Reloaded by the founder (₹0): pipeline/reports/2026-10-24-pyq-load-7.md is a first attempt that stopped before its
+  transaction (the SSO session had expired, nothing loaded); -8, -9 and -10 load 2025 code 45, 2024 S6 and 2023 G6
+  (founder 20 / 23 / 34, review 0, the bank 28 of 580 without an anchor). Read back from margai_d15: all 77 ruled
+  questions carry their grounding kind, S6 Q55's anchor holds §11.8.1 ¶5.
+NEXT: 2021 M4's extract when the founder starts it (scratchpad a6d5db10 `d19-extract-2021-m4.sh`), then Claude's
+  review; the topic lookup list before D37.
 
 D19 follow-up · 2026-10-24 (night, last) · Play answered; applicationId changed; R6's wait named
 The founder (DECISIONS 2026-10-24): the upload key is made on the Play-account day before the internal-testing upload,

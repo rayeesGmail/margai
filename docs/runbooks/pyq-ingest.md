@@ -82,7 +82,9 @@ AWS_PROFILE=margai DB_URL=… java -jar <jar> --spring.profiles.active=pipeline 
    DECISIONS 2026-10-20 and 2026-10-21; one the English column alone prints included, by SPEC §6.2 (the founder,
    2026-10-21). Whether the paper printed it: a wrong whole character in a JBIG2 or other lossy 1-bit scan is never
    evidence on its own, and only a lossless copy, a non-JBIG2 scan or the other language column can settle it (the
-   founder, same DECISIONS) — the other column settles it where it prints the same wrong character, and a non-JBIG2
+   founder, same DECISIONS) — the other column settles it where it prints the same wrong character (a Latin glyph in
+   the other column of the same JBIG2 page only where no substitution could have produced it; Claude's, DECISIONS
+   2026-10-24, for the founder to overrule), and a non-JBIG2
    scan is read as one that is not lossy 1-bit (Claude's readings, same DECISIONS, for the founder to overrule); a
    case nothing settles is read as
    meant, with no as-printed note, and listed in the review report as "cause unsettled", with no per-item ruling — it

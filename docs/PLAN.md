@@ -123,10 +123,11 @@ DLT registration is possible under the Udyam proprietorship (founder, 2026-10-01
   collective review and load, the primers beyond the top 50, the errata backfill). D48's consent proof also needs
   the parent-consent DLT template, still being drafted, approved by then; if it is not, the check moves with the
   proof to the next buffer after its approval that is not already committed, D60 at the latest, and D48 ticks on
-  the rest (for him to rule). Open for the founder: the internal-testing upload on the
-  Play-account day needs a release-signed bundle (Play refuses one signed with the debug key), so the upload key
-  would be made that day rather than at D66 as his answer has it; and that first upload fixes the applicationId for
-  good, while F21 holds `com.margai.app` until the trademark advice (F9, December).*
+  the rest (for him to rule).* *Answered 2026-10-24 (the founder; DECISIONS): the upload key is made on the
+  Play-account day, before the internal-testing upload, the keystore and its passwords outside the repo, backed up
+  in two places (F20), read from an untracked key.properties; and the upload does not wait for F21 — the
+  applicationId becomes `com.hauslalearning.app` now, F21 keeping only the display name.* *(Claude: Play refuses a
+  debug-signed bundle, hence the key that day; that first upload fixes the applicationId; the change is 3a5e680.)*
 
 ### PHASE 2 — Content pipeline v1 (Weeks 3–4, Days 13–24) — Module M3
 
@@ -601,9 +602,9 @@ tools; your reviews focus on output quality.)*
   *Amended 2026-10-19 (founder's calendar ruling, option (c); DECISIONS 2026-10-19; this day chosen by
   Claude, since it carries only the gate while D65 is ⚠): D74's Play work comes here — listing assets,
   data-safety form, and the upload to the **closed** testing track with TECH_PLAN §7.6's release signing key
-  and production API URL (TECH_PLAN §7.6 updated to match on 2026-10-24; the key is an upload key, made here before
-  the upload — the founder's OTP decision 7 and his answer of 2026-10-24, DECISIONS — unless the earlier
-  internal-testing upload of the floating phone-OTP item needs it first, open for him) — and the **closed test** opens: 12–15 adult testers the founder recruits
+  and production API URL (TECH_PLAN §7.6 updated to match on 2026-10-24; the key is an upload key, made on the
+  Play-account day before the first, internal-testing upload — the founder's answer of 2026-10-24, DECISIONS; that
+  the same key signs this upload is Claude's reading) — and the **closed test** opens: 12–15 adult testers the founder recruits
   personally, each under a written tester agreement (F16). It opens only once D59's crisis protocol passes
   every eval case and the founder has reviewed its copy (D64); it does not wait for the legal review (F9)
   or the slow-network test, which still block D79 — the closed test is not "the beta" of SPEC §6.6 and §3.1.

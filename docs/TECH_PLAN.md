@@ -1864,7 +1864,7 @@ amends the rule (§13.4).
 ### 5.9 Build flavours
 
 `--dart-define` for `API_BASE_URL`, `POSTHOG_KEY`, `RAZORPAY_KEY_ID`, `ENV`. Debug builds point at
-the emulator host; the D74 internal-track build (D66's closed-track build since DECISIONS 2026-10-19) points at the beta ALB. Release signing keys are
+the emulator host; the D74 internal-track build (D66's closed-track build since DECISIONS 2026-10-19) points at the beta ALB. *(Since DECISIONS 2026-10-24 the first upload to Play is an internal-testing upload on the Play-account day (TRACKER F14), made to read the app-signing certificate for the OTP hash; D66's closed-track build is still the one that points at the beta ALB — Claude's reading, for the founder to overrule.)* Release signing keys are
 human-held and never in the tree (`key.properties` is gitignored).
 
 ## 6. Content pipeline
@@ -2172,7 +2172,7 @@ IDs, prices, limits, flags and prompt versions never appear as code constants (`
 | D64 | export and deletion promises | exports prefix, purge job scheduled |
 | D70 | failure drills | backups, alarms, restore runbook |
 | D73 | dashboards | CloudWatch dashboard, PostHog project, AWS Budgets alarm *(for the AWS bill; the AI spend alarm is the ledger's, §10.4)* |
-| D74 | Play Store internal track — *moved to D66 and the closed track by the founder's calendar ruling (DECISIONS 2026-10-19)* | release signing key (human-held) — *an upload key, made at D66 before the upload (the founder's OTP decision 7 and his answer, DECISIONS 2026-10-24) — or on the Play-account day, if the internal-testing upload for the Play-key OTP template comes first (open for him)* — `--dart-define` production API URL |
+| D74 | Play Store internal track — *moved to D66 and the closed track by the founder's calendar ruling (DECISIONS 2026-10-19)* | release signing key (human-held) — *an upload key, made on the Play-account day before the first, internal-testing upload, the keystore and its passwords outside the repo and read from an untracked key.properties (the founder, DECISIONS 2026-10-24); the applicationId is `com.hauslalearning.app`* — `--dart-define` production API URL |
 
 ### 7.7 Beta cost estimate (monthly, order of magnitude)
 

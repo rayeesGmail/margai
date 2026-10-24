@@ -184,3 +184,13 @@ papers:
         gap: ZOO.11.STRUCTANI.INSECT — Morphology and anatomy of an insect (cockroach)
         ruled: 2026-10-23
         note: In syllabus with no NCERT anchor — the cockroach's digestive system, as Q179; the current NCERT names its Malpighian tubules only in passing (bio11 ch 16).
+  - code: neet-2023-g6
+    approved_file_sha256: 75aeca06723d19384bc6119f90d1835630eb1d1a49bb00f4b2a025665b68872c   # 14c890a, the founder's approval
+    rulings:
+      - question: 66
+        primary: CHE.12.DFBLOCK.PROPS
+        secondary: [CHE.12.KINET.RATE]
+        out_of_syllabus: false
+        anchor: chem12-part1 ch 4 §4.3.12 ¶1 (catalysts at a solid surface; finely divided iron in Haber's process); chem12-part1 ch 3 §3.4.1 ¶1 (what a catalyst is)
+        ruled: 2026-10-24
+        note: In syllabus — the d-block's catalytic behaviour (the NMC syllabus's "catalytic property"); NCERT teaches a solid catalyst with Haber's iron, though not the words homogeneous and heterogeneous catalysis, which were the earlier edition's Surface Chemistry.

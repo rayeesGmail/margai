@@ -99,7 +99,8 @@ AWS_PROFILE=margai DB_URL=… java -jar <jar> --spring.profiles.active=pipeline 
    answer, a number, a unit, a sign or a formula and the Hindi column, the second official copy and D20's
    solve-vs-key check together still cannot settle it; the founder, same DECISIONS) is recorded with a one-line description of the intended reading, which the
    app can show as an "as printed in the original paper" note (the founder, 2026-10-21; PLAN D31, D40) — as an
-   `as_printed` entry of its question: the field (`stem` or `option:N`), the span as printed (no more than the wrong
+   `as_printed` entry of its question: the field (`stem` or `option:N`, or, for a misprint drawn in a figure,
+   `figure:stem` or `figure:option:N`, the figure's description — the founder, 2026-10-24), the span as printed (no more than the wrong
    word or sign and what it needs to name its place), the intended reading, and the note (Claude's shape, DECISIONS
    2026-10-21). The review assigns every kept misprint its display class (the founder, 2026-10-21): `show` for one
    that could change how a student reads the question — a wrong unit, symbol, number, sign or formula, or a

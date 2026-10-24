@@ -26,11 +26,21 @@ and never memory of the paper.
    - A unit's μ is the character (μF, μC, μA). Other Greek letters go by name (alpha, lambda, nu, epsilon_0),
      including a glyph the page sets for a Greek letter (∈ for ε). A variable the stem defines keeps its printed
      glyph by name, whatever letter that is (ϑ as `theta`; the founder, 2026-10-24).
+   - **Dimensions, units, quotes and grids** (the founder, 2026-10-24, approving 2021 M4's review):
+     - A dimension's power is written as the corpus writes dimensional formulae, unbracketed: `[M L T^-2]`, `[T^-1]`.
+     - A unit is written exactly as printed: "ms^-1" printed run together stays so, with no note. A space after a
+       unit's exponent only ends the superscript (`JK^-1 mol^-1`; Claude's reading of the same rule, for the founder
+       to overrule).
+     - Quotes and apostrophes are straight (`'`, `"`).
+     - An answer grid printed under (a) (b) (c) (d) is written as pairs: `(a)-(iv), (b)-(i), (c)-(iii), (d)-(ii)`.
 2. **Figures** are described as drawn: what kind each is, and every label, value and unit printed in it.
    - Never describe what a figure implies, or name what the question asks the student to work out ("a D-shaped gate
      with an output bubble", not "a NAND gate", where the question turns on the gates).
    - Check every description against its drawing: each label, value, arrow direction, sign and polarity, and which
      item is where.
+   - A misprint drawn in a figure, such as a wrong sign or a missing bracket in a formula, is described as drawn and
+     reported like any misprint. The reviewer notes it on the figure: "a wrong formula in a figure teaches the wrong
+     formula as much as one in an option" (the founder, 2026-10-24).
 3. **Tables** are Markdown tables, row by row, as printed.
 
 ## How to read a damaged scan
@@ -52,7 +62,8 @@ and never memory of the paper.
   meant. A missing letter at the end of a line, where spacing cannot show a gap, is not settled this way.
 - **Words printed run together with no spaces** are a typesetting fault, not content. This includes a single missing
   space between two words. The text shows them normally spaced, and the printed form is kept in a record-only note
-  (the founder, 2026-10-24; SPEC §6.2). Report the run-together form.
+  (the founder, 2026-10-24; SPEC §6.2). Report the run-together form. An abbreviation's full stop with no space
+  after it ("E.coli") is not words run together: it is kept as printed, with no note (the founder, 2026-10-24).
 - **A word NCERT itself spells so** is not a misprint. A word NCERT spells two ways is held to the right one. Report
   it with the NCERT spelling you know, and the reviewer checks the corpus.
 - **Cause unsettled.** These are read as meant:

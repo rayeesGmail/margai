@@ -107,7 +107,7 @@ papers:
         out_of_syllabus: false
         anchor: pending
         ruled: 2026-10-23
-        note: Not yet in the corpus — the vitamins' deficiency diseases are only in Table 10.3 (chem12-part2 ch 10), which §10.4.1 ¶4 cites.
+        note: Not yet in the corpus — the vitamins' deficiency diseases are only in Table 10.3 (chem12-part2 ch 10), which §10.4.1 ¶4 cites. Grounding — stated, once Table 10.3 is in.
       - question: 77
         primary: CHE.11.HYDROC
         secondary: [CHE.12.ALCPHE.PHENOLS]
@@ -122,7 +122,7 @@ papers:
         anchor: chem12-part2 ch 8 §8.2.2 ¶4 (preparation of aldehydes — "esters are also reduced to aldehydes with DIBAL-H")
         gap: CHE.12.CARBONYL.PREP — Preparation of aldehydes, ketones and carboxylic acids
         ruled: 2026-10-22
-        note: 40-sample correction — the question tests the preparation of an aldehyde from an ester, not oxidation and reduction (REDOX); the taxonomy has no preparation topic, so the chapter, without the chapter-level secondary, and a gap.
+        note: 40-sample correction — the question tests the preparation of an aldehyde from an ester, not oxidation and reduction (REDOX); the taxonomy has no preparation topic, so the chapter, without the chapter-level secondary, and a gap. Grounding — stated.
       - question: 87
         primary: CHE.11.BOND
         secondary: [CHE.11.BOND.COVALENT, CHE.11.BOND.VSEPR]
@@ -136,34 +136,34 @@ papers:
         out_of_syllabus: false
         anchor: chem11-part2 ch 8 §8.9.2 ¶1 (Lassaigne's test)
         ruled: 2026-10-22
-        note: 40-sample correction — the primary kept; CHE.00.PRACTICAL.ELEMENTS dropped as a duplicate of the primary, CHE.11.GOCTECH.QUANTIT the only secondary.
+        note: 40-sample correction — the primary kept; CHE.00.PRACTICAL.ELEMENTS dropped as a duplicate of the primary, CHE.11.GOCTECH.QUANTIT the only secondary. Grounding — stated.
       - question: 95
         primary: BOT.11.CELL
         out_of_syllabus: false
         anchor: pending
         gap: BOT.11.CELL.OPENER — Unit opening, the physico-chemical (reductionist) approach to living organisms
         ruled: 2026-10-23
-        note: Not out of syllabus — NTA set it under the 2025 syllabus, from NCERT's introductory text on reductionist biology; not yet in the corpus — bio11 Unit 3's opening essay, printed with chapter 8 (kebo108.pdf p1), comes in at D24.
+        note: Not out of syllabus — NTA set it under the 2025 syllabus, from NCERT's introductory text on reductionist biology; not yet in the corpus — bio11 Unit 3's opening essay, printed with chapter 8 (kebo108.pdf p1), comes in at D24. Grounding — stated, once the unit opening is in.
       - question: 101
         primary: ZOO.11.BREATH.DISORDER
         secondary: [ZOO.11.EXCRET.DISORDER, ZOO.11.CIRC.DISORDER]
         out_of_syllabus: false
         anchor: bio11 ch 14 §14.6 ¶2 (emphysema); ch 15 §15.6 ¶3 (angina pectoris); ch 16 §16.8 ¶4 (glomerulonephritis); ch 17 §17.5 ¶3 (tetany)
         ruled: 2026-10-22
-        note: Approved as tagged — four disorders across four chapters, a tag holding three codes, so ZOO.11.LOCOMOT.DISORDER is left out.
+        note: Approved as tagged — four disorders across four chapters, a tag holding three codes, so ZOO.11.LOCOMOT.DISORDER is left out. Grounding — stated.
       - question: 115
         primary: BOT.12.BIOTECHP.TOOLS
         out_of_syllabus: false
         anchor: bio12 ch 9 §9.2.2 ¶6 (Cloning Vectors — insertional inactivation, blue and white colonies)
         ruled: 2026-10-22
-        note: NCERT teaches insertional inactivation under 9.2 Tools (Cloning Vectors), not 9.3 Processes; one idea, no secondary.
+        note: NCERT teaches insertional inactivation under 9.2 Tools (Cloning Vectors), not 9.3 Processes; one idea, no secondary. Grounding — stated.
       - question: 133
         primary: BOT.12.ORGPOP
         out_of_syllabus: false
         anchor: pending
         gap: BOT.12.ORGPOP.OPENER — Unit opening, Ramdeo Misra and ecology in India
         ruled: 2026-10-23
-        note: Not out of syllabus — NTA set it under the 2025 syllabus, from the Ramdeo Misra profile box in the Ecology unit; not yet in the corpus — bio12's Ecology unit opening, printed with chapter 11 (lebo111.pdf p2), comes in at D24.
+        note: Not out of syllabus — NTA set it under the 2025 syllabus, from the Ramdeo Misra profile box in the Ecology unit; not yet in the corpus — bio12's Ecology unit opening, printed with chapter 11 (lebo111.pdf p2), comes in at D24. Grounding — stated, once the unit opening is in.
   - code: neet-2024-s6
     approved_file_sha256: 6a064676197a084e3866c514b186460dc01a3d46799450b27fc097554ef326bb   # 69ead53, the founder's approval
     rulings:
@@ -172,7 +172,7 @@ papers:
         out_of_syllabus: false
         anchor: chem11-part1 ch 2 §2.3.3 ¶9, ¶10
         ruled: 2026-10-23
-        note: Cross-subject anchor — the Rydberg formula and the hydrogen series are taught in current Chemistry (chem11-part1 §2.3.3), not in current Physics.
+        note: Cross-subject anchor — the Rydberg formula and the hydrogen series are taught in current Chemistry (chem11-part1 §2.3.3), not in current Physics. Grounding — derived.
       - question: 4
         primary: PHY.12.WAVOPT.POLAR
         out_of_syllabus: false
@@ -229,7 +229,7 @@ papers:
         out_of_syllabus: false
         anchor: phy11-part2 ch 11 §11.8.4 ¶1, §11.8.5 ¶1, ¶2
         ruled: 2026-10-23
-        note: Cross-subject anchor — isochoric and isobaric processes are taught in current Physics (phy11-part2 §11.8.4–11.8.5), not in current Chemistry.
+        note: Cross-subject anchor — isochoric and isobaric processes are taught in current Physics (phy11-part2 §11.8.4–11.8.5), not in current Chemistry. Grounding — stated.
       - question: 58
         primary: CHE.00.PBLOCK.CONFIG
         secondary: [CHE.11.PERIOD.VALENCE]
@@ -243,7 +243,7 @@ papers:
         anchor: chem12-part2 ch 8 §8.2.1 ¶1 (ketones by oxidising secondary alcohols), §8.2.1 ¶3 (ozonolysis of alkenes), §8.2.3 ¶3 (Friedel-Crafts acylation), §8.7 ¶4 (aromatic acids from alkylbenzenes with KMnO_4)
         gap: CHE.12.CARBONYL.PREP — Preparation of aldehydes, ketones and carboxylic acids
         ruled: 2026-10-22
-        note: Review list (0.4) — all four reactions are preparations the carbonyl chapter teaches, which has no preparation topic, so the chapter and the gap code 45's Q83 opened, widened to carboxylic acids.
+        note: Review list (0.4) — all four reactions are preparations the carbonyl chapter teaches, which has no preparation topic, so the chapter and the gap code 45's Q83 opened, widened to carboxylic acids. Grounding — stated.
       - question: 93
         primary: CHE.00.PRACTICAL.SALTANAL
         out_of_syllabus: false
@@ -268,7 +268,7 @@ papers:
         out_of_syllabus: false
         anchor: bio12 ch 10 §10.1 ¶4 ("This capacity to generate a whole plant from any cell/explant is called totipotency")
         ruled: 2026-10-22
-        note: The current NCERT teaches totipotency with tissue culture in Biotechnology and its Applications, not in Plant Growth; three of the four options are tissue-culture terms.
+        note: The current NCERT teaches totipotency with tissue culture in Biotechnology and its Applications, not in Plant Growth; three of the four options are tissue-culture terms. Grounding — stated.
       - question: 126
         primary: BOT.12.BIODIV.CONSERV
         out_of_syllabus: false
@@ -280,7 +280,7 @@ papers:
         out_of_syllabus: false
         anchor: bio12 ch 10 §10.1 ¶6 (protoplasts of two varieties fused into somatic hybrids)
         ruled: 2026-10-22
-        note: In syllabus — the current NCERT teaches somatic hybridisation with tissue culture in Biotechnology and its Applications; the tagger's BIOTECHP tag and its out-of-syllabus flag replaced.
+        note: In syllabus — the current NCERT teaches somatic hybridisation with tissue culture in Biotechnology and its Applications; the tagger's BIOTECHP tag and its out-of-syllabus flag replaced. Grounding — stated.
       - question: 179
         primary: ZOO.11.STRUCTANI
         out_of_syllabus: false
@@ -294,7 +294,7 @@ papers:
         out_of_syllabus: false
         anchor: pending
         ruled: 2026-10-23
-        note: "Refined for anchor precision: the five statements are the rows of NCERT's chordate/non-chordate comparison (Table 4.1); the tagger's basis-of-classification tag was defensible."
+        note: "Refined for anchor precision: the five statements are the rows of NCERT's chordate/non-chordate comparison (Table 4.1); the tagger's basis-of-classification tag was defensible. Grounding — stated, once Table 4.1 is in."
       - question: 190
         primary: ZOO.11.STRUCTANI.TISSUES
         out_of_syllabus: false

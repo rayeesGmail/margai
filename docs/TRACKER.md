@@ -214,9 +214,10 @@ Reloaded by the founder (scratchpad a6d5db10 `d19-reload-pre-d20.sh`, ₹0): pip
   `none` 11, `pending` 4) and -6.md (2023 G6: 200, founder 34, review 0, out of syllabus 20, `none` 12, `pending` 2);
   the bank 28 of 580 without an anchor. Claude read the rows back from margai_d15: the same counts, G6 Q169 under
   ZOO.11.EXCRET.OTHERS, Q147 and Q198 out of syllabus, each ruled note's grounding kind stored.
-NEXT: Claude gives the 18 earlier rulings with an anchor or `pending` their grounding kinds (only elimination or
-  caveated ones to the founder, the rest committed); 2021 M4's extract when he starts it; the topic lookup list
-  before D37.
+The 18 earlier rulings' grounding kinds (DECISIONS 2026-10-24): 13 stated or derived, committed in their notes;
+  5 to the founder — 2025 Q66, Q77; 2024 S6 Q52, Q193; 2023 G6 Q66 (elimination, a plain word or a material caveat).
+NEXT: the founder rules the five; 2021 M4's extract when he starts it; the topic lookup list before D37; the next
+  ₹0 reload stores the 13 new kinds in the notes the database keeps.
 
 D19 follow-up · 2026-10-24 (night, last) · Play answered; applicationId changed; R6's wait named
 The founder (DECISIONS 2026-10-24): the upload key is made on the Play-account day before the internal-testing upload,

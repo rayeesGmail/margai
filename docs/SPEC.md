@@ -512,6 +512,8 @@ misprint in it could change how a student reads the question — a wrong unit, s
 misspelling that forms a different real word — one line under the question says it is as printed in the original
 paper and gives the intended reading, wherever the question appears, before and after answering, and never hinting
 at the answer. A pure spelling or grammar slip a student reads correctly is kept as printed, without that line.
+Words the paper runs together with no space between them are a typesetting fault, not a slip: they are shown with
+normal spacing, and the printed form is kept only on record.
 
 **Timing and skip-strategy drills (CS-4 §5.2):** short drills that train exam temperament —
 pacing against the clock, deciding when to skip, negative-marking discipline — built from
